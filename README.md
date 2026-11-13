@@ -39,6 +39,18 @@ Después: `python3 scripts/build_data.py` y recargar.
 
 ## Publicar en GitHub Pages
 
+Sitio: https://ezequielrickert.github.io/austral-ia-generativa/
+
+```sh
+./scripts/publish.sh   # construye y sube el sitio a la rama gh-pages
+```
+
+Pages está configurado para servir la rama `gh-pages`. El workflow de Actions (`.github/workflows/deploy.yml`)
+falla mientras la cuenta tenga Actions bloqueado por facturación; cuando se resuelva, se puede cambiar
+*Settings → Pages* a **GitHub Actions** y dejar de usar el script.
+
+### Alternativa con GitHub Actions
+
 1. Crear un repositorio y subir esta carpeta a la rama `main`.
 2. En *Settings → Pages*, elegir **GitHub Actions** como fuente.
 3. El workflow `.github/workflows/deploy.yml` construye y publica en cada push.
