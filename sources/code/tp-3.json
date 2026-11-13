@@ -1,0 +1,813 @@
+{
+ "snippets": [
+  {
+   "id": "fragmento-con-metadatos",
+   "titulo": "Fragmento literal y texto con metadatos para embeber",
+   "archivo": "hospital/rag/chunking.py",
+   "desde": 23,
+   "hasta": 34,
+   "lenguaje": "python",
+   "codigo": "@dataclass(frozen=True)\nclass Fragmento:\n    texto: str\n    doc: str\n    titulo: str\n    seccion: str\n\n    def para_embedding(self, metadatos=False):\n        if not metadatos:\n            return self.texto\n        encabezado = f\"{self.titulo} > {self.seccion}\" if self.seccion else self.titulo\n        return f\"{encabezado}: {self.texto}\"",
+   "que_hace": "Define la unidad que maneja todo el RAG: un fragmento con su texto literal, el documento, el título y la sección. Sabe armar el texto que se va a embeber, con o sin «Título > Sección» adelante.",
+   "como_funciona": "- `Fragmento` es un dataclass inmutable con `texto`, `doc`, `titulo` y `seccion`.\n- `para_embedding(metadatos=False)` devuelve el `texto` tal cual.\n- Con `metadatos=True` arma `encabezado = \"{titulo} > {seccion}\"` (o solo el título si es la intro) y devuelve `\"{encabezado}: {texto}\"`.\n- Lo que se devuelve al evaluador sigue siendo `f.texto`; el encabezado solo cambia el vector.",
+   "proposito": "El evaluador busca la evidencia como substring, así que el fragmento no se puede reescribir. Separar «texto devuelto» de «texto embebido» permite sumar el tema de la sección al vector sin romper esa regla: subió e5-base de 0,85 a 1,00 con k = 1.",
+   "interaccion": "Lo construye `fragmentar()` en el mismo archivo; `Recuperador.__init__` llama a `para_embedding(metadatos)` para cada fragmento y `documentos.buscar_documentos` usa `titulo` y `seccion` para escribir la fuente `[Documento > Sección]`.",
+   "teoria": "Metadatos en RAG: acá no se usan para filtrar antes de buscar sino como texto buscable que enriquece el embedding del fragmento."
+  },
+  {
+   "id": "chunking-por-seccion",
+   "titulo": "Cortar el Markdown por secciones ##",
+   "archivo": "hospital/rag/chunking.py",
+   "desde": 41,
+   "hasta": 53,
+   "lenguaje": "python",
+   "codigo": "def _secciones(doc):\n    \"\"\"(nombre_de_seccion, texto) por cada bloque entre encabezados; la intro va con seccion ''.\"\"\"\n    bloques, seccion, lineas = [], \"\", []\n    for linea in doc.texto.splitlines():\n        if linea.startswith(\"## \"):\n            bloques.append((seccion, \"\\n\".join(lineas)))\n            seccion, lineas = linea[3:].strip(), []\n        elif linea.startswith(\"# \"):\n            continue\n        else:\n            lineas.append(linea)\n    bloques.append((seccion, \"\\n\".join(lineas)))\n    return [(s, t.strip()) for s, t in bloques if t.strip()]",
+   "que_hace": "Parte cada documento del corpus en bloques, uno por encabezado `##`, guardando el nombre de la sección. La introducción antes del primer `##` queda como sección vacía.",
+   "como_funciona": "- Recorre `doc.texto.splitlines()` acumulando líneas en `lineas`.\n- Al ver `## ` cierra el bloque anterior en `bloques` y arranca uno nuevo con `seccion = linea[3:]`.\n- Saltea la línea del título `# ` (va aparte, en `Documento.titulo`).\n- Al final descarta los bloques vacíos y devuelve `[(seccion, texto)]`.",
+   "proposito": "Es el chunking estructural: respeta la jerarquía del documento. Ganó porque las secciones del corpus son cortas (223 caracteres de media) y cada una habla de un solo tema; además le da al agente fragmentos completos.",
+   "interaccion": "Lo llama `fragmentar()` para todas las estrategias: incluso párrafo, oración y ventana trabajan dentro de cada sección, así ningún fragmento cruza dos secciones.",
+   "teoria": "Chunking estructural: cortar por la estructura del documento (títulos) en vez de por longitud fija."
+  },
+  {
+   "id": "chunking-estrategias",
+   "titulo": "Las cuatro estrategias de chunking comparadas",
+   "archivo": "hospital/rag/chunking.py",
+   "desde": 56,
+   "hasta": 93,
+   "lenguaje": "python",
+   "codigo": "def _parrafos(texto):\n    return [p.strip() for p in re.split(r\"\\n\\s*\\n\", texto) if p.strip()]\n\n\ndef _oraciones(parrafo):\n    partes = []\n    for linea in parrafo.splitlines():  # los items de una lista son oraciones sueltas\n        partes += re.split(r\"(?<=[.!?])\\s+(?=[^\\sa-z])\", linea.strip())\n    return [p for p in partes if p]\n\n\ndef _ventanas(texto, palabras, solapamiento):\n    spans = [m.span() for m in re.finditer(r\"\\S+\", texto)]\n    paso = palabras - solapamiento\n    for i in range(0, len(spans), paso):\n        grupo = spans[i:i + palabras]\n        yield texto[grupo[0][0]:grupo[-1][1]]\n        if i + palabras >= len(spans):\n            break\n\n\ndef fragmentar(docs, estrategia, palabras=60, solapamiento=15):\n    \"\"\"estrategia: 'seccion' | 'parrafo' | 'oracion' | 'ventana' (usa palabras y solapamiento).\"\"\"\n    frags = []\n    for doc in docs:\n        for seccion, texto in _secciones(doc):\n            if estrategia == \"seccion\":\n                piezas = [texto]\n            elif estrategia == \"parrafo\":\n                piezas = _parrafos(texto)\n            elif estrategia == \"oracion\":\n                piezas = [o for p in _parrafos(texto) for o in _oraciones(p)]\n            elif estrategia == \"ventana\":\n                piezas = list(_ventanas(texto, palabras, solapamiento))\n            else:\n                raise ValueError(f\"estrategia desconocida: {estrategia}\")\n            frags += [Fragmento(p, doc.nombre, doc.titulo, seccion) for p in piezas]\n    return frags",
+   "que_hace": "Implementa las estrategias que se compararon en la grilla: sección entera, párrafo, oración y ventana de N palabras con solapamiento.",
+   "como_funciona": "- `_parrafos` corta por líneas en blanco; `_oraciones` corta tras `.`, `!` o `?` seguidos de mayúscula (cada ítem de lista es una oración).\n- `_ventanas` toma los `spans` de cada palabra y avanza de a `paso = palabras - solapamiento`, recortando el texto original entre el primer y el último span (así sigue siendo literal).\n- `fragmentar(docs, estrategia, palabras, solapamiento)` aplica la estrategia dentro de cada sección y crea un `Fragmento` por pieza.",
+   "proposito": "Medir en palabras (no tokens) y recortar con spans mantiene cada fragmento como substring exacto del corpus. Se probaron ventanas de 40/10 y 80/20; tamaños de 800–1000 caracteres se descartaron porque mezclarían 4 o 5 secciones.",
+   "interaccion": "Lo usan `Recuperador.__init__` y `experimentos/correr_recuperacion.py` (diccionario `CHUNKINGS`). La configuración entregada fija `\"estrategia\": \"seccion\"` en `hospital/rag/config.json`.",
+   "teoria": "Las tres familias de chunking de la clase: longitud fija con solapamiento, semántico (párrafo/oración) y estructural."
+  },
+  {
+   "id": "encoder-bert-promedio",
+   "titulo": "Línea de base: BERT sin ajustar, promedio de tokens",
+   "archivo": "hospital/rag/encoders.py",
+   "desde": 9,
+   "hasta": 37,
+   "lenguaje": "python",
+   "codigo": "def _normalizar(m):\n    return m / np.linalg.norm(m, axis=1, keepdims=True).clip(min=1e-12)\n\n\nclass BertPromedio:\n    \"\"\"Linea de base obligatoria: BERT sin ajustar para similitud, embedding = promedio de los\n    vectores de la ultima capa sobre los tokens reales (se ignora el padding).\"\"\"\n\n    def __init__(self, modelo=\"google-bert/bert-base-multilingual-cased\", lote=16):\n        from transformers import AutoModel, AutoTokenizer\n\n        self.nombre, self.lote = modelo, lote\n        self.tokenizer = AutoTokenizer.from_pretrained(modelo)\n        self.modelo = AutoModel.from_pretrained(modelo).eval()\n\n    def _codificar(self, textos):\n        import torch\n\n        salidas = []\n        with torch.no_grad():\n            for i in range(0, len(textos), self.lote):\n                enc = self.tokenizer(textos[i:i + self.lote], padding=True, truncation=True,\n                                     max_length=512, return_tensors=\"pt\")\n                h = self.modelo(**enc).last_hidden_state\n                m = enc[\"attention_mask\"].unsqueeze(-1).float()\n                salidas.append(((h * m).sum(1) / m.sum(1)).numpy())\n        return _normalizar(np.concatenate(salidas))\n\n    codificar_consultas = codificar_pasajes = _codificar",
+   "que_hace": "Calcula el embedding de un texto como el promedio de los vectores de la última capa de BERT multilingüe, ignorando el padding, y lo normaliza a norma 1.",
+   "como_funciona": "- `_normalizar` divide cada fila por su norma L2.\n- `BertPromedio._codificar` tokeniza en lotes de 16 (`padding=True`, `max_length=512`).\n- Toma `last_hidden_state` (`h`) y la `attention_mask` (`m`) y calcula `(h * m).sum(1) / m.sum(1)`: promedio solo de tokens reales.\n- Consultas y pasajes usan la misma función (`codificar_consultas = codificar_pasajes = _codificar`).",
+   "proposito": "Es la línea de base obligatoria de la consigna. Sirve para mostrar que un encoder no entrenado para similitud no alcanza: sacó CR 0,350 (igual que el recuperador léxico ingenuo) y el fragmento correcto quedaba apenas a z = 1,56 del promedio.",
+   "interaccion": "Lo crea `crear_encoder({\"tipo\": \"bert_promedio\"})`, usado desde `experimentos/correr_recuperacion.py` (clave `bert` de `ENCODERS`). La matriz que devuelve alimenta `Recuperador.matriz`.",
+   "teoria": "Embedding de oración por promedio de tokens: promediar vectores contextuales pierde el orden y BERT no fue entrenado para que el coseno mida significado."
+  },
+  {
+   "id": "encoder-e5-prefijos",
+   "titulo": "Encoder de oraciones con prefijos query/passage",
+   "archivo": "hospital/rag/encoders.py",
+   "desde": 40,
+   "hasta": 68,
+   "lenguaje": "python",
+   "codigo": "class SentenceTransformerEncoder:\n    \"\"\"Modelos entrenados para embeddings de oraciones (MiniLM, e5, bge-m3). Los e5 piden prefijos.\"\"\"\n\n    def __init__(self, modelo, prefijo_consulta=\"\", prefijo_pasaje=\"\", lote=16):\n        from sentence_transformers import SentenceTransformer\n\n        self.nombre, self.lote = modelo, lote\n        self.prefijo_consulta, self.prefijo_pasaje = prefijo_consulta, prefijo_pasaje\n        self.modelo = SentenceTransformer(modelo, device=\"cpu\")\n\n    def _codificar(self, textos, prefijo):\n        m = self.modelo.encode([prefijo + t for t in textos], batch_size=self.lote,\n                               normalize_embeddings=True, show_progress_bar=False)\n        return np.asarray(m, dtype=np.float32)\n\n    def codificar_consultas(self, textos):\n        return self._codificar(textos, self.prefijo_consulta)\n\n    def codificar_pasajes(self, textos):\n        return self._codificar(textos, self.prefijo_pasaje)\n\n\ndef crear_encoder(cfg):\n    \"\"\"cfg: {\"tipo\": \"bert_promedio\" | \"sentence_transformer\", \"modelo\": ..., \"prefijo_consulta\": ..., \"prefijo_pasaje\": ...}\"\"\"\n    if cfg[\"tipo\"] == \"bert_promedio\":\n        return BertPromedio(cfg[\"modelo\"])\n    if cfg[\"tipo\"] == \"sentence_transformer\":\n        return SentenceTransformerEncoder(cfg[\"modelo\"], cfg.get(\"prefijo_consulta\", \"\"), cfg.get(\"prefijo_pasaje\", \"\"))\n    raise ValueError(f\"tipo de encoder desconocido: {cfg['tipo']}\")",
+   "que_hace": "Envuelve modelos de `sentence-transformers` (MiniLM, e5, bge-m3) con la misma interfaz que BERT y agrega los prefijos que piden los e5. `crear_encoder` elige la clase según la configuración.",
+   "como_funciona": "- `SentenceTransformerEncoder` guarda `prefijo_consulta` y `prefijo_pasaje`.\n- `_codificar(textos, prefijo)` antepone el prefijo a cada texto y llama a `self.modelo.encode(..., normalize_embeddings=True)`.\n- `codificar_consultas` usa el prefijo de consulta (`\"query: \"`) y `codificar_pasajes` el de pasaje (`\"passage: \"`).\n- `crear_encoder(cfg)` despacha por `cfg[\"tipo\"]`.",
+   "proposito": "e5 fue entrenado de forma contrastiva con pares consulta–pasaje y espera esos prefijos; sin ellos se pierde la asimetría pregunta/documento. Ganó e5-base: separó el fragmento correcto a z = 3,94 contra 3,07 de MiniLM (entrenado para paráfrasis).",
+   "interaccion": "`Recuperador.desde_config` lo crea a partir de `config.json` (`intfloat/multilingual-e5-base`, `query: ` / `passage: `). `Recuperador._puntuar` llama a `codificar_consultas` y `_embeddings` a `codificar_pasajes`.",
+   "teoria": "Embeddings de oración entrenados con aprendizaje contrastivo (como CLIP pero texto–texto): consulta y pasaje relevantes quedan cerca en el espacio."
+  },
+  {
+   "id": "recuperador-coseno-exacto",
+   "titulo": "Búsqueda exacta por coseno (y reranker opcional)",
+   "archivo": "hospital/rag/recuperador.py",
+   "desde": 51,
+   "hasta": 74,
+   "lenguaje": "python",
+   "codigo": "    def _puntuar(self, consulta):\n        \"\"\"[(Fragmento, score)] de todos los fragmentos (o de los candidatos rerankeados), de mayor a menor.\"\"\"\n        q = self.encoder.codificar_consultas([consulta])[0]\n        scores = self.matriz @ q\n        orden = np.argsort(-scores)\n        if self.reranker is None:\n            return [(self.fragmentos[i], float(scores[i])) for i in orden]\n        cand = orden[:self.candidatos]\n        pares = [(consulta, self.fragmentos[i].para_embedding(self.metadatos)) for i in cand]\n        re_scores = self.reranker.predict(pares, show_progress_bar=False)\n        return sorted(((self.fragmentos[i], float(s)) for i, s in zip(cand, re_scores)), key=lambda x: -x[1])\n\n    def puntuar(self, consulta):\n        \"\"\"[(texto, score)] de mayor a menor.\"\"\"\n        return [(f.texto, s) for f, s in self._puntuar(consulta)]\n\n    def buscar_fragmentos(self, consulta, **seleccion):\n        \"\"\"Los Fragmento elegidos (texto literal + documento, título y sección). top_k, umbral y margen se\n        pueden pisar por llamada; si no, se usan los de la configuración.\"\"\"\n        s = {\"top_k\": self.top_k, \"umbral\": self.umbral, \"margen\": self.margen, **seleccion}\n        return seleccionar(self._puntuar(consulta), s[\"top_k\"], s[\"umbral\"], s[\"margen\"])\n\n    def buscar(self, consulta):\n        return [f.texto for f in self.buscar_fragmentos(consulta)]",
+   "que_hace": "Puntúa todos los fragmentos contra la consulta con un producto matricial y los ordena; si hay cross-encoder configurado, rerankea los mejores candidatos.",
+   "como_funciona": "- `q = self.encoder.codificar_consultas([consulta])[0]`: vector de la consulta, ya normalizado.\n- `scores = self.matriz @ q`: como todo tiene norma 1, cada producto punto es el coseno contra los 56 fragmentos.\n- `np.argsort(-scores)` ordena de mayor a menor.\n- Si `self.reranker` no es `None`, toma `orden[:self.candidatos]`, arma pares `(consulta, texto)` y los vuelve a ordenar con `reranker.predict`.\n- `buscar_fragmentos` aplica `seleccionar` con top-k/umbral/margen; `buscar` devuelve solo los textos.",
+   "proposito": "Con 56 secciones, comparar contra todas es instantáneo y exacto, así que no hizo falta un índice aproximado como HNSW. El reranker quedó soportado pero la entrega usa `reranker: null`: no mejoraba sobre e5-base con metadatos.",
+   "interaccion": "`recuperar.py` llama a `buscar()` por pregunta; `hospital/documentos.py` llama a `buscar_fragmentos()` para la tool `buscar_documentos`; `correr_recuperacion.py` usa `puntuar()` una vez por pregunta y prueba varios k/umbral/margen sobre el mismo ranking.",
+   "teoria": "Similitud coseno sobre vectores normalizados y búsqueda exacta (fuerza bruta); el cross-encoder como segunda etapa que lee consulta y pasaje juntos."
+  },
+  {
+   "id": "seleccion-topk-margen",
+   "titulo": "Top-k, umbral y margen relativo al mejor",
+   "archivo": "hospital/rag/recuperador.py",
+   "desde": 18,
+   "hasta": 25,
+   "lenguaje": "python",
+   "codigo": "def seleccionar(puntuados, top_k=3, umbral=None, margen=None):\n    \"\"\"puntuados: [(texto, score)] ordenado de mayor a menor. Siempre devuelve al menos el mejor.\"\"\"\n    if not puntuados:\n        return []\n    mejor = puntuados[0][1]\n    elegidos = [t for t, s in puntuados[:top_k]\n                if (umbral is None or s >= umbral) and (margen is None or s >= mejor - margen)]\n    return elegidos or [puntuados[0][0]]",
+   "que_hace": "Decide cuántos fragmentos devolver de la lista ya ordenada: corta en `top_k`, descarta los que no pasan un umbral absoluto o quedan lejos del mejor, y nunca devuelve vacío.",
+   "como_funciona": "- `mejor` es el puntaje del primero.\n- Recorre `puntuados[:top_k]` y se queda con los que cumplen `s >= umbral` (si hay umbral) y `s >= mejor - margen` (si hay margen).\n- Si ninguno pasa, devuelve igual el mejor (`[puntuados[0][0]]`).",
+   "proposito": "La métrica premia pocos fragmentos (cada uno de más baja la precisión a la mitad) pero castiga perder evidencia. Se eligió top-2 con margen 0,005: el segundo entra solo si está casi empatado con el primero (R01, R15). Un umbral absoluto de 0,88 se descartó porque los cosenos de e5 viven en una franja estrecha y depende del conjunto dev.",
+   "interaccion": "La llaman `Recuperador.buscar_fragmentos` (con los valores de `config.json`) y `correr_recuperacion.py` para cada combinación de `--k`, `--umbral` y `--margen`.",
+   "teoria": "Ajustes de producción del retriever: top-k y similitud mínima, acá con un corte relativo a cada pregunta en vez de uno absoluto."
+  },
+  {
+   "id": "recuperador-desde-config",
+   "titulo": "Recuperador armado desde la configuración ganadora",
+   "archivo": "hospital/rag/recuperador.py",
+   "desde": 76,
+   "hasta": 96,
+   "lenguaje": "python",
+   "codigo": "    @classmethod\n    def desde_config(cls, cfg):\n        \"\"\"cfg: dict o ruta a un JSON como hospital/rag/config.json.\"\"\"\n        if not isinstance(cfg, dict):\n            cfg = json.loads(Path(cfg).read_text(encoding=\"utf-8\"))\n        chunk = cfg.get(\"chunking\", {})\n        reranker = None\n        if cfg.get(\"reranker\"):\n            from sentence_transformers import CrossEncoder\n            reranker = CrossEncoder(cfg[\"reranker\"][\"modelo\"], device=\"cpu\")\n        return cls(cargar_corpus(RAIZ / cfg.get(\"corpus\", \"datos/corpus\")), crear_encoder(cfg[\"encoder\"]),\n                   estrategia=chunk.get(\"estrategia\", \"seccion\"), palabras=chunk.get(\"palabras\", 60),\n                   solapamiento=chunk.get(\"solapamiento\", 15), metadatos=cfg.get(\"metadatos\", False),\n                   top_k=cfg.get(\"top_k\", 3), umbral=cfg.get(\"umbral\"), margen=cfg.get(\"margen\"),\n                   reranker=reranker, candidatos=(cfg.get(\"reranker\") or {}).get(\"candidatos\", 20))\n\n\n@lru_cache(maxsize=1)\ndef obtener_recuperador(ruta=str(CONFIG)):\n    \"\"\"Instancia unica con la configuracion ganadora (la usan recuperar.py, el agente y el servidor MCP).\"\"\"\n    return Recuperador.desde_config(ruta)",
+   "que_hace": "Construye el recuperador leyendo `config.json` (encoder, chunking, metadatos, selección y reranker opcional) y expone una instancia única cacheada.",
+   "como_funciona": "- `desde_config` acepta un dict o una ruta y lee el JSON.\n- Si `cfg[\"reranker\"]` existe, carga un `CrossEncoder`; si es `null`, queda `None`.\n- Carga el corpus con `cargar_corpus`, crea el encoder con `crear_encoder` y pasa estrategia, metadatos, `top_k`, `umbral`, `margen`.\n- `obtener_recuperador` está decorado con `@lru_cache(maxsize=1)`: el modelo se carga una sola vez por proceso.",
+   "proposito": "La consigna pide que la configuración ganadora quede fija para que la cátedra corra `recuperar.py` sobre test. Centralizarla en un JSON evita que el agente y el script de la parte 1 diverjan, y el singleton evita recargar e5-base en cada llamada.",
+   "interaccion": "`recuperar.py`, `agente.py` (para precalentar) y `hospital/documentos.py` llaman a `obtener_recuperador()`; el docstring anticipa que también lo iba a usar el servidor MCP.",
+   "teoria": "Pipeline RAG completo (indexar, recuperar) parametrizado; el cross-encoder como etapa opcional que la entrega no activó."
+  },
+  {
+   "id": "informe-seleccion",
+   "titulo": "Cómo se eligió chunking, metadatos y top-k",
+   "archivo": "INFORME.md",
+   "desde": 16,
+   "hasta": 45,
+   "lenguaje": "markdown",
+   "codigo": "### Cómo se eligió\n\n1. **Encoders × chunking × metadatos × k ∈ {1, 3}** para los cuatro encoders (80 corridas). Cada pregunta dev tiene una\n   sola frase de evidencia, así que devolver un fragmento extra baja la precisión a la mitad: con k = 3 ningún encoder\n   pasa de 0,515. Por eso el ajuste fino se hizo con k chico.\n2. **Metadatos:** anteponer \"título del documento > sección\" al texto del embedding (el fragmento devuelto sigue siendo\n   literal) mejora a los cuatro encoders con chunking estructural y k = 1: BERT 0,25 → 0,35, MiniLM 0,70 → 0,90,\n   e5-small 0,80 → 0,95, e5-base 0,85 → 1,00. La única combinación donde empeora es BERT con longitud fija de 40 palabras\n   (0,30 → 0,20). Muchas secciones no nombran su tema (\"La unidad tiene dos franjas de visita…\"): el tema está en el encabezado.\n3. **Chunking.** Se probaron las tres estrategias de la clase:\n   - *Longitud fija con solapamiento*: ventanas de 40 palabras (solapamiento 10) y de 80 (solapamiento 20), sin cruzar\n     secciones. Se mide en palabras y no en tokens para que cada fragmento siga siendo texto literal del corpus.\n   - *Semántico*: un fragmento por párrafo y, como variante más fina, uno por oración.\n   - *Estructural*: un fragmento por sección `##` del Markdown (la introducción del documento es una sección más).\n\n   La estructural y la de longitud fija de 80 palabras empatan arriba. La semántica por oración es la peor para todos\n   los encoders: corta el contexto que el encoder necesita para reconocer el tema. Los tamaños de referencia de la\n   clase (800–1000 caracteres) no se probaron porque las secciones de este corpus miden 223 caracteres en promedio\n   (mediana 193): una ventana así juntaría cuatro o cinco temas distintos en cada fragmento. Se eligió la estructural porque respeta la jerarquía\n   del documento y da fragmentos completos (útil para el agente de la parte 2, p. ej. la preparación de la colonoscopía\n   entera).\n4. **Selección (top-k, umbral, margen):** con e5-base + chunking estructural + metadatos, k = 1 da 1,000 en dev. Pero en dos preguntas\n   el primer y el segundo fragmento están casi empatados (R01: diferencia de 0,001 en el coseno; R15: 0,003). En el\n   conjunto de test un empate así es casi una moneda al aire: con k = 1 un error vale 0, y devolver los dos vale 0,667.\n   Por eso se entrega **top-2 con margen 0,005**: el segundo fragmento se agrega solo si está a menos de 0,005 del\n   primero (k medio 1,10). Cuesta 0,033 en dev y protege los casos dudosos. Un umbral absoluto de 0,88 saca más en dev\n   (0,983), pero no cubre esos casos: agrega el segundo fragmento cuando los dos puntajes son altos, no cuando están\n   empatados, y en R01 (0,862) y R15 (0,816) el mejor ni siquiera llega a 0,88. Como los cosenos de e5 viven en una franja\n   estrecha (el mejor va de 0,82 a 0,91 según la pregunta), un umbral absoluto depende demasiado del conjunto dev; el\n   margen es relativo a cada pregunta.",
+   "que_hace": "Es la sección del INFORME que justifica, con números, el encoder, los metadatos, la estrategia de chunking y la selección top-2 con margen.",
+   "como_funciona": "1. Grilla de 80 corridas: con k = 3 ningún encoder pasa 0,515 porque hay una evidencia por pregunta.\n2. Metadatos: anteponer «título > sección» mejora a los cuatro encoders (e5-base 0,85 → 1,00 con k = 1).\n3. Chunking: estructural y ventana 80 empatan; por oración es la peor; 800–1000 caracteres no se probó (secciones de 223 de media).\n4. Selección: top-2 con margen 0,005 en vez de k = 1 o umbral 0,88, por los empates de R01 y R15.",
+   "proposito": "Deja por escrito las alternativas descartadas y por qué, que es lo que se defiende en el coloquio.",
+   "interaccion": "Resume los resultados de `experimentos/recuperacion/*.eval.json` (generados por `correr_recuperacion.py`) y explica los valores de `hospital/rag/config.json`.",
+   "teoria": "Tamaño de fragmento, solapamiento, metadatos y top-k como decisiones que ponen el techo de calidad del RAG."
+  },
+  {
+   "id": "informe-por-que-e5",
+   "titulo": "Por qué ganó e5-base (z del fragmento correcto)",
+   "archivo": "INFORME.md",
+   "desde": 47,
+   "hasta": 66,
+   "lenguaje": "markdown",
+   "codigo": "### Por qué ganó e5-base\n\n| Encoder | Mejor CR | CR medio con k = 1 (10 configs) | Coseno medio entre fragmentos | z del fragmento correcto |\n|---|---|---|---|---|\n| BERT multilingüe (promedio) | 0,350 | 0,27 | 0,786 | 1,56 |\n| paraphrase-multilingual-MiniLM-L12-v2 | 0,950 | 0,76 | 0,365 | 3,07 |\n| multilingual-e5-small | 0,950 | 0,80 | 0,842 | 3,94 |\n| **multilingual-e5-base** | **1,000** | **0,85** | 0,830 | 3,94 |\n\n*z del fragmento correcto*: cuántos desvíos estándar está el coseno del fragmento con la evidencia por encima del\npromedio de todos los fragmentos para esa pregunta (secciones con metadatos, promedio sobre las 20 preguntas).\n\n- BERT sin ajustar no fue entrenado para que el coseno mida similitud de significado: el promedio de sus tokens\n  refleja sobre todo la forma superficial del texto, y el fragmento correcto apenas se separa del resto (z = 1,56).\n- Que los vectores estén \"amontonados\" no es el problema en sí: e5 tiene cosenos medios tan altos como BERT (0,83),\n  pero fue entrenado con pares consulta–pasaje (por eso los prefijos `query:` / `passage:`), así que ordena bien dentro\n  de esa franja: el fragmento correcto queda a 3,94 desvíos. MiniLM está entrenado para paráfrasis entre oraciones, no\n  para preguntas contra pasajes, y separa menos (3,07).\n- e5-base y e5-small separan igual en promedio, pero e5-base acierta el primer lugar en más configuraciones (CR medio\n  0,85 contra 0,80) y es el único que llega a 1,00 con k = 1. Corre en CPU en pocos segundos para las 56 secciones.",
+   "que_hace": "Compara los cuatro encoders con el mejor CR, el CR medio con k = 1, el coseno medio entre fragmentos y cuántos desvíos queda el fragmento correcto sobre el promedio.",
+   "como_funciona": "- BERT promediado: CR 0,350 y z = 1,56; el coseno refleja forma superficial, no significado.\n- e5 tiene cosenos medios altos (0,83, «amontonados») pero ordena bien: z = 3,94, porque fue entrenado con pares consulta–pasaje.\n- MiniLM, entrenado para paráfrasis, separa menos (3,07).\n- e5-base gana a e5-small por acertar el primer lugar en más configuraciones.",
+   "proposito": "Explica la elección del encoder con una medida propia (z-score del fragmento correcto) en lugar de quedarse solo con el CR.",
+   "interaccion": "Se apoya en las corridas de `experimentos/recuperacion/` y en las clases `BertPromedio` y `SentenceTransformerEncoder` de `hospital/rag/encoders.py`.",
+   "teoria": "Encoder sin ajustar vs. encoder contrastivo: lo que importa no es la escala absoluta del coseno sino cómo ordena consultas contra pasajes."
+  },
+  {
+   "id": "consigna-metrica-cr",
+   "titulo": "La métrica de la parte 1 y el recuperador léxico ingenuo",
+   "archivo": "docs/mission.md",
+   "desde": 52,
+   "hasta": 62,
+   "lenguaje": "markdown",
+   "codigo": "**La métrica: Context Relevance.** Cada pregunta trae una o más frases de evidencia, textuales del corpus. El evaluador mide:\n\n- *recall*: qué parte de la evidencia aparece en los fragmentos devueltos;\n- *precision*: qué parte de los fragmentos devueltos contiene evidencia;\n- *context_relevance*: la media armónica de las dos, promediada sobre las preguntas. **Es el número a maximizar.**\n\n```bash\npython3 evaluar/evaluar.py recuperacion --preguntas datos/preguntas_recuperacion_dev.jsonl --resultados resultados.jsonl\n```\n\nLa métrica castiga los dos extremos: traer pocos fragmentos pierde evidencia, y traer muchos baja la precisión. Un recuperador léxico ingenuo, que devuelve los tres párrafos con más palabras en común, saca 0,35.",
+   "que_hace": "Es la consigna de la cátedra: define recall, precisión y Context Relevance (su media armónica) y da como referencia que un recuperador léxico ingenuo saca 0,35.",
+   "como_funciona": "- *recall*: qué parte de la evidencia aparece en los fragmentos.\n- *precision*: qué parte de los fragmentos contiene evidencia.\n- *context_relevance*: media armónica de las dos, promediada por pregunta.\n- El léxico ingenuo devuelve los tres párrafos con más palabras en común con la pregunta.",
+   "proposito": "Fija la vara contra la que se mide el TP: BERT crudo empató con el léxico (0,35) y e5-base con secciones llegó a 0,967.",
+   "interaccion": "El cálculo real está en `evaluar/evaluar.py` (función `recuperacion`); el TP no implementó el léxico, solo lo usa como referencia.",
+   "teoria": "Búsqueda por palabras (índice invertido, coincidencia de términos) frente a búsqueda por significado con embeddings."
+  },
+  {
+   "id": "descripciones-tools",
+   "titulo": "Descripciones de tools: fuente, uso, qué NO tienen, valores válidos",
+   "archivo": "hospital/descripciones.py",
+   "desde": 8,
+   "hasta": 38,
+   "lenguaje": "python",
+   "codigo": "BUSCAR_DOCUMENTOS = (\n    \"Busca en los documentos oficiales del Hospital Provincial Arroyo Claro: normas y procedimientos que no \"\n    \"cambian de un día a otro. Sirve para horarios fijos (visitas, altas, farmacia, laboratorio, vacunatorio, \"\n    \"donación de sangre), quién puede visitar o quedarse con un paciente, preparación para estudios y cirugías \"\n    \"(ayunos, dietas), requisitos y documentación para turnos, internación, farmacia y coberturas, triage de \"\n    \"la guardia, derechos del paciente, accesos al edificio, control de infecciones, maternidad, pediatría, \"\n    \"kinesiología, salud mental y telemedicina. NO tiene el estado de hoy (camas libres, profesionales de \"\n    \"guardia, turnos disponibles, stock de farmacia ni tiempos de espera actuales). \"\n    \"consulta: el tema a buscar, en español y con las mismas palabras que usó el paciente (por ejemplo \"\n    \"'cómo es una consulta por telemedicina'). Si la pregunta toca varios temas de los documentos, hacé una \"\n    \"búsqueda por tema. Devuelve los fragmentos más relevantes con su documento y sección de origen.\"\n)\n\nCONSULTAR_CAMAS = (\n    \"Estado de HOY de las camas de internación de un sector: total, ocupadas y libres. Usala para saber si hay \"\n    \"lugar o camas disponibles para internar. \"\n    \"sector: uno de clinica_medica, cirugia_general, terapia_intensiva, pediatria, neonatologia, maternidad.\"\n)\n\nCONSULTAR_GUARDIA = (\n    \"Profesionales que están de guardia HOY en una especialidad, con su horario (por ejemplo 08:00-20:00 es \"\n    \"el turno de día y 20:00-08:00 el de la noche). Usala para saber quién atiende hoy o esta noche. \"\n    \"especialidad: una de clinica_medica, cardiologia, pediatria, traumatologia, obstetricia, salud_mental.\"\n)\n\nCONSULTAR_TURNOS = (\n    \"Próximos turnos disponibles (fecha y hora) con una especialidad en consultorios externos. Usala para saber \"\n    \"cuándo es el primer turno libre. No dice qué hay que llevar al turno: eso está en los documentos. \"\n    \"especialidad: una de cardiologia, dermatologia, traumatologia, psicologia, gastroenterologia, \"\n    \"obstetricia, kinesiologia.\"\n)",
+   "que_hace": "Define el texto que lee el modelo para decidir qué herramienta llamar: `buscar_documentos` para normas fijas y las de la API para el estado de hoy.",
+   "como_funciona": "- `BUSCAR_DOCUMENTOS` lista los temas de los documentos y aclara que NO tiene el estado de hoy; pide buscar «con las mismas palabras que usó el paciente» y hacer una búsqueda por tema.\n- `CONSULTAR_CAMAS`, `CONSULTAR_GUARDIA` y `CONSULTAR_TURNOS` dicen que son el estado de HOY y enumeran los valores válidos del parámetro.\n- `CONSULTAR_TURNOS` agrega: «No dice qué hay que llevar al turno: eso está en los documentos».",
+   "proposito": "El ruteo depende solo de estas descripciones, así que separan norma (documentos) de estado (API) y dicen cuándo NO usar cada tool: ruteo 1,00 en las 4 corridas. La frase de las palabras del paciente arregló A11, y el ejemplo de consulta se cambió por uno de telemedicina para no filtrar la pregunta A01 de dev.",
+   "interaccion": "Las importa `hospital/herramientas.py` a través del diccionario `DESCRIPCIONES`; el PLAN prevé que el servidor MCP use exactamente los mismos textos para que la comparación parte 2 vs. parte 3 sea justa.",
+   "teoria": "Diseño de herramientas: la descripción es la interfaz para el modelo (qué hace, cuándo usarla, cuándo no, parámetros válidos)."
+  },
+  {
+   "id": "descripciones-api-y-registro",
+   "titulo": "Descripciones de farmacia y espera, y el registro de las seis",
+   "archivo": "hospital/descripciones.py",
+   "desde": 40,
+   "hasta": 61,
+   "lenguaje": "python",
+   "codigo": "CONSULTAR_FARMACIA = (\n    \"Stock de HOY de un medicamento en la farmacia del hospital y, si no hay, la fecha de reposición. Usala para \"\n    \"saber si un medicamento está disponible. No dice cómo retirarlo ni qué papeles hacen falta: eso está en los \"\n    \"documentos. \"\n    \"medicamento: uno de 'amoxicilina 500 mg', 'enalapril 10 mg', 'metformina 850 mg', 'salbutamol aerosol', \"\n    \"'insulina NPH', 'paracetamol 500 mg', 'levotiroxina 50 mcg'.\"\n)\n\nCONSULTAR_ESPERA = (\n    \"Minutos de espera ACTUALES en la guardia para cada nivel de triage (rojo, naranja, amarillo, verde, azul). \"\n    \"Usala para saber cuánto se está esperando hoy en la guardia. No recibe parámetros. Los tiempos máximos \"\n    \"que fija la norma de triage están en los documentos, no acá.\"\n)\n\nDESCRIPCIONES = {\n    \"buscar_documentos\": BUSCAR_DOCUMENTOS,\n    \"consultar_camas\": CONSULTAR_CAMAS,\n    \"consultar_guardia\": CONSULTAR_GUARDIA,\n    \"consultar_turnos\": CONSULTAR_TURNOS,\n    \"consultar_farmacia\": CONSULTAR_FARMACIA,\n    \"consultar_espera\": CONSULTAR_ESPERA,\n}",
+   "que_hace": "Completa las descripciones de las dos tools de la API que faltan y arma el diccionario nombre → descripción con las seis herramientas.",
+   "como_funciona": "- `CONSULTAR_FARMACIA` aclara que no dice cómo retirar el medicamento («eso está en los documentos») y lista los siete medicamentos válidos.\n- `CONSULTAR_ESPERA` no recibe parámetros y aclara que los tiempos máximos de la norma de triage están en los documentos.\n- `DESCRIPCIONES` mapea los seis nombres exactos que exige el evaluador.",
+   "proposito": "Mantiene en un único lugar el contrato de las tools, sin depender de LangChain, para reusarlo en la parte 2 y en la parte 3 (MCP). Con solo 6 tools bien descritas no hizo falta routing jerárquico.",
+   "interaccion": "`hospital/herramientas.py` toma `DESCRIPCIONES[nombre]` para cada `@tool`; `tests/test_agente.py` verifica que las descripciones de las tools coincidan con este diccionario.",
+   "teoria": "Pocas herramientas bien elegidas y con descripciones que marcan límites entre fuentes reducen errores de selección."
+  },
+  {
+   "id": "herramientas-langchain",
+   "titulo": "Las seis tools como @tool de LangChain",
+   "archivo": "hospital/herramientas.py",
+   "desde": 1,
+   "hasta": 40,
+   "lenguaje": "python",
+   "codigo": "\"\"\"Las seis herramientas de la parte 2 como tools de LangChain. Los nombres son los que exige el evaluador y\nlas descripciones salen de hospital/descripciones.py (las mismas que usa el servidor MCP).\"\"\"\nfrom langchain_core.tools import tool\n\nfrom hospital import api_cliente, documentos\nfrom hospital.descripciones import DESCRIPCIONES\n\n\n@tool(\"buscar_documentos\", description=DESCRIPCIONES[\"buscar_documentos\"])\ndef buscar_documentos(consulta: str) -> str:\n    return documentos.buscar_documentos(consulta)\n\n\n@tool(\"consultar_camas\", description=DESCRIPCIONES[\"consultar_camas\"])\ndef consultar_camas(sector: str) -> str:\n    return api_cliente.camas(sector)\n\n\n@tool(\"consultar_guardia\", description=DESCRIPCIONES[\"consultar_guardia\"])\ndef consultar_guardia(especialidad: str) -> str:\n    return api_cliente.guardia(especialidad)\n\n\n@tool(\"consultar_turnos\", description=DESCRIPCIONES[\"consultar_turnos\"])\ndef consultar_turnos(especialidad: str) -> str:\n    return api_cliente.turnos(especialidad)\n\n\n@tool(\"consultar_farmacia\", description=DESCRIPCIONES[\"consultar_farmacia\"])\ndef consultar_farmacia(medicamento: str) -> str:\n    return api_cliente.farmacia(medicamento)\n\n\n@tool(\"consultar_espera\", description=DESCRIPCIONES[\"consultar_espera\"])\ndef consultar_espera() -> str:\n    return api_cliente.espera()\n\n\nHERRAMIENTAS = [buscar_documentos, consultar_camas, consultar_guardia, consultar_turnos, consultar_farmacia,\n                consultar_espera]",
+   "que_hace": "Envuelve las funciones planas del hospital como herramientas de LangChain con los nombres que exige el evaluador y las descripciones compartidas.",
+   "como_funciona": "- Cada función lleva `@tool(nombre, description=DESCRIPCIONES[nombre])`; LangChain arma el esquema JSON del parámetro a partir de la firma (`consulta: str`, `sector: str`, ...).\n- `buscar_documentos` delega en `documentos.buscar_documentos`; las otras cinco en `api_cliente`.\n- `consultar_espera()` no tiene parámetros.\n- `HERRAMIENTAS` es la lista que se le pasa al agente.",
+   "proposito": "Son herramientas «hardcodeadas» en el proceso del agente. La lógica real vive en módulos sin LangChain para que el servidor MCP planificado pueda publicar las mismas funciones sin duplicar código.",
+   "interaccion": "`agente.py` pasa `HERRAMIENTAS` a `correr()`, que las entrega a `responder()` en `hospital/agente/bucle.py`, donde se enlazan con `bind_tools`.",
+   "teoria": "Una tool en código: nombre, descripción y esquema de parámetros que el modelo ve; tool calling con LangChain."
+  },
+  {
+   "id": "documentos-buscar",
+   "titulo": "buscar_documentos: fragmentos con su fuente",
+   "archivo": "hospital/documentos.py",
+   "desde": 10,
+   "hasta": 27,
+   "lenguaje": "python",
+   "codigo": "import json\n\nfrom hospital.rag.recuperador import CONFIG, obtener_recuperador\n\nSEPARADOR = \"\\n\\n---\\n\\n\"\n\n\ndef seleccion_agente():\n    return json.loads(CONFIG.read_text(encoding=\"utf-8\")).get(\"agente\", {})\n\n\ndef buscar_documentos(consulta):\n    \"\"\"Fragmentos elegidos, cada uno con su fuente '[Documento > Sección]' arriba del texto literal.\"\"\"\n    bloques = []\n    for f in obtener_recuperador().buscar_fragmentos(consulta, **seleccion_agente()):\n        fuente = f\"{f.titulo} > {f.seccion}\" if f.seccion else f.titulo\n        bloques.append(f\"[{fuente}]\\n{f.texto}\")\n    return SEPARADOR.join(bloques) or \"No se encontraron documentos para esa consulta.\"",
+   "que_hace": "Es la parte «recuperar» del RAG vista desde el agente: busca con el recuperador de la parte 1 y devuelve cada fragmento con su origen `[Documento > Sección]`.",
+   "como_funciona": "- `seleccion_agente()` lee una clave opcional `agente` de `config.json` para pisar top-k/umbral/margen (la entrega no la define).\n- `obtener_recuperador().buscar_fragmentos(consulta, ...)` trae los `Fragmento`.\n- Para cada uno arma `\"[{titulo} > {seccion}]\\n{texto}\"`.\n- Los une con `SEPARADOR` (`---`) o devuelve «No se encontraron documentos…».",
+   "proposito": "Anteponer la fuente le dice al modelo de dónde sale cada dato. En las corridas 2 y 3 se probó darle más fragmentos al agente; empeoró el CR y se volvió a la selección de la parte 1.",
+   "interaccion": "La llama la tool `buscar_documentos` de `hospital/herramientas.py`; su salida vuelve al modelo como `ToolMessage` y queda en `contextos` para el juez.",
+   "teoria": "Recuperar → aumentar: los fragmentos recuperados entran al contexto del LLM como resultado de una herramienta."
+  },
+  {
+   "id": "api-cliente",
+   "titulo": "Cliente de la API: el estado de hoy, errores incluidos",
+   "archivo": "hospital/api_cliente.py",
+   "desde": 1,
+   "hasta": 45,
+   "lenguaje": "python",
+   "codigo": "\"\"\"Cliente de la API del hospital (api/servidor.py). Sin LangChain: lo usan las tools de la parte 2 y el\nservidor MCP de la parte 3.\n\nCada funcion devuelve el cuerpo JSON como texto, tambien cuando la API responde con error (404 con la lista\nde opciones validas), para que el modelo pueda corregirse y reintentar.\n\"\"\"\nimport json\nimport os\nimport urllib.error\nimport urllib.parse\nimport urllib.request\n\n\ndef _get(ruta, **params):\n    base = os.environ.get(\"HOSPITAL_API\", \"http://localhost:8765\")\n    url = f\"{base}{ruta}\"\n    if params:\n        url += \"?\" + urllib.parse.urlencode(params)\n    try:\n        with urllib.request.urlopen(url, timeout=10) as r:\n            return r.read().decode(\"utf-8\")\n    except urllib.error.HTTPError as e:  # 400/404 traen JSON con \"error\" y \"opciones\"\n        return e.read().decode(\"utf-8\")\n    except OSError as e:\n        return json.dumps({\"error\": f\"la API del hospital no responde en {base}: {e}\"}, ensure_ascii=False)\n\n\ndef camas(sector):\n    return _get(\"/camas\", sector=sector)\n\n\ndef guardia(especialidad):\n    return _get(\"/guardia\", especialidad=especialidad)\n\n\ndef turnos(especialidad):\n    return _get(\"/turnos\", especialidad=especialidad)\n\n\ndef farmacia(medicamento):\n    return _get(\"/farmacia\", medicamento=medicamento)\n\n\ndef espera():\n    return _get(\"/espera\")",
+   "que_hace": "Funciones sin LangChain que llaman a la API del hospital (`/camas`, `/guardia`, `/turnos`, `/farmacia`, `/espera`) y devuelven el JSON como texto.",
+   "como_funciona": "- `_get(ruta, **params)` arma la URL con `HOSPITAL_API` (por defecto `localhost:8765`) y `urlencode`.\n- Si la API responde 400/404, devuelve igual el cuerpo, que trae `error` y `opciones` válidas.\n- Si la API no responde, devuelve un JSON con el error.\n- `camas`, `guardia`, `turnos`, `farmacia` y `espera` son envoltorios de una línea.",
+   "proposito": "Devolver el error como texto (en vez de lanzar una excepción) permite que el modelo lea las opciones válidas y reintente con la correcta, como pide el prompt.",
+   "interaccion": "La usan las cinco tools `consultar_*` de `hospital/herramientas.py`; la API está en `api/servidor.py` (de la cátedra, datos fijos del 2026-10-05).",
+   "teoria": "La segunda fuente del agente: datos que cambian cada día y no pueden estar en los pesos ni en los documentos."
+  },
+  {
+   "id": "prompt-sistema",
+   "titulo": "Prompt de sistema: solo datos de las herramientas",
+   "archivo": "hospital/agente/bucle.py",
+   "desde": 9,
+   "hasta": 22,
+   "lenguaje": "python",
+   "codigo": "MAX_PASOS = 6  # llamadas al modelo por pregunta\n\nPROMPT = \"\"\"Sos el asistente virtual del Hospital Provincial Arroyo Claro y respondés preguntas de pacientes y familiares.\n\nNo sabés nada de este hospital de antemano: toda la información sale de tus herramientas.\n- Normas, horarios fijos, procedimientos, requisitos, preparaciones y quién puede visitar o acompañar: buscar_documentos.\n- Estado de hoy (camas libres, profesionales de guardia, turnos disponibles, stock de farmacia, espera en la guardia): la herramienta de la API que corresponda.\n- Si la pregunta tiene varias partes, cubrí cada una con su fuente. Por ejemplo, \"¿hay lugar y me puedo quedar?\" necesita las camas de hoy y la norma de acompañantes.\n- Si una herramienta devuelve un error con opciones válidas, reintentá con la opción que corresponda.\n\nAl responder:\n- Usá solo datos que aparezcan en los resultados de las herramientas. No agregues horarios, nombres, cantidades ni requisitos que no estén ahí, aunque te parezcan razonables.\n- Si la información no está, decilo en vez de suponer.\n- Respondé en español, en pocas oraciones, contestando todo lo que se preguntó.\"\"\"",
+   "que_hace": "Fija el tope de pasos del bucle y el prompt de sistema del agente del hospital.",
+   "como_funciona": "- `MAX_PASOS = 6` limita las llamadas al modelo por pregunta.\n- El prompt dice que el modelo no sabe nada del hospital y que todo sale de las herramientas.\n- Rutea: normas y procedimientos → `buscar_documentos`; estado de hoy → la tool de la API; preguntas mixtas → cada parte con su fuente.\n- Pide reintentar ante errores con opciones válidas, usar solo datos de los resultados y decir si falta algo.",
+   "proposito": "Es la mitigación de alucinaciones por prompt: el hospital es ficticio, así que todo dato no recuperado sería inventado. Resultado: Faithfulness 5,00 en las 4 corridas. Es zero-shot: el único ejemplo (camas + acompañantes) ilustra el patrón mixto sin copiar preguntas de dev.",
+   "interaccion": "Lo usa `responder()` en el mismo archivo como `SystemMessage(PROMPT)`; aplica igual a las tools de LangChain y a las que cargaría el cliente MCP.",
+   "teoria": "Grounding: restringir la respuesta al contexto recuperado y admitir cuando falta información."
+  },
+  {
+   "id": "bucle-tool-calling",
+   "titulo": "El bucle de tool calling escrito a mano",
+   "archivo": "hospital/agente/bucle.py",
+   "desde": 25,
+   "hasta": 48,
+   "lenguaje": "python",
+   "codigo": "async def _ejecutar(por_nombre, llamada):\n    tool = por_nombre.get(llamada[\"name\"])\n    if tool is None:\n        return ToolMessage(f\"Error: la herramienta '{llamada['name']}' no existe. Herramientas disponibles: \"\n                           f\"{', '.join(sorted(por_nombre))}.\", tool_call_id=llamada[\"id\"], name=llamada[\"name\"])\n    try:\n        return await tool.ainvoke({**llamada, \"type\": \"tool_call\"})\n    except Exception as e:  # el error vuelve al modelo como texto para que pueda corregirse\n        return ToolMessage(f\"Error al ejecutar {llamada['name']}: {e}\", tool_call_id=llamada[\"id\"], name=llamada[\"name\"])\n\n\nasync def responder(llm, tools, pregunta):\n    \"\"\"Devuelve todos los mensajes de la conversación: sistema, pregunta, AIMessage y ToolMessage.\"\"\"\n    llm_con_tools = llm.bind_tools(tools)\n    por_nombre = {t.name: t for t in tools}\n    mensajes = [SystemMessage(PROMPT), HumanMessage(pregunta)]\n    for _ in range(MAX_PASOS):\n        ai = await llm_con_tools.ainvoke(mensajes)\n        mensajes.append(ai)\n        if not ai.tool_calls:\n            break\n        for llamada in ai.tool_calls:\n            mensajes.append(await _ejecutar(por_nombre, llamada))\n    return mensajes",
+   "que_hace": "Implementa el agente: el modelo pide herramientas, se ejecutan, sus resultados vuelven como `ToolMessage` y se repite hasta que responde sin pedir nada o se llega a 6 pasos.",
+   "como_funciona": "- `responder` enlaza las tools con `llm.bind_tools(tools)` y arma `por_nombre`.\n- Arranca con `[SystemMessage(PROMPT), HumanMessage(pregunta)]`.\n- En cada paso: `ai = await llm_con_tools.ainvoke(mensajes)`; si `ai.tool_calls` está vacío, termina.\n- Si no, ejecuta cada llamada con `_ejecutar` y agrega el `ToolMessage` (puede haber varias en paralelo en el mismo paso).\n- `_ejecutar` devuelve un `ToolMessage` de error si la tool no existe o lanza una excepción.",
+   "proposito": "Se escribió a mano, sin LangGraph ni AgentExecutor, para tener todos los mensajes y poder loguearlos. Es agnóstico del origen de las tools: el docstring lo prepara para las de `langchain-mcp-adapters` (parte 3, pendiente).",
+   "interaccion": "Lo llama `correr()` en `hospital/agente/corrida.py` por cada pregunta; devuelve la lista completa de mensajes, que `resumir()` convierte en respuesta, contextos, herramientas y costo. `tests/test_agente.py` lo prueba con un modelo falso.",
+   "teoria": "Agente ReAct / ciclo de vida de una tool: AIMessage con tool_calls → ejecución → ToolMessage → nueva llamada al modelo."
+  },
+  {
+   "id": "modelo-llm-openrouter",
+   "titulo": "El LLM: ChatOpenAI contra OpenRouter, temperatura 0",
+   "archivo": "hospital/agente/modelo.py",
+   "desde": 1,
+   "hasta": 33,
+   "lenguaje": "python",
+   "codigo": "\"\"\"El LLM de los agentes: ChatOpenAI de langchain-openai apuntando a OpenRouter.\"\"\"\nimport os\nfrom pathlib import Path\n\nMODELO = \"deepseek/deepseek-v4-flash-0731\"\nPRECIO_ENTRADA = 0.04 / 1e6  # USD por token; solo si OpenRouter no informa el costo\nPRECIO_SALIDA = 0.64 / 1e6\nRAIZ = Path(__file__).resolve().parents[2]\n\n\ndef cargar_env(ruta=RAIZ / \".env\"):\n    \"\"\"Carga VARIABLE=valor de .env sin pisar lo que ya está en el entorno.\"\"\"\n    if Path(ruta).exists():\n        for linea in Path(ruta).read_text(encoding=\"utf-8\").splitlines():\n            if \"=\" in linea and not linea.lstrip().startswith(\"#\"):\n                k, v = linea.split(\"=\", 1)\n                os.environ.setdefault(k.strip(), v.strip().strip(\"'\\\"\"))\n\n\ndef crear_llm():\n    from langchain_openai import ChatOpenAI\n\n    cargar_env()\n    if not os.environ.get(\"OPENROUTER_API_KEY\"):\n        raise SystemExit(\"falta OPENROUTER_API_KEY (en el entorno o en .env)\")\n    return ChatOpenAI(\n        model=MODELO,\n        base_url=\"https://openrouter.ai/api/v1\",\n        api_key=os.environ[\"OPENROUTER_API_KEY\"],\n        temperature=0,\n        max_retries=3,\n        extra_body={\"usage\": {\"include\": True}},  # OpenRouter devuelve el costo de cada llamada\n    )",
+   "que_hace": "Crea el modelo de chat del agente: `deepseek/deepseek-v4-flash-0731` vía OpenRouter con la interfaz `ChatOpenAI`, temperatura 0 y costo informado por llamada.",
+   "como_funciona": "- `PRECIO_ENTRADA` y `PRECIO_SALIDA` (USD por token) sirven de respaldo si OpenRouter no informa el costo.\n- `cargar_env` carga variables de `.env` sin pisar el entorno (la clave nunca está en el código).\n- `crear_llm` corta si falta `OPENROUTER_API_KEY` y devuelve `ChatOpenAI(..., base_url=\"https://openrouter.ai/api/v1\", temperature=0, max_retries=3)`.\n- `extra_body={\"usage\": {\"include\": True}}` pide a OpenRouter el costo de cada llamada.",
+   "proposito": "Temperatura 0 hace que el decodificado elija siempre el token más probable, para que las corridas sean lo más comparables posible (aunque el INFORME muestra que la consulta igual varió entre corridas). OpenRouter permite usar cualquier modelo con la API de OpenAI.",
+   "interaccion": "`agente.py` llama a `crear_llm()` y le pasa el LLM a `correr()`; `corrida._usage` usa los precios de respaldo.",
+   "teoria": "Generación autoregresiva token a token; temperatura 0 = decodificación greedy. Costo = tokens de entrada × precio + tokens de salida × precio."
+  },
+  {
+   "id": "corrida-usage-resumen",
+   "titulo": "Tokens y costo por llamada al modelo",
+   "archivo": "hospital/agente/corrida.py",
+   "desde": 34,
+   "hasta": 67,
+   "lenguaje": "python",
+   "codigo": "def _usage(ai):\n    u = ai.usage_metadata or {}\n    uso = (ai.response_metadata or {}).get(\"token_usage\") or {}\n    entrada, salida = u.get(\"input_tokens\", 0), u.get(\"output_tokens\", 0)\n    costo = uso.get(\"cost\")\n    return {\n        \"tokens_entrada\": entrada,\n        \"tokens_cache\": (u.get(\"input_token_details\") or {}).get(\"cache_read\", 0),\n        \"tokens_salida\": salida,\n        \"tokens_razonamiento\": (u.get(\"output_token_details\") or {}).get(\"reasoning\", 0),\n        \"costo\": costo if costo is not None else entrada * PRECIO_ENTRADA + salida * PRECIO_SALIDA,\n        \"costo_estimado\": costo is None,\n        \"id\": (ai.response_metadata or {}).get(\"id\"),\n    }\n\n\ndef resumir(mensajes):\n    ais = [m for m in mensajes if isinstance(m, AIMessage)]\n    herramientas = []\n    for m in ais:\n        for c in m.tool_calls:\n            if c[\"name\"] not in herramientas:\n                herramientas.append(c[\"name\"])\n    llamadas = [_usage(m) for m in ais]\n    respuesta = next((texto(m.content).strip() for m in reversed(ais) if texto(m.content).strip()), \"\")\n    return {\n        \"respuesta\": respuesta,\n        \"contextos\": [texto(m.content) for m in mensajes if isinstance(m, ToolMessage)],\n        \"herramientas\": herramientas,\n        \"llamadas_modelo\": llamadas,\n        \"tokens_entrada\": sum(l[\"tokens_entrada\"] for l in llamadas),\n        \"tokens_salida\": sum(l[\"tokens_salida\"] for l in llamadas),\n        \"costo\": sum(l[\"costo\"] for l in llamadas),\n    }",
+   "que_hace": "Extrae de cada `AIMessage` los tokens (entrada, cache, salida, razonamiento) y el costo, y resume la conversación en respuesta, contextos y herramientas usadas.",
+   "como_funciona": "- `_usage(ai)` lee `usage_metadata` y `response_metadata[\"token_usage\"]`; si OpenRouter no trae `cost`, lo estima con `entrada * PRECIO_ENTRADA + salida * PRECIO_SALIDA` y marca `costo_estimado`.\n- Guarda también el `id` de generación.\n- `resumir(mensajes)` junta los nombres de tools en orden sin repetir, toma como respuesta el último `AIMessage` con texto y como `contextos` el texto de cada `ToolMessage`.\n- Suma tokens y costo de todas las llamadas.",
+   "proposito": "Responde al pedido de registrar usage y costo por llamada. Permitió ver que una corrida del agente cuesta ~USD 0,0015 y el juez más de 10 veces eso.",
+   "interaccion": "Lo usa `correr()` para escribir `respuestas.jsonl` (formato del evaluador) y el log `.md`; `tests/test_agente.py` verifica la extracción con un modelo falso.",
+   "teoria": "La fórmula del costo de un LLM: se paga por tokens de entrada y de salida, con precios distintos (y descuento por cache)."
+  },
+  {
+   "id": "corrida-log-md",
+   "titulo": "El log .md de cada corrida",
+   "archivo": "hospital/agente/corrida.py",
+   "desde": 70,
+   "hasta": 95,
+   "lenguaje": "python",
+   "codigo": "def _log_pregunta(p, mensajes, r, segundos, error):\n    out = [f\"## {p['id']}: {p['pregunta']}\", \"\"]\n    if error:\n        out += [f\"**Error:** `{error}`\", \"\"]\n    resultados = {m.tool_call_id: m for m in mensajes if isinstance(m, ToolMessage)}\n    paso = 0\n    for m in mensajes:\n        if not isinstance(m, AIMessage):\n            continue\n        u = r[\"llamadas_modelo\"][paso]\n        paso += 1\n        costo = f\"USD {u['costo']:.6f}\" + (\" (estimado)\" if u[\"costo_estimado\"] else \"\")\n        out += [f\"### Llamada al modelo {paso}\", \"\",\n                f\"- Tokens: entrada {u['tokens_entrada']} (cache {u['tokens_cache']}), \"\n                f\"salida {u['tokens_salida']} (razonamiento {u['tokens_razonamiento']})\",\n                f\"- Costo: {costo}\", f\"- Generación: `{u['id']}`\", \"\"]\n        if texto(m.content).strip():\n            out += [\"Texto del modelo:\", \"\", \"> \" + texto(m.content).strip().replace(\"\\n\", \"\\n> \"), \"\"]\n        for c in m.tool_calls:\n            res = resultados.get(c[\"id\"])\n            out += [f\"**Herramienta** `{c['name']}` con argumentos `{json.dumps(c['args'], ensure_ascii=False)}`\", \"\",\n                    \"```\", texto(res.content) if res else \"(sin resultado)\", \"```\", \"\"]\n    out += [\"**Respuesta final:**\", \"\", r[\"respuesta\"] or \"(vacía)\", \"\",\n            f\"_Herramientas: {', '.join(r['herramientas']) or 'ninguna'} · llamadas al modelo: {len(r['llamadas_modelo'])} · \"\n            f\"tokens {r['tokens_entrada']} / {r['tokens_salida']} · USD {r['costo']:.6f} · {segundos:.1f} s_\", \"\"]\n    return out",
+   "que_hace": "Escribe, por pregunta, cada llamada al modelo con tokens, costo e id de generación, cada herramienta con sus argumentos y su resultado completo, y la respuesta final.",
+   "como_funciona": "- Indexa los `ToolMessage` por `tool_call_id` para emparejar cada llamada con su resultado.\n- Por cada `AIMessage` agrega «Llamada al modelo N» con tokens (cache y razonamiento), costo y `Generación`.\n- Si el modelo escribió texto, lo cita; por cada `tool_call` escribe nombre, argumentos JSON y el resultado en un bloque de código.\n- Cierra con la respuesta final y una línea de totales (tools, llamadas, tokens, USD, segundos).",
+   "proposito": "Es la analítica de la corrida: gracias a este log se diagnosticó A11 (la consulta que redactó el modelo no traía la sección correcta) sin adivinar.",
+   "interaccion": "Lo llama `correr()`, que junta las secciones con una cabecera de totales y lo guarda en `experimentos/corridas/agente_<fecha>.md`.",
+   "teoria": "Observabilidad en producción: registrar llamadas, argumentos, resultados, tokens y costo para depurar y controlar gasto."
+  },
+  {
+   "id": "log-a10-paralelo",
+   "titulo": "Log real: A10 pide las dos fuentes en paralelo",
+   "archivo": "experimentos/corridas/agente_20260929-105719.md",
+   "desde": 302,
+   "hasta": 337,
+   "lenguaje": "markdown",
+   "codigo": "## A10: Quiero internar a mi nene en pediatría, ¿hay lugar y me puedo quedar con él?\n\n### Llamada al modelo 1\n\n- Tokens: entrada 1577 (cache 1536), salida 211 (razonamiento 116)\n- Costo: USD 0.000096\n- Generación: `gen-1790690305-njr9UFOvy47hBsCpf6aG`\n\n**Herramienta** `consultar_camas` con argumentos `{\"sector\": \"pediatria\"}`\n\n```\n{\"sector\": \"pediatria\", \"fecha\": \"2026-10-05\", \"datos\": {\"total\": 24, \"ocupadas\": 17, \"libres\": 7}}\n```\n\n**Herramienta** `buscar_documentos` con argumentos `{\"consulta\": \"acompañante de paciente pediátrico internado puede quedarse\"}`\n\n```\n[Ingreso a internación programada > Acompañante]\nSe permite un acompañante por paciente internado durante la noche, salvo en terapia intensiva. El acompañante recibe una tarjeta que presenta en el control de acceso.\n```\n\n### Llamada al modelo 2\n\n- Tokens: entrada 1787 (cache 1536), salida 153 (razonamiento 86)\n- Costo: USD 0.000081\n- Generación: `gen-1790690313-9NZL4I4ymMq06XPo3UnQ`\n\nTexto del modelo:\n\n> Sí, hoy hay lugar en pediatría: 7 camas libres de 24. Y sí, podés quedarte: se permite un acompañante por paciente internado durante la noche (excepto en terapia intensiva), que recibe una tarjeta para presentar en el control de acceso.\n\n**Respuesta final:**\n\nSí, hoy hay lugar en pediatría: 7 camas libres de 24. Y sí, podés quedarte: se permite un acompañante por paciente internado durante la noche (excepto en terapia intensiva), que recibe una tarjeta para presentar en el control de acceso.\n\n_Herramientas: consultar_camas, buscar_documentos · llamadas al modelo: 2 · tokens 3364 / 364 · USD 0.000177 · 15.1 s_",
+   "que_hace": "Extracto del log de la corrida 4 para la pregunta mixta A10: en la primera llamada el modelo pide `consultar_camas` y `buscar_documentos` a la vez y en la segunda responde.",
+   "como_funciona": "- Llamada 1: 1577 tokens de entrada (1536 de cache), 211 de salida (116 de razonamiento), USD 0,000096.\n- Dos herramientas en el mismo paso: camas de pediatría (7 libres de 24) y la norma de acompañantes.\n- Cada resultado vuelve como `ToolMessage` (fragmento con `[Ingreso a internación programada > Acompañante]`).\n- Llamada 2: el modelo combina ambos datos sin agregar nada que no esté en los resultados.",
+   "proposito": "Muestra en datos reales el ruteo entre norma (documentos) y estado (API), el tool calling paralelo y el registro de tokens y costo.",
+   "interaccion": "Lo generó `_log_pregunta` de `hospital/agente/corrida.py` al correr `agente.py`; es la corrida entregada (`respuestas.jsonl`).",
+   "teoria": "RAG como herramienta: el agente decide cuándo y con qué consulta buscar, y puede combinar varias fuentes en un mismo paso."
+  },
+  {
+   "id": "informe-corridas",
+   "titulo": "Tabla de las cuatro corridas del agente",
+   "archivo": "INFORME.md",
+   "desde": 199,
+   "hasta": 214,
+   "lenguaje": "markdown",
+   "codigo": "### Corridas\n\nCada corrida tiene en `experimentos/corridas/` su log `.md`, su `respuestas.jsonl` y su `.eval.json`. La entregada es\nla 4 (`respuestas.jsonl` en la raíz = `agente_20260929-105719`).\n\n| # | Corrida | Cambio respecto de la anterior | Ruteo | CR | F | AR | Costo agente (USD) | Costo juez (USD) |\n|---|---|---|---|---|---|---|---|---|\n| 1 | `agente_20260929-104728` | versión inicial; `buscar_documentos` con la selección de la parte 1 (top-2, margen 0,005) | 1,00 | 4,917 | 5,00 | 4,917 | 0,001405 | 0,01667 |\n| 2 | `agente_20260929-105117` | `buscar_documentos` devuelve siempre 3 fragmentos | 1,00 | 4,417 | 5,00 | 5,000 | 0,001464 | 0,02141 |\n| 3 | `agente_20260929-105408` | hasta 3 fragmentos, solo los que están a menos de 0,02 del mejor | 1,00 | 4,833 | 5,00 | 4,917 | 0,001439 | 0,01797 |\n| 4 | `agente_20260929-105719` | vuelve la selección de la parte 1; la descripción de `buscar_documentos` pide usar las palabras del paciente y una búsqueda por tema | **1,00** | **5,000** | **5,00** | **5,000** | **0,001458** | 0,01744 |\n\nCada corrida hace 24 llamadas al modelo (2 por pregunta: una que pide las herramientas y otra que responde) y usa unos\n40 mil tokens de entrada y 2,3 mil de salida. En las preguntas mixtas (A10–A12) el modelo pide las dos herramientas\nen paralelo en la misma llamada. El costo del agente es de alrededor de USD 0,0015 por corrida, y el juez cuesta más de\ndiez veces eso.",
+   "que_hace": "Resume las cuatro corridas del benchmark: qué cambió en cada una, ruteo, CR, Faithfulness, AR y costos del agente y del juez.",
+   "como_funciona": "- Corrida 1: selección de la parte 1; CR 4,917.\n- Corrida 2: siempre 3 fragmentos; CR baja a 4,417 por ruido.\n- Corrida 3: margen 0,02; CR 4,833.\n- Corrida 4: vuelve top-2/0,005 y se cambia la descripción de `buscar_documentos`: 5/5/5 con ruteo 1,00.\n- Agente ~USD 0,0015 por corrida; juez ~0,017.",
+   "proposito": "Documenta la iteración sobre descripciones y selección en vez de hacks por pregunta, y muestra que Faithfulness y ruteo fueron estables en las cuatro.",
+   "interaccion": "Los números salen de los logs `experimentos/corridas/*.md` y de los `.eval.json` que produce `evaluar/evaluar.py agente`.",
+   "teoria": "Evaluar el sistema RAG por etapas con un LLM juez: relevancia del contexto, fidelidad y relevancia de la respuesta."
+  },
+  {
+   "id": "informe-a11",
+   "titulo": "A11: el problema era la consulta, no la cantidad de fragmentos",
+   "archivo": "INFORME.md",
+   "desde": 216,
+   "hasta": 247,
+   "lenguaje": "markdown",
+   "codigo": "### Dónde falló el agente y qué se cambió\n\n**A11** (\"Necesito turno con cardiología, ¿cuál es el primero y qué tengo que llevar?\") fue la única pregunta con\nproblemas en la corrida 1 (CR 4, AR 4). El log muestra que el ruteo estuvo bien: llamó a `consultar_turnos` y a\n`buscar_documentos`. Pero buscó *\"requisitos y documentación para turno en consultorios externos de cardiología\"*, y el\nrecuperador devolvió solo la sección \"Cómo se pide un turno\", que menciona la derivación. La sección \"Qué llevar a la\nprimera consulta\" (DNI, credencial, derivación, estudios previos) quedó tercera, a 0,018 del primero y fuera del\nmargen de 0,005. La respuesta fue fiel a lo que recibió (F 5), pero incompleta.\n\nPrimero se probó darle más fragmentos al agente, porque la métrica de la parte 1 castiga cada fragmento extra y la del\njuez no tanto:\n\n- Con **top-3 fijo** (corrida 2), A11 sube a 5, pero el ruido baja el CR de A01–A04 y A12 (3 y 4): el juez penaliza\n  los fragmentos que no hacen falta. El promedio de CR cae a 4,417.\n- Con **margen 0,02** (corrida 3), el resto vuelve a 5. Pero A11 falla otra vez (CR 3), porque el modelo redactó la\n  consulta de otra forma y la sección correcta ya no quedaba cerca del primero.\n\nEl problema no era la cantidad de fragmentos sino la consulta. Buscar \"requisitos y documentación\" no se parece al\nencabezado \"Qué llevar a la primera consulta\"; buscar con las palabras del paciente (\"qué tengo que llevar\") sí. Por\neso en la corrida 4 se volvió a la selección de la parte 1 y se cambió la descripción de `buscar_documentos`: la\nconsulta va \"con las mismas palabras que usó el paciente\" y, si la pregunta toca varios temas, se hace una búsqueda por\ntema. En A11 el modelo buscó *\"qué llevar a un turno de cardiología…\"*, recibió la sección correcta y contestó completo.\n\nEn el mismo cambio se reemplazó el ejemplo de la descripción (\"horario de visita de los abuelos en neonatología\"), que\nera literalmente la pregunta A01 de dev, por uno que no aparece en ninguna pregunta dev (\"cómo es una consulta por\ntelemedicina\"). Así se evita ajustar el agente a las preguntas dev.\n\n**Límites de esta medición.** Son 12 preguntas y una corrida por configuración. El modelo redacta la consulta distinto\nen cada corrida aun con temperatura 0: en A11, con la misma descripción, las corridas 1 a 3 buscaron \"…consultorios\nexternos de cardiología\", \"…consultorios externos cardiología\" y \"…consultorios externos\" a secas. Así que una\ndiferencia de una pregunta entre corridas está dentro del ruido. Lo que se sostiene en las cuatro corridas es el ruteo\n(1,00 siempre) y la fidelidad (5,00 siempre): el agente no inventó datos en ninguna respuesta.",
+   "que_hace": "Analiza la única pregunta que falló (A11, turno de cardiología y qué llevar), las dos soluciones que no funcionaron y la que sí, más los límites de la medición.",
+   "como_funciona": "- El ruteo estaba bien, pero el modelo buscó «requisitos y documentación…» y la sección «Qué llevar a la primera consulta» quedó tercera, fuera del margen.\n- Top-3 fijo la arreglaba pero el ruido bajó el CR general a 4,417; margen 0,02 falló por otra redacción de la consulta.\n- Solución: la descripción de `buscar_documentos` pide usar las palabras del paciente y una búsqueda por tema.\n- Se sacó del ejemplo la pregunta A01 de dev.\n- Con 12 preguntas y una corrida, una pregunta de diferencia es ruido.",
+   "proposito": "Muestra que se corrigió el síntoma «la sección correcta queda tercera» mejorando la consulta (descripción de la tool) en vez de agregar un reranker o más contexto.",
+   "interaccion": "Se apoya en los logs de `experimentos/corridas/` y explica el texto final de `BUSCAR_DOCUMENTOS` en `hospital/descripciones.py`.",
+   "teoria": "Diagnóstico de RAG: cuando falta una etapa (consulta mal formulada) más contexto mete ruido; y la variabilidad del LLM aun con temperatura 0."
+  },
+  {
+   "id": "evaluar-juez",
+   "titulo": "El juez LLM: CR, Faithfulness y Answer Relevance",
+   "archivo": "evaluar/evaluar.py",
+   "desde": 73,
+   "hasta": 98,
+   "lenguaje": "python",
+   "codigo": "INSTRUCCIONES = \"\"\"Sos un evaluador de un sistema de preguntas y respuestas de un hospital. Recibís una pregunta, los contextos que el sistema recuperó con sus herramientas, la respuesta del sistema y una respuesta de referencia escrita por la cátedra.\n\nPuntuá de 1 a 5 cada criterio, con estas anclas:\n\ncontext_relevance: ¿los contextos contienen la información necesaria para responder, sin ruido de más? 5 = está todo lo necesario y casi nada irrelevante. 3 = está lo necesario pero mezclado con mucho contenido ajeno, o falta una parte. 1 = los contextos no sirven para responder.\n\nfaithfulness: ¿cada afirmación de la respuesta está respaldada por los contextos? Juzgá SOLO contra los contextos, no contra la referencia ni contra tu conocimiento. 5 = todo está respaldado. 3 = hay alguna afirmación sin respaldo que no cambia el sentido. 1 = la respuesta inventa datos centrales.\n\nanswer_relevance: ¿la respuesta contesta lo que se preguntó, completa y sin desviarse? Usá la referencia para saber qué se esperaba. 5 = contesta todo lo pedido. 3 = contesta una parte. 1 = no contesta la pregunta.\n\nDevolvé solo el JSON pedido. La justificación, en una o dos oraciones.\"\"\"\n\n\ndef juzgar(key, p, r):\n    ctx = \"\\n\\n---\\n\\n\".join(r.get(\"contextos\", [])) or \"(sin contextos)\"\n    usuario = (f\"PREGUNTA:\\n{p['pregunta']}\\n\\nCONTEXTOS RECUPERADOS:\\n{ctx}\\n\\n\"\n               f\"RESPUESTA DEL SISTEMA:\\n{r.get('respuesta', '')}\\n\\nRESPUESTA DE REFERENCIA:\\n{p['respuesta_referencia']}\")\n    body = {\"model\": JUEZ, \"temperature\": 0,\n            \"messages\": [{\"role\": \"system\", \"content\": INSTRUCCIONES}, {\"role\": \"user\", \"content\": usuario}],\n            \"response_format\": {\"type\": \"json_schema\", \"json_schema\": {\"name\": \"evaluacion\", \"strict\": True, \"schema\": ESQUEMA}}}\n    req = urllib.request.Request(URL, data=json.dumps(body).encode(), headers={\"Authorization\": f\"Bearer {key}\", \"Content-Type\": \"application/json\"})\n    for intento in range(3):\n        try:\n            with urllib.request.urlopen(req, timeout=120) as resp:\n                d = json.loads(resp.read())\n            return json.loads(d[\"choices\"][0][\"message\"][\"content\"]), d.get(\"usage\", {})",
+   "que_hace": "Script de la cátedra: instrucciones y llamada al modelo juez (`google/gemini-3.7-flash`) que puntúa de 1 a 5 cada respuesta del agente en tres criterios.",
+   "como_funciona": "- `INSTRUCCIONES` define anclas 1/3/5 para `context_relevance` (contextos), `faithfulness` (respuesta vs. contextos) y `answer_relevance` (respuesta vs. pregunta, usando la referencia).\n- `juzgar` arma el mensaje con pregunta, contextos, respuesta y referencia.\n- Pide salida estructurada con `response_format` y el `ESQUEMA` JSON, a temperatura 0.\n- Aparte, `agente()` calcula el ruteo comparando herramientas esperadas y usadas.",
+   "proposito": "Separa la calidad de la recuperación (CR) de la de la generación (F, AR): por eso A11 se diagnosticó como problema de contexto con F 5. La corrida 4 sacó 5/5/5.",
+   "interaccion": "Lo corre el equipo con `python3 evaluar/evaluar.py agente --respuestas respuestas.jsonl`, que lee los `contextos` y `herramientas` que escribe `correr()`.",
+   "teoria": "LLM-as-a-judge y la tríada de evaluación de RAG: Context Relevance, Faithfulness, Answer Relevance."
+  },
+  {
+   "id": "plan-mcp-pendiente",
+   "titulo": "Diseño del servidor y cliente MCP (pendiente)",
+   "archivo": "PLAN.md",
+   "desde": 155,
+   "hasta": 171,
+   "lenguaje": "markdown",
+   "codigo": "## Step 3 — Part 3: MCP server + LangChain MCP client (15 pts)\nDepends on Step 2.\n\n**3.1 `servidor_mcp.py`** — `mcp.server.fastmcp.FastMCP(\"hospital\")`, 6 `@mcp.tool(name=..., description=DESCRIPCIONES[...])`\nwrapping `hospital.api_cliente` and `Recuperador`; `mcp.run()` (stdio). Nothing on stdout except the protocol (logs → stderr);\nwarm up the retriever at startup so the first call doesn’t time out.\n\n**3.2 `agente_mcp.py`** — **no API/retriever code of its own**: `MultiServerMCPClient({\"hospital\": {\"command\": sys.executable, \"args\": [\"servidor_mcp.py\"], \"transport\": \"stdio\"}})`,\n`tools = await client.get_tools()` (tools/list; log the discovered names), then reuse `responder` + `correr(..., etiqueta=\"mcp\")`\nwith the same LLM and prompt.\n\n**3.3 Inspector** (manual, user) — `npx @modelcontextprotocol/inspector python3 servidor_mcp.py`, call all 6 tools, save screenshots to `experimentos/inspector/`.\n\n**3.4 Compare** — run benchmark → `respuestas_mcp.jsonl` + log + eval. `experimentos/comparar_agentes.py` prints a table\n(ruteo, CR, F, AR, agent cost from log totals, judge cost) for Part 2 vs 3. INFORME §3: table + explanation of any difference from the logs (e.g. tool-result formatting, nondeterminism).\n\n**Done when:** `python3 agente_mcp.py --preguntas datos/preguntas_agente_dev.jsonl --salida respuestas_mcp.jsonl` works with the API running, `grep -E \"urllib|Recuperador|localhost\" agente_mcp.py` is empty, 6 inspector screenshots exist.",
+   "que_hace": "Es el diseño, no código: la parte 3 quedó pendiente y no existen `servidor_mcp.py` ni `agente_mcp.py`. El PLAN describe un servidor FastMCP por stdio con las 6 tools y un cliente LangChain con `MultiServerMCPClient`.",
+   "como_funciona": "- 3.1: `FastMCP(\"hospital\")` con 6 `@mcp.tool(name=..., description=DESCRIPCIONES[...])` que envuelven `api_cliente` y el recuperador; `mcp.run()` por stdio; logs a stderr porque stdout es el canal del protocolo.\n- 3.2: `agente_mcp.py` sin código propio de API: `MultiServerMCPClient` lanza el servidor, `get_tools()` descubre las tools (tools/list) y se reusa `responder` y `correr`.\n- 3.3: probar con MCP Inspector.\n- 3.4: comparar parte 2 vs. parte 3.",
+   "proposito": "Separa herramienta y agente: el mismo set de tools podría usarlo cualquier host MCP. Reusar `descripciones.py` y el bucle agnóstico haría justa la comparación. Quedó pendiente en la entrega.",
+   "interaccion": "Se apoyaría en `hospital/descripciones.py`, `hospital/api_cliente.py`, `hospital/documentos.py`, `hospital/agente/bucle.py` y `corrida.py` (que ya normaliza bloques de contenido MCP en `texto()`).",
+   "teoria": "Arquitectura MCP: host, cliente y servidor; descubrimiento con tools/list y ejecución con tools/call sobre JSON-RPC 2.0 por stdio."
+  },
+  {
+   "id": "plan-atencion-pendiente",
+   "titulo": "Diseño de la atención en NumPy (pendiente)",
+   "archivo": "PLAN.md",
+   "desde": 175,
+   "hasta": 184,
+   "lenguaje": "markdown",
+   "codigo": "## Step 4 — Part 4: attention in NumPy (`atencion.py`, 15 pts)\nIndependent. TDD against the given tests (red → green per function):\n- `softmax(M)`: subtract row max, exp, normalize over last axis.\n- `atencion(Q, K, V, mascara=False)`: `S = Q Kᵀ / √d_k`; if mask, `np.triu(ones, 1)` → `-inf`; `A = softmax(S)`; return `(A V, A)`.\n- `autoatencion(X, Wq, Wk, Wv, mascara)`: project then `atencion`.\n- `multicabeza(X, cabezas, Wo, mascara)`: concat head outputs on axis 1, `@ Wo`.\n- `layer_norm(x, eps=1e-5)`: `(x - mean) / sqrt(var + eps)` per row, no γ/β.\nNumPy only. INFORME §4 short.\n\n**Done when:** `python3 atencion/test_atencion.py atencion.py` → 14 tests OK (test file untouched).",
+   "que_hace": "Es el diseño, no código: `atencion.py` no existe en el repo. El PLAN fija las cinco funciones que había que implementar con TDD contra los tests de la cátedra.",
+   "como_funciona": "- `softmax(M)`: restar el máximo de la fila, exponenciar y normalizar.\n- `atencion(Q, K, V, mascara)`: `S = Q Kᵀ / √d_k`; con máscara, `np.triu(ones, 1)` → `-inf`; `A = softmax(S)`; devuelve `(A V, A)`.\n- `autoatencion`: proyecta X con Wq, Wk, Wv y llama a `atencion`.\n- `multicabeza`: concatena las cabezas y multiplica por `Wo`.\n- `layer_norm`: `(x - media) / sqrt(var + eps)` por fila, sin γ/β.",
+   "proposito": "Traduce la clase de transformers a operaciones de matrices. Restar el máximo evita overflow en `exp`; escalar por √d_k evita que el softmax se sature. Quedó pendiente.",
+   "interaccion": "Se validaría con `python3 atencion/test_atencion.py atencion.py` (14 tests) y la parte 5 lo usaría para verificar las cuentas a mano.",
+   "teoria": "Atención escalada por producto punto, máscara causal, multi-cabeza y layer norm."
+  },
+  {
+   "id": "test-atencion-ejemplo-clase",
+   "titulo": "Tests de la cátedra: 'the cat sat', softmax y máscara",
+   "archivo": "atencion/test_atencion.py",
+   "desde": 23,
+   "hasta": 61,
+   "lenguaje": "python",
+   "codigo": "X = np.array([[1, 0, 1, 0], [0, 2, 0, 1], [1, 1, 1, 1]], float)\nWQ = np.eye(4)\nWK = np.array([[0, 1, 0, 0], [1, 0, 0, 0], [0, 0, 0, 1], [0, 0, 1, 0]], float)\nWV = np.array([[1, 0], [0, 1], [1, 0], [0, 1]], float)\n\n\nclass TestSoftmax(unittest.TestCase):\n    def test_filas_suman_uno(self):\n        M = np.array([[1.5, 0, 1.5], [3, -2, 0.5]])\n        np.testing.assert_allclose(at.softmax(M).sum(-1), 1)\n\n    def test_valor_de_la_clase(self):\n        np.testing.assert_allclose(at.softmax(np.array([[1.5, 0, 1.5]])), [[0.4498, 0.1004, 0.4498]], atol=1e-3)\n\n    def test_estable_con_numeros_grandes(self):\n        s = at.softmax(np.array([[1000.0, 1000.0]]))\n        self.assertTrue(np.all(np.isfinite(s)))\n        np.testing.assert_allclose(s, [[0.5, 0.5]])\n\n\nclass TestAtencion(unittest.TestCase):\n    def test_matriz_de_atencion(self):\n        _, A = at.autoatencion(X, WQ, WK, WV)\n        np.testing.assert_allclose(A, [[0.1220, 0.5465, 0.3315], [0.4498, 0.1004, 0.4498], [0.1863, 0.3072, 0.5065]], atol=1e-3)\n\n    def test_salida(self):\n        out, _ = at.autoatencion(X, WQ, WK, WV)\n        np.testing.assert_allclose(out, [[0.9069, 2.3026], [1.7993, 1.2007], [1.3856, 1.9345]], atol=1e-3)\n\n    def test_formas_con_n_distinto_de_d(self):\n        out, A = at.autoatencion(X, WQ, WK, WV)\n        self.assertEqual(A.shape, (3, 3))\n        self.assertEqual(out.shape, (3, 2))\n\n    def test_mascara_causal(self):\n        out, A = at.autoatencion(X, WQ, WK, WV, mascara=True)\n        np.testing.assert_allclose(np.triu(A, 1), 0, atol=1e-12)\n        np.testing.assert_allclose(A.sum(-1), 1)\n        np.testing.assert_allclose(out, [[2, 0], [1.6351, 0.5474], [1.3856, 1.9345]], atol=1e-3)",
+   "que_hace": "Tests provistos por la cátedra para la parte 4 (pendiente): definen el ejemplo de clase ('the cat sat', d = 4) y los valores esperados de softmax, matriz de atención, salida y máscara causal.",
+   "como_funciona": "- `X` son 3 tokens de dimensión 4; `WQ` es la identidad, `WK` permuta dimensiones y `WV` proyecta a 2.\n- `TestSoftmax`: filas que suman 1, el valor de clase `[0.4498, 0.1004, 0.4498]` y estabilidad con `[1000, 1000]`.\n- `test_matriz_de_atencion` y `test_salida`: la `A` 3×3 y la salida 3×2 esperadas.\n- `test_mascara_causal`: el triángulo superior de `A` es 0 y la primera fila solo mira a sí misma (`[2, 0]`).",
+   "proposito": "Es la especificación ejecutable de lo que `atencion.py` tenía que cumplir; el archivo no se puede modificar. La implementación no existe todavía.",
+   "interaccion": "Carga dinámicamente el `atencion.py` que se le pase por argumento y llama a `softmax` y `autoatencion`; el PLAN (paso 4) lo usa como guía de TDD.",
+   "teoria": "Cada token mira a todos: A = softmax(QKᵀ/√d_k) y salida = A V; con máscara causal un token no ve los posteriores."
+  },
+  {
+   "id": "test-atencion-escala-multicabeza-ln",
+   "titulo": "Tests: escala √d_k, permutación, multicabeza y layer norm",
+   "archivo": "atencion/test_atencion.py",
+   "desde": 63,
+   "hasta": 101,
+   "lenguaje": "python",
+   "codigo": "    def test_permutar_filas_permuta_la_salida(self):\n        perm = [2, 0, 1]\n        out, _ = at.autoatencion(X, WQ, WK, WV)\n        out_p, _ = at.autoatencion(X[perm], WQ, WK, WV)\n        np.testing.assert_allclose(out_p, out[perm], atol=1e-9)\n\n    def test_escala_por_raiz_de_dk(self):\n        Q = np.array([[1.0, 0, 0, 0]]); K = np.array([[4.0, 0, 0, 0], [0, 0, 0, 0]]); V = np.eye(2)\n        _, A = at.atencion(Q, K, V)\n        np.testing.assert_allclose(A, [[np.exp(2) / (np.exp(2) + 1), 1 / (np.exp(2) + 1)]], atol=1e-6)\n\n\nclass TestMulticabeza(unittest.TestCase):\n    def test_una_cabeza_con_wo_identidad_es_autoatencion(self):\n        out1, _ = at.autoatencion(X, WQ, WK, WV)\n        outm = at.multicabeza(X, [(WQ, WK, WV)], np.eye(2))\n        np.testing.assert_allclose(outm, out1, atol=1e-9)\n\n    def test_dos_cabezas_concatenan_y_proyectan(self):\n        c1 = (WQ[:, :2], WK[:, :2], WV[:, :1]); c2 = (WQ[:, 2:], WK[:, 2:], WV[:, 1:])\n        Wo = np.array([[1.0, 2.0], [0.0, 1.0]])\n        esperado = np.concatenate([at.autoatencion(X, *c1)[0], at.autoatencion(X, *c2)[0]], axis=1) @ Wo\n        np.testing.assert_allclose(at.multicabeza(X, [c1, c2], Wo), esperado, atol=1e-9)\n        self.assertEqual(at.multicabeza(X, [c1, c2], Wo).shape, (3, 2))\n\n\nclass TestLayerNorm(unittest.TestCase):\n    def test_valor_de_la_clase(self):\n        np.testing.assert_allclose(at.layer_norm(np.array([[2.0, 0, 1, 1]])), [[1.4142, -1.4142, 0, 0]], atol=1e-3)\n\n    def test_invariante_a_escala_y_corrimiento(self):\n        x = np.array([[2.0, 0, 1, 1]])\n        np.testing.assert_allclose(at.layer_norm(2 * x), at.layer_norm(x), atol=1e-4)\n        np.testing.assert_allclose(at.layer_norm(x + 10), at.layer_norm(x), atol=1e-4)\n\n    def test_por_fila(self):\n        y = at.layer_norm(np.array([[1.0, 0, 1, 0], [0, 20, 0, 10], [300, 0, 100, 200]]))\n        np.testing.assert_allclose(y.mean(-1), 0, atol=1e-6)\n        np.testing.assert_allclose(y.var(-1), 1, atol=1e-3)",
+   "que_hace": "Resto de los tests de la parte 4 (pendiente): permutar la entrada permuta la salida, la escala por √d_k, multicabeza y layer norm.",
+   "como_funciona": "- `test_permutar_filas_permuta_la_salida`: sin posiciones, la atención es equivariante a permutaciones.\n- `test_escala_por_raiz_de_dk`: con d_k = 4, un producto de 4 se escala a 2 antes del softmax.\n- `TestMulticabeza`: una cabeza con `Wo` identidad es autoatención; dos cabezas se concatenan y se proyectan con `Wo`.\n- `TestLayerNorm`: `[2, 0, 1, 1]` → `[1.414, -1.414, 0, 0]`, invariancia a escala y corrimiento, media 0 y varianza 1 por fila.",
+   "proposito": "Fija propiedades que hay que entender para el final (por qué hacen falta posiciones, por qué se escala, qué normaliza layer norm). La implementación quedó pendiente.",
+   "interaccion": "Igual que los anteriores: se corre con `python3 atencion/test_atencion.py atencion.py` contra el `atencion.py` que faltaba escribir.",
+   "teoria": "Escalado del softmax, atención multi-cabeza, layer norm y que la atención por sí sola no conoce el orden."
+  },
+  {
+   "id": "ejercicio-a-mano",
+   "titulo": "Parte 5: el bloque de transformer a mano (pendiente)",
+   "archivo": "a_mano/ejercicio.md",
+   "desde": 63,
+   "hasta": 93,
+   "lenguaje": "markdown",
+   "codigo": "## Parte A: el bloque completo como decoder (con máscara causal)\n\nPara cada una de las dos frases:\n\n1. **Entrada.** X = E + P, una fila por token.\n2. **Proyecciones.** Q = X Wq, K = X Wk, V = X Wv.\n3. **Afinidades.** S = Q Kᵀ.\n4. **Escala.** S / √d, con d = 4.\n5. **Máscara causal.** Poner −∞ donde un token mira a uno posterior.\n6. **Matriz de atención.** A = softmax por fila.\n7. **Mezcla.** A V, y después la proyección de salida (A V) Wo.\n8. **Residual.** Z = X + (A V) Wo.\n9. **Layer norm.** LN(Z), fila por fila (media y varianza de cada fila; ε despreciable).\n10. **Feed-forward.** FFN = ReLU(LN(Z) W1) W2.\n11. **Residual.** H = Z + FFN.\n12. **Layer norm final.** LN(H).\n13. **Predicción.** Con la última fila de LN(H), logits = fila · Wout (un valor por palabra del vocabulario) y softmax sobre esos seis valores. ¿Qué palabra completa la frase, y con qué probabilidad?\n\n## Parte B: la misma atención sin máscara (encoder)\n\nPara cada frase, repitan los pasos 5 a 9 sin la máscara causal y anoten la fila de \"banco\" en LN(Z).\n\n## Preguntas\n\nContesten en la misma hoja, en dos o tres líneas cada una:\n\n1. Comparen la fila de \"banco\" en LN(Z) entre las dos frases en la parte A y en la parte B. ¿En cuál de las dos partes el vector de \"banco\" cambia según la frase? ¿Por qué?\n2. En la parte A, ¿cómo \"sabe\" el modelo si tiene que predecir \"peso\" o \"dinero\", si el vector de \"banco\" es el mismo en las dos frases?\n3. La predicción de la parte A y la que resultaría de la parte B para la última posición, ¿son iguales o distintas? Expliquen por qué con lo que hace la máscara.\n4. ¿Qué modelo de la clase se parece a la parte A y cuál a la parte B? ¿Para qué se usa cada uno?\n5. Si P fuera todo ceros, ¿qué cambiaría en los resultados de este ejercicio? ¿Y en una frase donde el orden de las palabras cambie el sentido?",
+   "que_hace": "Es la consigna de la cátedra para la parte 5, que quedó pendiente en el repo: pasar «El banco aguanta» y «El banco presta» por un bloque completo, con y sin máscara causal.",
+   "como_funciona": "- Parte A (decoder): X = E + P, proyecciones Q/K/V, S = QKᵀ, escala por √d, máscara causal, softmax, A V y Wo, residual, layer norm, FFN con ReLU, residual, layer norm final y predicción con Wout.\n- Parte B (encoder): la misma atención sin máscara, mirando la fila de «banco».\n- Las preguntas comparan cómo cambia «banco» según el contexto y qué hace la máscara.",
+   "proposito": "Obliga a hacer a mano cada operación del bloque para entender qué aporta cada una. Por regla del TP se resuelve sin IA; no hay hojas escaneadas en el repo.",
+   "interaccion": "Usa los datos del mismo archivo (embeddings, posiciones y pesos); el PLAN preveía verificar las cuentas con `atencion.py` desde `a_mano/verificar.py`, que tampoco existe.",
+   "teoria": "Un bloque de transformer completo: atención, residuales, layer norm y feed-forward; diferencia entre decoder (máscara causal) y encoder (bidireccional)."
+  }
+ ],
+ "refs": [
+  {
+   "slug": "introduccion",
+   "i": 36,
+   "snippet": "informe-por-que-e5",
+   "nota": "Acá ves por qué e5 representa mejor el significado que BERT promediado: 0,967 contra 0,350."
+  },
+  {
+   "slug": "introduccion",
+   "i": 62,
+   "snippet": "bucle-tool-calling",
+   "nota": "El bucle con MAX_PASOS = 6 es el agente autónomo en miniatura: el modelo decide qué tool usar y cuándo terminar."
+  },
+  {
+   "slug": "claude-desktop-chat",
+   "i": 21,
+   "snippet": "plan-mcp-pendiente",
+   "nota": "Un servidor MCP propio sería un «connector» que cualquier host podría agregar; en el TP solo quedó diseñado."
+  },
+  {
+   "slug": "cowork-intro",
+   "i": 25,
+   "snippet": "descripciones-tools",
+   "nota": "El agente descubre cuándo usar cada tool solo por este texto."
+  },
+  {
+   "slug": "prompting",
+   "i": 8,
+   "snippet": "corrida-usage-resumen",
+   "nota": "Costo = tokens de entrada × precio de entrada + tokens de salida × precio de salida, calculado por llamada."
+  },
+  {
+   "slug": "prompting",
+   "i": 14,
+   "snippet": "informe-a11",
+   "nota": "Mirá el último párrafo: aun con temperatura 0 la consulta varió entre corridas."
+  },
+  {
+   "slug": "prompting",
+   "i": 17,
+   "snippet": "prompt-sistema"
+  },
+  {
+   "slug": "prompting",
+   "i": 33,
+   "snippet": "descripciones-tools",
+   "nota": "Fijate el ejemplo de `consulta` ('cómo es una consulta por telemedicina'): reemplazó a la pregunta A01 de dev para no filtrar la evaluación."
+  },
+  {
+   "slug": "rag-y-mcp",
+   "i": 2,
+   "snippet": "prompt-sistema",
+   "nota": "«No sabés nada de este hospital de antemano»: como es ficticio, nada está en los pesos y todo tiene que venir de las fuentes."
+  },
+  {
+   "slug": "rag-y-mcp",
+   "i": 3,
+   "snippet": "documentos-buscar",
+   "nota": "Recuperar (recuperador e5), aumentar (fragmentos con fuente como ToolMessage); la generación la hace el bucle."
+  },
+  {
+   "slug": "rag-y-mcp",
+   "i": 10,
+   "snippet": "descripciones-tools",
+   "nota": "Dos fuentes con distinta frecuencia de cambio: normas en Markdown y estado del día en la API."
+  },
+  {
+   "slug": "rag-y-mcp",
+   "i": 20,
+   "snippet": "encoder-e5-prefijos"
+  },
+  {
+   "slug": "rag-y-mcp",
+   "i": 21,
+   "snippet": "recuperador-coseno-exacto",
+   "nota": "`matriz @ q` es el coseno porque `encoders.py` normaliza todo a norma 1."
+  },
+  {
+   "slug": "rag-y-mcp",
+   "i": 22,
+   "snippet": "recuperador-coseno-exacto",
+   "nota": "Con 56 fragmentos alcanza la búsqueda exacta contra todos; HNSW tiene sentido con millones."
+  },
+  {
+   "slug": "rag-y-mcp",
+   "i": 29,
+   "snippet": "informe-a11"
+  },
+  {
+   "slug": "rag-y-mcp",
+   "i": 31,
+   "snippet": "recuperador-coseno-exacto",
+   "nota": "La rama `if self.reranker` es el cross-encoder; la entrega lo deja en null."
+  },
+  {
+   "slug": "rag-y-mcp",
+   "i": 32,
+   "snippet": "informe-seleccion",
+   "nota": "Puntos 1 y 4: por qué k = 3 no pasaba 0,515 y por qué top-2 con margen 0,005."
+  },
+  {
+   "slug": "rag-y-mcp",
+   "i": 35,
+   "snippet": "informe-seleccion",
+   "nota": "Punto 3: se probaron las tres familias; ganó la estructural y por oración fue la peor."
+  },
+  {
+   "slug": "rag-y-mcp",
+   "i": 36,
+   "snippet": "chunking-estrategias",
+   "nota": "`_ventanas` es longitud fija con solapamiento (40/10 y 80/20 palabras)."
+  },
+  {
+   "slug": "rag-y-mcp",
+   "i": 37,
+   "snippet": "fragmento-con-metadatos"
+  },
+  {
+   "slug": "rag-y-mcp",
+   "i": 39,
+   "snippet": "evaluar-juez"
+  },
+  {
+   "slug": "rag-y-mcp",
+   "i": 53,
+   "snippet": "plan-mcp-pendiente",
+   "nota": "Pendiente: el diseño separa el servidor (tools) del agente y manda logs a stderr porque stdout es el canal MCP."
+  },
+  {
+   "slug": "rag-y-mcp",
+   "i": 54,
+   "snippet": "plan-mcp-pendiente",
+   "nota": "Pendiente: `get_tools()` haría tools/list y cada ejecución un tools/call."
+  },
+  {
+   "slug": "rag-y-mcp",
+   "i": 57,
+   "snippet": "bucle-tool-calling",
+   "nota": "El bucle ya no depende del origen de las tools; el servidor MCP que lo usaría quedó pendiente."
+  },
+  {
+   "slug": "rag-y-mcp",
+   "i": 63,
+   "snippet": "descripciones-tools"
+  },
+  {
+   "slug": "rag-y-mcp",
+   "i": 64,
+   "snippet": "descripciones-api-y-registro",
+   "nota": "Seis tools en un solo nivel: no hizo falta routing jerárquico."
+  },
+  {
+   "slug": "rag-y-mcp",
+   "i": 68,
+   "snippet": "descripciones-tools",
+   "nota": "Mirá `CONSULTAR_TURNOS`: dice explícitamente qué NO tiene y adónde ir."
+  },
+  {
+   "slug": "rag-y-mcp",
+   "i": 69,
+   "snippet": "corrida-log-md"
+  },
+  {
+   "slug": "rag-mcp-rapida",
+   "i": 2,
+   "snippet": "recuperador-coseno-exacto"
+  },
+  {
+   "slug": "rag-mcp-rapida",
+   "i": 3,
+   "snippet": "consigna-metrica-cr"
+  },
+  {
+   "slug": "rag-mcp-rapida",
+   "i": 4,
+   "snippet": "recuperador-coseno-exacto"
+  },
+  {
+   "slug": "rag-mcp-rapida",
+   "i": 5,
+   "snippet": "log-a10-paralelo"
+  },
+  {
+   "slug": "rag-mcp-rapida",
+   "i": 8,
+   "snippet": "seleccion-topk-margen"
+  },
+  {
+   "slug": "rag-mcp-rapida",
+   "i": 9,
+   "snippet": "chunking-por-seccion",
+   "nota": "Ganó la sección `##`; las otras estrategias están en `fragmentar()`."
+  },
+  {
+   "slug": "rag-mcp-rapida",
+   "i": 10,
+   "snippet": "fragmento-con-metadatos"
+  },
+  {
+   "slug": "rag-mcp-rapida",
+   "i": 11,
+   "snippet": "recuperador-desde-config",
+   "nota": "El cross-encoder se carga solo si `config.json` trae `reranker`; la entrega lo deja en null."
+  },
+  {
+   "slug": "rag-mcp-rapida",
+   "i": 13,
+   "snippet": "informe-corridas",
+   "nota": "El juez puntúa CR (recuperación) aparte de F y AR (generación); la corrida 4 dio 5/5/5."
+  },
+  {
+   "slug": "rag-mcp-rapida",
+   "i": 16,
+   "snippet": "plan-mcp-pendiente"
+  },
+  {
+   "slug": "rag-mcp-rapida",
+   "i": 18,
+   "snippet": "plan-mcp-pendiente",
+   "nota": "Pendiente: JSON-RPC 2.0 sobre stdio lo resolverían FastMCP y langchain-mcp-adapters; no hay código propio."
+  },
+  {
+   "slug": "rag-mcp-rapida",
+   "i": 19,
+   "snippet": "herramientas-langchain",
+   "nota": "Estas son las herramientas hardcodeadas; la versión servidor aparte (MCP) quedó pendiente."
+  },
+  {
+   "slug": "rag-mcp-rapida",
+   "i": 20,
+   "snippet": "bucle-tool-calling"
+  },
+  {
+   "slug": "rag-mcp-rapida",
+   "i": 25,
+   "snippet": "api-cliente",
+   "nota": "Los errores de la API vuelven como texto con las opciones válidas para que el modelo se corrija."
+  },
+  {
+   "slug": "rag-mcp-rapida",
+   "i": 26,
+   "snippet": "informe-corridas",
+   "nota": "Ruteo 1,00 en las cuatro corridas con solo seis tools en un nivel."
+  },
+  {
+   "slug": "rag-mcp-rapida",
+   "i": 28,
+   "snippet": "descripciones-tools"
+  },
+  {
+   "slug": "rag-mcp-rapida",
+   "i": 29,
+   "snippet": "corrida-log-md"
+  },
+  {
+   "slug": "rag-mcp-rapida",
+   "i": 31,
+   "snippet": "informe-a11",
+   "nota": "Más fragmentos (top-3) arreglaban A11 pero metían ruido; poco y bien elegido ganó."
+  },
+  {
+   "slug": "palabra-al-transformer",
+   "i": 21,
+   "snippet": "encoder-bert-promedio"
+  },
+  {
+   "slug": "palabra-al-transformer",
+   "i": 27,
+   "snippet": "plan-atencion-pendiente",
+   "nota": "Pendiente: así estaba planeada la atención donde cada token mira a todos."
+  },
+  {
+   "slug": "palabra-al-transformer",
+   "i": 32,
+   "snippet": "modelo-llm-openrouter"
+  },
+  {
+   "slug": "transformers-a-fondo",
+   "i": 11,
+   "snippet": "test-atencion-ejemplo-clase",
+   "nota": "Pendiente: estos tests con 'the cat sat' son los que tenía que pasar `atencion.py`."
+  },
+  {
+   "slug": "transformers-a-fondo",
+   "i": 18,
+   "snippet": "test-atencion-escala-multicabeza-ln",
+   "nota": "Pendiente: `test_escala_por_raiz_de_dk` y la estabilidad del softmax fijan el escalado y el truco de restar el máximo."
+  },
+  {
+   "slug": "transformers-a-fondo",
+   "i": 20,
+   "snippet": "test-atencion-ejemplo-clase",
+   "nota": "Pendiente: `test_mascara_causal` exige ceros arriba de la diagonal; la parte 5 lo aplica a mano."
+  },
+  {
+   "slug": "transformers-a-fondo",
+   "i": 26,
+   "snippet": "test-atencion-escala-multicabeza-ln",
+   "nota": "Pendiente: `TestLayerNorm` fija layer norm sin γ/β."
+  },
+  {
+   "slug": "transformers-a-fondo",
+   "i": 34,
+   "snippet": "informe-por-que-e5"
+  },
+  {
+   "slug": "transformers-a-fondo",
+   "i": 36,
+   "snippet": "encoder-e5-prefijos",
+   "nota": "Este es el lado encoder (e5-base recupera); el decoder es deepseek en `hospital/agente/modelo.py`."
+  },
+  {
+   "slug": "transformers-a-fondo",
+   "i": 42,
+   "snippet": "ejercicio-a-mano"
+  },
+  {
+   "slug": "como-se-entrena-un-llm",
+   "i": 36,
+   "snippet": "bucle-tool-calling"
+  },
+  {
+   "slug": "como-se-entrena-un-llm",
+   "i": 47,
+   "snippet": "plan-mcp-pendiente"
+  },
+  {
+   "slug": "como-se-entrena-un-llm",
+   "i": 48,
+   "snippet": "descripciones-tools",
+   "nota": "En MCP una herramienta es nombre + descripción + esquema; estas descripciones son las que iba a publicar el servidor."
+  },
+  {
+   "slug": "como-se-entrena-un-llm",
+   "i": 49,
+   "snippet": "log-a10-paralelo"
+  },
+  {
+   "slug": "agentes-y-multiagentes",
+   "i": 14,
+   "snippet": "bucle-tool-calling",
+   "nota": "Es agente y no workflow: el modelo decide qué tools llamar y cuándo cortar (`if not ai.tool_calls`)."
+  },
+  {
+   "slug": "agentes-y-multiagentes",
+   "i": 19,
+   "snippet": "herramientas-langchain",
+   "nota": "`@tool` acá y `bind_tools` en `bucle.py`, con `ChatOpenAI` contra OpenRouter en `modelo.py`."
+  },
+  {
+   "slug": "agentes-y-multiagentes",
+   "i": 20,
+   "snippet": "descripciones-tools",
+   "nota": "La frase «con las mismas palabras que usó el paciente… una búsqueda por tema» es el arreglo de A11."
+  },
+  {
+   "slug": "agentes-y-multiagentes",
+   "i": 26,
+   "snippet": "bucle-tool-calling",
+   "nota": "El mismo ciclo ReAct que arma LangGraph, escrito a mano."
+  },
+  {
+   "slug": "segmentacion-y-stable-diffusion",
+   "i": 22,
+   "snippet": "encoder-e5-prefijos"
+  },
+  {
+   "slug": "segmentacion-y-stable-diffusion",
+   "i": 51,
+   "snippet": "encoder-e5-prefijos",
+   "nota": "Como CLIP, e5 se entrenó de forma contrastiva acercando pares (consulta, pasaje)."
+  },
+  {
+   "slug": "segmentacion-y-stable-diffusion",
+   "i": 52,
+   "snippet": "encoder-bert-promedio",
+   "nota": "`_normalizar` divide por la norma L2: después el producto punto es el coseno, como en la matriz S de CLIP."
+  },
+  {
+   "slug": "cierre-magnifica-humanitas",
+   "i": 25,
+   "snippet": "prompt-sistema"
+  },
+  {
+   "slug": "cierre-magnifica-humanitas",
+   "i": 45,
+   "snippet": "plan-mcp-pendiente"
+  }
+ ]
+}

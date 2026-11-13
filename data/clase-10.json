@@ -1,0 +1,2472 @@
+{
+ "num": 10,
+ "nn": "10",
+ "fecha": "7 oct",
+ "titulo": "Agentes: sistemas multiagente, especialización, contexto y orquestación",
+ "bloque": "Agentes",
+ "decks": [
+  {
+   "slug": "agentes-y-multiagentes",
+   "titulo": "Agentes y sistemas multiagente",
+   "slides": [
+    {
+     "i": 0,
+     "title": "Inteligencia Artificial Generativa (AI Gen)",
+     "section": "",
+     "resumen": "Portada de la clase 10: agentes y sistemas multiagente.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Portada",
+     "last": 63
+    },
+    {
+     "i": 1,
+     "title": "Qué es un agente",
+     "section": "",
+     "resumen": "Agenda: qué es un agente, el agente con LLM, tools, ReAct, otros tipos, multiagente y cuándo repartir.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Portada",
+     "last": 63
+    },
+    {
+     "i": 2,
+     "title": "¿Un LLM es un agente?",
+     "section": "Qué es un agente",
+     "resumen": "Quiz: un LLM **por sí solo no es un agente**. Recibe texto y devuelve texto; se vuelve agente cuando percibe y actúa en un loop.",
+     "claves": [
+      {
+       "id": "agente",
+       "label": "Agente",
+       "glos": true
+      },
+      {
+       "id": "llm",
+       "label": "LLM (Large Language Model)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Qué es un agente",
+     "last": 63
+    },
+    {
+     "i": 3,
+     "title": "La definición de Russell & Norvig",
+     "section": "Qué es un agente",
+     "resumen": "Russell & Norvig: un **agente** es cualquier cosa que percibe su entorno con **sensores** y actúa sobre él con **actuadores**. Es la definición canónica.",
+     "claves": [
+      {
+       "id": "agente",
+       "label": "Agente",
+       "glos": true
+      },
+      {
+       "id": "sensores",
+       "label": "sensores",
+       "glos": false
+      },
+      {
+       "id": "actuadores",
+       "label": "actuadores",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/01/#d=introduccion&s=63",
+       "clase": 1,
+       "cnn": "01",
+       "i": 63,
+       "title": "Tipos de Agentes en IA",
+       "por": "tipos de agentes en IA"
+      }
+     ],
+     "key": true,
+     "section_label": "Qué es un agente",
+     "last": 63
+    },
+    {
+     "i": 4,
+     "title": "Lo que la definición no menciona",
+     "section": "Qué es un agente",
+     "resumen": "La definición es amplia a propósito: no exige LLM, ni robot, ni inteligencia. Antes de diseñar, preguntá qué percibe, qué hace y en qué ambiente.",
+     "claves": [
+      {
+       "id": "agente",
+       "label": "Agente",
+       "glos": true
+      },
+      {
+       "id": "peas",
+       "label": "PEAS",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Qué es un agente",
+     "last": 63
+    },
+    {
+     "i": 5,
+     "title": "El agente racional",
+     "section": "Qué es un agente",
+     "resumen": "**Agente racional**: elige la acción que maximiza la **medida de performance** esperada con lo que percibió. Si la medida está mal especificada, hace algo indeseable.",
+     "claves": [
+      {
+       "id": "agente-racional",
+       "label": "Agente racional (definición de IA)",
+       "glos": true
+      },
+      {
+       "id": "medida de performance",
+       "label": "medida de performance",
+       "glos": false
+      }
+     ],
+     "tp": [
+      {
+       "tp": 4,
+       "texto": "Tu medida de performance eran 9 controles: un caso cuenta como resuelto solo si los 9 están bien.",
+       "tp_titulo": "El agente de admisión de guardia (TP final)",
+       "code": "tp4-comparar-9-controles",
+       "nota": ""
+      }
+     ],
+     "ver": [
+      {
+       "url": "/clases/13/#d=cierre-magnifica-humanitas&s=28",
+       "clase": 13,
+       "cnn": "13",
+       "i": 28,
+       "title": "Objetivos instrumentales",
+       "por": "objetivos instrumentales"
+      }
+     ],
+     "key": true,
+     "section_label": "Qué es un agente",
+     "last": 63
+    },
+    {
+     "i": 6,
+     "title": "Racionalidad: actuar bien según una medida",
+     "section": "Qué es un agente",
+     "resumen": "Lo racional depende de cuatro factores: la medida, el conocimiento previo, las acciones posibles y lo percibido. Este último después se llama **contexto**.",
+     "claves": [
+      {
+       "id": "agente-racional",
+       "label": "Agente racional (definición de IA)",
+       "glos": true
+      },
+      {
+       "id": "contexto-de-agente",
+       "label": "El repo como contexto",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Qué es un agente",
+     "last": 63
+    },
+    {
+     "i": 7,
+     "title": "Función de agente y programa de agente",
+     "section": "Qué es un agente",
+     "resumen": "La **función** de agente mapea historias de percepciones a acciones (tabla casi infinita); el **programa** es el código que corre y solo ve la percepción actual.",
+     "claves": [
+      {
+       "id": "funcion de agente",
+       "label": "funcion de agente",
+       "glos": false
+      },
+      {
+       "id": "programa de agente",
+       "label": "programa de agente",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Qué es un agente",
+     "last": 63
+    },
+    {
+     "i": 8,
+     "title": "Arquitecturas clásicas de agente",
+     "section": "Qué es un agente",
+     "resumen": "Arquitecturas clásicas: reflejo simple, con modelo, basado en objetivos, en utilidad y que aprende. Cada una agrega una pieza a la anterior.",
+     "claves": [
+      {
+       "id": "arquitecturas-clasicas-de-agente",
+       "label": "Arquitecturas clásicas de agente",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/01/#d=introduccion&s=63",
+       "clase": 1,
+       "cnn": "01",
+       "i": 63,
+       "title": "Tipos de Agentes en IA",
+       "por": "tipos de agentes en IA"
+      }
+     ],
+     "key": false,
+     "section_label": "Qué es un agente",
+     "last": 63
+    },
+    {
+     "i": 9,
+     "title": "Un auto autónomo en cada arquitectura",
+     "section": "Qué es un agente",
+     "resumen": "El auto autónomo en cada arquitectura: el modelo recuerda lo que no ve, el objetivo da destino, la utilidad elige la ruta y el aprendizaje corrige al diseñador.",
+     "claves": [
+      {
+       "id": "arquitecturas-clasicas-de-agente",
+       "label": "Arquitecturas clásicas de agente",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Qué es un agente",
+     "last": 63
+    },
+    {
+     "i": 10,
+     "title": "Dos agentes, una descripción PEAS",
+     "section": "Qué es un agente",
+     "resumen": "**PEAS**: medida de **P**erformance, **E**ntorno, **A**ctuadores y **S**ensores. Al LLM, sus tools le dan los actuadores y sus resultados, los sensores.",
+     "claves": [
+      {
+       "id": "peas",
+       "label": "PEAS",
+       "glos": true
+      },
+      {
+       "id": "agente",
+       "label": "Agente",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 4,
+       "texto": "P: 9 controles. E: entorno de admisión. A: `preguntar`, `registrar_decision`. S: `leer_triage` y lo que devuelven las tools.",
+       "tp_titulo": "El agente de admisión de guardia (TP final)",
+       "code": "tp4-entorno-herramientas",
+       "nota": "P = `comparar` (9 controles); A = `preguntar`, `registrar_decision`; S = `leer_triage` y las observaciones."
+      }
+     ],
+     "ver": [
+      {
+       "url": "/clases/01/#d=introduccion&s=64",
+       "clase": 1,
+       "cnn": "01",
+       "i": 64,
+       "title": "Dimensiones del Entorno",
+       "por": "dimensiones del entorno"
+      }
+     ],
+     "key": true,
+     "section_label": "Qué es un agente",
+     "last": 63
+    },
+    {
+     "i": 11,
+     "title": "El agente basado en LLM",
+     "section": "",
+     "resumen": "Sección 2: el agente basado en LLM.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Portada",
+     "last": 63
+    },
+    {
+     "i": 12,
+     "title": "Agente = LLM + planificación + tools",
+     "section": "El agente basado en LLM",
+     "resumen": "Lilian Weng: **agente = LLM + planificación + tools** (+ memoria). El LLM es el cerebro; tools y planificación organizan la clase.",
+     "claves": [
+      {
+       "id": "agente",
+       "label": "Agente",
+       "glos": true
+      },
+      {
+       "id": "llm",
+       "label": "LLM (Large Language Model)",
+       "glos": true
+      },
+      {
+       "id": "planificacion",
+       "label": "planificacion",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "El agente basado en LLM",
+     "last": 63
+    },
+    {
+     "i": 13,
+     "title": "Dos formas de conectar un LLM con tools",
+     "section": "El agente basado en LLM",
+     "resumen": "Mismo LLM y mismas tools, dos formas: el **código** decide el próximo paso (pasos fijos) o lo decide el **modelo** en un loop.",
+     "claves": [
+      {
+       "id": "workflow-vs-agente",
+       "label": "Workflow vs agente (Anthropic)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "El agente basado en LLM",
+     "last": 63
+    },
+    {
+     "i": 14,
+     "title": "Workflow o agente",
+     "section": "El agente basado en LLM",
+     "resumen": "Anthropic: **workflow** si el código fija el camino; **agente** si el LLM usa tools en un loop según lo que observa. Los sistemas reales mezclan las dos.",
+     "claves": [
+      {
+       "id": "workflow-vs-agente",
+       "label": "Workflow vs agente (Anthropic)",
+       "glos": true
+      },
+      {
+       "id": "agente",
+       "label": "Agente",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 3,
+       "texto": "Hiciste un agente: el modelo elige tools y cuándo terminar.",
+       "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+       "code": "tp3-bucle-tool-calling",
+       "nota": "Es agente y no workflow: el modelo decide qué tools llamar y cuándo cortar (`if not ai.tool_calls`)."
+      },
+      {
+       "tp": 4,
+       "texto": "El de admisión también: 5 tools, el modelo decide el recorrido.",
+       "tp_titulo": "El agente de admisión de guardia (TP final)",
+       "code": "tp4-entorno-herramientas",
+       "nota": "No hay un orden fijo en el código: el modelo elige qué herramienta llamar en cada turno."
+      }
+     ],
+     "ver": [
+      {
+       "url": "/clases/05/#d=prompting&s=43",
+       "clase": 5,
+       "cnn": "05",
+       "i": 43,
+       "title": "Prompt chaining",
+       "por": "prompt chaining, un workflow"
+      }
+     ],
+     "key": true,
+     "section_label": "El agente basado en LLM",
+     "last": 63
+    },
+    {
+     "i": 15,
+     "title": "Cuándo vale la pena un agente",
+     "section": "El agente basado en LLM",
+     "resumen": "Empezá por **lo más simple posible**: a veces no hace falta un agente. Cuesta latencia y plata, y los errores se acumulan.",
+     "claves": [
+      {
+       "id": "workflow-vs-agente",
+       "label": "Workflow vs agente (Anthropic)",
+       "glos": true
+      },
+      {
+       "id": "costo",
+       "label": "costo",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "El agente basado en LLM",
+     "last": 63
+    },
+    {
+     "i": 16,
+     "title": "Los agentes tienen tools",
+     "section": "",
+     "resumen": "Sección 3: los agentes tienen tools.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Portada",
+     "last": 63
+    },
+    {
+     "i": 17,
+     "title": "Qué es una tool",
+     "section": "Los agentes tienen tools",
+     "resumen": "Una **tool** es una función que el agente pide: nombre, descripción y parámetros van al contexto. El LLM solo genera el pedido; **el programa ejecuta**.",
+     "claves": [
+      {
+       "id": "tool-calling",
+       "label": "Uso de herramientas (tool calling)",
+       "glos": true
+      },
+      {
+       "id": "descripcion-como-disparador",
+       "label": "La descripción como disparador",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 4,
+       "texto": "Cinco tools fijas: `leer_triage`, `preguntar`, `verificar_afiliacion`, `buscar_normativa` y `registrar_decision`.",
+       "tp_titulo": "El agente de admisión de guardia (TP final)",
+       "code": "tp4-entorno-herramientas",
+       "nota": ""
+      }
+     ],
+     "ver": [
+      {
+       "url": "/clases/09/#d=como-se-entrena-un-llm&s=48",
+       "clase": 9,
+       "cnn": "09",
+       "i": 48,
+       "title": "MCP: una herramienta es una definición",
+       "por": "una tool es una definición"
+      }
+     ],
+     "key": true,
+     "section_label": "Los agentes tienen tools",
+     "last": 63
+    },
+    {
+     "i": 18,
+     "title": "Un contrato con un sistema no determinístico",
+     "section": "Los agentes tienen tools",
+     "resumen": "Una tool es un contrato con un sistema **no determinístico**: puede llamarla de más, de menos o con argumentos raros. Se diseña pensando en quien la llama.",
+     "claves": [
+      {
+       "id": "tool-calling",
+       "label": "Uso de herramientas (tool calling)",
+       "glos": true
+      },
+      {
+       "id": "no determinismo",
+       "label": "no determinismo",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Los agentes tienen tools",
+     "last": 63
+    },
+    {
+     "i": 19,
+     "title": "Una tool en código",
+     "section": "Los agentes tienen tools",
+     "resumen": "En código: `@tool` + docstring. El modelo ve el nombre, los tipos y el docstring, **nunca el cuerpo**. Ojo: `eval()` sobre texto del modelo es inaceptable en producción.",
+     "claves": [
+      {
+       "id": "tool-calling",
+       "label": "Uso de herramientas (tool calling)",
+       "glos": true
+      },
+      {
+       "id": "langchain",
+       "label": "langchain",
+       "glos": false
+      }
+     ],
+     "tp": [
+      {
+       "tp": 3,
+       "texto": "Usaste `@tool` y `bind_tools` en LangChain, con `ChatOpenAI` apuntando a OpenRouter.",
+       "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+       "code": "tp3-herramientas-langchain",
+       "nota": "`@tool` acá y `bind_tools` en `bucle.py`, con `ChatOpenAI` contra OpenRouter en `modelo.py`."
+      }
+     ],
+     "ver": [
+      {
+       "url": "/clases/09/#d=como-se-entrena-un-llm&s=42",
+       "clase": 9,
+       "cnn": "09",
+       "i": 42,
+       "title": "Calcular: la misma cuenta por la API",
+       "por": "la llamada vista desde la API"
+      }
+     ],
+     "key": false,
+     "section_label": "Los agentes tienen tools",
+     "last": 63
+    },
+    {
+     "i": 20,
+     "title": "Principios para diseñar tools",
+     "section": "Los agentes tienen tools",
+     "resumen": "Diseño de tools: **pocas y consolidadas**, nombres con prefijo, devolver contexto con significado y respuestas cortas. El contexto es caro y la memoria, barata.",
+     "claves": [
+      {
+       "id": "tool-calling",
+       "label": "Uso de herramientas (tool calling)",
+       "glos": true
+      },
+      {
+       "id": "routing-de-herramientas",
+       "label": "Patrones de catálogo: routing jerárquico y catálogo por fase",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 3,
+       "texto": "Arreglaste A11 cambiando la descripción de `buscar_documentos` («con las palabras del paciente, una búsqueda por tema»): CR 5,000.",
+       "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+       "code": "tp3-descripciones-tools",
+       "nota": "La frase «con las mismas palabras que usó el paciente… una búsqueda por tema» es el arreglo de A11."
+      }
+     ],
+     "ver": [
+      {
+       "url": "/clases/06/#d=rag-y-mcp&s=63",
+       "clase": 6,
+       "cnn": "06",
+       "i": 63,
+       "title": "Cuatro principios de diseño",
+       "por": "cuatro principios de diseño"
+      }
+     ],
+     "key": false,
+     "section_label": "Los agentes tienen tools",
+     "last": 63
+    },
+    {
+     "i": 21,
+     "title": "ReAct",
+     "section": "",
+     "resumen": "Sección 4: ReAct.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Portada",
+     "last": 63
+    },
+    {
+     "i": 22,
+     "title": "ReAct: pensar también es una acción",
+     "section": "ReAct",
+     "resumen": "**ReAct** suma el lenguaje a las acciones ($\\hat A = A \\cup L$): intercala **pensamientos** y **acciones** hasta poder responder. Razonar para actuar y actuar para razonar.",
+     "claves": [
+      {
+       "id": "react",
+       "label": "ReAct",
+       "glos": true
+      },
+      {
+       "id": "chain-of-thought",
+       "label": "Chain of Thought (CoT)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/05/#d=prompting&s=37",
+       "clase": 5,
+       "cnn": "05",
+       "i": 37,
+       "title": "Chain of Thought (CoT)",
+       "por": "chain of thought"
+      }
+     ],
+     "key": true,
+     "section_label": "ReAct",
+     "last": 63
+    },
+    {
+     "i": 23,
+     "title": "Una trayectoria ReAct",
+     "section": "ReAct",
+     "resumen": "Una trayectoria de HotpotQA: los pensamientos descomponen la pregunta, extraen lo importante, reformulan cuando falla la búsqueda y sintetizan la respuesta.",
+     "claves": [
+      {
+       "id": "react",
+       "label": "ReAct",
+       "glos": true
+      },
+      {
+       "id": "trayectoria",
+       "label": "trayectoria",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "ReAct",
+     "last": 63
+    },
+    {
+     "i": 24,
+     "title": "Las tools y la instrucción",
+     "section": "ReAct",
+     "resumen": "En 2022, ReAct corría sobre modelos de **completado** (PaLM, davinci), sin roles; las tools eran tres líneas de texto en la instrucción.",
+     "claves": [
+      {
+       "id": "react",
+       "label": "ReAct",
+       "glos": true
+      },
+      {
+       "id": "few-shot",
+       "label": "In-context learning: zero / few / many-shot",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "ReAct",
+     "last": 63
+    },
+    {
+     "i": 25,
+     "title": "El prompt completo y el corte",
+     "section": "ReAct",
+     "resumen": "Cada paso es una llamada de completado cortada antes de `Observation`; el código ejecuta la acción, pega el resultado y repite hasta `Finish` o 7 pasos.",
+     "claves": [
+      {
+       "id": "react",
+       "label": "ReAct",
+       "glos": true
+      },
+      {
+       "id": "stop sequence",
+       "label": "stop sequence",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/09/#d=como-se-entrena-un-llm&s=40",
+       "clase": 9,
+       "cnn": "09",
+       "i": 40,
+       "title": "Calcular: lo que escribe Llama 3.1",
+       "por": "el modelo se detiene para la tool"
+      }
+     ],
+     "key": false,
+     "section_label": "ReAct",
+     "last": 63
+    },
+    {
+     "i": 26,
+     "title": "ReAct en LangGraph",
+     "section": "ReAct",
+     "resumen": "ReAct en LangGraph: un `agent_node` con tools enlazadas y un `ToolNode`; la arista tools → agent es el loop, y el modelo decide cuándo salir.",
+     "claves": [
+      {
+       "id": "react",
+       "label": "ReAct",
+       "glos": true
+      },
+      {
+       "id": "langgraph",
+       "label": "langgraph",
+       "glos": false
+      }
+     ],
+     "tp": [
+      {
+       "tp": 3,
+       "texto": "Escribiste ese mismo loop a mano, sin LangGraph ni AgentExecutor, para registrar cada mensaje en el log.",
+       "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+       "code": "tp3-bucle-tool-calling",
+       "nota": "El mismo ciclo ReAct que arma LangGraph, escrito a mano."
+      }
+     ],
+     "ver": [],
+     "key": false,
+     "section_label": "ReAct",
+     "last": 63
+    },
+    {
+     "i": 27,
+     "title": "Dos sentidos de «agente ReAct»",
+     "section": "ReAct",
+     "resumen": "«Agente ReAct» hoy tiene dos sentidos: el formato de prompt de 2022 o cualquier loop de tools con llamadas estructuradas (`bind_tools`).",
+     "claves": [
+      {
+       "id": "react",
+       "label": "ReAct",
+       "glos": true
+      },
+      {
+       "id": "tool-calling",
+       "label": "Uso de herramientas (tool calling)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/09/#d=como-se-entrena-un-llm&s=49",
+       "clase": 9,
+       "cnn": "09",
+       "i": 49,
+       "title": "MCP: lo que aprende el modelo",
+       "por": "function calling genérico"
+      }
+     ],
+     "key": false,
+     "section_label": "ReAct",
+     "last": 63
+    },
+    {
+     "i": 28,
+     "title": "Otros tres tipos",
+     "section": "",
+     "resumen": "Sección 5: otros tres tipos de agente.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Portada",
+     "last": 63
+    },
+    {
+     "i": 29,
+     "title": "Dos preguntas para cada tipo",
+     "section": "Otros tres tipos",
+     "resumen": "Dos preguntas para comparar los tipos: **¿cuándo se planifica?** y **¿cuántas veces vuelve a razonar el LLM?** ReAct: nunca antes, y en cada paso.",
+     "claves": [
+      {
+       "id": "react",
+       "label": "ReAct",
+       "glos": true
+      },
+      {
+       "id": "planificacion",
+       "label": "planificacion",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Otros tres tipos",
+     "last": 63
+    },
+    {
+     "i": 30,
+     "title": "Plan-and-Execute: planificar primero",
+     "section": "Otros tres tipos",
+     "resumen": "**Plan-and-Execute**: un planner escribe el plan completo, los executors (pequeños ReAct) resuelven cada paso y un re-planner decide si sigue o replanifica.",
+     "claves": [
+      {
+       "id": "plan-and-execute",
+       "label": "Plan-and-Execute",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/05/#d=prompting&s=43",
+       "clase": 5,
+       "cnn": "05",
+       "i": 43,
+       "title": "Prompt chaining",
+       "por": "prompt chaining"
+      }
+     ],
+     "key": true,
+     "section_label": "Otros tres tipos",
+     "last": 63
+    },
+    {
+     "i": 31,
+     "title": "Un plan para la misma pregunta",
+     "section": "Otros tres tipos",
+     "resumen": "La misma pregunta del Apple Remote, con un plan de dos pasos armado por la cátedra. La búsqueda fallida la resuelve el executor sin volver al planner.",
+     "claves": [
+      {
+       "id": "plan-and-execute",
+       "label": "Plan-and-Execute",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Otros tres tipos",
+     "last": 63
+    },
+    {
+     "i": 32,
+     "title": "Qué gana y qué cuesta planificar",
+     "section": "Otros tres tipos",
+     "resumen": "Planificar ahorra llamadas al modelo grande y fuerza a pensar la tarea entera, pero las ventajas no están medidas y el plan no conecta datos entre pasos.",
+     "claves": [
+      {
+       "id": "plan-and-execute",
+       "label": "Plan-and-Execute",
+       "glos": true
+      },
+      {
+       "id": "costo",
+       "label": "costo",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Otros tres tipos",
+     "last": 63
+    },
+    {
+     "i": 33,
+     "title": "Reflexion: intentar, evaluar, reflexionar",
+     "section": "Otros tres tipos",
+     "resumen": "**Reflexion**: el Actor intenta, el Evaluator juzga y, si falla, se escribe una **crítica en lenguaje natural** como memoria para el próximo intento. No toca los pesos.",
+     "claves": [
+      {
+       "id": "reflexion",
+       "label": "Reflexion",
+       "glos": true
+      },
+      {
+       "id": "memoria",
+       "label": "memoria",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": true,
+     "section_label": "Otros tres tipos",
+     "last": 63
+    },
+    {
+     "i": 34,
+     "title": "Una reflexión, en código",
+     "section": "Otros tres tipos",
+     "resumen": "Ejemplo: una solución que solo cuenta paréntesis falla los tests que generó el propio agente; la reflexión dice «importa el orden» y guía el siguiente intento.",
+     "claves": [
+      {
+       "id": "reflexion",
+       "label": "Reflexion",
+       "glos": true
+      },
+      {
+       "id": "tests",
+       "label": "tests",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Otros tres tipos",
+     "last": 63
+    },
+    {
+     "i": 35,
+     "title": "Qué gana y qué cuesta reflexionar",
+     "section": "Otros tres tipos",
+     "resumen": "Reflexion llegó a 91 % en HumanEval (vs 80,1 % de GPT-4), pero necesita una **señal clara de éxito** y cuesta varios intentos.",
+     "claves": [
+      {
+       "id": "reflexion",
+       "label": "Reflexion",
+       "glos": true
+      },
+      {
+       "id": "evals",
+       "label": "Evals (eval set propio)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Otros tres tipos",
+     "last": 63
+    },
+    {
+     "i": 36,
+     "title": "ReWOO: planificar con variables",
+     "section": "Otros tres tipos",
+     "resumen": "**ReWOO**: el plan se escribe completo con **variables** (`#E1`) y todas las tools se ejecutan sin volver a razonar. El LLM piensa solo al planificar y al resolver.",
+     "claves": [
+      {
+       "id": "rewoo",
+       "label": "ReWOO",
+       "glos": true
+      },
+      {
+       "id": "planificacion",
+       "label": "planificacion",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": true,
+     "section_label": "Otros tres tipos",
+     "last": 63
+    },
+    {
+     "i": 37,
+     "title": "Un plan ReWOO",
+     "section": "Otros tres tipos",
+     "resumen": "En el plan ReWOO, E4 usa el resultado de E2 sin conocerlo todavía. Un LLM puede ser una tool (`LLM[...]`): una llamada al planner, cinco ejecuciones y un solver.",
+     "claves": [
+      {
+       "id": "rewoo",
+       "label": "ReWOO",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Otros tres tipos",
+     "last": 63
+    },
+    {
+     "i": 38,
+     "title": "Qué gana y qué cuesta planificar con variables",
+     "section": "Otros tres tipos",
+     "resumen": "ReWOO ataca el **costo**: en ReAct cada paso reenvía el prompt acumulado. A cambio, si una tool devuelve algo inesperado, nadie replanifica.",
+     "claves": [
+      {
+       "id": "rewoo",
+       "label": "ReWOO",
+       "glos": true
+      },
+      {
+       "id": "costo-por-token",
+       "label": "Costo por token / fórmula del costo",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Otros tres tipos",
+     "last": 63
+    },
+    {
+     "i": 39,
+     "title": "Los cuatro tipos, comparados",
+     "section": "Otros tres tipos",
+     "resumen": "Comparación: **ReAct** para tareas exploratorias, **Plan-and-Execute** para largas y predecibles, **ReWOO** para ahorrar tokens y **Reflexion** cuando hay un evaluador claro.",
+     "claves": [
+      {
+       "id": "react",
+       "label": "ReAct",
+       "glos": true
+      },
+      {
+       "id": "plan-and-execute",
+       "label": "Plan-and-Execute",
+       "glos": true
+      },
+      {
+       "id": "reflexion",
+       "label": "Reflexion",
+       "glos": true
+      },
+      {
+       "id": "rewoo",
+       "label": "ReWOO",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": true,
+     "section_label": "Otros tres tipos",
+     "last": 63
+    },
+    {
+     "i": 40,
+     "title": "Sistemas multiagente",
+     "section": "",
+     "resumen": "Sección 6: sistemas multiagente.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Portada",
+     "last": 63
+    },
+    {
+     "i": 41,
+     "title": "El contexto se degrada",
+     "section": "Sistemas multiagente",
+     "resumen": "**Context rot**: el contexto crece en cada vuelta y, cuanto más largo, peor recuerda el modelo. Hay que buscar el conjunto **más chico** de tokens útiles.",
+     "claves": [
+      {
+       "id": "context-rot",
+       "label": "Context rot",
+       "glos": true
+      },
+      {
+       "id": "contexto-de-agente",
+       "label": "El repo como contexto",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 4,
+       "texto": "El sistema ocupa el 55 % del contexto. `prefijos` subió el contexto por caso y bajó de 10/50 a 6/50 casos resueltos.",
+       "tp_titulo": "El agente de admisión de guardia (TP final)",
+       "code": "tp4-reparto-contexto-doc",
+       "nota": ""
+      }
+     ],
+     "ver": [
+      {
+       "url": "/clases/02/#d=cowork-intro&s=12",
+       "clase": 2,
+       "cnn": "02",
+       "i": 12,
+       "title": "El manejo del contexto",
+       "por": "el manejo del contexto"
+      }
+     ],
+     "key": true,
+     "section_label": "Sistemas multiagente",
+     "last": 63
+    },
+    {
+     "i": 42,
+     "title": "Qué es un sistema multiagente",
+     "section": "Sistemas multiagente",
+     "resumen": "**Multiagente**: varios agentes que interactúan para un problema que excede a uno. Repartir mueve tres palancas: paralelismo, especialización y **aislamiento de contexto**.",
+     "claves": [
+      {
+       "id": "sistema-multiagente",
+       "label": "Sistema multiagente",
+       "glos": true
+      },
+      {
+       "id": "aislamiento-de-contexto",
+       "label": "Aislamiento de contexto",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": true,
+     "section_label": "Sistemas multiagente",
+     "last": 63
+    },
+    {
+     "i": 43,
+     "title": "Multiagente: orquestador y workers",
+     "section": "Sistemas multiagente",
+     "resumen": "Forma básica: un **orquestador** parte la tarea en el momento y cada **worker** resuelve su parte con su propio loop.",
+     "claves": [
+      {
+       "id": "orquestador-workers",
+       "label": "Fan-out / fan-in (orquestador y workers)",
+       "glos": true
+      },
+      {
+       "id": "subagente",
+       "label": "Subagente",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/02/#d=cowork-intro&s=21",
+       "clase": 2,
+       "cnn": "02",
+       "i": 21,
+       "title": "Subagentes: varios trabajando a la vez",
+       "por": "subagentes en paralelo"
+      }
+     ],
+     "key": false,
+     "section_label": "Sistemas multiagente",
+     "last": 63
+    },
+    {
+     "i": 44,
+     "title": "Dónde aparece el orquestador con workers",
+     "section": "Sistemas multiagente",
+     "resumen": "Dónde aparece: edición de código en varios archivos, búsqueda en muchas fuentes y el sistema de investigación de Anthropic. Leer en paralelo no choca; escribir, sí.",
+     "claves": [
+      {
+       "id": "orquestador-workers",
+       "label": "Fan-out / fan-in (orquestador y workers)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Sistemas multiagente",
+     "last": 63
+    },
+    {
+     "i": 45,
+     "title": "Estrella: orquestador y subagentes",
+     "section": "Sistemas multiagente",
+     "resumen": "**Estrella**: cada subagente habla solo con el orquestador, con **su propia ventana**; lee mucho y devuelve poco. «La esencia de buscar es comprimir».",
+     "claves": [
+      {
+       "id": "topologias-multiagente",
+       "label": "Topologías multiagente",
+       "glos": true
+      },
+      {
+       "id": "subagente",
+       "label": "Subagente",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/02/#d=claude-cowork&s=24",
+       "clase": 2,
+       "cnn": "02",
+       "i": 24,
+       "title": "Subagentes: varios trabajando a la vez",
+       "por": "subagentes trabajando a la vez"
+      }
+     ],
+     "key": false,
+     "section_label": "Sistemas multiagente",
+     "last": 63
+    },
+    {
+     "i": 46,
+     "title": "Router: despacho",
+     "section": "Sistemas multiagente",
+     "resumen": "**Router**: clasifica el pedido una vez y lo despacha al especialista; no vuelve a razonar sobre lo que devuelve.",
+     "claves": [
+      {
+       "id": "topologias-multiagente",
+       "label": "Topologías multiagente",
+       "glos": true
+      },
+      {
+       "id": "routing-jerarquico",
+       "label": "Routing jerárquico / catálogo por fase",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/07/#d=rag-mcp-rapida&s=27",
+       "clase": 7,
+       "cnn": "07",
+       "i": 27,
+       "title": "Routing jerárquico y catálogo por fase",
+       "por": "routing jerárquico"
+      }
+     ],
+     "key": false,
+     "section_label": "Sistemas multiagente",
+     "last": 63
+    },
+    {
+     "i": 47,
+     "title": "Red: el control pasa de agente en agente",
+     "section": "Sistemas multiagente",
+     "resumen": "**Red**: sin coordinador, el control pasa de agente en agente con el contexto armado (bienvenida → IT → finanzas).",
+     "claves": [
+      {
+       "id": "topologias-multiagente",
+       "label": "Topologías multiagente",
+       "glos": true
+      },
+      {
+       "id": "handoff",
+       "label": "handoff",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Sistemas multiagente",
+     "last": 63
+    },
+    {
+     "i": 48,
+     "title": "Pizarra: publicar y leer",
+     "section": "Sistemas multiagente",
+     "resumen": "**Pizarra**: cada agente publica en un espacio compartido y lee de ahí. No se mandan mensajes (MetaGPT).",
+     "claves": [
+      {
+       "id": "topologias-multiagente",
+       "label": "Topologías multiagente",
+       "glos": true
+      },
+      {
+       "id": "pizarra",
+       "label": "pizarra",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Sistemas multiagente",
+     "last": 63
+    },
+    {
+     "i": 49,
+     "title": "Pipeline y jerarquía",
+     "section": "Sistemas multiagente",
+     "resumen": "**Pipeline**: cadena fija, un workflow con un agente por paso (ChatDev). **Jerarquía**: un árbol de orquestadores (Contract Net).",
+     "claves": [
+      {
+       "id": "topologias-multiagente",
+       "label": "Topologías multiagente",
+       "glos": true
+      },
+      {
+       "id": "prompt-chaining",
+       "label": "Prompt chaining",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Sistemas multiagente",
+     "last": 63
+    },
+    {
+     "i": 50,
+     "title": "Las topologías, comparadas",
+     "section": "Sistemas multiagente",
+     "resumen": "Tabla de topologías: quién tiene el control, por dónde pasa el contexto, la latencia y los tokens. El orquestador central da trazabilidad a cambio de tiempo.",
+     "claves": [
+      {
+       "id": "topologias-multiagente",
+       "label": "Topologías multiagente",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": true,
+     "section_label": "Sistemas multiagente",
+     "last": 63
+    },
+    {
+     "i": 51,
+     "title": "Primero, un solo agente",
+     "section": "Sistemas multiagente",
+     "resumen": "LangChain: **empezá con un agente** y buenas tools; repartí solo si el contexto o la especialización se vuelven un límite.",
+     "claves": [
+      {
+       "id": "sistema-multiagente",
+       "label": "Sistema multiagente",
+       "glos": true
+      },
+      {
+       "id": "agente",
+       "label": "Agente",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 4,
+       "texto": "Tu agente es uno solo, con 5 tools: el trabajo es secuencial y nunca hizo falta repartir.",
+       "tp_titulo": "El agente de admisión de guardia (TP final)",
+       "code": "tp4-agente-bucle",
+       "nota": "Un solo `AgentePrompt` por caso, con todas las herramientas: no hay subagentes."
+      }
+     ],
+     "ver": [],
+     "key": false,
+     "section_label": "Sistemas multiagente",
+     "last": 63
+    },
+    {
+     "i": 52,
+     "title": "Cuándo repartir",
+     "section": "",
+     "resumen": "Sección 7: cuándo repartir.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Portada",
+     "last": 63
+    },
+    {
+     "i": 53,
+     "title": "El precio de paralelizar",
+     "section": "Cuándo repartir",
+     "resumen": "Un agente gasta ~4× los tokens de un chat; un multiagente, ~15×. El 80 % del desempeño en BrowseComp se explica por tokens: solo paga si la tarea vale.",
+     "claves": [
+      {
+       "id": "costo-por-token",
+       "label": "Costo por token / fórmula del costo",
+       "glos": true
+      },
+      {
+       "id": "sistema-multiagente",
+       "label": "Sistema multiagente",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/05/#d=prompting&s=8",
+       "clase": 5,
+       "cnn": "05",
+       "i": 8,
+       "title": "La fórmula del costo",
+       "por": "la fórmula del costo"
+      }
+     ],
+     "key": false,
+     "section_label": "Cuándo repartir",
+     "last": 63
+    },
+    {
+     "i": 54,
+     "title": "Cómo fallan",
+     "section": "Cuándo repartir",
+     "resumen": "**MAST**: 1.642 trazas de 7 sistemas, entre 41 % y 86,7 % de fallas. Tres categorías: especificación, desalineación entre agentes y verificación.",
+     "claves": [
+      {
+       "id": "mast",
+       "label": "MAST",
+       "glos": true
+      },
+      {
+       "id": "evals",
+       "label": "Evals (eval set propio)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Cuándo repartir",
+     "last": 63
+    },
+    {
+     "i": 55,
+     "title": "El aislamiento hay que configurarlo",
+     "section": "Cuándo repartir",
+     "resumen": "Al pasar el control, el que recibe suele **heredar toda la conversación**. El aislamiento no viene solo: hay que configurarlo y verificarlo en los logs.",
+     "claves": [
+      {
+       "id": "aislamiento-de-contexto",
+       "label": "Aislamiento de contexto",
+       "glos": true
+      },
+      {
+       "id": "handoff",
+       "label": "handoff",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Cuándo repartir",
+     "last": 63
+    },
+    {
+     "i": 56,
+     "title": "Compartir el contexto no alcanza",
+     "section": "Cuándo repartir",
+     "resumen": "Aun con todo el contexto compartido, cada subagente no ve las **decisiones de su hermano**, y chocan al combinar (el Flappy Bird de Cognition).",
+     "claves": [
+      {
+       "id": "aislamiento-de-contexto",
+       "label": "Aislamiento de contexto",
+       "glos": true
+      },
+      {
+       "id": "decisiones implicitas",
+       "label": "decisiones implicitas",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Cuándo repartir",
+     "last": 63
+    },
+    {
+     "i": 57,
+     "title": "El debate: ¿construir multiagentes?",
+     "section": "Cuándo repartir",
+     "resumen": "Cognition («no construyas multiagentes»: un solo hilo) vs. Anthropic (a favor para investigación), con un día de diferencia. Discuten si los agentes necesitan verse.",
+     "claves": [
+      {
+       "id": "sistema-multiagente",
+       "label": "Sistema multiagente",
+       "glos": true
+      },
+      {
+       "id": "debate",
+       "label": "debate",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Cuándo repartir",
+     "last": 63
+    },
+    {
+     "i": 58,
+     "title": "¿El trabajo lee o escribe?",
+     "section": "Cuándo repartir",
+     "resumen": "La regla: si el trabajo **lee**, repartir paga; si **escribe** sobre algo compartido, conviene un solo hilo o límites explícitos.",
+     "claves": [
+      {
+       "id": "lee-o-escribe",
+       "label": "Regla «¿el trabajo lee o escribe?»",
+       "glos": true
+      },
+      {
+       "id": "sistema-multiagente",
+       "label": "Sistema multiagente",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": true,
+     "section_label": "Cuándo repartir",
+     "last": 63
+    },
+    {
+     "i": 59,
+     "title": "Un caso: cómo se descompone",
+     "section": "Cuándo repartir",
+     "resumen": "Caso Kore.ai: «pagá el crédito con la caja de ahorro». Dos lecturas en paralelo y una única escritura, la transferencia, al final y después de validar.",
+     "claves": [
+      {
+       "id": "lee-o-escribe",
+       "label": "Regla «¿el trabajo lee o escribe?»",
+       "glos": true
+      },
+      {
+       "id": "orquestador-workers",
+       "label": "Fan-out / fan-in (orquestador y workers)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Cuándo repartir",
+     "last": 63
+    },
+    {
+     "i": 60,
+     "title": "Conclusions",
+     "section": "",
+     "resumen": "Conclusiones.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Portada",
+     "last": 63
+    },
+    {
+     "i": 61,
+     "title": "Lo que queda de la clase",
+     "section": "Conclusions",
+     "resumen": "Resumen: agente, tools, tipos de agente, multiagente y la regla que los ordena: **empezar por lo más simple que alcance**.",
+     "claves": [
+      {
+       "id": "agente",
+       "label": "Agente",
+       "glos": true
+      },
+      {
+       "id": "tool-calling",
+       "label": "Uso de herramientas (tool calling)",
+       "glos": true
+      },
+      {
+       "id": "sistema-multiagente",
+       "label": "Sistema multiagente",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": true,
+     "section_label": "Conclusions",
+     "last": 63
+    },
+    {
+     "i": 62,
+     "title": "Cómo elegir la arquitectura",
+     "section": "Conclusions",
+     "resumen": "Árbol para elegir la arquitectura: workflow o agente, uno o varios, y qué topología. La mayoría de los casos se resuelve en la segunda o tercera pregunta.",
+     "claves": [
+      {
+       "id": "workflow-vs-agente",
+       "label": "Workflow vs agente (Anthropic)",
+       "glos": true
+      },
+      {
+       "id": "topologias-multiagente",
+       "label": "Topologías multiagente",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Conclusions",
+     "last": 63
+    },
+    {
+     "i": 63,
+     "title": "Para leer después",
+     "section": "Conclusions",
+     "resumen": "Lecturas: ReAct, Reflexion, *Building effective agents* de Anthropic y el debate Cognition vs. Anthropic.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Conclusions",
+     "last": 63
+    }
+   ],
+   "groups": [
+    {
+     "label": "Portada",
+     "slides": [
+      {
+       "i": 0,
+       "title": "Inteligencia Artificial Generativa (AI Gen)",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 1,
+       "title": "Qué es un agente",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 0,
+     "last": 1,
+     "ntp": 0,
+     "nkey": 0
+    },
+    {
+     "label": "Qué es un agente",
+     "slides": [
+      {
+       "i": 2,
+       "title": "¿Un LLM es un agente?",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 3,
+       "title": "La definición de Russell & Norvig",
+       "key": true,
+       "tp": false
+      },
+      {
+       "i": 4,
+       "title": "Lo que la definición no menciona",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 5,
+       "title": "El agente racional",
+       "key": true,
+       "tp": true
+      },
+      {
+       "i": 6,
+       "title": "Racionalidad: actuar bien según una medida",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 7,
+       "title": "Función de agente y programa de agente",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 8,
+       "title": "Arquitecturas clásicas de agente",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 9,
+       "title": "Un auto autónomo en cada arquitectura",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 10,
+       "title": "Dos agentes, una descripción PEAS",
+       "key": true,
+       "tp": true
+      }
+     ],
+     "first": 2,
+     "last": 10,
+     "ntp": 2,
+     "nkey": 3
+    },
+    {
+     "label": "Portada",
+     "slides": [
+      {
+       "i": 11,
+       "title": "El agente basado en LLM",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 11,
+     "last": 11,
+     "ntp": 0,
+     "nkey": 0
+    },
+    {
+     "label": "El agente basado en LLM",
+     "slides": [
+      {
+       "i": 12,
+       "title": "Agente = LLM + planificación + tools",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 13,
+       "title": "Dos formas de conectar un LLM con tools",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 14,
+       "title": "Workflow o agente",
+       "key": true,
+       "tp": true
+      },
+      {
+       "i": 15,
+       "title": "Cuándo vale la pena un agente",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 12,
+     "last": 15,
+     "ntp": 1,
+     "nkey": 1
+    },
+    {
+     "label": "Portada",
+     "slides": [
+      {
+       "i": 16,
+       "title": "Los agentes tienen tools",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 16,
+     "last": 16,
+     "ntp": 0,
+     "nkey": 0
+    },
+    {
+     "label": "Los agentes tienen tools",
+     "slides": [
+      {
+       "i": 17,
+       "title": "Qué es una tool",
+       "key": true,
+       "tp": true
+      },
+      {
+       "i": 18,
+       "title": "Un contrato con un sistema no determinístico",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 19,
+       "title": "Una tool en código",
+       "key": false,
+       "tp": true
+      },
+      {
+       "i": 20,
+       "title": "Principios para diseñar tools",
+       "key": false,
+       "tp": true
+      }
+     ],
+     "first": 17,
+     "last": 20,
+     "ntp": 3,
+     "nkey": 1
+    },
+    {
+     "label": "Portada",
+     "slides": [
+      {
+       "i": 21,
+       "title": "ReAct",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 21,
+     "last": 21,
+     "ntp": 0,
+     "nkey": 0
+    },
+    {
+     "label": "ReAct",
+     "slides": [
+      {
+       "i": 22,
+       "title": "ReAct: pensar también es una acción",
+       "key": true,
+       "tp": false
+      },
+      {
+       "i": 23,
+       "title": "Una trayectoria ReAct",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 24,
+       "title": "Las tools y la instrucción",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 25,
+       "title": "El prompt completo y el corte",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 26,
+       "title": "ReAct en LangGraph",
+       "key": false,
+       "tp": true
+      },
+      {
+       "i": 27,
+       "title": "Dos sentidos de «agente ReAct»",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 22,
+     "last": 27,
+     "ntp": 1,
+     "nkey": 1
+    },
+    {
+     "label": "Portada",
+     "slides": [
+      {
+       "i": 28,
+       "title": "Otros tres tipos",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 28,
+     "last": 28,
+     "ntp": 0,
+     "nkey": 0
+    },
+    {
+     "label": "Otros tres tipos",
+     "slides": [
+      {
+       "i": 29,
+       "title": "Dos preguntas para cada tipo",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 30,
+       "title": "Plan-and-Execute: planificar primero",
+       "key": true,
+       "tp": false
+      },
+      {
+       "i": 31,
+       "title": "Un plan para la misma pregunta",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 32,
+       "title": "Qué gana y qué cuesta planificar",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 33,
+       "title": "Reflexion: intentar, evaluar, reflexionar",
+       "key": true,
+       "tp": false
+      },
+      {
+       "i": 34,
+       "title": "Una reflexión, en código",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 35,
+       "title": "Qué gana y qué cuesta reflexionar",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 36,
+       "title": "ReWOO: planificar con variables",
+       "key": true,
+       "tp": false
+      },
+      {
+       "i": 37,
+       "title": "Un plan ReWOO",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 38,
+       "title": "Qué gana y qué cuesta planificar con variables",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 39,
+       "title": "Los cuatro tipos, comparados",
+       "key": true,
+       "tp": false
+      }
+     ],
+     "first": 29,
+     "last": 39,
+     "ntp": 0,
+     "nkey": 4
+    },
+    {
+     "label": "Portada",
+     "slides": [
+      {
+       "i": 40,
+       "title": "Sistemas multiagente",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 40,
+     "last": 40,
+     "ntp": 0,
+     "nkey": 0
+    },
+    {
+     "label": "Sistemas multiagente",
+     "slides": [
+      {
+       "i": 41,
+       "title": "El contexto se degrada",
+       "key": true,
+       "tp": true
+      },
+      {
+       "i": 42,
+       "title": "Qué es un sistema multiagente",
+       "key": true,
+       "tp": false
+      },
+      {
+       "i": 43,
+       "title": "Multiagente: orquestador y workers",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 44,
+       "title": "Dónde aparece el orquestador con workers",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 45,
+       "title": "Estrella: orquestador y subagentes",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 46,
+       "title": "Router: despacho",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 47,
+       "title": "Red: el control pasa de agente en agente",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 48,
+       "title": "Pizarra: publicar y leer",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 49,
+       "title": "Pipeline y jerarquía",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 50,
+       "title": "Las topologías, comparadas",
+       "key": true,
+       "tp": false
+      },
+      {
+       "i": 51,
+       "title": "Primero, un solo agente",
+       "key": false,
+       "tp": true
+      }
+     ],
+     "first": 41,
+     "last": 51,
+     "ntp": 2,
+     "nkey": 3
+    },
+    {
+     "label": "Portada",
+     "slides": [
+      {
+       "i": 52,
+       "title": "Cuándo repartir",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 52,
+     "last": 52,
+     "ntp": 0,
+     "nkey": 0
+    },
+    {
+     "label": "Cuándo repartir",
+     "slides": [
+      {
+       "i": 53,
+       "title": "El precio de paralelizar",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 54,
+       "title": "Cómo fallan",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 55,
+       "title": "El aislamiento hay que configurarlo",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 56,
+       "title": "Compartir el contexto no alcanza",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 57,
+       "title": "El debate: ¿construir multiagentes?",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 58,
+       "title": "¿El trabajo lee o escribe?",
+       "key": true,
+       "tp": false
+      },
+      {
+       "i": 59,
+       "title": "Un caso: cómo se descompone",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 53,
+     "last": 59,
+     "ntp": 0,
+     "nkey": 1
+    },
+    {
+     "label": "Portada",
+     "slides": [
+      {
+       "i": 60,
+       "title": "Conclusions",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 60,
+     "last": 60,
+     "ntp": 0,
+     "nkey": 0
+    },
+    {
+     "label": "Conclusions",
+     "slides": [
+      {
+       "i": 61,
+       "title": "Lo que queda de la clase",
+       "key": true,
+       "tp": false
+      },
+      {
+       "i": 62,
+       "title": "Cómo elegir la arquitectura",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 63,
+       "title": "Para leer después",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 61,
+     "last": 63,
+     "ntp": 0,
+     "nkey": 1
+    }
+   ],
+   "tab": "Agentes y sistemas multiagente",
+   "extra": false,
+   "total": 64
+  }
+ ],
+ "multi": false,
+ "prev": "09",
+ "next": "11",
+ "snippets": [
+  {
+   "id": "comparar-9-controles",
+   "titulo": "Los 9 controles: medida de performance",
+   "archivo": "admision/comparar.py",
+   "desde": 7,
+   "hasta": 48,
+   "lenguaje": "python",
+   "codigo": "CONTROLES = CAMPOS + [\"verificacion\"]\n\n\ndef _doc(x) -> str | None:\n    return None if x is None else \"\".join(ch for ch in str(x).upper() if ch.isalnum())\n\n\ndef _igual(campo: str, esperado, obtenido) -> bool:\n    if campo == \"numero_documento\":\n        return _doc(esperado) == _doc(obtenido)\n    if campo == \"entidad_a_notificar\":\n        return (esperado is None and obtenido is None) or (\n            esperado is not None and obtenido is not None and _norm(esperado) == _norm(obtenido))\n    return esperado == obtenido\n\n\ndef _verifico(verificacion: dict, log: list[dict]) -> bool:\n    hechas = [(_norm(e[\"argumentos\"].get(\"entidad\", \"\")), _norm(e[\"argumentos\"].get(\"numero_afiliado\", \"\")))\n              for e in log if e[\"herramienta\"] == \"verificar_afiliacion\" and isinstance(e[\"argumentos\"], dict)]\n    if any(e in {_norm(x) for x in verificacion[\"prohibidas\"]} for e, _ in hechas):\n        return False\n    requerida = verificacion[\"requerida\"]\n    return requerida is None or (_norm(requerida[0]), _norm(requerida[1])) in hechas\n\n\ndef comparar(esperada: dict, decision: dict | None, log: list[dict]) -> dict:\n    ficha = esperada[\"ficha\"]\n    if decision is None:\n        controles = {k: False for k in CONTROLES}\n    else:\n        controles = {k: _igual(k, ficha[k], decision.get(k)) for k in CAMPOS}\n        controles[\"verificacion\"] = _verifico(esperada[\"verificacion\"], log)\n    return {\n        \"caso\": esperada[\"caso\"],\n        \"resuelto\": all(controles.values()),\n        \"parcial\": round(sum(controles.values()) / len(controles), 3),\n        \"controles\": controles,\n        \"esperada\": ficha,\n        \"obtenida\": decision,\n        \"llamadas\": len(log),\n        \"invalidas\": sum(not e[\"valida\"] for e in log),\n    }",
+   "que_hace": "Compara la ficha registrada con la esperada: 8 campos más el control de verificación de afiliación; un caso cuenta como resuelto solo si los 9 dan bien.",
+   "como_funciona": "- `CONTROLES = CAMPOS + ['verificacion']`.\n- `_igual` normaliza documento y entidad antes de comparar.\n- `_verifico` revisa en el `log` que se consultó la entidad requerida con el número correcto y ninguna prohibida.\n- `comparar` devuelve `resuelto = all(controles)`, `parcial` y el detalle.",
+   "proposito": "Es código del kit de la cátedra; el TP lo usa como medida de performance tanto para elegir prompts como para reportar.",
+   "interaccion": "Lo usa `admision.correr.puntuar`; `admision_tp/evaluacion_prompts.calcular_metricas_candidato` exige exactamente estos `CONTROLES`.",
+   "teoria": "Medida de performance de un agente racional: un criterio objetivo y estricto (todo o nada) de qué es hacerlo bien.",
+   "key": "tp4-comparar-9-controles",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 5,
+     "title": "El agente racional",
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=5"
+    }
+   ],
+   "nusos": 1
+  },
+  {
+   "id": "entorno-herramientas",
+   "titulo": "Las cinco herramientas del entorno (kit)",
+   "archivo": "admision/entorno.py",
+   "desde": 99,
+   "hasta": 143,
+   "lenguaje": "python",
+   "codigo": "    def _ejecutar(self, h: str, a: dict) -> str:\n        c = self.caso\n        if h == \"leer_triage\":\n            self._paciente(a)\n            return nota_de_triage(c)\n        if h == \"preguntar\":\n            self._paciente(a)\n            quien, tema = _norm(a.get(\"a_quien\", \"\")), _norm(a.get(\"tema\", \"\"))\n            if quien not in (\"paciente\", \"acompanante\") or tema not in (\"cobertura\", \"art\"):\n                raise ValueError(\"a_quien tiene que ser paciente o acompanante, y tema, cobertura o art.\")\n            if quien == \"paciente\" and not c.puede_responder:\n                return \"El paciente no está en condiciones de responder.\"\n            if quien == \"acompanante\" and not c.acompanante:\n                return \"El paciente no tiene acompañante en la guardia.\"\n            sujeto = \"El paciente\" if quien == \"paciente\" else f\"El acompañante ({c.acompanante})\"\n            if tema == \"art\":\n                if not c.trabajo:\n                    return f\"{sujeto} dice que no se lesionó ni enfermó trabajando ni en el trayecto.\"\n                return (f\"{sujeto} dice que la ART de su empleador es {c.art[0]}. CUIL del paciente: {c.art[1]}.\")\n            if c.declarada is None:\n                return f\"{sujeto} dice que no tiene obra social ni prepaga.\"\n            tipo = \"obra social\" if c.declarada[0] == \"obra_social\" else \"prepaga\"\n            return (f\"{sujeto} dice que tiene {c.declarada[1]} ({tipo}), número de afiliado {c.declarada[2]}.\")\n        if h == \"verificar_afiliacion\":\n            entidad, numero = _norm(a.get(\"entidad\", \"\")), _norm(a.get(\"numero_afiliado\", \"\"))\n            conocidas = {}\n            for clave, activa in c.afiliaciones.items():\n                e, n = clave.split(\"|\")\n                conocidas.setdefault(_norm(e), {})[_norm(n)] = (e, activa)\n            if entidad not in {_norm(x) for x in OBRAS_SOCIALES + PREPAGAS + ARTS}:\n                return \"No hay ninguna entidad con ese nombre.\"\n            if numero not in conocidas.get(entidad, {}):\n                return \"La entidad no encuentra ese número de afiliado.\"\n            nombre, activa = conocidas[entidad][numero]\n            return f\"{nombre} informa que la afiliación {numero} está {'activa' if activa else 'inactiva'}.\"\n        if h == \"buscar_normativa\":\n            consulta = str(a.get(\"consulta\", \"\")).strip()\n            if not consulta:\n                raise ValueError(\"falta la consulta.\")\n            try:\n                frs = self.buscador.recuperar(consulta, getattr(self.buscador, \"k_entorno\", K_POR_DEFECTO))\n                return \"\\n\\n\".join(_texto(f) for f in frs) if frs else \"No se encontró ninguna sección.\"\n            except Exception as e:  # un error del buscador del grupo no corta la corrida\n                raise ValueError(f\"el buscador falló: {type(e).__name__}.\") from e\n        if h == \"registrar_decision\":",
+   "que_hace": "Implementa lo que hace cada herramienta: `leer_triage`, `preguntar`, `verificar_afiliacion`, `buscar_normativa` y `registrar_decision`.",
+   "como_funciona": "- `leer_triage` valida el `paciente_id` y devuelve la nota de triage.\n- `preguntar` exige `a_quien` (paciente/acompañante) y `tema` (cobertura/art) y responde según el caso.\n- `verificar_afiliacion` consulta entidad y número contra las afiliaciones del caso.\n- `buscar_normativa` llama al buscador del grupo con `k_entorno` y une los textos.\n- `registrar_decision` valida la ficha y termina el caso. Los errores vuelven como observación.",
+   "proposito": "Es el entorno de la cátedra (no se modifica): define las acciones del agente y lo que percibe. El TP decide sobre él con un solo agente que elige el orden de las llamadas.",
+   "interaccion": "`Entorno.paso` (mismo archivo) lo invoca y aplica `MAX_LLAMADAS = 40`; el agente lo ve a través de `VistaDelAgente`. `agente_prompt._PartidaPrompt.recibir` le pasa `herramienta` y `argumentos` del JSON del modelo.",
+   "teoria": "Tools de un agente: acciones (preguntar, registrar) y sensores (leer triage, observaciones) en la descripción PEAS.",
+   "key": "tp4-entorno-herramientas",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 10,
+     "title": "Dos agentes, una descripción PEAS",
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=10"
+    },
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 14,
+     "title": "Workflow o agente",
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=14"
+    },
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 17,
+     "title": "Qué es una tool",
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=17"
+    }
+   ],
+   "nusos": 3
+  },
+  {
+   "id": "bucle-tool-calling",
+   "titulo": "El bucle de tool calling escrito a mano",
+   "archivo": "hospital/agente/bucle.py",
+   "desde": 25,
+   "hasta": 48,
+   "lenguaje": "python",
+   "codigo": "async def _ejecutar(por_nombre, llamada):\n    tool = por_nombre.get(llamada[\"name\"])\n    if tool is None:\n        return ToolMessage(f\"Error: la herramienta '{llamada['name']}' no existe. Herramientas disponibles: \"\n                           f\"{', '.join(sorted(por_nombre))}.\", tool_call_id=llamada[\"id\"], name=llamada[\"name\"])\n    try:\n        return await tool.ainvoke({**llamada, \"type\": \"tool_call\"})\n    except Exception as e:  # el error vuelve al modelo como texto para que pueda corregirse\n        return ToolMessage(f\"Error al ejecutar {llamada['name']}: {e}\", tool_call_id=llamada[\"id\"], name=llamada[\"name\"])\n\n\nasync def responder(llm, tools, pregunta):\n    \"\"\"Devuelve todos los mensajes de la conversación: sistema, pregunta, AIMessage y ToolMessage.\"\"\"\n    llm_con_tools = llm.bind_tools(tools)\n    por_nombre = {t.name: t for t in tools}\n    mensajes = [SystemMessage(PROMPT), HumanMessage(pregunta)]\n    for _ in range(MAX_PASOS):\n        ai = await llm_con_tools.ainvoke(mensajes)\n        mensajes.append(ai)\n        if not ai.tool_calls:\n            break\n        for llamada in ai.tool_calls:\n            mensajes.append(await _ejecutar(por_nombre, llamada))\n    return mensajes",
+   "que_hace": "Implementa el agente: el modelo pide herramientas, se ejecutan, sus resultados vuelven como `ToolMessage` y se repite hasta que responde sin pedir nada o se llega a 6 pasos.",
+   "como_funciona": "- `responder` enlaza las tools con `llm.bind_tools(tools)` y arma `por_nombre`.\n- Arranca con `[SystemMessage(PROMPT), HumanMessage(pregunta)]`.\n- En cada paso: `ai = await llm_con_tools.ainvoke(mensajes)`; si `ai.tool_calls` está vacío, termina.\n- Si no, ejecuta cada llamada con `_ejecutar` y agrega el `ToolMessage` (puede haber varias en paralelo en el mismo paso).\n- `_ejecutar` devuelve un `ToolMessage` de error si la tool no existe o lanza una excepción.",
+   "proposito": "Se escribió a mano, sin LangGraph ni AgentExecutor, para tener todos los mensajes y poder loguearlos. Es agnóstico del origen de las tools: el docstring lo prepara para las de `langchain-mcp-adapters` (parte 3, pendiente).",
+   "interaccion": "Lo llama `correr()` en `hospital/agente/corrida.py` por cada pregunta; devuelve la lista completa de mensajes, que `resumir()` convierte en respuesta, contextos, herramientas y costo. `tests/test_agente.py` lo prueba con un modelo falso.",
+   "teoria": "Agente ReAct / ciclo de vida de una tool: AIMessage con tool_calls → ejecución → ToolMessage → nueva llamada al modelo.",
+   "key": "tp3-bucle-tool-calling",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "introduccion",
+     "i": 62,
+     "title": "El futuro: agentes autónomos e IA multimodal",
+     "url": "/clases/01/#d=introduccion&s=62"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 57,
+     "title": "Demo: un servidor MCP mínimo",
+     "url": "/clases/06/#d=rag-y-mcp&s=57"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 20,
+     "title": "El ciclo de vida de una herramienta",
+     "url": "/clases/07/#d=rag-mcp-rapida&s=20"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 36,
+     "title": "El circuito con un agente",
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=36"
+    },
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 14,
+     "title": "Workflow o agente",
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=14"
+    },
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 26,
+     "title": "ReAct en LangGraph",
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=26"
+    }
+   ],
+   "nusos": 6
+  },
+  {
+   "id": "herramientas-langchain",
+   "titulo": "Las seis tools como @tool de LangChain",
+   "archivo": "hospital/herramientas.py",
+   "desde": 1,
+   "hasta": 40,
+   "lenguaje": "python",
+   "codigo": "\"\"\"Las seis herramientas de la parte 2 como tools de LangChain. Los nombres son los que exige el evaluador y\nlas descripciones salen de hospital/descripciones.py (las mismas que usa el servidor MCP).\"\"\"\nfrom langchain_core.tools import tool\n\nfrom hospital import api_cliente, documentos\nfrom hospital.descripciones import DESCRIPCIONES\n\n\n@tool(\"buscar_documentos\", description=DESCRIPCIONES[\"buscar_documentos\"])\ndef buscar_documentos(consulta: str) -> str:\n    return documentos.buscar_documentos(consulta)\n\n\n@tool(\"consultar_camas\", description=DESCRIPCIONES[\"consultar_camas\"])\ndef consultar_camas(sector: str) -> str:\n    return api_cliente.camas(sector)\n\n\n@tool(\"consultar_guardia\", description=DESCRIPCIONES[\"consultar_guardia\"])\ndef consultar_guardia(especialidad: str) -> str:\n    return api_cliente.guardia(especialidad)\n\n\n@tool(\"consultar_turnos\", description=DESCRIPCIONES[\"consultar_turnos\"])\ndef consultar_turnos(especialidad: str) -> str:\n    return api_cliente.turnos(especialidad)\n\n\n@tool(\"consultar_farmacia\", description=DESCRIPCIONES[\"consultar_farmacia\"])\ndef consultar_farmacia(medicamento: str) -> str:\n    return api_cliente.farmacia(medicamento)\n\n\n@tool(\"consultar_espera\", description=DESCRIPCIONES[\"consultar_espera\"])\ndef consultar_espera() -> str:\n    return api_cliente.espera()\n\n\nHERRAMIENTAS = [buscar_documentos, consultar_camas, consultar_guardia, consultar_turnos, consultar_farmacia,\n                consultar_espera]",
+   "que_hace": "Envuelve las funciones planas del hospital como herramientas de LangChain con los nombres que exige el evaluador y las descripciones compartidas.",
+   "como_funciona": "- Cada función lleva `@tool(nombre, description=DESCRIPCIONES[nombre])`; LangChain arma el esquema JSON del parámetro a partir de la firma (`consulta: str`, `sector: str`, ...).\n- `buscar_documentos` delega en `documentos.buscar_documentos`; las otras cinco en `api_cliente`.\n- `consultar_espera()` no tiene parámetros.\n- `HERRAMIENTAS` es la lista que se le pasa al agente.",
+   "proposito": "Son herramientas «hardcodeadas» en el proceso del agente. La lógica real vive en módulos sin LangChain para que el servidor MCP planificado pueda publicar las mismas funciones sin duplicar código.",
+   "interaccion": "`agente.py` pasa `HERRAMIENTAS` a `correr()`, que las entrega a `responder()` en `hospital/agente/bucle.py`, donde se enlazan con `bind_tools`.",
+   "teoria": "Una tool en código: nombre, descripción y esquema de parámetros que el modelo ve; tool calling con LangChain.",
+   "key": "tp3-herramientas-langchain",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 19,
+     "title": "Herramienta hardcodeada o servidor aparte",
+     "url": "/clases/07/#d=rag-mcp-rapida&s=19"
+    },
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 19,
+     "title": "Una tool en código",
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=19"
+    }
+   ],
+   "nusos": 2
+  },
+  {
+   "id": "descripciones-tools",
+   "titulo": "Descripciones de tools: fuente, uso, qué NO tienen, valores válidos",
+   "archivo": "hospital/descripciones.py",
+   "desde": 8,
+   "hasta": 38,
+   "lenguaje": "python",
+   "codigo": "BUSCAR_DOCUMENTOS = (\n    \"Busca en los documentos oficiales del Hospital Provincial Arroyo Claro: normas y procedimientos que no \"\n    \"cambian de un día a otro. Sirve para horarios fijos (visitas, altas, farmacia, laboratorio, vacunatorio, \"\n    \"donación de sangre), quién puede visitar o quedarse con un paciente, preparación para estudios y cirugías \"\n    \"(ayunos, dietas), requisitos y documentación para turnos, internación, farmacia y coberturas, triage de \"\n    \"la guardia, derechos del paciente, accesos al edificio, control de infecciones, maternidad, pediatría, \"\n    \"kinesiología, salud mental y telemedicina. NO tiene el estado de hoy (camas libres, profesionales de \"\n    \"guardia, turnos disponibles, stock de farmacia ni tiempos de espera actuales). \"\n    \"consulta: el tema a buscar, en español y con las mismas palabras que usó el paciente (por ejemplo \"\n    \"'cómo es una consulta por telemedicina'). Si la pregunta toca varios temas de los documentos, hacé una \"\n    \"búsqueda por tema. Devuelve los fragmentos más relevantes con su documento y sección de origen.\"\n)\n\nCONSULTAR_CAMAS = (\n    \"Estado de HOY de las camas de internación de un sector: total, ocupadas y libres. Usala para saber si hay \"\n    \"lugar o camas disponibles para internar. \"\n    \"sector: uno de clinica_medica, cirugia_general, terapia_intensiva, pediatria, neonatologia, maternidad.\"\n)\n\nCONSULTAR_GUARDIA = (\n    \"Profesionales que están de guardia HOY en una especialidad, con su horario (por ejemplo 08:00-20:00 es \"\n    \"el turno de día y 20:00-08:00 el de la noche). Usala para saber quién atiende hoy o esta noche. \"\n    \"especialidad: una de clinica_medica, cardiologia, pediatria, traumatologia, obstetricia, salud_mental.\"\n)\n\nCONSULTAR_TURNOS = (\n    \"Próximos turnos disponibles (fecha y hora) con una especialidad en consultorios externos. Usala para saber \"\n    \"cuándo es el primer turno libre. No dice qué hay que llevar al turno: eso está en los documentos. \"\n    \"especialidad: una de cardiologia, dermatologia, traumatologia, psicologia, gastroenterologia, \"\n    \"obstetricia, kinesiologia.\"\n)",
+   "que_hace": "Define el texto que lee el modelo para decidir qué herramienta llamar: `buscar_documentos` para normas fijas y las de la API para el estado de hoy.",
+   "como_funciona": "- `BUSCAR_DOCUMENTOS` lista los temas de los documentos y aclara que NO tiene el estado de hoy; pide buscar «con las mismas palabras que usó el paciente» y hacer una búsqueda por tema.\n- `CONSULTAR_CAMAS`, `CONSULTAR_GUARDIA` y `CONSULTAR_TURNOS` dicen que son el estado de HOY y enumeran los valores válidos del parámetro.\n- `CONSULTAR_TURNOS` agrega: «No dice qué hay que llevar al turno: eso está en los documentos».",
+   "proposito": "El ruteo depende solo de estas descripciones, así que separan norma (documentos) de estado (API) y dicen cuándo NO usar cada tool: ruteo 1,00 en las 4 corridas. La frase de las palabras del paciente arregló A11, y el ejemplo de consulta se cambió por uno de telemedicina para no filtrar la pregunta A01 de dev.",
+   "interaccion": "Las importa `hospital/herramientas.py` a través del diccionario `DESCRIPCIONES`; el PLAN prevé que el servidor MCP use exactamente los mismos textos para que la comparación parte 2 vs. parte 3 sea justa.",
+   "teoria": "Diseño de herramientas: la descripción es la interfaz para el modelo (qué hace, cuándo usarla, cuándo no, parámetros válidos).",
+   "key": "tp3-descripciones-tools",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 2,
+     "cnn": "02",
+     "slug": "cowork-intro",
+     "i": 25,
+     "title": "Cómo el agente descubre y usa una herramienta",
+     "url": "/clases/02/#d=cowork-intro&s=25"
+    },
+    {
+     "clase": 5,
+     "cnn": "05",
+     "slug": "prompting",
+     "i": 33,
+     "title": "Zero-shot vs. few-shot",
+     "url": "/clases/05/#d=prompting&s=33"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 10,
+     "title": "Las fuentes ponen el techo de calidad",
+     "url": "/clases/06/#d=rag-y-mcp&s=10"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 63,
+     "title": "Cuatro principios de diseño",
+     "url": "/clases/06/#d=rag-y-mcp&s=63"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 68,
+     "title": "La descripción dice cuándo NO usarla",
+     "url": "/clases/06/#d=rag-y-mcp&s=68"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 28,
+     "title": "La descripción dice cuándo NO usarla",
+     "url": "/clases/07/#d=rag-mcp-rapida&s=28"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 48,
+     "title": "MCP: una herramienta es una definición",
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=48"
+    },
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 20,
+     "title": "Principios para diseñar tools",
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=20"
+    }
+   ],
+   "nusos": 8
+  },
+  {
+   "id": "reparto-contexto-doc",
+   "titulo": "Reparto medido: sistema 55 %, búsquedas 25 %",
+   "archivo": "docs/optimizacion-prompt.md",
+   "desde": 324,
+   "hasta": 352,
+   "lenguaje": "markdown",
+   "codigo": "**Dónde está el contexto.** `python -m scripts.medir_contexto --trazas <trazas.jsonl> --prompt <spec>`\nrejuega trazas ya jugadas con otro `PromptSpec` (mismas respuestas y observaciones) y reparte\n`caracteres_de_contexto` del kit por tipo de mensaje. Antes de comparar, exige que el prompt de\norigen reproduzca exactamente cada conversación grabada. Sobre las 100 trazas v22 (Kaggle T4,\nGemma sin entrenar, 50 casos × buscadores `baseline` y `prefijos`; artefactos locales no versionados):\n\n| Parte | `baseline` | `prefijos` |\n|---|---:|---:|\n| Mensaje de sistema | 55,0 % | 54,2 % |\n| Búsquedas | 24,8 % | 25,7 % |\n| Otras observaciones | 13,4 % | 13,3 % |\n| Respuestas del modelo | 5,0 % | 5,1 % |\n| Mensaje inicial | 1,8 % | 1,7 % |\n| Caracteres por caso | 19.954 | 20.689 |\n\nEl mensaje de sistema (2.232 caracteres) se reenvía en cada turno: es la palanca principal. Con\nlos ~5 turnos medios de v22 (máximo 8), cada 100 caracteres menos de sistema ahorran ~2,5 % por caso.\n\nCandidatos de formato que controla el agente (ahorro total sobre `caracteres_de_contexto`, mismas trazas):\n\n| Candidato | `baseline` | `prefijos` | Decisión |\n|---|---:|---:|---|\n| `{herramienta}:\\n{observacion}` | 0,67 % | 0,67 % | No adoptado: sin pérdida, pero no justifica regenerar #8 |\n| `[{herramienta}]\\n{observacion}` | 0,62 % | 0,62 % | No adoptado: ídem |\n| `{observacion}` sin herramienta | 1,43 % | 1,45 % | No adoptado: exige relajar `PromptSpec` y debilita la validación herramienta/observación de #8 |\n| Unir líneas en blanco de las observaciones | 0,10 % | 0,10 % | No adoptado: cambia la presentación del buscador (#6) |\n| Reemplazar secciones ya mostradas por una referencia | 0,05 % | 0,79 % | No adoptado: cambia la presentación del buscador (#6) |\n\nSupuesto: el modelo responde lo mismo con el formato nuevo; la medición es de formato, no de conducta.",
+   "que_hace": "Resultado de `scripts.medir_contexto` sobre 100 trazas: qué porcentaje del contexto ocupa cada parte con `baseline` y `prefijos`.",
+   "como_funciona": "- Tabla: mensaje de sistema 55,0 %, búsquedas 24,8 %, otras observaciones 13,4 %, respuestas 5 %.\n- El sistema (2.232 caracteres) se reenvía en cada turno: cada 100 caracteres menos ahorran ~2,5 % por caso.\n- Candidatos de formato de observación ahorran menos de 1,5 % y no se adoptaron.",
+   "proposito": "Justifica dónde optimizar: no en el formato de las observaciones sino en el mensaje de sistema.",
+   "interaccion": "Las cifras salen de `admision_tp/contexto.desglose`; la conclusión orienta el trabajo de prompts (#13) y el contrato con `PromptSpec`.",
+   "teoria": "El contexto se degrada y se encarece con su tamaño: medir su composición es el primer paso para recortarlo.",
+   "key": "tp4-reparto-contexto-doc",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 41,
+     "title": "El contexto se degrada",
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=41"
+    }
+   ],
+   "nusos": 1
+  },
+  {
+   "id": "agente-bucle",
+   "titulo": "Ciclo del agente: JSON, corrección y tope de llamadas",
+   "archivo": "admision_tp/agente_prompt.py",
+   "desde": 25,
+   "hasta": 68,
+   "lenguaje": "python",
+   "codigo": "class _PartidaPrompt:\n    def __init__(self, entorno, prompt: PromptSpec, max_turnos: int, max_sin_json: int,\n                 max_llamadas: int):\n        self.entorno = entorno\n        self.prompt = prompt\n        self.max_turnos = max_turnos\n        self.max_sin_json = max_sin_json\n        self.max_llamadas = max_llamadas\n        self.mensajes = [\n            {\"role\": \"system\", \"content\": prompt.system_prompt},\n            {\"role\": \"user\", \"content\": prompt.mensaje_inicial_para(entorno.paciente_id)},\n        ]\n        self.turnos = self.sin_json = self.llamadas = 0\n        self.activa = True\n\n    def recibir(self, respuesta: str) -> None:\n        self.turnos += 1\n        self.mensajes.append({\"role\": \"assistant\", \"content\": respuesta})\n        obj = extraer_json(respuesta)\n        if obj is None:\n            self.sin_json += 1\n            if self.sin_json >= self.max_sin_json:\n                self.activa = False\n                return\n            self.mensajes.append({\"role\": \"user\", \"content\": self.prompt.mensaje_json_invalido})\n        else:\n            self.sin_json = 0\n            herramienta = str(obj.get(\"herramienta\", \"\"))\n            observacion, fin = self.entorno.paso(herramienta, obj.get(\"argumentos\") or {})\n            self.llamadas += 1\n            if fin:\n                self.activa = False\n                return\n            self.mensajes.append({\n                \"role\": \"user\",\n                \"content\": self.prompt.observacion_para(herramienta, observacion),\n            })\n        if self.turnos >= self.max_turnos or self.llamadas >= self.max_llamadas:\n            self.activa = False\n\n    def cortar_por_contexto(self, tokens: int, limite: int) -> None:\n        self.mensajes.append({\"role\": \"user\", \"content\": MENSAJE_CONTEXTO_EXCEDIDO.format(\n            tokens=tokens, limite=limite)})\n        self.activa = False",
+   "que_hace": "Mantiene la conversación de un caso: agrega la respuesta del modelo, ejecuta la herramienta pedida o, si no hay JSON válido, inserta el mensaje de corrección.",
+   "como_funciona": "- `_PartidaPrompt.__init__` arranca con `system_prompt` y `mensaje_inicial_para(paciente_id)` del `PromptSpec`.\n- `recibir` usa `extraer_json`; si es `None`, suma `sin_json` y agrega `prompt.mensaje_json_invalido` (corta tras `max_sin_json` seguidas).\n- Con JSON válido llama `entorno.paso(herramienta, argumentos)`, cuenta `llamadas` y agrega la observación con `observacion_para`.\n- Termina si el entorno cerró el caso (registrar_decision) o al llegar a `max_turnos` o `max_llamadas` (40, del kit).",
+   "proposito": "Es un agente de un solo modelo que decide el recorrido: el código no impone orden de herramientas. Los textos vienen del `PromptSpec` para que agente y generador de datos rendericen idéntico.",
+   "interaccion": "`AgentePrompt.jugar_lote` crea una `_PartidaPrompt` por caso y le pasa las respuestas de `ModeloLocal`; `entorno` es la `VistaDelAgente` del kit. `admision_tp/contexto.py` reusa este mismo ciclo para rejugar trazas.",
+   "teoria": "Salida estructurada con reintento ante JSON inválido, dentro de un bucle de agente con herramientas y un límite de pasos.",
+   "key": "tp4-agente-bucle",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 5,
+     "cnn": "05",
+     "slug": "prompting",
+     "i": 29,
+     "title": "Salidas estructuradas: JSON Schema",
+     "url": "/clases/05/#d=prompting&s=29"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 36,
+     "title": "El circuito con un agente",
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=36"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 42,
+     "title": "Calcular: la misma cuenta por la API",
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=42"
+    },
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 51,
+     "title": "Primero, un solo agente",
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=51"
+    }
+   ],
+   "nusos": 4
+  }
+ ]
+}

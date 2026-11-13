@@ -1,0 +1,824 @@
+{
+  "num": 10,
+  "fecha": "2026-10-07",
+  "titulo": "Agentes: sistemas multiagente, especialización, contexto y orquestación",
+  "talks": [
+    "agentes-y-multiagentes"
+  ],
+  "bloque": "Agentes",
+  "tesis": "Un agente basado en LLM es un loop en el que el modelo elige su próxima acción según lo que observó. Los tipos de agente cambian **cuándo se planifica** y **cuántas veces se vuelve a razonar**, y las arquitecturas multiagente cambian **quién le habla a quién, quién tiene el control y por dónde circula el contexto** entre varios loops. Cada decisión se paga en llamadas al LLM, tokens, latencia y confiabilidad (un sistema multiagente gasta ~15× los tokens de un chat), así que hay que elegir la forma más simple que alcanza.",
+  "resumen": "La clase (Paulo Veiga, Claudio Righetti y Marco Sorondo) arranca con una pregunta que la sala suele contestar mal: ¿un LLM es un agente? Por sí solo, no. Con la definición de Russell & Norvig (sensores, actuadores, ambiente, agente racional según una medida de performance, función y programa de agente) recorre las arquitecturas clásicas con un auto autónomo y cierra con la descripción PEAS de una aspiradora y de un LLM con tools. Después ubica al agente LLM en la descomposición de Lilian Weng y separa **workflow** (el código decide el próximo paso) de **agente** (lo decide el modelo), según Anthropic. Define la **tool** como función descripta en el contexto que el LLM pide y el programa ejecuta. Recorre **ReAct** (Â = A ∪ L, la trayectoria del Apple Remote, el prompt de completado con stop, el grafo de LangGraph) y lo compara con **Plan-and-Execute, Reflexion y ReWOO** con dos preguntas. Tras la pausa: el contexto se degrada (*context rot*), qué es un sistema multiagente y sus tres palancas, el orquestador con workers y seis topologías (estrella, router, red, pizarra, pipeline, jerarquía). Cierra con cuándo repartir: precio en tokens, fallas según MAST, aislamiento que hay que configurar, el debate Cognition vs Anthropic resuelto por «¿el trabajo lee o escribe?», el caso de Kore.ai y un árbol de decisión.",
+  "secciones": [
+    {
+      "titulo": "Qué es un agente: la definición de Russell & Norvig",
+      "contenido": "**Quiz de apertura:** ¿un LLM que recibe una pregunta y devuelve una respuesta es un agente? Respuesta: **por sí solo, no**. En el uso diario se llama «agente» a cualquier LLM, pero un LLM suelto no es un agente, y existen muchos agentes que no usan modelos de lenguaje. Tampoco hace falta ser un robot, ni el tamaño del modelo cambia nada: un modelo más grande sigue recibiendo texto y devolviendo texto.\n\n> «An agent is anything that can be viewed as perceiving its environment through **sensors** and acting upon that environment through **actuators**.» — Russell & Norvig, *AIMA*\n\nEl loop es: ambiente → percepciones → sensores → **agente decide** → actuadores → acciones → ambiente. La única caja que decide es el agente; sensores y actuadores son interfaces; el ambiente es todo lo que no es el agente.\n\nLa definición es amplia a propósito: **no nombra ML ni LLMs** (son implementaciones posibles), **no exige software** (un sistema mecánico encaja) e **incluye sistemas biológicos** (células, insectos, personas).\n\n**Agente racional.** Russell & Norvig evalúan al agente con una **medida de performance**: el agente racional elige, para cada secuencia de percepciones, la acción que se espera que maximice esa medida, dada la evidencia percibida y el conocimiento incorporado. **Racional no es omnisciente ni infalible**: el auto autónomo que frena bien y lo choca un auto que no podía ver actuó racionalmente. Como la racionalidad es relativa a la medida, definir bien la medida es parte central del diseño: un agente puede ser perfectamente racional y hacer algo indeseable si el criterio de éxito está mal especificado.\n\nLa racionalidad depende de **cuatro factores**: medida de performance, conocimiento previo, acciones disponibles y **secuencia de percepciones** (en un agente LLM, esta última tiene otro nombre: **el contexto**).\n\n**Función vs programa de agente:**\n- **Función de agente** `f: P* → A`: asigna una acción a cada secuencia de percepciones posible (P* = todas las secuencias, de cero o más percepciones). Es una descripción matemática; nadie la ejecuta y como tabla sería infinita.\n- **Programa de agente**: el código que corre; recibe la percepción *actual* y devuelve una acción. Si necesita la historia, la tiene que guardar él. Ejemplo: el termostato (si la temperatura bajó del umbral, encender).\n\nEn un agente LLM, **el modelo cumple el papel de la función** (elige con todo lo visto hasta ese paso) y **el programa** es el código que arma esa historia en un texto, llama al modelo y ejecuta las tools.",
+      "conceptos": [
+        "agente",
+        "agente-racional"
+      ],
+      "ejemplo": "Pregunta de examen típica: «¿Por qué ChatGPT sin tools no es un agente en el sentido de R&N?» Porque su único actuador es generar texto y no percibe el resultado de sus acciones sobre un ambiente en un loop. Se vuelve agente cuando tiene sensores (lo que entra al contexto, incluidos resultados de tools) y actuadores (llamar APIs, ejecutar comandos)."
+    },
+    {
+      "titulo": "Arquitecturas clásicas y la descripción PEAS",
+      "contenido": "Russell & Norvig ordenan a los agentes según lo que hay **entre la percepción y la acción**; cada tipo agrega una pieza al anterior:\n\n- **Reflejo simple**: regla «si condición, entonces acción» sobre la percepción actual. Solo funciona si el ambiente es **completamente observable**.\n- **Reflejo con modelo**: guarda un **estado interno** con la parte del mundo que no ve.\n- **Basado en objetivos**: predice qué produce cada acción y elige la que lleva a un **estado meta**.\n- **Basado en utilidad**: puntúa los estados con una **función de utilidad** y elige la acción de mayor utilidad esperada.\n- **Que aprende**: un **crítico** le dice cómo le va, un **elemento de aprendizaje** mejora al resto, y un **generador de problemas** propone experiencias nuevas. Le permite superar lo que el diseñador le cargó (autonomía).\n\n**El auto autónomo como hilo** (construcción de la cátedra): percibe con cámaras, LiDAR, GPS y velocímetro; actúa con acelerador, freno y dirección. Cada fila resuelve la limitación de la anterior (ver tabla comparativa). El reflejo frena ante las luces de freno pero un auto tapado por un camión no existe para él; el de modelo recuerda el auto del punto ciego pero no tiene destino; el de objetivos llega pero le da lo mismo la ruta rápida o la peligrosa; el de utilidad pondera seguridad, velocidad y comodidad; el que aprende corrige con un crítico que marca cada frenada brusca.\n\n**Lectura de la cátedra:** Reflexion se parece al agente que aprende, con un evaluador que hace de crítico, pero lo aprendido queda escrito en el contexto: **los pesos no cambian**. BDI (creencias, deseos, intenciones) es otro modelo de un solo agente; la coordinación entre varios la resuelven protocolos como Contract Net.\n\n**PEAS** describe un agente con cuatro elementos: **P**erformance, **E**nvironment (ambiente), **A**ctuadores, **S**ensores. La misma descripción sirve para una aspiradora y para un LLM con tools:\n\n| | Aspiradora autónoma | LLM con tools |\n|---|---|---|\n| P | +10 limpiar celda sucia, −1 moverse, −5 aspirar celda limpia, −10 chocar | calidad, relevancia y precisión de las respuestas; satisfacción del usuario |\n| E | grilla n×m, parcialmente observable, determinístico | digital, simbólico, parcialmente observable, dinámico |\n| A | motor de movimiento, motor de succión | texto, comandos, llamadas a tools y APIs |\n| S | suciedad, posición | pedido, contexto, resultados de tools |\n\nTres lecciones: (1) un LLM se vuelve agente cuando tiene sensores y actuadores; (2) **ambiente y performance son los dos elementos que se olvidan** al diseñar; (3) el ambiente LLM es **parcialmente observable y dinámico**, por eso el agente tiene que observar después de cada acción (una base cambia mientras piensa). El −5 por aspirar celda limpia existe porque, si la medida solo premiara aspirar, un agente racional aspiraría sin parar.",
+      "conceptos": [
+        "arquitecturas-clasicas-de-agente",
+        "peas"
+      ],
+      "ejemplo": "PEAS del agente del TP final (admisión de guardia): **P** = los 9 controles de la ficha bien (8 campos + afiliación verificada con la entidad correcta), con costo y latencia por caso; **E** = la guardia del Hospital General de Prueba, con paciente/acompañante, normas que cambian de números y un simulador; parcialmente observable (hay que preguntar lo que falta); **A** = `preguntar`, `verificar_afiliacion`, `buscar_normativa`, `registrar_decision`; **S** = la nota de triage (`leer_triage`), las respuestas del paciente, el resultado de la afiliación y los fragmentos de normas que trae el buscador."
+    },
+    {
+      "titulo": "El agente basado en LLM: workflow o agente",
+      "contenido": "**Lilian Weng (jun-2023)** describe al LLM como **el cerebro del agente** y le suma componentes: **planificación** (descomponer en subobjetivos y reflexionar sobre acciones pasadas; ahí ubica a ReAct y Reflexion), **memoria** (fuera de esta clase) y **uso de tools** (APIs para lo que no está en los pesos: información actual, ejecución de código, fuentes propietarias). Anthropic dice algo parecido: su bloque básico es el *augmented LLM* (LLM + retrieval + tools + memoria).\n\n**Dos formas de conectar un LLM con tools.** Con el mismo LLM y las mismas tools, el próximo paso lo puede decidir **el código** o **el modelo**. Anthropic llama *agentic systems* a ambas:\n\n- **Workflow**: «LLMs and tools are orchestrated through predefined code paths». Para tareas bien definidas que piden previsibilidad. Patrones: prompt chaining, routing, paralelización, orchestrator-workers, evaluator-optimizer.\n- **Agente**: «LLMs dynamically direct their own processes and tool usage». En la práctica, «typically just LLMs using tools based on environmental feedback in a loop».\n\nUn sistema real mezcla las dos (un routing determinista entre agentes autónomos por dentro). Ojo: Anthropic clasifica **orchestrator-workers como workflow**; la clase lo retoma como la forma básica de multiagente cuando cada worker tiene su propio loop.\n\n**Cuándo vale la pena un agente** (deck del curso + Anthropic): Anthropic recomienda «the simplest solution possible… This might mean not building agentic systems at all». Para muchas aplicaciones alcanza con **una llamada optimizada con retrieval y ejemplos**. Un agente se justifica con:\n1. **varias tools en orden variable**;\n2. **resultados que hay que interpretar** (el paso siguiente depende del anterior);\n3. **reglas fijas insuficientes** (espacio grande o dinámico);\n4. **éxito verificable** (criterio claro y feedback, como tests en un agente de código).\n\nCosto: un agente cambia **latencia y plata por desempeño**, y la autonomía deja que **los errores se acumulen**; por eso sandbox y **condiciones de parada** (máximo de iteraciones). Recordatorio: **Agentless**, un pipeline fijo sin agente, resolvió el **32% de SWE-bench Lite a 0,70 USD** por problema, más que todos los agentes abiertos de ese momento.",
+      "conceptos": [
+        "agente",
+        "workflow-vs-agente"
+      ],
+      "ejemplo": "Árbol de decisión del cierre: ¿alcanza una llamada al LLM con RAG o ejemplos? → sin agente. ¿Los pasos se conocen de antemano? → workflow en código. Si no → un agente con buenas tools (ReAct; planificar o reflexionar si hace falta). ¿La información no entra en un contexto, hay equipos dueños de dominios distintos o lecturas paralelas que valen ~15× tokens? → recién ahí multiagente."
+    },
+    {
+      "titulo": "Los agentes tienen tools",
+      "contenido": "Una **tool** es una función que el agente puede pedir. Su **nombre, descripción y parámetros están en el contexto** (el texto que el modelo recibe en cada llamada). **El LLM decide cuándo llamarla y el programa la ejecuta.** Con R&N: cada tool es un **actuador**, y lo que devuelve entra al contexto como **percepción nueva**.\n\nCircuito: (1) el LLM emite un pedido estructurado con nombre y argumentos; (2) el programa llama a la API/base/búsqueda; (3) el resultado vuelve como texto al contexto y el LLM decide de nuevo. **El LLM no ejecuta nada.** Por eso la descripción importa tanto: es lo único que el modelo sabe de la tool.\n\nEl **contexto** es la secuencia de percepciones con otro nombre: instrucciones, tools, resultados y conversación. Crece en cada vuelta, tiene tamaño máximo y **se paga por token**. MCP es una forma estándar de exponer tools (clase 6/7); lo de acá vale con o sin MCP.\n\n> «tools are a new kind of software which reflects a contract between deterministic systems and non-deterministic agents» — Anthropic, *Writing effective tools for agents*, sep-2025\n\nAnte «¿Llevo paraguas hoy?» el agente puede llamar a la tool del clima, contestar de memoria, pedir aclaración… o alucinar y usarla mal. Quien llama a la función ya no es determinístico.\n\n**En código (LangChain):** `@tool` sobre una función; **el docstring es la descripción que lee el modelo**; `bind_tools(tools)` le pasa el esquema. El cuerpo nunca le llega al modelo. Dos defectos didácticos del tutorial: `calculator` hace `eval()` sobre texto del modelo (ejecución de código arbitrario, inaceptable en producción) y el docstring de `search_wikipedia` dice «Simulates» aunque llama a la biblioteca real: **para el modelo, la descripción es la verdad**.\n\n**Principios de diseño (Anthropic, sep-2025):**\n- **Pocas y consolidadas**: `schedule_event` en vez de `list_users` + `list_events` + `create_event` (el orden queda en el código). «More tools don't always lead to better outcomes».\n- **Espacios de nombres**: `asana_search`, `jira_search`.\n- **Contexto con significado**: devolver `name` en lugar de `uuid` reduce alucinaciones.\n- **Respuestas que cuidan tokens**: `search_contacts` en vez de `list_contacts`; en Slack la respuesta concisa ocupó **72 tokens vs 206** la detallada (parámetro `response_format`).\n- **Descripciones para alguien nuevo en el equipo**: pequeños ajustes en la descripción dan mejoras grandes en evals.",
+      "conceptos": [
+        "tool-calling",
+        "contexto-de-agente",
+        "mcp"
+      ],
+      "ejemplo": "En el TP final, `buscar_normativa` es una tool cuyo resultado ocupa contexto: en la referencia de la cátedra, más de la mitad de cada conversación es texto de las búsquedas (BM25 con una sección entera por fragmento: recall 0,875, precisión 0,492, 580 tokens por consulta). Es el principio de «respuestas que cuidan tokens» aplicado: traer menos permite procesar más casos a la vez y entrenar con menos tokens."
+    },
+    {
+      "titulo": "ReAct: pensar también es una acción",
+      "contenido": "**ReAct** (Yao et al., arXiv oct-2022, ICLR 2023) suma el lenguaje al espacio de acciones: $\\hat{A} = A \\cup L$. Intercala pensamientos y acciones hasta tener lo necesario para responder.\n- **Acción en A**: toca el ambiente (`search[entity]`) y vuelve una **observación**.\n- **Pensamiento en L**: texto del modelo; **no toca el ambiente ni produce observación**, solo se suma al contexto.\n\nEl paper lo resume: **razonar para actuar y actuar para razonar**. El deck del curso la presenta como **la arquitectura más simple y fundamental** para agentes LLM. El paper nunca dice «tool»: en HotpotQA hay tres acciones sobre una API de Wikipedia (`search`, `lookup`, `finish`).\n\n**Trayectoria (HotpotQA):** «Además del Apple Remote, ¿qué otro dispositivo controla el programa para el que se diseñó?». Thought 1 descompone → `Search[Apple Remote]` → Front Row. Thought 2 extrae → `Search[Front Row]` → *Could not find*. Thought 3 **maneja la excepción** → `Search[Front Row (software)]`. Thought 4 sintetiza → `Finish[keyboard function keys]`. En la misma figura: Standard responde «iPod» (mal); CoT solo **alucina** Apple TV (mal); **Act-only** busca lo mismo que ReAct y responde «yes» (mal): las búsquedas eran correctas pero sin pensamientos no razonó sobre lo observado.\n\n**El prompt de completado y el corte.** No hay system prompt: PaLM-540B y text-davinci-002 son modelos de completado. Un único texto = instrucción (define Search/Lookup/Finish) + **6 ejemplos escritos a mano** + pregunta nueva. Cada paso: `llm(prompt + 'Thought i:', stop=['\\nObservation i:'])`; el modelo escribe Thought y Action, la API **corta antes de Observation**, el código ejecuta la acción y pega la observación. Hasta **7 pasos** (`range(1, 8)`), temperatura 0, 100 tokens por paso. Sin el stop, el modelo inventaría él mismo la observación.\n\n**ReAct en LangGraph:** dos nodos (`agent`, `tools` con `ToolNode`) y una arista condicional `is_done`: si el último mensaje no tiene `tool_calls` → END; si tiene → tools. **El loop es la arista `tools → agent`**; la salida la decide el modelo. Falta un máximo de iteraciones (buen ejercicio).\n\n**Dos sentidos de «agente ReAct»:**\n- **Estricto**: el método del paper (completado, ejemplos a mano, Thought/Action como texto, stop).\n- **Laxo**: cualquier agente que llama tools en un loop con un modelo de chat, system prompt y `tool_calls` estructurados. La plantilla de LangGraph cita el paper y describe este sentido.\n\nEn el sentido laxo **se puede perder el pensamiento escrito**: en ALFWorld el mismo agente sin pensamientos logró **45% vs 71%** de ReAct (mejor de 6, PaLM-540B). `samples/react-langgraph` usa `buscar_wikipedia` y `buscar_en_pagina` (Search/Lookup) y pide una línea «Pensamiento:» antes de cada tool.\n\n**Límites (LangChain):** una llamada al LLM **por cada tool** y **un subproblema planificado por vez**, sin razonar la tarea entera.",
+      "conceptos": [
+        "react",
+        "chain-of-thought",
+        "tool-calling"
+      ],
+      "ejemplo": "Pregunta trampa: «En ReAct, ¿un pensamiento produce observación?» No: solo la acción en A toca el ambiente. El contexto se actualiza $c_{t+1} = (c_t, \\hat{a}_t)$ con el pensamiento, sin observación nueva."
+    },
+    {
+      "titulo": "Otros tres tipos: Plan-and-Execute, Reflexion y ReWOO",
+      "contenido": "Dos preguntas para comparar tipos (de la crítica de LangChain a ReAct): **(1) ¿cuándo se planifica?** (nunca de antemano, al inicio, entre intentos) y **(2) ¿cuántas veces vuelve a razonar el LLM?** (en cada paso, al replanificar, solo al final). ReAct: nunca de antemano / en cada paso.\n\n**Plan-and-Execute** (LangChain, feb-2024; basado en Plan-and-Solve de Wang et al. y BabyAGI): un **planner** escribe el plan completo al inicio, un **executor** resuelve cada paso con sus tools (cada executor es **un pequeño ReAct**) y un **re-planner** decide si terminó o replanifica. En el ejemplo de la cátedra con el Apple Remote, el LLM que planifica interviene **dos veces** (plan y «¿terminó?») contra cuatro pensamientos en ReAct; la búsqueda fallida de Front Row la resuelve el executor sin volver al planner. Ventajas según LangChain (**afirmadas, sin benchmark**): más rápido, más barato (pasos con modelos chicos), mejor (piensa todo antes). Límites: ejecución **en serie** y **un LLM por paso, sin variables** que conecten pasos.\n\n**Reflexion** (Shinn et al., 2023): ejecuta, evalúa y, si falló, escribe una **crítica en lenguaje natural** que guarda como memoria para el intento siguiente. **No toca los pesos** («not by updating weights, but instead through linguistic feedback»): **refuerzo verbal**, un «gradiente semántico». Tres roles: **Actor** (un agente ReAct o CoT), **Evaluator** (tests, heurística o LLM), **Self-Reflection** (escribe la crítica); memoria de largo plazo con Ω = 1 a 3 reflexiones. Ejemplo `match_parens`: la solución solo contaba paréntesis, los **tests autogenerados** fallan, la reflexión dice «importa el orden», el nuevo intento pasa. Cifras (2023): HumanEval Python **91,0% vs 80,1%** de GPT-4 (pass@1); ALFWorld **130/134** en 12 intentos. Ablación Rust: completo **68%**, sin tests autogenerados **52%** (¡por debajo del base, 60%!), sin reflexión 60%. Límites: **depende del evaluador**, pide modelo capaz (starchat-beta 26% → 26%), no ayuda a explorar (WebShop, cortado a 4 intentos), cada intento es otra corrida.\n\n**ReWOO** (Reasoning WithOut Observations; Xu et al., 2023): el **planner** escribe todo el plan **con variables** (`E1 = Search[...]`, `E2 = LLM[... #E1]`), el **worker** ejecuta en orden reemplazando cada `#E` por su resultado (trata `LLM[...]` como una tool más) y el **solver** integra. **Dos llamadas al LLM** en vez de una por paso; no reenvía la trayectoria acumulada; pasos independientes en paralelo; planner destilable a modelo chico. Ejemplo verbatim: estadísticas de los quarterbacks del Super Bowl (E1 equipos, E2/E3 quarterbacks vía LLM, E4/E5 stats). Límite: **no se adapta**; si una búsqueda no devuelve nada, nadie replanifica (por eso Plan-and-Execute agrega re-planner). Mención: **LLMCompiler** emite un DAG y ejecuta en paralelo (3,6× según LangChain, no verificado).\n\n**Regla inversa:** si el próximo paso depende de lo que aparezca → ReAct; pasos conocidos y alguno puede fallar → Plan-and-Execute; hay un test que dice si salió bien → Reflexion; todas las consultas se escriben antes de ver un resultado → ReWOO. **Los tipos se combinan.**",
+      "conceptos": [
+        "plan-and-execute",
+        "reflexion",
+        "rewoo",
+        "react"
+      ],
+      "ejemplo": "Caso de la tabla para Plan-and-Execute (de la cátedra): actualizar un proyecto a una versión nueva de una biblioteca: los pasos se conocen y cada uno pide varias tools. Para Reflexion: una función que tiene que pasar tests. Para ReWOO: las stats de los quarterbacks, donde todas las búsquedas se escriben antes de ejecutar."
+    },
+    {
+      "titulo": "El límite de un agente y qué es un sistema multiagente",
+      "contenido": "**El contexto se degrada.** El contexto crece en cada vuelta y cuanto más largo, peor recuerda el modelo lo que tiene adentro: Anthropic lo llama **context rot** (sep-2025).\n- **Presupuesto de atención**: «a finite resource with diminishing marginal returns»; cada token compite con los demás.\n- **Degradación gradual**: «a performance gradient rather than a hard cliff».\n- **Contexto mínimo**: el objetivo es «the *smallest possible* set of high-signal tokens that maximize the likelihood of some desired outcome».\n- **Acumulación**: un agente que trabaja mucho junta resultados, logs y archivos que no vuelve a usar.\n\nCausas: la atención relaciona cada token con todos (n²) y los modelos se entrenan sobre todo con secuencias más cortas (conexión con la clase de transformers). En Claude Research, la ventana del orquestador se trunca pasados los **200.000 tokens**. Tres técnicas: **compactar** la conversación, **tomar notas** fuera del contexto y **repartir entre subagentes** (la clase sigue esta).\n\n**Sistema multiagente:** varios agentes que interactúan, de forma **colaborativa, competitiva o ambas**, para resolver un problema que excede a uno solo. Anthropic: «multiple agents (LLMs autonomously using tools in a loop) working together». MAST: «agents designed to interact through orchestration». **Tres palancas:**\n- **Especialización**: cada agente con su system prompt, sus tools y, si conviene, su modelo.\n- **Aislamiento de contexto**: cada uno en su ventana, devuelve un resumen; un subagente puede gastar decenas de miles de tokens y devolver **1.000 a 2.000**.\n- **Paralelismo**: subtareas independientes a la vez; **más tokens en menos tiempo**.\n\nLangChain suma un motivo organizacional: **desarrollo distribuido** (equipos distintos dueños de agentes distintos).\n\n**Forma básica: orquestador y workers.** El orquestador **descompone la tarea en tiempo de ejecución**, delega cada subtarea y **sintetiza** («a central LLM dynamically breaks down tasks, delegates them to worker LLMs, and synthesizes their results»). Cuando cada worker tiene su propio loop de tools, **el worker es un subagente**. Diferencia con paralelización: ahí las subtareas están escritas en el código; acá las decide el orquestador para cada pedido. Diferencia con Reflexion: ahí tres roles se turnan sobre la misma tarea; acá cada worker trabaja en su pedazo. Aparece en código que cambia muchos archivos, búsqueda en muchas fuentes y **Claude Research**.\n\n**Subagente vs tool:** «una tool se ejecuta y devuelve; **un subagente decide**» qué hacer con su encargo. **«The essence of search is compression»**: cada subagente lee mucho y devuelve poco.\n\n`samples/multiagente-langgraph`: el orquestador tiene una sola tool, `delegar_investigacion`; cada llamada corre un subagente ReAct que **arranca con contexto vacío** y devuelve solo su respuesta (no su trayectoria); dos pedidos en el mismo turno corren en paralelo (`ToolNode`). Ejemplo: ¿quién nació primero, el director de Parasite (Bong Joon-ho, 1969) o el de Roma (Alfonso Cuarón, 1961)?",
+      "conceptos": [
+        "context-rot",
+        "sistema-multiagente",
+        "orquestador-workers",
+        "subagente",
+        "aislamiento-de-contexto",
+        "contexto-de-agente"
+      ],
+      "ejemplo": "«Para jugar» del sample: «¿Dónde nació el director de Parasite?» no se puede partir en paralelo (la segunda subpregunta depende de la primera). Y si `delegar_investigacion` recibe también el pedido original, el subagente sabe más pero gasta más tokens y **pierde el aislamiento**."
+    },
+    {
+      "titulo": "Topologías: quién habla con quién, quién controla y por dónde circula el contexto",
+      "contenido": "La clase recorre las topologías a nivel de comunicación, sin frameworks.\n\n**Estrella (orquestador y subagentes).** Cada subagente habla **solo con el orquestador**. El orquestador decide qué entra en la ventana de cada uno (desde dos líneas hasta todo lo que sabía); **los hermanos no se ven** mientras trabajan; cada subagente tiene **siempre su propia ventana** (lo que cambia es cuánto le pone adentro quien lo crea). Ejemplo publicado: **Magentic-One**, orquestador con WebSurfer, FileSurfer, Coder y **ComputerTerminal, que ejecuta código sin LLM**.\n\n**Router (despacho).** Clasifica el pedido y lo despacha al especialista (o a varios en paralelo). **Decide una vez, al inicio**, y no razona sobre lo que vuelve. Ejemplo de Anthropic: atención al cliente con consultas generales, reembolsos y soporte técnico. Conviene con categorías bien separadas y clasificables con precisión; si clasifica mal, nadie lo corrige.\n\n**Red (transferencia de control).** **Sin nodo central**: cada agente atiende su parte y, cuando el pedido sale de su dominio, transfiere el control con un **handoff**, una acción más (como una tool que en vez de traer datos **mueve el control**). El que recibe pasa a ser el agente activo y sigue con el usuario. Ejemplo de Kore.ai: el empleado no ve su recibo de sueldo → agente de bienvenida → IT (la autenticación anda, falló la sincronización con nómina) → finanzas, sin repreguntar al usuario. Generative Agents: 25 agentes en Smallville; la invitación a una fiesta pasa de 1 (4%) a 13 (52%) en dos días; 5 de 12 invitados asisten.\n\n**Pizarra (publicar y leer).** Cada agente **publica** su resultado en un espacio compartido y **lee** lo que necesita; **no se mandan mensajes**. Se **suscriben** por rol (el resto no entra a su contexto, contra el *information overload*) y se **activan** cuando está publicado todo lo que necesitan, sin orquestador. Ejemplo: **MetaGPT** (Hong et al., 2023), cinco roles (Product Manager, Architect, Project Manager, Engineer, QA) que publican PRD, diseño, tareas, código y tests; documentos con **formato fijo** contra el **teléfono descompuesto**.\n\n**Pipeline.** El **código fija el orden**; la salida de uno es la entrada del siguiente. Es prompt chaining con un agente por paso (un workflow). ChatDev: fases diseño → código → pruebas, pasando **solo la solución**, no el historial.\n\n**Jerarquía.** Un orquestador coordina orquestadores, cada uno con su equipo. **Contract Net (1980, Reid G. Smith)**: un manager anuncia, los contratistas ofertan, se adjudica, y un contratista puede subcontratar.\n\nLas topologías **se combinan** (un router que despacha a orquestadores; MetaGPT ordena sus roles como pipeline sobre una pizarra). Kore.ai: el orquestador central conviene cuando **trazabilidad y calidad** pesan más que el tiempo real; la red, en asistentes conversacionales, soporte y voz, y se desaconseja cuando la trazabilidad es prioridad.\n\n**Freno de LangChain (ene-2026):** «Start with a single agent and good prompt engineering. **Add tools before adding agents.** Graduate to multi-agent patterns only when you hit clear limits.» Dos restricciones empujan a repartir: **manejo del contexto** (técnica) y **desarrollo distribuido** (organizacional). La carga de la prueba la tiene el multiagente.",
+      "conceptos": [
+        "topologias-multiagente",
+        "orquestador-workers"
+      ],
+      "ejemplo": "Pregunta de comparación: «¿En qué se diferencian el router y la estrella?» En **cuántas veces se decide**: el router decide una vez al inicio y no vuelve a mirar; el orquestador de la estrella lee lo que devolvió cada subagente y puede decidir a quién llamar después."
+    },
+    {
+      "titulo": "Cuándo repartir: costo, fallas, aislamiento y «¿el trabajo lee o escribe?»",
+      "contenido": "**El precio de paralelizar** (Anthropic, jun-2025, cifras internas): un agente usa **~4×** los tokens de un chat; un sistema multiagente **~15×**. En **BrowseComp** (agentes que navegan buscando información difícil de hallar), tres factores explican el **95%** de la varianza (tokens, llamadas a tools, elección de modelo) y **el uso de tokens solo explica el 80%**. Lectura incómoda del propio post: «Multi-agent systems work mainly because they help spend enough tokens». Conclusión: el multiagente pide tareas cuyo valor alcance para pagar la mejora. Ejercicio: costo como chat × 15, ¿lo vale?\n\n**Cómo fallan: MAST** (Cemri et al., UC Berkeley, mar-2025): 1.642 trazas de 7 sistemas abiertos (ChatDev, MetaGPT, Magentic-One…), tasas de falla de **41% a 86,7%**, 14 modos en 3 categorías: **diseño del sistema 44,2%** (repetir pasos 15,7%, no saber cuándo terminar 12,4%, desobedecer la tarea 11,8%), **desalineación entre agentes 32,35%** (razonamiento ≠ acción 13,2%, desviarse 7,4%, no pedir aclaración 6,8%), **verificación 23,5%** (incorrecta 9,1%, ausente 8,2%, terminar antes 6,2%). Ejemplo: el agente del teléfono descubre que el usuario es el número de teléfono, falla el login y pide credenciales nuevas al orquestador **sin contarle lo que aprendió**; nadie pregunta; repiten logins. Conclusiones: un protocolo de mensajes común no arregla las fallas (los agentes no modelan qué necesita saber el otro) y un verificador superficial (que compile) no alcanza.\n\n**El aislamiento hay que configurarlo.** Por defecto se hereda la conversación: en un **handoff** el agente que toma el control ve todo el historial (recortar pide un filtro explícito, `input_filter`); con **historial compartido** todos escriben en una sola lista (aislar pide estado propio por agente); un **fork** del agente hereda la conversación entera (más barato por caché, pero sin aislamiento), mientras que un **subagente nuevo** arranca con ventana limpia. Verificarlo en los logs.\n\n**Compartir el contexto no alcanza (Cognition).** Clonar Flappy Bird: un subagente hace el fondo con los caños, otro el pájaro. Sin contexto compartido sale un fondo estilo Super Mario; con todo el contexto, igual salen en **estilos visuales distintos**, porque ninguno vio lo que decidía el otro. El choque aparece **al combinar**.\n\n**El debate** (con un día de diferencia): **Cognition** (12 jun 2025, Walden Yan, «Don't Build Multi-Agents», agentes de código/Devin): «Share context, and share full agent traces» y «Actions carry implicit decisions, and conflicting decisions carry bad results»; un solo hilo; principios sin números. **Anthropic** (13 jun 2025, Claude Research): cada subagente comprime en su ventana; eval interna «outperformed single-agent Claude Opus 4 by **90.2%**» (Opus 4 orquestador + Sonnet 4 subagentes; no aclara si es relativo o en puntos).\n\n**La resolución: ¿el trabajo lee o escribe?** Si **lee** (investigación, búsqueda) los hermanos no se pisan: repartir paga. Si **escribe sobre algo compartido** (código, un documento, una base), cada acción cambia el terreno del otro: **un solo hilo o límites explícitos**. Anthropic: «most coding tasks involve fewer truly parallelizable tasks than research». Reglas de esfuerzo: búsqueda simple = 1 agente con 3–10 llamadas; comparación = 2–4 subagentes con 10–15 cada uno; investigación compleja = más de 10 (error temprano: crear 50 subagentes para preguntas simples).\n\n**Caso Kore.ai:** «Pagá el crédito del auto con la plata de mi caja de ahorro». Estrella: **Loan Agent** (cotiza saldo, interés, penalidades) y **Transaction Manager** (fondos, límites diarios, fraude) **leen en paralelo**; el orquestador **valida** (si no cierra, replanifica); el **Payment Processor transfiere: la única escritura, sola y al final**. Cada agente recibe solo los datos que necesita (enmascarados) y queda registro para auditoría. Esa escritura irreversible es justo donde corresponde **humano en el circuito** (aprobación explícita para pagar, enviar o borrar).",
+      "conceptos": [
+        "mast",
+        "aislamiento-de-contexto",
+        "lee-o-escribe",
+        "humano-en-el-circuito"
+      ],
+      "ejemplo": "Aplicado al TP final: el agente de admisión **escribe** una sola cosa (`registrar_decision`) y antes **lee** (triage, normas, afiliación). Un solo agente con buenas tools alcanza, y el reparto del trabajo entre RAG y pesos sigue el mismo espíritu: lo que cambia (los números de las normas) va al buscador, el oficio va al entrenamiento."
+    }
+  ],
+  "conceptos": [
+    {
+      "id": "agente",
+      "termino": "Agente (Russell & Norvig)",
+      "definicion": "Cualquier entidad que percibe su ambiente mediante sensores y actúa sobre él mediante actuadores. Un agente basado en LLM es un loop en el que el modelo elige su próxima acción según lo que observó.",
+      "por_que_importa": "Es la definición contra la que se mide todo lo demás: permite distinguir un LLM suelto de un agente y preguntar en diseño qué percibe, qué puede hacer y en qué ambiente.",
+      "trampa": "Creer que cualquier LLM es un agente, o que un agente tiene que ser un robot o usar ML. Un LLM solo no es agente; un termostato sí lo es."
+    },
+    {
+      "id": "agente-racional",
+      "termino": "Agente racional",
+      "definicion": "El que, para cada secuencia de percepciones, elige la acción que se espera que maximice su medida de performance, dada la evidencia percibida y su conocimiento previo. Depende de cuatro factores: medida, conocimiento previo, acciones disponibles y secuencia de percepciones.",
+      "por_que_importa": "La racionalidad siempre es relativa a una medida, así que definir la medida es parte del diseño.",
+      "trampa": "Confundir racional con omnisciente o infalible: el auto que frena bien y lo choca un auto que no podía ver actuó racionalmente."
+    },
+    {
+      "id": "arquitecturas-clasicas-de-agente",
+      "termino": "Arquitecturas clásicas de agente",
+      "definicion": "Reflejo simple (regla condición-acción, solo en ambientes completamente observables), reflejo con modelo (estado interno), basado en objetivos (estado meta), basado en utilidad (maximiza utilidad esperada) y que aprende (crítico, elemento de aprendizaje, generador de problemas).",
+      "por_que_importa": "Cada una agrega una pieza que resuelve la limitación de la anterior; el auto autónomo las recorre todas.",
+      "trampa": "El de objetivos solo distingue meta/no meta: le da lo mismo la ruta rápida que la peligrosa; para ponderar hace falta utilidad."
+    },
+    {
+      "id": "peas",
+      "termino": "PEAS",
+      "definicion": "Descripción de un agente con cuatro elementos: Performance, Environment (ambiente), Actuadores y Sensores. Vale igual para una aspiradora que para un LLM con tools.",
+      "por_que_importa": "Obliga a pensar ambiente y performance, que se suelen olvidar. Para un LLM: sensores = pedido, contexto y resultados de tools; actuadores = texto, comandos y llamadas a tools/APIs; ambiente digital, simbólico, parcialmente observable y dinámico.",
+      "trampa": "Poner las tools como sensores: llamarlas es actuar; lo que devuelven es lo que se percibe."
+    },
+    {
+      "id": "workflow-vs-agente",
+      "termino": "Workflow vs agente (Anthropic)",
+      "definicion": "Workflow: LLMs y tools orquestados por caminos de código predefinidos (el código decide el próximo paso). Agente: el LLM dirige su propio proceso y uso de tools en un loop según el feedback del ambiente.",
+      "por_que_importa": "Anthropic recomienda la solución más simple posible; muchas veces un workflow o una sola llamada con RAG alcanza (Agentless: 32% de SWE-bench Lite a 0,70 USD).",
+      "trampa": "Anthropic clasifica orchestrator-workers como workflow; la clase lo trata como multiagente cuando cada worker tiene su propio loop."
+    },
+    {
+      "id": "tool-calling",
+      "termino": "Tool",
+      "definicion": "Función que el agente puede pedir; su nombre, descripción y parámetros están en el contexto. El LLM decide cuándo llamarla (emite nombre y argumentos) y el programa la ejecuta; el resultado vuelve al contexto.",
+      "por_que_importa": "Es el actuador del agente LLM. La descripción es lo único que el modelo sabe de la tool: una descripción que miente produce un agente que se equivoca.",
+      "trampa": "Creer que el LLM ejecuta la tool. El LLM solo genera el pedido; el cuerpo de la función nunca le llega."
+    },
+    {
+      "id": "contexto-de-agente",
+      "termino": "Contexto de un agente",
+      "definicion": "Todo lo que el modelo tiene a la vista en una corrida: instrucciones, descripciones de tools, resultados y conversación. Es la secuencia de percepciones de R&N con otro nombre; crece en cada vuelta, es finito y se paga por token.",
+      "por_que_importa": "Su crecimiento y degradación son el límite de un agente único y la razón principal para repartir trabajo.",
+      "trampa": "Pensar que si todavía queda ventana el rendimiento no cae: la degradación es gradual."
+    },
+    {
+      "id": "react",
+      "termino": "ReAct",
+      "definicion": "Tipo de agente (Yao et al., 2022) que amplía el espacio de acciones a Â = A ∪ L e intercala pensamientos (sin observación) y acciones (con observación) en un loop pensar → actuar → observar, un paso a la vez.",
+      "por_que_importa": "Es el tipo base contra el que se comparan los demás y el que se usa por dentro en executors de Plan-and-Execute y en el Actor de Reflexion.",
+      "trampa": "Hay dos sentidos: estricto (prompt de completado con ejemplos y stop antes de Observation) y laxo (cualquier loop de tool calling). En el laxo se puede perder el pensamiento escrito (ALFWorld: 45% sin pensamientos vs 71% ReAct)."
+    },
+    {
+      "id": "plan-and-execute",
+      "termino": "Plan-and-Execute",
+      "definicion": "Un planner escribe el plan completo al inicio, un executor resuelve cada paso con sus tools (un pequeño ReAct) y un re-planner decide si terminó o replanifica.",
+      "por_que_importa": "Ahorra llamadas al modelo grande en tareas largas y predecibles; los pasos pueden ir a modelos más chicos.",
+      "trampa": "Sus ventajas (más rápido, barato, mejor) LangChain las afirma sin benchmark; y sigue en serie, sin variables entre pasos."
+    },
+    {
+      "id": "reflexion",
+      "termino": "Reflexion",
+      "definicion": "Tipo de agente (Shinn et al., 2023) con Actor, Evaluator y Self-Reflection: ejecuta, evalúa y, si falla, escribe una crítica en lenguaje natural que guarda como memoria (1 a 3 reflexiones) para el próximo intento. Refuerzo verbal, sin tocar pesos.",
+      "por_que_importa": "Brilla cuando hay cómo evaluar: HumanEval 91,0% vs 80,1% de GPT-4 (2023).",
+      "trampa": "Sin evaluador confiable puede quedar peor que no reflexionar: en Rust sin tests autogenerados cae a 52%, debajo del base (60%)."
+    },
+    {
+      "id": "rewoo",
+      "termino": "ReWOO",
+      "definicion": "Reasoning WithOut Observations (Xu et al., 2023): el planner escribe todo el plan con variables (#E1, #E2), un worker ejecuta y sustituye, y un solver integra. Dos llamadas al LLM en total.",
+      "por_que_importa": "Optimiza costo y latencia: no reenvía la trayectoria en cada paso y permite paralelizar pasos independientes.",
+      "trampa": "No se adapta: si una búsqueda sale vacía, nadie replanifica. Las variables conectan pasos, pero no cambian el plan."
+    },
+    {
+      "id": "context-rot",
+      "termino": "Context rot",
+      "definicion": "Degradación del rendimiento del modelo a medida que crece el contexto: «a finite resource with diminishing marginal returns», «a performance gradient rather than a hard cliff» (Anthropic, sep-2025).",
+      "por_que_importa": "Es el límite que motiva compactar, tomar notas fuera del contexto o repartir entre subagentes. El objetivo de diseño es el conjunto más chico de tokens de alta señal.",
+      "trampa": "No es un corte abrupto al llenar la ventana: baja gradualmente mucho antes."
+    },
+    {
+      "id": "sistema-multiagente",
+      "termino": "Sistema multiagente",
+      "definicion": "Varios agentes que interactúan, de forma colaborativa, competitiva o ambas, para resolver un problema que excede a uno solo. Mueve tres palancas: especialización, aislamiento de contexto y paralelismo.",
+      "por_que_importa": "Permite repartir el contexto entre varios loops, a cambio de ~15× tokens y nuevos modos de falla (41%–86,7% según MAST).",
+      "trampa": "Debate o Mixture-of-Agents (varios LLM sin tools sobre la misma pregunta) no son multiagente en sentido estricto: ninguno actúa sobre un ambiente."
+    },
+    {
+      "id": "orquestador-workers",
+      "termino": "Orquestador con workers",
+      "definicion": "Forma básica del multiagente: un LLM central descompone la tarea en tiempo de ejecución, delega subtareas en workers y sintetiza los resultados. Como comunicación, es una estrella.",
+      "por_que_importa": "Es la única forma que mueve las tres palancas a la vez; la usa Claude Research.",
+      "trampa": "Confundirlo con paralelización: ahí las subtareas están fijas en el código; acá las decide el orquestador para cada pedido."
+    },
+    {
+      "id": "subagente",
+      "termino": "Subagente",
+      "definicion": "Worker que es un agente con su propio loop de tools y su propia ventana de contexto; recibe un encargo y devuelve un hallazgo destilado (a menudo 1.000–2.000 tokens), no su historial.",
+      "por_que_importa": "«Una tool se ejecuta y devuelve; un subagente decide.» «The essence of search is compression.»",
+      "trampa": "Creer que los subagentes comparten contexto: cada uno tiene siempre su ventana; los hermanos no se ven."
+    },
+    {
+      "id": "aislamiento-de-contexto",
+      "termino": "Aislamiento de contexto",
+      "definicion": "Que cada agente trabaje solo con lo que necesita en su propia ventana. No viene de fábrica: un handoff pasa todo el historial por defecto, el historial compartido mezcla a todos y un fork hereda la conversación.",
+      "por_que_importa": "Es la palanca que combate el context rot; se verifica mirando en los logs qué contexto recibe cada agente.",
+      "trampa": "Tener un system prompt propio no implica estar aislado; y aun con todo el contexto compartido, las decisiones de hermanos pueden chocar (Flappy Bird)."
+    },
+    {
+      "id": "topologias-multiagente",
+      "termino": "Topologías multiagente",
+      "definicion": "Estrella (todo pasa por el orquestador), router (clasifica una vez y despacha), red (el control pasa de agente en agente por handoffs), pizarra (publicar y leer en un espacio común), pipeline (orden fijo por código) y jerarquía (árbol de orquestadores).",
+      "por_que_importa": "Cada una fija quién tiene el control y por dónde circula el contexto, con costos distintos en latencia y trazabilidad.",
+      "trampa": "Son combinables: MetaGPT es un pipeline de roles sobre una pizarra; un router puede despachar a orquestadores."
+    },
+    {
+      "id": "mast",
+      "termino": "MAST",
+      "definicion": "Taxonomía de fallas de sistemas multiagente (Cemri et al., Berkeley, 2025) sobre 1.642 trazas de 7 sistemas: 14 modos en 3 categorías, diseño del sistema (44,2%), desalineación entre agentes (32,35%) y verificación (23,5%).",
+      "por_que_importa": "Muestra tasas de falla de 41% a 86,7% y que los modos más frecuentes son repetir pasos y no saber cuándo terminar.",
+      "trampa": "Un protocolo de mensajes común no arregla la desalineación, y un verificador superficial (que compile) no alcanza."
+    },
+    {
+      "id": "lee-o-escribe",
+      "termino": "Regla «¿el trabajo lee o escribe?»",
+      "definicion": "Criterio que resuelve el debate Cognition vs Anthropic: si el trabajo lee (investigación, búsqueda), repartir paga; si escribe sobre algo compartido (código, un documento, una base), conviene un solo hilo o límites explícitos.",
+      "por_que_importa": "Explica por qué Anthropic (Research) y Cognition (código) llegan a conclusiones opuestas sin contradecirse.",
+      "trampa": "No es «multiagente bueno o malo»: el caso intermedio (escribir archivos distintos) funciona si los límites están escritos de antemano."
+    },
+    {
+      "id": "humano-en-el-circuito",
+      "termino": "Humano en el circuito",
+      "definicion": "Aprobación humana explícita para acciones irreversibles (enviar, borrar, pagar); la última defensa del sistema.",
+      "por_que_importa": "En el caso del crédito de Kore.ai, la única escritura (la transferencia) va sola, al final y después de validar: es el lugar natural de la compuerta humana.",
+      "trampa": "Ponerlo no alcanza: con IA de alta calidad los humanos se desconectan («dormidos al volante», Dell'Acqua); hay que diseñar para que siga despierto."
+    }
+  ],
+  "formulas": [
+    {
+      "nombre": "Función de agente",
+      "tex": "f: P^{*} \\rightarrow A",
+      "explicacion": "$P^{*}$ es el conjunto de todas las secuencias posibles de percepciones (cero o más, por eso la estrella) y $A$ el conjunto de acciones. Describe el comportamiento; el programa de agente lo implementa viendo solo la percepción actual."
+    },
+    {
+      "nombre": "Espacio de acciones de ReAct",
+      "tex": "\\hat{A} = A \\cup L",
+      "explicacion": "$A$ son las acciones que tocan el ambiente (search, lookup, finish) y devuelven observación; $L$ es el espacio del lenguaje: los pensamientos, que no producen observación."
+    },
+    {
+      "nombre": "Contexto de ReAct",
+      "tex": "c_t = (o_1, a_1, \\dots, o_{t-1}, a_{t-1}, o_t), \\qquad c_{t+1} = (c_t, \\hat{a}_t)",
+      "explicacion": "El contexto en el paso $t$ es todo lo observado ($o$) y hecho ($a$) hasta ahí. Si $\\hat{a}_t$ es un pensamiento, el contexto suma solo el pensamiento, sin observación nueva."
+    },
+    {
+      "nombre": "Precio en tokens (Anthropic, jun-2025)",
+      "tex": "\\text{tokens}_{\\text{agente}} \\approx 4\\times \\text{tokens}_{\\text{chat}}, \\qquad \\text{tokens}_{\\text{multiagente}} \\approx 15\\times \\text{tokens}_{\\text{chat}}",
+      "explicacion": "Cifras internas de Anthropic sobre su propio sistema. En BrowseComp, el uso de tokens solo explica el 80% de la varianza de desempeño."
+    }
+  ],
+  "comparaciones": [
+    {
+      "titulo": "Un auto autónomo en cada arquitectura clásica",
+      "columnas": [
+        "Arquitectura",
+        "Qué hace el auto",
+        "Dónde se queda corto"
+      ],
+      "filas": [
+        [
+          "Reflejo simple",
+          "Frena cuando el de adelante enciende las luces de freno",
+          "Decide solo con lo que ve ahora; un auto tapado por un camión no existe para él"
+        ],
+        [
+          "Reflejo con modelo",
+          "Recuerda el auto del punto ciego aunque la cámara ya no lo vea",
+          "Elige con reglas fijas y no tiene destino"
+        ],
+        [
+          "Basado en objetivos",
+          "En cada esquina elige el giro que lo acerca al destino",
+          "Le da lo mismo la ruta rápida o la peligrosa"
+        ],
+        [
+          "Basado en utilidad",
+          "Pondera seguridad, velocidad y comodidad del pasajero",
+          "Necesita un modelo del ambiente y una utilidad escrita por el diseñador"
+        ],
+        [
+          "Que aprende",
+          "Un crítico marca cada frenada brusca y el auto corrige",
+          "Probar maniobras nuevas en la calle cuesta caro"
+        ]
+      ]
+    },
+    {
+      "titulo": "Workflow vs agente (Anthropic)",
+      "columnas": [
+        "Aspecto",
+        "Workflow",
+        "Agente"
+      ],
+      "filas": [
+        [
+          "Quién decide el próximo paso",
+          "El código",
+          "El LLM, en un loop"
+        ],
+        [
+          "Definición",
+          "LLMs y tools orquestados por caminos de código predefinidos",
+          "LLMs que dirigen su propio proceso y uso de tools"
+        ],
+        [
+          "Conviene para",
+          "Tareas bien definidas que piden previsibilidad",
+          "Tareas que piden flexibilidad y decisiones del modelo"
+        ],
+        [
+          "Patrones",
+          "Prompt chaining, routing, paralelización, orchestrator-workers, evaluator-optimizer",
+          "Un LLM que usa tools según el feedback del ambiente"
+        ]
+      ]
+    },
+    {
+      "titulo": "Los cuatro tipos de agente de un solo LLM",
+      "columnas": [
+        "Tipo",
+        "Cómo funciona",
+        "Cuándo planifica",
+        "Cuántas veces razona el LLM",
+        "Cuándo conviene",
+        "Un caso"
+      ],
+      "filas": [
+        [
+          "ReAct",
+          "Loop pensar → actuar → observar, un paso a la vez",
+          "Nunca de antemano",
+          "En cada paso",
+          "Tareas exploratorias, donde el próximo paso depende del resultado anterior",
+          "Apple Remote: cada búsqueda depende de la anterior"
+        ],
+        [
+          "Plan-and-Execute",
+          "Planifica todo al inicio, luego ejecuta con executors",
+          "Al inicio",
+          "Al replanificar",
+          "Tareas largas y predecibles; menos llamadas al LLM",
+          "Actualizar un proyecto a una nueva versión de una biblioteca"
+        ],
+        [
+          "Reflexion",
+          "Ejecuta, se autoevalúa y reintenta con la crítica como memoria",
+          "Entre intentos",
+          "Después de cada intento fallido",
+          "Cuando hay un criterio claro de éxito (tests)",
+          "Una función que tiene que pasar tests (match_parens)"
+        ],
+        [
+          "ReWOO",
+          "Plan con variables; ejecuta las tools sin volver a razonar",
+          "Al inicio",
+          "Solo al final (solver)",
+          "Optimizar costo y latencia",
+          "Stats de los quarterbacks del Super Bowl"
+        ]
+      ]
+    },
+    {
+      "titulo": "Las topologías multiagente",
+      "columnas": [
+        "Topología",
+        "Quién tiene el control",
+        "Cómo circula el contexto",
+        "Costo y latencia",
+        "Trazabilidad"
+      ],
+      "filas": [
+        [
+          "Estrella",
+          "El orquestador, en cada vuelta",
+          "Encargo de ida, hallazgo comprimido de vuelta",
+          "Un salto por el centro en cada delegación",
+          "Todo pasa por un lugar"
+        ],
+        [
+          "Router",
+          "El router, una vez al inicio",
+          "El pedido va al especialista elegido",
+          "Una clasificación antes de empezar",
+          "Una decisión por pedido"
+        ],
+        [
+          "Red",
+          "El agente activo, que lo transfiere",
+          "Viaja con el control: historial entero o resumen",
+          "Sin saltos por un centro",
+          "Nadie tiene la foto completa"
+        ],
+        [
+          "Pizarra",
+          "Ninguno; hay que decidir quién termina",
+          "Un espacio común que todos leen y escriben",
+          "Leer todo satura; se filtra por rol",
+          "Lo publicado queda en el espacio común"
+        ],
+        [
+          "Pipeline",
+          "El código",
+          "La salida de uno es la entrada del siguiente",
+          "Etapas en serie",
+          "Orden fijo; un error temprano se arrastra"
+        ],
+        [
+          "Jerarquía",
+          "Un árbol de orquestadores",
+          "Resúmenes que suben nivel por nivel",
+          "Cada nivel suma llamadas y latencia",
+          "Cada resumen pierde información"
+        ]
+      ]
+    },
+    {
+      "titulo": "El debate: ¿construir multiagentes?",
+      "columnas": [
+        "Aspecto",
+        "Cognition",
+        "Anthropic"
+      ],
+      "filas": [
+        [
+          "Publicación",
+          "12 jun 2025 (Walden Yan)",
+          "13 jun 2025"
+        ],
+        [
+          "Posición",
+          "«Don't Build Multi-Agents»: un solo hilo con contexto continuo",
+          "A favor del multiagente, para investigación"
+        ],
+        [
+          "Argumento",
+          "Las acciones llevan decisiones implícitas; sin la traza completa, las decisiones chocan",
+          "Cada subagente comprime en su ventana; repartir permite gastar los tokens que el problema pide"
+        ],
+        [
+          "Evidencia",
+          "Principios y un ejemplo (Flappy Bird), sin números",
+          "Eval interna: «outperformed single-agent Claude Opus 4 by 90.2%»"
+        ],
+        [
+          "Dominio",
+          "Agentes de código (Devin): el trabajo escribe",
+          "Claude Research: el trabajo lee"
+        ]
+      ]
+    }
+  ],
+  "flashcards": [
+    {
+      "q": "¿Un LLM es un agente por sí solo?",
+      "a": "No. Se vuelve agente cuando elige acciones en un loop según lo que observa, con sensores (contexto, resultados de tools) y actuadores (tools, APIs, comandos)."
+    },
+    {
+      "q": "Definición de agente de Russell & Norvig",
+      "a": "Cualquier entidad que percibe su ambiente mediante sensores y actúa sobre él mediante actuadores."
+    },
+    {
+      "q": "¿Qué significa PEAS?",
+      "a": "Performance, Environment (ambiente), Actuadores, Sensores."
+    },
+    {
+      "q": "¿Por qué la aspiradora resta −5 al aspirar una celda limpia?",
+      "a": "Porque si la medida solo premiara aspirar, un agente racional aspiraría sin parar: la medida es parte del diseño."
+    },
+    {
+      "q": "Cuatro factores de la racionalidad",
+      "a": "Medida de performance, conocimiento previo, acciones disponibles y secuencia de percepciones (en un LLM: el contexto)."
+    },
+    {
+      "q": "Función vs programa de agente",
+      "a": "Función f: P* → A, descripción matemática sobre toda la historia; programa: código que recibe la percepción actual y devuelve una acción."
+    },
+    {
+      "q": "Workflow vs agente según Anthropic",
+      "a": "Workflow: el código decide el próximo paso por caminos predefinidos. Agente: el LLM dirige su proceso y uso de tools en un loop."
+    },
+    {
+      "q": "¿Quién ejecuta una tool?",
+      "a": "El programa. El LLM solo emite el pedido con nombre y argumentos; el resultado vuelve al contexto."
+    },
+    {
+      "q": "¿Qué es Â = A ∪ L en ReAct?",
+      "a": "El espacio de acciones ampliado con el lenguaje: acciones en A tocan el ambiente y dan observación; pensamientos en L solo se suman al contexto."
+    },
+    {
+      "q": "¿Cómo corta el prompt de ReAct original para que el modelo no invente la observación?",
+      "a": "Con un stop en '\\nObservation i:'; el código ejecuta la acción y pega la observación real. Máximo 7 pasos."
+    },
+    {
+      "q": "Las dos preguntas para comparar tipos de agente",
+      "a": "¿Cuándo se planifica? y ¿cuántas veces vuelve a razonar el LLM?"
+    },
+    {
+      "q": "Tres roles de Reflexion",
+      "a": "Actor (ReAct/CoT), Evaluator (tests, heurística o LLM) y Self-Reflection (escribe la crítica que va a memoria)."
+    },
+    {
+      "q": "¿Qué distingue a ReWOO de Plan-and-Execute?",
+      "a": "Las variables (#E1…): el worker sustituye y ejecuta sin LLM entre pasos; no hay re-planner, así que no se adapta."
+    },
+    {
+      "q": "¿Qué es context rot?",
+      "a": "La degradación gradual del rendimiento del modelo a medida que crece el contexto (Anthropic): el contexto es un recurso finito con rendimientos decrecientes."
+    },
+    {
+      "q": "Tres palancas de un sistema multiagente",
+      "a": "Especialización, aislamiento de contexto y paralelismo."
+    },
+    {
+      "q": "¿Cuántos tokens gasta un multiagente vs un chat?",
+      "a": "~15× (un agente solo ~4×), según Anthropic."
+    },
+    {
+      "q": "Tres categorías de falla de MAST",
+      "a": "Diseño del sistema (44,2%), desalineación entre agentes (32,35%) y verificación (23,5%)."
+    },
+    {
+      "q": "¿Qué ve por defecto el agente que recibe un handoff?",
+      "a": "Todo el historial anterior; aislarlo pide un filtro explícito."
+    },
+    {
+      "q": "La pregunta que resuelve Cognition vs Anthropic",
+      "a": "¿El trabajo lee o escribe? Si lee, repartir paga; si escribe sobre algo compartido, un solo hilo o límites explícitos."
+    },
+    {
+      "q": "Frase de LangChain sobre empezar",
+      "a": "«Add tools before adding agents»: empezar con un agente y buen prompt, y repartir solo ante límites claros."
+    }
+  ],
+  "quiz": [
+    {
+      "q": "¿Un LLM que recibe una pregunta y devuelve una respuesta es un agente?",
+      "opciones": [
+        "Sí, cualquier LLM es un agente",
+        "Sí, siempre que el modelo sea lo bastante grande",
+        "Por sí solo, no",
+        "No, porque un agente tiene que ser un robot"
+      ],
+      "correcta": 2,
+      "explicacion": "Un LLM solo no percibe ni actúa sobre un ambiente en un loop. A es el uso popular que la clase corrige; B confunde tamaño con forma de trabajo; D es el extremo opuesto: la definición de R&N no exige hardware ni software."
+    },
+    {
+      "q": "En la descripción PEAS de un LLM con tools, ¿qué son los resultados que devuelven las tools?",
+      "opciones": [
+        "Actuadores",
+        "Sensores (percepciones)",
+        "Medida de performance",
+        "Ambiente"
+      ],
+      "correcta": 1,
+      "explicacion": "Llamar a la tool es actuar; lo que devuelve entra al contexto como percepción nueva, es decir, por los sensores. La performance es calidad/relevancia/satisfacción y el ambiente es digital, parcialmente observable y dinámico."
+    },
+    {
+      "q": "Un auto que en cada esquina elige el giro que lo acerca al destino, pero le da igual una ruta peligrosa que una segura, corresponde a un agente:",
+      "opciones": [
+        "Reflejo simple",
+        "Reflejo con modelo",
+        "Basado en objetivos",
+        "Basado en utilidad"
+      ],
+      "correcta": 2,
+      "explicacion": "El agente basado en objetivos solo distingue estados meta de no meta. Para ponderar seguridad, velocidad y comodidad hace falta una función de utilidad. El reflejo (simple o con modelo) no tiene destino."
+    },
+    {
+      "q": "Según Anthropic, ¿qué distingue a un workflow de un agente?",
+      "opciones": [
+        "El workflow no usa LLM",
+        "En el workflow el próximo paso lo decide el código; en el agente, el LLM",
+        "El agente siempre usa varios LLMs",
+        "El workflow no puede usar tools"
+      ],
+      "correcta": 1,
+      "explicacion": "Ambos usan LLM y tools (por eso la palabra agente se estira). La diferencia es quién elige el próximo paso: caminos de código predefinidos vs el modelo en un loop."
+    },
+    {
+      "q": "En ReAct, ¿qué pasa cuando el modelo emite un pensamiento (acción en L)?",
+      "opciones": [
+        "Se ejecuta una búsqueda en Wikipedia",
+        "Se obtiene una observación del ambiente",
+        "Se suma solo el pensamiento al contexto, sin observación",
+        "Termina la tarea"
+      ],
+      "correcta": 2,
+      "explicacion": "Por definición del paper, un pensamiento no afecta el ambiente y no produce feedback: c_{t+1} = (c_t, â_t). Solo las acciones en A (search, lookup, finish) tocan el ambiente."
+    },
+    {
+      "q": "En la Figura 1 de ReAct, la variante Act-only (acciones sin pensamientos) hizo las mismas búsquedas que ReAct pero respondió «yes». ¿Qué muestra eso?",
+      "opciones": [
+        "Que las búsquedas estaban mal",
+        "Que sin pensamientos el agente no pudo razonar sobre lo que observó",
+        "Que hacía falta un modelo más grande",
+        "Que hacía falta chain-of-thought sin acciones"
+      ],
+      "correcta": 1,
+      "explicacion": "Las observaciones eran correctas; faltó razonar sobre ellas. CoT sin acciones, en cambio, alucinó (Apple TV). ReAct combina ambos: razonar para actuar y actuar para razonar."
+    },
+    {
+      "q": "Una tarea donde todas las consultas a tools se pueden escribir antes de ver ningún resultado y se busca minimizar costo y latencia. ¿Qué tipo conviene?",
+      "opciones": [
+        "ReAct",
+        "Reflexion",
+        "ReWOO",
+        "Una red de agentes"
+      ],
+      "correcta": 2,
+      "explicacion": "ReWOO planifica con variables y ejecuta todo sin volver al LLM: dos llamadas en total. ReAct llamaría al LLM en cada paso; Reflexion necesita un evaluador y reintentos; una red es multiagente y gasta más."
+    },
+    {
+      "q": "En la ablación de Reflexion en Rust, quitar los tests autogenerados bajó el pass@1 de 68% a 52%, por debajo del modelo base (60%). ¿Qué conclusión se saca?",
+      "opciones": [
+        "La reflexión no sirve nunca",
+        "Reflexion depende de un evaluador confiable; sin él puede empeorar",
+        "Los modelos chicos funcionan mejor",
+        "Conviene más ReWOO para código"
+      ],
+      "correcta": 1,
+      "explicacion": "La pieza que más pesa es tener algo que diga si salió bien. Por eso la tabla dice: Reflexion cuando hay un criterio claro de éxito. Con starchat-beta (modelo chico) no mejora nada: 26% → 26%."
+    },
+    {
+      "q": "¿Cuál es la diferencia clave entre un router y una estrella (orquestador con subagentes)?",
+      "opciones": [
+        "El router no usa LLM",
+        "El router decide una vez al inicio; el orquestador puede leer los resultados y decidir a quién llamar después",
+        "La estrella no permite paralelismo",
+        "En el router los agentes comparten pizarra"
+      ],
+      "correcta": 1,
+      "explicacion": "El router clasifica y despacha sin volver a razonar sobre lo que vuelve; si clasifica mal, nadie lo corrige. El orquestador decide en cada vuelta y sintetiza."
+    },
+    {
+      "q": "En un sistema con handoffs entre agentes, ¿qué recibe por defecto el agente que toma el control?",
+      "opciones": [
+        "Solo el último mensaje del usuario",
+        "Un resumen generado automáticamente",
+        "Todo el historial anterior de la conversación",
+        "Nada: arranca con la ventana vacía"
+      ],
+      "correcta": 2,
+      "explicacion": "Por defecto se hereda la conversación entera: el aislamiento hay que configurarlo con un filtro. El que arranca con ventana limpia es un subagente nuevo, no un handoff ni un fork."
+    },
+    {
+      "q": "En el ejemplo Flappy Bird de Cognition, aun pasándoles todo el contexto del orquestador, los subagentes produjeron fondo y pájaro en estilos visuales distintos. ¿Por qué?",
+      "opciones": [
+        "Porque el modelo era demasiado chico",
+        "Porque cada subagente no veía las decisiones que tomaba su hermano",
+        "Porque el orquestador no sintetizó",
+        "Porque faltaban tools"
+      ],
+      "correcta": 1,
+      "explicacion": "Las acciones llevan decisiones implícitas; heredar el contexto del orquestador no da acceso al trabajo del hermano. El choque aparece recién al combinar."
+    },
+    {
+      "q": "¿Qué tarea encaja mejor con repartir entre subagentes en paralelo?",
+      "opciones": [
+        "Refactorizar un mismo módulo de código entre tres agentes",
+        "Investigar un tema leyendo fuentes distintas",
+        "Editar el mismo documento a la vez",
+        "Actualizar una misma base de datos con tres agentes"
+      ],
+      "correcta": 1,
+      "explicacion": "Regla de la clase: si el trabajo lee, los hermanos no se pisan y repartir paga. Las otras opciones escriben sobre algo compartido: un solo hilo o límites explícitos."
+    },
+    {
+      "q": "Según Anthropic, en BrowseComp el uso de tokens solo explica el 80% de la varianza de desempeño. ¿Qué lectura deja?",
+      "opciones": [
+        "Que el multiagente funciona sobre todo porque permite gastar suficientes tokens para resolver el problema",
+        "Que los tokens no importan",
+        "Que conviene usar el modelo más chico",
+        "Que los agentes no necesitan tools"
+      ],
+      "correcta": 0,
+      "explicacion": "El propio post lo dice: «Multi-agent systems work mainly because they help spend enough tokens». Por eso el multiagente (~15× tokens) solo se justifica si el valor de la tarea paga la mejora."
+    },
+    {
+      "q": "En el caso del crédito de Kore.ai, ¿cómo se ordena el trabajo?",
+      "opciones": [
+        "Las tres acciones corren en paralelo",
+        "Dos lecturas en paralelo (Loan Agent y Transaction Manager), validación y una única escritura (Payment Processor) al final",
+        "Una red donde cada agente transfiere al siguiente",
+        "Un pipeline fijo sin validación"
+      ],
+      "correcta": 1,
+      "explicacion": "Es la regla lee/escribe aplicada en una estrella: las lecturas no se pisan; la transferencia, irreversible, va sola y después de validar (si no cierra, el orquestador replanifica)."
+    },
+    {
+      "q": "¿Qué recomienda LangChain (ene-2026) antes de pasar a multiagente?",
+      "opciones": [
+        "Empezar siempre con una jerarquía",
+        "Agregar tools antes que agentes y repartir solo ante límites claros",
+        "Usar un router para todo",
+        "Entrenar un modelo propio"
+      ],
+      "correcta": 1,
+      "explicacion": "«Start with a single agent and good prompt engineering. Add tools before adding agents.» Las dos restricciones que empujan a repartir son manejo del contexto y desarrollo distribuido."
+    }
+  ],
+  "desarrollo": [
+    {
+      "pregunta": "Explique la definición de agente de Russell & Norvig y la descripción PEAS. Aplíquela a un agente basado en LLM y justifique por qué un LLM solo no es un agente.",
+      "respuesta_modelo": "Para Russell & Norvig un **agente** es cualquier entidad que percibe su ambiente mediante **sensores** y actúa sobre él mediante **actuadores**, en un loop cerrado: las acciones cambian el ambiente y la vuelta siguiente parte de percepciones nuevas. La definición no exige ML, LLMs ni software. Un **agente racional** elige la acción que maximiza la esperanza de una **medida de performance**, dados su conocimiento previo, sus acciones disponibles y su secuencia de percepciones; no tiene que ser omnisciente.\n\n**PEAS** describe al agente con Performance, Environment, Actuadores y Sensores. Para un LLM con tools: **P** = calidad, relevancia y precisión de las respuestas, satisfacción del usuario; **E** = digital, simbólico, parcialmente observable y dinámico; **A** = texto, comandos, llamadas a tools y APIs; **S** = el pedido, el contexto y los resultados de las tools.\n\nUn LLM suelto recibe texto y devuelve texto: no observa el efecto de sus acciones ni elige la próxima en un loop. Se vuelve agente cuando el programa que lo rodea le da actuadores (tools) y le devuelve las observaciones al contexto. Como el ambiente es parcialmente observable y dinámico, tiene que observar después de cada acción. En el agente LLM, el modelo cumple el papel de la **función** de agente y el código que arma el contexto y ejecuta las tools es el **programa**.",
+      "puntos_clave": [
+        "Sensores, actuadores, ambiente y loop cerrado",
+        "Racionalidad relativa a una medida, no omnisciencia",
+        "Las cuatro letras de PEAS con valores para el LLM",
+        "Ambiente parcialmente observable y dinámico",
+        "LLM solo = único actuador es generar texto; tools lo vuelven agente",
+        "Función vs programa de agente"
+      ]
+    },
+    {
+      "pregunta": "Compare ReAct, Plan-and-Execute, Reflexion y ReWOO usando las dos preguntas de la clase. Dé un caso de uso para cada uno.",
+      "respuesta_modelo": "Las dos preguntas son **¿cuándo se planifica?** y **¿cuántas veces vuelve a razonar el LLM?**\n\n- **ReAct** (Yao et al., 2022): nunca planifica de antemano y razona **en cada paso**; intercala pensamientos (Â = A ∪ L) y acciones. Conviene en tareas exploratorias donde el siguiente paso depende del resultado anterior: la pregunta del Apple Remote, donde la búsqueda de Front Row falla y el agente reformula.\n- **Plan-and-Execute**: planifica **al inicio** con un planner, ejecuta cada paso con executors (pequeños ReAct) y vuelve a razonar **al replanificar**. Conviene en tareas largas y predecibles, como actualizar un proyecto a una nueva versión de una biblioteca. Ahorra llamadas al modelo grande, pero ejecuta en serie y no conecta pasos con variables.\n- **Reflexion**: planifica **entre intentos**; Actor, Evaluator y Self-Reflection producen una crítica verbal que va a memoria, sin tocar pesos. Conviene cuando hay un criterio claro de éxito, como una función que tiene que pasar tests (91,0% vs 80,1% en HumanEval). Sin evaluador confiable puede empeorar (52% vs 60% en Rust).\n- **ReWOO**: planifica **al inicio con variables** (#E1) y el LLM razona **solo al final** (solver). Conviene para optimizar costo y latencia cuando todas las consultas se escriben de antemano (las stats de los quarterbacks). No se adapta si algo falla.\n\nLos tipos se combinan: el executor y el Actor son ReAct.",
+      "puntos_clave": [
+        "Las dos preguntas explícitas",
+        "Respuesta de cada tipo a ambas preguntas",
+        "Roles: planner/executor/re-planner; actor/evaluator/self-reflection; planner/worker/solver",
+        "Un caso por tipo",
+        "Trade-offs: adaptabilidad vs llamadas al LLM",
+        "Reflexion depende del evaluador; ReWOO no replanifica"
+      ]
+    },
+    {
+      "pregunta": "¿Por qué el contexto es el límite de un agente único y cómo lo atacan los sistemas multiagente? Mencione las tres palancas y el orquestador con workers.",
+      "respuesta_modelo": "El contexto de un agente (instrucciones, tools, resultados y conversación) crece en cada vuelta. Anthropic llama **context rot** a que, cuanto más largo es, peor recuerda el modelo lo que tiene adentro: es un recurso finito con rendimientos decrecientes y la caída es gradual, no un precipicio. Parte de la causa está en la atención (cada token con todos) y en que los modelos se entrenan con secuencias más cortas. El objetivo de diseño es el conjunto más chico de tokens de alta señal. Las técnicas son compactar, tomar notas fuera del contexto o **repartir entre subagentes**.\n\nUn **sistema multiagente** son varios agentes que interactúan para resolver un problema que excede a uno. Mueve tres palancas: **especialización** (prompt, tools y modelo propios), **aislamiento de contexto** (cada agente en su ventana; un subagente puede gastar decenas de miles de tokens y devolver 1.000–2.000) y **paralelismo** (más tokens en menos tiempo).\n\nSu forma básica es el **orquestador con workers**: un LLM central descompone la tarea en tiempo de ejecución, delega y sintetiza. Si cada worker tiene su loop de tools, es un **subagente**: «una tool se ejecuta y devuelve; un subagente decide». «The essence of search is compression.» El precio es ~15× tokens, y el aislamiento no viene de fábrica: hay que configurarlo.",
+      "puntos_clave": [
+        "Context rot con las citas de Anthropic",
+        "Tres técnicas: compactar, notas, subagentes",
+        "Definición de sistema multiagente",
+        "Las tres palancas con la cifra 1.000–2.000 tokens",
+        "Orquestador descompone en tiempo de ejecución, delega y sintetiza",
+        "Costo ~15× y aislamiento a configurar"
+      ]
+    },
+    {
+      "pregunta": "Presente el debate entre Cognition y Anthropic sobre construir sistemas multiagente y explique cómo lo resuelve la clase.",
+      "respuesta_modelo": "Con un día de diferencia (12 y 13 de junio de 2025) se publicaron conclusiones opuestas. **Cognition** («Don't Build Multi-Agents», dominio: agentes de código como Devin) sostiene dos principios: compartir el contexto y las trazas completas, y que «las acciones llevan decisiones implícitas, y decisiones en conflicto dan malos resultados». Su ejemplo es Flappy Bird: aun con todo el contexto compartido, el subagente del fondo y el del pájaro producen estilos visuales distintos porque ninguno ve lo que decide el otro. Propone un solo hilo. No presenta números.\n\n**Anthropic** (Claude Research) defiende el multiagente: cada subagente comprime en su propia ventana y repartir permite gastar los tokens que el problema pide. Reporta que su sistema «outperformed single-agent Claude Opus 4 by 90.2%» en una eval interna, a ~15× tokens.\n\nLa clase lo resuelve con una pregunta: **¿el trabajo lee o escribe?** Si **lee** (investigación, búsqueda), los hermanos no se pisan y repartir paga: es el dominio de Anthropic. Si **escribe sobre algo compartido** (código, un documento, una base), cada acción cambia el terreno del otro: conviene un solo hilo o límites explícitos, que es el dominio de Cognition. El caso de Kore.ai lo aplica: dos lecturas en paralelo, validación y una sola escritura al final.",
+      "puntos_clave": [
+        "Fechas y dominios de cada uno",
+        "Principios de Cognition y ejemplo Flappy Bird",
+        "Argumento y cifra (90.2%) de Anthropic, con su matiz",
+        "La regla lee/escribe",
+        "Caso Kore.ai: lecturas paralelas, escritura sola al final",
+        "Posición intermedia de LangChain: empezar con un agente"
+      ]
+    },
+    {
+      "pregunta": "El TP final pide un agente de admisión de guardia con cinco herramientas. Analícelo con la teoría de la clase: tipo de agente, PEAS, uso de tools y si conviene una arquitectura multiagente.",
+      "respuesta_modelo": "**PEAS:** la **performance** son los 9 controles de la ficha (8 campos más la verificación de afiliación con la entidad correcta), con costo y latencia por caso; el **ambiente** es la guardia simulada, parcialmente observable (hay que preguntar lo que falta) y con normas cuyos números cambian; los **actuadores** son `preguntar`, `verificar_afiliacion`, `buscar_normativa` y `registrar_decision`; los **sensores**, la nota de triage (`leer_triage`), las respuestas del paciente, la afiliación y los fragmentos de normas.\n\n**Tipo de agente:** el próximo paso depende de lo observado (qué falta en el triage, qué cobertura aparece, qué dice la norma), así que encaja con un **ReAct en sentido laxo**: un loop de tool calling con un modelo de chat. Hace falta una condición de parada (registrar la ficha o un máximo de pasos).\n\n**Tools y contexto:** el buscador ocupa más de la mitad de cada conversación en la referencia, y el system prompt una quinta parte. Por el context rot y el costo, conviene traer pocos tokens de alta señal y un prompt corto (principio de respuestas que cuidan tokens).\n\n**¿Multiagente?** Según el árbol de la clase, no: la información entra en un contexto, no hay equipos dueños de dominios distintos y la única escritura (`registrar_decision`) va al final. Repartir costaría ~15× tokens y abriría fallas tipo MAST. Aplica «Add tools before adding agents».",
+      "puntos_clave": [
+        "PEAS completo del agente de admisión",
+        "ReAct laxo con condición de parada",
+        "Tools como actuadores y sus resultados como percepciones",
+        "Costo de contexto del RAG y del prompt",
+        "Árbol de decisión: un agente alcanza",
+        "Lee mucho, escribe una vez al final"
+      ]
+    }
+  ],
+  "conexiones": [
+    {
+      "clase": 5,
+      "relacion": "Prompting y costos: el system prompt, few-shot (los 6 ejemplos a mano del prompt de ReAct), chain-of-thought (el CoT que alucina Apple TV) y el costo por token que explica por qué ~15× tokens importa."
+    },
+    {
+      "clase": 6,
+      "relacion": "RAG y MCP: el retrieval es parte del augmented LLM; MCP es una forma estándar de exponer las tools que esta clase define como concepto independiente del protocolo."
+    },
+    {
+      "clase": 7,
+      "relacion": "MCP y herramientas: el circuito de tool calling (el LLM pide, el programa ejecuta) se vuelve acá el actuador del agente de Russell & Norvig."
+    },
+    {
+      "clase": 8,
+      "relacion": "Transformers: la atención que relaciona cada token con todos (n²) es parte de la causa del context rot, el límite que motiva repartir entre subagentes."
+    },
+    {
+      "clase": 9,
+      "relacion": "Entrenamiento de LLMs: el SFT enseña a emitir tool calls estructurados (el ReAct laxo); Reflexion aprende sin tocar pesos, a diferencia del RL con verificador, aunque ambos dependen de un criterio de éxito."
+    },
+    {
+      "clase": 13,
+      "relacion": "Seguridad y ética: los agentes con tools amplían la superficie de ataque (prompt injection, tríada letal) y las acciones irreversibles, como la transferencia del caso Kore.ai, piden humano en el circuito."
+    }
+  ],
+  "lecturas": [
+    "Russell & Norvig, Artificial Intelligence: A Modern Approach (4.ª ed., Pearson, 2020), cap. 2 «Intelligent Agents»",
+    "Yao et al., 2022, ReAct: Synergizing Reasoning and Acting in Language Models (arXiv 2210.03629, ICLR 2023)",
+    "Shinn et al., 2023, Reflexion: Language Agents with Verbal Reinforcement Learning (arXiv 2303.11366)",
+    "Xu et al., 2023, ReWOO: Decoupling Reasoning from Observations (arXiv 2305.18323)",
+    "LangChain, feb-2024, Plan-and-Execute Agents (planning-agents)",
+    "Lilian Weng, jun-2023, LLM Powered Autonomous Agents",
+    "Anthropic, dic-2024 (revisado), Building effective agents",
+    "Anthropic, sep-2025, Writing effective tools for agents",
+    "Anthropic, sep-2025, Effective context engineering for AI agents",
+    "Anthropic, jun-2025, How we built our multi-agent research system",
+    "Cognition (Walden Yan), jun-2025, Don't Build Multi-Agents",
+    "Cemri et al. (UC Berkeley), 2025, Why Do Multi-Agent LLM Systems Fail? (MAST, arXiv 2503.13657)",
+    "LangChain (Sydney Runkle), ene-2026, Choosing the right multi-agent architecture",
+    "Hong et al., 2023, MetaGPT",
+    "Kore.ai, oct-2025, Choosing the right orchestration pattern for multi-agent systems",
+    "Reid G. Smith, 1980, Contract Net Protocol"
+  ]
+}

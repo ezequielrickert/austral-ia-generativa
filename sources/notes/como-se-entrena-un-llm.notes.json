@@ -1,0 +1,737 @@
+[
+ {
+  "i": 0,
+  "resumen": "Portada de la clase 9: cómo se entrena un LLM.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 1,
+  "resumen": "Agenda: pre-training, SFT, RLHF, razonamiento con RL, herramientas y fine-tuning.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 2,
+  "resumen": "Gancho: un GPT-3 **100× más chico**, con un poco de entrenamiento extra con personas, le ganó al original. Ese extra costó menos del 2 % del cómputo.",
+  "claves": [
+   "post-training",
+   "rlhf",
+   "sft"
+  ],
+  "tp": [
+   {
+    "tp": 4,
+    "texto": "Lo mismo en la consigna: Gemma de referencia pasa de 12/15/12 a 25/24/25 casos con un SFT simple."
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 3,
+  "resumen": "Mapa de la clase: **pre-training** (web, >1 billón de tokens), **SFT** (demostraciones) y **RLHF** (comparaciones). SFT + RLHF forman el post-training.",
+  "claves": [
+   "pretraining",
+   "sft",
+   "rlhf"
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 4,
+  "resumen": "Sección 1: pre-training.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 5,
+  "resumen": "El pre-training minimiza la pérdida del **siguiente token** sobre texto web, sin etiquetas (auto-supervisado). Sale un **modelo base**: sabe mucho, pero no sigue instrucciones.",
+  "claves": [
+   "pretraining",
+   "self-supervised",
+   "foundation-model"
+  ],
+  "ver": [
+   {
+    "ref": "palabra-al-transformer#8",
+    "por": "predecir la palabra que sigue"
+   },
+   {
+    "ref": "transformers-a-fondo#40",
+    "por": "la misma pérdida"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 6,
+  "resumen": "**Common Crawl**: archivo público de la web desde 2008, base de casi todos los datasets abiertos (60 % de GPT-3). Mayormente es ruido: menús, errores y duplicados.",
+  "claves": [
+   "common crawl",
+   "pretraining"
+  ],
+  "ver": [
+   {
+    "ref": "introduccion#52",
+    "por": "con qué datos se entrenan"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 7,
+  "resumen": "**C4**: Google filtró Common Crawl con reglas a mano, y el mismo modelo rinde mejor en todas las tareas. Filtrar datos funciona, aunque tiene costos.",
+  "claves": [
+   "c4",
+   "curado de datos"
+  ],
+  "tp": [
+   {
+    "tp": 4,
+    "texto": "Curaste el historial: 2.000 filas → 1.600 correctas, 240 errores y 160 de ruido. Solo las correctas entran al entrenamiento."
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 8,
+  "resumen": "Cómputo de entrenamiento: $C \\approx 6ND$ (N parámetros, D tokens; 2 FLOPs adelante, 4 atrás). La **ley de escala** dice qué N y D convienen para un C dado.",
+  "claves": [
+   "leyes-de-escala",
+   "computo"
+  ],
+  "ver": [
+   {
+    "ref": "introduccion#53",
+    "por": "escala, datos y cómputo"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 9,
+  "resumen": "**Chinchilla**: con el mismo cómputo, conviene un modelo más chico con más datos, unos **20 tokens por parámetro**. Hoy se entrena muy por encima (Llama 3 8B, ~100×).",
+  "claves": [
+   "chinchilla",
+   "leyes-de-escala"
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 10,
+  "resumen": "Los datasets crecen ~2,4× por año y se agotaría el texto humano público hacia **2028**. Pagar a personas para escribir no alcanza.",
+  "claves": [
+   "stock-de-datos",
+   "escala"
+  ],
+  "ver": [
+   {
+    "ref": "cierre-magnifica-humanitas#47",
+    "por": "¿alcanza con escalar?"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 11,
+  "resumen": "Problemas de los datos: la lista negra de C4 **sesga** contra dialectos, el inglés domina (89,7 % vs 0,13 % de castellano) y crece el texto generado por modelos.",
+  "claves": [
+   "sesgo",
+   "colapso de modelos"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 12,
+  "resumen": "Pregunta puente: si el modelo base solo completa texto, ¿por qué los chats responden?",
+  "claves": [
+   "modelo base",
+   "post-training"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 13,
+  "resumen": "Quiz: el modelo base puede seguir con otra pregunta, una receta o la respuesta. Las tres son continuaciones plausibles; no sabe que se espera una respuesta.",
+  "claves": [
+   "modelo base",
+   "pretraining"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 14,
+  "resumen": "Queremos la respuesta directa, pero nada del pre-training la hace más probable. Eso lo enseña el **post-training**.",
+  "claves": [
+   "post-training",
+   "sft"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 15,
+  "resumen": "Sección 2: Supervised Fine-Tuning (SFT).",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 16,
+  "resumen": "**SFT** sigue entrenando el modelo base con pares (prompt, respuesta) escritos por personas: decenas de miles, no billones de tokens. El modelo que sale conversa.",
+  "claves": [
+   "sft",
+   "demostraciones"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 17,
+  "resumen": "**Constitutional AI** (Anthropic, 2022): el modelo critica y corrige sus propias respuestas según principios escritos, y el SFT se hace con las versiones corregidas.",
+  "claves": [
+   "constitutional-ai",
+   "sft"
+  ],
+  "ver": [
+   {
+    "ref": "cierre-magnifica-humanitas#24",
+    "por": "cómo aprende a portarse bien"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 18,
+  "resumen": "El mismo GPT-3 antes y después del post-training: sin post-training, sigue el texto como si fuera un examen. Cambia el formato, pero no garantiza que sea correcto.",
+  "claves": [
+   "post-training",
+   "sft"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 19,
+  "resumen": "SFT usa la misma **cross-entropy** del siguiente token, pero sobre demostraciones y con la **pérdida solo en los tokens de la respuesta**. Es *behavior cloning*: copia el comportamiento.",
+  "claves": [
+   "sft",
+   "mascara-de-perdida",
+   "entropia-cruzada"
+  ],
+  "tp": [
+   {
+    "tp": 4,
+    "texto": "`tokenizacion.py`: labels = −100 en sistema, triage y observaciones; la pérdida cuenta solo las acciones JSON del asistente."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "transformers-a-fondo#40",
+    "por": "qué se minimiza"
+   },
+   {
+    "ref": "modelado-redes-neuronales#30",
+    "por": "cross-entropy multiclase"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 20,
+  "resumen": "Un dataset de SFT es un JSON con dos campos, prompt y respuesta. Hay públicos: Dolly-15k, OpenAssistant, Alpaca (generado con ChatGPT).",
+  "claves": [
+   "sft",
+   "dataset"
+  ],
+  "tp": [
+   {
+    "tp": 4,
+    "texto": "Armaste 2.900 conversaciones: 1.600 del historial correcto, 800 de la cátedra y 500 sintéticas."
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 21,
+  "resumen": "Pregunta puente: si el SFT ya enseña a responder, ¿para qué otra etapa?",
+  "claves": [
+   "sft",
+   "rlhf"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 22,
+  "resumen": "El SFT ve una sola respuesta por prompt y la imita: no aprende **cuál es mejor**. Para eso hacen falta comparaciones (RLHF).",
+  "claves": [
+   "sft",
+   "rlhf",
+   "preferencias"
+  ],
+  "tp": [
+   {
+    "tp": 4,
+    "texto": "Por eso excluiste errores y ruido del entrenamiento: el SFT copiaría esos desvíos."
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 23,
+  "resumen": "Sección 3: RLHF, aprender de preferencias humanas.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 24,
+  "resumen": "RLHF en dos pasos: entrenar un **juez** (reward model) con preferencias de personas y después mejorar el LLM contra ese juez.",
+  "claves": [
+   "rlhf",
+   "reward-model"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 25,
+  "resumen": "**RLHF**: con 100 mil a 1 millón de comparaciones se entrena el **reward model**; después el LLM se ajusta para sacar puntajes altos con solo prompts.",
+  "claves": [
+   "rlhf",
+   "reward-model",
+   "ppo"
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 26,
+  "resumen": "Comparar dos respuestas es más consistente que escribirlas o puntuarlas. Aun así, los anotadores coinciden ~73 %: el modelo se alinea a un grupo concreto de personas.",
+  "claves": [
+   "preferencias",
+   "anotadores"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 27,
+  "resumen": "El **reward model** es el modelo SFT con una salida escalar: recibe (prompt, respuesta) y aprende a puntuar más alta la respuesta elegida.",
+  "claves": [
+   "reward-model",
+   "rlhf"
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 28,
+  "resumen": "En un batch, cada par entra como dos secuencias con padding. La pérdida $-\\log\\sigma(r_A - r_B)$ baja cuando la preferida puntúa más.",
+  "claves": [
+   "reward-model",
+   "batch"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 29,
+  "resumen": "**PPO**: el LLM genera, el RM puntúa y se ajusta con un freno **KL** que lo ata al SFT. Es caro e inestable; **DPO** llega a lo mismo sin RM.",
+  "claves": [
+   "ppo",
+   "dpo",
+   "reward-hacking"
+  ],
+  "tp": [
+   {
+    "tp": 4,
+    "texto": "DPO con los errores del historial como respuestas malas quedó como opción; no se hizo."
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 30,
+  "resumen": "Sección 4: razonamiento con RL.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 31,
+  "resumen": "**RL con verificador**: una regla (no una persona) chequea la respuesta. **GRPO** genera 16 respuestas por problema y refuerza las que superan el promedio del grupo.",
+  "claves": [
+   "rl-con-verificador",
+   "grpo"
+  ],
+  "tp": [
+   {
+    "tp": 4,
+    "texto": "Quedó como alternativa no hecha: RL usando los 9 controles de la ficha como recompensa."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "prompting#53",
+    "por": "de dónde salió el thinking"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 32,
+  "resumen": "Solo sirven problemas comprobables por programa: matemática, código con tests, opción múltiple. El modelo razona entre `<think>` y responde en formato legible para el verificador.",
+  "claves": [
+   "rl-con-verificador",
+   "chain-of-thought"
+  ],
+  "ver": [
+   {
+    "ref": "prompting#49",
+    "por": "thinking: el mecanismo"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 33,
+  "resumen": "**DeepSeek-R1-Zero** aprende a razonar solo con RL desde el modelo base: AIME pasa de 15,6 % a 77,9 % y los razonamientos se alargan solos.",
+  "claves": [
+   "grpo",
+   "rl-con-verificador",
+   "razonamiento"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 34,
+  "resumen": "Sección 5: herramientas.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 35,
+  "resumen": "Por API, el modelo **nunca ejecuta**: la plantilla pasa JSON a texto con tags y un parser lo revierte. La herramienta corre en tu app o en la plataforma.",
+  "claves": [
+   "tool-calling",
+   "plantilla de chat"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 36,
+  "resumen": "El chat es el agente: llama al LLM, ejecuta las tools pedidas, agrega el resultado con rol *tool* y repite hasta que el LLM responde. Pone un tope de vueltas.",
+  "claves": [
+   "agente",
+   "tool-calling"
+  ],
+  "tp": [
+   {
+    "tp": 3,
+    "texto": "`bucle.py`: el mismo loop a mano con `ToolMessage` y tope de 6 llamadas."
+   },
+   {
+    "tp": 4,
+    "texto": "El agente de admisión tiene tope de 40 llamadas."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "rag-mcp-rapida#5",
+    "por": "el agente decide cuándo buscar"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 37,
+  "resumen": "El intercambio en JSON: pedido con tools → respuesta `tool_use` → el chat ejecuta y manda `tool_result` con el mismo id → respuesta final `end_turn`.",
+  "claves": [
+   "tool-calling",
+   "function-calling"
+  ],
+  "ver": [
+   {
+    "ref": "rag-y-mcp#54",
+    "por": "ciclo de vida de una herramienta"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 38,
+  "resumen": "Tres límites de los pesos y su herramienta: **calcular** (calculadora), **datos recientes** (búsqueda) y **otros sistemas** (MCP).",
+  "claves": [
+   "tool-calling",
+   "mcp"
+  ],
+  "ver": [
+   {
+    "ref": "rag-y-mcp#2",
+    "por": "lo que no está en los pesos"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 39,
+  "resumen": "El LLM genera por probabilidad y no puede volver atrás: un error en una cuenta de varios pasos arrastra al resto de la solución (GSM8K).",
+  "claves": [
+   "alucinacion",
+   "calculo"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 40,
+  "resumen": "Llama 3.1 escribe la llamada entre `<|python_tag|>` y `<|eom_id|>` y se detiene; el agente ejecuta Wolfram Alpha y devuelve el resultado con rol *ipython*.",
+  "claves": [
+   "function-calling",
+   "tokens especiales"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 41,
+  "resumen": "El servidor traduce: los tags del modelo pasan a `tool_calls` en JSON, y el mensaje *tool* vuelve como turno *ipython*. El modelo nunca ve el JSON de la API.",
+  "claves": [
+   "function-calling",
+   "plantilla de chat"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 42,
+  "resumen": "Con Ollama, la API esconde los tokens especiales: llegan `tool_calls` en JSON, tu código calcula y devuelve un mensaje con rol *tool*.",
+  "claves": [
+   "tool-calling",
+   "modelo local"
+  ],
+  "tp": [
+   {
+    "tp": 4,
+    "texto": "Gemma corre local y responde acciones JSON; si el JSON es inválido, el `PromptSpec` trae un mensaje de corrección."
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 43,
+  "resumen": "Buscar se aprende como cualquier conducta: SFT imitando a personas que buscan y citan, y después preferencias. En los chats actuales viene de fábrica.",
+  "claves": [
+   "sft",
+   "rlhf",
+   "busqueda web"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 44,
+  "resumen": "El modelo solo sabe lo que había antes de su **fecha de corte**. Para lo reciente, como el precio del oro de hoy, tiene que buscar o inventa.",
+  "claves": [
+   "fecha de corte",
+   "alucinacion"
+  ],
+  "ver": [
+   {
+    "ref": "claude-desktop-chat#9",
+    "por": "el chat responde de memoria"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 45,
+  "resumen": "Igual que con la calculadora: el modelo escribe la consulta (`brave_search.call`), se detiene, y el agente devuelve los resultados.",
+  "claves": [
+   "function-calling",
+   "busqueda web"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 46,
+  "resumen": "Con búsqueda nativa, la **plataforma** ejecuta la búsqueda dentro de una sola respuesta de la API. Por eso parece que «el modelo buscó».",
+  "claves": [
+   "herramientas nativas",
+   "busqueda web"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 47,
+  "resumen": "**MCP**: el host crea un cliente por servidor; `tools/list` descubre y `tools/call` ejecuta. El modelo queda fuera del protocolo.",
+  "claves": [
+   "mcp",
+   "json-rpc"
+  ],
+  "tp": [
+   {
+    "tp": 3,
+    "texto": "El servidor MCP del TP3 (FastMCP, 6 tools) quedó pendiente: solo está diseñado en `PLAN.md`."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "rag-y-mcp#52",
+    "por": "JSON-RPC, la capa de mensajes"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 48,
+  "resumen": "No hay que entrenar para cada servidor MCP: cada tool entra al contexto como **definición** (nombre, descripción, esquema). La descripción dice cuándo usarla.",
+  "claves": [
+   "mcp",
+   "descripcion-como-disparador"
+  ],
+  "tp": [
+   {
+    "tp": 3,
+    "texto": "`descripciones.py`: cada tool dice su fuente, qué NO tiene y los valores válidos; ruteo 1,00 en las 4 corridas."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "rag-y-mcp#68",
+    "por": "la descripción dice cuándo NO usarla"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 49,
+  "resumen": "El modelo aprende **function calling genérico** con SFT: funciones en el system prompt, el pedido y la llamada esperada, incluso varias en paralelo.",
+  "claves": [
+   "function-calling",
+   "sft"
+  ],
+  "tp": [
+   {
+    "tp": 3,
+    "texto": "En las preguntas mixtas (A10–A12), el modelo pidió las dos tools en paralelo en el mismo paso."
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 50,
+  "resumen": "Sección 6: fine-tuning.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 51,
+  "resumen": "El fine-tuning repite el post-training a escala chica con datos propios. **LoRA** congela los pesos y entrena dos matrices chicas; **QLoRA** además guarda el modelo en 4 bits.",
+  "claves": [
+   "fine-tuning",
+   "lora",
+   "qlora"
+  ],
+  "tp": [
+   {
+    "tp": 4,
+    "texto": "LoRA r=8, α=16 sobre `q_proj`/`v_proj` de Gemma 4 E4B. QLoRA quedó como alternativa."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "transformers-a-fondo#15",
+    "por": "las proyecciones Q, K, V"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 52,
+  "resumen": "**RAG** corrige fallas de **información**; el **fine-tuning**, fallas de **comportamiento** (forma, formato, estilo). Orden: prompt → ejemplos → RAG → fine-tuning.",
+  "claves": [
+   "rag",
+   "fine-tuning",
+   "prompt-engineering"
+  ],
+  "tp": [
+   {
+    "tp": 4,
+    "texto": "La idea central del TP: los números de las normas van al BM25 y el oficio y las costumbres, a los pesos con SFT."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "rag-y-mcp#5",
+    "por": "cinco razones para no reentrenar"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 53,
+  "resumen": "El fine-tuning paga cuando el prompt ya no alcanza: un formato fijo (JSON), un estilo, una tarea poco vista o **destilar** en un modelo chico.",
+  "claves": [
+   "fine-tuning",
+   "destilacion"
+  ],
+  "tp": [
+   {
+    "tp": 4,
+    "texto": "Con `procedimiento-v1` siguieron las fallas de verificación, entidad y voluntariado: son de comportamiento, y eso le tocaba al SFT."
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 54,
+  "resumen": "Fine-tuning administrado (sept. 2026): Azure y Google lo ofrecen; OpenAI cierra a usuarios nuevos. En todos se sube un JSONL, se lanza el trabajo y sale un modelo propio.",
+  "claves": [
+   "fine-tuning",
+   "nube"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 55,
+  "resumen": "Fine-tuning local con pesos abiertos: TRL/PEFT o Unsloth en una GPU propia o en Colab. Sale un **adaptador** aparte, con la máscara −100 antes de la respuesta.",
+  "claves": [
+   "lora",
+   "fine-tuning",
+   "mascara-de-perdida"
+  ],
+  "tp": [
+   {
+    "tp": 4,
+    "texto": "TRL/PEFT en Kaggle 2× T4 con checkpoints en HF. Solo corrió el humo (15,7 GB pico); faltó el entrenamiento con los datos curados."
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 56,
+  "resumen": "Los datos son lo difícil: un dataset **chico y parecido a la tarea** le gana a uno grande y genérico. Formato JSONL con `messages`.",
+  "claves": [
+   "fine-tuning",
+   "calidad de datos"
+  ],
+  "tp": [
+   {
+    "tp": 4,
+    "texto": "500 conversaciones sintéticas (semilla 12012) con valores de normas variados, para que el modelo los lea y no los memorice."
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 57,
+  "resumen": "Ejemplo práctico: notebook de fine-tuning en DataCamp.",
+  "claves": [
+   "fine-tuning"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 58,
+  "resumen": "Sección 7: conclusiones.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 59,
+  "resumen": "Cada comportamiento nace en una etapa: sesgos en el pre-training, completar sin SFT, formato con SFT y preferencias con RLHF. Cada una tiene su arreglo.",
+  "claves": [
+   "pretraining",
+   "sft",
+   "rlhf"
+  ],
+  "clave_examen": true
+ }
+]

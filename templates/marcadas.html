@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Marcadas · IA Generativa{% endblock title %}
+{% block content %}
+<header class="page-header">
+  <div class="ph-main">
+    <nav class="crumbs"><span>Estudiar</span><span class="sep">/</span><span>Marcadas</span></nav>
+    <h1>Marcadas para repasar</h1>
+    <div class="ph-meta"><span>Diapositivas que marcaste en el visor con <kbd>m</kbd> o el botón Marcar</span></div>
+  </div>
+  <div class="ph-actions"><button class="btn" id="clear" hidden>Desmarcar todas</button></div>
+</header>
+<section class="card">
+  <div class="card-header"><div class="card-title">Diapositivas <span class="count" id="n"></span></div></div>
+  <div class="card-body flush" id="list"><div class="empty">Cargando…</div></div>
+</section>
+{% endblock content %}
+{% block scripts %}
+<script>
+(function () {
+  var st = Study.state, list = document.getElementById('list');
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function draw(idx) {
+    var keys = Object.keys(st.star);
+    document.getElementById('n').textContent = keys.length;
+    document.getElementById('clear').hidden = !keys.length;
+    if (!keys.length) { list.innerHTML = '<div class="empty">Todavía no marcaste ninguna diapositiva. En el visor de una clase, apretá <kbd>m</kbd> o el botón Marcar.</div>'; return; }
+    var rows = keys.map(function (k) { var p = k.split('#'); var e = idx[k] || {}; return { k: k, d: p[0], i: +p[1], c: e.c || st.seenClass[p[0]] || 0, t: e.t || ('Diapositiva ' + p[1]), x: e.x || '' }; })
+      .sort(function (a, b) { return a.c - b.c || a.i - b.i; });
+    var html = '', cur = null;
+    rows.forEach(function (r) {
+      if (r.c !== cur) { if (cur !== null) html += '</div>'; html += '<div class="row-group" style="position:static"><span>Clase ' + pad(r.c) + '</span></div><div class="rows">'; cur = r.c; }
+      html += '<a class="row-item" href="' + SITE_BASE + '/clases/' + pad(r.c) + '/#d=' + r.d + '&s=' + r.i + '"><span class="ref">' + pad(r.c) + '·' + r.i + '</span><span><span class="t"></span><span class="d"></span></span></a>';
+    });
+    list.innerHTML = html + '</div>';
+    var items = list.querySelectorAll('.row-item');
+    rows.forEach(function (r, j) { items[j].querySelector('.t').textContent = r.t; items[j].querySelector('.d').textContent = r.x.split(' ').slice(0, 30).join(' '); });
+  }
+  fetch(SITE_BASE + '/data/search.json').then(function (r) { return r.json(); }).then(function (d) {
+    var idx = {}; d.forEach(function (e) { if (e.d) idx[e.d + '#' + e.i] = e; }); draw(idx);
+    document.getElementById('clear').onclick = function () { st.star = {}; Study.save(); Study.paintNav(); draw(idx); };
+  });
+})();
+</script>
+{% endblock scripts %}

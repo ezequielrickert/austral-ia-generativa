@@ -1,0 +1,361 @@
+[
+ {
+  "i": 0,
+  "resumen": "Portada: Claude Cowork.",
+  "claves": [],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 1,
+  "resumen": "Agenda: Cowork, knowledge y output, Projects, Skills, subagentes, conclusiones y misión parte 2.",
+  "claves": [],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 2,
+  "resumen": "**Cowork**: Claude instalado en la computadora, trabajando sobre tus carpetas y archivos. Herramienta de propósito general donde el «lenguaje de programación» es el español.",
+  "claves": [
+   "cowork",
+   "agente"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 3,
+  "resumen": "Chatear es un mensaje a la vez; **delegar** es describir un resultado que el agente planifica y ejecuta sobre archivos mientras vos supervisás.",
+  "claves": [
+   "agente",
+   "humano-en-el-circuito"
+  ],
+  "tp": [],
+  "ver": [
+   {
+    "ref": "agentes-y-multiagentes#14",
+    "por": "Workflow o agente"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 4,
+  "resumen": "Bloques apilados: chat, búsqueda, Connectors y Schedule, y ahora carpeta, Project, Skills y subagentes. Cada tarea usa solo los que necesita.",
+  "claves": [
+   "cowork",
+   "skill",
+   "subagente"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 5,
+  "resumen": "Tres pasos en la app: `+ New`, elegir modo Cowork y conceder un Project o carpeta. Desde ahí Claude trabaja sobre archivos reales.",
+  "claves": [
+   "cowork",
+   "carpeta concedida"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 6,
+  "resumen": "Sección 2: knowledge y output.",
+  "claves": [],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 7,
+  "resumen": "El agente lee y escribe en la carpeta, que casi siempre tiene **conocimiento e instrucciones**. Ese material necesita un formato pensado para la IA.",
+  "claves": [
+   "contexto-de-agente",
+   "carpeta concedida"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 8,
+  "resumen": "Markdown: texto plano con marcas simples (`#`, `-`, `**`, `|`) y frontmatter opcional. Lo abre cualquier editor y la IA lo lee nativo.",
+  "claves": [
+   "markdown-frontmatter"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 9,
+  "resumen": "Nada sale bien a la primera: muchas vueltas chicas sobre el mismo `.md`, donde editar es barato. Exportar a Word o PDF recién al final.",
+  "claves": [
+   "iteracion-en-vueltas-chicas",
+   "markdown-frontmatter"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": true
+ },
+ {
+  "i": 10,
+  "resumen": "Sección 3: Projects.",
+  "claves": [],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 11,
+  "resumen": "**Project**: espacio autocontenido con carpeta, memoria e instrucciones. Los chats del Project no comparten contexto entre sí, solo instrucciones y knowledge base.",
+  "claves": [
+   "project",
+   "contexto-de-agente"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": true
+ },
+ {
+  "i": 12,
+  "resumen": "Cowork solo ve la carpeta concedida: esa carpeta es el control de privacidad. Usar una dedicada y nunca datos sensibles.",
+  "claves": [
+   "minimo-privilegio",
+   "privacidad"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 13,
+  "resumen": "Con pocos archivos los lee completos (precisión, pero llena la ventana); con muchos, **busca** y lee lo relevante. No elegís el modo: elegís qué material entra.",
+  "claves": [
+   "ventana-de-contexto",
+   "rag"
+  ],
+  "tp": [],
+  "ver": [
+   {
+    "ref": "rag-y-mcp#6",
+    "por": "Con 1M de tokens, ¿para qué recuperar?"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 14,
+  "resumen": "Instrucciones = **contrato de trabajo** del Project: reglas en lenguaje natural, escritas una vez y válidas para todos los chats. Cortas y claras.",
+  "claves": [
+   "system-prompt",
+   "claude-md"
+  ],
+  "tp": [],
+  "ver": [
+   {
+    "ref": "prompting#27",
+    "por": "Los 6 componentes de un prompt"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 15,
+  "resumen": "Ejemplo: rol, audiencia, material y reglas. La regla de oro, que toda cifra lleve fuente y fecha, es una restricción que el agente nunca saltea.",
+  "claves": [
+   "system-prompt",
+   "regla de oro"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 16,
+  "resumen": "Sección 4: Skills.",
+  "claves": [],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 17,
+  "resumen": "Una **Skill** es un instructivo escrito en español, no código: se enseña una vez y la tarea sale siempre igual. Un trabajo por Skill.",
+  "claves": [
+   "skill"
+  ],
+  "tp": [
+   {
+    "tp": 1,
+    "texto": "Tu Skill `progress-log` de Corta vive en `.claude/skills/`, con su gemela para Codex en `.codex/prompts/`."
+   }
+  ],
+  "ver": [],
+  "clave_examen": true
+ },
+ {
+  "i": 18,
+  "resumen": "Explícita con `/informe-mensual` o automática cuando el pedido coincide con la **description**: la descripción decide si se activa sola.",
+  "claves": [
+   "descripcion-como-disparador",
+   "skill"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 19,
+  "resumen": "Tres caminos para crear una Skill: desde el panel, desde el prompt o grabando la pantalla mientras hacés la tarea.",
+  "claves": [
+   "skill",
+   "crear skill"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 20,
+  "resumen": "Configuración → Habilidades → Agregar: «Crear con Claude», «Escribir las instrucciones» o «Grabá tu pantalla». Importar una Skill es otra cosa.",
+  "claves": [
+   "skill",
+   "crear skill"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 21,
+  "resumen": "Pedir la Skill en el chat; Claude pregunta por el proceso. Contalo con el detalle que necesitaría alguien capaz que nunca hizo la tarea.",
+  "claves": [
+   "skill",
+   "crear skill"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 22,
+  "resumen": "Grabar la pantalla haciendo la tarea y narrándola; Claude mira la grabación y propone la Skill. Ideal para lo que tenés «en los dedos».",
+  "claves": [
+   "skill",
+   "crear skill"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 23,
+  "resumen": "Sección 5: subagentes.",
+  "claves": [],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 24,
+  "resumen": "**Subagente**: contexto propio, devuelve un resumen. Ej.: 8 propuestas de proveedores, un subagente por propuesta en paralelo; el principal arma la tabla comparativa.",
+  "claves": [
+   "subagente",
+   "orquestador-workers"
+  ],
+  "tp": [],
+  "ver": [
+   {
+    "ref": "agentes-y-multiagentes#43",
+    "por": "Multiagente: orquestador y workers"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 25,
+  "resumen": "No hay botón: un subagente es un `.md` (name, description, tools, model) empaquetado en un **plugin** para que quede siempre disponible.",
+  "claves": [
+   "subagente",
+   "markdown-frontmatter"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 26,
+  "resumen": "Ejemplo `revisor-de-informes`: encabezado con herramientas acotadas (Read, Grep, Glob) y prosa. Se le pide a Claude que lo escriba y se revisa la description.",
+  "claves": [
+   "subagente",
+   "minimo-privilegio",
+   "descripcion-como-disparador"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 27,
+  "resumen": "Separador: conclusiones.",
+  "claves": [],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 28,
+  "resumen": "Se delega un resultado completo y se guía el proceso. Los `.md`, el Project, las Instrucciones, las Skills y los subagentes están al servicio de eso.",
+  "claves": [
+   "agente",
+   "humano-en-el-circuito"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 29,
+  "resumen": "Toda salida es borrador. Nada de datos de clientes, financieros o PII: la actividad de Cowork no entra en la auditoría estándar. Capas de guardarraíles.",
+  "claves": [
+   "defensa-en-profundidad",
+   "alucinacion",
+   "privacidad"
+  ],
+  "tp": [],
+  "ver": [
+   {
+    "ref": "cierre-magnifica-humanitas#14",
+    "por": "Clasificá antes de pegar"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 30,
+  "resumen": "Sección 7: la misión, parte 2.",
+  "claves": [],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 31,
+  "resumen": "Faro, parte 2: el analista baja a Cowork y trabaja sobre la carpeta real del equipo; entrega un tablero para el jefe, armado en `.md` y exportado.",
+  "claves": [
+   "misión faro",
+   "cowork"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ }
+]

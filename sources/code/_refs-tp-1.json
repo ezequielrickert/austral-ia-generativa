@@ -1,0 +1,266 @@
+[
+ {
+  "slug": "introduccion",
+  "i": 12,
+  "clase": 1,
+  "slide_title": "Transformación en Ingeniería de Software",
+  "slide_resumen": "La IA acelera leer repos, escribir código y tests, pero el **equipo** conserva la responsabilidad: definir el objetivo, revisar el cambio y responder por las consecuencias.",
+  "tp_texto": "En Corta el agente tipeó casi todo, pero la confianza vino de lo que diseñó el equipo: tests con `node:test` y la prueba de redeploy del link `v4v`."
+ },
+ {
+  "slug": "introduccion",
+  "i": 13,
+  "clase": 1,
+  "slide_title": "Limitaciones de la IA Generativa",
+  "slide_resumen": "Cuatro riesgos: **alucinaciones** convincentes, sesgos heredados de los datos, fugas de privacidad y permisos excesivos. Ninguna salida se acepta sin pruebas ni revisión.",
+  "tp_texto": "Privacidad real en Corta: `notas.txt` tenía una credencial de Postgres; quedó gitignoreado y se reescribió la historia antes del primer push."
+ },
+ {
+  "slug": "introduccion",
+  "i": 17,
+  "clase": 1,
+  "slide_title": "Entregables de clase",
+  "slide_resumen": "Equipos de cuatro (2 de Sistemas + 2 de Datos), entregable cada dos clases y **trazabilidad** de decisiones, prompts, código, pruebas y fuentes.",
+  "tp_texto": "Trazabilidad en Corta: 21 commits convencionales de tres autores, pares `test:`→`fix:` visibles en `git log` y `progress_log/` con un `.md` por commit."
+ },
+ {
+  "slug": "claude-desktop-chat",
+  "i": 5,
+  "clase": 1,
+  "slide_title": "Las cuatro herramientas de Claude",
+  "slide_resumen": "Chat (uso diario), Code (terminal), Cowork (escritorio, sin programar) y Design (prototipos): el mismo agente con distintas superficies.",
+  "tp_texto": "Para Corta usaste Claude Code (y Codex) en la terminal, parados en la carpeta `corta/`."
+ },
+ {
+  "slug": "claude-desktop-chat",
+  "i": 9,
+  "clase": 1,
+  "slide_title": "El chat responde de memoria",
+  "slide_resumen": "El modelo responde de su **memoria de entrenamiento** hasta la fecha de corte: datos viejos y alucinaciones. Por **in-context learning**, el contexto es la única palanca.",
+  "tp_texto": "Por eso en Corta escribiste `CLAUDE.md`, `SPEC.md` y `docs/PROGRESS.md` antes de tocar código: cada sesión arranca sabiendo reglas y estado."
+ },
+ {
+  "slug": "claude-desktop-chat",
+  "i": 20,
+  "clase": 1,
+  "slide_title": "External connectors: todo pasa por MCP",
+  "slide_resumen": "Todo Connector externo habla **MCP**: traduce el pedido del usuario en llamadas a herramientas del servicio. Los Connectors son las manos de la IA.",
+  "tp_texto": "En Corta usaste los MCP de GitHub y Railway: crear el repo, provisionar Postgres, setear `DATABASE_URL` y deployar fueron llamadas a tools."
+ },
+ {
+  "slug": "claude-desktop-chat",
+  "i": 27,
+  "clase": 1,
+  "slide_title": "Describir una vez, que corra sola",
+  "slide_resumen": "**Schedule**: describir un trabajo una vez y fijarle cadencia; corre solo y hereda los Connectors. Ej.: resumen del inbox todos los días a las 8:00.",
+  "tp_texto": "El extra de una tarea programada que reportara cambios del repo quedó sin evidencia en Corta."
+ },
+ {
+  "slug": "cowork-intro",
+  "i": 3,
+  "clase": 2,
+  "slide_title": "Agentes de código: Claude Code y Codex",
+  "slide_resumen": "**Agente de código**: recibe una tarea en lenguaje natural y, en un loop, planifica, edita, corre comandos y verifica hasta entregar. Claude Code y Codex.",
+  "tp_texto": "Corta se hizo con Claude Code y Codex parados en `corta/`: el agente editó, corrió `npm test`, commiteó y deployó."
+ },
+ {
+  "slug": "cowork-intro",
+  "i": 4,
+  "clase": 2,
+  "slide_title": "Delegar una tarea completa",
+  "slide_resumen": "Cambia la unidad de trabajo: de una línea a una tarea completa. El agente planifica y ejecuta; el humano revisa el plan y los diffs.",
+  "tp_texto": "El ejemplo de la lámina pasó en Corta: delegaste «migrá la persistencia a Postgres», con `tests/postgres.test.js` escrito antes."
+ },
+ {
+  "slug": "cowork-intro",
+  "i": 6,
+  "clase": 2,
+  "slide_title": "Dónde se empieza: pararse en una carpeta",
+  "slide_resumen": "Se abre el agente parado en la carpeta del proyecto: ese directorio define el **alcance** (contexto y límite de seguridad). Primero, una pregunta de reconocimiento.",
+  "tp_texto": "Paso 0 de Corta: pararse en `corta/`, configurar los MCP de GitHub y Railway y hacer que el agente explique qué tools expone cada uno."
+ },
+ {
+  "slug": "cowork-intro",
+  "i": 9,
+  "clase": 2,
+  "slide_title": "Qué lee el agente al pararse en el repo",
+  "slide_resumen": "No carga el repo entero: lo **explora** con herramientas (árbol, README, configs, grep, `git log`). El orden del repo es contexto.",
+  "tp_texto": "En el M2 ordenaste Corta (`src/`, `tests/`, `docs/`, README) y borraste `server_OLD.js` e `index_v2_FINAL.js`: entenderlo en menos de 2 minutos."
+ },
+ {
+  "slug": "cowork-intro",
+  "i": 11,
+  "clase": 2,
+  "slide_title": "El conocimiento del proyecto en .md",
+  "slide_resumen": "Regla: lo que el agente deba saber va en **.md dentro del repo**: memoria, especificaciones (`SPEC.md`) y conocimiento general.",
+  "tp_texto": "Tu `SPEC.md` de Corta tiene modelo de datos, endpoints y casos borde; ojo: promete 400 para URLs inválidas y el código no lo valida ni lo testea."
+ },
+ {
+  "slug": "cowork-intro",
+  "i": 12,
+  "clase": 2,
+  "slide_title": "El manejo del contexto",
+  "slide_resumen": "Ventana finita: lo más chica posible con la máxima información relevante. Una ventana grande degrada al modelo y acumula instrucciones contradictorias; `/compact` o sesión nueva.",
+  "tp_texto": "`docs/PROGRESS.md` guardó el estado por milestone para que cada sesión nueva arrancara con ventana chica y sin re-explicar."
+ },
+ {
+  "slug": "cowork-intro",
+  "i": 13,
+  "clase": 2,
+  "slide_title": "Iterar con el agente sobre el código",
+  "slide_resumen": "Nada sale bien a la primera: **vueltas chicas** de pedir, verificar y corregir. Los tests son la unidad de revisión; TDD con tests derivados del SPEC, escritos antes.",
+  "tp_texto": "Cuatro ciclos `test:`→`fix:`/`feat:` en `git log` (redirect, colisión, stats, Postgres); la colisión se forzó mockeando `Math.random`."
+ },
+ {
+  "slug": "cowork-intro",
+  "i": 15,
+  "clase": 2,
+  "slide_title": "CLAUDE.md / AGENTS.md: la memoria del repo",
+  "slide_resumen": "**CLAUDE.md / AGENTS.md**: archivo en la raíz que el agente lee al arrancar cada sesión. Lleva cómo correr y testear, convenciones y reglas duras.",
+  "tp_texto": "Tu `CLAUDE.md` de Corta fija spec-first, test-first con commits separados, `node:test`, cero secretos y push solo al cerrar un milestone."
+ },
+ {
+  "slug": "cowork-intro",
+  "i": 16,
+  "clase": 2,
+  "slide_title": "Un ejemplo de CLAUDE.md",
+  "slide_resumen": "Nadie lo escribe de cero: el agente lo genera leyendo el repo y recolectando las instrucciones que le das. El humano revisa que quede corto y correcto.",
+  "tp_texto": "La consigna pedía la Skill `/collect-memory` para mantener `CLAUDE.md`; resolviste la memoria con la Skill `progress-log` y `CLAUDE.md` mantenido aparte."
+ },
+ {
+  "slug": "cowork-intro",
+  "i": 18,
+  "clase": 2,
+  "slide_title": "Qué es una Skill",
+  "slide_resumen": "«Lo que explicás más de una vez es una **Skill** que escribís una vez»: carpeta con `SKILL.md` (metadata + pasos en prosa). Un trabajo por Skill.",
+  "tp_texto": "Armaste la Skill `progress-log`: un script determinista lista los commits sin log y el modelo redacta un `.md` por commit."
+ },
+ {
+  "slug": "cowork-intro",
+  "i": 19,
+  "clase": 2,
+  "slide_title": "Cómo se dispara una Skill",
+  "slide_resumen": "Dos disparos: explícito con `/nombre` o automático cuando el pedido coincide con la **description**. Con una descripción vaga, nunca se activa sola.",
+  "tp_texto": "La `description` de `progress-log` enumera frases como «log progress» o «update the progress log» para dispararse sola."
+ },
+ {
+  "slug": "cowork-intro",
+  "i": 24,
+  "clase": 2,
+  "slide_title": "Qué es MCP",
+  "slide_resumen": "**MCP**: estándar abierto en el que un server expone las acciones de un servicio (GitHub, base de datos, deploy) como tools que el agente llama dentro de su loop.",
+  "tp_texto": "Usaste el MCP de GitHub para versionar y el de Railway para crear la base Postgres, setear variables y deployar Corta."
+ },
+ {
+  "slug": "cowork-intro",
+  "i": 29,
+  "clase": 2,
+  "slide_title": "El nuevo rol: Diseñar, delegar y revisar",
+  "slide_resumen": "El rol pasa a **diseñar, delegar y revisar**. Contrato, Skills y subagentes son archivos versionados que el equipo hereda con un clone.",
+  "tp_texto": "Conclusión de Corta: el agente tipeó casi todo; lo confiable fue el contexto en `.md` y los tests verificando cada vuelta chica."
+ },
+ {
+  "slug": "cowork-intro",
+  "i": 30,
+  "clase": 2,
+  "slide_title": "Antes de cerrar: cuidados",
+  "slide_resumen": "El agente se equivoca con confianza: leer cada diff. **Secretos** fuera del código y del contexto. El contenido externo puede traer instrucciones (prompt injection).",
+  "tp_texto": "`notas.txt` traía una credencial de Postgres: quedó fuera del primer commit, se reescribió la historia antes del push y `DATABASE_URL` va solo por variable de entorno."
+ },
+ {
+  "slug": "cowork-intro",
+  "i": 32,
+  "clase": 2,
+  "slide_title": "La historia de Corta",
+  "slide_resumen": "Corta: acortador de URLs heredado sin git ni README, con duplicados y bugs. Meta: llevarlo a producción con la historia completa en GitHub.",
+  "tp_texto": "El primer commit (`a6061b7`) subió el caos tal cual, salvo `node_modules/` y `notas.txt` (credencial)."
+ },
+ {
+  "slug": "cowork-intro",
+  "i": 33,
+  "clase": 2,
+  "slide_title": "La misión: del caos a producción",
+  "slide_resumen": "Cinco milestones (trackear, ordenar, corregir, completar stats, producción en Railway) con SPEC.md + TDD. Pregunta clave: ¿dónde viven los datos?",
+  "tp_texto": "Los datos pasaron de `links.json` a PostgreSQL en Railway; el link `v4v` sobrevivió a un redeploy forzado con `clicks: 1`."
+ },
+ {
+  "slug": "claude-cowork",
+  "i": 17,
+  "clase": 2,
+  "slide_title": "Qué es una Skill",
+  "slide_resumen": "Una **Skill** es un instructivo escrito en español, no código: se enseña una vez y la tarea sale siempre igual. Un trabajo por Skill.",
+  "tp_texto": "Tu Skill `progress-log` de Corta vive en `.claude/skills/`, con su gemela para Codex en `.codex/prompts/`."
+ },
+ {
+  "slug": "rag-y-mcp",
+  "i": 46,
+  "clase": 6,
+  "slide_title": "MCP conecta modelos con herramientas",
+  "slide_resumen": "**MCP** estandariza cómo una app de IA pide datos y acciones a sistemas externos. Un servidor expone herramientas, recursos y prompts; el modelo elige la herramienta por su **descripción**.",
+  "tp_texto": "En el TP1 el agente creó el repo, la base y el deploy llamando tools de los servidores MCP de GitHub y Railway."
+ },
+ {
+  "slug": "rag-y-mcp",
+  "i": 55,
+  "clase": 6,
+  "slide_title": "Conectar un servidor MCP: tres caminos",
+  "slide_resumen": "Tres formas de conectar un servidor: extensiones, configuración manual (stdio) o remoto. Instalar un servidor se parece a instalar una extensión del navegador: riesgo.",
+  "tp_texto": "El paso 0 del TP1 fue configurar los MCP de GitHub y Railway y hacer que el agente explicara qué tools expone cada uno."
+ },
+ {
+  "slug": "rag-y-mcp",
+  "i": 59,
+  "clase": 6,
+  "slide_title": "Un agente, varios servidores",
+  "slide_resumen": "Un agente con varios servidores: cada uno es independiente, pero el agente ve todas las tools **juntas**, con riesgo de colisiones y peor elección.",
+  "tp_texto": "En el TP1 el agente combinó dos servidores: GitHub para versionar y Railway para la infraestructura y el deploy."
+ },
+ {
+  "slug": "rag-mcp-rapida",
+  "i": 16,
+  "clase": 7,
+  "slide_title": "MCP conecta modelos con herramientas",
+  "slide_resumen": "**MCP** estandariza cómo una app de IA pide datos y acciones: el servidor expone tools, recursos y prompts; el cliente los consume; el modelo elige leyendo descripciones.",
+  "tp_texto": "En el TP1 usaste los MCP de GitHub y Railway para crear el repo, provisionar Postgres y deployar."
+ },
+ {
+  "slug": "rag-mcp-rapida",
+  "i": 21,
+  "clase": 7,
+  "slide_title": "Conectar un servidor: los caminos y la configuración",
+  "slide_resumen": "Tres caminos: extensión de escritorio, configuración stdio (`command`/`args`) o servidor HTTP (URL). Un servidor MCP corre con tus permisos: instalarlo es un riesgo.",
+  "tp_texto": "En Corta les diste credenciales de GitHub y Railway a servidores MCP de terceros."
+ },
+ {
+  "slug": "cierre-magnifica-humanitas",
+  "i": 14,
+  "clase": 13,
+  "slide_title": "Clasificá antes de pegar",
+  "slide_resumen": "Clasificá el dato (público, interno, confidencial) antes de pegarlo; lo confidencial nunca va a herramientas de consumo. Nunca pegues una API key en un prompt.",
+  "tp_texto": "En el TP1, `notas.txt` tenía una credencial de Postgres: se gitignoreó desde el primer commit y se reescribió la historia antes del primer push."
+ },
+ {
+  "slug": "cierre-magnifica-humanitas",
+  "i": 20,
+  "clase": 13,
+  "slide_title": "Cada conector, una decisión de confianza",
+  "slide_resumen": "Cada conector MCP es una decisión de confianza: aunque el LLM esté aprobado, la filtración puede entrar por un servidor enchufado. Un agente puede ejecutar el error.",
+  "tp_texto": "En el TP1 el agente creó el repo, provisionó Postgres y deployó vía los MCP de GitHub y Railway: permisos reales sobre tu infraestructura."
+ },
+ {
+  "slug": "cierre-magnifica-humanitas",
+  "i": 23,
+  "clase": 13,
+  "slide_title": "Defensa en profundidad",
+  "slide_resumen": "**Defensa en profundidad**: input y output rails, gateway, mínimo privilegio, separar datos de órdenes y un humano donde la acción no se puede deshacer.",
+  "tp_texto": "En el TP1 apilaste capas: gitignore, credenciales solo por variables de entorno, la regla en `CLAUDE.md` y push solo al cerrar cada milestone."
+ },
+ {
+  "slug": "cierre-magnifica-humanitas",
+  "i": 33,
+  "clase": 13,
+  "slide_title": "La potencia del centauro",
+  "slide_resumen": "El **centauro** de Kasparov: humano + máquina. Todo resultado clave pasa por revisión humana; la IA extiende, no reemplaza, y ese equilibrio hay que diseñarlo.",
+  "tp_texto": "En el TP1 el agente hizo el tipeo, pero la validación la diseñó el equipo: tests, prueba de redeploy (`clicks: 1`) y revisión de diffs."
+ }
+]

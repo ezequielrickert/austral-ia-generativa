@@ -1,0 +1,666 @@
+[
+ {
+  "i": 0,
+  "resumen": "Portada de la clase 3: introducción a las redes neuronales artificiales.",
+  "claves": [],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 1,
+  "resumen": "Agenda: de la intuición a la red, neurona, redes profundas, recorrido completo, activaciones y backpropagation.",
+  "claves": [],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 2,
+  "resumen": "Una red neuronal es un **circuito**: sensores (entradas), nodos que reparten señal y actuadores (salidas). Esta metáfora sostiene toda la clase.",
+  "claves": [
+   "neurona",
+   "red como circuito"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 3,
+  "resumen": "**Entrenar** es adivinar, medir el error, retocar un poco cada compuerta y repetir. Nadie programa reglas: los caminos útiles se refuerzan solos.",
+  "claves": [
+   "entrenamiento",
+   "epoca"
+  ],
+  "tp": [],
+  "ver": [
+   {
+    "ref": "palabra-al-transformer#12",
+    "por": "Misma idea: aprender es ajustar parámetros"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 4,
+  "resumen": "Punto de partida: entrada $x$, modelo lineal y una medida de error. Son las tres piezas que reaparecen en toda la clase.",
+  "claves": [
+   "modelo lineal",
+   "funcion-de-perdida"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 5,
+  "resumen": "Separador: la neurona y la capa.",
+  "claves": [],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 6,
+  "resumen": "Una recta pierde la **forma** de los fenómenos reales (ciclos, caídas abruptas, saturaciones). Por eso necesitamos modelos no lineales.",
+  "claves": [
+   "no-linealidad"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 7,
+  "resumen": "La parte lineal de la neurona: $a = x\\cdot w + b$. El **sesgo** $b$ desplaza el umbral para que se active antes o después.",
+  "claves": [
+   "neurona",
+   "sesgo",
+   "matriz-de-pesos"
+  ],
+  "tp": [],
+  "ver": [
+   {
+    "ref": "introduccion#26",
+    "por": "La celda básica, vista en C1"
+   },
+   {
+    "ref": "modelado-redes-neuronales#5",
+    "por": "Repaso: neurona en una línea"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 8,
+  "resumen": "La **sigmoide** aplasta cualquier número a $(0,1)$ y es diferenciable. Fue el default histórico; hoy en capas ocultas se usa ReLU.",
+  "claves": [
+   "sigmoide",
+   "funcion-de-activacion"
+  ],
+  "tp": [
+   {
+    "tp": 2,
+    "texto": "El notebook de clase usaba sigmoide para `AboveMedianPrice`; en el TP2 la salida pasó a `Dense(1, linear)` porque predecías dólares."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "redes-generativas-antagonicas#24",
+    "por": "Sigmoide como salida del discriminador"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 9,
+  "resumen": "Una **capa** = combinación lineal + no linealidad. Es la única pieza: toda red, incluso las modernas, es este bloque repetido.",
+  "claves": [
+   "capa",
+   "no-linealidad"
+  ],
+  "tp": [
+   {
+    "tp": 2,
+    "texto": "Cada `Dense(32, relu)` del TP2 es este bloque: $W\\cdot x+b$ seguido de ReLU, apilado dos veces antes de la salida."
+   }
+  ],
+  "ver": [],
+  "clave_examen": true
+ },
+ {
+  "i": 10,
+  "resumen": "Separador: redes profundas.",
+  "claves": [],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 11,
+  "resumen": "Las capas entre entrada y salida son **ocultas** porque no se observan: no son ni el dato ni la respuesta.",
+  "claves": [
+   "capa-oculta",
+   "perceptron-multicapa"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 12,
+  "resumen": "Toda arquitectura se describe con **ancho** (unidades por capa) y **profundidad** (capas ocultas, sin contar entrada ni salida).",
+  "claves": [
+   "profundidad-y-ancho"
+  ],
+  "tp": [
+   {
+    "tp": 2,
+    "texto": "Usaste 32-32 como baseline y 512-512-512 para overfitear a propósito: misma profundidad casi, ancho ×16."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "modelado-redes-neuronales#57",
+    "por": "Cómo elegir capas y ancho"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 13,
+  "resumen": "**Hiperparámetros** los fijás vos antes de entrenar (ancho, η); **parámetros** los aprende la red. η no se aprende, se elige.",
+  "claves": [
+   "parametros-vs-hiperparametros",
+   "learning-rate"
+  ],
+  "tp": [
+   {
+    "tp": 2,
+    "texto": "La red 512-512-512 tenía 550.985 parámetros aprendidos; L2 0,001, dropout 0,3 y patience 15 fueron hiperparámetros elegidos."
+   }
+  ],
+  "ver": [],
+  "clave_examen": true
+ },
+ {
+  "i": 14,
+  "resumen": "Separador: el recorrido completo de una entrada hasta la salida.",
+  "claves": [],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 15,
+  "resumen": "Encuadre: un caso real, dónde viven los pesos y cómo se calcula una capa (producto matricial + activación, nada más).",
+  "claves": [
+   "matriz-de-pesos"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 16,
+  "resumen": "Ejemplo guía: 8 variables del clima entran a una capa oculta de 9 unidades. El 9 es un hiperparámetro elegido.",
+  "claves": [
+   "capa-oculta",
+   "parametros-vs-hiperparametros"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 17,
+  "resumen": "Cada conexión es un peso: $8\\times9=72$ pesos + 9 sesgos = **81 parámetros**. Un sesgo por unidad, no por conexión.",
+  "claves": [
+   "matriz-de-pesos",
+   "sesgo"
+  ],
+  "tp": [],
+  "ver": [
+   {
+    "ref": "transformers-a-fondo#28",
+    "por": "Contar parámetros de un bloque Transformer"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 18,
+  "resumen": "Los 72 pesos forman una **matriz** $8\\times9$: fila = variable de entrada, columna = unidad oculta.",
+  "claves": [
+   "matriz-de-pesos"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 19,
+  "resumen": "Una capa se calcula como **producto matricial**: $x_{1\\times8}\\,W_{8\\times9} = h_{1\\times9}$, antes de aplicar la activación.",
+  "claves": [
+   "matriz-de-pesos",
+   "capa"
+  ],
+  "tp": [],
+  "ver": [
+   {
+    "ref": "transformers-a-fondo#12",
+    "por": "La frase entra como matriz"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 20,
+  "resumen": "Tabla para verificar que todas las dimensiones encajen. Ojo: el salto a $100\\times4$ supone capas intermedias no dibujadas.",
+  "claves": [
+   "matriz-de-pesos",
+   "dimensiones"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 21,
+  "resumen": "Separador: funciones de activación.",
+  "claves": [],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 22,
+  "resumen": "Encuadre: sin no linealidad la red colapsa; la activación cambia la naturaleza de la salida; sigmoide, tanh, ReLU y softmax.",
+  "claves": [
+   "funcion-de-activacion"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 23,
+  "resumen": "Las no linealidades permiten representar relaciones complejas. Con ellas, el **teorema de aproximación universal** garantiza que alguna red existe (no cuántas unidades ni cómo hallarla).",
+  "claves": [
+   "no-linealidad",
+   "aproximacion-universal"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": true
+ },
+ {
+  "i": 24,
+  "resumen": "Sin activación, $W_2(W_1x) = W^*x$: diez capas lineales valen lo mismo que una. La no linealidad evita ese **colapso**.",
+  "claves": [
+   "no-linealidad",
+   "funcion-de-activacion"
+  ],
+  "tp": [
+   {
+    "tp": 2,
+    "texto": "Por eso tus capas ocultas llevan ReLU: sin ella, `Dense(32)→Dense(32)→Dense(1)` sería una sola regresión lineal."
+   }
+  ],
+  "ver": [],
+  "clave_examen": true
+ },
+ {
+  "i": 25,
+  "resumen": "Sigmoide, tanh, ReLU y softmax: monótonas, continuas, diferenciables. **ReLU** es el estándar en ocultas; la sigmoide sufre el **gradiente que se desvanece**.",
+  "claves": [
+   "relu",
+   "sigmoide",
+   "gradiente-que-se-desvanece"
+  ],
+  "tp": [
+   {
+    "tp": 2,
+    "texto": "Ocultas con ReLU y salida lineal en todas las variantes del TP2, del baseline 32-32 a la 512-512-512."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "modelado-redes-neuronales#58",
+    "por": "Activaciones ocultas, con su forma"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 26,
+  "resumen": "**Softmax** convierte puntajes en probabilidades que suman 1. Solo en la capa de salida: en una oculta borra la magnitud.",
+  "claves": [
+   "softmax",
+   "capa-de-salida"
+  ],
+  "tp": [],
+  "ver": [
+   {
+    "ref": "transformers-a-fondo#18",
+    "por": "Softmax dentro de la atención"
+   },
+   {
+    "ref": "modelado-redes-neuronales#30",
+    "por": "Softmax con cross-entropy"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 27,
+  "resumen": "Separador: backpropagation.",
+  "claves": [],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 28,
+  "resumen": "Encuadre: el error lo mide la función de coste, la culpa se reparte con la regla de la cadena y cada peso se corrige con η.",
+  "claves": [
+   "backpropagation"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 29,
+  "resumen": "Entrenar es **forward** (predecir) y **backward** (propagar el error y ajustar pesos). Una **época** es una pasada completa por el train.",
+  "claves": [
+   "backpropagation",
+   "epoca"
+  ],
+  "tp": [
+   {
+    "tp": 2,
+    "texto": "Tu `fit` corre este ciclo: 100 épocas en el baseline y 150 en la red grande (cortó en 76 por early stopping)."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "modelado-redes-neuronales#36",
+    "por": "Repaso del ciclo, con batches"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 30,
+  "resumen": "La pérdida **L2**: $E=\\tfrac12\\sum(y-t)^2$. Al cuadrado para que los errores no se cancelen y los grandes pesen más; el ½ simplifica la derivada.",
+  "claves": [
+   "funcion-de-perdida",
+   "mse"
+  ],
+  "tp": [
+   {
+    "tp": 2,
+    "texto": "Entrenaste con `loss='mse'`; por eso una sola casa (Wheatfield, error \\$226.171) movió más el RMSE (3,3%) que el MAE (2,3%)."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "modelado-redes-neuronales#28",
+    "por": "MSE vs MAE vs Huber"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 31,
+  "resumen": "**Regla de la cadena**: el peso afecta el error vía suma ponderada y activación; el gradiente es el producto de esos tres efectos.",
+  "claves": [
+   "regla-de-la-cadena",
+   "backpropagation"
+  ],
+  "tp": [],
+  "ver": [
+   {
+    "ref": "modelado-redes-neuronales#38",
+    "por": "La misma cadena, más detallada"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 32,
+  "resumen": "El **delta** $\\delta_j=(y_j-t_j)\\,y_j(1-y_j)$ agrupa los dos primeros factores; con él, el gradiente de cada peso es una multiplicación.",
+  "claves": [
+   "delta",
+   "backpropagation"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 33,
+  "resumen": "Una unidad oculta no tiene objetivo propio: su delta es la suma de los deltas de la capa siguiente ponderada por los pesos. De ahí \"propagar hacia atrás\".",
+  "claves": [
+   "backpropagation",
+   "delta",
+   "capa-oculta"
+  ],
+  "tp": [],
+  "ver": [
+   {
+    "ref": "modelado-redes-neuronales#41",
+    "por": "Una capa más atrás"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 34,
+  "resumen": "Actualización: $w \\leftarrow w - \\eta\\,\\partial E/\\partial w$. El signo menos baja por el gradiente; η chico tarda, η grande oscila.",
+  "claves": [
+   "learning-rate",
+   "descenso por gradiente"
+  ],
+  "tp": [
+   {
+    "tp": 2,
+    "texto": "Escalaste `SalePrice` con `StandardScaler` porque con dólares crudos los gradientes eran enormes para el η=0,001 de Adam y no convergía."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "modelado-redes-neuronales#43",
+    "por": "Diagnóstico de η en la curva"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 35,
+  "resumen": "Separador: anexo con material de apoyo.",
+  "claves": [],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 36,
+  "resumen": "Cada nodo es una compuerta que decide cuánta señal deja pasar; sensor, compuerta y actuador son los tres roles.",
+  "claves": [
+   "neurona"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 37,
+  "resumen": "Deep learning no es otra idea: es meter más piezas (cálculos) en el circuito. Ajustar parámetros de a poco sigue siendo la técnica.",
+  "claves": [
+   "deep learning",
+   "capa"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 38,
+  "resumen": "Sin capas ocultas, la red es una combinación lineal: nada que una regresión no haga. Las ocultas son lo que agrega poder.",
+  "claves": [
+   "capa-oculta",
+   "modelo lineal"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 39,
+  "resumen": "Nadie le dice a una unidad oculta qué representar: la red descubre representaciones intermedias (en visión: bordes, texturas, objetos).",
+  "claves": [
+   "capa-oculta",
+   "representaciones"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 40,
+  "resumen": "Convenciones de diagrama: círculo = unidad, flecha = peso, columna = capa.",
+  "claves": [
+   "capa",
+   "matriz-de-pesos"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 41,
+  "resumen": "Dos ciclos: el interno (entrenar) produce parámetros; el externo (elegir configuración, medir, volver a elegir) produce hiperparámetros.",
+  "claves": [
+   "parametros-vs-hiperparametros"
+  ],
+  "tp": [],
+  "ver": [
+   {
+    "ref": "modelado-redes-neuronales#17",
+    "por": "Validación es para elegir configuración"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 42,
+  "resumen": "Notación: $w_{36}$ va de la entrada 3 a la unidad oculta 6. Primer subíndice origen, segundo destino.",
+  "claves": [
+   "matriz-de-pesos"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 43,
+  "resumen": "Las 9 unidades se calculan **a la vez** con una sola multiplicación; ven la misma entrada y difieren solo en su columna de pesos.",
+  "claves": [
+   "capa",
+   "matriz-de-pesos"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 44,
+  "resumen": "El mismo mecanismo llega a la salida: 100 unidades → 4 salidas es una matriz $100\\times4$, 400 pesos más.",
+  "claves": [
+   "capa-de-salida",
+   "matriz-de-pesos"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 45,
+  "resumen": "Analogía del termostato: la temperatura es continua, la decisión (abrigo sí/no) es de otra naturaleza. Eso hace la activación.",
+  "claves": [
+   "funcion-de-activacion"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 46,
+  "resumen": "$\\sigma'(x)=\\sigma(x)(1-\\sigma(x))$: barata de calcular, pero se aplana en los extremos y causa el **gradiente que se desvanece**.",
+  "claves": [
+   "sigmoide",
+   "gradiente-que-se-desvanece"
+  ],
+  "tp": [],
+  "ver": [
+   {
+    "ref": "transformers-a-fondo#24",
+    "por": "Gradiente que se pierde al apilar"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 47,
+  "resumen": "Glosario de símbolos de backprop: $x$, $w$, $a$, $y$, $t$, $\\delta$, $\\eta$. Útil para tener al lado.",
+  "claves": [
+   "backpropagation"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 48,
+  "resumen": "Separador: conclusiones.",
+  "claves": [],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 49,
+  "resumen": "Seis ideas: red como circuito, capa como bloque, la no linealidad evita el colapso, producto matricial, backprop reparte culpa, aprender es ajustar de a poco.",
+  "claves": [
+   "capa",
+   "no-linealidad",
+   "backpropagation"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": true
+ },
+ {
+  "i": 50,
+  "resumen": "Lo que sigue usa esta base: convolucionales para imágenes y generativas (GANs, difusión).",
+  "claves": [
+   "cnn",
+   "gan"
+  ],
+  "tp": [],
+  "ver": [
+   {
+    "ref": "segmentacion-y-stable-diffusion#10",
+    "por": "El kernel que se desliza (CNN)"
+   },
+   {
+    "ref": "redes-generativas-antagonicas#5",
+    "por": "Modelos generativos del curso"
+   }
+  ],
+  "clave_examen": false
+ }
+]

@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Práctica · IA Generativa{% endblock title %}
+{% block content %}
+<header class="page-header">
+  <div class="ph-main">
+    <nav class="crumbs"><span>Estudiar</span><span class="sep">/</span><span>Práctica</span></nav>
+    <h1>Práctica</h1>
+    <div class="ph-meta"><span>Opción múltiple, tarjetas y preguntas a desarrollar</span></div>
+  </div>
+</header>
+
+<section class="card">
+  <div class="card-body">
+    <div class="cfg">
+      <div class="field"><span class="lbl">Modo</span>
+        <div class="seg" id="mode">
+          <button aria-pressed="true" data-mode="quiz">Opción múltiple</button>
+          <button aria-pressed="false" data-mode="cards">Tarjetas</button>
+          <button aria-pressed="false" data-mode="dev">A desarrollar</button>
+          <button aria-pressed="false" data-mode="errors">Mis errores<span class="mono faint" id="err-n"></span></button>
+        </div>
+      </div>
+      <div class="field" id="topics-field"><span class="lbl">Temas</span>
+        <div class="menu-wrap">
+          <button class="btn" id="topics-btn" aria-haspopup="true" aria-expanded="false" style="min-width:220px;justify-content:space-between">
+            <span id="topics-label">Todas las clases y TPs</span>
+            <svg class="i" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <div class="menu" id="topics-menu" hidden>
+            <div class="menu-cols">
+              <div class="menu-col" id="topics-clases"><div class="section-label">Clases</div></div>
+              <div class="menu-col" id="topics-tps"><div class="section-label">Trabajos prácticos</div></div>
+            </div>
+            <div class="menu-foot"><div style="display:flex;gap:6px"><button class="btn sm" id="all">Todos</button><button class="btn sm" id="none">Ninguno</button></div><button class="btn sm primary" id="topics-done">Listo</button></div>
+          </div>
+        </div>
+      </div>
+      <div class="field" id="count-field"><span class="lbl">Cantidad</span>
+        <div class="seg" id="count"><button aria-pressed="false" data-n="10">10</button><button aria-pressed="true" data-n="20">20</button><button aria-pressed="false" data-n="40">40</button></div>
+      </div>
+      <div class="grow"></div>
+      <div class="field"><span class="lbl" id="avail">&nbsp;</span><button class="btn primary" id="start">Empezar</button></div>
+    </div>
+  </div>
+</section>
+
+<section class="card" id="run-card" hidden>
+  <div class="card-header"><div class="card-title" id="run-title">Ronda</div><div class="card-actions"><span class="mono faint" id="run-pos" style="font-size:12px"></span><button class="btn sm ghost" id="run-close">Terminar</button></div></div>
+  <div class="progress-line"><i id="run-bar" style="width:0"></i></div>
+  <div id="run"></div>
+</section>
+<div class="grid main-side" id="summary">
+  <section class="card">
+    <div class="card-header"><div class="card-title">Acierto por tema</div><span class="faint" style="font-size:12px">Opción múltiple</span></div>
+    <div class="card-body flush table-scroll">
+      <table class="table"><thead><tr><th style="width:64px">Tema</th><th>Título</th><th class="r" style="width:110px">Respondidas</th><th style="width:160px">Acierto</th></tr></thead><tbody id="by-topic"></tbody></table>
+    </div>
+  </section>
+  <section class="card">
+    <div class="card-header"><div class="card-title">Rondas recientes</div></div>
+    <div class="card-body flush" id="recent"></div>
+  </section>
+</div>
+{% endblock content %}
+{% block scripts %}<script src="{{ get_url(path='js/practice.js') }}"></script>{% endblock scripts %}

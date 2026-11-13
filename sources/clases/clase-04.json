@@ -1,0 +1,928 @@
+{
+  "num": 4,
+  "fecha": "2026-08-26",
+  "titulo": "Diseño de redes neuronales (modelado de un MLP)",
+  "talks": [
+    "modelado-redes-neuronales"
+  ],
+  "bloque": "Fundamentos de redes",
+  "tesis": "En un MLP casi nada de lo que decide el resultado es la arquitectura: se decide en cómo se codifica la entrada, cómo se parte el dataset, qué forma tiene la salida y qué fórmula mide el error. Backpropagation convierte ese error en pesos corregidos, y lo que separa un modelo que entrena de uno que sirve es medirlo sin engañarse y frenar el overfitting.",
+  "resumen": "La clase sigue el recorrido de un dato a través de la red. Primero reencuadra el diseño: la red solo ve una fila de floats, la forma del dato decide la arquitectura (tabla → MLP) y de las seis decisiones de diseño la cantidad de capas es la que menos pesa. Después el corazón: modelar la entrada con la pregunta de la resta, normalización z-score, one-hot contra embedding y los errores de codificación que no dan error. Luego partir el dataset en train, validación y test, con todo el preprocesamiento aprendido solo del train. La salida la determina la tarea, y viene con su loss: MSE, MAE, Huber, BCE, cross-entropy y pinball, cada una con el estadístico que hace aprender. Backpropagation se reabre como descenso por una superficie de error, con la regla de la cadena resuelta, batches que acumulan gradientes y un único ajuste por batch, η y la función objetivo regularizada. Cierra con cómo medir un clasificador (matriz de confusión, precisión, recall, F1, umbral), overfitting y regularización, y recetas para capas ocultas e inicialización. Es la teoría que ejercita el TP2, ¿Cuánto vale esta casa?",
+  "secciones": [
+    {
+      "titulo": "Qué se diseña de verdad: la red ve una fila de números",
+      "contenido": "**Todo lo que entra a una red es una fila de números de largo fijo, todos float.** Un cliente, una máquina, una foto o un contrato llegan como un vector; la semántica original (\"esto era una edad, aquello un barrio\") desaparece en la codificación. El input es **una traducción**, y como toda traducción puede perder cosas: si la información que importa no quedó en esa fila, **ninguna arquitectura la recupera**. Y el error de codificación **entra silencioso**: el modelo entrena, converge y se equivoca, sin excepción.\n\n**El dato decide la arquitectura, no al revés.** Cada tipo de dato tiene una **forma natural** (cuántos ejes necesita para no perder información): tabla → fila de $n$ números → **MLP**; señal 1D (audio, ECG) → secuencia de $T$ pasos → CNN 1D / RNN; imagen en grises 28×28 → grilla → CNN; imagen RGB → la misma grilla con 3 números por píxel → CNN. Aplanar es algo que **pide el MLP**, no algo que le pasa al dato (`layers.Flatten()`), y al aplanar se pierde la vecindad: 300, 784 y 2.352 entradas sueltas (una foto 224×224 color serían 150.528). Por eso el caso de la clase es **la tabla**.\n\n**MLP (Multi-Layer Perceptron):** capa de entrada, una o más capas ocultas donde cada neurona se conecta con **todas** las de la capa anterior (*densa*, *fully connected*) y una capa de salida. El nombre viene del perceptrón de Rosenblatt; en visión el MLP no quedó obsoleto, **quedó adentro** como bloque final después de la CNN.\n\n**Una neurona en una línea:** pre-activación $z = W\\cdot x + b$, activación $a=f(z)$. Una capa de $m$ neuronas sobre $n$ entradas tiene $m\\cdot n+m$ parámetros.\n\n**Lo que hay que diseñar: seis decisiones**, y la que todos creen principal es la que menos pesa:\n\n1. **La entrada** — cómo cada variable se vuelve floats (donde se gana o pierde el modelo).\n2. **El dataset** — partirlo en train/validación/test.\n3. **La salida** — neuronas y activación de la última capa (la determina la tarea).\n4. **La loss** — viene junto con la salida.\n5. **El error** — cómo se mide que el modelo sirve.\n6. **# capas y # neuronas** — lo único que se elige libremente y lo que menos impacto tiene: 1 a 3 ocultas para tabular, ancho en potencias de 2 decreciente, ReLU salvo motivo.\n\nDato honesto: en datos tabulares una red muchas veces **pierde contra gradient boosting** (XGBoost, LightGBM); las redes brillan cuando hay estructura (imágenes, texto, señales).",
+      "conceptos": [
+        "perceptron-multicapa",
+        "neurona",
+        "codificacion-de-entrada"
+      ]
+    },
+    {
+      "titulo": "Modelar la entrada: la pregunta de la resta, normalización y categóricas",
+      "contenido": "**Tabular** = una fila por ejemplo, una columna por variable, **sin vecindad ni orden entre columnas**: intercambiar las columnas `m2` y `barrio` de la tabla de casas es *el mismo dato*. Una capa densa no usa la posición, así que el MLP encaja.\n\n**La pregunta que decide la codificación: ¿qué significa la resta entre dos valores?**\n\n- Da una **cantidad interpretable** (85 m² − 60 m² = 25 m² reales) → **1 float normalizado**.\n- Da **un orden pero no una magnitud confiable** (satisfacción 4 − 2) → ordinal; evaluar también one-hot.\n- **No significa nada** (barrio 14 − barrio 7) → **one-hot o embedding** según cardinalidad.\n- **No se puede plantear** → probablemente no sea una feature útil.\n\n*Poner un número real en el vector es afirmar algo*: que las diferencias son comparables y que la magnitud escala el efecto (el aporte a $z=W\\cdot x+b$ es peso × valor). Con barrio 14 vs. 7 esa promesa es falsa. Todo termina en floats; los enteros solo aparecen como **índice** de un lookup de embeddings.\n\n**Normalizar no es opcional.** Reexpresar la variable en escala comparable: **z-score** $(x-\\mu)/\\sigma$ por defecto; con **colas largas** (ingresos, transacciones) `log(1+x)` y después z-score; **booleanos y one-hot no se tocan**. *Escala pareja no es importancia pareja.* **Por qué:** el gradiente respecto de un peso es proporcional a su entrada ($\\partial J/\\partial w_j=\\delta\\,x_j$) pero el learning rate es uno solo: m² ≈ 200 contra cochera 0/1 da gradientes a escala 200 a 1 y el entrenamiento **zigzaguea** (curvas de nivel elípticas). Además, con sigmoide/tanh una entrada grande **satura** la neurona. Árboles y boosting no necesitan normalizar.\n\n**Categóricas: one-hot contra embedding.**\n\n- **One-hot** (cardinalidad baja): $k$ floats, todo 0 salvo un 1. Todas equidistantes (la verdad del dato), no se aprende, necesita pocos datos.\n- **Embedding** (cardinalidad alta): aporta $d$ floats, **una fila** de una tabla entrenable $k\\times d$ que es **un peso de la red**. Con 500 barrios y $d=24$, 24 floats en vez de 500, y la red aprende la distancia entre categorías. Un embedding **equivale a one-hot seguido de una capa lineal sin sesgo**. Así arranca un LLM: cada token busca su fila en una tabla de ~50.000 × 4096.\n- **Regla de cardinalidad:** hasta 15 valores one-hot; 15–50 cualquiera; 50 o más embedding.\n\n**Errores de codificación caros (todos silenciosos):** **código como número** (barrio 14 \"el doble\" de 7); **identificador único** como feature (DNI, CUIT, póliza: memoriza, se descarta); **variable cíclica aplastada** (23:00 y 00:00 a una hora pero a 23 como números → `sin(2πt/T)`, `cos(2πt/T)`); **faltante rellenado con 0** (confunde ausencia con valor → imputar media/mediana **más un flag binario**, que a veces predice más que la variable).",
+      "conceptos": [
+        "normalizacion",
+        "one-hot-encoding",
+        "embeddings-categoricos",
+        "codificacion-de-entrada"
+      ],
+      "ejemplo": "**La tabla de decisiones** (cuántos floats aporta cada variable; $k$ = valores distintos, $d$ = dimensión del embedding):\n\n| Variable | Ejemplo | Codificación | # floats |\n|---|---|---|---|\n| Booleana | Tiene cochera | 0 o 1 | 1 |\n| Numérica con magnitud | Superficie 85 m² | z-score | 1 |\n| Numérica con cola larga | Ingreso mensual | log(1+x) + z-score | 1 |\n| Ordinal | Plan Free → Enterprise | float 0/0.5/1 + one-hot | 1 + k |\n| Nominal baja cardinalidad | Tipo de vivienda (4) | One-hot | k |\n| Nominal alta cardinalidad | Barrio (500) | Embedding | d |\n| Código con forma de número | Código postal | Embedding, nunca número | d |\n| Identificador único | DNI, CUIT | Se descarta | 0 |\n| Cíclica | Hora, mes | sin y cos | 2 |\n| Fecha | Fecha de alta | cíclica + \"hace cuánto\" | 2 por ciclo + 1 |\n| Texto libre | Reseña | Sentence transformer (TF-IDF baseline) | d |\n| (Faltantes) | Frente del lote | Imputar + flag | +1 |\n\n**Ejemplo de la clase:** `m2` + `barrio` (12 barrios) → 1 float normalizado + 12 one-hot = **13 nodos de entrada**, arquitectura `13→32→16→1`. Dos variables, trece entradas: el largo del vector **sale de la tabla**, no es una decisión de arquitectura.\n\n**En el TP2:** `State` (12 valores) → one-hot; `District` (72 valores) → embedding; `ListingId` → se descarta; `LotFrontage` (falta en ~7%) → imputar + flag; mes de venta → sin/cos."
+    },
+    {
+      "titulo": "Partir el dataset: train, validación y test",
+      "contenido": "**Partir el dataset** es reservar de antemano tres porciones con trabajos distintos. Existe por una sola razón: *si medís con los mismos datos con los que entrenaste, la métrica miente* (examen con las respuestas a la vista).\n\n| Criterio | Train | Validación (dev set) | Test |\n|---|---|---|---|\n| Para qué | El modelo aprende | Tuning, early stopping, elegir modelo | Evaluación final sin sesgo |\n| Cuándo lo ve | Cada epoch | Se evalúa cada epoch, nunca entrena | Una vez, al final |\n| ¿Actualiza pesos? | Sí | No | No |\n| Augmentation | Sí | No | No |\n| Proporción típica | 70% | 20% | 10% |\n\n(70/20/10 es criterio práctico de la industria —Roboflow—, no un resultado empírico; con decenas de miles de ejemplos 80/10/10 también sirve; piso: unos pocos cientos en val y test.)\n\n**Por qué no alcanza con dos.** El modelo no entrena con validación; **el que aprende de validación sos vos**, que a lo largo de muchos experimentos sobreajustás tus decisiones a ese conjunto. El test atrapa eso solo si nada se eligió mirándolo. Validación = simulacros; test = examen final (en Kaggle el test se libera al cierre).\n\n**Todo se aprende solo del train.** μ y σ de normalización, la mediana de imputación y el diccionario categoría→índice se calculan **solo sobre train** y se reaplican idénticos a val, test y producción. Calcularlos sobre todo el dataset es **data leakage**: la métrica de test sale optimista.\n\n```python\n# MAL: μ y σ contaminados con el test\nscaler.fit_transform(X_test)\n# BIEN\nscaler.fit(X_train); scaler.transform(X_test)\n```\n\n**Un modelo desplegado no son solo W y b**: son los pesos + μ y σ + diccionario de categorías + valores de imputación. Normalizar en producción con μ=120 en vez de 95 no tira excepción: solo predice mal.\n\n**Errores que inflan la métrica (ninguno lanza excepción):** duplicados repartidos entre conjuntos (se deduplica *antes* de partir); no estratificar con clases desbalanceadas (con 2% de fraude el test puede quedar con 3 positivos: un recall sobre 3 casos es una anécdota); partir al azar una serie de tiempo (se corta por fecha); achicar val/test.\n\n**Qué hacer:** partir antes de explorar · partir por grupo, no por fila (10 radiografías del mismo paciente) · fijar la semilla y guardar el split · augmentation solo en train. **Qué no:** tunear contra el test · volver a partir porque el número no cerró · confiar en el corte por defecto (`stratify=None`, sin grupos, sin tiempo).\n\n**Cross-validation (k-fold):** entrenar k veces reservando una porción distinta; paga con datasets chicos, rara vez en modelos profundos por el costo.",
+      "conceptos": [
+        "particion-train-val-test",
+        "data-leakage"
+      ],
+      "ejemplo": "70/20/10 en dos pasos, estratificado y reproducible:\n\n```python\nfrom sklearn.model_selection import train_test_split\ntrain_X, hold_X, train_y, hold_y = train_test_split(\n    X, y, test_size=0.30, random_state=42, stratify=y)\nval_X, test_X, val_y, test_y = train_test_split(\n    hold_X, hold_y, test_size=1/3, random_state=42, stratify=hold_y)\n```\n\nEl 30% retenido se parte en 1/3 (10% test) y 2/3 (20% val). **Pregunta 5 del TP2:** si el escalador se ajusta sobre el dataset completo, el número que queda \"mentido\" es la **métrica de test** (MAE/RMSE), porque el test dejó de ser dato no visto."
+    },
+    {
+      "titulo": "Modelar la salida: la tarea determina neuronas, activación y loss",
+      "contenido": "La última capa **no se elige: la determina la tarea**. Elegida la fila del catálogo, la salida queda fija, y **activación de salida y loss van siempre juntas** (cambiar una obliga a cambiar la otra).\n\n| Qué predice | Neuronas | Activación | Loss |\n|---|---|---|---|\n| Un real (precio) | 1 | Lineal | MSE / MAE / Huber |\n| Sí o no (churn) | 1 | Sigmoide | BCE |\n| Una de N clases | N | Softmax | Cross-entropy |\n| Varias de N (tags) | N | Sigmoide ×N | BCE |\n| Conteo (demanda) | 1 | Softplus / exp | Poisson NLL |\n| Percentiles (P10, P50, P90) | 3, uno por percentil | Lineal | Pinball |\n| Distribución (μ, σ) | 2 | μ lineal, σ softplus | NLL gaussiana |\n\n**Las cuatro activaciones de salida, y por qué su forma explica su uso:**\n\n- **Lineal** $y=z$ — sin piso ni techo: cualquier real es válido → **precio**. \"Activación lineal\" es una forma elegante de decir *ninguna*; es la única capa donde no poner activación es lo correcto.\n- **Sigmoide** $1/(1+e^{-z})$ — techo en 1 → **probabilidad** (churn).\n- **Softplus** $\\log(1+e^{z})$ — piso en 0, sin techo → **conteo o desvío**, que no pueden ser negativos. Salida lineal con MSE para conteos predice \"−3 unidades de demanda\": error clásico.\n- **Softmax** — no es una curva: **reparte 1 entre N clases que compiten**; necesita ver todas las neuronas de salida a la vez. Si alguien la dibuja como curva, no la entendió.\n\n**Dos errores de modelado de la salida:** (1) **softmax donde iba sigmoide**: un ticket puede ser \"urgente\" y \"de facturación\" a la vez (una película, comedia y drama) → N sigmoides independientes con BCE, porque softmax fuerza competencia entre etiquetas compatibles; (2) **predecir un punto cuando el negocio pedía un rango** (stock, riesgo, capacidad) → percentiles o distribución. Ambos nacen de elegir mirando la arquitectura en vez de la pregunta del negocio.\n\n**Detalle de implementación:** `BinaryCrossentropy(from_logits=True)` / `CategoricalCrossentropy(from_logits=True)` aplican sigmoide/softmax adentro por estabilidad numérica; si además se pone la activación en la capa, se aplica **dos veces** y el modelo entrena mal (síntoma: probabilidades pegadas a 0,5). Con logits crudos, al predecir: `prob = keras.ops.sigmoid(model(x))` — un logit de 2,3 no es una probabilidad.\n\n**En el TP2** la pregunta cambió de \"¿está por encima de la mediana?\" (1 sigmoide + BCE) a \"¿cuánto sale, en dólares?\" → **1 neurona lineal + MSE/MAE/Huber**, y por eso `accuracy` no significa nada ahí.",
+      "conceptos": [
+        "capa-de-salida",
+        "softmax",
+        "sigmoide"
+      ]
+    },
+    {
+      "titulo": "La loss function: MSE, MAE, Huber, BCE, cross-entropy y pinball",
+      "contenido": "*La IA es el diseño de agentes racionales que maximizan sus chances de éxito en un **objetivo dado***: la loss es, literalmente, ese objetivo dado.\n\n**Loss, cost y objective** (distinción de los cursos de Andrew Ng; en papers se dice \"loss\" para todo): **loss** = error de **un** ejemplo; **cost** = promedio del loss sobre el batch o dataset; **objective** $J$ = cost + términos de regularización (lo que el optimizador minimiza de verdad). \"Error\" a secas es otra cosa (residuo $y-t$ o error rate). Notación: $y$ predicción, $t$ valor verdadero. **No se entrena sobre accuracy porque no tiene derivada**: se optimiza un sustituto derivable y se mide con lo que importa.\n\n**Regresión** (1 neurona lineal), se diferencian en cuánto castigan un error grande:\n\n- **MSE** $(y-t)^2$ — parábola; un ejemplo muy lejos aporta más gradiente que cien cerca. Default; correcta si los valores raros son datos legítimos.\n- **MAE** $|y-t|$ — una V; un outlier pesa como un ejemplo más. Para cuando los raros son ruido o errores de carga.\n- **Huber** — cuadrática si $|e|\\le d$, lineal después: gradiente suave de MSE cerca del cero, resistencia de MAE lejos. $d$ es hiperparámetro.\n\nLa pregunta para elegir: *¿esa propiedad de 20 millones es real o alguien puso un cero de más?* **La elección de loss es una afirmación sobre los datos.** Tip: normalizar el target y desescalar al predecir.\n\n**Binaria — BCE** (1 sigmoide): $L=-[t\\log y+(1-t)\\log(1-y)]$. Siempre queda **un solo término vivo** ($t=1$: $-\\log y$; $t=0$: $-\\log(1-y)$). **La confianza equivocada es lo caro**: decir 0,5 y errar cuesta poco, decir 0,01 y errar cuesta muchísimo → empuja a **calibrar**. Combinada con sigmoide, la derivada da la forma limpia $y-t$.\n\n**Multiclase — cross-entropy** (N softmax): $L=-\\log y_c$, mira **una sola casilla**, la de la clase correcta. La red mejora aunque no acierte la clase, con solo subir la probabilidad de la correcta (por eso la loss baja aunque accuracy no se mueva). Con etiquetas enteras, `SparseCategoricalCrossentropy`.\n\n**Especializadas:** Poisson NLL para conteos (lineal+MSE predice negativos y asume varianza constante), pinball para rangos, NLL gaussiana para (μ, σ).\n\n**Pinball:** el dataset no tiene una columna \"P90\": cada fila trae un solo número. **Lo que decide si la red aprende media, mediana o P90 es la loss**: MSE → **promedio**, MAE → **mediana**, pinball con $q$ → **percentil $q$**. Con $q=0{,}9$ quedarse corto cuesta 0,9·error y pasarse 0,1·error: conviene subir hasta que solo 10% quede por encima. **MAE es pinball con $q=0{,}5$.** Una neurona lineal por percentil; hay que forzar que no se crucen. *La loss no mide el error: lo define.*",
+      "conceptos": [
+        "funcion-de-perdida",
+        "mse",
+        "entropia-cruzada",
+        "pinball-loss"
+      ],
+      "ejemplo": "**Cuánto castiga cada loss un error de 1, 2 y 10:**\n\n| error | MSE (cuadrado) | MAE (valor absoluto) | Huber ($d=1$) |\n|---|---|---|---|\n| 1 | 1 | 1 | 0,5 |\n| 2 | 4 | 2 | 1,5 |\n| 10 | **100** | 10 | 9,5 |\n\n(Huber con $d=1$: $\\tfrac12e^2$ si $|e|\\le1$, $|e|-\\tfrac12$ si no.) El salto 100 contra 10 explica por qué una propiedad mal cargada arrastra el entrenamiento con MSE.\n\n**Cross-entropy, 3 clases, la verdadera es gato:** la red da gato 0,80, perro 0,15, zorro 0,05 → $L=-\\ln 0{,}80=0{,}22$. Si a gato le hubiera dado 0,05 → $L=-\\ln 0{,}05=3{,}00$ (más de 13 veces)."
+    },
+    {
+      "titulo": "Backpropagation en la práctica: gradiente, batches, η y qué mirar",
+      "contenido": "**Entrenar es buscar el mínimo de una función.** Fijado el dataset, la loss depende **solo de los pesos**: eso dibuja una superficie $L(W)$ (un eje por peso; millones en un MLP real). No hay fórmula que salte al mínimo: se arranca al azar y se baja paso a paso. **El gradiente es la brújula**: apunta hacia donde el error *sube* más rápido, y el paso va al revés (el signo menos). La superficie real tiene mesetas y mínimos locales: se llega a uno bueno, no necesariamente al mejor (por eso importa la inicialización).\n\n**Qué es backprop.** El algoritmo que **calcula** esa brújula: de cuánto es culpable cada peso, todos en una pasada hacia atrás. La alternativa ingenua (mover cada peso y recorrer la red de nuevo) costaría **una corrida por peso**: un millón de corridas para **un** paso. **Backprop ≠ descenso por gradiente**: backprop calcula el gradiente; el descenso lo usa. Historia: **1986, Rumelhart, Hinton y Williams**, *Learning representations by back-propagating errors* (Nature) muestran que funciona y que las capas ocultas aprenden representaciones; la técnica ya existía (Linnainmaa 1970, diferenciación automática en modo reverso; Werbos 1974). Hoy es *autograd* / *gradient tape*, lo que corre dentro de `model.fit`.\n\n**Qué vale cada factor** (notación $z$ suma, $y$ salida, $t$ objetivo): $\\partial L/\\partial w_{ij} = (y_j-t_j)\\cdot f'(z_j)\\cdot x_i$. El ① es **el único que se entera de qué loss elegiste** (cambiar a BCE o cross-entropy cambia un solo factor). ① y ② dependen de la unidad, no del peso: se calculan **una vez por unidad**. Una capa de 512 entradas × 256 neuronas tiene 131.072 pesos y se resuelve con 256 cuentas más una multiplicación por peso. **Una capa más atrás**, la cadena *se estira, no se rehace*: se agregan $w_{ij}$, $f'(z_i)$ y $x_h$ adelante; si la unidad alimenta a varias, sus culpas **se suman**.\n\n**Batch y época no son lo mismo.** El train se parte en **batches**; las $B$ filas hacen forward con **los mismos W y b**, el backward produce valores intermedios que **se acumulan** (no se aplican), y **al cerrar el batch** se promedia y se aplica **un ajuste**: $W \\leftarrow W-\\eta\\,g$. **Época** = pasada por todos los batches. Regla editorial de la clase: *el backward no corrige pesos; produce gradientes que se acumulan*. Un batch, un ajuste. Por qué batches: el gradiente de una fila es ruidoso y el promedio lo estabiliza, y la GPU procesa 100 filas juntas mucho mejor. Entre épocas se baraja. **El batch size es hiperparámetro** y cambia el resultado, no solo la velocidad.\n\n**La tasa de aprendizaje η.** $W \\leftarrow W - \\eta\\,\\partial L/\\partial W$. Analogía: estar en una montaña con niebla; no se ve el camino, pero sí la pendiente bajo los pies, y cada paso va un poco hacia abajo. Los dos extremos fallan distinto: **paso grande** → cada paso se pasa de largo y la loss **rebota sin bajar** (u oscila/diverge); **paso chico** → baja pero **tarda demasiado**. Diagnóstico práctico: si la loss oscila, el paso es grande; si baja plana y no llega, es chico. Con una variable de 0 a 1.000.000 y otra de 0 a 1 un solo η no sirve a las dos → argumento formal de la normalización. Adam escala el paso por parámetro, pero no arregla saturación ni una inicialización rota.\n\n**Lo que se minimiza de verdad** es la función objetivo regularizada $J$ (ver la sección de overfitting).\n\n**Qué mirar cuando se entrena** (síntoma → causa → perilla):\n\n| Lo que ves | Qué suele ser | Qué tocar |\n|---|---|---|\n| La loss no baja desde el arranque | η muy chico o gradiente que se desvanece | Subir η ×10; ReLU en vez de sigmoide; revisar inicialización |\n| Oscila fuerte o da `NaN` | η muy grande o gradiente que explota | Bajar η ÷10; `clipnorm` / `global_clipnorm` |\n| Baja con mucho ruido | Batch chico | Subir batch size |\n| Train baja y validación sube | **Overfitting** | Regularizar |\n| Una variable domina | Codificación de la entrada | Normalizar / recodificar |\n\n**Perillas en orden de impacto:** η primero y por lejos → batch size → activación e inicialización → **último**, capas y neuronas (lo que todos tocan primero). **Una perilla por vez.** El gradiente que se desvanece es el factor ② multiplicado capa tras capa; el que explota es el simétrico (Pascanu, Mikolov & Bengio 2013 proponen recortar la norma).",
+      "conceptos": [
+        "backpropagation",
+        "batch",
+        "epoca",
+        "regla-de-la-cadena",
+        "learning-rate",
+        "regularizacion",
+        "gradiente-que-se-desvanece"
+      ],
+      "ejemplo": "**Train de 10.000 filas, batch de 100:** 100 batches → **100 ajustes por época**. En 10 épocas los pesos se tocaron **1.000 veces** (no 10 ni 10.000).\n\nEl ciclo de un batch $k$:\n\n1. filas 1…B → forward → $L$ → backward → `g += grad` (acumulador con la misma forma que W: $g_{ij} \\mathrel{+}= \\partial L/\\partial w_{ij}$)\n2. al terminar: promediar $g \\leftarrow g/B$; **aplicar** $W\\leftarrow W-\\eta g$, $b \\leftarrow b-\\eta g$; vaciar $g\\leftarrow 0$\n3. batch $k+1$ con W y b nuevos. Agotados los batches = 1 época → barajar y repetir.\n\nEn Keras: `tape.gradient(loss, model.trainable_weights)` + `optimizer.apply_gradients(...)`."
+    },
+    {
+      "titulo": "Overfitting y regularización: diagnosticar y después tratar",
+      "contenido": "**Overfitting** es que el modelo aprenda una función demasiado específica: anda bien en los datos con los que entrenó y no generaliza. *Deja de aprender y pasa a memorizar.* El diagnóstico sale de **dos números**:\n\n| Error de train | Error de validación | Diagnóstico | Qué hacer |\n|---|---|---|---|\n| Bajo | Alto | **Overfitting** | Regularizar, más datos |\n| Alto | Alto | **Underfitting** | Más capacidad, entrenar más |\n| Bajo | Bajo | Anda bien | Nada |\n\n**Primero se diagnostica, después se trata**: regularizar un modelo con underfitting empeora las dos métricas. En las curvas, la loss de train sigue bajando mientras la de validación **en algún momento empieza a subir**: ese quiebre es el overfitting hecho gráfico y el punto donde conviene cortar. Caso extremo: el **identificador único** como feature (train perfecto, validación desastrosa). La brecha solo se puede mirar si la partición está bien hecha.\n\n**Sesgo contra varianza.** Mucha capacidad → **alta varianza** (pasa por cada punto de train, incluido el ruido; cambia mucho con datos nuevos). Poca capacidad → **alto sesgo** (no captura el patrón ni en train). **Regularizar es un intercambio explícito**: se acepta algo más de sesgo (peor ajuste en train) para bajar la varianza. *El objetivo nunca fue el error de train.* Metáfora: memorizar las respuestas de los ejercicios viejos (varianza alta) contra entender el método.\n\n**El tratamiento: la función objetivo.** Lo que el optimizador minimiza no es la loss sino\n\n$$J = \\text{cost} + \\lambda\\,R(w)$$\n\nSin el segundo término, el camino más corto para bajar el error de train pueden ser **pesos gigantes que memorizan ruido**. $\\lambda$ decide el balance (típico 1e-5 a 1e-2; demasiado grande → underfitting). El término **se define en el cost pero actúa en el paso de actualización**: en cada paso empuja los pesos hacia cero además de hacia el mínimo del error.\n\n- **L2** (Ridge, *weight decay*): $\\lambda\\sum w^2$; gradiente $2\\lambda w$ → resta a cada peso una fracción de sí mismo. Achica todos, ninguno llega a cero. **El default.** `layers.Dense(64, kernel_regularizer=regularizers.l2(1e-4))`.\n- **L1** (Lasso): $\\lambda\\sum|w|$; gradiente $\\lambda\\,\\mathrm{signo}(w)$, empujón constante → clava pesos en cero (*sparsity*, selección de variables).\n- **Elastic Net:** combina L1 y L2.\n- **Dropout:** no entra en $J$; apaga neuronas al azar en cada forward de entrenamiento; en inferencia está apagado.\n\nPor qué L2 funciona: **pesos chicos → función suave**, que no puede pasar exactamente por cada punto. **El sesgo $b$ no se penaliza** (solo desplaza, no amplifica la entrada). En inferencia L2 no hace nada: ya quedó en los pesos. **L1 vs L2:** \"L1 selecciona, L2 empareja\".\n\n**Dropout:** cada neurona se apaga con probabilidad $p$ (0.2–0.5 en ocultas); la red no puede depender de ninguna y reparte la representación. Es un **ensamble implícito** de subredes que comparten pesos. En inferencia se desactiva: Keras lo maneja solo (`fit` lo activa, `predict` lo apaga); en PyTorch olvidar `model.eval()` deja dropout prendido y cada predicción da distinto. Se lleva mal con BatchNorm.\n\n**El resto del arsenal:** **early stopping** (cortar cuando validación deja de mejorar: gratis, el que más rinde) · **más datos** (ataca la causa) · **data augmentation** (solo en train; muy efectivo en visión) · **reducir capacidad** · **cross-validation** con datasets chicos.\n\n| Situación | Elegir |\n|---|---|\n| Tabular, red chica | L2 + early stopping |\n| Red profunda | Dropout + L2 |\n| Visión | Data augmentation, después dropout |\n| Transformers | Dropout bajo (0.1) + weight decay |\n\n**En el TP2 (Milestone 4)** se pide justamente esto: hacer overfitear al modelo a propósito, mostrarlo en la curva de train contra validación, y corregirlo con L2 y/o dropout.",
+      "conceptos": [
+        "overfitting",
+        "regularizacion",
+        "dropout",
+        "early-stopping"
+      ]
+    },
+    {
+      "titulo": "Medir el modelo: matriz de confusión, precisión, recall, F1, umbral (y regresión)",
+      "contenido": "**El 99% que no sirve.** Accuracy = correctas / total. Detector de fraude sobre **10.000 transacciones, 100 fraudes**: decir siempre \"no es fraude\" da **9.900/10.000 = 99% de accuracy** y **0/100 fraudes detectados**. Con clases desbalanceadas, accuracy la escribe la clase mayoritaria, y suma errores de costo muy distinto como si fueran iguales.\n\n**Matriz de confusión** (predicho × realidad): **TP** (era positivo y lo marcó), **FP** (falsa alarma), **FN** (se escapó — lo más caro en fraude o diagnóstico), **TN**. Accuracy es solo la diagonal sobre el total: $(TP+TN)/\\text{total}$.\n\n- **Precisión** $=TP/(TP+FP)$: \"cuando dice que sí, ¿le creo?\". Importa si el **FP** es caro. (Mira la columna de predichos positivos.)\n- **Recall** $=TP/(TP+FN)$: \"de todos los que eran, ¿cuántos encontró?\". Importa si el **FN** es caro. (Mira la fila de reales positivos.)\n- **F1** $=2PR/(P+R)$, media armónica: la manda el número más chico. P=0,9 y R=0,5 → promedio 0,70, F1 **0,64**; con R=0, F1=0. Impide que un 1.0 tape un 0.0 (marcar todo da recall 1.0 con precisión pésima).\n\nPrecisión y recall están en **tensión**; qué priorizar lo decide **el costo del error, no la matemática** — la métrica la elige el negocio.\n\n**Tres casos de la clase:** filtro de **spam** → **precisión** (perder la factura es peor que ver basura); test de **enfermedad grave y tratable** → **recall** (mandar a casa a un enfermo es lo grave); **churn** con descuento → **F1** (los dos errores cuestan parecido). Spam y enfermedad son espejo: mismo modelo, misma matemática, decisión opuesta.\n\n**El umbral es una perilla de negocio.** El clasificador devuelve una probabilidad; el umbral la convierte en decisión. **Bajarlo** (0,2) marca más: recall alto, precisión baja; **subirlo** (0,8) lo contrario. Dejarlo en 0,5 también es una decisión. La **curva precisión-recall** muestra el intercambio para todos los umbrales. Multiclase: la matriz crece a N×N y las métricas se calculan por clase y se promedian (un clasificador de dígitos que confunde 4 con 9 se ve en la celda, nunca en la accuracy).\n\n**En regresión (TP2)** el dilema equivalente es **MAE contra RMSE**: MAE $=\\frac1n\\sum|t-y|$ en dólares; RMSE $=\\sqrt{\\frac1n\\sum(t-y)^2}$, también en dólares pero castiga desproporcionadamente los errores grandes; MAPE $=\\frac{100\\%}{n}\\sum|t-y|/|t|$, error relativo. La casa que más separa MAE de RMSE es la que tiene el error más grande. *Medir es elegir qué error duele.*",
+      "conceptos": [
+        "matriz-de-confusion",
+        "precision-recall",
+        "umbral-de-decision"
+      ],
+      "ejemplo": "**Cuenta completa con un modelo de fraude** (números ilustrativos sobre el ejemplo de la clase: 100 fraudes en 10.000): el modelo marca 120 transacciones, de las cuales 80 son fraude.\n\n- TP = 80, FP = 40, FN = 100 − 80 = 20, TN = 9.900 − 40 = 9.860.\n- Accuracy = (80 + 9.860) / 10.000 = **99,4%** (casi igual que el modelo \"tonto\").\n- Precisión = 80 / 120 = **0,67**; Recall = 80 / 100 = **0,80**.\n- F1 = 2·0,67·0,80 / (0,67 + 0,80) ≈ **0,73**.\n\nBajar el umbral de 0,5 a 0,2 subiría el recall a costa de más falsas alarmas para el equipo antifraude."
+    },
+    {
+      "titulo": "Capas ocultas e inicialización: lo último que se toca",
+      "contenido": "Es **la única decisión que se elige libremente y la que menos impacto tiene**. Se resuelve rápido con un punto de partida y se corrige mirando el error.\n\n| Cuántos datos | Punto de partida |\n|---|---|\n| Cientos de filas | 1 capa de 8 a 16 neuronas |\n| Miles | 1 o 2 capas de 32 a 64 |\n| Decenas de miles | 2 o 3 capas de 64 a 128 |\n\n- **Más ancho que la entrada:** la primera oculta no debe ser más angosta que el vector de entrada (una capa de 8 después de un one-hot de 40 posiciones tira información que ninguna capa recupera).\n- **Potencia de 2 y decreciente:** 128 → 64 → 32 (alineación de memoria en GPU; lo decreciente comprime hacia la respuesta). No es profundo: 60 vs 64 no se nota.\n- **Manda la cantidad de datos:** parámetros contra **filas de entrenamiento**, no contra features.\n- **El procedimiento, no la fórmula:** empezar chico y mirar el **error de train**: si es alto, falta capacidad → agrandar; si train bien y validación mal, sobra → achicar o regularizar.\n\n**1 a 3 capas ocultas alcanzan para tabular.** Una sola capa muy ancha por el teorema de aproximación universal es cierto pero inútil en la práctica.\n\n**Activaciones ocultas:** su trabajo es **romper la linealidad**, no acotar el rango.\n\n| Función | Fórmula | Rango | Cuándo |\n|---|---|---|---|\n| ReLU | $\\max(0,z)$ | [0, ∞) | Default de las ocultas |\n| GELU / SiLU | suavizaciones de ReLU | (−0.3, ∞) aprox. | Transformers |\n| Tanh | $(e^z-e^{-z})/(e^z+e^{-z})$ | (−1, 1) | Recurrentes, salidas centradas |\n| Sigmoide | $1/(1+e^{-z})$ | (0, 1) | Casi nunca en ocultas |\n\nSigmoide y tanh **saturan**: con $z$ grande su derivada ≈ 0 y el gradiente que llega a las capas de abajo se apaga. ReLU no satura del lado positivo y es baratísima (dos rectas pegadas): por eso ganó. Una entrada sin normalizar satura igual que un $z$ grande.\n\n**Cómo arrancan los pesos.** Al azar, pero **no cualquier azar**. **No todos en cero**: si arrancan iguales calculan lo mismo, reciben el mismo gradiente y quedan idénticas para siempre (simetría). **El efecto es multiplicativo:** si cada capa multiplica la escala por $c$, tras 10 capas el efecto es $c^{10}$: $1{,}5^{10}\\approx 58$ (explota), $0{,}5^{10}\\approx 0{,}001$ (se desvanece). **He (Kaiming) para ReLU, Glorot (Xavier) para tanh/simétricas** eligen la varianza de W para que $c\\approx 1$; son el default (`GlorotUniform` en `Dense` de Keras). **Un problema, cuatro herramientas:** normalizar la entrada, inicializar bien, normalizar entre capas (BatchNorm, LayerNorm) y recortar el gradiente atacan lo mismo: que la escala no se descontrole. Lo accionable: dejá el default, normalizá la entrada, y si no arranca, revisá la inicialización antes de agregar capas.",
+      "conceptos": [
+        "profundidad-y-ancho",
+        "relu",
+        "gradiente-que-se-desvanece"
+      ]
+    }
+  ],
+  "conceptos": [
+    {
+      "id": "perceptron-multicapa",
+      "termino": "MLP (perceptrón multicapa)",
+      "definicion": "Red con capa de entrada, una o más capas ocultas densas (cada neurona conectada con todas las de la capa anterior) y una capa de salida.",
+      "por_que_importa": "Es la arquitectura natural para datos tabulares, y sigue viva como bloque final de CNNs y transformers.",
+      "trampa": "Pensar que diseñarlo es elegir capas: es la decisión que menos pesa de las seis."
+    },
+    {
+      "id": "codificacion-de-entrada",
+      "termino": "Codificación de la entrada / pregunta de la resta",
+      "definicion": "Convertir cada variable en floats; la pregunta '¿qué significa la resta entre dos valores?' decide si va como float, ordinal, one-hot o embedding.",
+      "por_que_importa": "La red solo ve floats: lo que se pierde en la codificación ninguna arquitectura lo recupera, y el error es silencioso.",
+      "trampa": "Cargar un código (barrio, código postal) como número: la red lee orden y magnitud que no existen."
+    },
+    {
+      "id": "normalizacion",
+      "termino": "Normalización (z-score)",
+      "definicion": "Reexpresar una variable numérica en escala comparable: $(x-\\mu)/\\sigma$, con log(1+x) previo para colas largas. Booleanos y one-hot no se tocan.",
+      "por_que_importa": "El gradiente de un peso es proporcional a su entrada y η es uno solo: escalas dispares hacen zigzaguear el entrenamiento y saturan sigmoide/tanh.",
+      "trampa": "Creer que normalizar iguala la importancia: escala pareja no es importancia pareja; la importancia la aprenden los pesos."
+    },
+    {
+      "id": "one-hot-encoding",
+      "termino": "One-hot",
+      "definicion": "Codificar una categoría con k floats, todos 0 salvo un 1 en su posición.",
+      "por_que_importa": "Deja todas las categorías equidistantes (la verdad del dato); no se aprende y necesita pocos datos. Regla: hasta 15 valores.",
+      "trampa": "Usarlo con cardinalidad alta (500 barrios = 500 entradas) o, al revés, meter la categoría como entero."
+    },
+    {
+      "id": "embeddings-categoricos",
+      "termino": "Embedding categórico",
+      "definicion": "Tabla entrenable k×d dentro de la red; la categoría es un índice y entra al vector su fila de d floats. Equivale a one-hot seguido de una capa lineal sin sesgo.",
+      "por_que_importa": "Con cardinalidad alta (≥50) ahorra entradas (500 barrios → 24 floats) y aprende distancias entre categorías; es la misma idea que el embedding de tokens de un LLM.",
+      "trampa": "Creer que la matriz k×d es la entrada: es un peso de la red; lo que entra es una fila."
+    },
+    {
+      "id": "particion-train-val-test",
+      "termino": "Partición train / validación / test",
+      "definicion": "Tres porciones (típico 70/20/10): train actualiza pesos, validación sirve para tunear y early stopping, test se abre una vez al final.",
+      "por_que_importa": "Es lo que hace honesta cualquier métrica; sin validación se termina tuneando contra el test.",
+      "trampa": "Creer que el modelo 'aprende' de validación: no actualiza pesos, pero vos sobreajustás tus decisiones a ella."
+    },
+    {
+      "id": "data-leakage",
+      "termino": "Data leakage",
+      "definicion": "Filtración de información de validación/test al entrenamiento, por ejemplo calcular μ y σ, la imputación o el diccionario de categorías sobre todo el dataset.",
+      "por_que_importa": "Infla la métrica de test sin lanzar ningún error; todo lo que se aprende de los datos sale solo del train.",
+      "trampa": "Confundir aplicar la transformación a los tres conjuntos (correcto) con calcular sus parámetros sobre los tres (leakage)."
+    },
+    {
+      "id": "capa-de-salida",
+      "termino": "Capa de salida (par activación–loss)",
+      "definicion": "Neuronas, activación y loss de la última capa, determinadas por la tarea: real → 1 lineal + MSE; sí/no → 1 sigmoide + BCE; N clases → N softmax + cross-entropy; tags → N sigmoides + BCE.",
+      "por_que_importa": "No es una elección de gusto: elegida la tarea, queda fijada; activación y loss van siempre juntas.",
+      "trampa": "Softmax para etiquetas no excluyentes (ticket urgente y de facturación) o salida lineal para conteos (predice negativos)."
+    },
+    {
+      "id": "mse",
+      "termino": "MSE (y sus alternativas MAE y Huber)",
+      "definicion": "MSE $=(y-t)^2$ castiga el error al cuadrado y su minimizador es el promedio. MAE $=|y-t|$ tiene pendiente constante y su minimizador es la mediana. Huber es cuadrática si $|e|\\le d$ y lineal después.",
+      "por_que_importa": "Son las losses de regresión (1 neurona lineal); elegir entre ellas es una afirmación sobre los datos: extremos legítimos → MSE; extremos que son ruido → MAE o Huber.",
+      "trampa": "Usar MSE con outliers que son errores de carga: un error de 10 pesa 100. Y olvidar que MAE es pinball con q = 0,5."
+    },
+    {
+      "id": "entropia-cruzada",
+      "termino": "Entropía cruzada (BCE y cross-entropy)",
+      "definicion": "BCE $=-[t\\log y+(1-t)\\log(1-y)]$ para sigmoide; cross-entropy $=-\\log y_c$ para softmax, mirando solo la probabilidad de la clase correcta.",
+      "por_que_importa": "Castiga fuerte la confianza equivocada y empuja a calibrar; con sigmoide/softmax da la derivada limpia $y-t$.",
+      "trampa": "Poner la activación en la capa y además usar from_logits=True: se aplica dos veces y entrena mal."
+    },
+    {
+      "id": "pinball-loss",
+      "termino": "Pinball loss",
+      "definicion": "$L=\\max(q(t-y),(q-1)(t-y))$: asimétrica; su minimizador es el percentil q.",
+      "por_que_importa": "Permite predecir rangos (P10, P50, P90) sin asumir distribución; la loss define qué estadístico aprende la red.",
+      "trampa": "Creer que hace falta una columna con el P90 en los datos: la asimetría de la loss lo produce."
+    },
+    {
+      "id": "backpropagation",
+      "termino": "Backpropagation",
+      "definicion": "Algoritmo que calcula el gradiente de la loss respecto de todos los pesos en una pasada hacia atrás, reutilizando los factores de cada unidad (regla de la cadena).",
+      "por_que_importa": "Reemplaza una corrida por peso por una ida y una vuelta: es lo que vuelve entrenable una red grande (Rumelhart, Hinton y Williams, 1986).",
+      "trampa": "Confundirlo con 'cómo aprende la red' o creer que el backward corrige pesos: solo calcula gradientes que se acumulan; el ajuste es del descenso por gradiente."
+    },
+    {
+      "id": "batch",
+      "termino": "Batch (lote)",
+      "definicion": "Subconjunto de B filas del train que hace forward con los mismos W y b; sus gradientes se promedian y producen exactamente un ajuste de los pesos.",
+      "por_que_importa": "Estabiliza el gradiente y aprovecha la GPU; el batch size es hiperparámetro y cambia el resultado.",
+      "trampa": "Confundir batch con época: 10.000 filas, batch 100 y 10 épocas = 1.000 ajustes."
+    },
+    {
+      "id": "overfitting",
+      "termino": "Overfitting",
+      "definicion": "El modelo memoriza los datos de entrenamiento y no generaliza: error de train bajo y de validación alto; la curva de validación empieza a subir mientras la de train sigue bajando.",
+      "por_que_importa": "Arruina modelos que parecían buenos; el diagnóstico es la brecha train–validación.",
+      "trampa": "Regularizar sin diagnosticar: si el train también es alto, es underfitting y regularizar empeora todo."
+    },
+    {
+      "id": "regularizacion",
+      "termino": "Regularización (L2 / L1)",
+      "definicion": "Agregar una penalización por complejidad al objetivo, $J=\\text{cost}+\\lambda R(w)$. L2 (weight decay) $\\lambda\\sum w^2$ achica todos los pesos; L1 $\\lambda\\sum|w|$ lleva algunos a cero.",
+      "por_que_importa": "Cambia algo de sesgo por menos varianza; actúa en cada paso de actualización empujando los pesos hacia cero.",
+      "trampa": "Penalizar el sesgo b (no se hace) o usar λ demasiado grande (underfitting)."
+    },
+    {
+      "id": "dropout",
+      "termino": "Dropout",
+      "definicion": "Apagar al azar una fracción p de las neuronas en cada forward de entrenamiento (0,2–0,5 en ocultas); en inferencia está apagado.",
+      "por_que_importa": "Rompe la coadaptación entre neuronas; funciona como un ensamble implícito de subredes.",
+      "trampa": "Dejarlo activo al predecir (PyTorch sin model.eval()): cada llamada da una predicción distinta."
+    },
+    {
+      "id": "early-stopping",
+      "termino": "Early stopping",
+      "definicion": "Cortar el entrenamiento cuando la métrica de validación deja de mejorar.",
+      "por_que_importa": "Gratis, funciona con cualquier arquitectura y es el regularizador que más rinde por unidad de esfuerzo.",
+      "trampa": "Hacerlo mirando el test en vez de validación: el test deja de ser insesgado."
+    },
+    {
+      "id": "matriz-de-confusion",
+      "termino": "Matriz de confusión (y accuracy)",
+      "definicion": "Tabla que cruza predicho con real: TP, FP (falsa alarma), FN (se escapó), TN. Accuracy $=(TP+TN)/\\text{total}$ es solo su diagonal.",
+      "por_que_importa": "Separa los tipos de error, que tienen costos distintos; accuracy con clases desbalanceadas engaña (99% sin detectar un solo fraude).",
+      "trampa": "Confundir FP con FN: en un test médico el FN (mandar a casa a un enfermo) suele ser mucho peor."
+    },
+    {
+      "id": "precision-recall",
+      "termino": "Precisión, recall y F1",
+      "definicion": "Precisión $TP/(TP+FP)$; recall $TP/(TP+FN)$; F1 $=2PR/(P+R)$, media armónica dominada por el menor.",
+      "por_que_importa": "Describen lo que accuracy esconde; cuál priorizar lo decide el costo de FP vs FN (spam → precisión, enfermedad → recall, churn → F1).",
+      "trampa": "Reportar solo accuracy con clases desbalanceadas (99% sin detectar un fraude) o solo F1 sin mirar las dos."
+    },
+    {
+      "id": "umbral-de-decision",
+      "termino": "Umbral de decisión",
+      "definicion": "Valor que convierte la probabilidad de un clasificador binario en sí/no; bajarlo sube recall y baja precisión, subirlo lo inverso.",
+      "por_que_importa": "Es una perilla de negocio, no de modelado; 0,5 también es una decisión.",
+      "trampa": "Reentrenar el modelo cuando lo que había que mover era el umbral."
+    }
+  ],
+  "formulas": [
+    {
+      "nombre": "Pre-activación y activación",
+      "tex": "z = W\\cdot x + b,\\qquad a = f(z)",
+      "explicacion": "$z$ combinación lineal más sesgo; $f$ la activación."
+    },
+    {
+      "nombre": "z-score",
+      "tex": "x' = \\frac{x-\\mu}{\\sigma}",
+      "explicacion": "μ y σ calculados solo sobre train; el valor pasa a leerse en desvíos respecto del promedio."
+    },
+    {
+      "nombre": "Cola larga",
+      "tex": "x' = \\frac{\\log(1+x)-\\mu}{\\sigma}",
+      "explicacion": "Comprimir valores altos antes de estandarizar (ingresos, transacciones)."
+    },
+    {
+      "nombre": "Codificación cíclica",
+      "tex": "\\left(\\sin\\frac{2\\pi t}{T},\\ \\cos\\frac{2\\pi t}{T}\\right)",
+      "explicacion": "$t$ posición en el ciclo, $T$ largo del ciclo (24 horas, 12 meses)."
+    },
+    {
+      "nombre": "Gradiente proporcional a la entrada",
+      "tex": "\\frac{\\partial J}{\\partial w_j} = \\delta\\,x_j",
+      "explicacion": "Por eso escalas dispares (m² ≈ 200 vs 0/1) dan gradientes desbalanceados con un único η."
+    },
+    {
+      "nombre": "MSE / MAE",
+      "tex": "L_{MSE}=(y-t)^2,\\qquad L_{MAE}=|y-t|",
+      "explicacion": "Minimizador: promedio (MSE) y mediana (MAE)."
+    },
+    {
+      "nombre": "Huber",
+      "tex": "L_d(e)=\\begin{cases}\\tfrac12 e^2 & |e|\\le d\\\\ d\\,(|e|-\\tfrac12 d) & |e|>d\\end{cases}",
+      "explicacion": "$e=y-t$; con $d=1$: $\\tfrac12e^2$ o $|e|-\\tfrac12$. Errores 1, 2, 10 → 0,5; 1,5; 9,5."
+    },
+    {
+      "nombre": "Binary cross-entropy",
+      "tex": "L = -\\big[t\\log y + (1-t)\\log(1-y)\\big]",
+      "explicacion": "$t\\in\\{0,1\\}$; siempre queda un solo término vivo."
+    },
+    {
+      "nombre": "Cross-entropy multiclase",
+      "tex": "L = -\\log y_c",
+      "explicacion": "$y_c$ probabilidad que el softmax le dio a la clase correcta $c$. 0,80 → 0,22; 0,05 → 3,00."
+    },
+    {
+      "nombre": "Pinball (cuantílica)",
+      "tex": "L_q = \\max\\big(q\\,(t-y),\\ (q-1)\\,(t-y)\\big)",
+      "explicacion": "Con $q=0{,}9$ quedarse corto cuesta 0,9·error y pasarse 0,1·error; minimizador = percentil q. MAE = pinball con q = 0,5."
+    },
+    {
+      "nombre": "Softplus",
+      "tex": "\\mathrm{softplus}(z)=\\log(1+e^{z})",
+      "explicacion": "Salida con piso en 0 para conteos o desvíos."
+    },
+    {
+      "nombre": "Regla de la cadena (factores resueltos)",
+      "tex": "\\frac{\\partial L}{\\partial w_{ij}} = (y_j-t_j)\\cdot f'(z_j)\\cdot x_i",
+      "explicacion": "① depende de la loss (L2 acá), ② derivada de la activación, ③ entrada. ① y ② se calculan una vez por unidad."
+    },
+    {
+      "nombre": "Paso de actualización por batch",
+      "tex": "g = \\frac{1}{B}\\sum_{r=1}^{B}\\nabla_W L_r,\\qquad W \\leftarrow W - \\eta\\, g",
+      "explicacion": "Se acumulan los gradientes de las B filas, se promedian y se aplica un único ajuste al cerrar el batch."
+    },
+    {
+      "nombre": "Ajustes por época",
+      "tex": "\\text{ajustes por época} = \\frac{N_{train}}{B}",
+      "explicacion": "10.000 filas, batch 100 → 100 ajustes por época."
+    },
+    {
+      "nombre": "Función objetivo regularizada",
+      "tex": "J = \\text{cost} + \\lambda\\,R(w),\\quad R_{L2}=\\sum w^2,\\ R_{L1}=\\sum |w|",
+      "explicacion": "λ balancea ajuste y simplicidad (1e-5 a 1e-2). Gradiente de L2: $2\\lambda w$ (weight decay); de L1: $\\lambda\\,\\mathrm{signo}(w)$."
+    },
+    {
+      "nombre": "Accuracy",
+      "tex": "\\text{Accuracy}=\\frac{TP+TN}{TP+TN+FP+FN}",
+      "explicacion": "Fracción de aciertos; engaña con clases desbalanceadas."
+    },
+    {
+      "nombre": "Precisión y recall",
+      "tex": "P=\\frac{TP}{TP+FP},\\qquad R=\\frac{TP}{TP+FN}",
+      "explicacion": "Precisión: de lo marcado, cuánto era. Recall: de lo que había, cuánto encontró."
+    },
+    {
+      "nombre": "F1",
+      "tex": "F_1 = \\frac{2\\,P\\,R}{P+R}",
+      "explicacion": "Media armónica: P=0,9, R=0,5 → 0,64 (el promedio daría 0,70)."
+    },
+    {
+      "nombre": "Métricas de regresión (TP2)",
+      "tex": "\\text{MAE}=\\frac1n\\sum|t-y|,\\quad \\text{RMSE}=\\sqrt{\\frac1n\\sum(t-y)^2},\\quad \\text{MAPE}=\\frac{100\\%}{n}\\sum\\frac{|t-y|}{|t|}",
+      "explicacion": "MAE y RMSE en dólares; RMSE castiga los errores grandes; MAPE es relativo."
+    },
+    {
+      "nombre": "Efecto multiplicativo de la escala",
+      "tex": "c^{10}:\\quad 1{,}5^{10}\\approx 58,\\qquad 0{,}5^{10}\\approx 0{,}001",
+      "explicacion": "Si cada capa escala la señal por c, tras 10 capas explota o se desvanece; He/Glorot buscan c ≈ 1."
+    }
+  ],
+  "comparaciones": [
+    {
+      "titulo": "One-hot vs. embedding",
+      "columnas": [
+        "Aspecto",
+        "One-hot",
+        "Embedding"
+      ],
+      "filas": [
+        [
+          "Cardinalidad",
+          "Baja (hasta ~15)",
+          "Alta (50 o más)"
+        ],
+        [
+          "Floats que aporta",
+          "k",
+          "d (no depende de k)"
+        ],
+        [
+          "¿Se aprende?",
+          "No",
+          "Sí: tabla k×d, peso de la red"
+        ],
+        [
+          "Distancia entre categorías",
+          "Todas equidistantes",
+          "Aprendida de los datos"
+        ],
+        [
+          "Datos necesarios",
+          "Pocos",
+          "Más; categorías raras heredan de vecinas"
+        ],
+        [
+          "Ejemplo TP2",
+          "State (12)",
+          "District (72)"
+        ]
+      ]
+    },
+    {
+      "titulo": "Train vs. validación vs. test",
+      "columnas": [
+        "Criterio",
+        "Train",
+        "Validación",
+        "Test"
+      ],
+      "filas": [
+        [
+          "Para qué",
+          "Aprender",
+          "Tuning, early stopping, elegir modelo",
+          "Evaluación final sin sesgo"
+        ],
+        [
+          "Cuándo lo ve",
+          "Cada epoch",
+          "Cada epoch, sin entrenar",
+          "Una vez, al final"
+        ],
+        [
+          "Actualiza pesos",
+          "Sí",
+          "No",
+          "No"
+        ],
+        [
+          "Augmentation",
+          "Sí",
+          "No",
+          "No"
+        ],
+        [
+          "Proporción típica",
+          "70%",
+          "20%",
+          "10%"
+        ]
+      ]
+    },
+    {
+      "titulo": "Catálogo tarea → salida",
+      "columnas": [
+        "Qué predice",
+        "Neuronas",
+        "Activación",
+        "Loss"
+      ],
+      "filas": [
+        [
+          "Real (precio)",
+          "1",
+          "Lineal",
+          "MSE / MAE / Huber"
+        ],
+        [
+          "Sí o no (churn)",
+          "1",
+          "Sigmoide",
+          "BCE"
+        ],
+        [
+          "Una de N clases",
+          "N",
+          "Softmax",
+          "Cross-entropy"
+        ],
+        [
+          "Varias de N (tags)",
+          "N",
+          "Sigmoide ×N",
+          "BCE"
+        ],
+        [
+          "Conteo",
+          "1",
+          "Softplus / exp",
+          "Poisson NLL"
+        ],
+        [
+          "Percentiles",
+          "1 por percentil",
+          "Lineal",
+          "Pinball"
+        ],
+        [
+          "Distribución (μ, σ)",
+          "2",
+          "μ lineal, σ softplus",
+          "NLL gaussiana"
+        ]
+      ]
+    },
+    {
+      "titulo": "MSE vs. MAE vs. Huber",
+      "columnas": [
+        "Aspecto",
+        "MSE",
+        "MAE",
+        "Huber"
+      ],
+      "filas": [
+        [
+          "Forma",
+          "Parábola",
+          "V",
+          "Parábola cerca de 0, rectas lejos"
+        ],
+        [
+          "Error 1 / 2 / 10",
+          "1 / 4 / 100",
+          "1 / 2 / 10",
+          "0,5 / 1,5 / 9,5 (d=1)"
+        ],
+        [
+          "Minimizador",
+          "Promedio",
+          "Mediana",
+          "Entre ambos"
+        ],
+        [
+          "Cuándo",
+          "Extremos legítimos",
+          "Extremos = ruido o carga sucia",
+          "Punto medio; d es hiperparámetro"
+        ]
+      ]
+    },
+    {
+      "titulo": "L2 vs. L1 vs. dropout vs. early stopping",
+      "columnas": [
+        "Técnica",
+        "Mecanismo",
+        "Efecto",
+        "Nota"
+      ],
+      "filas": [
+        [
+          "L2 (weight decay)",
+          "+λΣw² al objetivo; gradiente 2λw",
+          "Achica todos los pesos, ninguno a 0",
+          "Default; no penaliza b"
+        ],
+        [
+          "L1 (Lasso)",
+          "+λΣ|w|; gradiente λ·signo(w)",
+          "Clava pesos en 0 (sparsity)",
+          "Más usado en modelos lineales"
+        ],
+        [
+          "Dropout",
+          "Apaga neuronas al azar en el forward",
+          "Rompe coadaptación; ensamble implícito",
+          "No entra en J; apagado en inferencia"
+        ],
+        [
+          "Early stopping",
+          "Corta cuando validación deja de mejorar",
+          "Evita seguir memorizando",
+          "Gratis; el que más rinde"
+        ]
+      ]
+    },
+    {
+      "titulo": "Spam vs. enfermedad vs. churn",
+      "columnas": [
+        "Caso",
+        "Error caro",
+        "Métrica a priorizar"
+      ],
+      "filas": [
+        [
+          "Filtro de spam",
+          "Falso positivo (bloquear un mail legítimo)",
+          "Precisión"
+        ],
+        [
+          "Test de enfermedad grave y tratable",
+          "Falso negativo (mandar a casa a un enfermo)",
+          "Recall"
+        ],
+        [
+          "Churn con descuento",
+          "Los dos cuestan parecido",
+          "F1"
+        ]
+      ]
+    }
+  ],
+  "flashcards": [
+    {
+      "q": "¿Cuáles son las seis decisiones de diseño de un MLP y cuál pesa menos?",
+      "a": "Entrada, dataset, salida, loss, cómo medir el error, # capas y neuronas. La última es la que menos pesa."
+    },
+    {
+      "q": "¿Qué pregunta decide cómo codificar una variable?",
+      "a": "¿Qué significa la resta entre dos valores?"
+    },
+    {
+      "q": "Regla de cardinalidad one-hot vs embedding",
+      "a": "Hasta 15 valores one-hot; 15–50 cualquiera; 50 o más embedding."
+    },
+    {
+      "q": "m² + barrio (12 barrios): ¿cuántas entradas?",
+      "a": "13: 1 float normalizado + 12 one-hot."
+    },
+    {
+      "q": "¿Cómo se codifica la hora del día?",
+      "a": "Con dos floats: sin(2πt/T) y cos(2πt/T), T=24."
+    },
+    {
+      "q": "¿Qué se hace con un faltante?",
+      "a": "Imputar (media/mediana o categoría propia) y sumar un flag binario; nunca rellenar con 0 si 0 es válido."
+    },
+    {
+      "q": "¿Por qué hay que normalizar la entrada?",
+      "a": "El gradiente de un peso es proporcional a su entrada y η es único: escalas dispares hacen zigzaguear el entrenamiento y saturan sigmoide/tanh."
+    },
+    {
+      "q": "¿Sobre qué datos se calculan μ y σ?",
+      "a": "Solo sobre train; se reaplican idénticos en val, test y producción. Lo contrario es data leakage."
+    },
+    {
+      "q": "Salida para predecir un precio",
+      "a": "1 neurona, activación lineal, loss MSE/MAE/Huber."
+    },
+    {
+      "q": "Salida para etiquetas no excluyentes (tags)",
+      "a": "N sigmoides independientes con BCE, no softmax."
+    },
+    {
+      "q": "¿Qué estadístico aprende la red con MSE, MAE y pinball q?",
+      "a": "Promedio, mediana y percentil q, respectivamente."
+    },
+    {
+      "q": "Loss vs cost vs objective",
+      "a": "Loss: un ejemplo. Cost: promedio sobre batch/dataset. Objective J: cost + regularización."
+    },
+    {
+      "q": "10.000 filas, batch 100, 10 épocas: ¿cuántos ajustes?",
+      "a": "1.000 (100 por época)."
+    },
+    {
+      "q": "¿El backward corrige los pesos?",
+      "a": "No: calcula gradientes que se acumulan; W y b se ajustan una vez al cerrar el batch."
+    },
+    {
+      "q": "Train bajo y validación alta: ¿diagnóstico?",
+      "a": "Overfitting → regularizar (L2, dropout, early stopping, más datos)."
+    },
+    {
+      "q": "¿Por qué no se inicializan todos los pesos en cero?",
+      "a": "Por simetría: calculan lo mismo, reciben el mismo gradiente y quedan idénticos para siempre."
+    },
+    {
+      "q": "Precisión 0,9 y recall 0,5: ¿F1?",
+      "a": "≈ 0,64 (el promedio sería 0,70)."
+    },
+    {
+      "q": "¿Qué pasa al bajar el umbral de 0,5 a 0,2?",
+      "a": "Sube el recall y baja la precisión: el modelo marca más."
+    },
+    {
+      "q": "Orden de perillas cuando un entrenamiento no anda",
+      "a": "η primero, luego batch size, luego activación/inicialización, último capas y neuronas. Una por vez."
+    },
+    {
+      "q": "¿Quién publicó backpropagation en 1986?",
+      "a": "Rumelhart, Hinton y Williams, 'Learning representations by back-propagating errors' (Nature)."
+    }
+  ],
+  "quiz": [
+    {
+      "q": "Una columna `District` tiene 72 valores distintos sin orden. ¿Cuál es la codificación recomendada?",
+      "opciones": [
+        "Un entero de 0 a 71 normalizado",
+        "One-hot de 72 posiciones, obligatoriamente",
+        "Embedding de dimensión d",
+        "Descartarla"
+      ],
+      "correcta": 2,
+      "explicacion": "Con 50 o más valores la regla es embedding. Como entero la red lee orden y magnitud inexistentes (pregunta 2 del TP2); one-hot de 72 es posible pero ineficiente; descartarla pierde información útil."
+    },
+    {
+      "q": "¿Qué hay que hacer con `ListingId` (distinto en cada fila)?",
+      "opciones": [
+        "Normalizarlo con z-score",
+        "Codificarlo como embedding",
+        "Descartarlo",
+        "Codificarlo con sin/cos"
+      ],
+      "correcta": 2,
+      "explicacion": "Un identificador único no tiene nada que generalizar: el modelo memorizaría (train perfecto, validación mala). Se descarta."
+    },
+    {
+      "q": "Se ajusta el `StandardScaler` sobre el dataset completo antes de partir. ¿Qué pasa?",
+      "opciones": [
+        "El entrenamiento falla con una excepción",
+        "La métrica de test sale optimista por data leakage",
+        "El modelo deja de converger",
+        "No pasa nada, el resultado es el mismo"
+      ],
+      "correcta": 1,
+      "explicacion": "Información del test se filtra en μ y σ; el modelo entrena igual, sin errores, pero el número de test queda inflado."
+    },
+    {
+      "q": "Para predecir cantidad de unidades vendidas, ¿qué salida es la correcta?",
+      "opciones": [
+        "1 neurona lineal + MSE",
+        "1 neurona softplus/exp + Poisson NLL",
+        "N neuronas softmax + cross-entropy",
+        "1 sigmoide + BCE"
+      ],
+      "correcta": 1,
+      "explicacion": "Un conteo no puede ser negativo y su varianza crece con la media; lineal+MSE puede predecir −3 unidades."
+    },
+    {
+      "q": "Un ticket puede ser 'urgente' y 'de facturación' a la vez. ¿Qué salida corresponde?",
+      "opciones": [
+        "Softmax con cross-entropy",
+        "N sigmoides con BCE",
+        "Una sola sigmoide",
+        "Salida lineal con MSE"
+      ],
+      "correcta": 1,
+      "explicacion": "Softmax fuerza a las etiquetas a competir por una unidad de probabilidad; con etiquetas compatibles van sigmoides independientes."
+    },
+    {
+      "q": "Entrenás una red con pinball loss y q = 0,9. ¿Qué aprende a predecir?",
+      "opciones": [
+        "El promedio",
+        "La mediana",
+        "El percentil 90",
+        "El máximo"
+      ],
+      "correcta": 2,
+      "explicacion": "La asimetría (quedarse corto cuesta 0,9, pasarse 0,1) lleva el mínimo al P90. El promedio lo da MSE y la mediana MAE (pinball con q = 0,5)."
+    },
+    {
+      "q": "Errores de 1, 2 y 10: ¿cuánto castiga MSE?",
+      "opciones": [
+        "1, 2 y 10",
+        "0,5, 1,5 y 9,5",
+        "1, 4 y 100",
+        "1, 1,4 y 3,2"
+      ],
+      "correcta": 2,
+      "explicacion": "MSE eleva al cuadrado. 1, 2, 10 es MAE; 0,5, 1,5, 9,5 es Huber con d = 1."
+    },
+    {
+      "q": "La red le asigna 0,80 a la clase correcta. ¿Cuánto vale la cross-entropy?",
+      "opciones": [
+        "0,20",
+        "0,22",
+        "0,80",
+        "3,00"
+      ],
+      "correcta": 1,
+      "explicacion": "−ln(0,80) ≈ 0,22. 3,00 sería con 0,05; 0,20 es 1 − 0,80, que no es la fórmula."
+    },
+    {
+      "q": "Train de 10.000 filas, batch de 100, 10 épocas. ¿Cuántas veces se actualizan los pesos?",
+      "opciones": [
+        "10",
+        "100",
+        "1.000",
+        "10.000"
+      ],
+      "correcta": 2,
+      "explicacion": "Un ajuste por batch: 100 por época × 10 épocas = 1.000."
+    },
+    {
+      "q": "Durante el procesamiento de un batch, ¿qué ocurre con W y b?",
+      "opciones": [
+        "Se actualizan después de cada fila",
+        "Se actualizan después del backward de cada fila",
+        "Quedan fijos; se actualizan una vez al cerrar el batch",
+        "Se actualizan al final de la época"
+      ],
+      "correcta": 2,
+      "explicacion": "El backward produce gradientes que se acumulan; al cerrar el batch se promedian y se aplica un único ajuste."
+    },
+    {
+      "q": "La loss de train sigue bajando y la de validación empezó a subir. ¿Qué conviene?",
+      "opciones": [
+        "Agregar capas",
+        "Subir η",
+        "Regularizar (L2, dropout) y early stopping",
+        "Bajar el batch size"
+      ],
+      "correcta": 2,
+      "explicacion": "Es overfitting (alta varianza). Agregar capas lo empeora; η y batch son perillas de convergencia, no de generalización."
+    },
+    {
+      "q": "La loss oscila fuerte y termina en NaN. ¿Primera perilla a tocar?",
+      "opciones": [
+        "Bajar η (÷10) y/o recortar el gradiente",
+        "Agregar dropout",
+        "Agregar una capa oculta",
+        "Cambiar a one-hot"
+      ],
+      "correcta": 0,
+      "explicacion": "Es η demasiado grande o gradiente que explota: bajar η o usar clipnorm. Las otras no atacan la causa."
+    },
+    {
+      "q": "Un detector de fraude da 99% de accuracy sobre 10.000 transacciones con 100 fraudes, pero no detecta ninguno. ¿Qué métrica lo revela?",
+      "opciones": [
+        "Accuracy",
+        "Recall",
+        "Loss de train",
+        "Cantidad de parámetros"
+      ],
+      "correcta": 1,
+      "explicacion": "Recall = TP/(TP+FN) = 0/100 = 0. Accuracy la domina la clase mayoritaria."
+    },
+    {
+      "q": "En un filtro de spam, bloquear un mail legítimo es lo peor. ¿Qué priorizás?",
+      "opciones": [
+        "Recall",
+        "Precisión",
+        "Accuracy",
+        "Ninguna, es indistinto"
+      ],
+      "correcta": 1,
+      "explicacion": "El error caro es el falso positivo, y la precisión TP/(TP+FP) es la que lo controla."
+    },
+    {
+      "q": "¿Por qué no se inicializan todos los pesos en cero?",
+      "opciones": [
+        "Porque el sesgo no se puede inicializar",
+        "Porque las neuronas quedarían idénticas y recibirían el mismo gradiente para siempre",
+        "Porque ReLU no está definida en cero",
+        "Porque dispararía overfitting"
+      ],
+      "correcta": 1,
+      "explicacion": "Es un problema de simetría: si arrancan iguales calculan lo mismo y se quedan iguales; el azar las diferencia."
+    }
+  ],
+  "desarrollo": [
+    {
+      "pregunta": "'En un MLP casi nada de lo que decide el resultado es la arquitectura.' Justificá la tesis recorriendo las decisiones de diseño.",
+      "respuesta_modelo": "Diseñar un MLP son seis decisiones: **entrada, dataset, salida, loss, cómo medir y #capas/#neuronas**, y la última es la que menos pesa (1 a 3 ocultas, potencias de 2 decrecientes, ReLU, alcanzan para tabular). La **entrada** es donde se gana o pierde: la red solo ve una fila de floats y lo que se pierde en la traducción (un barrio como entero, un ID único, una hora aplastada, un faltante con 0) no lo recupera ninguna capa, y el error es silencioso. La **partición** no cambia el modelo pero decide si la métrica dice la verdad (train/val/test y todo se aprende solo de train). La **salida** y la **loss** no se eligen: las fija la tarea (precio → lineal + MSE; churn → sigmoide + BCE; N clases → softmax + CE), y la loss incluso define qué estadístico aprende la red. **Backpropagation** no es una decisión sino la condición para que estas importen. Medir bien (matriz de confusión, umbral) y regularizar (L2, dropout, early stopping) separan un modelo que entrena de uno que sirve. Incluso la tabla de 'qué tocar' pone capas y neuronas al final, después de η, batch e inicialización.",
+      "puntos_clave": [
+        "Seis decisiones; capas/neuronas la de menor impacto",
+        "La red ve floats; errores silenciosos de codificación",
+        "Partición honesta",
+        "Salida y loss determinadas por la tarea",
+        "Medir y regularizar",
+        "Orden de perillas"
+      ]
+    },
+    {
+      "pregunta": "Explicá cómo codificarías las columnas del TP2 (numéricas, State, District, ListingId, LotFrontage, mes de venta) y por qué.",
+      "respuesta_modelo": "Aplico la pregunta de la resta y la tabla de decisiones. **Numéricas con magnitud** (superficie, calidad, etc.): z-score $(x-\\mu)/\\sigma$, con log(1+x) previo si tienen cola larga; μ y σ calculados **solo sobre train**. **State** (12 valores, nominal): la resta no significa nada y la cardinalidad es baja → **one-hot** de 12 floats, todas equidistantes. **District** (72 valores): cardinalidad alta → **embedding** de dimensión d (una fila de una tabla 72×d que es peso de la red y aprende distancias). Meterlo como entero 0–71 hace que la red asuma orden y magnitud (distrito 70 'más' que distrito 2). **ListingId**: identificador único → **se descarta**; dejarlo hace memorizar (train baja, validación no). **LotFrontage** (falta ~7%): **imputar con la mediana de train y agregar un flag binario** de faltante; con 0 la red confunde ausencia con un frente de 0 metros, y el flag puede predecir por sí mismo. **Mes de venta**: cíclica → **sin y cos** con T=12. Todo el preprocesamiento (escalador, imputador, mapa de categorías) viaja con el modelo.",
+      "puntos_clave": [
+        "Pregunta de la resta",
+        "z-score solo con train",
+        "State one-hot (12), District embedding (72)",
+        "Entero como código = error",
+        "ListingId descartado",
+        "Imputación + flag",
+        "Cíclica sin/cos",
+        "Preprocesamiento como parte del modelo"
+      ]
+    },
+    {
+      "pregunta": "¿Por qué hacen falta tres conjuntos (train, validación, test) y qué errores de partición inflan la métrica?",
+      "respuesta_modelo": "Medir con los datos de entrenamiento es tomar examen con las respuestas a la vista. **Train** (≈70%) es el único que actualiza W y b. **Validación** (≈20%) se evalúa cada epoch para tunear hiperparámetros y hacer early stopping; el modelo no entrena con ella, pero **quien decide sí la mira**, y tras muchos experimentos sus decisiones quedan sobreajustadas a ese conjunto. Por eso existe el **test** (≈10%), que se abre una vez al final: como nada se eligió mirándolo, es lo más cercano a producción. Con dos conjuntos se termina tuneando contra el test.\n\nLa regla se extiende al preprocesamiento: μ, σ, imputación y diccionarios se calculan **solo sobre train** (si no, data leakage). Errores que inflan la métrica sin lanzar excepciones: duplicados en train y test (deduplicar antes), no estratificar con clases desbalanceadas, partir al azar una serie temporal (cortar por fecha), partir por fila cuando hay grupos (paciente, cliente), achicar val/test, re-partir hasta que el número cierre. Fijar la semilla y guardar los índices hace los experimentos comparables.",
+      "puntos_clave": [
+        "Rol de cada conjunto y proporciones",
+        "Vos sobreajustás a validación",
+        "Test una sola vez",
+        "Leakage de preprocesamiento",
+        "Duplicados, estratificación, tiempo, grupos"
+      ]
+    },
+    {
+      "pregunta": "Describí el ciclo completo de entrenamiento batch a batch: qué hace el forward, qué produce el backward, cuándo cambian los pesos y qué rol juegan η y la regularización.",
+      "respuesta_modelo": "Fijado el dataset, la loss es una función de los pesos y entrenar es bajar por esa superficie. El train se parte en **batches** de B filas. Cada fila hace **forward** con los mismos W y b y produce su predicción y su loss. El **backward** aplica la regla de la cadena hacia atrás, $\\partial L/\\partial w_{ij}=(y_j-t_j)f'(z_j)x_i$, reutilizando los factores de cada unidad, y **suma** los gradientes en un acumulador con la forma de W: **no corrige nada**. Al cerrar el batch se promedia, $g\\leftarrow g/B$, se **aplica** $W\\leftarrow W-\\eta g$ (único momento en que la red cambia) y se vacía g. Un batch, un ajuste; una época = todos los batches (10.000 filas con batch 100 → 100 ajustes), y se baraja entre épocas.\n\n**η** fija el largo del paso: grande → rebota u oscila (NaN); chico → baja y tarda. Lo que se minimiza es $J=\\text{cost}+\\lambda R(w)$: con L2 el gradiente agrega $2\\lambda w$ y en cada paso empuja los pesos hacia cero (weight decay). Dropout actúa en el forward, sin entrar en J. Backprop calcula el gradiente; el descenso por gradiente lo usa.",
+      "puntos_clave": [
+        "Loss como función de los pesos",
+        "Forward por fila con mismos W,b",
+        "Backward acumula, no aplica",
+        "Promediar, aplicar, vaciar",
+        "Batch vs época con números",
+        "Rol de η",
+        "J = cost + λR(w), weight decay"
+      ]
+    },
+    {
+      "pregunta": "Accuracy, precisión, recall y F1: definilas, explicá por qué accuracy engaña y cómo elegirías métrica y umbral en spam, enfermedad y churn.",
+      "respuesta_modelo": "Accuracy = (TP+TN)/total. Con 10.000 transacciones y 100 fraudes, decir siempre 'no es fraude' da **99% de accuracy y 0 fraudes detectados**: la clase mayoritaria escribe el número y los errores de distinto costo se suman como iguales. La **matriz de confusión** separa TP, FP (falsa alarma), FN (se escapó) y TN. **Precisión** = TP/(TP+FP): cuando dice que sí, ¿le creo? **Recall** = TP/(TP+FN): de los que eran, ¿cuántos encontró? **F1** = 2PR/(P+R), media armónica que manda el menor (0,9 y 0,5 → 0,64).\n\nPrecisión y recall están en tensión; elige **el costo del error**. Spam → **precisión** (bloquear un mail legítimo es lo caro). Enfermedad grave y tratable → **recall** (no detectar a un enfermo es lo caro). Churn con descuento → **F1** (los dos errores cuestan parecido). El **umbral** convierte la probabilidad en decisión: bajarlo (0,2) sube recall y baja precisión; subirlo hace lo inverso; 0,5 también es una decisión de negocio. En regresión (TP2) el dilema análogo es MAE contra RMSE.",
+      "puntos_clave": [
+        "Ejemplo 99% fraude",
+        "Matriz de confusión",
+        "Fórmulas P, R, F1 y media armónica",
+        "Elección por costo de FP/FN",
+        "Tres casos",
+        "Umbral como perilla de negocio"
+      ]
+    }
+  ],
+  "conexiones": [
+    {
+      "clase": 3,
+      "relacion": "Retoma la neurona, la capa, las activaciones y backpropagation de la clase 3 (pérdida L2, regla de la cadena, η) y les agrega la mecánica de batches, épocas, acumulación y regularización."
+    },
+    {
+      "clase": 7,
+      "relacion": "El embedding categórico (tabla k×d que es la primera capa) es la misma idea que el embedding de tokens de un LLM (≈50.000 × 4096) y que word2vec."
+    },
+    {
+      "clase": 8,
+      "relacion": "Los transformers usan GELU en las capas ocultas, LayerNorm, dropout bajo (0,1) y weight decay: las mismas herramientas de activación, normalización y regularización de esta clase."
+    },
+    {
+      "clase": 9,
+      "relacion": "El pre-entrenamiento de un LLM es cross-entropy multiclase sobre el vocabulario con softmax, entrenada batch a batch con este mismo ciclo de gradiente."
+    },
+    {
+      "clase": 12,
+      "relacion": "Las CNN son la arquitectura que corresponde a la forma de grilla (imagen 28×28 o RGB) que un MLP solo puede procesar aplanando y perdiendo la vecindad."
+    }
+  ],
+  "lecturas": [
+    "Rumelhart, Hinton & Williams (1986), Learning representations by back-propagating errors, Nature 323, 533-536",
+    "Werbos (1974), Beyond Regression (tesis doctoral, Harvard); Linnainmaa (1970), diferenciación automática en modo reverso",
+    "3Blue1Brown (Grant Sanderson), Backpropagation calculus · Deep Learning Chapter 4",
+    "Pascanu, Mikolov & Bengio (2013), On the difficulty of training Recurrent Neural Networks (gradiente que se desvanece/explota, clipping)",
+    "Jacob Solawetz (Roboflow), Train, Validation, Test Split Explained (with Ratios)",
+    "Tarang Shah (2017), About Train, Validation and Test Sets in Machine Learning",
+    "Stanford CS231n, Optimization y Backpropagation; Google Machine Learning Crash Course, Gradient descent",
+    "Documentación de Keras: Model.fit (batch_size, epochs), optimizadores (clipnorm), inicializadores HeNormal/GlorotUniform",
+    "Russell & Norvig, Artificial Intelligence: A Modern Approach (la IA como diseño de agentes racionales; paráfrasis citada en clase)",
+    "Notebooks del curso: missions/mlp/input-data-types.ipynb y output-layer-types.ipynb (las mismas 2000 casas)",
+    "TP2: missions/mlp/mission.md — ¿Cuánto vale esta casa?"
+  ]
+}

@@ -1,0 +1,878 @@
+[
+ {
+  "i": 0,
+  "section": "",
+  "title": "Inteligencia Artificial Generativa (AI Gen)",
+  "lead": "",
+  "visible_text": "Inteligencia Artificial Generativa (AI Gen) Modelos Generativos de Señales, Imágenes y Multimodalidad Autor: Paulo Veiga, Claudio Righetti, Marco Sorondo (Universidad Austral) Última modificación: 2026-10-28",
+  "details": [],
+  "speaker_notes": ""
+ },
+ {
+  "i": 1,
+  "section": "Qué es una convolución",
+  "title": "Qué es una convolución",
+  "lead": "",
+  "visible_text": "01 Qué es una convolución 02 Segmentación: qué es y para qué sirve 03 De FCN a U-Net 04 SAM: segmentar lo que le señalás 05 Generación condicionada por texto 06 Stable Diffusion por dentro 07 TilTedTinder v2 y notebook 01 Qué es una convolución",
+  "details": [],
+  "speaker_notes": ""
+ },
+ {
+  "i": 2,
+  "section": "Qué es una convolución",
+  "title": "Una red neuronal clásica solo acepta entradas de largo fijo",
+  "lead": "",
+  "visible_text": "Qué es una convolución Una red neuronal clásica solo acepta entradas de largo fijo Arrancar por lo que ya saben: el TP de precios de casas fue exactamente esto. La red funciona porque cada fila del dataset trae las mismas columnas. MNIST sirve de puente: es una imagen, pero todas miden 28×28, así que aplanarla a 784 números no rompe nada. La pregunta que abre la sección es qué pasa cuando la entrada no trae siempre la misma cantidad de números.",
+  "details": [],
+  "speaker_notes": "Arrancar por lo que ya saben: el TP de precios de casas fue exactamente esto. La red funciona porque cada fila del dataset trae las mismas columnas. MNIST sirve de puente: es una imagen, pero todas miden 28×28, así que aplanarla a 784 números no rompe nada. La pregunta que abre la sección es qué pasa cuando la entrada no trae siempre la misma cantidad de números."
+ },
+ {
+  "i": 3,
+  "section": "Qué es una convolución",
+  "title": "Una red neuronal clásica solo acepta entradas de largo fijo",
+  "lead": "Una red densa (MLP) recibe un vector con una cantidad fija de números. Esa cantidad queda fija al definir la primera capa, porque cada entrada tiene sus propios pesos. Tareas que una red así resuelve bien:",
+  "visible_text": "Qué es una convolución Una red neuronal clásica solo acepta entradas de largo fijo Una red densa (MLP) recibe un vector con una cantidad fija de números. Esa cantidad queda fija al definir la primera capa, porque cada entrada tiene sus propios pesos. Tareas que una red así resuelve bien: Precio de una casa Los atributos de la propiedad (metros cuadrados, barrio, ambientes) entran como un vector y sale un número. Es el caso del TP de MLP. Dígitos manuscritos (MNIST) La imagen de 28×28 se aplana e",
+  "details": [
+   "Precio de una casa: Los atributos de la propiedad (metros cuadrados, barrio, ambientes) entran como un vector y sale un número. Es el caso del TP de MLP.",
+   "Dígitos manuscritos (MNIST): La imagen de 28×28 se aplana en 784 números y salen 10 probabilidades, una por dígito.",
+   "Riesgo crediticio: Los datos de una solicitud entran normalizados y sale la probabilidad de que el cliente no pague."
+  ],
+  "speaker_notes": "Arrancar por lo que ya saben: el TP de precios de casas fue exactamente esto. La red funciona porque cada fila del dataset trae las mismas columnas. MNIST sirve de puente: es una imagen, pero todas miden 28×28, así que aplanarla a 784 números no rompe nada. La pregunta que abre la sección es qué pasa cuando la entrada no trae siempre la misma cantidad de números."
+ },
+ {
+  "i": 4,
+  "section": "Qué es una convolución",
+  "title": "Cómo se entrena una red densa",
+  "lead": "",
+  "visible_text": "Qué es una convolución Cómo se entrena una red densa Repaso de la clase de redes neuronales con un MLP de juguete en numpy (64→16→12→10, dígitos sintéticos de 8×8). Forward: el «3» entra y la salida da p(3) = 0,04. Pérdida: L = −log p(3) = 3,12. Backward con la regla de la cadena: δ₃ = p − y en la salida, después δ₂ y δ₁ hacia atrás; cada fila de ∂L/∂W se completa cuando su neurona recibe su δ. Se promedia sobre el mini-batch de 10 dígitos y se actualiza W ← W − η·∂L/∂W con η = 0,2. En 40 pasos ",
+  "details": [],
+  "speaker_notes": "Repaso de la clase de redes neuronales con un MLP de juguete en numpy (64→16→12→10, dígitos sintéticos de 8×8). Forward: el «3» entra y la salida da p(3) = 0,04. Pérdida: L = −log p(3) = 3,12. Backward con la regla de la cadena: δ₃ = p − y en la salida, después δ₂ y δ₁ hacia atrás; cada fila de ∂L/∂W se completa cuando su neurona recibe su δ. Se promedia sobre el mini-batch de 10 dígitos y se actualiza W ← W − η·∂L/∂W con η = 0,2. En 40 pasos la pérdida del mini-batch baja de 3,14 a 0,08 y p(3) sube a 0,92; los mapas de ∂L/∂W usan escala fija y se apagan a medida que baja L. Este mismo ciclo (forward, pérdida, backward, actualización) es el que entrena a todos los modelos de la clase; lo que cambia de uno a otro es la pérdida."
+ },
+ {
+  "i": 5,
+  "section": "Qué es una convolución",
+  "title": "El detector de voz: cada audio dura distinto",
+  "lead": "",
+  "visible_text": "Qué es una convolución El detector de voz: cada audio dura distinto Funciona en una demo y es poco elegante. Elegir L es una decisión arbitraria: si es corto perdés información, si es largo la mayoría de los audios son relleno. Y aunque se resuelva el largo, queda lo que la arquitectura densa no modela de un audio, que viene en la lámina siguiente.",
+  "details": [],
+  "speaker_notes": "Funciona en una demo y es poco elegante. Elegir L es una decisión arbitraria: si es corto perdés información, si es largo la mayoría de los audios son relleno. Y aunque se resuelva el largo, queda lo que la arquitectura densa no modela de un audio, que viene en la lámina siguiente."
+ },
+ {
+  "i": 6,
+  "section": "Qué es una convolución",
+  "title": "El detector de voz: cada audio dura distinto",
+  "lead": "Querés una red que escuche una grabación y diga si alguien está hablando. Un audio de 5 s tiene más muestras que uno de 2 s, y la red densa espera siempre la misma cantidad. Con un MLP tenés que elegir un largo L y forzar todos los audios a ese largo:",
+  "visible_text": "Qué es una convolución El detector de voz: cada audio dura distinto Querés una red que escuche una grabación y diga si alguien está hablando. Un audio de 5 s tiene más muestras que uno de 2 s, y la red densa espera siempre la misma cantidad. Con un MLP tenés que elegir un largo L y forzar todos los audios a ese largo: Recortar los audios largos Si la voz estaba en el tramo que cortaste, esa parte nunca entra a la red. Rellenar con ceros los cortos La red recibe silencio artificial y tiene que ap",
+  "details": [
+   "Recortar los audios largos: Si la voz estaba en el tramo que cortaste, esa parte nunca entra a la red.",
+   "Rellenar con ceros los cortos: La red recibe silencio artificial y tiene que aprender a ignorarlo."
+  ],
+  "speaker_notes": "Funciona en una demo y es poco elegante. Elegir L es una decisión arbitraria: si es corto perdés información, si es largo la mayoría de los audios son relleno. Y aunque se resuelva el largo, queda lo que la arquitectura densa no modela de un audio, que viene en la lámina siguiente."
+ },
+ {
+  "i": 7,
+  "section": "Qué es una convolución",
+  "title": "El sesgo inductivo equivocado",
+  "lead": "Aun con el largo resuelto, una capa densa trata al audio como una lista de números sin orden.",
+  "visible_text": "Qué es una convolución El sesgo inductivo equivocado Aun con el largo resuelto, una capa densa trata al audio como una lista de números sin orden. Sin vecindad Cada muestra se conecta con cada neurona con pesos independientes. Si mezclás el orden de las entradas (la misma mezcla en todos los ejemplos) y reentrenás, la red aprende igual de bien. En su arquitectura la muestra t no está al lado de la t+1. Sin invariancia a traslación Un \"hola\" al principio del audio y el mismo \"hola\" al final pasan",
+  "details": [
+   "Sin vecindad: Cada muestra se conecta con cada neurona con pesos independientes. Si mezclás el orden de las entradas (la misma mezcla en todos los ejemplos) y reentrenás, la red aprende igual de bien. En su arquitectura la muestra t no está al lado de la t+1.",
+   "Sin invariancia a traslación: Un \"hola\" al principio del audio y el mismo \"hola\" al final pasan por pesos distintos. La red tiene que aprender el patrón una vez por cada posición.",
+   "Demasiados parámetros: Cada entrada suma una fila de pesos. Una imagen RGB de 224×224 son 150.528 números, y una primera capa densa de 256 neuronas ya tiene unos 38,5 millones de pesos."
+  ],
+  "speaker_notes": "Sesgo inductivo es lo que la arquitectura asume antes de ver un solo dato. La capa densa no asume nada sobre el orden, y para tablas eso está bien: las columnas de una planilla se pueden reordenar. En audio e imágenes el orden es la información. Lo que queremos es una capa que sepa que lo vecino está relacionado y que un patrón es el mismo esté donde esté."
+ },
+ {
+  "i": 8,
+  "section": "Qué es una convolución",
+  "title": "El problema aparece en cualquier señal, y en las imágenes",
+  "lead": "La limitación no depende de la tarea. Con audio y señales:",
+  "visible_text": "Qué es una convolución El problema aparece en cualquier señal, y en las imágenes La limitación no depende de la tarea. Con audio y señales: Tarea Ejemplo Qué sale Clasificación ¿hay voz en esta grabación? una etiqueta Regresión estimar la frecuencia cardíaca desde un ECG un número Filtrado sacarle el ruido a una grabación una señal del mismo largo Upscaling llevar un audio a una frecuencia de muestreo más alta una señal con más muestras Generación sintetizar voz una señal nueva Imágenes : Las im",
+  "details": [
+   "Imágenes: Las imágenes tienen el mismo problema en dos dimensiones: alto y ancho cambian de una foto a otra, y cada píxel trae sus canales (3 en RGB). Un MLP obliga a llevarlas todas a un tamaño y aplanarlas."
+  ],
+  "speaker_notes": "En filtrado y upscaling la salida también es una señal, así que el largo variable aparece dos veces: en la entrada y en la salida. Con imágenes, el ejemplo de MNIST funcionaba porque el dataset ya viene con todas las imágenes del mismo tamaño; una foto de celular y una tomografía no."
+ },
+ {
+  "i": 9,
+  "section": "Qué es una convolución",
+  "title": "La solución: un kernel que se desliza",
+  "lead": "Un kernel de 9 pesos iguales a 1/9 (un promedio móvil) filtra un audio ruidoso.",
+  "visible_text": "Qué es una convolución La solución: un kernel que se desliza Un kernel de 9 pesos iguales a 1/9 (un promedio móvil) filtra un audio ruidoso. Dejar correr la animación una vez en silencio y después narrarla. La operación es una suma ponderada, la misma que hace una neurona; la diferencia es que la neurona del kernel combina solo los valores de una ventana y se reutiliza en cada posición. Eso le da a la capa justo lo que le faltaba a la densa: vecindad y el mismo patrón en cualquier lugar.",
+  "details": [],
+  "speaker_notes": "Dejar correr la animación una vez en silencio y después narrarla. La operación es una suma ponderada, la misma que hace una neurona; la diferencia es que la neurona del kernel combina solo los valores de una ventana y se reutiliza en cada posición. Eso le da a la capa justo lo que le faltaba a la densa: vecindad y el mismo patrón en cualquier lugar."
+ },
+ {
+  "i": 10,
+  "section": "Qué es una convolución",
+  "title": "La solución: un kernel que se desliza",
+  "lead": "Un **kernel** es un vector chico de pesos que recorre la señal. En cada posición multiplica sus pesos por el tramo que tiene debajo, suma y escribe un número en la salida. Después avanza una muestra y repite. En la animación, un kernel de 9 pesos iguales a 1/9 (un promedio móvil) filtra un audio ruidoso:",
+  "visible_text": "Qué es una convolución La solución: un kernel que se desliza Un kernel es un vector chico de pesos que recorre la señal. En cada posición multiplica sus pesos por el tramo que tiene debajo, suma y escribe un número en la salida. Después avanza una muestra y repite. En la animación, un kernel de 9 pesos iguales a 1/9 (un promedio móvil) filtra un audio ruidoso: Arriba La ventana del kernel avanza sobre el audio con ruido. Abajo Cada punto de la salida aparece cuando el kernel pasa por esa posició",
+  "details": [
+   "Arriba: La ventana del kernel avanza sobre el audio con ruido.",
+   "Abajo: Cada punto de la salida aparece cuando el kernel pasa por esa posición.",
+   "Al final: La salida conserva la forma de la onda con menos ruido.",
+   "Pesos compartidos: Usa los mismos pesos en todas las posiciones. Por eso detecta un patrón esté donde esté, y la cantidad de pesos no depende del largo del audio."
+  ],
+  "speaker_notes": "Dejar correr la animación una vez en silencio y después narrarla. La operación es una suma ponderada, la misma que hace una neurona; la diferencia es que la neurona del kernel combina solo los valores de una ventana y se reutiliza en cada posición. Eso le da a la capa justo lo que le faltaba a la densa: vecindad y el mismo patrón en cualquier lugar."
+ },
+ {
+  "i": 11,
+  "section": "Qué es una convolución",
+  "title": "Mismo mecanismo, otra tarea: detectar voz",
+  "lead": "",
+  "visible_text": "Qué es una convolución Mismo mecanismo, otra tarea: detectar voz Los dos ejemplos usan kernels diseñados a mano para que se vea qué hace cada uno. En una CNN real la red arranca con kernels al azar y el descenso por gradiente los ajusta; muchas veces terminan pareciéndose a estos filtros clásicos, pero nadie se los dicta.",
+  "details": [],
+  "speaker_notes": "Los dos ejemplos usan kernels diseñados a mano para que se vea qué hace cada uno. En una CNN real la red arranca con kernels al azar y el descenso por gradiente los ajusta; muchas veces terminan pareciéndose a estos filtros clásicos, pero nadie se los dicta."
+ },
+ {
+  "i": 12,
+  "section": "Qué es una convolución",
+  "title": "Mismo mecanismo, otra tarea: detectar voz",
+  "lead": "Con otro kernel, una ventana larga sobre la señal al cuadrado, la misma operación mide la energía local del audio: cuánta señal hay alrededor de cada instante. Donde la energía pasa un umbral, el detector marca voz.",
+  "visible_text": "Qué es una convolución Mismo mecanismo, otra tarea: detectar voz Con otro kernel, una ventana larga sobre la señal al cuadrado, la misma operación mide la energía local del audio: cuánta señal hay alrededor de cada instante. Donde la energía pasa un umbral, el detector marca voz. Tramos con voz La salida sube; en los silencios baja. Umbral La línea horizontal; lo que queda por encima se marca como voz. Pesos aprendidos : En una red convolucional nadie elige los pesos del kernel a mano. Los apren",
+  "details": [
+   "Tramos con voz: La salida sube; en los silencios baja.",
+   "Umbral: La línea horizontal; lo que queda por encima se marca como voz.",
+   "Pesos aprendidos: En una red convolucional nadie elige los pesos del kernel a mano. Los aprende el entrenamiento, igual que los de una capa densa."
+  ],
+  "speaker_notes": "Los dos ejemplos usan kernels diseñados a mano para que se vea qué hace cada uno. En una CNN real la red arranca con kernels al azar y el descenso por gradiente los ajusta; muchas veces terminan pareciéndose a estos filtros clásicos, pero nadie se los dicta."
+ },
+ {
+  "i": 13,
+  "section": "Qué es una convolución",
+  "title": "El largo variable deja de ser un problema",
+  "lead": "",
+  "visible_text": "Qué es una convolución El largo variable deja de ser un problema Este es el punto de la sección en una lámina: la cantidad de pesos depende del tamaño del kernel y no del largo de la entrada. El pooling global es lo que conecta la parte convolucional, que acepta cualquier largo, con la parte densa, que requiere uno fijo.",
+  "details": [],
+  "speaker_notes": "Este es el punto de la sección en una lámina: la cantidad de pesos depende del tamaño del kernel y no del largo de la entrada. El pooling global es lo que conecta la parte convolucional, que acepta cualquier largo, con la parte densa, que requiere uno fijo."
+ },
+ {
+  "i": 14,
+  "section": "Qué es una convolución",
+  "title": "El largo variable deja de ser un problema",
+  "lead": "",
+  "visible_text": "Qué es una convolución El largo variable deja de ser un problema Cualquier largo El kernel funciona con cualquier duración de audio: se desliza hasta que la señal se termina. Sobre 2 s produce una salida corta, sobre 5 s una más larga, con los mismos pesos. Pooling global Para clasificar la grabación entera, la red resume esa salida en un vector de largo fijo, por ejemplo con un pooling global que toma el promedio o el máximo. Recién ahí entra una capa densa. En la figura : Los dos audios usan e",
+  "details": [
+   "Cualquier largo: El kernel funciona con cualquier duración de audio: se desliza hasta que la señal se termina. Sobre 2 s produce una salida corta, sobre 5 s una más larga, con los mismos pesos.",
+   "Pooling global: Para clasificar la grabación entera, la red resume esa salida en un vector de largo fijo, por ejemplo con un pooling global que toma el promedio o el máximo. Recién ahí entra una capa densa.",
+   "En la figura: Los dos audios usan el mismo kernel, y cada salida tiene el largo de su entrada."
+  ],
+  "speaker_notes": "Este es el punto de la sección en una lámina: la cantidad de pesos depende del tamaño del kernel y no del largo de la entrada. El pooling global es lo que conecta la parte convolucional, que acepta cualquier largo, con la parte densa, que requiere uno fijo."
+ },
+ {
+  "i": 15,
+  "section": "Qué es una convolución",
+  "title": "Dos soluciones al largo variable",
+  "lead": "",
+  "visible_text": "Qué es una convolución Dos soluciones al largo variable Convolución Un kernel chico recorre la entrada con los mismos pesos en cada posición. Lo que detecta en un lugar lo detecta en cualquier otro (invariancia a traslación). Cada salida combina solo valores cercanos. Ese sesgo inductivo fuerte, la localidad, le permite aprender con menos datos. Para relacionar puntos lejanos hay que apilar capas. Atención (transformer) Cada posición se combina con todas las demás desde la primera capa, con peso",
+  "details": [
+   "Elegir una arquitectura es elegir un sesgo inductivo."
+  ],
+  "speaker_notes": "En \"De la palabra al transformer\" vieron la atención con texto: la representación de cada token sale de una suma ponderada de todos los demás, con pesos que dependen de qué tan parecidos son. Esa misma atención acepta cualquier cantidad de posiciones, igual que el kernel, así que también resuelve el largo variable. Lo que cambia es lo que cada arquitectura fija antes del entrenamiento. La convolución solo combina vecinos; en la atención esa estructura no está fijada y los pesos la tienen que capturar del entrenamiento, por eso hacen falta muchos más datos. El costo se siente rápido: con una secuencia del doble de largo, la atención compara cuatro veces más pares. La clase vuelve a cruzar las dos ideas en CLIP, en SAM y en la U-Net de Stable Diffusion."
+ },
+ {
+  "i": 16,
+  "section": "Qué es una convolución",
+  "title": "Convolución en imágenes",
+  "lead": "",
+  "visible_text": "Qué es una convolución Convolución en imágenes \"Valores grandes\" en valor absoluto: según el lado del borde, el detector da positivo o negativo. El 896 contra 38,5 millones explica por qué las CNN entrenan con imágenes grandes y una red densa no.",
+  "details": [],
+  "speaker_notes": "\"Valores grandes\" en valor absoluto: según el lado del borde, el detector da positivo o negativo. El 896 contra 38,5 millones explica por qué las CNN entrenan con imágenes grandes y una red densa no."
+ },
+ {
+  "i": 17,
+  "section": "Qué es una convolución",
+  "title": "Convolución en imágenes",
+  "lead": "En una imagen el kernel es una grilla chica, por ejemplo de 3×3, que recorre la imagen a lo alto y a lo ancho. En cada posición multiplica sus 9 pesos por los 9 píxeles que cubre y suma.",
+  "visible_text": "Qué es una convolución Convolución en imágenes En una imagen el kernel es una grilla chica, por ejemplo de 3×3, que recorre la imagen a lo alto y a lo ancho. En cada posición multiplica sus 9 pesos por los 9 píxeles que cubre y suma. Una celda por posición Cada lugar donde se apoya el kernel produce una celda del feature map. Tamaño Sobre una grilla de 7×7, un kernel de 3×3 sin relleno cabe en 5 posiciones por fila y por columna, y la salida es de 5×5. Bordes Los valores grandes aparecen donde e",
+  "details": [
+   "Una celda por posición: Cada lugar donde se apoya el kernel produce una celda del feature map.",
+   "Tamaño: Sobre una grilla de 7×7, un kernel de 3×3 sin relleno cabe en 5 posiciones por fila y por columna, y la salida es de 5×5.",
+   "Bordes: Los valores grandes aparecen donde el kernel cruza un borde.",
+   "Parámetros: Sobre una imagen RGB el kernel abarca los 3 canales a la vez: 3×3×3 = 27 pesos. Una capa `nn.Conv2d(3, 32, 3)` con 32 kernels tiene 896 parámetros, contra los 38,5 millones de la capa densa."
+  ],
+  "speaker_notes": "\"Valores grandes\" en valor absoluto: según el lado del borde, el detector da positivo o negativo. El 896 contra 38,5 millones explica por qué las CNN entrenan con imágenes grandes y una red densa no."
+ },
+ {
+  "i": 18,
+  "section": "Qué es una convolución",
+  "title": "Distintos kernels, distintos rasgos",
+  "lead": "",
+  "visible_text": "Qué es una convolución Distintos kernels, distintos rasgos Con 32 kernels en una capa salen 32 feature maps, uno por rasgo. La capa siguiente combina esos mapas, y por eso puede detectar algo más complejo que un borde.",
+  "details": [],
+  "speaker_notes": "Con 32 kernels en una capa salen 32 feature maps, uno por rasgo. La capa siguiente combina esos mapas, y por eso puede detectar algo más complejo que un borde."
+ },
+ {
+  "i": 19,
+  "section": "Qué es una convolución",
+  "title": "Distintos kernels, distintos rasgos",
+  "lead": "",
+  "visible_text": "Qué es una convolución Distintos kernels, distintos rasgos 1 Cada kernel detecta un rasgo. En la figura, uno resalta los bordes verticales y otro los horizontales de la misma imagen. 2 Una CNN apila capas convolucionales y aprende sus kernels. Las primeras capas detectan bordes, las siguientes texturas, después partes y al final objetos. 3 Esa pila es el encoder de FCN y de la U-Net, que aparecen en la sección de segmentación. Con 32 kernels en una capa salen 32 feature maps, uno por rasgo. La c",
+  "details": [
+   "Cada kernel detecta un rasgo. En la figura, uno resalta los bordes verticales y otro los horizontales de la misma imagen.",
+   "Una CNN apila capas convolucionales y aprende sus kernels. Las primeras capas detectan bordes, las siguientes texturas, después partes y al final objetos.",
+   "Esa pila es el encoder de FCN y de la U-Net, que aparecen en la sección de segmentación."
+  ],
+  "speaker_notes": "Con 32 kernels en una capa salen 32 feature maps, uno por rasgo. La capa siguiente combina esos mapas, y por eso puede detectar algo más complejo que un borde."
+ },
+ {
+  "i": 20,
+  "section": "Qué es una convolución",
+  "title": "Cómo se aprende un kernel",
+  "lead": "",
+  "visible_text": "Qué es una convolución Cómo se aprende un kernel Un kernel 3×3 que arranca con pesos al azar se entrena para que su feature map se parezca a un objetivo: el mapa de bordes verticales de una imagen de 7×7. La pérdida es la MSE entre salida y objetivo (al principio L = 83,93). Lo nuevo frente a una capa densa está en el backward: como el mismo kernel se aplicó en las 25 posiciones, su gradiente es la suma de las contribuciones de cada posición; en cada una se suma (2/25)·(salida − objetivo)·ventan",
+  "details": [],
+  "speaker_notes": "Un kernel 3×3 que arranca con pesos al azar se entrena para que su feature map se parezca a un objetivo: el mapa de bordes verticales de una imagen de 7×7. La pérdida es la MSE entre salida y objetivo (al principio L = 83,93). Lo nuevo frente a una capa densa está en el backward: como el mismo kernel se aplicó en las 25 posiciones, su gradiente es la suma de las contribuciones de cada posición; en cada una se suma (2/25)·(salida − objetivo)·ventana. Después, kernel ← kernel − η·∂L/∂kernel. En 60 pasos el kernel llega a [−1 0 +1] en las tres filas y L baja a 0,01. Modelo de juguete en numpy, gradiente verificado con diferencias finitas. En una CNN nadie diseña los kernels: se aprenden, y una red real aprende miles a la vez."
+ },
+ {
+  "i": 21,
+  "section": "Qué es una convolución",
+  "title": "Embeddings más allá del texto",
+  "lead": "",
+  "visible_text": "Qué es una convolución Embeddings más allá del texto Lo vieron con palabras y tokens; acá la idea se generaliza. Cuando lleguemos a CLIP, la novedad va a ser entrenar los dos encoders para que caigan en el mismo espacio. El latente del VAE es un pariente: no está entrenado para que lo cercano signifique lo mismo, pero también comprime la imagen en algo mucho más chico.",
+  "details": [],
+  "speaker_notes": "Lo vieron con palabras y tokens; acá la idea se generaliza. Cuando lleguemos a CLIP, la novedad va a ser entrenar los dos encoders para que caigan en el mismo espacio. El latente del VAE es un pariente: no está entrenado para que lo cercano signifique lo mismo, pero también comprime la imagen en algo mucho más chico."
+ },
+ {
+  "i": 22,
+  "section": "Qué es una convolución",
+  "title": "Embeddings más allá del texto",
+  "lead": "",
+  "visible_text": "Qué es una convolución Embeddings más allá del texto Un vector por entrada El encoder de una CNN termina en un vector de largo fijo que resume el contenido de la imagen. Un encoder de texto hace lo mismo con una oración, y uno de audio con una grabación. Embedding Una representación densa aprendida donde la geometría del espacio codifica el significado: vectores cercanos, contenidos parecidos. Sirve para cualquier modalidad, con o sin transformers. Vuelve dos veces en esta clase CLIP pone imágen",
+  "details": [
+   "Un vector por entrada: El encoder de una CNN termina en un vector de largo fijo que resume el contenido de la imagen. Un encoder de texto hace lo mismo con una oración, y uno de audio con una grabación.",
+   "Embedding: Una representación densa aprendida donde la geometría del espacio codifica el significado: vectores cercanos, contenidos parecidos. Sirve para cualquier modalidad, con o sin transformers.",
+   "Vuelve dos veces en esta clase: CLIP pone imágenes y textos en el mismo espacio, y el VAE de Stable Diffusion comprime la imagen en un latente donde trabaja la difusión.",
+   "Con transformers: El encoder de texto de CLIP es un transformer, y un ViT trata la imagen como una secuencia de parches."
+  ],
+  "speaker_notes": "Lo vieron con palabras y tokens; acá la idea se generaliza. Cuando lleguemos a CLIP, la novedad va a ser entrenar los dos encoders para que caigan en el mismo espacio. El latente del VAE es un pariente: no está entrenado para que lo cercano signifique lo mismo, pero también comprime la imagen en algo mucho más chico."
+ },
+ {
+  "i": 23,
+  "section": "Segmentación: qué es y para qué sirve",
+  "title": "Segmentación: qué es y para qué sirve",
+  "lead": "",
+  "visible_text": "01 Qué es una convolución 02 Segmentación: qué es y para qué sirve 03 De FCN a U-Net 04 SAM: segmentar lo que le señalás 05 Generación condicionada por texto 06 Stable Diffusion por dentro 07 TilTedTinder v2 y notebook 02 Segmentación: qué es y para qué sirve",
+  "details": [],
+  "speaker_notes": ""
+ },
+ {
+  "i": 24,
+  "section": "Segmentación: qué es y para qué sirve",
+  "title": "¿Qué es segmentar?",
+  "lead": "En visión por computadora, hay tres preguntas distintas que podemos hacerle a una imagen — y segmentar es la más fina de todas.",
+  "visible_text": "Segmentación: qué es y para qué sirve ¿Qué es segmentar? En visión por computadora, hay tres preguntas distintas que podemos hacerle a una imagen — y segmentar es la más fina de todas. Tarea Pregunta Salida Clasificación ¿Qué hay en esta imagen? Una etiqueta (ej: \"perro\") Detección ¿Dónde está y qué es? Cajas con etiquetas Segmentación ¿Qué representa cada píxel? Una etiqueta por píxel — una \"máscara\" Frase clave : Segmentar es darle un significado pixel por pixel a la imagen. La figura muestra ",
+  "details": [
+   "Frase clave: Segmentar es darle un significado **pixel por pixel** a la imagen."
+  ],
+  "speaker_notes": "La figura muestra las cuatro salidas sobre la misma foto del perro y las ovejas: en la semántica las tres ovejas comparten color, en la de instancias cada una tiene el suyo. Eso adelanta la lámina siguiente."
+ },
+ {
+  "i": 25,
+  "section": "Segmentación: qué es y para qué sirve",
+  "title": "Tipos de segmentación",
+  "lead": "Tres niveles de granularidad, según qué tan finamente queramos diferenciar lo que vemos:",
+  "visible_text": "Segmentación: qué es y para qué sirve Tipos de segmentación Tres niveles de granularidad, según qué tan finamente queramos diferenciar lo que vemos: Semántica Etiqueta cada píxel con su clase, sin distinguir individuos. Todos los píxeles de \"auto\" reciben la misma etiqueta, aunque haya cinco autos. De instancias Distingue cada objeto individual. \"Auto 1\", \"auto 2\", \"auto 3\"... aunque sean de la misma clase. Panóptica Combina ambas — clasifica cada píxel y distingue instancias. Es la versión más ",
+  "details": [
+   "Semántica: Etiqueta cada píxel con su clase, sin distinguir individuos. Todos los píxeles de \"auto\" reciben la misma etiqueta, aunque haya cinco autos.",
+   "De instancias: Distingue cada objeto individual. \"Auto 1\", \"auto 2\", \"auto 3\"... aunque sean de la misma clase.",
+   "Panóptica: Combina ambas — clasifica cada píxel y distingue instancias. Es la versión más completa."
+  ],
+  "speaker_notes": ""
+ },
+ {
+  "i": 26,
+  "section": "Segmentación: qué es y para qué sirve",
+  "title": "Dónde se usa",
+  "lead": "",
+  "visible_text": "Segmentación: qué es y para qué sirve Dónde se usa Autos autónomos Separar carretera, peatones, semáforos y otros vehículos. Imagen satelital Medir cobertura forestal, urbanización y cuerpos de agua. Videoconferencia y edición de fotos Separar a la persona del fondo en tiempo real; el \"Seleccionar sujeto\" de Photoshop. Neuroimagen y oncología Delinear tumores y lesiones; medir volumen tumoral para planificar radioterapia. Cardiología Delimitar ventrículos para calcular la fracción de eyección. P",
+  "details": [
+   "Autos autónomos: Separar carretera, peatones, semáforos y otros vehículos.",
+   "Imagen satelital: Medir cobertura forestal, urbanización y cuerpos de agua.",
+   "Videoconferencia y edición de fotos: Separar a la persona del fondo en tiempo real; el \"Seleccionar sujeto\" de Photoshop.",
+   "Neuroimagen y oncología: Delinear tumores y lesiones; medir volumen tumoral para planificar radioterapia.",
+   "Cardiología: Delimitar ventrículos para calcular la fracción de eyección.",
+   "Patología, oftalmología y dermatología: Contar núcleos y mitosis, segmentar vasos retinianos, delimitar lesiones.",
+   "En medicina la máscara es lo que se mide, se documenta y se compara entre estudios."
+  ],
+  "speaker_notes": "Fusión de \"Aplicaciones genéricas\" y \"Aplicaciones en medicina\". En biomedicina segmentar suele ser el paso clínico y no un paso intermedio: la máscara final es la respuesta. Agricultura de precisión (plagas, estrés hídrico) quedó fuera de la lámina; se puede mencionar de palabra."
+ },
+ {
+  "i": 27,
+  "section": "Segmentación: qué es y para qué sirve",
+  "title": "Cómo se ve una salida",
+  "lead": "",
+  "visible_text": "Segmentación: qué es y para qué sirve Cómo se ve una salida Visualización típica : Imagen original (MRI cardíaca) → máscara binaria (blanco = estructura, negro = fondo) → overlay sobre la imagen → mapa de probabilidad por píxel. Internamente : La máscara es una matriz del mismo tamaño que la imagen, donde cada celda dice a qué clase pertenece ese píxel. Para 2 clases es 0/1; para N clases es 0..N-1. Cada fila es un paciente: el corte de eje corto del ventrículo izquierdo, la máscara en media lun",
+  "details": [
+   "Visualización típica: Imagen original (MRI cardíaca) → **máscara binaria** (blanco = estructura, negro = fondo) → overlay sobre la imagen → mapa de probabilidad por píxel.",
+   "Internamente: La máscara es una **matriz** del mismo tamaño que la imagen, donde cada celda dice a qué clase pertenece ese píxel. Para 2 clases es 0/1; para N clases es 0..N-1."
+  ],
+  "speaker_notes": "Cada fila es un paciente: el corte de eje corto del ventrículo izquierdo, la máscara en media luna, la predicción en verde encima de la MRI y el mapa de calor de probabilidad. La figura vieja de esta lámina (cortes de cerebro con cajas rojas) mostraba detección, no segmentación."
+ },
+ {
+  "i": 28,
+  "section": "De FCN a U-Net",
+  "title": "De FCN a U-Net",
+  "lead": "",
+  "visible_text": "01 Qué es una convolución 02 Segmentación: qué es y para qué sirve 03 De FCN a U-Net 04 SAM: segmentar lo que le señalás 05 Generación condicionada por texto 06 Stable Diffusion por dentro 07 TilTedTinder v2 y notebook 03 De FCN a U-Net",
+  "details": [],
+  "speaker_notes": ""
+ },
+ {
+  "i": 29,
+  "section": "De FCN a U-Net",
+  "title": "La intuición: clasificar cada píxel",
+  "lead": "",
+  "visible_text": "De FCN a U-Net La intuición: clasificar cada píxel Si segmentar es asignar una etiqueta a cada píxel, la idea más directa es tratar cada píxel como un mini-problema de clasificación. Lo que ya sabemos: CNN clásica Clasifica la imagen entera. Comprime la imagen con convoluciones + pooling. Al final, una capa densa entrega una clase. La idea de FCN Fully Convolutional Network (Long et al., 2015). Saca la capa densa final. La reemplaza por capas convolucionales que producen una salida espacial del ",
+  "details": [
+   "Una sola frase: \"Convertí un clasificador de imágenes en un **clasificador de píxeles**\"."
+  ],
+  "speaker_notes": ""
+ },
+ {
+  "i": 30,
+  "section": "De FCN a U-Net",
+  "title": "FCN por dentro",
+  "lead": "",
+  "visible_text": "De FCN a U-Net FCN por dentro Diagrama propio en lugar de la figura isométrica del paper de Long, Shelhamer y Darrell (dos gatos en un sofá).",
+  "details": [],
+  "speaker_notes": "Diagrama propio en lugar de la figura isométrica del paper de Long, Shelhamer y Darrell (dos gatos en un sofá)."
+ },
+ {
+  "i": 31,
+  "section": "De FCN a U-Net",
+  "title": "FCN por dentro",
+  "lead": "",
+  "visible_text": "De FCN a U-Net FCN por dentro 1 Encoder convolucional La imagen se comprime capa a capa; cada capa detecta patrones más abstractos (bordes, texturas, estructuras, objetos). 2 Convoluciones 1×1 En lugar de la capa densa: se mantienen las dimensiones espaciales. Sale un mapa chico con probabilidades por clase. 3 Upsampling Convoluciones traspuestas estiran ese mapa hasta el tamaño original. Resultado : Una máscara con una etiqueta por píxel. Fue el primer modelo de segmentación end-to-end con deep",
+  "details": [
+   "Resultado: Una máscara con una etiqueta por píxel. Fue el primer modelo de segmentación end-to-end con deep learning.",
+   "Encoder convolucional: La imagen se comprime capa a capa; cada capa detecta patrones más abstractos (bordes, texturas, estructuras, objetos).",
+   "Convoluciones 1×1: En lugar de la capa densa: se mantienen las dimensiones espaciales. Sale un mapa chico con probabilidades por clase.",
+   "Upsampling: Convoluciones traspuestas estiran ese mapa hasta el tamaño original."
+  ],
+  "speaker_notes": "Diagrama propio en lugar de la figura isométrica del paper de Long, Shelhamer y Darrell (dos gatos en un sofá)."
+ },
+ {
+  "i": 32,
+  "section": "De FCN a U-Net",
+  "title": "El problema de FCN",
+  "lead": "Durante el encoder, la red comprime mucho: una imagen de **512×512** puede terminar como un mapa de **16×16**. Cuando hacemos upsampling para volver al tamaño original, la información espacial fina ya se perdió.",
+  "visible_text": "De FCN a U-Net El problema de FCN Durante el encoder, la red comprime mucho: una imagen de 512×512 puede terminar como un mapa de 16×16 . Cuando hacemos upsampling para volver al tamaño original, la información espacial fina ya se perdió. Síntoma Los contornos quedan borrosos o redondeados. El borde exacto de un tumor o el contorno de un núcleo celular desaparecen. En medicina Si estás midiendo el volumen de un tumor para decidir radioterapia, un borde 2 píxeles más adentro o más afuera cambia e",
+  "details": [
+   "Síntoma: Los contornos quedan **borrosos** o redondeados. El borde exacto de un tumor o el contorno de un núcleo celular desaparecen.",
+   "En medicina: Si estás midiendo el volumen de un tumor para decidir radioterapia, un borde 2 píxeles más adentro o más afuera cambia el cálculo y puede cambiar la decisión clínica.",
+   "La pregunta: ¿Cómo recuperamos los detalles finos que el encoder descartó?"
+  ],
+  "speaker_notes": ""
+ },
+ {
+  "i": 33,
+  "section": "De FCN a U-Net",
+  "title": "U-Net: la U y sus atajos",
+  "lead": "",
+  "visible_text": "De FCN a U-Net U-Net: la U y sus atajos Fusión de \"UNET: nacida en biomedicina\", \"La arquitectura en U\" y \"La clave: skip connections\". El bottleneck es la representación más comprimida y abstracta. Sin skip connections, U-Net sería un FCN más elegante: los detalles que el encoder vio antes de comprimir viajan por el atajo y el decoder los recupera, y por eso los contornos salen precisos. Es uno de los papers más citados de la última década en visión; diez años después sigue siendo la base por d",
+  "details": [],
+  "speaker_notes": "Fusión de \"UNET: nacida en biomedicina\", \"La arquitectura en U\" y \"La clave: skip connections\". El bottleneck es la representación más comprimida y abstracta. Sin skip connections, U-Net sería un FCN más elegante: los detalles que el encoder vio antes de comprimir viajan por el atajo y el decoder los recupera, y por eso los contornos salen precisos. Es uno de los papers más citados de la última década en visión; diez años después sigue siendo la base por defecto para segmentación médica."
+ },
+ {
+  "i": 34,
+  "section": "De FCN a U-Net",
+  "title": "U-Net: la U y sus atajos",
+  "lead": "Ronneberger, Fischer y Brox (Universidad de Friburgo, 2015) la diseñaron para segmentar **células en microscopía electrónica**, con muy pocas imágenes etiquetadas.",
+  "visible_text": "De FCN a U-Net U-Net: la U y sus atajos Ronneberger, Fischer y Brox (Universidad de Friburgo, 2015) la diseñaron para segmentar células en microscopía electrónica , con muy pocas imágenes etiquetadas. Encoder Convoluciones + max pooling. En cada nivel la resolución se reduce a la mitad y los canales se duplican. Las features codifican cada vez mejor \"qué hay\" y pierden \"dónde está\". Decoder Convoluciones traspuestas. La resolución se duplica en cada nivel y \"dónde\" se reconstruye. Skip connectio",
+  "details": [
+   "Encoder: Convoluciones + max pooling. En cada nivel la resolución se reduce a la mitad y los canales se duplican. Las features codifican cada vez mejor \"qué hay\" y pierden \"dónde está\".",
+   "Decoder: Convoluciones traspuestas. La resolución se duplica en cada nivel y \"dónde\" se reconstruye.",
+   "Skip connections: La salida de cada nivel del encoder se concatena con la entrada del decoder en el mismo nivel. El decoder recibe qué es (desde abajo) y dónde está exactamente (desde el atajo)."
+  ],
+  "speaker_notes": "Fusión de \"UNET: nacida en biomedicina\", \"La arquitectura en U\" y \"La clave: skip connections\". El bottleneck es la representación más comprimida y abstracta. Sin skip connections, U-Net sería un FCN más elegante: los detalles que el encoder vio antes de comprimir viajan por el atajo y el decoder los recupera, y por eso los contornos salen precisos. Es uno de los papers más citados de la última década en visión; diez años después sigue siendo la base por defecto para segmentación médica."
+ },
+ {
+  "i": 35,
+  "section": "De FCN a U-Net",
+  "title": "Cómo se entrena un modelo de segmentación",
+  "lead": "",
+  "visible_text": "De FCN a U-Net Cómo se entrena un modelo de segmentación Una U-Net de juguete real en numpy (14.265 pesos, gradiente verificado contra diferencias finitas) sobre el mismo gato a 64×64 con su máscara anotada a mano. Forward: en la época 5 la probabilidad p todavía es una mancha tenue. Pérdida: cross-entropy en cada píxel, ℓ = −[y·log p + (1−y)·log(1−p)]; en un píxel de borde con y = 1 y p = 0,22 da 1,52, en uno de fondo con y = 0 y p = 0,13 da 0,14, y L es el promedio de los 4.096 píxeles (0,264)",
+  "details": [],
+  "speaker_notes": "Una U-Net de juguete real en numpy (14.265 pesos, gradiente verificado contra diferencias finitas) sobre el mismo gato a 64×64 con su máscara anotada a mano. Forward: en la época 5 la probabilidad p todavía es una mancha tenue. Pérdida: cross-entropy en cada píxel, ℓ = −[y·log p + (1−y)·log(1−p)]; en un píxel de borde con y = 1 y p = 0,22 da 1,52, en uno de fondo con y = 0 y p = 0,13 da 0,14, y L es el promedio de los 4.096 píxeles (0,264). El mapa de pérdida por píxel muestra dónde se equivoca: en los bordes y en las partes finas. Backward: el gradiente vuelve por el decoder, los skips y el encoder. Actualización con η = 0,05. En las épocas siguientes la máscara pasa de mancha a silueta, L baja de 0,67 a 0,04 y el IoU sube de 0,16 a 0,93; la pérdida que queda se concentra en los bordes. FCN se entrena igual: misma pérdida por píxel, otra arquitectura. La U-Net original se entrenó con apenas 30 imágenes anotadas."
+ },
+ {
+  "i": 36,
+  "section": "De FCN a U-Net",
+  "title": "Por qué funciona tan bien en medicina",
+  "lead": "",
+  "visible_text": "De FCN a U-Net Por qué funciona tan bien en medicina Funciona con pocos datos Las skip connections actúan como un regularizador estructural. U-Net puede entrenarse con cientos de imágenes, no miles, y aún así generalizar bien. Crítico cuando etiquetar requiere un radiólogo. Contornos precisos Los detalles finos sobreviven el viaje por la U. En medicina, el borde es el dato. Es modular y adaptable La misma arquitectura funciona para MRI de cerebro, células de patología, retina, ecografía cardíaca",
+  "details": [
+   "Funciona con pocos datos: Las skip connections actúan como un regularizador estructural. U-Net puede entrenarse con cientos de imágenes, no miles, y aún así generalizar bien. Crítico cuando etiquetar requiere un radiólogo.",
+   "Contornos precisos: Los detalles finos sobreviven el viaje por la U. En medicina, el borde es el dato.",
+   "Es modular y adaptable: La misma arquitectura funciona para MRI de cerebro, células de patología, retina, ecografía cardíaca... cambia el dataset, no la red."
+  ],
+  "speaker_notes": ""
+ },
+ {
+  "i": 37,
+  "section": "SAM: segmentar lo que le señalás",
+  "title": "SAM: segmentar lo que le señalás",
+  "lead": "",
+  "visible_text": "01 Qué es una convolución 02 Segmentación: qué es y para qué sirve 03 De FCN a U-Net 04 SAM: segmentar lo que le señalás 05 Generación condicionada por texto 06 Stable Diffusion por dentro 07 TilTedTinder v2 y notebook 04 SAM: segmentar lo que le señalás",
+  "details": [],
+  "speaker_notes": ""
+ },
+ {
+  "i": 38,
+  "section": "SAM: segmentar lo que le señalás",
+  "title": "SAM: segmentación promptable",
+  "lead": "",
+  "visible_text": "SAM: segmentar lo que le señalás SAM: segmentación promptable Fusión de \"SAM: ¿qué hace y por qué fue revolucionario?\" y \"mejoras conceptuales internas\". SAM trajo a segmentación el paradigma \"foundation model + prompt en inferencia\" que ya había explotado en NLP con los LLMs. Frase para llevarse: SAM no está entrenado para una tarea sino para separar objetos en general, y vos le indicás con el prompt cuál querés. El reparto de cómputo del deck original (image encoder ~95%) no tiene fuente publi",
+  "details": [],
+  "speaker_notes": "Fusión de \"SAM: ¿qué hace y por qué fue revolucionario?\" y \"mejoras conceptuales internas\". SAM trajo a segmentación el paradigma \"foundation model + prompt en inferencia\" que ya había explotado en NLP con los LLMs. Frase para llevarse: SAM no está entrenado para una tarea sino para separar objetos en general, y vos le indicás con el prompt cuál querés. El reparto de cómputo del deck original (image encoder ~95%) no tiene fuente publicada: decir \"la gran mayoría\". Sin SA-1B, SAM no funcionaría: el secreto está tanto en el modelo como en los datos."
+ },
+ {
+  "i": 39,
+  "section": "SAM: segmentar lo que le señalás",
+  "title": "SAM: segmentación promptable",
+  "lead": "",
+  "visible_text": "SAM: segmentar lo que le señalás SAM: segmentación promptable SAM (Segment Anything Model, Meta, 2023) es el opuesto de la U-Net: un foundation model masivo que segmenta cualquier cosa en cualquier imagen, sin reentrenamiento. Recibe una imagen + una pista (un click, una caja, una máscara aproximada o, desde SAM 3, texto) y devuelve la máscara del objeto que querés. El truco: La imagen se codifica una sola vez . Después podés probar decenas de prompts sobre esa misma imagen; solo se reejecuta el",
+  "details": [
+   "Encoder: Su encoder de imagen es un ViT, un transformer sobre parches de imagen."
+  ],
+  "speaker_notes": "Fusión de \"SAM: ¿qué hace y por qué fue revolucionario?\" y \"mejoras conceptuales internas\". SAM trajo a segmentación el paradigma \"foundation model + prompt en inferencia\" que ya había explotado en NLP con los LLMs. Frase para llevarse: SAM no está entrenado para una tarea sino para separar objetos en general, y vos le indicás con el prompt cuál querés. El reparto de cómputo del deck original (image encoder ~95%) no tiene fuente publicada: decir \"la gran mayoría\". Sin SA-1B, SAM no funcionaría: el secreto está tanto en el modelo como en los datos."
+ },
+ {
+  "i": 40,
+  "section": "SAM: segmentar lo que le señalás",
+  "title": "Cómo se entrena SAM",
+  "lead": "",
+  "visible_text": "SAM: segmentar lo que le señalás Cómo se entrena SAM Un SAM de juguete real (los tres módulos se entrenan juntos, gradientes verificados contra diferencias finitas). El prompt no lo escribe nadie: se sortea un punto adentro de la máscara verdadera. Forward por image encoder, prompt encoder y mask decoder; la pérdida combina focal (castiga más los píxeles difíciles) y dice (mide el solapamiento entre máscara predicha y verdadera): L = 0,37. El gradiente llega a los tres módulos y se actualizan. D",
+  "details": [],
+  "speaker_notes": "Un SAM de juguete real (los tres módulos se entrenan juntos, gradientes verificados contra diferencias finitas). El prompt no lo escribe nadie: se sortea un punto adentro de la máscara verdadera. Forward por image encoder, prompt encoder y mask decoder; la pérdida combina focal (castiga más los píxeles difíciles) y dice (mide el solapamiento entre máscara predicha y verdadera): L = 0,37. El gradiente llega a los tres módulos y se actualizan. Después se simula el uso interactivo: se sortea un clic corrector en la zona de error (un falso positivo da un clic negativo) y se repite; la pérdida baja 0,37 → 0,19 → 0,09 en las tres rondas. La parte de abajo es un esquema, no un cálculo: el data engine. SAM propone máscaras, anotadores las corrigen, con más datos se reentrena SAM, que propone mejores máscaras. Así se armó SA-1B: 11 millones de imágenes y más de 1.000 millones de máscaras."
+ },
+ {
+  "i": 41,
+  "section": "SAM: segmentar lo que le señalás",
+  "title": "SAM 2: memoria para video",
+  "lead": "",
+  "visible_text": "SAM: segmentar lo que le señalás SAM 2: memoria para video La figura vieja de la lámina de SAM 1 era en realidad esta arquitectura de SAM 2; por eso ahora va acá, redibujada. El post de Meta sobre SAM 3 confirma que el memory bank y el memory encoder de SAM 2 son la base del tracker de SAM 3.",
+  "details": [],
+  "speaker_notes": "La figura vieja de la lámina de SAM 1 era en realidad esta arquitectura de SAM 2; por eso ahora va acá, redibujada. El post de Meta sobre SAM 3 confirma que el memory bank y el memory encoder de SAM 2 son la base del tracker de SAM 3."
+ },
+ {
+  "i": 42,
+  "section": "SAM: segmentar lo que le señalás",
+  "title": "SAM 2: memoria para video",
+  "lead": "",
+  "visible_text": "SAM: segmentar lo que le señalás SAM 2: memoria para video SAM 2 (julio 2024) extiende SAM al video con un módulo de memoria que mantiene la segmentación coherente entre frames. Guardar Después de cada frame. Cada máscara que sale pasa por un memory encoder. El resultado se guarda en un memory bank. Recordar En el frame siguiente. La memory attention combina las features del image encoder con lo que quedó guardado. Así la máscara sigue al mismo objeto aunque se mueva. La figura vieja de la lámin",
+  "details": [],
+  "speaker_notes": "La figura vieja de la lámina de SAM 1 era en realidad esta arquitectura de SAM 2; por eso ahora va acá, redibujada. El post de Meta sobre SAM 3 confirma que el memory bank y el memory encoder de SAM 2 son la base del tracker de SAM 3."
+ },
+ {
+  "i": 43,
+  "section": "SAM: segmentar lo que le señalás",
+  "title": "Cómo se entrena SAM 2",
+  "lead": "",
+  "visible_text": "SAM: segmentar lo que le señalás Cómo se entrena SAM 2 Primer paso de entrenamiento de un SAM 2 de juguete real (gradientes verificados). El dato es un clip de 8 frames, la pelota que pasa detrás del poste, con la máscara verdadera en todos los frames y el prompt solo en los frames 1 y 7. El forward va frame por frame y llena el memory bank. Cada frame tiene su pérdida (focal + dice) y se suman: L = 8,39. Lo distinto frente a SAM: el gradiente de un frame vuelve también a los frames anteriores a",
+  "details": [],
+  "speaker_notes": "Primer paso de entrenamiento de un SAM 2 de juguete real (gradientes verificados). El dato es un clip de 8 frames, la pelota que pasa detrás del poste, con la máscara verdadera en todos los frames y el prompt solo en los frames 1 y 7. El forward va frame por frame y llena el memory bank. Cada frame tiene su pérdida (focal + dice) y se suman: L = 8,39. Lo distinto frente a SAM: el gradiente de un frame vuelve también a los frames anteriores a través de la memoria, así que memory attention y memory encoder se entrenan junto con el resto; el memory bank no tiene pesos, solo guarda. Este juguete usa el optimizador Adam. En 1.500 pasos la L del clip baja de 8,39 a 2,25; en los frames sin prompt la otra pelota todavía se cuela en la máscara. SAM 2 real se entrenó con SA-V, videos con máscaras en cada frame."
+ },
+ {
+  "i": 44,
+  "section": "SAM: segmentar lo que le señalás",
+  "title": "SAM 3 y 3.1: texto y muchos objetos",
+  "lead": "",
+  "visible_text": "SAM: segmentar lo que le señalás SAM 3 y 3.1: texto y muchos objetos SAM 1 · Abril 2023 Foundation model para imágenes. Prompts visuales: puntos, cajas, máscaras. SAM 2 · Julio 2024 Extiende SAM al video — módulo de memoria que mantiene la segmentación coherente entre frames. SAM 3 · Noviembre 2025 Suma prompts de texto y vocabulario abierto. Permite pedir \"todos los hepatocitos\" en lenguaje natural. SAM 3.1 · Marzo 2026 Object Multiplex: tracking conjunto multi-objeto con memoria compartida, si",
+  "details": [
+   "En la práctica clínica U-Net y SAM conviven. U-Net, cuando la salida tiene que ser **medible y reproducible**. SAM, en **anotación asistida**: un radiólogo clickea, SAM propone la máscara."
+  ],
+  "speaker_notes": "Patrón: cada versión generaliza más, de imagen a video, de prompts visuales a texto, de un objeto a muchos. Es la misma trayectoria que vivieron los LLMs. La captura de Meta muestra SAM 1 a SAM 3; SAM 3.1 es posterior a esa página. El \"10× o más\" de aceleración en anotación que traía el deck no tiene fuente: no lo digas como dato."
+ },
+ {
+  "i": 45,
+  "section": "SAM: segmentar lo que le señalás",
+  "title": "U-Net es modular: adelanto",
+  "lead": "U-Net no es solo para segmentación. Encoder que comprime + decoder que reconstruye + skip connections sirve para cualquier tarea donde la entrada y la salida tengan el **mismo tamaño espacial** y haya que preservar detalles finos.",
+  "visible_text": "SAM: segmentar lo que le señalás U-Net es modular: adelanto U-Net no es solo para segmentación. Encoder que comprime + decoder que reconstruye + skip connections sirve para cualquier tarea donde la entrada y la salida tengan el mismo tamaño espacial y haya que preservar detalles finos. Restauración de imágenes Denoising, deblurring, super-resolución. Image-to-image translation MRI → CT, día → noche. El corazón de Stable Diffusion Dentro de un rato la vamos a usar para quitar ruido paso a paso de",
+  "details": [
+   "Restauración de imágenes: Denoising, deblurring, super-resolución.",
+   "Image-to-image translation: MRI → CT, día → noche.",
+   "El corazón de **Stable Diffusion**: Dentro de un rato la vamos a usar para quitar ruido paso a paso de una imagen."
+  ],
+  "speaker_notes": ""
+ },
+ {
+  "i": 46,
+  "section": "Generación condicionada por texto",
+  "title": "Generación condicionada por texto",
+  "lead": "",
+  "visible_text": "01 Qué es una convolución 02 Segmentación: qué es y para qué sirve 03 De FCN a U-Net 04 SAM: segmentar lo que le señalás 05 Generación condicionada por texto 06 Stable Diffusion por dentro 07 TilTedTinder v2 y notebook 05 Generación condicionada por texto",
+  "details": [],
+  "speaker_notes": ""
+ },
+ {
+  "i": 47,
+  "section": "Generación condicionada por texto",
+  "title": "TilTedTinder: el nuevo desafío",
+  "lead": "En la clase pasada, una **Vanilla GAN** le llenó la base de datos a TilTedTinder, la app de citas de Slanted Land, con rostros inclinados nuevos a partir de solo 4 fotos reales. Un año después la app tiene miles de usuarios, y cada uno describe lo que le atrae:",
+  "visible_text": "Generación condicionada por texto TilTedTinder: el nuevo desafío En la clase pasada, una Vanilla GAN le llenó la base de datos a TilTedTinder, la app de citas de Slanted Land, con rostros inclinados nuevos a partir de solo 4 fotos reales. Un año después la app tiene miles de usuarios, y cada uno describe lo que le atrae: \"Me atraen las personas inclinadas, altas, con anteojos y pelo rizado.\" \"Prefiero caras inclinadas, jóvenes, con sonrisa y barba corta.\" \"Me gustan las inclinadas, mayores, con ",
+  "details": [
+   "\"Me atraen las personas inclinadas, altas, con anteojos y pelo rizado.\"",
+   "\"Prefiero caras inclinadas, jóvenes, con sonrisa y barba corta.\"",
+   "\"Me gustan las inclinadas, mayores, con expresión seria y rasgos angulosos.\"",
+   "Pasamos de \"generá una persona inclinada cualquiera\" a \"generá una persona inclinada con **estos atributos descritos en texto libre**\"."
+  ],
+  "speaker_notes": "Fusión de \"Recordando Slanted Land\" y \"El nuevo desafío\". Slanted Land: un mundo donde todo está inclinado y un rostro recto resulta incomprensible. La idea de negocio: que el usuario escriba lo que le atrae en lenguaje natural y la app le muestre candidatos generados a medida."
+ },
+ {
+  "i": 48,
+  "section": "Generación condicionada por texto",
+  "title": "Por qué la GAN no alcanza",
+  "lead": "",
+  "visible_text": "Generación condicionada por texto Por qué la GAN no alcanza Vanilla GAN Aprende una única cosa, \"producir algo que parezca un rostro inclinado\". No tiene ningún canal para recibir descripciones. Conditional GAN Condiciona por etiquetas predefinidas (\"alto\", \"con anteojos\"). Las preferencias reales son frases con matices que no encajan en categorías cerradas. StyleGAN Da control de estilo, pero no semántico. No podés pedirle \"expresión melancólica al atardecer\". La nueva tarea, text-to-image : Es",
+  "details": [
+   "Vanilla GAN: Aprende una única cosa, \"producir algo que parezca un rostro inclinado\". No tiene ningún canal para recibir descripciones.",
+   "Conditional GAN: Condiciona por etiquetas predefinidas (\"alto\", \"con anteojos\"). Las preferencias reales son frases con matices que no encajan en categorías cerradas.",
+   "StyleGAN: Da control de estilo, pero no semántico. No podés pedirle \"expresión melancólica al atardecer\".",
+   "La nueva tarea, text-to-image: Escribís un prompt en lenguaje natural y el modelo genera una imagen que coincide. Permite combinar conceptos que el modelo nunca vio juntos (\"un astronauta montando un caballo\")."
+  ],
+  "speaker_notes": "Fusión de \"¿Por qué la GAN del año pasado no alcanza?\" y \"Una nueva tarea: del ruido a las palabras\". Text-to-image da control expresivo (el lenguaje cubre muchos más matices que una etiqueta) y no hace falta programar para usarlo. La arquitectura que lo resuelve es Stable Diffusion: el resto de la clase es entenderla para que el equipo de TilTedTinder construya su sistema."
+ },
+ {
+  "i": 49,
+  "section": "Generación condicionada por texto",
+  "title": "Text-to-image en cinco años",
+  "lead": "",
+  "visible_text": "Generación condicionada por texto Text-to-image en cinco años 2021 DALL·E 1 (OpenAI): primera demo viral. 2022 DALL·E 2, Imagen (Google), Midjourney: salto enorme en realismo. Agosto 2022 Stable Diffusion 1.4 : primer modelo open source serio, con pesos publicados, que corre en una GPU de consumo. 2023 DALL·E 3, SDXL, Midjourney v5/v6: siguen mejor prompts complejos. 2024 FLUX, Stable Diffusion 3, Sora: texto a imagen se vuelve commodity; texto a video empieza a funcionar. Hoy vemos las tripas d",
+  "details": [
+   "Hoy vemos las tripas de Stable Diffusion porque abrió el ecosistema y porque su arquitectura ya la conocemos en parte."
+  ],
+  "speaker_notes": "2025-2026: modelos más grandes, mejor edición controlada, integración con segmentación (SAM) y 3D (SAM 3D). La infografía del deck original se sacó porque contradecía estas fechas (DALL-E en abril 2022, Midjourney en julio 2023)."
+ },
+ {
+  "i": 50,
+  "section": "Generación condicionada por texto",
+  "title": "CLIP: el puente texto ↔ imagen",
+  "lead": "",
+  "visible_text": "Generación condicionada por texto CLIP: el puente texto ↔ imagen Absorbe lo esencial de la lámina vieja sobre cómo una red neuronal representa texto (tokenización, embeddings, encoder contextual: \"banco de plaza\" vs \"banco financiero\"). Resultado del entrenamiento: la frase \"una foto de un perro corriendo en la playa\" aterriza en el mismo vecindario que una foto real de eso. CLIP proyecta el texto a un espacio que la U-Net usa como entrada.",
+  "details": [],
+  "speaker_notes": "Absorbe lo esencial de la lámina vieja sobre cómo una red neuronal representa texto (tokenización, embeddings, encoder contextual: \"banco de plaza\" vs \"banco financiero\"). Resultado del entrenamiento: la frase \"una foto de un perro corriendo en la playa\" aterriza en el mismo vecindario que una foto real de eso. CLIP proyecta el texto a un espacio que la U-Net usa como entrada."
+ },
+ {
+  "i": 51,
+  "section": "Generación condicionada por texto",
+  "title": "CLIP: el puente texto ↔ imagen",
+  "lead": "",
+  "visible_text": "Generación condicionada por texto CLIP: el puente texto ↔ imagen Una red no procesa palabras: el texto se tokeniza, cada token pasa a un vector y un encoder Transformer produce un embedding de la oración completa. Dos encoders, un espacio CLIP (OpenAI, 2021). Entrena en paralelo un encoder de imagen y otro de texto. Sus salidas viven en el mismo espacio vectorial. Entrenamiento contrastivo 400 millones de pares (imagen, descripción) de internet. Los pares reales quedan cerca. Los mal apareados q",
+  "details": [
+   "Ese embedding de texto es la entrada con la que la U-Net de Stable Diffusion se condiciona."
+  ],
+  "speaker_notes": "Absorbe lo esencial de la lámina vieja sobre cómo una red neuronal representa texto (tokenización, embeddings, encoder contextual: \"banco de plaza\" vs \"banco financiero\"). Resultado del entrenamiento: la frase \"una foto de un perro corriendo en la playa\" aterriza en el mismo vecindario que una foto real de eso. CLIP proyecta el texto a un espacio que la U-Net usa como entrada."
+ },
+ {
+  "i": 52,
+  "section": "Generación condicionada por texto",
+  "title": "Cómo se entrena CLIP",
+  "lead": "",
+  "visible_text": "Generación condicionada por texto Cómo se entrena CLIP Un paso de entrenamiento visto de cerca, con un modelo de juguete en numpy: un encoder de imagen lineal sobre imágenes de 8×8 y un encoder de texto que promedia embeddings de palabras. Forward: el batch de 4 pares pasa por los dos encoders y se arma la matriz S de cosenos. Pérdida: la de CLIP, cross-entropy simétrica (softmax por filas y por columnas, el objetivo es la diagonal), con τ = 0,07 fijo; en CLIP real la temperatura también se apre",
+  "details": [],
+  "speaker_notes": "Un paso de entrenamiento visto de cerca, con un modelo de juguete en numpy: un encoder de imagen lineal sobre imágenes de 8×8 y un encoder de texto que promedia embeddings de palabras. Forward: el batch de 4 pares pasa por los dos encoders y se arma la matriz S de cosenos. Pérdida: la de CLIP, cross-entropy simétrica (softmax por filas y por columnas, el objetivo es la diagonal), con τ = 0,07 fijo; en CLIP real la temperatura también se aprende. Backward: el gradiente de L llega a los pesos de los DOS encoders, que se entrenan a la vez; CLIP no tiene decoder. Actualización: W ← W − η·∂L/∂W. En 11 pasos L baja de 4,35 a 0,05 mientras la diagonal de cosenos sube solo hasta ~0,5: con τ chica alcanza con separar un poco los cosenos para que el softmax quede casi todo en la diagonal. El mapa de ∂L/∂W se apaga a medida que baja L."
+ },
+ {
+  "i": 53,
+  "section": "Generación condicionada por texto",
+  "title": "La idea de condición",
+  "lead": "",
+  "visible_text": "Generación condicionada por texto La idea de condición Generación incondicional Generación condicionada Ruido aleatorio → red → imagen. La red genera lo que aprendió, sin guía. Ruido aleatorio + condición → red → imagen que respeta la condición. La condición puede ser una etiqueta de clase (cGAN), una imagen de referencia (Pix2Pix) o un embedding de texto (Stable Diffusion). La condición dirige cada paso de la generación. Si dice \"perro en la playa\", la red empuja el ruido en cada iteración haci",
+  "details": [
+   "La condición puede ser una etiqueta de clase (cGAN), una imagen de referencia (Pix2Pix) o un **embedding de texto** (Stable Diffusion).",
+   "La condición dirige **cada paso** de la generación. Si dice \"perro en la playa\", la red empuja el ruido en cada iteración hacia algo que se parezca a eso.",
+   "En Stable Diffusion, el embedding de CLIP se inyecta en la U-Net mediante **cross-attention**."
+  ],
+  "speaker_notes": ""
+ },
+ {
+  "i": 54,
+  "section": "Stable Diffusion por dentro",
+  "title": "Stable Diffusion por dentro",
+  "lead": "",
+  "visible_text": "01 Qué es una convolución 02 Segmentación: qué es y para qué sirve 03 De FCN a U-Net 04 SAM: segmentar lo que le señalás 05 Generación condicionada por texto 06 Stable Diffusion por dentro 07 TilTedTinder v2 y notebook 06 Stable Diffusion por dentro",
+  "details": [],
+  "speaker_notes": ""
+ },
+ {
+  "i": 55,
+  "section": "Stable Diffusion por dentro",
+  "title": "La idea de difusión: agregar y quitar ruido",
+  "lead": "",
+  "visible_text": "Stable Diffusion por dentro La idea de difusión: agregar y quitar ruido Diferencia con las GANs: no hay dos redes compitiendo. Una sola red aprende a desruidizar, es más estable de entrenar, no tiene mode collapse y da más diversidad. Imagen para decir: Stable Diffusion talla la imagen, arranca de un bloque de ruido y saca lo que sobra hasta dejar la figura.",
+  "details": [],
+  "speaker_notes": "Diferencia con las GANs: no hay dos redes compitiendo. Una sola red aprende a desruidizar, es más estable de entrenar, no tiene mode collapse y da más diversidad. Imagen para decir: Stable Diffusion talla la imagen, arranca de un bloque de ruido y saca lo que sobra hasta dejar la figura."
+ },
+ {
+  "i": 56,
+  "section": "Stable Diffusion por dentro",
+  "title": "La idea de difusión: agregar y quitar ruido",
+  "lead": "Difusión viene de la física: una gota de tinta en un vaso de agua se dispersa hasta volverse uniforme.",
+  "visible_text": "Stable Diffusion por dentro La idea de difusión: agregar y quitar ruido Difusión viene de la física: una gota de tinta en un vaso de agua se dispersa hasta volverse uniforme. Forward (entrenamiento) A una imagen real le agregamos un poco de ruido gaussiano en cada paso, durante miles de pasos, hasta que queda ruido puro. Reverse (inferencia) La red hace el camino inverso. Arranca de ruido puro y quita ruido paso a paso, guiada por la condición c. La red aprende una sola cosa: dado un latente rui",
+  "details": [
+   "Forward (entrenamiento): A una imagen real le agregamos un poco de ruido gaussiano en cada paso, durante miles de pasos, hasta que queda ruido puro.",
+   "Reverse (inferencia): La red hace el camino inverso. Arranca de ruido puro y quita ruido paso a paso, guiada por la condición c.",
+   "La red aprende una sola cosa: dado un latente ruidoso y un timestep, **predecir qué ruido fue agregado**. Con esa predicción, el ruido se puede restar."
+  ],
+  "speaker_notes": "Diferencia con las GANs: no hay dos redes compitiendo. Una sola red aprende a desruidizar, es más estable de entrenar, no tiene mode collapse y da más diversidad. Imagen para decir: Stable Diffusion talla la imagen, arranca de un bloque de ruido y saca lo que sobra hasta dejar la figura."
+ },
+ {
+  "i": 57,
+  "section": "Stable Diffusion por dentro",
+  "title": "Del ruido a la imagen",
+  "lead": "El proceso inverso sobre una imagen real: de ruido puro (x_T) a la muestra limpia (x_0).",
+  "visible_text": "Stable Diffusion por dentro Del ruido a la imagen El proceso inverso sobre una imagen real: de ruido puro (x_T) a la muestra limpia (x_0). La figura lleva el logo de Calibraint, su autor; el deck original no la atribuía.",
+  "details": [],
+  "speaker_notes": "La figura lleva el logo de Calibraint, su autor; el deck original no la atribuía."
+ },
+ {
+  "i": 58,
+  "section": "Stable Diffusion por dentro",
+  "title": "Latent diffusion: difundir en un espacio comprimido",
+  "lead": "Rombach et al. (CompVis, 2021) propusieron difundir en un **espacio latente** comprimido.",
+  "visible_text": "Stable Diffusion por dentro Latent diffusion: difundir en un espacio comprimido Rombach et al. (CompVis, 2021) propusieron difundir en un espacio latente comprimido. 786.432 valores en una imagen de 512×512 RGB: la difusión directa sobre píxeles (DALL·E 2, Imagen) es cara, y cada uno de los 50 a 1000 pasos de denoising los procesa todos 16.384 valores en el latente: una imagen de 512×512×3 se comprime a 64×64×4 48× menos valores por paso Funciona porque las imágenes naturales son redundantes: lo",
+  "details": [
+   "Funciona porque las imágenes naturales son redundantes: los píxeles vecinos se parecen. Una compresión 8× por lado preserva la estructura.",
+   "Resultado: Stable Diffusion corre en una GPU de consumo (8-16 GB) en pocos segundos."
+  ],
+  "speaker_notes": "Fusión de \"Por qué la difusión pura es lenta y costosa\" y \"Latent Diffusion: la idea genial\". Cuenta: 786.432 / 16.384 = 48. Sobre píxeles hacían falta GPUs muy grandes y minutos por imagen: inviable para consumo, deployment masivo o un equipo chico que quiere iterar. El paper es \"High-Resolution Image Synthesis with Latent Diffusion Models\": preprint de diciembre de 2021, publicado en CVPR 2022. Por eso se llama Stable Diffusion."
+ },
+ {
+  "i": 59,
+  "section": "Stable Diffusion por dentro",
+  "title": "Las tres piezas de Stable Diffusion",
+  "lead": "",
+  "visible_text": "Stable Diffusion por dentro Las tres piezas de Stable Diffusion El prompt entra a CLIP, que produce un embedding. La U-Net usa ese embedding para guiar el denoising en el espacio latente. Cuando termina, el decoder del VAE transforma el latente final en una imagen visible. Texto y tabla salen de la captura del deck original.",
+  "details": [],
+  "speaker_notes": "El prompt entra a CLIP, que produce un embedding. La U-Net usa ese embedding para guiar el denoising en el espacio latente. Cuando termina, el decoder del VAE transforma el latente final en una imagen visible. Texto y tabla salen de la captura del deck original."
+ },
+ {
+  "i": 60,
+  "section": "Stable Diffusion por dentro",
+  "title": "Las tres piezas de Stable Diffusion",
+  "lead": "",
+  "visible_text": "Stable Diffusion por dentro Las tres piezas de Stable Diffusion Componente Qué hace Tamaño aprox. VAE (Variational Autoencoder) Comprime imagen ↔ latente ~80M params UNET Denoiser condicional en espacio latente ~860M params CLIP Text Encoder Prompt de texto → embedding ~123M params Dos de estas piezas ya las vimos: la U-Net en segmentación y CLIP en text-to-image. Falta el VAE. El prompt entra a CLIP, que produce un embedding. La U-Net usa ese embedding para guiar el denoising en el espacio late",
+  "details": [
+   "Dos de estas piezas ya las vimos: la U-Net en segmentación y CLIP en text-to-image. Falta el VAE."
+  ],
+  "speaker_notes": "El prompt entra a CLIP, que produce un embedding. La U-Net usa ese embedding para guiar el denoising en el espacio latente. Cuando termina, el decoder del VAE transforma el latente final en una imagen visible. Texto y tabla salen de la captura del deck original."
+ },
+ {
+  "i": 61,
+  "section": "Stable Diffusion por dentro",
+  "title": "Componente 1: el VAE",
+  "lead": "",
+  "visible_text": "Stable Diffusion por dentro Componente 1: el VAE El VAE es un compresor inteligente: convierte el problema de \"generar 800K píxeles\" en el de \"generar 16K números latentes\". Lo variacional: el latente es una distribución, no un punto fijo (la campana gaussiana de la figura vieja).",
+  "details": [],
+  "speaker_notes": "El VAE es un compresor inteligente: convierte el problema de \"generar 800K píxeles\" en el de \"generar 16K números latentes\". Lo variacional: el latente es una distribución, no un punto fijo (la campana gaussiana de la figura vieja)."
+ },
+ {
+  "i": 62,
+  "section": "Stable Diffusion por dentro",
+  "title": "Componente 1: el VAE",
+  "lead": "",
+  "visible_text": "Stable Diffusion por dentro Componente 1: el VAE Encoder Toma la imagen 512×512×3 y la mapea a un latente 64×64×4. Compresión ~48×. Decoder Toma un latente 64×64×4 y reconstruye una imagen 512×512×3. En el entrenamiento de SD se usa el encoder, para llevar las imágenes del dataset al latente. En inferencia solo se usa el decoder . Se entrena antes y por separado de la U-Net, con un objetivo simple: decoder(encoder(imagen)) ≈ imagen . Después sus pesos quedan congelados. El VAE es un compresor in",
+  "details": [
+   "Encoder: Toma la imagen 512×512×3 y la mapea a un latente 64×64×4. Compresión ~48×.",
+   "Decoder: Toma un latente 64×64×4 y reconstruye una imagen 512×512×3.",
+   "En el entrenamiento de SD se usa el encoder, para llevar las imágenes del dataset al latente. En inferencia **solo se usa el decoder**.",
+   "Se entrena antes y por separado de la U-Net, con un objetivo simple: `decoder(encoder(imagen)) ≈ imagen`. Después sus pesos quedan congelados."
+  ],
+  "speaker_notes": "El VAE es un compresor inteligente: convierte el problema de \"generar 800K píxeles\" en el de \"generar 16K números latentes\". Lo variacional: el latente es una distribución, no un punto fijo (la campana gaussiana de la figura vieja)."
+ },
+ {
+  "i": 63,
+  "section": "Stable Diffusion por dentro",
+  "title": "Cómo se entrena el VAE",
+  "lead": "",
+  "visible_text": "Stable Diffusion por dentro Cómo se entrena el VAE Un VAE real y chico en numpy (256 → 64 → μ, σ de 2 dimensiones; z → 64 → 256) sobre 96 formas de 16×16, entrenado con SGD. El encoder no devuelve un punto sino una distribución: μ y σ. Se sortea ε ~ N(0, I) y se arma z = μ + σ·ε; el decoder reconstruye x̂. La pérdida tiene dos términos: la reconstrucción ‖x − x̂‖² y β·KL, que empuja a cada N(μ, σ²) hacia N(0, I); en el primer paso, 63,28 + 1 × 0,08 = 63,35. El punto clave del backward: el sorteo",
+  "details": [],
+  "speaker_notes": "Un VAE real y chico en numpy (256 → 64 → μ, σ de 2 dimensiones; z → 64 → 256) sobre 96 formas de 16×16, entrenado con SGD. El encoder no devuelve un punto sino una distribución: μ y σ. Se sortea ε ~ N(0, I) y se arma z = μ + σ·ε; el decoder reconstruye x̂. La pérdida tiene dos términos: la reconstrucción ‖x − x̂‖² y β·KL, que empuja a cada N(μ, σ²) hacia N(0, I); en el primer paso, 63,28 + 1 × 0,08 = 63,35. El punto clave del backward: el sorteo no es derivable, pero z = μ + σ·ε sí (∂z/∂μ = 1, ∂z/∂σ = ε), así que el gradiente cruza z y llega al encoder. Eso es la reparametrización. En 1.000 épocas la pérdida baja de 62,6 a 4,9, las reconstrucciones se vuelven nítidas y en el plano latente las cuatro formas quedan separadas. En Stable Diffusion el VAE se entrena antes y por separado de la U-Net, y después queda congelado."
+ },
+ {
+  "i": 64,
+  "section": "Stable Diffusion por dentro",
+  "title": "Componente 2: la U-Net, de vuelta",
+  "lead": "",
+  "visible_text": "Stable Diffusion por dentro Componente 2: la U-Net, de vuelta La conexión que cierra el círculo: la arquitectura que en 2015 segmentaba células al microscopio hoy es el corazón de la generación de imágenes más usada. U-Net es un patrón arquitectónico reutilizable. El ciclo de cada paso se ve en el pipeline, dos láminas más adelante.",
+  "details": [],
+  "speaker_notes": "La conexión que cierra el círculo: la arquitectura que en 2015 segmentaba células al microscopio hoy es el corazón de la generación de imágenes más usada. U-Net es un patrón arquitectónico reutilizable. El ciclo de cada paso se ve en el pipeline, dos láminas más adelante."
+ },
+ {
+  "i": 65,
+  "section": "Stable Diffusion por dentro",
+  "title": "Componente 2: la U-Net, de vuelta",
+  "lead": "La misma estructura que vimos en segmentación: encoder + decoder en U + skip connections.",
+  "visible_text": "Stable Diffusion por dentro Componente 2: la U-Net, de vuelta La misma estructura que vimos en segmentación: encoder + decoder en U + skip connections. Cambia la tarea U-Net de segmentación: entra una imagen, sale una máscara. U-Net de SD: entran latente ruidoso, timestep y embedding del prompt ; sale la predicción del ruido presente en el latente. Cross-attention En cada nivel de la U, bajando y subiendo, un bloque calcula pesos entre las features de la imagen y cada token del embedding de CLIP",
+  "details": [
+   "Cambia la tarea: U-Net de segmentación: entra una imagen, sale una máscara. U-Net de SD: entran **latente ruidoso, timestep y embedding del prompt**; sale la **predicción del ruido** presente en el latente.",
+   "Cross-attention: En cada nivel de la U, bajando y subiendo, un bloque calcula pesos entre las features de la imagen y cada token del embedding de CLIP, y suma la información de los tokens ponderada por esos pesos.",
+   "El cross-attention con el prompt es atención de transformer metida dentro de una red convolucional."
+  ],
+  "speaker_notes": "La conexión que cierra el círculo: la arquitectura que en 2015 segmentaba células al microscopio hoy es el corazón de la generación de imágenes más usada. U-Net es un patrón arquitectónico reutilizable. El ciclo de cada paso se ve en el pipeline, dos láminas más adelante."
+ },
+ {
+  "i": 66,
+  "section": "Stable Diffusion por dentro",
+  "title": "Componente 3: el CLIP Text Encoder",
+  "lead": "SD 1.x usa el text encoder de **CLIP ViT-L/14** (~123M parámetros), congelado: el equipo de SD no lo reentrena, lo toma prestado de OpenAI.",
+  "visible_text": "Stable Diffusion por dentro Componente 3: el CLIP Text Encoder SD 1.x usa el text encoder de CLIP ViT-L/14 (~123M parámetros), congelado: el equipo de SD no lo reentrena, lo toma prestado de OpenAI. Entrada El prompt (ej: \"un astronauta montando un caballo\"), tokenizado a 77 tokens (con padding si la frase es corta, truncado si es larga). Salida Una matriz de embeddings de 77 × 768 , que se enchufa a la U-Net en cada bloque de cross-attention. ~123M parámetros, congelado 77 tokens por prompt 77 ",
+  "details": [
+   "Entrada: El prompt (ej: \"un astronauta montando un caballo\"), tokenizado a **77 tokens** (con padding si la frase es corta, truncado si es larga).",
+   "Salida: Una matriz de embeddings de **77 × 768**, que se enchufa a la U-Net en cada bloque de cross-attention."
+  ],
+  "speaker_notes": "Los 123M son del text encoder, no del CLIP completo (que suma el image encoder ViT-L/14); SD solo usa la parte de texto. Tomarlo ya entrenado ahorra cómputo y aprovecha que CLIP ya relacionaba texto e imagen."
+ },
+ {
+  "i": 67,
+  "section": "Stable Diffusion por dentro",
+  "title": "Pipeline completo de inferencia",
+  "lead": "",
+  "visible_text": "Stable Diffusion por dentro Pipeline completo de inferencia Todo lo que vimos (U-Net, embeddings de texto, condición) confluye en este pipeline. Stable Diffusion no es un modelo monolítico: son tres piezas modulares orquestadas por un loop iterativo.",
+  "details": [],
+  "speaker_notes": "Todo lo que vimos (U-Net, embeddings de texto, condición) confluye en este pipeline. Stable Diffusion no es un modelo monolítico: son tres piezas modulares orquestadas por un loop iterativo."
+ },
+ {
+  "i": 68,
+  "section": "Stable Diffusion por dentro",
+  "title": "Pipeline completo de inferencia",
+  "lead": "",
+  "visible_text": "Stable Diffusion por dentro Pipeline completo de inferencia 1 Prompt Tokenizer → CLIP Text Encoder → embedding de texto (77 × 768). 2 Latente inicial Un tensor aleatorio de 64×64×4 desde una normal, controlado por la seed. Es el bloque de mármol que vamos a tallar. 3 Bucle de denoising (~50 pasos): la U-Net recibe (latente, t, embedding) y predice el ruido; el scheduler lo resta. 4 Decodificar Latente final 64×64×4 → VAE Decoder → imagen 512×512×3. Todo lo que vimos (U-Net, embeddings de texto, ",
+  "details": [
+   "Prompt: Tokenizer → CLIP Text Encoder → embedding de texto (77 × 768).",
+   "Latente inicial: Un tensor aleatorio de 64×64×4 desde una normal, controlado por la seed. Es el bloque de mármol que vamos a tallar.",
+   "Bucle de denoising: (~50 pasos): la U-Net recibe (latente, t, embedding) y predice el ruido; el scheduler lo resta.",
+   "Decodificar: Latente final 64×64×4 → VAE Decoder → imagen 512×512×3."
+  ],
+  "speaker_notes": "Todo lo que vimos (U-Net, embeddings de texto, condición) confluye en este pipeline. Stable Diffusion no es un modelo monolítico: son tres piezas modulares orquestadas por un loop iterativo."
+ },
+ {
+  "i": 69,
+  "section": "Stable Diffusion por dentro",
+  "title": "Cómo se entrena Stable Diffusion",
+  "lead": "",
+  "visible_text": "Stable Diffusion por dentro Cómo se entrena Stable Diffusion Un paso de entrenamiento con un modelo de juguete en numpy (4 pares, entrenado de verdad). El par (imagen, texto) pasa por CLIP y por el VAE encoder, que están congelados: no se entrenan. Se sortean un timestep t (acá t = 517) y un ruido ε, y se arma z_t = √ᾱ_t·z0 + √(1−ᾱ_t)·ε con el schedule real de SD (0,51·z0 + 0,86·ε). La U-Net, la única que se entrena, recibe (z_t, t, embedding) y devuelve ε̂. La pérdida es L = ‖ε − ε̂‖². El gradi",
+  "details": [],
+  "speaker_notes": "Un paso de entrenamiento con un modelo de juguete en numpy (4 pares, entrenado de verdad). El par (imagen, texto) pasa por CLIP y por el VAE encoder, que están congelados: no se entrenan. Se sortean un timestep t (acá t = 517) y un ruido ε, y se arma z_t = √ᾱ_t·z0 + √(1−ᾱ_t)·ε con el schedule real de SD (0,51·z0 + 0,86·ε). La U-Net, la única que se entrena, recibe (z_t, t, embedding) y devuelve ε̂. La pérdida es L = ‖ε − ε̂‖². El gradiente vuelve solo a la U-Net y se corta en CLIP y en el VAE. Después vienen pasos con t chico (casi limpio) y t grande (casi ruido), y un paso con el texto vacío: así aprende también la predicción sin condición, que es lo que usa la classifier-free guidance en inferencia. Al final, el mismo par con el mismo t y el mismo ε da L de 0,81 a 0,014. Escala real: SD 1.x se entrenó sobre pares de LAION y su U-Net tiene ~860 M parámetros."
+ },
+ {
+  "i": 70,
+  "section": "Stable Diffusion por dentro",
+  "title": "Los hiperparámetros que importan",
+  "lead": "",
+  "visible_text": "Stable Diffusion por dentro Los hiperparámetros que importan num_inference_steps Cuántos pasos de denoising. Default 50. Por debajo de 20 la calidad se degrada; por encima de 100 las mejoras son marginales. guidance_scale (classifier-free guidance): qué tan estricto seguir el prompt. Default 7.5. Bajo (1-3) más diverso y menos fiel; medio (7-9) el punto justo; alto (15+) muy fiel pero saturado. seed Controla el ruido inicial. Misma seed + mismo prompt = misma imagen. height y width Múltiplos de ",
+  "details": [
+   "num_inference_steps: Cuántos pasos de denoising. Default 50. Por debajo de 20 la calidad se degrada; por encima de 100 las mejoras son marginales.",
+   "guidance_scale: (classifier-free guidance): qué tan estricto seguir el prompt. Default 7.5. Bajo (1-3) más diverso y menos fiel; medio (7-9) el punto justo; alto (15+) muy fiel pero saturado.",
+   "seed: Controla el ruido inicial. Misma seed + mismo prompt = misma imagen.",
+   "height y width: Múltiplos de 8, porque el VAE comprime 8×. Default 512×512.",
+   "Para iterar: Fijá la seed y el guidance, y mové el prompt. Así aislás el efecto de cada cambio de texto."
+  ],
+  "speaker_notes": ""
+ },
+ {
+  "i": 71,
+  "section": "Stable Diffusion por dentro",
+  "title": "Limitaciones de Stable Diffusion",
+  "lead": "",
+  "visible_text": "Stable Diffusion por dentro Limitaciones de Stable Diffusion Manos y anatomía Dedos de más o fundidos, ojos asimétricos, articulaciones raras. Texto dentro de la imagen Carteles y etiquetas salen como caracteres pseudo-aleatorios. Mejoró en SD 3 y FLUX. Conteo y composición \"Tres manzanas\" puede salir con dos o cinco; \"un perro a la izquierda y un gato a la derecha\" es frágil. Sesgos del dataset LAION-5B refleja sesgos demográficos, culturales y estéticos de internet. Importa en aplicaciones méd",
+  "details": [
+   "Manos y anatomía: Dedos de más o fundidos, ojos asimétricos, articulaciones raras.",
+   "Texto dentro de la imagen: Carteles y etiquetas salen como caracteres pseudo-aleatorios. Mejoró en SD 3 y FLUX.",
+   "Conteo y composición: \"Tres manzanas\" puede salir con dos o cinco; \"un perro a la izquierda y un gato a la derecha\" es frágil.",
+   "Sesgos del dataset: LAION-5B refleja sesgos demográficos, culturales y estéticos de internet. Importa en aplicaciones médicas y sociales.",
+   "Costo de inferencia: Sigue siendo caro para deployment masivo en tiempo real."
+  ],
+  "speaker_notes": "Stable Diffusion es una herramienta muy poderosa pero falible. Saber dónde falla es tan importante como saber qué puede hacer."
+ },
+ {
+  "i": 72,
+  "section": "TilTedTinder v2 y notebook",
+  "title": "TilTedTinder v2 y notebook",
+  "lead": "",
+  "visible_text": "01 Qué es una convolución 02 Segmentación: qué es y para qué sirve 03 De FCN a U-Net 04 SAM: segmentar lo que le señalás 05 Generación condicionada por texto 06 Stable Diffusion por dentro 07 TilTedTinder v2 y notebook 07 TilTedTinder v2 y notebook",
+  "details": [],
+  "speaker_notes": ""
+ },
+ {
+  "i": 73,
+  "section": "TilTedTinder v2 y notebook",
+  "title": "De preferencias a prompts",
+  "lead": "Ya tenemos las piezas: el usuario escribe un prompt, CLIP lo convierte en un embedding, la U-Net talla la imagen paso a paso y el VAE la decodifica.",
+  "visible_text": "TilTedTinder v2 y notebook De preferencias a prompts Ya tenemos las piezas: el usuario escribe un prompt, CLIP lo convierte en un embedding, la U-Net talla la imagen paso a paso y el VAE la decodifica. Usuario A \"Me atraen las personas inclinadas, altas, con anteojos y pelo rizado.\" Usuario B \"Prefiero caras inclinadas, jóvenes, con sonrisa y barba corta.\" Usuario C \"Inclinadas, mayores, expresión seria, rasgos angulosos.\" Fusión del recap (\"El desafío que dejamos pendiente\") y \"De preferencias ",
+  "details": [
+   "Usuario A: \"Me atraen las personas inclinadas, altas, con anteojos y pelo rizado.\"",
+   "Usuario B: \"Prefiero caras inclinadas, jóvenes, con sonrisa y barba corta.\"",
+   "Usuario C: \"Inclinadas, mayores, expresión seria, rasgos angulosos.\""
+  ],
+  "speaker_notes": "Fusión del recap (\"El desafío que dejamos pendiente\") y \"De preferencias a prompts\". La imagen final depende de la estructura del prompt tanto como del modelo: escribir prompts es una habilidad propia. Si el usuario \"matchea\" con un perfil, la seed permite reproducirlo idéntico."
+ },
+ {
+  "i": 74,
+  "section": "TilTedTinder v2 y notebook",
+  "title": "De preferencias a prompts",
+  "lead": "",
+  "visible_text": "TilTedTinder v2 y notebook De preferencias a prompts Un buen prompt combina sujeto + atributos + estilo + luz . Mismo prompt + misma seed = mismo perfil estable cuando el usuario vuelve a abrir la app. A: prompt = \"a tilted portrait of a tall person with round glasses and curly hair, soft natural lighting, photorealistic, 4k\" B: prompt = \"a tilted portrait of a young person with a warm smile and short beard, soft daylight, candid photo, shallow depth of field\" C: prompt = \"a tilted portrait of a",
+  "details": [],
+  "speaker_notes": "Fusión del recap (\"El desafío que dejamos pendiente\") y \"De preferencias a prompts\". La imagen final depende de la estructura del prompt tanto como del modelo: escribir prompts es una habilidad propia. Si el usuario \"matchea\" con un perfil, la seed permite reproducirlo idéntico."
+ },
+ {
+  "i": 75,
+  "section": "TilTedTinder v2 y notebook",
+  "title": "Lo que el equipo va a encontrar",
+  "lead": "",
+  "visible_text": "TilTedTinder v2 y notebook Lo que el equipo va a encontrar Slanted Land no está en los datos de SD LAION-5B no tiene caras inclinadas, así que las primeras generaciones saldrán rectas. Solución: fine-tuning con las 4 fotos reales, con DreamBooth o LoRA. Sesgo demográfico Hay grupos sobrerrepresentados y otros casi ausentes. El equipo tiene que auditar las generaciones. Control de detalle limitado No podés pedir \"exactamente esa nariz\". Para detalles finos, iterar o usar ControlNet e Inpainting. ",
+  "details": [
+   "Slanted Land no está en los datos de SD: LAION-5B no tiene caras inclinadas, así que las primeras generaciones saldrán rectas. Solución: fine-tuning con las 4 fotos reales, con DreamBooth o LoRA.",
+   "Sesgo demográfico: Hay grupos sobrerrepresentados y otros casi ausentes. El equipo tiene que auditar las generaciones.",
+   "Control de detalle limitado: No podés pedir \"exactamente esa nariz\". Para detalles finos, iterar o usar ControlNet e Inpainting.",
+   "Costo: 50 perfiles por usuario en tiempo real es caro. Caché, generación batched offline o modelos rápidos (SDXL Turbo, FLUX Schnell).",
+   "Ética: ¿Se le avisa al usuario que el perfil es sintético? ¿Hay riesgo de manipulación emocional?"
+  ],
+  "speaker_notes": "Stable Diffusion les resuelve el motor. El producto requiere muchas decisiones más, sobre datos, ética, cómputo y UX. Las de ética son decisiones de producto, no técnicas, pero alguien las tiene que tomar."
+ },
+ {
+  "i": 76,
+  "section": "TilTedTinder v2 y notebook",
+  "title": "Pasamos al notebook",
+  "lead": "**Stack**: Google Colab con GPU (Tesla T4, 16 GB) · Hugging Face Diffusers · Stable Diffusion v1.4 (CompVis) en `float16`.",
+  "visible_text": "TilTedTinder v2 y notebook Pasamos al notebook Stack : Google Colab con GPU (Tesla T4, 16 GB) · Hugging Face Diffusers · Stable Diffusion v1.4 (CompVis) en float16 . 1 Pipeline alto nivel StableDiffusion​Pipeline.​from_pretrained(...) y generar imágenes en pocas líneas. 2 Hiperparámetros Mover num_inference_steps , guidance_scale y seed , y ver qué cambia. 3 Grids Varias imágenes de un mismo prompt para ver la variabilidad. 4 Dimensiones Imágenes rectangulares (512×768). 5 Pipeline manual Desarm",
+  "details": [
+   "Pipeline alto nivel: `StableDiffusion​Pipeline.​from_pretrained(...)` y generar imágenes en pocas líneas.",
+   "Hiperparámetros: Mover `num_inference_steps`, `guidance_scale` y `seed`, y ver qué cambia.",
+   "Grids: Varias imágenes de un mismo prompt para ver la variabilidad.",
+   "Dimensiones: Imágenes rectangulares (512×768).",
+   "Pipeline manual: Desarmar el pipeline en VAE + U-Net + CLIP y reconstruirlo a mano."
+  ],
+  "speaker_notes": "`float16` para que entre en la GPU gratuita. El último ejercicio es donde la sección de Stable Diffusion se vuelve tangible: ven el bucle de denoising, la cross-attention con el embedding de CLIP y el VAE decodificando al final. Cada bloque de la teoría aparece como código."
+ },
+ {
+  "i": 77,
+  "section": "",
+  "title": "Conclusiones",
+  "lead": "",
+  "visible_text": "Conclusiones",
+  "details": [],
+  "speaker_notes": ""
+ },
+ {
+  "i": 78,
+  "section": "",
+  "title": "Key takeaways",
+  "lead": "",
+  "visible_text": "Key takeaways Una convolución desliza un kernel chico de pesos compartidos sobre la señal: acepta cualquier largo y detecta un patrón esté donde esté. Su encoder resume la entrada en un embedding. Segmentar es etiquetar cada píxel; en medicina, la máscara es el dato que se mide. U-Net recupera los bordes que FCN pierde gracias a las skip connections, y funciona con pocas imágenes etiquetadas. SAM segmenta cualquier objeto a partir de una pista: click, caja, máscara o texto. Stable Diffusion comb",
+  "details": [
+   "Una convolución: desliza un kernel chico de pesos compartidos sobre la señal: acepta cualquier largo y detecta un patrón esté donde esté. Su encoder resume la entrada en un embedding.",
+   "Segmentar: es etiquetar cada píxel; en medicina, la máscara es el dato que se mide.",
+   "U-Net: recupera los bordes que FCN pierde gracias a las skip connections, y funciona con pocas imágenes etiquetadas.",
+   "SAM: segmenta cualquier objeto a partir de una pista: click, caja, máscara o texto.",
+   "Stable Diffusion: combina tres piezas: CLIP convierte el prompt en un embedding, la U-Net quita ruido en el latente y el VAE lo vuelve imagen.",
+   "La misma U-Net: aparece en las dos mitades de la clase: segmenta células y talla imágenes desde ruido."
+  ],
+  "speaker_notes": ""
+ }
+]

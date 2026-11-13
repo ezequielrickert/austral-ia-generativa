@@ -1,0 +1,391 @@
+{
+  "num": 1,
+  "titulo": "Corta, del caos a producción",
+  "repo": "corta",
+  "consigna": "**Contexto (clase 2, misión `missions/clase2`).** Se suman a una empresa donde el dev anterior se fue sin documentar y les dejó **Corta**, el acortador de URLs interno: una carpeta copiada de su computadora, **sin git, sin README**, con duplicados (`server_OLD.js`, `index_v2_FINAL.js`, `links_backup_marzo.json`), un `notas.txt`, dependencias que nadie usa, bugs conocidos y una feature a medio hacer. El trabajo: **llevar Corta a producción con la historia completa en GitHub** desde ese estado.\n\n**Herramientas:** un agente de código (recomendado Claude Code o Codex) + dos **MCP servers**: GitHub (versionado) y Railway (infra, deploy y base de datos). **Paso 0 obligatorio:** pararse en `corta/`, configurar ambos MCP y hacerle leer al agente su documentación (que pueda explicar qué tools expone cada uno y para qué las va a usar).\n\n**Forma de trabajo obligatoria:** `SPEC.md` (el comportamiento esperado, con casos borde) + **TDD**: tests derivados del SPEC, escritos **antes** de implementar; la historia de git tiene que mostrar los tests antes que los fixes.\n\n**Milestones:**\n1. **Trackear:** primer commit con la carpeta *tal cual* (con el matiz: ¿todo merece viajar a un remoto?).\n2. **Ordenar:** sin archivos muertos ni dependencias sin uso, con README y `.gitignore` (criterio: entender el repo en < 2 minutos).\n3. **Corregir:** acortar funciona, el link **te lleva** a destino, las estadísticas dicen la verdad, y una colisión de códigos no rompe nada.\n4. **Completar:** `GET /api/links/:codigo/stats` (clicks, URL, fecha) y `stats.html` consumiéndolo.\n5. **Producción** en Railway vía MCP; *¿dónde viven los datos?* — los links y clicks tienen que **sobrevivir a un redeploy**; secretos fuera del código.\n\n**Extras:** equipo (todos colaboradores, commits con autor real, tarea programada que reporta cambios) y memoria del agente (Skill `/collect-memory` que mantiene `CLAUDE.md` al día). **Entrega:** URL pública + link al repo.",
+  "que_hicimos": "Trabajamos con **Claude Code (y Codex)** parados en `corta/`, siguiendo el ciclo de la clase 2: el repo como contexto, un `CLAUDE.md` como contrato, `SPEC.md` como especificación y los tests como unidad de revisión. El repo tiene **21 commits** de tres autores (FranCalveyra 16, MartuGiordanelli 4, ezequielrickert 1), todos con *conventional commits*.\n\n**M1 — Trackear.** El primer commit (`a6061b7`, *\"chore: estado inicial heredado de Corta\"*) sube la carpeta sin curar —duplicados, backups y `test.js` incluidos— **salvo dos cosas**, explicadas en el mensaje: `node_modules/` (regenerable con `npm install`) y `notas.txt`, que contenía **una credencial de Postgres en texto plano**. Se gitignoreó desde el inicio y la historia se reescribió una vez antes del primer push para que no quedara rastro.\n\n**El contrato del agente.** Antes de tocar código se agregaron `CLAUDE.md` y `MISSION.md`, y después `SPEC.md` (modelo de datos, cada endpoint, tabla de casos borde, \"fuera de alcance\"). `CLAUDE.md` fija las reglas no negociables: *spec-first*, *test-first* con commits de test e implementación **separados**, `node:test` como framework (sin dependencias nuevas), nada de secretos versionados, usar las herramientas de infraestructura (MCP) antes que comandos sueltos, sin atribución de IA en commits, y **push solo al cerrar un milestone**. Un `docs/PROGRESS.md` registra el estado de cada milestone.\n\n**M3 — Corregir (TDD).** Dos ciclos rojo→verde visibles en `git log`:\n- `test: … bug de redirect` → `fix: redirigir a destino y persistir clicks`. El bug: `GET /:codigo` hacía `res.send(link.url)` (mostraba la URL como texto) y además incrementaba `clicks` **en memoria sin guardar** — las estadísticas mentían.\n- `test: cubrir colision` → `fix: reintentar generacion de codigo`. Con 3 caracteres `[a-z0-9]` hay **46.656** códigos; el test *mockea* `Math.random` para forzar que el primer código choque con uno existente (`aaa`) y verifica que se genere otro (`sss`) sin pisar el link viejo.\n\n**M2 — Ordenar.** Estructura `src/`, `data/`, `public/`, `tests/`, `docs/`; se borraron `server_OLD.js`, `index_v2_FINAL.js`, `links_backup_marzo.json`, `estilos_viejos.css` y las dependencias `lodash` y `moment`; `test.js` pasó a `manual-check.js` porque `node --test` lo descubría solo y le pegaba a un server real. README con uso, estructura y configuración.\n\n**M4 — Completar.** Test primero (`tests/stats.test.js`, incluido un test de que **los clicks reportados coinciden con las redirecciones servidas**), después el endpoint y `stats.html` haciendo `fetch` a `/api/links/:codigo/stats`.\n\n**M5 — Producción.** Se respondió *\"¿dónde viven los datos?\"*: el JSON en disco no sobrevive a un redeploy, así que se migró a **PostgreSQL en Railway**. Otra vez test primero (`tests/postgres.test.js` con un *pool falso*). La app se refactorizó a `crearApp(repositorio)` (inyección del repositorio, que permite testear con uno en memoria), `INSERT … ON CONFLICT (codigo) DO NOTHING` para colisiones y para importar los datos heredados sin pisar nada, `UPDATE … SET clicks = clicks + 1` **atómico**, `GET /health` que también chequea la base, `railway.json` (Railpack + healthcheck), `PORT` dinámico y `DATABASE_URL` por variable de entorno (`${{Postgres.DATABASE_URL}}`). Prueba de fuego hecha: link `v4v`, una redirección, redeploy forzado, y siguió con `clicks: 1`. URL: `corta-production-7bc5.up.railway.app`.\n\n**Memoria del agente.** En vez de `/collect-memory` se armó una Skill **`progress-log`** (en `.claude/skills/` y su gemela para Codex en `.codex/prompts/`) con un script `scripts/progress-log-missing.sh`: escribe en `progress_log/` **un `.md` por commit** (resumen, archivos, impacto), solo agrega, nunca reescribe.",
+  "arquitectura": "flowchart LR\n  subgraph Dev[Flujo de trabajo con el agente]\n    SPEC[docs/SPEC.md] --> T[Test rojo en carpeta tests]\n    T --> I[Implementacion]\n    I --> V[npm test verde]\n    V --> C[Commit convencional]\n    C --> PL[Skill progress-log]\n    CM[CLAUDE.md contrato] -.-> T\n    CM -.-> I\n  end\n  C -- GitHub MCP --> GH[Repo en GitHub]\n  GH -- Railway MCP --> RW[Servicio corta en Railway]\n  subgraph Prod[Produccion]\n    U[Usuario] --> APP[Express crearApp]\n    APP --> R[Repositorio Postgres]\n    R --> PG[(PostgreSQL Railway)]\n    APP --> H[GET /health]\n    J[data/links.json] -- import ON CONFLICT DO NOTHING --> PG\n  end\n  RW --> APP",
+  "resultados": "- **Los 5 milestones cerrados** según `docs/PROGRESS.md`. App en producción en `https://corta-production-7bc5.up.railway.app`.\n- **Historia trazable:** 21 commits desde el estado heredado; los pares `test:` → `fix:`/`feat:` aparecen en orden en 4 ciclos (redirect, colisión, stats, PostgreSQL).\n- **Suite de tests** (`npm test`, `node:test`, **sin necesitar PostgreSQL**): 5 archivos (`redirect`, `collision`, `stats`, `health`, `postgres`) que cubren redirect 302 + incremento de clicks, 404 sin tocar contadores, reintento ante colisión, stats reales y 404, coherencia clicks = redirecciones, healthcheck y el SQL del repositorio (tabla, `ON CONFLICT`, incremento atómico).\n- **Persistencia verificada end-to-end:** link `v4v` con 1 click sobrevivió a un redeploy forzado.\n- **Seguridad:** credencial de `notas.txt` nunca llegó al remoto (gitignore + reescritura de historia antes del primer push); `.env*` ignorado salvo `.env.example`.\n- **Extras:** commits de tres autores distintos (extra de equipo parcial: no hay evidencia de la tarea programada en el repo); la memoria del agente se resolvió con `CLAUDE.md` mantenido a mano/por el agente + la Skill `progress-log`, no con `/collect-memory` tal cual lo pedía la consigna.\n\n**Brechas honestas (útiles para la defensa):**\n- `SPEC.md` promete **400 para URLs inválidas** (`\"hola\"`, `\"ftp://x\"`), pero `POST /api/links` solo valida que `url` exista; ese caso borde no tiene test. Es justo el tipo de desincronización spec↔código que el TDD derivado del SPEC debería atrapar.\n- El reintento ante colisión es un `while` sin tope: con el espacio de 46.656 códigos casi lleno, se degradaría (habría que agrandar el código o cortar tras N intentos).\n- `axios` sigue como dependencia solo por `manual-check.js`.\n\n**Conclusión:** el agente hizo casi todo el tipeo, pero lo que hizo confiable el resultado fue el **contexto en `.md`** (CLAUDE.md, SPEC.md, PROGRESS.md) y los **tests como verificación** de cada vuelta chica.",
+  "decisiones": [
+    {
+      "decision": "Primer commit 'tal cual' pero excluyendo `notas.txt` (credencial) y `node_modules/`, reescribiendo la historia antes del primer push.",
+      "por_que": "La consigna pide registrar el caos inicial, pero un secreto que llega a un remoto queda comprometido para siempre (aunque después se borre). `node_modules/` es generado y reproducible con `npm install`.",
+      "alternativas": "Subir todo literalmente (cumple la letra pero filtra la credencial) o limpiar antes del primer commit (pierde la trazabilidad del punto de partida). Se eligió el punto medio defendible, explicado en el mensaje del commit.",
+      "clases": [
+        2,
+        13
+      ],
+      "conceptos": [
+        "gestion-de-secretos",
+        "humano-en-el-circuito"
+      ]
+    },
+    {
+      "decision": "Escribir `CLAUDE.md` (contrato) y `SPEC.md` antes de tocar código, y mantener `docs/PROGRESS.md` con el estado por milestone.",
+      "por_que": "El modelo responde de memoria y lo único que cambia su comportamiento es el contexto (in-context learning). Destilar reglas y estado a `.md` versionados permite sesiones nuevas con ventanas chicas que arrancan sabiendo qué está hecho y qué reglas rigen.",
+      "alternativas": "Explicarle todo al agente en cada conversación: ventana más grande, instrucciones contradictorias acumuladas y conocimiento que se pierde al cerrar la sesión.",
+      "clases": [
+        2
+      ],
+      "conceptos": [
+        "claude-md",
+        "spec-md",
+        "contexto-de-agente",
+        "ventana-de-contexto"
+      ]
+    },
+    {
+      "decision": "TDD estricto con commits de test e implementación separados (`test:` antes que `fix:`/`feat:`).",
+      "por_que": "Los tests son la unidad de revisión principal: el agente itera hasta ponerlos en verde y el humano revisa contra criterios acordados de antemano. Separar commits hace visible en `git log` que el test existía antes del fix (criterio de éxito de la misión).",
+      "alternativas": "Pedirle al agente el fix y que 'después agregue tests': los tests tienden a describir lo que el código hace, no lo que debería hacer, y no se puede probar el orden.",
+      "clases": [
+        2
+      ],
+      "conceptos": [
+        "tdd",
+        "agente-de-codigo"
+      ]
+    },
+    {
+      "decision": "`node:test` nativo, tests en `tests/` y renombrar `test.js` a `manual-check.js`.",
+      "por_que": "Cero dependencias nuevas. `node --test` descubre automáticamente archivos llamados `test.js` o dentro de `test/`; el script heredado terminaba pegándole a un server real si había uno corriendo.",
+      "alternativas": "Jest/Mocha: más features pero más dependencias en un repo que justamente había que adelgazar.",
+      "clases": [
+        2
+      ],
+      "conceptos": [
+        "tdd"
+      ]
+    },
+    {
+      "decision": "Resolver colisiones reintentando la generación del código hasta encontrar uno libre; en Postgres, con `codigo` como PRIMARY KEY e `INSERT … ON CONFLICT DO NOTHING`.",
+      "por_que": "Con 3 caracteres hay 46.656 combinaciones: las colisiones son reales (paradoja del cumpleaños). La restricción de unicidad en la base hace que la garantía no dependa de que el código de la app chequee bien, y evita la carrera entre 'chequear' e 'insertar'.",
+      "alternativas": "Códigos más largos (reduce pero no elimina la colisión), códigos secuenciales/hash (predecibles), o chequear con un SELECT previo (condición de carrera entre requests concurrentes).",
+      "clases": [
+        2
+      ],
+      "conceptos": [
+        "tdd"
+      ]
+    },
+    {
+      "decision": "Migrar de `links.json` a PostgreSQL de Railway con incremento atómico `SET clicks = clicks + 1` y migración inicial no destructiva de los datos heredados.",
+      "por_que": "El filesystem de un contenedor no sobrevive a un redeploy: la 'base' del dev anterior no aguanta producción. El UPDATE atómico evita perder clicks con redirecciones concurrentes, que es parte de que 'las estadísticas digan la verdad'.",
+      "alternativas": "Volumen persistente con el JSON (sigue sin concurrencia segura), SQLite en volumen, o una base gestionada externa. Railway crea la base desde el mismo MCP y la conecta por variable de referencia.",
+      "clases": [
+        2,
+        7
+      ],
+      "conceptos": [
+        "mcp",
+        "tool-calling"
+      ]
+    },
+    {
+      "decision": "Inyectar el repositorio en `crearApp(repositorio)` y testear la app con un repositorio en memoria y el SQL con un pool falso.",
+      "por_que": "La suite corre en segundos y sin base de datos (`npm test` no requiere PostgreSQL), así cada vuelta del agente se verifica rápido y en cualquier máquina.",
+      "alternativas": "Tests de integración contra un Postgres real (más fieles, pero lentos y dependientes de infraestructura en cada vuelta).",
+      "clases": [
+        2
+      ],
+      "conceptos": [
+        "tdd"
+      ]
+    },
+    {
+      "decision": "Credenciales solo por variable de entorno (`DATABASE_URL=${{Postgres.DATABASE_URL}}` en Railway, `.env` gitignoreado en local, `.env.example` versionado).",
+      "por_que": "Regla de la clase: secretos fuera del código y fuera del contexto; lo que el agente lee puede terminar en un commit. La consigna lo anticipa: 'en el código no. Ni en un .txt'.",
+      "alternativas": "Hardcodear o commitear un `.env` (filtra el secreto), o un gestor de secretos dedicado (más robusto, excesivo para el alcance).",
+      "clases": [
+        2,
+        13
+      ],
+      "conceptos": [
+        "gestion-de-secretos",
+        "prompt-injection"
+      ]
+    },
+    {
+      "decision": "Push a `origin` solo al cerrar un milestone; commits locales chicos y frecuentes.",
+      "por_que": "Commits chicos hacen cada vuelta del agente reversible; el push por milestone deja el remoto siempre en un estado coherente y revisado.",
+      "alternativas": "Push por commit (remoto con estados intermedios rotos) o un único push al final (se pierde el respaldo y la visibilidad del equipo).",
+      "clases": [
+        2
+      ],
+      "conceptos": [
+        "humano-en-el-circuito"
+      ]
+    },
+    {
+      "decision": "Skill `progress-log` (Claude) + prompt gemelo para Codex + script `progress-log-missing.sh`, que escribe un `.md` por commit.",
+      "por_que": "'Todo lo que le explicás al agente más de una vez es una Skill que deberías escribir una vez'. Un trabajo por Skill, disparada por su `description`; el script determinista decide qué falta y el modelo solo redacta.",
+      "alternativas": "La Skill `/collect-memory` pedida por la consigna (actualiza `CLAUDE.md` con avances y preferencias); o pedir el resumen a mano cada vez, sin formato estable.",
+      "clases": [
+        2
+      ],
+      "conceptos": [
+        "skill",
+        "claude-md"
+      ]
+    }
+  ],
+  "evidencia": [
+    {
+      "archivo": "tests/collision.test.js",
+      "lenguaje": "javascript",
+      "fragmento": "const ctx = await iniciarServerDeTest([\n  { codigo: 'aaa', url: 'https://ya-existia.com', clicks: 0, creado: '2026-01-01T00:00:00.000Z' }\n]);\n\n// primer intento de generarCodigo cae en \"aaa\" (colision), el segundo en \"sss\" (libre)\nconst secuencia = [0, 0, 0, 0.5, 0.5, 0.5];\nt.mock.method(Math, 'random', function () {\n  return secuencia.shift();\n});\n\nconst res = await fetch(ctx.baseUrl + '/api/links', { method: 'POST',\n  headers: { 'Content-Type': 'application/json' },\n  body: JSON.stringify({ url: 'https://ejemplo.com/nueva' }) });\nconst body = await res.json();\n\nassert.equal(body.codigo, 'sss');\nassert.equal(links.find(function (l) { return l.codigo === 'aaa'; }).url, 'https://ya-existia.com');",
+      "explicacion": "Test escrito **antes** del fix (commit `c1ace5f`, fix en `dbcba0f`). Fuerza la colisión de forma determinista mockeando `Math.random`: es un caso borde del SPEC convertido en criterio verificable. Materializa el TDD de la clase 2: el agente implementa hasta que esto pase.",
+      "clases": [
+        2
+      ],
+      "conceptos": [
+        "tdd",
+        "spec-md"
+      ]
+    },
+    {
+      "archivo": "server.js (estado heredado, commit a6061b7)",
+      "lenguaje": "javascript",
+      "fragmento": "// redirigir al destino\napp.get('/:codigo', (req, res) => {\n  const links = leerLinks();\n  const link = links.find(function (l) { return l.codigo === req.params.codigo; });\n  if (!link) {\n    return res.status(404).send('No existe ese link');\n  }\n  link.clicks = link.clicks + 1;\n  res.send(link.url);\n});",
+      "explicacion": "Los dos bugs del Milestone 3 en el código heredado: `res.send` muestra la URL en vez de redirigir (302), y `clicks` se incrementa en un objeto en memoria que nunca se guarda con `guardarLinks` — por eso 'las estadísticas no decían la verdad'. Se encontraron **usando la app** y leyendo el código, como pedía la consigna.",
+      "clases": [
+        2
+      ],
+      "conceptos": [
+        "agente-de-codigo"
+      ]
+    },
+    {
+      "archivo": "src/postgres.js",
+      "lenguaje": "javascript",
+      "fragmento": "async crear(link) {\n  const resultado = await pool.query(\n    `INSERT INTO links (codigo, url, clicks, creado)\n     VALUES ($1, $2, $3, $4)\n     ON CONFLICT (codigo) DO NOTHING\n     RETURNING codigo`,\n    [link.codigo, link.url, link.clicks, link.creado]\n  );\n  return resultado.rowCount === 1;\n},\n\nasync incrementarClicks(codigo) {\n  const resultado = await pool.query(\n    `UPDATE links\n     SET clicks = clicks + 1\n     WHERE codigo = $1\n     RETURNING codigo, url, clicks, creado`,\n    [codigo]\n  );\n  return normalizarLink(resultado.rows[0]);\n},",
+      "explicacion": "La respuesta a '¿dónde viven los datos?' y a '¿qué pasa si dos URLs reciben el mismo código?': la unicidad la garantiza la PRIMARY KEY (`crear` devuelve `false` y el server reintenta), y el incremento es atómico en la base, sin leer-modificar-escribir en la app. Consultas parametrizadas (`$1`), sin concatenar strings.",
+      "clases": [
+        2
+      ],
+      "conceptos": [
+        "tdd"
+      ]
+    },
+    {
+      "archivo": "src/server.js",
+      "lenguaje": "javascript",
+      "fragmento": "while (!creadoEnDB) {\n  codigo = generarCodigo();\n  creadoEnDB = await repositorio.crear({\n    codigo,\n    url,\n    clicks: 0,\n    creado\n  });\n}\n\nres.json({ codigo, corta: '/' + codigo });",
+      "explicacion": "El loop de reintento ante colisión, apoyado en el `ON CONFLICT DO NOTHING` del repositorio. La app no sabe si el repositorio es Postgres o el de memoria de los tests: `crearApp(repositorio)` recibe la dependencia inyectada.",
+      "clases": [
+        2
+      ],
+      "conceptos": [
+        "tdd"
+      ]
+    },
+    {
+      "archivo": "CLAUDE.md",
+      "lenguaje": "markdown",
+      "fragmento": "## Prácticas de trabajo\n\n1. **Documentar el comportamiento esperado antes de tocarlo.** Mantené `docs/SPEC.md` ...\n2. **Test-first.** Para cada fix o feature: primero el test, después la implementación que lo\n   hace pasar. Commits separados para uno y otro, así queda trazable en `git log`.\n3. **Nada de secretos versionados.** Ni hardcodeados en código, ni en archivos de texto o JSON\n   commiteados.\n4. **Usar las herramientas de infraestructura disponibles**, no comandos manuales sueltos,\n   cuando el flujo lo soporta (gestión de repo/colaboradores, servicios, bases de datos, deploy).\n\n## Cuándo pushear\n- El **push** a `origin` se hace recién cuando se cierra un milestone completo",
+      "explicacion": "El contrato de trabajo: lo que el agente lee al arrancar cada sesión. Tiene exactamente las partes que la clase 2 recomienda (cómo correr y testear, convenciones, reglas no negociables) más una sección 'Estado del proyecto' que se actualiza para que la próxima sesión no arranque de cero.",
+      "clases": [
+        2
+      ],
+      "conceptos": [
+        "claude-md",
+        "contexto-de-agente"
+      ]
+    },
+    {
+      "archivo": ".claude/skills/progress-log/SKILL.md",
+      "lenguaje": "markdown",
+      "fragmento": "---\nname: progress-log\ndescription: Backfill and update progress_log/ with one file per commit, summarizing what changed and why. Use when the user asks to \"log progress\", \"update the progress log\", \"document commit history\", or \"dump a log of what was done\" for this repo.\n---\n\n## Steps\n\n1. Run `scripts/progress-log-missing.sh` from the repo root. It prints one `NNNN hash` line per\n   commit that still needs a log file, oldest first. If it prints nothing, tell the user the log\n   is up to date and stop — don't touch existing files.",
+      "explicacion": "Una Skill: carpeta con `SKILL.md` (frontmatter YAML + pasos en prosa). La `description` es el disparador (se activa sola si el pedido coincide, o con `/progress-log`). Combina una parte determinista (el script que lista commits sin log) con la parte que hace bien el modelo (resumir el diff en prosa).",
+      "clases": [
+        2
+      ],
+      "conceptos": [
+        "skill"
+      ]
+    },
+    {
+      "archivo": "railway.json",
+      "lenguaje": "json",
+      "fragmento": "{\n  \"$schema\": \"https://railway.com/railway.schema.json\",\n  \"build\": {\n    \"builder\": \"RAILPACK\"\n  },\n  \"deploy\": {\n    \"healthcheckPath\": \"/health\",\n    \"healthcheckTimeout\": 120,\n    \"restartPolicyType\": \"ON_FAILURE\",\n    \"restartPolicyMaxRetries\": 3\n  }\n}",
+      "explicacion": "Configuración de deploy versionada y sin credenciales. El healthcheck en `/health` también consulta PostgreSQL: si la base no responde, Railway no activa ese deployment. La infraestructura se operó desde el agente vía el MCP de Railway.",
+      "clases": [
+        2,
+        7
+      ],
+      "conceptos": [
+        "mcp",
+        "gestion-de-secretos"
+      ]
+    }
+  ],
+  "relaciones": [
+    {
+      "clase": 2,
+      "conceptos": [
+        "agente-de-codigo",
+        "claude-md",
+        "spec-md",
+        "tdd",
+        "skill",
+        "mcp",
+        "contexto-de-agente"
+      ],
+      "como_se_aplico": "Es la clase de la misión: todo el TP es la práctica de sus piezas apiladas. El repo como contexto (estructura ordenada, README), `CLAUDE.md` como contrato con reglas no negociables, `SPEC.md` + TDD como forma de verificar cada vuelta chica, una Skill propia (`progress-log`) y los MCP de GitHub y Railway para tocar el ecosistema."
+    },
+    {
+      "clase": 7,
+      "conceptos": [
+        "mcp",
+        "tool-calling"
+      ],
+      "como_se_aplico": "MCP como protocolo: un server expone las acciones de un servicio como tools que el agente descubre por nombre, descripción y parámetros. Crear el repo, provisionar Postgres, setear variables y deployar fueron llamadas a tools de los servers de GitHub y Railway, después de hacerle leer al agente la documentación de cada server."
+    },
+    {
+      "clase": 10,
+      "conceptos": [
+        "agente",
+        "contexto-de-agente",
+        "humano-en-el-circuito"
+      ],
+      "como_se_aplico": "Un agente de código es un loop: observa (lee el repo, corre tests), decide y actúa (edita, commitea, deploya). El contexto que circula entre sesiones vive en archivos (`CLAUDE.md`, `PROGRESS.md`, `progress_log/`), y el humano queda en el circuito revisando diffs y aprobando acciones sensibles."
+    },
+    {
+      "clase": 13,
+      "conceptos": [
+        "gestion-de-secretos",
+        "prompt-injection",
+        "defensa-en-profundidad"
+      ],
+      "como_se_aplico": "El `notas.txt` con una credencial es el caso de libro: lo que el agente lee puede terminar en un commit. Se aplicaron capas: gitignore, reescritura de historia antes del push, credenciales solo por variables de entorno y la regla explícita en `CLAUDE.md`."
+    },
+    {
+      "clase": 1,
+      "conceptos": [
+        "humano-en-el-circuito"
+      ],
+      "como_se_aplico": "La tesis de la clase 1 —la IA generativa amplía la capacidad de quien la usa con criterio técnico, validación y responsabilidad— se ve en que el agente hizo el tipeo pero la validación (tests, prueba de redeploy, revisión de diffs) la diseñó el equipo."
+    }
+  ],
+  "preguntas_defensa": [
+    {
+      "q": "La consigna pedía pushear la carpeta 'tal cual'. ¿Por qué no lo hicieron literalmente?",
+      "a": "Porque `notas.txt` tenía una credencial de Postgres en texto plano. Un secreto que llega a un remoto se considera comprometido aunque se borre después (queda en la historia y en clones). Subimos todo lo demás —duplicados, backups, `test.js`— para que el caos quede registrado, excluimos `notas.txt` y `node_modules/` (regenerable), lo explicamos en el mensaje del commit y reescribimos la historia una vez antes del primer push. Es la regla de la clase 2: secretos fuera del código y fuera del contexto."
+    },
+    {
+      "q": "¿Qué pasa si dos URLs reciben el mismo código corto?",
+      "a": "Nada malo. `codigo` es PRIMARY KEY en PostgreSQL y el insert usa `ON CONFLICT (codigo) DO NOTHING`; si la fila no se insertó, `crear` devuelve `false` y el server genera otro código y reintenta. La garantía vive en la base, no en un chequeo previo de la app, así que no hay condición de carrera entre requests concurrentes. Está cubierto por `tests/collision.test.js`, que fuerza la colisión mockeando `Math.random`."
+    },
+    {
+      "q": "¿Cuáles eran los bugs y cómo los encontraron?",
+      "a": "Usando la app y leyendo el código heredado. `GET /:codigo` respondía `res.send(link.url)`: mostraba la URL como texto en vez de redirigir con 302. Además incrementaba `clicks` en un objeto en memoria sin persistirlo, así que las estadísticas no contaban la verdad. Y la generación de códigos no chequeaba colisiones, pisando links existentes. Para cada uno se escribió primero el test rojo y después el fix."
+    },
+    {
+      "q": "¿Por qué TDD con un agente de código? ¿No alcanza con leer el diff?",
+      "a": "El agente se equivoca con confianza: código que compila y está mal, explicaciones seguras y falsas. Los tests derivados del `SPEC.md` son criterios acordados **antes** de implementar, así que el agente no puede 'ajustar' el criterio a lo que hizo. Son la unidad de revisión principal; el diff se lee igual. Separar el commit de test del de implementación hace verificable en `git log` que el test existía antes."
+    },
+    {
+      "q": "¿Qué es `CLAUDE.md` y qué pusieron ahí? ¿Qué no debería ir?",
+      "a": "Es el contrato del repo: un `.md` que el agente lee automáticamente al iniciar cada sesión (AGENTS.md en Codex). Pusimos cómo correr y testear, la estructura, el estado de cada milestone y reglas no negociables: spec-first, test-first con commits separados, sin secretos, conventional commits, push por milestone. No va lo que el código ya dice solo ni detalle que se desactualiza en una semana. Funciona porque el modelo responde de memoria y lo único que cambia su comportamiento es el contexto."
+    },
+    {
+      "q": "¿Dónde viven los datos en producción y cómo probaron que sobreviven a un redeploy?",
+      "a": "En PostgreSQL provisionado en Railway, conectado por `DATABASE_URL=${{Postgres.DATABASE_URL}}`. El JSON en disco del dev anterior no sobrevive porque el filesystem del contenedor se recrea en cada deploy. La prueba: crear el link `v4v`, registrar una redirección, forzar un redeploy y confirmar que seguía con `clicks: 1`. Al arrancar, la app importa `data/links.json` con `ON CONFLICT DO NOTHING`, así que reiniciar nunca duplica ni pisa datos."
+    },
+    {
+      "q": "¿Cómo garantizan que las estadísticas 'dicen la verdad' con usuarios concurrentes?",
+      "a": "El click se cuenta con un único `UPDATE links SET clicks = clicks + 1 WHERE codigo = $1 RETURNING ...`: la base lo hace atómico, sin el patrón leer-modificar-escribir que pierde incrementos. Y hay un test que hace dos redirecciones y verifica que `/stats` reporte exactamente 2."
+    },
+    {
+      "q": "Su `SPEC.md` dice que una URL inválida como `ftp://x` devuelve 400. ¿Lo cumple el código?",
+      "a": "No del todo: `POST /api/links` solo valida que `url` exista. Es una desincronización spec↔código que no tiene test, y es justo lo que el método debería prevenir: si cada caso borde del SPEC se traduce en un test, ese test habría quedado rojo. El arreglo es agregar el test (URL sin esquema, `ftp://`, string vacío) y validar con `new URL()` restringiendo a `http`/`https`."
+    },
+    {
+      "q": "¿Qué es un MCP server y por qué hacerle leer la documentación al agente antes de usarlo?",
+      "a": "MCP es el estándar abierto por el que un agente usa herramientas externas: el server expone acciones de un servicio (GitHub, Railway) como tools con nombre, descripción y parámetros, y el agente elige por descripción. El catálogo dice **qué** hace cada tool; **cuándo y cómo conviene usarla** lo dice la documentación. Además conviene mirar quién publica el server, porque corre con nuestras credenciales."
+    },
+    {
+      "q": "¿Qué es una Skill y en qué se diferencia de un subagente?",
+      "a": "Una Skill es un instructivo en un archivo (`SKILL.md` con frontmatter y pasos): se enseña una vez y la tarea sale siempre igual; se dispara con `/nombre` o sola cuando el pedido coincide con su `description`. Un subagente es un asistente aislado con ventana de contexto propia que corre una subtarea (a veces en paralelo) y devuelve un resumen. Nuestra `progress-log` es una Skill: un solo trabajo, disparado por descripción, con un script determinista que decide qué commits faltan."
+    }
+  ],
+  "quiz": [
+    {
+      "q": "Según la clase 2, ¿qué es lo único que cambia el comportamiento de un modelo frente a un proyecto que no conoce?",
+      "opciones": [
+        "Reentrenarlo con el código del repo",
+        "El contexto que recibe (in-context learning)",
+        "Subir la temperatura",
+        "Usar un modelo más grande"
+      ],
+      "correcta": 1,
+      "explicacion": "El modelo responde de su memoria de entrenamiento (una foto congelada hasta la fecha de corte). Sin reentrenar, la única palanca es el contexto: para un agente de código, el repo y sus `.md`. Reentrenar no es lo que hace un agente; temperatura y tamaño no le enseñan nada del proyecto."
+    },
+    {
+      "q": "¿Cuál es el rol de `SPEC.md` en el flujo TDD de la misión?",
+      "opciones": [
+        "Documentar el código una vez terminado",
+        "Reemplazar a los tests",
+        "Ser la fuente de la que se derivan los tests antes de implementar",
+        "Guardar las credenciales de producción"
+      ],
+      "correcta": 2,
+      "explicacion": "El SPEC plasma con detalle lo que se espera (endpoints, casos borde) y de ahí se deriva la batería de tests, escrita antes de implementar. No reemplaza a los tests, no es documentación post-hoc y jamás guarda secretos."
+    },
+    {
+      "q": "Un agente de código lee `notas.txt` con una contraseña y la incluye en un commit. ¿Qué principio de la clase se violó?",
+      "opciones": [
+        "Contexto > prompting",
+        "Secretos fuera del código y fuera del contexto",
+        "Un trabajo por Skill",
+        "Partir la tarea en pedidos revisables"
+      ],
+      "correcta": 1,
+      "explicacion": "Lo que el agente lee puede terminar en un commit: por eso los secretos van en variables de entorno, nunca en el repo ni en un `.txt`. Las otras son reglas válidas pero de otro tema."
+    },
+    {
+      "q": "¿Qué decide que una Skill se active sola (sin tipear `/nombre`)?",
+      "opciones": [
+        "El nombre de la carpeta",
+        "Su `description` en el frontmatter",
+        "El orden en que se instalaron",
+        "Que esté mencionada en el README"
+      ],
+      "correcta": 1,
+      "explicacion": "La description es el disparador: el agente carga la Skill cuando el pedido coincide con ella. Con una descripción vaga nunca se activa sola. El mismo principio vale para subagentes y tools MCP."
+    },
+    {
+      "q": "¿Por qué la clase recomienda mantener la ventana de contexto chica?",
+      "opciones": [
+        "Porque el modelo no puede leer más de 1000 tokens",
+        "Porque una ventana grande puede empeorar la performance y acumular instrucciones contradictorias",
+        "Porque `/compact` borra el CLAUDE.md",
+        "Porque los MCP solo funcionan con ventanas chicas"
+      ],
+      "correcta": 1,
+      "explicacion": "Objetivo: la ventana más chica con la máxima información relevante. Una ventana grande sostiene mucho, pero degrada la performance y acumula contradicciones. Por eso se destila el conocimiento a `.md` y se arrancan sesiones frescas."
+    },
+    {
+      "q": "En un MCP server, ¿cómo elige el agente qué tool usar?",
+      "opciones": [
+        "Al azar entre las disponibles",
+        "Por la descripción de cada tool en el catálogo que recibe al conectarse",
+        "Siempre la primera de la lista",
+        "El usuario tiene que nombrarla explícitamente"
+      ],
+      "correcta": 1,
+      "explicacion": "Al conectar, el agente recibe el catálogo (nombre, descripción, parámetros) y elige por descripción. Por eso conviene además hacerle leer la documentación: el catálogo dice qué hace cada tool, no cuándo conviene usarla."
+    },
+    {
+      "q": "En la tabla 'Autocomplete/chat vs delegar a un agente', ¿cuál es el rol humano al delegar?",
+      "opciones": [
+        "Escribir y pegar el código sugerido",
+        "Revisar el plan y los diffs, y corregir el rumbo",
+        "Ninguno: el agente entrega solo",
+        "Elegir el modelo en cada paso"
+      ],
+      "correcta": 1,
+      "explicacion": "Al delegar, la unidad de trabajo es una tarea completa y la salida son diffs, commits y deploys; el humano revisa y guía en vueltas chicas. 'Escribir y pegar' es el modo autocomplete; 'ninguno' contradice la regla de que el agente se equivoca con confianza."
+    }
+  ]
+}

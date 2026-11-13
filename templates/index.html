@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block content %}
+{% set idx = load_data(path="data/index.json") %}
+<header class="page-header">
+  <div class="ph-main">
+    <nav class="crumbs"><span>Universidad Austral</span><span class="sep">/</span><span>Ingeniería</span></nav>
+    <h1>Inteligencia Artificial Generativa</h1>
+    <div class="ph-meta"><span>Examen final: vie 4 dic</span><span class="sep"></span><span>2ª fecha: jue 10 dic</span><span class="sep"></span><span id="days" class="num"></span></div>
+  </div>
+  <div class="ph-actions">
+    <a class="btn" href="{{ config.base_url }}/practica/">Practicar</a>
+    <a class="btn primary" id="continue" href="{{ config.base_url }}/clases/01/">Empezar por la clase 1</a>
+  </div>
+</header>
+
+<div class="grid cols-4">
+  <div class="card stat"><span class="v num" id="st-seen">0</span><span class="l">Diapositivas vistas</span></div>
+  <div class="card stat"><span class="v num" id="st-key">0</span><span class="l">Claves para el examen vistas</span></div>
+  <div class="card stat"><span class="v num" id="st-acc">—</span><span class="l">Acierto en práctica</span></div>
+  <div class="card stat"><span class="v num" id="st-star">0</span><span class="l">Marcadas para repasar</span></div>
+</div>
+
+<section class="card">
+  <div class="card-header"><div class="card-title">Clases <span class="count">{{ idx.clases | length }}</span></div></div>
+  <div class="card-body flush table-scroll">
+    <table class="table">
+      <thead><tr><th style="width:56px">#</th><th style="width:88px">Fecha</th><th>Clase</th><th class="r">Diapositivas</th><th class="r">Clave</th><th>TPs</th><th style="width:120px">Visto</th></tr></thead>
+      <tbody>
+      {% for b in idx.bloques %}
+        <tr class="group"><td colspan="7">{{ b.bloque }}</td></tr>
+        {% for c in b.clases %}
+        <tr data-href="{{ config.base_url }}/clases/{{ c.nn }}/">
+          <td class="mono faint">{{ c.nn }}</td>
+          <td class="muted num">{{ c.fecha }}</td>
+          <td><a class="title" href="{{ config.base_url }}/clases/{{ c.nn }}/">{{ c.titulo }}</a></td>
+          <td class="r num muted">{{ c.slides }}</td>
+          <td class="r num muted">{{ c.key }}</td>
+          <td><div class="pills">{% for t in c.tps %}<span class="pill tp">TP{{ t }}</span>{% endfor %}</div></td>
+          <td><span class="progress" data-class="{{ c.num }}" data-total="{{ c.slides }}"><i></i></span></td>
+        </tr>
+        {% endfor %}
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="card">
+  <div class="card-header"><div class="card-title">Trabajos prácticos <span class="count">{{ idx.tps | length }}</span></div></div>
+  <div class="card-body flush table-scroll">
+    <table class="table">
+      <thead><tr><th style="width:56px">TP</th><th>Título</th><th>Aparece en las clases</th><th class="r">Diapositivas</th></tr></thead>
+      <tbody>
+      {% for t in idx.tps %}
+        <tr data-href="{{ config.base_url }}/tp/{{ t.num }}/">
+          <td class="mono faint">{{ t.num }}</td>
+          <td><a class="title" href="{{ config.base_url }}/tp/{{ t.num }}/">{{ t.titulo }}</a></td>
+          <td><div class="pills">{% for c in t.clases %}<span class="pill">{{ c }}</span>{% endfor %}</div></td>
+          <td class="r num muted">{{ t.nrefs }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock content %}
+{% block scripts %}
+<script>
+(function(){
+  var p = Study.state, seen = 0;
+  Object.keys(p.seen).forEach(function(k){ seen += p.seen[k].length; });
+  document.getElementById('st-seen').innerHTML = seen + ' <small>/ {{ idx.total_slides }}</small>';
+  document.getElementById('st-key').innerHTML = Object.keys(p.seenKey || {}).length + ' <small>/ {{ idx.total_key }}</small>';
+  var q = Object.keys(p.quiz).map(function(k){ return p.quiz[k]; });
+  document.getElementById('st-acc').textContent = q.length ? Math.round(100 * q.filter(function(x){return x.ok;}).length / q.length) + '%' : '—';
+  document.getElementById('st-star').textContent = Object.keys(p.star).length;
+  if (p.last) { var a = document.getElementById('continue'); a.href = SITE_BASE + p.last; a.textContent = 'Continuar donde quedaste'; }
+  var d = Math.round((new Date(2026, 11, 4) - new Date(new Date().toDateString())) / 864e5);
+  document.getElementById('days').textContent = d > 0 ? 'faltan ' + d + ' días' : (d === 0 ? 'es hoy' : '');
+})();
+</script>
+{% endblock scripts %}

@@ -1,0 +1,439 @@
+[
+ {
+  "i": 0,
+  "resumen": "Clase 7, segunda parte: del texto como palabras hasta el transformer.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 1,
+  "resumen": "Agenda: un modelo por tarea, predecir lo que sigue, palabras como vectores, de RNN a atención, transformer completo.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 2,
+  "resumen": "Repaso: predecir y agrupar tienen salida en un conjunto conocido; **generar** no, y por eso parecía intratable.",
+  "claves": [
+   "taxonomia-de-problemas",
+   "generativo-vs-discriminativo"
+  ],
+  "ver": [
+   {
+    "ref": "introduccion#29",
+    "por": "taxonomía de problemas"
+   },
+   {
+    "ref": "modelado-redes-neuronales#23",
+    "por": "la tarea decide la salida"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 3,
+  "resumen": "Cada problema clásico tiene su versión con texto. **Predicción y generación** son la misma operación: completar un hueco con el token más probable.",
+  "claves": [
+   "taxonomia-de-problemas",
+   "token"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 4,
+  "resumen": "**NLP** resuelve tareas de texto a una escala que nadie puede leer: tickets, logs, commits, documentación.",
+  "claves": [
+   "nlp"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 5,
+  "resumen": "Matriz de referencia con 25 tareas en cinco familias. La celda clave: 'predecir la siguiente palabra', que termina absorbiendo a las demás.",
+  "claves": [
+   "nlp",
+   "taxonomia-de-problemas"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 6,
+  "resumen": "Antes de los modelos fundacionales, cada tarea pedía su dataset etiquetado y su modelo. El costo estaba en **etiquetar**, y no se reusaba entre tareas.",
+  "claves": [
+   "foundation-model",
+   "datos etiquetados"
+  ],
+  "ver": [
+   {
+    "ref": "introduccion#48",
+    "por": "IA tradicional vs foundation models"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 7,
+  "resumen": "Separador: empieza la sección «Predecir lo que sigue».",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 8,
+  "resumen": "Entradas: vocabulario V, corpus T, frase P; salida: el token siguiente. Escala porque el texto trae su etiqueta: 6 tokens dan 5 ejemplos gratis.",
+  "claves": [
+   "self-supervised",
+   "llm",
+   "token"
+  ],
+  "ver": [
+   {
+    "ref": "como-se-entrena-un-llm#5",
+    "por": "pre-training: completar texto"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 9,
+  "resumen": "La salida es una **distribución** de largo |V| que suma 1. Elegir el token es una decisión aparte de quien usa el modelo.",
+  "claves": [
+   "softmax",
+   "token"
+  ],
+  "ver": [
+   {
+    "ref": "intro-redes-neuronales#26",
+    "por": "softmax: puntajes a probabilidades"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 10,
+  "resumen": "Un **token** es palabra, subpalabra o signo. Las subpalabras achican el vocabulario y arman palabras nuevas: 'unbelievable' son 3 tokens.",
+  "claves": [
+   "token",
+   "tokenizacion"
+  ],
+  "ver": [
+   {
+    "ref": "prompting#6",
+    "por": "cómo se tokeniza"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 11,
+  "resumen": "Ejemplo de juguete: |V|=14 y 5 frases. Para 'the dog sat on' la salida es un vector de 14 probabilidades que suma uno.",
+  "claves": [
+   "token"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 12,
+  "resumen": "Un modelo es un conjunto de **parámetros** ajustables; entrenar es moverlos para que la salida se parezca al vector objetivo.",
+  "claves": [
+   "parametros-vs-hiperparametros",
+   "funcion-de-perdida"
+  ],
+  "ver": [
+   {
+    "ref": "intro-redes-neuronales#13",
+    "por": "parámetros contra hiperparámetros"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 13,
+  "resumen": "Separador: empieza la sección «Palabras como vectores».",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 14,
+  "resumen": "Tres formas de pasar texto a números: bag of words/TF-IDF (sin orden ni significado), **one-hot** (|V| dimensiones equidistantes) y embeddings densos.",
+  "claves": [
+   "one-hot-encoding",
+   "tf-idf",
+   "embedding"
+  ],
+  "tp": [
+   {
+    "tp": 2,
+    "texto": "En el TP2 elegiste one-hot para `State` (12 valores) y embedding de dimensión 8 para `District` (72): el mismo dilema."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "modelado-redes-neuronales#12",
+    "por": "one-hot contra embedding"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 15,
+  "resumen": "Un **embedding** es un vector denso y aprendido por token. Sus números son coordenadas; ninguna dimensión se interpreta sola.",
+  "claves": [
+   "embedding"
+  ],
+  "tp": [
+   {
+    "tp": 2,
+    "texto": "Tu `Embedding(73, 8)` del TP2 es esto: una tabla con un vector aprendido por distrito (72 + 1 para desconocidos)."
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 16,
+  "resumen": "En el espacio de embeddings lo parecido cae cerca. Esa cercanía permite comparar textos sin compararlos palabra por palabra.",
+  "claves": [
+   "embedding",
+   "similitud-coseno"
+  ],
+  "ver": [
+   {
+    "ref": "rag-y-mcp#20",
+    "por": "cada texto es un punto"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 17,
+  "resumen": "Los desplazamientos codifican relaciones: man→woman ≈ king→queen; también tiempo verbal y país→capital.",
+  "claves": [
+   "embedding",
+   "word2vec"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 18,
+  "resumen": "**Word2Vec** aprende un vector por palabra a partir de sus coocurrencias: una palabra se define por su compañía. Da un vector fijo, sin contexto.",
+  "claves": [
+   "word2vec",
+   "embedding"
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 19,
+  "resumen": "Separador: empieza la sección «De las RNN a la atención».",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 20,
+  "resumen": "Repaso: neurona, profundidad, backprop y softmax no cambian con texto; lo único que cambia es la representación de la entrada.",
+  "claves": [
+   "neurona",
+   "backpropagation"
+  ],
+  "ver": [
+   {
+    "ref": "intro-redes-neuronales#5",
+    "por": "la neurona y la capa"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 21,
+  "resumen": "Promediar los vectores de una frase da tamaño fijo pero pierde el orden: 'perro muerde hombre' queda igual que 'hombre muerde perro'.",
+  "claves": [
+   "embedding",
+   "embedding-de-oracion"
+  ],
+  "tp": [
+   {
+    "tp": 3,
+    "texto": "Tu línea base BERT con promedio de tokens sacó 0,35 de Context Relevance: promediar sin ajuste no captura el significado."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "transformers-a-fondo#34",
+    "por": "del encoder al embedding de oración"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 22,
+  "resumen": "Una red común da siempre la misma salida para el mismo vector; una **RNN** recibe además el estado anterior y arrastra lo ya procesado.",
+  "claves": [
+   "rnn"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 23,
+  "resumen": "Desenrollar: una copia por token con los **mismos pesos**; solo viaja el estado. Sirve para cualquier largo, pero obliga a procesar en serie.",
+  "claves": [
+   "rnn"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 24,
+  "resumen": "El estado tiene tamaño fijo: cuanto más larga la frase, más se diluye lo primero. Es un **cuello de botella** de la arquitectura, no del entrenamiento.",
+  "claves": [
+   "rnn",
+   "cuello de botella"
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 25,
+  "resumen": "LSTM y GRU agregan compuertas que deciden qué guardar del estado; ELMo da embeddings contextuales con RNN. Mejoras dentro de la línea recurrente.",
+  "claves": [
+   "rnn",
+   "lstm"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 26,
+  "resumen": "Para resolver 'it'→'animal' una RNN atraviesa 6 estados intermedios; la **atención** los conecta en un solo paso.",
+  "claves": [
+   "atencion",
+   "rnn"
+  ],
+  "ver": [
+   {
+    "ref": "transformers-a-fondo#5",
+    "por": "quiz: qué hace la atención"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 27,
+  "resumen": "La **atención** da a cada token una fila de pesos que suma 1 sobre todos los demás, y con ella arma su representación contextual.",
+  "claves": [
+   "atencion",
+   "self-attention"
+  ],
+  "tp": [
+   {
+    "tp": 3,
+    "texto": "La parte 4 del TP3 (atención en NumPy) quedó pendiente: el plan era `softmax`, `atencion` y `autoatencion` guiados por 14 tests."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "transformers-a-fondo#19",
+    "por": "la mezcla, con números"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 28,
+  "resumen": "Sin recurrencia, el **Transformer** procesa toda la secuencia en paralelo: más de 2 puntos BLEU y 3,5 días en 8 GPU. Mejor calidad con menos entrenamiento.",
+  "claves": [
+   "transformer"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 29,
+  "resumen": "Separador: empieza la sección «El transformer completo».",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 30,
+  "resumen": "El transformer de 2017: el encoder codifica la entrada y el decoder genera token a token consultando al encoder. Bloques de atención apilados.",
+  "claves": [
+   "transformer",
+   "encoder-decoder"
+  ],
+  "ver": [
+   {
+    "ref": "transformers-a-fondo#31",
+    "por": "encoder y decoder por dentro"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 31,
+  "resumen": "Word2Vec (estático) → RNN (secuencial, con cuello de botella) → transformer (contextual con atención): cada fila arregla la limitación de la anterior.",
+  "claves": [
+   "word2vec",
+   "rnn",
+   "transformer"
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 32,
+  "resumen": "Cada token generado es una vuelta: tokenizar, embeber, transformer, distribución, elegir y volver a leer todo. La **temperatura** regula cuánto azar hay al elegir.",
+  "claves": [
+   "token",
+   "llm",
+   "temperatura"
+  ],
+  "tp": [
+   {
+    "tp": 3,
+    "texto": "Tu agente corre deepseek-v4-flash con temperatura 0: siempre elige el token más probable."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "transformers-a-fondo#11",
+    "por": "el mismo ciclo, con el bloque abierto"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 33,
+  "resumen": "Un LLM es el mismo problema a otra escala: vocabulario de unos 100 mil tokens, datos a escala web y miles de millones de parámetros.",
+  "claves": [
+   "llm",
+   "leyes-de-escala"
+  ],
+  "ver": [
+   {
+    "ref": "como-se-entrena-un-llm#9",
+    "por": "Chinchilla: 20 tokens por parámetro"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 34,
+  "resumen": "Un modelo que genera texto reescribe casi cualquier tarea de NLP como **instrucción**: sentimiento, traducción o resumen con el mismo modelo y otro prompt.",
+  "claves": [
+   "foundation-model",
+   "prompt-engineering"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 35,
+  "resumen": "Entrenar es caro, lo hacen pocos y se hace una vez; la **inferencia** usa parámetros fijos en cada consulta. Chatear no entrena al modelo.",
+  "claves": [
+   "inferencia",
+   "pretraining"
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 36,
+  "resumen": "Un modelo de lenguaje predice el token siguiente; la etiqueta gratis cambió la escala y la atención rompió el cuello de botella de las RNN.",
+  "claves": [
+   "llm",
+   "atencion"
+  ],
+  "clave_examen": false
+ }
+]

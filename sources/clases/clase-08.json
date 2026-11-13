@@ -1,0 +1,856 @@
+{
+ "num": 8,
+ "fecha": "2026-09-23",
+ "titulo": "El transformer por dentro: atención, el bloque completo y la familia de modelos",
+ "talks": [
+  "transformers-a-fondo"
+ ],
+ "bloque": "Transformers",
+ "tesis": "Un transformer es una pila de bloques idénticos, y cada bloque hace dos cosas: **la atención mezcla información entre posiciones y la red feed-forward la procesa posición por posición**. La matemática de un bloque son ocho multiplicaciones de matrices, un softmax, una ReLU y dos normalizaciones: con una frase de pocos tokens y vectores de dimensión 4 se calcula a mano.",
+ "resumen": "La clase anterior terminó en la intuición de que cada token mira a todos los demás; esta muestra la matemática. Arranca con un quiz de repaso y retoma el ciclo token a token con la caja del transformer abierta: un bloque repetido N veces (6 en el paper de 2017, 12 en GPT-2 chico). Fija la notación (la frase como matriz X de n × d) y explica por qué la posición se suma al embedding antes de todo. Después calcula una capa de self-attention a mano sobre \"the cat sat\" con d = 4: tres proyecciones Q, K, V; el producto punto QKᵀ como afinidad (la única matriz n × n y el costo cuadrático); la escala por √d_k; el softmax por fila; la mezcla A·V; y la máscara causal que convierte un encoder en generador. Arma el bloque completo: multi-head, feed-forward 4d con la única no linealidad, residuales contra el gradiente que se desvanece, layer norm (pre-LN vs post-LN), la codificación sinusoidal y la cuenta de ~12d² parámetros por bloque. Con eso apila: encoder y decoder del paper, GPT (solo decoder), BERT (solo encoder), Sentence-BERT para RAG y ViT para imágenes. Nombra las variantes modernas (KV cache, GQA/MLA, FlashAttention, RoPE, MoE) y cierra con la cross-entropy que se minimiza al entrenar.",
+ "secciones": [
+  {
+   "titulo": "Dónde quedamos: la frase como matriz y la posición",
+   "contenido": "**El ciclo con el transformer abierto.** Cada token generado es una vuelta: tokenizar → embeber (+ posición) → **transformer = bloque × N** → distribución sobre |V| (50.257 en GPT-2) → elegir → agregar y repetir. Cada bloque hace **atención** (mueve información entre tokens y enriquece cada embedding con el contexto) y luego **feed-forward** (procesa cada token por separado). **Entrada y salida del bloque tienen la misma forma** (n × d), por eso se apilan; N bloques con la misma forma y **pesos propios** (paper 2017: N = 6; GPT-2 chico: 12).\n\n**La frase como matriz.** \"the cat sat\" es una matriz **X de 3 tokens × 4 dimensiones**: una fila por token, una columna por dimensión. Convención: **n** = cantidad de tokens, **d** = dimensión del embedding. Son independientes: en un modelo real d = 512 (paper) o 768 (GPT-2 chico) y n son cientos o miles, así que **X casi nunca es cuadrada**. Los números del ejemplo son enteros de juguete; en un modelo real son decimales aprendidos de la tabla de embeddings |V| × d, sin significado individual.\n\n$$X = \\begin{bmatrix} 1 & 0 & 1 & 0 \\\\ 0 & 2 & 0 & 1 \\\\ 1 & 1 & 1 & 1 \\end{bmatrix} \\begin{matrix} \\leftarrow \\text{the} \\\\ \\leftarrow \\text{cat} \\\\ \\leftarrow \\text{sat} \\end{matrix}$$\n\n**La posición entra con el embedding.** La atención compara vectores y **no sabe en qué lugar está cada uno**: todo lo que viene (proyecciones, productos punto, softmax, mezcla) trata a las filas como un conjunto; **si se permutan las filas de X, se permuta la salida y nada más**. Sin posición, \"the cat sat\" y \"sat cat the\" serían indistinguibles. Solución: antes de todo, a cada embedding se le **suma** (no se concatena) un vector de posición de la misma dimensión d: $x_i = e_{\\text{token}} + p_i$. Así todas las matrices siguen siendo de d columnas y el modelo aprende a leer las dos cosas mezcladas. De dónde sale p: en el paper de 2017, una fórmula fija de senos y cosenos; en BERT y GPT-2, una **tabla aprendida** (512 y 1024 filas).",
+   "conceptos": [
+    "transformer",
+    "codificacion-posicional",
+    "embedding"
+   ]
+  },
+  {
+   "titulo": "Q, K, V y el producto punto como afinidad",
+   "contenido": "**Tres proyecciones del mismo vector.** Cada token se proyecta tres veces con tres matrices **entrenables**:\n\n- $Q = XW_Q$ — **\"qué busco\"**: lo que el token necesita del contexto.\n- $K = XW_K$ — **\"qué ofrezco\"**: lo que cada token le aporta al que consulta.\n- $V = XW_V$ — **\"qué entrego\"**: la información que se mezcla para producir el embedding enriquecido.\n\nLas tres salen del mismo X: de ahí ***self*-attention**. **¿Por qué tres y no una?** Buscar y ser encontrado **no es simétrico**: \"it\" busca un sustantivo y \"animal\" ofrece serlo. Si consulta y clave fueran la misma proyección, el score de un token contra sí mismo sería su norma al cuadrado y (por Cauchy-Schwarz) ningún token de norma igual o menor podría superarlo: cada token tendería a mirarse a sí mismo. Por eso la matriz de atención **no es simétrica** (el peso de \"it\" sobre \"animal\" no tiene por qué igualar el de \"animal\" sobre \"it\").\n\n**Formas:** Q y K deben tener la **misma dimensión $d_k$** (se multiplican); V puede tener otra, $d_v$. En el paper, 64 por cabeza.\n\n**En el ejemplo:** $W_Q = I$ (Q = X); $W_K$ intercambia la columna 1 con la 2 y la 3 con la 4; $W_V$ suma la columna 1 con la 3 y la 2 con la 4 y **baja a dimensión 2**. Elegidas para que las cuentas salgan a mano; en un modelo real son densas y aprendidas por gradiente.\n\n**El producto punto mide afinidad.** Cada consulta contra todas las claves: $S = QK^\\top$, una matriz **n × n** (cuánto le importa a cada token cada otro). Una celda es un producto punto, grande cuando los vectores apuntan para el mismo lado. Se calcula para toda la frase con **una multiplicación de matrices** (lo que las GPU hacen mejor); el paper descarta la atención *aditiva* (una red chica por par) por lenta. **Es la única matriz cuadrada del proceso** y es **el costo cuadrático**: n² celdas — 9 con 3 tokens, **16 millones con 4.096**, por cabeza y por capa. En el ejemplo la diagonal no es la más alta (\"the\" contra sí mismo da 0) porque $W_K \\neq I$.",
+   "conceptos": [
+    "query-key-value",
+    "self-attention",
+    "atencion"
+   ],
+   "ejemplo": "$$Q = X = \\begin{bmatrix}1&0&1&0\\\\0&2&0&1\\\\1&1&1&1\\end{bmatrix} \\quad K = XW_K = \\begin{bmatrix}0&1&0&1\\\\2&0&1&0\\\\1&1&1&1\\end{bmatrix} \\quad V = XW_V = \\begin{bmatrix}2&0\\\\0&3\\\\2&2\\end{bmatrix}$$\n\n\"the\" [1 0 1 0] como clave es [0 1 0 1]; \"cat\" [0 2 0 1] como clave es [2 0 1 0].\n\n$$QK^\\top = \\begin{bmatrix} 0 & 3 & 2 \\\\ 3 & 0 & 3 \\\\ 2 & 3 & 4 \\end{bmatrix} \\quad (\\text{filas = consultas, columnas = claves})$$\n\nCelda cat·the $= 0\\cdot0 + 2\\cdot1 + 0\\cdot0 + 1\\cdot1 = 3$."
+  },
+  {
+   "titulo": "Escalar, softmax y mezclar los valores",
+   "contenido": "**Escalar por $\\sqrt{d_k}$.** Los scores se dividen por $\\sqrt{d_k}$ (en el ejemplo $\\sqrt4 = 2$): la fila \"cat\" pasa de [3 0 3] a [1,5 0 1,5]. **Por qué (justificación estadística):** si las componentes de q y k son independientes con varianza 1, el producto punto (suma de $d_k$ productos) tiene **varianza $d_k$**; dividir por $\\sqrt{d_k}$ la devuelve a 1 sea cual sea la dimensión. Sin escala, con $d_k = 64$ los scores andan por ±8 y **el softmax se satura**: un peso ≈ 1, el resto ≈ 0, **gradiente casi nulo**.\n\n**Softmax por fila:** $\\text{softmax}(x)_i = e^{x_i} / \\sum_j e^{x_j}$. Cada fila de la **matriz de atención A** pasa a ser una distribución: pesos positivos que **suman 1**. **Por qué softmax:** es **derivable** (se entrena por gradiente) y **reparte**; quedarse con el máximo daría peso 1 a un solo token y no tendría gradiente.\n\n**Mezclar los valores:** la salida de cada token es la suma de todos los V pesada por su fila de atención: $\\text{salida} = AV$. **Es un promedio ponderado**: \"cat\" sale como mezcla de lo que entregan todos, con más peso de los que le importan — la versión numérica de \"it reescrito con el peso puesto sobre animal\" (representación contextual).\n\n**La fórmula completa (Vaswani et al., ec. 1):**\n$$\\text{Attention}(Q,K,V) = \\text{softmax}\\!\\left(\\frac{QK^\\top}{\\sqrt{d_k}}\\right)V$$\n\nToda la frase se procesa con **cinco multiplicaciones de matrices y un softmax**: $XW_Q$, $XW_K$, $XW_V$, $QK^\\top$, softmax por fila y $A\\cdot V$. **No hay bucle sobre los tokens: por eso paraleliza.**",
+   "conceptos": [
+    "self-attention",
+    "softmax",
+    "escala-raiz-dk"
+   ],
+   "ejemplo": "**Fila \"cat\":** $[3\\;0\\;3] / 2 = [1{,}5\\;0\\;1{,}5]$. $e^{1,5} = 4{,}48$, $e^{0} = 1$, $e^{1,5} = 4{,}48$; suma 9,96 → pesos **[0,45 0,10 0,45]** (\"cat\" mira a \"the\" y a \"sat\" por igual y casi nada a sí misma).\n\n$$A = \\text{softmax}\\!\\left(\\frac{QK^\\top}{2}\\right) = \\begin{bmatrix} 0{,}12 & 0{,}55 & 0{,}33 \\\\ 0{,}45 & 0{,}10 & 0{,}45 \\\\ 0{,}19 & 0{,}31 & 0{,}51 \\end{bmatrix} \\quad \\text{(cada fila suma 1)}$$\n\n**Mezcla para \"cat\":** $0{,}45\\cdot[2\\;0] + 0{,}10\\cdot[0\\;3] + 0{,}45\\cdot[2\\;2]$:\n- dim 1: $0{,}45\\cdot2 + 0{,}10\\cdot0 + 0{,}45\\cdot2 = 1{,}80$\n- dim 2: $0{,}45\\cdot0 + 0{,}10\\cdot3 + 0{,}45\\cdot2 = 1{,}20$\n\n| salida A·V | dim 1 | dim 2 |\n|---|---|---|\n| the | 0,91 | 2,30 |\n| cat | 1,80 | 1,20 |\n| sat | 1,39 | 1,93 |\n\n(Son los valores de referencia de `test_atencion.py` del TP3: A = [[0,1220 0,5465 0,3315], [0,4498 0,1004 0,4498], [0,1863 0,3072 0,5065]].)"
+  },
+  {
+   "titulo": "La máscara causal",
+   "contenido": "**Para generar texto, un token no puede mirar a los que vienen después.** Antes del softmax, los scores de posiciones posteriores (arriba de la diagonal) se ponen en **−∞**:\n\n$$\\text{Attention}_{\\text{causal}} = \\text{softmax}\\!\\left(\\frac{QK^\\top}{\\sqrt{d_k}} + M\\right)V, \\qquad M_{ij} = \\begin{cases} 0 & j \\le i \\\\ -\\infty & j > i \\end{cases}$$\n\n**Por qué −∞ y no 0:** $e^{-\\infty} = 0$, así que el softmax reparte solo entre los tokens permitidos y **la fila sigue sumando 1**. Un score de 0 le daría al token prohibido un peso $e^0 = 1$, que **no es cero**. En el código de GPT-2: `att.masked_fill(mask == 0, float('-inf'))`.\n\n**Por qué (justificación de entrenamiento):** si \"cat\" pudiera ver \"sat\" mientras aprende a predecir \"sat\", la tarea sería trivial (copiar) y no aprendería nada. Con la máscara, **una frase de n tokens da n ejemplos de entrenamiento válidos de una vez**: es la ventana deslizante de la clase 7 calculada en paralelo.\n\n**Efecto:** la matriz de atención queda **triangular inferior**. La **primera fila** solo se ve a sí misma (peso 1). La **última fila no cambia**: el último token ya veía a todos.\n\n**Es la diferencia entre encoder-only y decoder-only.** BERT no enmascara: cada token ve la frase entera. GPT enmascara: cada token ve solo lo anterior. **El resto del bloque es igual.** Consecuencia práctica (clase siguiente): como las filas de los tokens anteriores no cambian cuando aparece uno nuevo, sus K y V se pueden guardar: **KV cache**.",
+   "conceptos": [
+    "mascara-causal",
+    "atencion"
+   ],
+   "ejemplo": "$$\\frac{QK^\\top}{2} + M = \\begin{bmatrix} 0 & -\\infty & -\\infty \\\\ 1{,}5 & 0 & -\\infty \\\\ 1 & 1{,}5 & 2 \\end{bmatrix} \\xrightarrow{\\text{softmax}} A = \\begin{bmatrix} 1{,}00 & 0 & 0 \\\\ 0{,}82 & 0{,}18 & 0 \\\\ 0{,}19 & 0{,}31 & 0{,}51 \\end{bmatrix}$$\n\nFila \"cat\": $e^{1,5}=4{,}48$ y $e^0 = 1$ → 4,48/5,48 = 0,82 y 1/5,48 = 0,18.\nLa salida cambia: \"cat\" pasa de [1,80 1,20] a **[1,64 0,55]** porque ya no recibe nada de \"sat\". Salida completa: the [2,00 0], cat [1,64 0,55], sat [1,39 1,93] (sat igual que sin máscara)."
+  },
+  {
+   "titulo": "Multi-head attention y la feed-forward",
+   "contenido": "**Varias cabezas en paralelo.** Multi-head attention corre **h atenciones en paralelo**, cada una con sus propias $W_Q^i, W_K^i, W_V^i$ de dimensión **d/h**, **concatena** las salidas y las proyecta con una matriz más, $W_O$:\n\n$$\\text{MultiHead}(X) = \\text{Concat}(\\text{head}_1,\\dots,\\text{head}_h)\\,W_O, \\quad \\text{head}_i = \\text{Attention}(XW_Q^i, XW_K^i, XW_V^i)$$\n\n- **Por qué varias:** una sola cabeza **promedia** (\"averaging inhibits this\", dice el paper): si \"it\" necesita mirar al sujeto por una razón y al verbo por otra, una sola distribución tiene que repartir. Con 8 cabezas, cada una aprende una relación distinta (dependencias largas, anáforas, estructura sintáctica). Una sola cabeza da 0,9 BLEU peor; demasiadas también empeoran.\n- **El costo no sube:** $d_k = d/h$; en el paper **512/8 = 64** por cabeza. Ocho cabezas de 64 cuestan lo mismo que una de 512, y la concatenación devuelve 512.\n- **$W_O$** mezcla lo que dijeron las cabezas; sin ella cada cabeza escribiría en su propio rincón del vector.\n- En el juguete con h = 2 habría dos cabezas de dimensión 2, cada una con su propia matriz 3 × 3 (es el test `dos_cabezas_concatenan_y_proyectan` del TP3).\n\n**La feed-forward: la misma red para cada posición.** Después de la atención, cada token pasa **solo** por una red de dos capas: subir a **4d**, ReLU, bajar a d:\n\n$$\\text{FFN}(x) = \\max(0,\\, xW_1 + b_1)\\,W_2 + b_2 \\qquad (d = 512,\\ d_{ff} = 2048)$$\n\n- **Por qué hace falta:** la atención **solo mezcla**: su salida es una combinación lineal de los V. **La ReLU es la única no linealidad** del bloque que permite computar algo nuevo; sin FFN, una pila de atenciones sería casi lineal. (BERT usa GELU, siguiendo al GPT original.)\n- **Por qué por posición:** se aplica fila por fila, con los mismos pesos, sin mirar vecinos; el intercambio entre tokens ya ocurrió en la atención. El paper la describe como dos convoluciones de tamaño 1.\n- **Cuenta:** dos matrices d × 4d = **8d²** parámetros, contra **4d²** de la atención ($W_Q, W_K, W_V, W_O$): la FFN concentra **dos tercios** de los parámetros del bloque.",
+   "conceptos": [
+    "multi-head-attention",
+    "feed-forward",
+    "relu",
+    "no-linealidad"
+   ]
+  },
+  {
+   "titulo": "Residuales, el gradiente que se pierde y layer norm",
+   "contenido": "**El problema de apilar.** Para entrenar, el error en la salida tiene que volver hasta la primera capa. En N bloques, por la **regla de la cadena** (la de backpropagation), el gradiente en la capa 1 es un **producto de N derivadas**: $\\frac{\\partial L}{\\partial x_N} J_N J_{N-1}\\cdots J_1$. Si cada factor encoge la señal: $0{,}9^{12} = 0{,}28$, **$0{,}9^{48} = 0{,}006$** (se desvanece); si la agranda: $1{,}1^{48} = 97$ (explota). Las primeras capas casi no reciben señal y no aprenden (por eso las redes profundas de los 2000 entrenaban peor que las chicas).\n\n**Residuales: la salida es la entrada más una corrección.** Cada subcapa **suma** su resultado al vector de entrada:\n$$x' = x + \\text{Atención}(x), \\qquad x'' = x' + \\text{FFN}(x')$$\n**Por qué resuelve el problema:** $\\frac{\\partial}{\\partial x}(x + f(x)) = 1 + f'(x)$: en cada bloque hay un término **identidad**, un camino con derivada exactamente 1, y el error llega a la primera capa aunque los $f'$ sean chicos (idea de ResNet, He et al. 2016). Las capas aprenden **solo la diferencia**. El vector de cada token atraviesa la pila como **residual stream**: una cabeza escribe en la capa 3 y otra lo lee en la 10. **Por eso d se conserva en toda la pila**: para que la suma sea posible.\n\n**Layer norm: mantener los números en rango.** Cada vector (cada token) se normaliza **por separado**: restar su media y dividir por su desvío, y luego reescalar con dos parámetros aprendidos por dimensión, γ y β:\n$$\\text{LN}(x) = \\gamma \\odot \\frac{x - \\mu}{\\sqrt{\\sigma^2 + \\varepsilon}} + \\beta$$\n- **Por qué:** cada bloque suma algo al residual stream; sin normalizar, la escala crece capa a capa y el softmax y la ReLU dejan de trabajar en su rango.\n- **Por qué por vector y no batch norm:** normalizar sobre las d dimensiones de un token **no depende de las otras frases del batch ni de la longitud**; funciona con secuencias de distinto largo y batch de 1 en inferencia. Batch norm depende de ambas cosas.\n- **Pre-LN vs post-LN:** el paper de 2017 normaliza **después** de sumar, $\\text{LN}(x + \\text{Sub}(x))$; GPT-2 la movió **antes**, $x + \\text{Sub}(\\text{LN}(x))$ (y agregó una LN final). Con pre-LN el camino residual queda limpio y el entrenamiento es más estable; GPT-2, ViT y casi todo lo posterior usan pre-LN.",
+   "conceptos": [
+    "conexion-residual",
+    "layer-norm",
+    "backpropagation",
+    "regla-de-la-cadena"
+   ],
+   "ejemplo": "**LN([2 0 1 1]):** media $\\mu = 1$; varianza $\\sigma^2 = \\frac{(1)^2 + (-1)^2 + 0 + 0}{4} = 0{,}5$; desvío $\\approx 0{,}71$. Normalizado: $[1/0{,}71,\\ -1/0{,}71,\\ 0,\\ 0] = [1{,}41\\ -1{,}41\\ 0\\ 0]$. Después se multiplica por γ y se suma β. (Es el test `layer_norm` del TP3; LN es invariante a escalar o correr el vector: LN(2x) = LN(x + 10) = LN(x).)"
+  },
+  {
+   "titulo": "La codificación posicional sinusoidal y la cuenta de parámetros",
+   "contenido": "**Senos y cosenos.** El paper de 2017 suma un vector **fijo** con una sinusoide de distinta frecuencia por par de dimensiones:\n$$PE_{(pos,\\,2i)} = \\sin\\!\\left(\\frac{pos}{10000^{2i/d}}\\right), \\qquad PE_{(pos,\\,2i+1)} = \\cos\\!\\left(\\frac{pos}{10000^{2i/d}}\\right)$$\nLas primeras dimensiones **cambian rápido** con la posición y las últimas **casi no cambian** (longitudes de onda de 2π a 10000·2π). **Por qué sinusoides:** para cualquier desplazamiento k, $PE_{pos+k}$ es una **función lineal** de $PE_{pos}$, así que el modelo puede aprender a atender por **posición relativa**. El paper conjetura que extrapolan a secuencias más largas que las de entrenamiento; en la práctica lo hacen mal, y eso motiva **RoPE**.\n\n**Alternativas:** embeddings de posición **aprendidos** (BERT 512 filas, GPT-2 1024; \"nearly identical results\" según el paper) y **RoPE**, que **rota Q y K** en vez de sumar un vector (la usan los LLM actuales).\n\n**Cuenta de parámetros de un bloque: ~12d².** Atención $4d^2$ ($W_Q, W_K, W_V, W_O$) + feed-forward $8d^2$ ($d\\times4d$ y $4d\\times d$). Para N bloques: **$12Nd^2$** (fórmula de Kaplan et al. para parámetros sin embeddings). El decoder del paper suma $4d^2$ por la cross-attention → $16Nd^2$. Embeddings: $|V|\\cdot d$.\n\n| | Paper 2017 (d = 512, N = 6) | GPT-2 chico (d = 768, N = 12) |\n|---|---|---|\n| Atención por bloque (4d²) | 1,05 M | 2,36 M |\n| FFN por bloque (8d²) | 2,10 M | 4,72 M |\n| Encoder 12Nd² | 18,9 M | 84,9 M (decoder-only) |\n| Decoder 16Nd² | 25,2 M | — |\n| Embeddings \\|V\\|·d | 37k·512 = 19 M | 50.257·768 = 38,6 M |\n| **Total** | **~63 M (paper: 65 M)** | **~124 M** |\n\nLa tabla de embeddings es **un tercio** del total en GPT-2 chico pero **despreciable** en modelos grandes: con d = 12.288 y 96 bloques (GPT-3 175B), los bloques son 174.000 M y los embeddings 600 M. **Los cientos de miles de millones de parámetros de un LLM son $12Nd^2$ con d y N grandes.**",
+   "conceptos": [
+    "codificacion-posicional"
+   ],
+   "ejemplo": "PE con d = 4 (dims 1-2 con frecuencia 1, dims 3-4 con $1/10000^{1/2} = 0{,}01$):\n\n| pos | dim 1 (sen) | dim 2 (cos) | dim 3 (sen) | dim 4 (cos) |\n|---|---|---|---|---|\n| 0 | 0 | 1 | 0 | 1 |\n| 1 | 0,84 | 0,54 | 0,01 | 1,00 |\n| 2 | 0,91 | −0,42 | 0,02 | 1,00 |\n| 3 | 0,14 | −0,99 | 0,03 | 1,00 |\n\nEj.: pos 1, dim 1 = sen(1) = 0,84; dim 3 = sen(1/100) ≈ 0,01. GPT-2 chico: 12·12·768² = 84,9 M en bloques."
+  },
+  {
+   "titulo": "Encoder, decoder y la familia de modelos",
+   "contenido": "**El paper de 2017** apila **6 bloques de encoder y 6 de decoder**. El encoder lee la entrada completa (self-attention **sin máscara** + FFN) y produce una representación contextual por token. El decoder genera token a token con **tres subcapas**: self-attention **con máscara causal**, **cross-attention** (las **consultas vienen del decoder**, las **claves y valores del encoder**: la misma fórmula con Q de una secuencia y K, V de otra) y FFN. Fue diseñado **para traducir** (entrada en un idioma, salida en otro).\n\n**Solo el decoder: GPT.** GPT-2 (Radford et al., 2019) usa solo el decoder, **sin cross-attention**: self-attention enmascarada + FFN, terminando en un softmax sobre el vocabulario. **Por qué alcanza:** si la tarea es predecir el token siguiente, entrada y salida son la **misma secuencia**; no hay frase de origen que codificar. Tamaños: 117 M (12 capas, d = 768), 345 M, 762 M, 1.542 M (48, 1600); contexto 1024; vocabulario 50.257; WebText 40 GB. Tesis: entrenado solo con next-token, hace tareas que nadie le enseñó si se las describe en el prompt (**origen del prompting**). Casi todos los LLM actuales son decoder-only.\n\n**Solo el encoder: BERT.** Devlin et al., 2018. Sin máscara, cada token ve toda la frase. **No genera texto**: produce una representación contextual por token. Como sin máscara el next-token sería copiar, se entrena con **masked language model**: tapar el **15 %** de los tokens (80 % [MASK], 10 % aleatorio, 10 % igual) y predecirlos desde ambos lados, más NSP (¿una frase sigue a otra?). BERT-base: 12 capas, d = 768, 12 cabezas, 110 M; large: 24, 1024, 16, 340 M. Entrada: WordPiece (30k) + segmento + posición aprendida (máx. 512).\n\n**Del encoder al embedding de oración (RAG).** BERT crudo **no** da buenos embeddings de oración: en STS, promedio de tokens de BERT 54,8, vector [CLS] 29,2, **promedio de GloVe 61,3**. Un **cross-encoder** (las dos frases juntas) funciona pero comparar 10.000 frases son 50 millones de pasadas (~65 h). **Sentence-BERT** (Reimers 2019): **pooling por media** + ajuste **siamés** con pares (NLI, STS) para que el coseno refleje similitud → 74,9 (base) / 76,6 (large), y la búsqueda baja a ~5 s. Es la base de los modelos de embeddings actuales.\n\n**ViT.** El bloque no sabe que procesa texto: una imagen 224 × 224 en parches 16 × 16 (**196 parches**, 768 valores cada uno) proyectados a d, más un token [class] y posiciones aprendidas → encoder estándar. Menos sesgo inductivo que una CNN: peor con pocos datos, mejor con 14 M–300 M imágenes (88,55 % ImageNet).\n\n**Regla práctica:** salida = **vector → encoder**; salida = **texto → decoder**; encoder-decoder sobrevive en traducción, resumen y audio (T5, BART, Whisper).",
+   "conceptos": [
+    "encoder-decoder",
+    "cross-attention",
+    "bert",
+    "decoder-only",
+    "embedding-de-oracion",
+    "mascara-causal"
+   ],
+   "ejemplo": "**TP3, parte 5: \"El banco aguanta\" vs \"El banco presta\" (d = 4, una cabeza).** Dimensiones inventadas: 1 = mueble, 2 = finanzas, 3 = acción, 4 = gramatical. X = E + P, con P aprendida (pos 0: 0; pos 1: [0 0 0 1]; pos 2: [0 0 0 2]) → X = [El 0 0 0 1; banco 1 1 0 1; aguanta 1 0 1 2] (presta: 0 1 1 2). $W_Q = W_V = W_O = I$.\n\n- Scores escalados (iguales en ambas frases): fila banco [0 1 1,5], fila 3 [0 0,5 1].\n- **Parte A (decoder, con máscara):** fila banco de A = [0,269 0,731 0] → LN(Z) de banco = **[0,459 0,459 −1,715 0,797] en las dos frases**: banco todavía no vio el verbo. Fila 3 de A = [0,186 0,307 0,506]. Predicción con la última fila: **\"aguanta\" → peso ≈ 0,60**; **\"presta\" → dinero ≈ 0,60** (logits [0 0 −0,47 −0,47 1,59 −2,81] y simétrico).\n- **Parte B (encoder, sin máscara):** fila banco de A = [0,122 0,331 0,547] → LN(Z) de banco = [0,412 −0,333 −1,403 1,323] (aguanta) vs [−0,333 0,412 −1,403 1,323] (presta): **banco cambia según la frase** porque ve al verbo.\n- La predicción de la última posición es **la misma** con y sin máscara: el último token ya veía a todos.\n- El modelo \"sabe\" peso vs dinero porque la **última fila** (el verbo) atiende a banco y a sí misma; la desambiguación vive en la posición que predice. A se parece a GPT (generar); B a BERT (representaciones, el encoder del RAG). Si P fuera cero, aquí no cambiaría la predicción, pero frases con las mismas palabras en otro orden darían salidas permutadas e indistinguibles."
+  },
+  {
+   "titulo": "Lo que cambió desde 2017 y cómo se entrena",
+   "contenido": "**Variantes modernas** (solo se nombran; se desarrollan en la clase siguiente). Casi todas atacan dos costos: **la matriz de atención crece con n²** y **generar exige guardar K y V de todos los tokens anteriores**.\n\n| Técnica | Qué problema ataca |\n|---|---|\n| **KV cache** | Recalcular K y V de todo el texto previo en cada token generado (existe gracias a la máscara causal) |\n| **GQA y MLA** | La memoria que ocupa esa cache con contextos largos |\n| **FlashAttention** | El tiempo perdido leyendo/escribiendo la matriz de atención en la memoria de la GPU |\n| **RoPE** | Codificar la posición para funcionar con textos más largos que los de entrenamiento |\n| **Mixture of Experts** | Tener muchos más parámetros sin pagarlos todos en cada token |\n| **Atención lineal e híbridos** | El costo cuadrático en sí |\n\nLas cinco primeras **conservan la fórmula** $\\text{softmax}(QK^\\top/\\sqrt{d_k})V$; la última la reemplaza.\n\n**Qué se minimiza: cross-entropy.** Para cada posición, el modelo da $p(\\text{token})$ sobre |V| y la pérdida es $-\\log p(\\text{token correcto})$, promediada sobre todas las posiciones del batch. Si le dio **0,5** al correcto, pérdida **0,69**; si le dio **0,01**, **4,6**. **Por qué:** es derivable respecto de los logits y castiga más cuanto menos probabilidad le dio al correcto (es la misma de clasificación, con |V| clases). **Su mínimo no es cero**: es la entropía del texto, porque después de \"the cat sat on the\" hay varios tokens razonables. Con la máscara causal, **cada posición de cada frase es un ejemplo**.\n\n**Escala:** paper base 100k pasos, 12 h en 8 P100; grande 300k pasos, 3,5 días. Adam (β1 = 0,9, β2 = 0,98), warmup de 4.000 pasos, dropout 0,1, label smoothing 0,1. GPT-2: 40 GB. BERT: 3.300 M de palabras, 4 días en 4 Cloud TPU.\n\n**Cierre:** la atención en una línea es $\\text{softmax}(QK^\\top/\\sqrt{d_k})V$; con máscara genera, sin máscara representa. El bloque: varias cabezas, FFN 4d (la no linealidad), residuales (gradiente), layer norm (escala), posición (orden). ~12d² por bloque.",
+   "conceptos": [
+    "kv-cache",
+    "entropia-cruzada",
+    "funcion-de-perdida"
+   ]
+  }
+ ],
+ "conceptos": [
+  {
+   "id": "self-attention",
+   "termino": "Self-attention",
+   "definicion": "Atención en la que consultas, claves y valores salen de la misma secuencia X: $\\text{softmax}(QK^\\top/\\sqrt{d_k})V$ con $Q=XW_Q$, $K=XW_K$, $V=XW_V$.",
+   "por_que_importa": "Cada token arma su representación contextual mezclando la de todos, en paralelo y con un solo salto entre tokens lejanos.",
+   "trampa": "Creer que la matriz de atención es simétrica: Q y K son proyecciones distintas, así que el peso de 'it' sobre 'animal' no tiene por qué igualar al inverso."
+  },
+  {
+   "id": "query-key-value",
+   "termino": "Query, Key, Value",
+   "definicion": "Tres proyecciones entrenables de cada token: Q = qué busca, K = qué ofrece, V = qué entrega para mezclar.",
+   "por_que_importa": "Separar buscar de ser encontrado rompe la simetría y evita que cada token se mire sobre todo a sí mismo.",
+   "trampa": "Q y K deben tener la misma dimensión d_k (se multiplican); V puede tener otra (d_v)."
+  },
+  {
+   "id": "escala-raiz-dk",
+   "termino": "Escala por √d_k",
+   "definicion": "Dividir los productos punto QKᵀ por la raíz de la dimensión de las claves antes del softmax.",
+   "por_que_importa": "Con componentes de varianza 1 el producto punto tiene varianza d_k; sin escala el softmax se satura (un peso ≈ 1) y el gradiente es casi nulo.",
+   "trampa": "Dividir por d_k en vez de √d_k, o creer que es un detalle cosmético: con d_k = 64 los scores andan por ±8."
+  },
+  {
+   "id": "softmax",
+   "termino": "Softmax por fila",
+   "definicion": "$e^{x_i}/\\sum_j e^{x_j}$ aplicado a cada fila de scores: convierte cada fila en pesos positivos que suman 1.",
+   "por_que_importa": "Es derivable (permite entrenar por gradiente) y reparte la atención entre varios tokens.",
+   "trampa": "Reemplazarlo por un máximo duro: da peso 1 a un solo token y no tiene gradiente."
+  },
+  {
+   "id": "mascara-causal",
+   "termino": "Máscara causal",
+   "definicion": "Poner −∞ en los scores de posiciones posteriores (arriba de la diagonal) antes del softmax, para que cada token solo vea los anteriores y a sí mismo.",
+   "por_que_importa": "Hace posible generar y entrenar con n ejemplos por frase a la vez; es lo que distingue un decoder de un encoder.",
+   "trampa": "Poner 0 en vez de −∞: e^0 = 1 le da peso al token prohibido. La última fila no cambia con la máscara."
+  },
+  {
+   "id": "multi-head-attention",
+   "termino": "Multi-head attention",
+   "definicion": "h atenciones en paralelo, cada una con sus W_Q, W_K, W_V de dimensión d/h; se concatenan las salidas y se proyectan con W_O.",
+   "por_que_importa": "Cada cabeza aprende una relación distinta (sintaxis, anáfora, dependencias largas); una sola cabeza promedia.",
+   "trampa": "Pensar que multiplica el costo por h: con d_k = d/h (512/8 = 64) cuesta lo mismo que una cabeza de dimensión completa."
+  },
+  {
+   "id": "feed-forward",
+   "termino": "Feed-forward por posición",
+   "definicion": "Red de dos capas aplicada a cada token por separado con los mismos pesos: FFN(x) = max(0, xW1 + b1)W2 + b2, con d_ff = 4d.",
+   "por_que_importa": "Aporta la única no linealidad del bloque (la atención solo mezcla linealmente los V) y concentra 8d² de los ~12d² parámetros.",
+   "trampa": "Creer que mezcla información entre tokens: eso lo hace la atención; la FFN no mira vecinos."
+  },
+  {
+   "id": "conexion-residual",
+   "termino": "Conexión residual",
+   "definicion": "Cada subcapa suma su resultado a su entrada: x' = x + Sub(x). El vector que atraviesa la pila es el residual stream.",
+   "por_que_importa": "La derivada de x + f(x) es 1 + f'(x): hay un camino identidad y el gradiente llega a las primeras capas sin desvanecerse (0,9⁴⁸ = 0,006 sin él).",
+   "trampa": "Olvidar que por eso d debe conservarse en toda la pila: si no, la suma no es posible."
+  },
+  {
+   "id": "layer-norm",
+   "termino": "Layer normalization",
+   "definicion": "Normalizar cada vector de token por separado (restar su media, dividir por su desvío) y reescalar con γ y β aprendidos.",
+   "por_que_importa": "Mantiene la escala del residual stream para que softmax y ReLU trabajen en rango; no depende del batch ni de la longitud.",
+   "trampa": "Confundirla con batch norm (que normaliza a través del batch). Y no recordar pre-LN (GPT-2, x + Sub(LN(x))) vs post-LN (paper 2017, LN(x + Sub(x)))."
+  },
+  {
+   "id": "codificacion-posicional",
+   "termino": "Codificación posicional",
+   "definicion": "Vector de dimensión d que se suma al embedding de cada token según su posición: sinusoidal fija (paper 2017), aprendida (BERT, GPT-2) o rotación de Q y K (RoPE).",
+   "por_que_importa": "La atención es invariante a permutaciones: sin posición, 'the cat sat' y 'sat cat the' serían indistinguibles.",
+   "trampa": "Creer que se concatena: se suma, y el vector tiene la misma dimensión d que el embedding."
+  },
+  {
+   "id": "transformer",
+   "termino": "Bloque transformer",
+   "definicion": "Unidad que se apila N veces: atención multi-cabeza + feed-forward, cada una con residual y layer norm; entrada y salida n × d.",
+   "por_que_importa": "Todos los modelos actuales (BERT, GPT, ViT) son este bloque repetido con distinta máscara, objetivo y salida.",
+   "trampa": "Pensar que los N bloques comparten pesos: tienen la misma forma pero pesos propios."
+  },
+  {
+   "id": "encoder-decoder",
+   "termino": "Encoder-decoder",
+   "definicion": "Arquitectura del paper de 2017: 6 bloques de encoder sin máscara y 6 de decoder con máscara causal más cross-attention al encoder.",
+   "por_que_importa": "Fue diseñada para traducir; sobrevive en traducción, resumen y audio (T5, BART, Whisper).",
+   "trampa": "Creer que los LLM actuales la usan: casi todos son decoder-only."
+  },
+  {
+   "id": "cross-attention",
+   "termino": "Cross-attention",
+   "definicion": "Subcapa del decoder donde Q viene del decoder y K, V vienen de la salida del encoder.",
+   "por_que_importa": "Es el mecanismo por el que el decoder 'lee' la frase de origen; es la misma fórmula de atención con dos secuencias.",
+   "trampa": "Buscarla en GPT: un decoder-only no tiene cross-attention."
+  },
+  {
+   "id": "decoder-only",
+   "termino": "Decoder-only (GPT)",
+   "definicion": "Pila de bloques con self-attention enmascarada y FFN, sin encoder ni cross-attention, que termina en un softmax sobre |V|.",
+   "por_que_importa": "Es la arquitectura de casi todos los LLM: si la tarea es predecir el siguiente token, entrada y salida son la misma secuencia.",
+   "trampa": "Pensar que necesita un encoder para 'entender' el prompt: prompt y respuesta van en el mismo flujo."
+  },
+  {
+   "id": "bert",
+   "termino": "BERT (encoder-only)",
+   "definicion": "Encoder bidireccional (Devlin et al., 2018) entrenado con masked language model (15 % de tokens tapados) y NSP; produce una representación por token.",
+   "por_que_importa": "Es la base de los encoders para clasificación y para RAG (fue la línea de base obligatoria del TP3).",
+   "trampa": "Usar el promedio de sus tokens o [CLS] sin ajustar como embedding de oración: rinde peor que promediar GloVe (54,8 / 29,2 vs 61,3 en STS)."
+  },
+  {
+   "id": "embedding-de-oracion",
+   "termino": "Embedding de oración (Sentence-BERT)",
+   "definicion": "Un vector por fragmento obtenido con pooling (media de los tokens) de un encoder ajustado de forma siamesa con pares de frases para que el coseno refleje similitud.",
+   "por_que_importa": "Es lo que necesita un RAG vectorial: comparar 10.000 frases pasa de ~65 h (cross-encoder) a ~5 s.",
+   "trampa": "Creer que cualquier encoder sirve para similitud: el coseno solo significa similitud si el modelo fue entrenado para eso."
+  },
+  {
+   "id": "kv-cache",
+   "termino": "KV cache",
+   "definicion": "Guardar las claves y valores de los tokens ya procesados para no recalcularlos en cada token generado.",
+   "por_que_importa": "Abarata la generación; es posible porque con máscara causal las filas anteriores no cambian al aparecer un token nuevo.",
+   "trampa": "Su memoria crece con el contexto; eso es lo que atacan GQA y MLA."
+  },
+  {
+   "id": "entropia-cruzada",
+   "termino": "Cross-entropy de next-token",
+   "definicion": "Pérdida −log p(token correcto) en cada posición, promediada sobre el batch.",
+   "por_que_importa": "Es lo que se minimiza al preentrenar un LLM; derivable y castiga más cuanto menos probabilidad se le dio al correcto (0,5 → 0,69; 0,01 → 4,6).",
+   "trampa": "Esperar que llegue a cero: su mínimo es la entropía del texto, porque hay varias continuaciones válidas."
+  },
+  {
+   "id": "costo-cuadratico",
+   "termino": "Costo cuadrático de la atención",
+   "definicion": "La matriz QKᵀ tiene n × n celdas por cabeza y por capa (complejidad O(n²·d)).",
+   "por_que_importa": "Con 4.096 tokens son 16 millones de celdas; es lo que atacan FlashAttention, atención lineal e híbridos.",
+   "trampa": "Atribuirlo a d: la matriz es cuadrada por comparar tokens contra tokens, sea cual sea d."
+  }
+ ],
+ "formulas": [
+  {
+   "nombre": "Proyecciones",
+   "tex": "Q = XW_Q, \\quad K = XW_K, \\quad V = XW_V",
+   "explicacion": "X es n × d (una fila por token, ya con la posición sumada). W_Q y W_K son d × d_k, W_V es d × d_v; las tres son parámetros entrenables."
+  },
+  {
+   "nombre": "Scaled dot-product attention",
+   "tex": "\\text{Attention}(Q,K,V) = \\text{softmax}\\!\\left(\\frac{QK^\\top}{\\sqrt{d_k}}\\right)V",
+   "explicacion": "QKᵀ (n × n) mide afinidad consulta-clave; dividir por √d_k mantiene varianza 1; softmax por fila da la matriz de atención A (filas suman 1); A·V es el promedio ponderado de los valores."
+  },
+  {
+   "nombre": "Softmax",
+   "tex": "\\text{softmax}(x)_i = \\frac{e^{x_i}}{\\sum_j e^{x_j}}",
+   "explicacion": "Convierte una fila de scores en una distribución. Ej.: [1,5 0 1,5] → [0,45 0,10 0,45]."
+  },
+  {
+   "nombre": "Máscara causal",
+   "tex": "A = \\text{softmax}\\!\\left(\\frac{QK^\\top}{\\sqrt{d_k}} + M\\right), \\quad M_{ij} = \\begin{cases}0 & j \\le i\\\\ -\\infty & j > i\\end{cases}",
+   "explicacion": "e^{−∞} = 0: los tokens posteriores quedan con peso cero y cada fila sigue sumando 1. A queda triangular inferior."
+  },
+  {
+   "nombre": "Multi-head attention",
+   "tex": "\\text{MultiHead}(X) = \\text{Concat}(\\text{head}_1,\\dots,\\text{head}_h)W_O, \\quad \\text{head}_i = \\text{Attention}(XW_Q^i, XW_K^i, XW_V^i)",
+   "explicacion": "h cabezas de dimensión d/h (paper: 8 × 64 = 512); la concatenación vuelve a n × d y W_O (d × d) mezcla lo de las cabezas."
+  },
+  {
+   "nombre": "Feed-forward por posición",
+   "tex": "\\text{FFN}(x) = \\max(0,\\, xW_1 + b_1)\\,W_2 + b_2",
+   "explicacion": "W1 es d × 4d, W2 es 4d × d (paper: 512 → 2048 → 512). La ReLU es la no linealidad del bloque; se aplica a cada fila con los mismos pesos."
+  },
+  {
+   "nombre": "Residual (pre-LN, GPT-2)",
+   "tex": "x' = x + \\text{Attn}(\\text{LN}(x)), \\qquad x'' = x' + \\text{FFN}(\\text{LN}(x'))",
+   "explicacion": "Cada subcapa suma una corrección; la derivada 1 + f'(x) deja pasar el gradiente. Post-LN (paper 2017): LN(x + Sub(x))."
+  },
+  {
+   "nombre": "Layer norm",
+   "tex": "\\text{LN}(x) = \\gamma \\odot \\frac{x - \\mu}{\\sqrt{\\sigma^2 + \\varepsilon}} + \\beta",
+   "explicacion": "μ y σ² son la media y la varianza de las d componentes de ese token; γ y β son aprendidos por dimensión. LN([2 0 1 1]) = [1,41 −1,41 0 0]."
+  },
+  {
+   "nombre": "Codificación posicional sinusoidal",
+   "tex": "PE_{(pos,2i)} = \\sin\\!\\left(\\frac{pos}{10000^{2i/d}}\\right), \\quad PE_{(pos,2i+1)} = \\cos\\!\\left(\\frac{pos}{10000^{2i/d}}\\right)",
+   "explicacion": "Cada par de dimensiones es una sinusoide de distinta frecuencia; PE_{pos+k} es función lineal de PE_{pos}, lo que permite atender por posición relativa."
+  },
+  {
+   "nombre": "Varianza del producto punto",
+   "tex": "\\text{Var}(q\\cdot k) = \\sum_{i=1}^{d_k} \\text{Var}(q_i k_i) = d_k \\;\\Rightarrow\\; \\text{Var}\\!\\left(\\frac{q\\cdot k}{\\sqrt{d_k}}\\right) = 1",
+   "explicacion": "Con componentes independientes de media 0 y varianza 1. Justifica la escala por √d_k."
+  },
+  {
+   "nombre": "Parámetros por bloque y por modelo",
+   "tex": "\\underbrace{4d^2}_{\\text{atención}} + \\underbrace{8d^2}_{\\text{FFN}} = 12d^2, \\qquad N_{\\text{params}} \\approx 12\\,N\\,d^2 + |V|\\,d",
+   "explicacion": "Fórmula de Kaplan et al. GPT-2 chico: 12·12·768² = 84,9 M + 50.257·768 = 38,6 M ≈ 124 M. El decoder con cross-attention suma 4d² por bloque (16Nd²)."
+  },
+  {
+   "nombre": "Pérdida de entrenamiento",
+   "tex": "\\mathcal{L} = -\\frac{1}{T}\\sum_{t=1}^{T} \\log p_\\theta(x_{t} \\mid x_{<t})",
+   "explicacion": "Cross-entropy entre la distribución sobre |V| y el token que seguía; promedio sobre todas las posiciones (gracias a la máscara causal, todas son ejemplos). −log 0,5 = 0,69; −log 0,01 = 4,6."
+  }
+ ],
+ "comparaciones": [
+  {
+   "titulo": "El mapa de la familia",
+   "columnas": [
+    "Aspecto",
+    "Encoder-only",
+    "Decoder-only",
+    "Encoder-decoder"
+   ],
+   "filas": [
+    [
+     "Máscara",
+     "Ninguna: cada token ve todo",
+     "Causal: solo lo anterior",
+     "Encoder sin máscara; decoder con máscara y cross-attention"
+    ],
+    [
+     "Objetivo de entrenamiento",
+     "Tapar tokens y predecirlos (MLM)",
+     "Predecir el token siguiente",
+     "Secuencia de entrada → secuencia de salida"
+    ],
+    [
+     "Produce",
+     "Una representación por token",
+     "Texto, token a token",
+     "Texto condicionado a una entrada aparte"
+    ],
+    [
+     "Modelos",
+     "BERT, RoBERTa, Sentence-BERT, modelos de embeddings, ViT",
+     "GPT-2 y sucesores, Llama, DeepSeek, Kimi",
+     "Transformer 2017, T5, BART, Whisper"
+    ],
+    [
+     "En el TP3",
+     "El encoder del RAG vectorial",
+     "El agente que responde y llama herramientas",
+     "No se usa"
+    ]
+   ]
+  },
+  {
+   "titulo": "Atención con y sin máscara (ejemplo 'the cat sat')",
+   "columnas": [
+    "Fila",
+    "Sin máscara (encoder): A",
+    "Con máscara (decoder): A",
+    "Salida A·V sin / con"
+   ],
+   "filas": [
+    [
+     "the",
+     "[0,12 0,55 0,33]",
+     "[1,00 0 0]",
+     "[0,91 2,30] / [2,00 0]"
+    ],
+    [
+     "cat",
+     "[0,45 0,10 0,45]",
+     "[0,82 0,18 0]",
+     "[1,80 1,20] / [1,64 0,55]"
+    ],
+    [
+     "sat",
+     "[0,19 0,31 0,51]",
+     "[0,19 0,31 0,51]",
+     "[1,39 1,93] / [1,39 1,93]"
+    ]
+   ]
+  },
+  {
+   "titulo": "Pre-LN vs post-LN",
+   "columnas": [
+    "Aspecto",
+    "Post-LN (paper 2017)",
+    "Pre-LN (GPT-2 en adelante)"
+   ],
+   "filas": [
+    [
+     "Fórmula",
+     "LN(x + Sub(x))",
+     "x + Sub(LN(x)) (+ LN final)"
+    ],
+    [
+     "Camino residual",
+     "Pasa por la normalización",
+     "Queda limpio (identidad)"
+    ],
+    [
+     "Estabilidad",
+     "Menor en pilas profundas",
+     "Mayor; lo usan GPT-2, ViT y casi todo lo posterior"
+    ]
+   ]
+  },
+  {
+   "titulo": "Codificaciones de posición",
+   "columnas": [
+    "Aspecto",
+    "Sinusoidal",
+    "Aprendida",
+    "RoPE"
+   ],
+   "filas": [
+    [
+     "Quién",
+     "Paper 2017",
+     "BERT (512), GPT-2 (1024)",
+     "LLM actuales"
+    ],
+    [
+     "Cómo",
+     "Vector fijo sen/cos sumado al embedding",
+     "Tabla de una fila por posición, sumada",
+     "Rota Q y K según la posición"
+    ],
+    [
+     "Ventaja",
+     "PE_{pos+k} lineal en PE_{pos}: posición relativa",
+     "Resultados casi idénticos a la sinusoidal",
+     "Mejor con textos más largos que los de entrenamiento"
+    ],
+    [
+     "Límite",
+     "Extrapola mal en la práctica",
+     "No existe más allá de la última fila",
+     "Tema de la clase siguiente"
+    ]
+   ]
+  },
+  {
+   "titulo": "Layer norm vs batch norm",
+   "columnas": [
+    "Aspecto",
+    "Layer norm",
+    "Batch norm"
+   ],
+   "filas": [
+    [
+     "Normaliza sobre",
+     "Las d dimensiones de un token",
+     "El mismo feature a través del batch"
+    ],
+    [
+     "Depende del batch",
+     "No",
+     "Sí"
+    ],
+    [
+     "Depende de la longitud",
+     "No",
+     "Sí (con secuencias)"
+    ],
+    [
+     "Uso en transformers",
+     "Sí",
+     "No"
+    ]
+   ]
+  },
+  {
+   "titulo": "Partes del bloque y por qué están",
+   "columnas": [
+    "Componente",
+    "Qué hace",
+    "Por qué hace falta"
+   ],
+   "filas": [
+    [
+     "Posición",
+     "Suma p_i al embedding",
+     "La atención es invariante a permutaciones"
+    ],
+    [
+     "Q, K, V",
+     "Tres proyecciones",
+     "Buscar y ser encontrado no es simétrico"
+    ],
+    [
+     "√d_k",
+     "Escala los scores",
+     "Evitar saturar el softmax (varianza d_k)"
+    ],
+    [
+     "Softmax",
+     "Filas que suman 1",
+     "Derivable y reparte"
+    ],
+    [
+     "Máscara",
+     "−∞ arriba de la diagonal",
+     "Generar sin ver el futuro; n ejemplos por frase"
+    ],
+    [
+     "Multi-head",
+     "h atenciones de d/h",
+     "Una sola cabeza promedia"
+    ],
+    [
+     "FFN",
+     "4d, ReLU, d por token",
+     "Única no linealidad"
+    ],
+    [
+     "Residual",
+     "x + Sub(x)",
+     "Gradiente con camino identidad"
+    ],
+    [
+     "Layer norm",
+     "Media 0, varianza 1 por token",
+     "Mantener la escala del residual stream"
+    ]
+   ]
+  }
+ ],
+ "flashcards": [
+  {
+   "q": "Fórmula de scaled dot-product attention",
+   "a": "softmax(QKᵀ / √d_k) V"
+  },
+  {
+   "q": "¿Qué representan Q, K y V?",
+   "a": "Q = qué busca el token; K = qué ofrece cada token; V = qué información entrega para mezclar."
+  },
+  {
+   "q": "¿Por qué tres proyecciones y no una?",
+   "a": "Buscar y ser encontrado no es simétrico; con Q = K cada token tendería a mirarse a sí mismo."
+  },
+  {
+   "q": "¿Qué forma tiene QKᵀ y por qué importa?",
+   "a": "n × n, la única matriz cuadrada; es el costo cuadrático (16 M celdas con 4.096 tokens, por cabeza y capa)."
+  },
+  {
+   "q": "¿Por qué se divide por √d_k?",
+   "a": "El producto punto tiene varianza d_k; sin escala el softmax se satura y el gradiente es casi nulo."
+  },
+  {
+   "q": "Fila 'cat' del ejemplo: scores, escalados y softmax",
+   "a": "[3 0 3] → [1,5 0 1,5] → [0,45 0,10 0,45]."
+  },
+  {
+   "q": "Salida A·V de 'cat' sin y con máscara",
+   "a": "[1,80 1,20] sin máscara; [1,64 0,55] con máscara."
+  },
+  {
+   "q": "¿Por qué −∞ y no 0 en la máscara?",
+   "a": "e^{−∞} = 0; un 0 daría e^0 = 1 de peso al token prohibido."
+  },
+  {
+   "q": "¿Qué fila de A no cambia con la máscara causal?",
+   "a": "La última: ya veía a todos los tokens."
+  },
+  {
+   "q": "Dimensión por cabeza en el paper de 2017",
+   "a": "d_k = d/h = 512/8 = 64; ocho cabezas cuestan lo mismo que una de 512."
+  },
+  {
+   "q": "¿Por qué hace falta la feed-forward?",
+   "a": "La atención solo mezcla linealmente los V; la ReLU de la FFN es la única no linealidad del bloque."
+  },
+  {
+   "q": "¿Cuánto es 0,9^48 y qué ilustra?",
+   "a": "≈ 0,006: el gradiente que se desvanece al multiplicar 48 derivadas menores que 1."
+  },
+  {
+   "q": "¿Por qué la residual resuelve el gradiente?",
+   "a": "d/dx (x + f(x)) = 1 + f'(x): hay un camino identidad en cada bloque."
+  },
+  {
+   "q": "LN([2 0 1 1])",
+   "a": "Media 1, varianza 0,5, desvío 0,71 → [1,41 −1,41 0 0]."
+  },
+  {
+   "q": "Parámetros por bloque",
+   "a": "≈ 12d²: 4d² atención + 8d² feed-forward. Modelo: 12·N·d² + |V|·d."
+  },
+  {
+   "q": "¿Qué % de tokens tapa BERT y cómo?",
+   "a": "15 %: 80 % [MASK], 10 % token aleatorio, 10 % sin cambio."
+  },
+  {
+   "q": "¿En la cross-attention de dónde salen Q, K y V?",
+   "a": "Q del decoder; K y V de la salida del encoder."
+  },
+  {
+   "q": "Regla práctica para elegir arquitectura",
+   "a": "Salida vector → encoder; salida texto → decoder; encoder-decoder para traducción, resumen, audio."
+  },
+  {
+   "q": "Pérdida si el modelo dio 0,5 y 0,01 al token correcto",
+   "a": "−log 0,5 = 0,69; −log 0,01 = 4,6."
+  },
+  {
+   "q": "¿Por qué BERT crudo es mal embedding de oración?",
+   "a": "No fue entrenado para que el coseno mida similitud: promedio de BERT 54,8 en STS vs GloVe 61,3; SBERT llega a 74,9."
+  }
+ ],
+ "quiz": [
+  {
+   "q": "Con Q = [0 2 0 1] (cat) y la clave de 'the' = [0 1 0 1], ¿cuánto vale el score cat·the antes de escalar?",
+   "opciones": [
+    "1",
+    "2",
+    "3",
+    "1,5"
+   ],
+   "correcta": 2,
+   "explicacion": "0·0 + 2·1 + 0·0 + 1·1 = 3. El 1,5 es el valor ya escalado por √4 = 2."
+  },
+  {
+   "q": "¿Cuál es el objetivo de dividir QKᵀ por √d_k?",
+   "opciones": [
+    "Que las filas sumen 1",
+    "Que los scores tengan varianza ≈ 1 y el softmax no se sature",
+    "Reducir el costo cuadrático",
+    "Ocultar los tokens futuros"
+   ],
+   "correcta": 1,
+   "explicacion": "El producto punto tiene varianza d_k; la escala la devuelve a 1. Que las filas sumen 1 lo hace el softmax; ocultar el futuro, la máscara; el costo n² no cambia."
+  },
+  {
+   "q": "En la máscara causal se usa −∞ porque:",
+   "opciones": [
+    "Hace que la fila sume 0",
+    "e^{−∞} = 0, así el token prohibido recibe peso cero y la fila sigue sumando 1",
+    "Acelera el softmax",
+    "Es el valor que usa BERT"
+   ],
+   "correcta": 1,
+   "explicacion": "Un 0 daría peso e^0 = 1 (no nulo). BERT no usa máscara causal."
+  },
+  {
+   "q": "Con una frase de 4.096 tokens, ¿cuántas celdas tiene la matriz de afinidades de una cabeza en una capa?",
+   "opciones": [
+    "4.096",
+    "4.096 · d",
+    "≈ 16,8 millones",
+    "4.096 · 64"
+   ],
+   "correcta": 2,
+   "explicacion": "Es n × n = 4.096² ≈ 16,8 M, independiente de d."
+  },
+  {
+   "q": "¿Qué pasa si se permutan las filas de X en una capa de self-attention sin codificación posicional?",
+   "opciones": [
+    "La salida es idéntica",
+    "La salida se permuta de la misma forma y nada más",
+    "La matriz de atención se vuelve simétrica",
+    "El softmax deja de sumar 1"
+   ],
+   "correcta": 1,
+   "explicacion": "La atención es equivariante a permutaciones: trata las filas como un conjunto. Por eso hace falta sumar la posición (test `permutar_filas_permuta_la_salida` del TP3)."
+  },
+  {
+   "q": "El paper usa d = 512 y h = 8 cabezas. ¿Cuál es d_k por cabeza y cómo es el costo frente a una sola cabeza de 512?",
+   "opciones": [
+    "512; 8 veces mayor",
+    "64; similar",
+    "64; 8 veces mayor",
+    "8; menor"
+   ],
+   "correcta": 1,
+   "explicacion": "d_k = d/h = 64; el costo total es similar al de una sola cabeza de dimensión completa."
+  },
+  {
+   "q": "¿Cuál es la única no linealidad que permite al bloque computar algo que no sea combinación de su entrada?",
+   "opciones": [
+    "El softmax de la atención",
+    "La ReLU (o GELU) de la feed-forward",
+    "La layer norm",
+    "La suma residual"
+   ],
+   "correcta": 1,
+   "explicacion": "La clase lo plantea así: la salida de la atención es combinación lineal de los V (pesos × valores); la ReLU de la FFN es donde se computa algo nuevo. Residual es una suma y LN una normalización."
+  },
+  {
+   "q": "¿Por qué las conexiones residuales permiten entrenar 48 o 96 bloques?",
+   "opciones": [
+    "Reducen la cantidad de parámetros",
+    "Agregan un camino con derivada 1, así el gradiente no se desvanece como 0,9⁴⁸",
+    "Reemplazan a la layer norm",
+    "Evitan el costo cuadrático"
+   ],
+   "correcta": 1,
+   "explicacion": "d/dx (x + f(x)) = 1 + f'(x). No cambian el número de parámetros ni la complejidad."
+  },
+  {
+   "q": "¿Por qué los transformers usan layer norm y no batch norm?",
+   "opciones": [
+    "Porque es más rápida en GPU",
+    "Porque normaliza cada token por separado, sin depender del batch ni de la longitud",
+    "Porque no tiene parámetros",
+    "Porque la inventó el mismo paper"
+   ],
+   "correcta": 1,
+   "explicacion": "Funciona con secuencias de distinto largo y batch de 1 en inferencia. Sí tiene parámetros (γ, β)."
+  },
+  {
+   "q": "La cuenta de parámetros de un bloque es ≈ 12d². ¿Cómo se reparte?",
+   "opciones": [
+    "6d² atención, 6d² FFN",
+    "4d² atención, 8d² FFN",
+    "8d² atención, 4d² FFN",
+    "12d² atención, FFN sin parámetros"
+   ],
+   "correcta": 1,
+   "explicacion": "Atención: W_Q, W_K, W_V, W_O = 4d². FFN: d × 4d + 4d × d = 8d², el doble."
+  },
+  {
+   "q": "¿Por qué a GPT le alcanza con el decoder?",
+   "opciones": [
+    "Porque el encoder es demasiado caro",
+    "Porque en next-token entrada y salida son la misma secuencia y no hay frase de origen que codificar",
+    "Porque no usa atención",
+    "Porque BERT ya hace de encoder"
+   ],
+   "correcta": 1,
+   "explicacion": "Prompt y respuesta van en el mismo flujo; la máscara garantiza que cada token vea solo lo anterior."
+  },
+  {
+   "q": "En el TP3 la línea de base del RAG era BERT sin ajustar con promedio de tokens. ¿Qué predice la clase sobre su rendimiento?",
+   "opciones": [
+    "Que es el mejor encoder posible porque es bidireccional",
+    "Que es malo para similitud: en STS rinde peor que promediar GloVe",
+    "Que es igual a Sentence-BERT",
+    "Que funciona solo con el vector [CLS]"
+   ],
+   "correcta": 1,
+   "explicacion": "BERT no fue entrenado para que el coseno mida similitud (54,8 vs 61,3 GloVe; [CLS] 29,2). SBERT, con pooling y ajuste siamés, sube a 74,9."
+  },
+  {
+   "q": "En el ejercicio 'El banco aguanta/presta', con máscara causal, ¿por qué la fila de 'banco' en LN(Z) es igual en las dos frases?",
+   "opciones": [
+    "Porque W_Q es la identidad",
+    "Porque con máscara 'banco' solo ve a 'El' y a sí mismo, y no ve el verbo que viene después",
+    "Porque la layer norm borra la diferencia",
+    "Porque P es igual en las dos frases"
+   ],
+   "correcta": 1,
+   "explicacion": "La máscara impide mirar posiciones posteriores; la diferencia entre frases está en la posición 3 (el verbo). Sin máscara (parte B), 'banco' sí cambia."
+  },
+  {
+   "q": "¿Qué técnica moderna existe gracias a que, con máscara causal, las filas de tokens anteriores no cambian al generar uno nuevo?",
+   "opciones": [
+    "RoPE",
+    "Mixture of Experts",
+    "KV cache",
+    "Sentence-BERT"
+   ],
+   "correcta": 2,
+   "explicacion": "K y V de los tokens previos se guardan en vez de recalcularse. RoPE es posición; MoE es parámetros condicionales."
+  },
+  {
+   "q": "¿Por qué la pérdida de next-token nunca llega a cero, aunque el modelo sea perfecto?",
+   "opciones": [
+    "Por el dropout",
+    "Porque su mínimo es la entropía del texto: después de un prefijo hay varias continuaciones válidas",
+    "Porque el softmax nunca da exactamente 1",
+    "Por la layer norm"
+   ],
+   "correcta": 1,
+   "explicacion": "Ningún modelo puede saber cuál de los tokens razonables iba; el mínimo es la entropía del texto."
+  }
+ ],
+ "desarrollo": [
+  {
+   "pregunta": "Calculá y justificá paso a paso una capa de self-attention para X = [[1,0,1,0],[0,2,0,1],[1,1,1,1]] ('the cat sat') con W_Q = I, W_K que intercambia columnas 1↔2 y 3↔4, y W_V = [[1,0],[0,1],[1,0],[0,1]]. Mostrá la fila de 'cat'.",
+   "respuesta_modelo": "1. **Proyecciones** (qué busca, qué ofrece y qué entrega cada token; tres matrices porque buscar y ser encontrado no es simétrico): Q = X; K = [[0,1,0,1],[2,0,1,0],[1,1,1,1]]; V = [[2,0],[0,3],[2,2]] (baja a d_v = 2).\n2. **Afinidades** S = QKᵀ (producto punto: grande si los vectores apuntan igual; una sola multiplicación para toda la frase): [[0,3,2],[3,0,3],[2,3,4]]. Fila cat: 0·0+2·1+0·0+1·1 = 3, etc. → [3 0 3].\n3. **Escala** por √d_k = 2 (mantiene varianza 1 y evita saturar el softmax): [1,5 0 1,5].\n4. **Softmax** por fila (derivable, reparte, filas suman 1): e^{1,5}=4,48, e^0=1; suma 9,96 → [0,45 0,10 0,45]. A completa: [[0,12 0,55 0,33],[0,45 0,10 0,45],[0,19 0,31 0,51]].\n5. **Mezcla** A·V (promedio ponderado: el token leído en su contexto): cat = 0,45·[2 0] + 0,10·[0 3] + 0,45·[2 2] = [1,80 1,20]. Salida: the [0,91 2,30], cat [1,80 1,20], sat [1,39 1,93].\n6. **Con máscara causal** (−∞ arriba de la diagonal para no ver el futuro): fila cat [1,5 0 −∞] → [0,82 0,18 0] → [1,64 0,55]; la fila de sat no cambia.",
+   "puntos_clave": [
+    "Q, K, V correctos y su rol",
+    "QKᵀ con una celda mostrada",
+    "Escala por 2 con justificación (varianza)",
+    "Softmax con exponenciales y suma 1",
+    "A·V = [1,80 1,20] para cat",
+    "Justificación de cada operación, no solo el número",
+    "Opcional: efecto de la máscara [1,64 0,55]"
+   ]
+  },
+  {
+   "pregunta": "Describí el bloque transformer completo y justificá cada componente (multi-head, feed-forward, residuales, layer norm, posición).",
+   "respuesta_modelo": "Un bloque recibe y devuelve una matriz n × d, por eso se apila N veces (6 en el paper, 12 en GPT-2 chico) con pesos propios.\n\n- **Posición:** antes del primer bloque se suma p_i al embedding (sinusoidal, aprendida o RoPE), porque la atención trata las filas como conjunto y no distinguiría 'the cat sat' de 'sat cat the'.\n- **Multi-head attention:** h cabezas de dimensión d/h (8 × 64) en paralelo, concatenadas y proyectadas con W_O. Una sola cabeza promedia; varias aprenden relaciones distintas, al mismo costo.\n- **Feed-forward por posición:** max(0, xW1+b1)W2+b2 con d_ff = 4d. La atención solo mezcla linealmente los V; la ReLU es la no linealidad. Concentra 8d² de los ~12d² parámetros.\n- **Residuales:** x + Sub(x) en cada subcapa. El gradiente en la capa 1 es producto de N jacobianos (0,9⁴⁸ = 0,006); con la residual cada factor es 1 + f', hay camino identidad. Exige conservar d.\n- **Layer norm:** normaliza cada token (media 0, varianza 1, luego γ, β) para que la escala del residual stream no crezca; no depende del batch ni de la longitud. GPT-2 usa pre-LN: x + Sub(LN(x)), más estable.",
+   "puntos_clave": [
+    "Forma n × d conservada y apilable",
+    "Posición sumada y por qué",
+    "Multi-head: d/h, concatenar, W_O, por qué varias",
+    "FFN 4d con ReLU como no linealidad",
+    "Residual: 1 + f'(x), gradiente",
+    "Layer norm por token, pre-LN vs post-LN",
+    "~12d² parámetros"
+   ]
+  },
+  {
+   "pregunta": "Compará encoder-only, decoder-only y encoder-decoder. ¿Qué tipo de modelo usaste para cada parte del TP3 y por qué?",
+   "respuesta_modelo": "Los tres comparten el bloque; cambian **la máscara, el objetivo de entrenamiento y la salida que se lee**.\n\n- **Encoder-only (BERT, Sentence-BERT, e5, ViT):** sin máscara, cada token ve toda la frase; se entrena tapando tokens (MLM, 15 %); produce una representación por token. Como el next-token sería trivial sin máscara, se enmascara la entrada en vez de la atención.\n- **Decoder-only (GPT-2, Llama, DeepSeek):** máscara causal, objetivo next-token, produce texto token a token. Alcanza con el decoder porque entrada y salida son la misma secuencia.\n- **Encoder-decoder (transformer 2017, T5, BART, Whisper):** encoder sin máscara + decoder con máscara y cross-attention (Q del decoder, K y V del encoder); para traducción, resumen, audio.\n\n**En el TP3:** el RAG usó un **encoder** porque la salida necesaria es un vector por fragmento comparable por coseno; BERT crudo con promedio era la línea de base (mala: no fue entrenado para similitud) frente a encoders de oraciones tipo Sentence-BERT/e5 (pooling + ajuste con pares). El agente usó un **decoder-only** (deepseek) porque la salida es texto y llamadas a herramientas. Regla: vector → encoder; texto → decoder.",
+   "puntos_clave": [
+    "Diferencia de máscara",
+    "Objetivos MLM vs next-token vs seq2seq",
+    "Cross-attention en encoder-decoder",
+    "Por qué GPT no necesita encoder",
+    "BERT crudo vs Sentence-BERT para RAG",
+    "Mapeo al TP3: encoder para RAG, decoder para el agente"
+   ]
+  },
+  {
+   "pregunta": "En el ejercicio a mano del TP3 ('El banco aguanta' / 'El banco presta'), explicá qué diferencia hay entre la parte A (con máscara) y la parte B (sin máscara) para el vector de 'banco' y para la predicción final.",
+   "respuesta_modelo": "En ambas frases las dos primeras filas de X son iguales (El, banco) y solo cambia la tercera (el verbo). **Parte A (decoder, máscara causal):** 'banco' (posición 1) solo puede mirar a 'El' y a sí mismo; sus pesos [0,269 0,731 0] y su fila de LN(Z) = [0,459 0,459 −1,715 0,797] son **idénticos en las dos frases**: todavía no vio el verbo. **Parte B (encoder, sin máscara):** 'banco' también atiende al verbo (pesos [0,122 0,331 0,547]) y su vector cambia: [0,412 −0,333 −1,403 1,323] con 'aguanta' (más mueble) vs [−0,333 0,412 −1,403 1,323] con 'presta' (más finanzas). Es la representación contextual que da un encoder como BERT.\n\n**Predicción:** el modelo predice desde la **última** fila (el verbo), que con o sin máscara ve a todos los tokens; por eso la predicción de la última posición es la misma en A y B: 'peso' ≈ 0,60 tras 'aguanta' y 'dinero' ≈ 0,60 tras 'presta'. El modelo 'sabe' qué predecir porque la desambiguación ocurre en la posición del verbo, no en 'banco'. A se parece a GPT (generar), B a BERT (representaciones para RAG). Si P fuera cero, frases con las mismas palabras en otro orden darían filas permutadas indistinguibles.",
+   "puntos_clave": [
+    "Máscara: banco no ve el verbo en A",
+    "Banco igual en A, distinto en B",
+    "Última fila igual con y sin máscara",
+    "peso vs dinero ≈ 0,60",
+    "A ~ GPT, B ~ BERT",
+    "Rol de la posición P"
+   ]
+  }
+ ],
+ "conexiones": [
+  {
+   "clase": 7,
+   "relacion": "Convierte en matemática la intuición de 'cada token mira a todos' y da fuente a que los LLM son decoder-only; la máscara causal es la ventana deslizante de la clase 7 calculada en paralelo."
+  },
+  {
+   "clase": 6,
+   "relacion": "Explica por qué el encoder del RAG vectorial es un hiperparámetro: BERT crudo es mal embedding de oración y Sentence-BERT (pooling + ajuste siamés) lo arregla."
+  },
+  {
+   "clase": 3,
+   "relacion": "Las residuales responden al gradiente que se desvanece por la regla de la cadena de backpropagation; la cross-entropy es la de clasificación con |V| clases."
+  },
+  {
+   "clase": 9,
+   "relacion": "La clase siguiente desarrolla cómo se entrena un LLM a partir de la cross-entropy de next-token, y las variantes nombradas (KV cache, GQA/MLA, FlashAttention, RoPE, MoE)."
+  },
+  {
+   "clase": 5,
+   "relacion": "GPT-2 muestra el origen del prompting: un modelo entrenado solo con next-token hace tareas descriptas en el prompt."
+  },
+  {
+   "clase": 12,
+   "relacion": "ViT muestra que el mismo encoder procesa imágenes cortadas en parches: el bloque es agnóstico a la modalidad."
+  }
+ ],
+ "lecturas": [
+  "Vaswani et al. 2017, Attention Is All You Need",
+  "Alammar, The Illustrated Transformer",
+  "3Blue1Brown, Attention in transformers, step-by-step (Deep Learning Chapter 6)",
+  "Radford et al. 2019, Language Models are Unsupervised Multitask Learners (GPT-2)",
+  "Devlin et al. 2018, BERT: Pre-training of Deep Bidirectional Transformers",
+  "Reimers & Gurevych 2019, Sentence-BERT",
+  "Dosovitskiy et al. 2020, An Image is Worth 16x16 Words (ViT)",
+  "Kaplan et al. 2020, Scaling Laws for Neural Language Models (12·N·d²)",
+  "He et al. 2016, Deep Residual Learning (ResNet)",
+  "Su et al. 2021, RoFormer (RoPE); Dao et al. 2022, FlashAttention; Ainslie et al. 2023, GQA; DeepSeek-V2 2024, MLA",
+  "From GPT-2 to Kimi K3 (artículo guía de la cátedra)"
+ ]
+}

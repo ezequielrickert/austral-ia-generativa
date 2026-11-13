@@ -1,0 +1,2031 @@
+{
+ "num": 11,
+ "nn": "11",
+ "fecha": "21 oct",
+ "titulo": "Redes generativas antagónicas (GANs)",
+ "bloque": "Visión y generativos",
+ "decks": [
+  {
+   "slug": "redes-generativas-antagonicas",
+   "titulo": "Redes generativas antagónicas (GANs)",
+   "slides": [
+    {
+     "i": 0,
+     "title": "Inteligencia Artificial Generativa (AI Gen)",
+     "section": "",
+     "resumen": "Portada de la clase 11: redes generativas antagónicas (GANs).",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Portada",
+     "last": 53
+    },
+    {
+     "i": 1,
+     "title": "IA generativa de visión",
+     "section": "IA generativa de visión",
+     "resumen": "Agenda: IA generativa de visión, GANs, Slanted Land, tipos y aplicaciones, limitaciones.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "IA generativa de visión",
+     "last": 53
+    },
+    {
+     "i": 2,
+     "title": "IA Generativa de Visión",
+     "section": "IA generativa de visión",
+     "resumen": "La IA generativa de visión aprende la **distribución** de un conjunto de imágenes y crea imágenes nuevas que podrían haber estado en los datos.",
+     "claves": [
+      {
+       "id": "ia-generativa-vs-discriminativa",
+       "label": "IA generativa vs. discriminativa",
+       "glos": true
+      },
+      {
+       "id": "distribución",
+       "label": "distribución",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "IA generativa de visión",
+     "last": 53
+    },
+    {
+     "i": 3,
+     "title": "¿Qué es la IA Generativa de Visión?",
+     "section": "IA generativa de visión",
+     "resumen": "**Discriminativa** analiza y clasifica lo que existe («¿es un 7?»); **generativa** crea contenido nuevo («generá un 7»). Es la distinción base de la clase.",
+     "claves": [
+      {
+       "id": "ia-generativa-vs-discriminativa",
+       "label": "IA generativa vs. discriminativa",
+       "glos": true
+      },
+      {
+       "id": "generativo-vs-discriminativo",
+       "label": "Modelo generativo vs discriminativo",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/01/#d=introduccion&s=60",
+       "clase": 1,
+       "cnn": "01",
+       "i": 60,
+       "title": "Modelos Discriminativos vs Generativos",
+       "por": "La misma distinción en la clase 1"
+      }
+     ],
+     "key": true,
+     "section_label": "IA generativa de visión",
+     "last": 53
+    },
+    {
+     "i": 4,
+     "title": "Línea de tiempo: el camino hasta hoy",
+     "section": "IA generativa de visión",
+     "resumen": "Recorrido histórico: redes estadísticas, CNN, GANs (2014) y difusión. El bloque arranca por las GANs, el hito más influyente de su era.",
+     "claves": [
+      {
+       "id": "gan",
+       "label": "GAN (Generative Adversarial Network)",
+       "glos": true
+      },
+      {
+       "id": "cnn",
+       "label": "CNN (red convolucional)",
+       "glos": true
+      },
+      {
+       "id": "difusion",
+       "label": "Modelo de difusión",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "IA generativa de visión",
+     "last": 53
+    },
+    {
+     "i": 5,
+     "title": "Los modelos que veremos en el curso",
+     "section": "IA generativa de visión",
+     "resumen": "Tres familias del bloque: **GANs** (generador contra evaluador), **difusión** (quitar ruido) y **CNN** (analizar imágenes). Cada una responde una pregunta distinta.",
+     "claves": [
+      {
+       "id": "gan",
+       "label": "GAN (Generative Adversarial Network)",
+       "glos": true
+      },
+      {
+       "id": "difusion",
+       "label": "Modelo de difusión",
+       "glos": true
+      },
+      {
+       "id": "cnn",
+       "label": "CNN (red convolucional)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "IA generativa de visión",
+     "last": 53
+    },
+    {
+     "i": 6,
+     "title": "Tabla comparativa rápida",
+     "section": "IA generativa de visión",
+     "resumen": "Tabla de consulta para elegir herramienta: GANs rápidas y realistas, difusión diversa y guiada por texto, CNN para reconocer y transformar.",
+     "claves": [
+      {
+       "id": "gan",
+       "label": "GAN (Generative Adversarial Network)",
+       "glos": true
+      },
+      {
+       "id": "difusion",
+       "label": "Modelo de difusión",
+       "glos": true
+      },
+      {
+       "id": "cnn",
+       "label": "CNN (red convolucional)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "IA generativa de visión",
+     "last": 53
+    },
+    {
+     "i": 7,
+     "title": "Introducción a las GANs",
+     "section": "Introducción a las GANs",
+     "resumen": "Separador: introducción a las GANs.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Introducción a las GANs",
+     "last": 53
+    },
+    {
+     "i": 8,
+     "title": "Generative Adversarial Networks (GANs)",
+     "section": "Introducción a las GANs",
+     "resumen": "Portada de sección: Generative Adversarial Networks.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Introducción a las GANs",
+     "last": 53
+    },
+    {
+     "i": 9,
+     "title": "Punto de partida",
+     "section": "Introducción a las GANs",
+     "resumen": "Idea central de Goodfellow (2014): en vez de enseñarle a una red a crear directamente, ponerla a competir contra otra que detecta sus errores.",
+     "claves": [
+      {
+       "id": "gan",
+       "label": "GAN (Generative Adversarial Network)",
+       "glos": true
+      },
+      {
+       "id": "generador",
+       "label": "Generador (G)",
+       "glos": true
+      },
+      {
+       "id": "discriminador",
+       "label": "Discriminador (D)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Introducción a las GANs",
+     "last": 53
+    },
+    {
+     "i": 10,
+     "title": "El origen: una noche en un bar (2014)",
+     "section": "Introducción a las GANs",
+     "resumen": "Anécdota del origen: Goodfellow propone dos redes que compiten y el prototipo funciona esa misma noche. LeCun la llamó la idea más interesante en 20 años.",
+     "claves": [
+      {
+       "id": "gan",
+       "label": "GAN (Generative Adversarial Network)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Introducción a las GANs",
+     "last": 53
+    },
+    {
+     "i": 11,
+     "title": "Modelo Mental Para Entenderlo",
+     "section": "Introducción a las GANs",
+     "resumen": "Modelo mental: el **falsificador** crea rostros y el **detective** los distingue de los reales; compitiendo millones de rondas, ambos mejoran.",
+     "claves": [
+      {
+       "id": "generador",
+       "label": "Generador (G)",
+       "glos": true
+      },
+      {
+       "id": "discriminador",
+       "label": "Discriminador (D)",
+       "glos": true
+      },
+      {
+       "id": "juego-minimax",
+       "label": "Juego minimax",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Introducción a las GANs",
+     "last": 53
+    },
+    {
+     "i": 12,
+     "title": "Arquitectura de una GAN",
+     "section": "Introducción a las GANs",
+     "resumen": "Analogía → técnica: falsificador = **Generador** (ruido → imagen sintética), detective = **Discriminador** (real o falsa). El veredicto de D entrena a ambos.",
+     "claves": [
+      {
+       "id": "gan",
+       "label": "GAN (Generative Adversarial Network)",
+       "glos": true
+      },
+      {
+       "id": "generador",
+       "label": "Generador (G)",
+       "glos": true
+      },
+      {
+       "id": "discriminador",
+       "label": "Discriminador (D)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": true,
+     "section_label": "Introducción a las GANs",
+     "last": 53
+    },
+    {
+     "i": 13,
+     "title": "Arquitectura de una \"Vanilla\" GAN",
+     "section": "Introducción a las GANs",
+     "resumen": "Diagrama de la Vanilla GAN: ruido → G → imagen falsa; D recibe reales y falsas y emite un veredicto.",
+     "claves": [
+      {
+       "id": "gan",
+       "label": "GAN (Generative Adversarial Network)",
+       "glos": true
+      },
+      {
+       "id": "generador",
+       "label": "Generador (G)",
+       "glos": true
+      },
+      {
+       "id": "discriminador",
+       "label": "Discriminador (D)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Introducción a las GANs",
+     "last": 53
+    },
+    {
+     "i": 14,
+     "title": "Entrenamiento paso a paso",
+     "section": "Introducción a las GANs",
+     "resumen": "Ciclo de entrenamiento: G genera desde ruido, D juzga reales y falsas, ambos reciben su error y ajustan pesos; se repite miles de veces.",
+     "claves": [
+      {
+       "id": "gan",
+       "label": "GAN (Generative Adversarial Network)",
+       "glos": true
+      },
+      {
+       "id": "backpropagation",
+       "label": "Backpropagation",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Introducción a las GANs",
+     "last": 53
+    },
+    {
+     "i": 15,
+     "title": "Slanted Land",
+     "section": "Slanted Land",
+     "resumen": "Separador: Slanted Land.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Slanted Land",
+     "last": 53
+    },
+    {
+     "i": 16,
+     "title": "El Problema: ¡Bienvenidos a Slanted Land! 🌀",
+     "section": "Slanted Land",
+     "resumen": "Slanted Land: un mundo donde todos los rostros están inclinados. Es el ejemplo de juguete para construir una GAN a mano.",
+     "claves": [
+      {
+       "id": "slanted-land",
+       "label": "Slanted Land",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Slanted Land",
+     "last": 53
+    },
+    {
+     "i": 17,
+     "title": "El problema urgente",
+     "section": "Slanted Land",
+     "resumen": "El problema: TiltedTinder tiene solo 4 fotos reales y necesita más perfiles. Una GAN debe generar caras nuevas y plausibles.",
+     "claves": [
+      {
+       "id": "slanted-land",
+       "label": "Slanted Land",
+       "glos": true
+      },
+      {
+       "id": "datos-sinteticos",
+       "label": "Datos sintéticos / aumentación con GANs",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Slanted Land",
+     "last": 53
+    },
+    {
+     "i": 18,
+     "title": "El mundo de Slanted Land",
+     "section": "Slanted Land",
+     "resumen": "Simplificación: imágenes de 2×2 píxeles con valores entre 0 y 1, y redes de una sola capa, para seguir cada número.",
+     "claves": [
+      {
+       "id": "slanted-land",
+       "label": "Slanted Land",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Slanted Land",
+     "last": 53
+    },
+    {
+     "i": 19,
+     "title": "Los datos reales: caras con patrón",
+     "section": "Slanted Land",
+     "resumen": "La «firma» de una cara: diagonal principal oscura (valores altos) y secundaria clara (bajos). El Discriminador tiene que aprender ese patrón.",
+     "claves": [
+      {
+       "id": "slanted-land",
+       "label": "Slanted Land",
+       "glos": true
+      },
+      {
+       "id": "discriminador",
+       "label": "Discriminador (D)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Slanted Land",
+     "last": 53
+    },
+    {
+     "i": 20,
+     "title": "Caras vs. ruido: los dos tipos de imágenes",
+     "section": "Slanted Land",
+     "resumen": "Las caras reales tienen estructura diagonal; el ruido no tiene patrón. D debe separarlos solo a partir de los valores numéricos.",
+     "claves": [
+      {
+       "id": "slanted-land",
+       "label": "Slanted Land",
+       "glos": true
+      },
+      {
+       "id": "discriminador",
+       "label": "Discriminador (D)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Slanted Land",
+     "last": 53
+    },
+    {
+     "i": 21,
+     "title": "Construyendo el Discriminador",
+     "section": "Slanted Land",
+     "resumen": "D asigna peso **+1** a los píxeles de la diagonal principal y **−1** a los de la secundaria: así premia el patrón de cara.",
+     "claves": [
+      {
+       "id": "discriminador",
+       "label": "Discriminador (D)",
+       "glos": true
+      },
+      {
+       "id": "matriz-de-pesos",
+       "label": "Matriz de pesos",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Slanted Land",
+     "last": 53
+    },
+    {
+     "i": 22,
+     "title": "Construyendo el Discriminador",
+     "section": "Slanted Land",
+     "resumen": "Score = suma ponderada píxel × peso: la cara prototipo da 2 y el ruido −0,5. El umbral 1 pasa a la neurona como sesgo $b=-1$.",
+     "claves": [
+      {
+       "id": "discriminador",
+       "label": "Discriminador (D)",
+       "glos": true
+      },
+      {
+       "id": "sesgo",
+       "label": "Sesgo (bias)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Slanted Land",
+     "last": 53
+    },
+    {
+     "i": 23,
+     "title": "Discriminador Como red neuronal",
+     "section": "Slanted Land",
+     "resumen": "D es una sola neurona: $\\sigma(w\\cdot x+b)$ con $b=-1$; la cara da $\\sigma(1)\\approx0{,}73$ → real. Sin capa oculta no es MLP. Ojo: acá $z$ es el ruido de G.",
+     "claves": [
+      {
+       "id": "neurona",
+       "label": "Neurona artificial",
+       "glos": true
+      },
+      {
+       "id": "discriminador",
+       "label": "Discriminador (D)",
+       "glos": true
+      },
+      {
+       "id": "sesgo",
+       "label": "Sesgo (bias)",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 2,
+       "texto": "En el TP2 cada `Dense` hacía lo mismo ($W\\cdot x+b$ + activación), pero con dos capas ocultas de 32 ReLU y salida lineal.",
+       "tp_titulo": "¿Cuánto vale esta casa?",
+       "code": "tp2-baseline-mlp-32-32",
+       "nota": "El discriminador es una sola neurona; acá hay dos capas ocultas de 32 antes de la salida."
+      }
+     ],
+     "ver": [
+      {
+       "url": "/clases/03/#d=intro-redes-neuronales&s=7",
+       "clase": 3,
+       "cnn": "03",
+       "i": 7,
+       "title": "La neurona: primero, una combinación lineal",
+       "por": "La neurona como combinación lineal"
+      }
+     ],
+     "key": true,
+     "section_label": "Slanted Land",
+     "last": 53
+    },
+    {
+     "i": 24,
+     "title": "Función Sigmoid: la activación del Discriminador",
+     "section": "Slanted Land",
+     "resumen": "**Sigmoide** $\\sigma(x)=1/(1+e^{-x})$: acota a (0,1), es diferenciable y $\\sigma(0)=0{,}5$ da el umbral. Por eso D la usa como probabilidad de «real».",
+     "claves": [
+      {
+       "id": "sigmoide",
+       "label": "Sigmoide",
+       "glos": true
+      },
+      {
+       "id": "funcion-de-activacion",
+       "label": "Función de activación",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 2,
+       "texto": "En el TP2 la salida fue `Dense(1, linear)`: una sigmoide habría acotado el precio a (0,1). Sirve para probabilidades, como en D.",
+       "tp_titulo": "¿Cuánto vale esta casa?",
+       "code": "tp2-clase-sigmoide",
+       "nota": "La sigmoide sirve para probabilidades (como en D o en este clasificador de clase), no para un precio."
+      }
+     ],
+     "ver": [
+      {
+       "url": "/clases/03/#d=intro-redes-neuronales&s=8",
+       "clase": 3,
+       "cnn": "03",
+       "i": 8,
+       "title": "La sigmoide: la no linealidad clásica",
+       "por": "La sigmoide en la clase 3"
+      }
+     ],
+     "key": true,
+     "section_label": "Slanted Land",
+     "last": 53
+    },
+    {
+     "i": 25,
+     "title": "Pongamos todo junto del Discriminador",
+     "section": "Slanted Land",
+     "resumen": "Todo junto: la cara prototipo da $\\sigma(1)=0{,}73$ (real) y el ruido $\\sigma(-1{,}5)=0{,}18$ (falsa). D clasifica bien ambas.",
+     "claves": [
+      {
+       "id": "discriminador",
+       "label": "Discriminador (D)",
+       "glos": true
+      },
+      {
+       "id": "sigmoide",
+       "label": "Sigmoide",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Slanted Land",
+     "last": 53
+    },
+    {
+     "i": 26,
+     "title": "El Generador: el objetivo opuesto",
+     "section": "Slanted Land",
+     "resumen": "Objetivos opuestos sobre el mismo $D(\\cdot)$: D quiere $D(G(z))\\to0$, G quiere $\\to1$. G nunca ve caras reales: aprende por el gradiente de D. Los $z$ forman el **espacio latente**.",
+     "claves": [
+      {
+       "id": "generador",
+       "label": "Generador (G)",
+       "glos": true
+      },
+      {
+       "id": "espacio-latente",
+       "label": "Espacio latente",
+       "glos": true
+      },
+      {
+       "id": "juego-minimax",
+       "label": "Juego minimax",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=31",
+       "clase": 12,
+       "cnn": "12",
+       "i": 31,
+       "title": "FCN por dentro",
+       "por": "Convoluciones transpuestas para subir resolución"
+      }
+     ],
+     "key": true,
+     "section_label": "Slanted Land",
+     "last": 53
+    },
+    {
+     "i": 27,
+     "title": "Construyendo el Generador",
+     "section": "Slanted Land",
+     "resumen": "Con $z=0{,}7$ y pesos aprendidos, G produce una imagen con el patrón diagonal: internalizó la estructura del dataset y engaña a D.",
+     "claves": [
+      {
+       "id": "generador",
+       "label": "Generador (G)",
+       "glos": true
+      },
+      {
+       "id": "espacio-latente",
+       "label": "Espacio latente",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Slanted Land",
+     "last": 53
+    },
+    {
+     "i": 28,
+     "title": "Proceso de Entrenamiento",
+     "section": "Slanted Land",
+     "resumen": "Bisagra: en la práctica los pesos no se ponen a mano. Cada red predice, mide su error con **binary cross-entropy** y ajusta con backpropagation.",
+     "claves": [
+      {
+       "id": "entropia-cruzada",
+       "label": "Entropía cruzada (BCE y cross-entropy)",
+       "glos": true
+      },
+      {
+       "id": "backpropagation",
+       "label": "Backpropagation",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Slanted Land",
+     "last": 53
+    },
+    {
+     "i": 29,
+     "title": "Binary cross-entropy: los dos casos del Discriminador",
+     "section": "Slanted Land",
+     "resumen": "**BCE**: $-[y\\ln p+(1-y)\\ln(1-p)]$. Con $y=1$ queda $-\\ln p$; con $y=0$, $-\\ln(1-p)$. Castiga sin tope la confianza equivocada.",
+     "claves": [
+      {
+       "id": "entropia-cruzada",
+       "label": "Entropía cruzada (BCE y cross-entropy)",
+       "glos": true
+      },
+      {
+       "id": "funcion-de-perdida",
+       "label": "Función de coste (pérdida L2)",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 2,
+       "texto": "El TP2 era regresión: entrenó con MSE (no BCE) y reportó MAE en dólares. BCE es la del clasificador `AboveMedianPrice` del notebook de clase.",
+       "tp_titulo": "¿Cuánto vale esta casa?",
+       "code": "tp2-clase-compile-bce",
+       "nota": "BCE es la loss del clasificador de clase; el TP2 la cambió por MSE."
+      }
+     ],
+     "ver": [
+      {
+       "url": "/clases/04/#d=modelado-redes-neuronales&s=29",
+       "clase": 4,
+       "cnn": "04",
+       "i": 29,
+       "title": "Clasificación binaria: BCE",
+       "por": "BCE en la clase de diseño"
+      }
+     ],
+     "key": true,
+     "section_label": "Slanted Land",
+     "last": 53
+    },
+    {
+     "i": 30,
+     "title": "Loss Function: Discriminador — imagen real",
+     "section": "Slanted Land",
+     "resumen": "Con imagen real el error es $-\\ln(D(x))$: alto si D predice bajo. D quiere acercarse a 1 con lo real.",
+     "claves": [
+      {
+       "id": "entropia-cruzada",
+       "label": "Entropía cruzada (BCE y cross-entropy)",
+       "glos": true
+      },
+      {
+       "id": "discriminador",
+       "label": "Discriminador (D)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Slanted Land",
+     "last": 53
+    },
+    {
+     "i": 31,
+     "title": "Loss Function: Generador — imagen falsa",
+     "section": "Slanted Land",
+     "resumen": "Con imagen generada el error de D es $-\\ln(1-D(G(z)))$; G quiere lo contrario: que D le dé un score cercano a 1.",
+     "claves": [
+      {
+       "id": "entropia-cruzada",
+       "label": "Entropía cruzada (BCE y cross-entropy)",
+       "glos": true
+      },
+      {
+       "id": "generador",
+       "label": "Generador (G)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Slanted Land",
+     "last": 53
+    },
+    {
+     "i": 32,
+     "title": "Backpropagation: el procedimiento paso a paso",
+     "section": "Slanted Land",
+     "resumen": "Backprop en cuatro pasos: calcular el error, derivar $\\partial E/\\partial w$ con la regla de la cadena, actualizar $w\\leftarrow w-\\alpha\\,\\partial E/\\partial w$ y repetir en ambas redes.",
+     "claves": [
+      {
+       "id": "backpropagation",
+       "label": "Backpropagation",
+       "glos": true
+      },
+      {
+       "id": "regla-de-la-cadena",
+       "label": "Regla de la cadena",
+       "glos": true
+      },
+      {
+       "id": "learning-rate",
+       "label": "Tasa de aprendizaje η",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 2,
+       "texto": "En el TP2 Keras corrió este ciclo con Adam (lr 0,001); escalaron `SalePrice` porque sin escalar los gradientes eran enormes y no convergía.",
+       "tp_titulo": "¿Cuánto vale esta casa?",
+       "code": "tp2-train-and-report",
+       "nota": "Keras hace los cuatro pasos de backprop dentro de `model.fit`; Adam aplica la actualización."
+      }
+     ],
+     "ver": [
+      {
+       "url": "/clases/03/#d=intro-redes-neuronales&s=34",
+       "clase": 3,
+       "cnn": "03",
+       "i": 34,
+       "title": "El paso de actualización",
+       "por": "El paso de actualización"
+      }
+     ],
+     "key": true,
+     "section_label": "Slanted Land",
+     "last": 53
+    },
+    {
+     "i": 33,
+     "title": "Backpropagation: ejemplo con Slanted Land",
+     "section": "Slanted Land",
+     "resumen": "Ejemplo numérico con $\\partial E/\\partial w_i=-[1-D(x)]\\,x_i$ y $\\alpha=0{,}1$: los pesos se mueven poco y D se vuelve más exigente con imágenes similares.",
+     "claves": [
+      {
+       "id": "backpropagation",
+       "label": "Backpropagation",
+       "glos": true
+      },
+      {
+       "id": "learning-rate",
+       "label": "Tasa de aprendizaje η",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Slanted Land",
+     "last": 53
+    },
+    {
+     "i": 34,
+     "title": "El ciclo completo: Generador y Discriminador juntos",
+     "section": "Slanted Land",
+     "resumen": "Entra un **lote** de m reales y m generadas. D se actualiza con ambas (objetivos 1 y 0); G solo con las generadas, objetivo 1, atravesando D sin cambiarlo.",
+     "claves": [
+      {
+       "id": "batch",
+       "label": "Batch (lote)",
+       "glos": true
+      },
+      {
+       "id": "gan",
+       "label": "GAN (Generative Adversarial Network)",
+       "glos": true
+      },
+      {
+       "id": "backpropagation",
+       "label": "Backpropagation",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 2,
+       "texto": "En el TP2, `batch_size=32` sobre 1022 casas: unos 32 ajustes de pesos por época, con el error promediado en cada lote.",
+       "tp_titulo": "¿Cuánto vale esta casa?",
+       "code": "tp2-train-and-report",
+       "nota": "`batch_size=32`: el error se promedia por lote y cada lote produce un ajuste."
+      }
+     ],
+     "ver": [
+      {
+       "url": "/clases/04/#d=modelado-redes-neuronales&s=44",
+       "clase": 4,
+       "cnn": "04",
+       "i": 44,
+       "title": "Batch y época no son lo mismo",
+       "por": "Batch y época no son lo mismo"
+      }
+     ],
+     "key": true,
+     "section_label": "Slanted Land",
+     "last": 53
+    },
+    {
+     "i": 35,
+     "title": "El error del Discriminador",
+     "section": "Slanted Land",
+     "resumen": "D le dio 0,68 a una falsa: $E_D=-\\ln(0{,}32)\\approx1{,}14$. Un error considerable que lo empuja a ser más exigente.",
+     "claves": [
+      {
+       "id": "discriminador",
+       "label": "Discriminador (D)",
+       "glos": true
+      },
+      {
+       "id": "entropia-cruzada",
+       "label": "Entropía cruzada (BCE y cross-entropy)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Slanted Land",
+     "last": 53
+    },
+    {
+     "i": 36,
+     "title": "Para los curiosos: la derivada del error",
+     "section": "Slanted Land",
+     "resumen": "Opcional: la derivada $\\partial E/\\partial w_i=-[1-D(x)]\\,x_i$. Backprop la calcula para todos los pesos y la regla de la cadena lo hace eficiente.",
+     "claves": [
+      {
+       "id": "regla-de-la-cadena",
+       "label": "Regla de la cadena",
+       "glos": true
+      },
+      {
+       "id": "backpropagation",
+       "label": "Backpropagation",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/03/#d=intro-redes-neuronales&s=31",
+       "clase": 3,
+       "cnn": "03",
+       "i": 31,
+       "title": "La regla de la cadena",
+       "por": "La regla de la cadena"
+      }
+     ],
+     "key": false,
+     "section_label": "Slanted Land",
+     "last": 53
+    },
+    {
+     "i": 37,
+     "title": "Tipos y aplicaciones",
+     "section": "Tipos y aplicaciones",
+     "resumen": "Separador: tipos y aplicaciones.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Tipos y aplicaciones",
+     "last": 53
+    },
+    {
+     "i": 38,
+     "title": "Tipos de GANs: el punto de partida",
+     "section": "Tipos y aplicaciones",
+     "resumen": "Variantes: **Vanilla** (sin control, inestable), **cGAN** (condiciona por etiqueta), **DCGAN** (convolucional, más estable) y **SRGAN** (super-resolución).",
+     "claves": [
+      {
+       "id": "cgan",
+       "label": "Conditional GAN (cGAN)",
+       "glos": true
+      },
+      {
+       "id": "dcgan",
+       "label": "DCGAN",
+       "glos": true
+      },
+      {
+       "id": "srgan",
+       "label": "SRGAN",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=53",
+       "clase": 12,
+       "cnn": "12",
+       "i": 53,
+       "title": "La idea de condición",
+       "por": "La condición: de etiqueta a texto"
+      }
+     ],
+     "key": true,
+     "section_label": "Tipos y aplicaciones",
+     "last": 53
+    },
+    {
+     "i": 39,
+     "title": "Tipos de GANs: cómo se ven sus imágenes",
+     "section": "Tipos y aplicaciones",
+     "resumen": "Lo que muestra cada paper: caras en B/N (Vanilla, sin copiar el entrenamiento), dígitos por etiqueta (cGAN), dormitorios en color (DCGAN) e imágenes ampliadas (SRGAN).",
+     "claves": [
+      {
+       "id": "cgan",
+       "label": "Conditional GAN (cGAN)",
+       "glos": true
+      },
+      {
+       "id": "dcgan",
+       "label": "DCGAN",
+       "glos": true
+      },
+      {
+       "id": "srgan",
+       "label": "SRGAN",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Tipos y aplicaciones",
+     "last": 53
+    },
+    {
+     "i": 40,
+     "title": "El salto que lo cambió todo: StyleGAN (2018)",
+     "section": "Tipos y aplicaciones",
+     "resumen": "**StyleGAN** resolvió el control de atributos: una red de mapeo convierte $z$ en un estilo $w$ que se inyecta por capa; las capas chicas deciden pose, las grandes detalles.",
+     "claves": [
+      {
+       "id": "stylegan",
+       "label": "StyleGAN",
+       "glos": true
+      },
+      {
+       "id": "espacio-latente",
+       "label": "Espacio latente",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": true,
+     "section_label": "Tipos y aplicaciones",
+     "last": 53
+    },
+    {
+     "i": 41,
+     "title": "StyleGAN: arquitectura",
+     "section": "Tipos y aplicaciones",
+     "resumen": "Arquitectura: red de mapeo (8 capas densas, $z\\to w$ de 512) y red de síntesis de 4×4 a 1024×1024; $w$ entra en cada bloque por **AdaIN**, más un ruido propio.",
+     "claves": [
+      {
+       "id": "stylegan",
+       "label": "StyleGAN",
+       "glos": true
+      },
+      {
+       "id": "adain",
+       "label": "AdaIN",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Tipos y aplicaciones",
+     "last": 53
+    },
+    {
+     "i": 42,
+     "title": "StyleGAN: Innovaciones Clave (Resumen)",
+     "section": "Tipos y aplicaciones",
+     "resumen": "StyleGAN solo cambia el Generador: progressive growing (4×4 → 1024×1024), muestreo bilineal y estilo por capa dan estabilidad y control fino.",
+     "claves": [
+      {
+       "id": "stylegan",
+       "label": "StyleGAN",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Tipos y aplicaciones",
+     "last": 53
+    },
+    {
+     "i": 43,
+     "title": "ThisPersonDoesNotExist.com en números",
+     "section": "Tipos y aplicaciones",
+     "resumen": "Escala real: 70.000 caras FFHQ y 26,2M parámetros en G, contra los 5 números del D de Slanted Land. Misma idea; **FID** 4,40 (más bajo, mejor).",
+     "claves": [
+      {
+       "id": "stylegan",
+       "label": "StyleGAN",
+       "glos": true
+      },
+      {
+       "id": "fid",
+       "label": "FID e Inception Score",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Tipos y aplicaciones",
+     "last": 53
+    },
+    {
+     "i": 44,
+     "title": "Fortaleza 1: Generación de imágenes realistas",
+     "section": "Tipos y aplicaciones",
+     "resumen": "Realismo medido: en CIFAR-10 los jueces humanos se equivocan 21,3% (azar sería 50%). Modelo de validación: jueces ciegos, tarea definida, error reportado.",
+     "claves": [
+      {
+       "id": "gan",
+       "label": "GAN (Generative Adversarial Network)",
+       "glos": true
+      },
+      {
+       "id": "fid",
+       "label": "FID e Inception Score",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Tipos y aplicaciones",
+     "last": 53
+    },
+    {
+     "i": 45,
+     "title": "Fortaleza 2: Transformación de imágenes (Image Translation)",
+     "section": "Tipos y aplicaciones",
+     "resumen": "Image translation: **Pix2Pix** aprende de pares alineados (boceto → foto); **CycleGAN** aprende sin pares (caballo ↔ cebra).",
+     "claves": [
+      {
+       "id": "pix2pix",
+       "label": "Pix2Pix",
+       "glos": true
+      },
+      {
+       "id": "cyclegan",
+       "label": "CycleGAN",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=45",
+       "clase": 12,
+       "cnn": "12",
+       "i": 45,
+       "title": "U-Net es modular: adelanto",
+       "por": "U-Net también hace image-to-image"
+      }
+     ],
+     "key": true,
+     "section_label": "Tipos y aplicaciones",
+     "last": 53
+    },
+    {
+     "i": 46,
+     "title": "Image Translation: modelos y librerías",
+     "section": "Tipos y aplicaciones",
+     "resumen": "Usos y librerías: MRI → CT, día → noche, caballo → cebra (pytorch-CycleGAN-and-pix2pix); Real-ESRGAN es lo que se usa hoy para ampliar fotos.",
+     "claves": [
+      {
+       "id": "pix2pix",
+       "label": "Pix2Pix",
+       "glos": true
+      },
+      {
+       "id": "cyclegan",
+       "label": "CycleGAN",
+       "glos": true
+      },
+      {
+       "id": "srgan",
+       "label": "SRGAN",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Tipos y aplicaciones",
+     "last": 53
+    },
+    {
+     "i": 47,
+     "title": "Fortaleza 3: Completado de imágenes (Image Inpainting)",
+     "section": "Tipos y aplicaciones",
+     "resumen": "**Inpainting**: la GAN reconstruye regiones faltantes coherentes con el contexto (DeepFill); en medicina recupera información de tomografías de baja dosis.",
+     "claves": [
+      {
+       "id": "gan",
+       "label": "GAN (Generative Adversarial Network)",
+       "glos": true
+      },
+      {
+       "id": "inpainting",
+       "label": "inpainting",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Tipos y aplicaciones",
+     "last": 53
+    },
+    {
+     "i": 48,
+     "title": "El dataset importa: lo que le das es lo que obtenés",
+     "section": "Tipos y aplicaciones",
+     "resumen": "Una GAN solo genera lo que aprendió: clases mezcladas sin etiqueta dan híbridos. Hay que validar el dataset (limpio, etiquetado, homogéneo) o usar cGAN.",
+     "claves": [
+      {
+       "id": "datos-sinteticos",
+       "label": "Datos sintéticos / aumentación con GANs",
+       "glos": true
+      },
+      {
+       "id": "cgan",
+       "label": "Conditional GAN (cGAN)",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 4,
+       "texto": "En el TP4 sacaron del SFT las 240 filas con error y las 160 de ruido: el modelo copia lo que ve, igual que una GAN.",
+       "tp_titulo": "El agente de admisión de guardia (TP final)",
+       "code": "tp4-seleccionar-ids",
+       "nota": ""
+      }
+     ],
+     "ver": [],
+     "key": false,
+     "section_label": "Tipos y aplicaciones",
+     "last": 53
+    },
+    {
+     "i": 49,
+     "title": "Limitaciones y cierre",
+     "section": "Limitaciones y cierre",
+     "resumen": "Separador: limitaciones y cierre.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Limitaciones y cierre",
+     "last": 53
+    },
+    {
+     "i": 50,
+     "title": "Limitaciones (1 de 2): los problemas de entrenamiento",
+     "section": "Limitaciones y cierre",
+     "resumen": "Problemas de entrenamiento: **mode collapse** (G produce siempre lo mismo que engaña a D) e **inestabilidad** del equilibrio entre las dos redes.",
+     "claves": [
+      {
+       "id": "mode-collapse",
+       "label": "Mode collapse",
+       "glos": true
+      },
+      {
+       "id": "inestabilidad-gan",
+       "label": "Inestabilidad del entrenamiento",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=56",
+       "clase": 12,
+       "cnn": "12",
+       "i": 56,
+       "title": "La idea de difusión: agregar y quitar ruido",
+       "por": "Difusión: sin mode collapse"
+      }
+     ],
+     "key": true,
+     "section_label": "Limitaciones y cierre",
+     "last": 53
+    },
+    {
+     "i": 51,
+     "title": "Limitaciones (2 de 2): evaluación, coste y sesgo",
+     "section": "Limitaciones y cierre",
+     "resumen": "Más límites: no hay métrica universal (FID e IS aproximan), entrenar es caro y la GAN hereda los **sesgos** del dataset.",
+     "claves": [
+      {
+       "id": "fid",
+       "label": "FID e Inception Score",
+       "glos": true
+      },
+      {
+       "id": "sesgo del dataset",
+       "label": "sesgo del dataset",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/13/#d=cierre-magnifica-humanitas&s=32",
+       "clase": 13,
+       "cnn": "13",
+       "i": 32,
+       "title": "Para empezar",
+       "por": "Sesgos como desafío ético"
+      }
+     ],
+     "key": false,
+     "section_label": "Limitaciones y cierre",
+     "last": 53
+    },
+    {
+     "i": 52,
+     "title": "Cierre: lo que aprendimos y lo que sigue",
+     "section": "Limitaciones y cierre",
+     "resumen": "Recap: intuición (falsificador y detective), arquitectura, entrenamiento con Slanted Land, el **juego minimax** como marco, variantes y limitaciones.",
+     "claves": [
+      {
+       "id": "juego-minimax",
+       "label": "Juego minimax",
+       "glos": true
+      },
+      {
+       "id": "gan",
+       "label": "GAN (Generative Adversarial Network)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": true,
+     "section_label": "Limitaciones y cierre",
+     "last": 53
+    },
+    {
+     "i": 53,
+     "title": "Práctica: entrenar una GAN",
+     "section": "Limitaciones y cierre",
+     "resumen": "Práctica: repo pytorch-gans con Vanilla GAN (MNIST), cGAN (genera el dígito pedido) y DCGAN (CelebA). La Vanilla es la más parecida a Slanted Land.",
+     "claves": [
+      {
+       "id": "gan",
+       "label": "GAN (Generative Adversarial Network)",
+       "glos": true
+      },
+      {
+       "id": "cgan",
+       "label": "Conditional GAN (cGAN)",
+       "glos": true
+      },
+      {
+       "id": "dcgan",
+       "label": "DCGAN",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Limitaciones y cierre",
+     "last": 53
+    }
+   ],
+   "groups": [
+    {
+     "label": "Portada",
+     "slides": [
+      {
+       "i": 0,
+       "title": "Inteligencia Artificial Generativa (AI Gen)",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 0,
+     "last": 0,
+     "ntp": 0,
+     "nkey": 0
+    },
+    {
+     "label": "IA generativa de visión",
+     "slides": [
+      {
+       "i": 1,
+       "title": "IA generativa de visión",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 2,
+       "title": "IA Generativa de Visión",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 3,
+       "title": "¿Qué es la IA Generativa de Visión?",
+       "key": true,
+       "tp": false
+      },
+      {
+       "i": 4,
+       "title": "Línea de tiempo: el camino hasta hoy",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 5,
+       "title": "Los modelos que veremos en el curso",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 6,
+       "title": "Tabla comparativa rápida",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 1,
+     "last": 6,
+     "ntp": 0,
+     "nkey": 1
+    },
+    {
+     "label": "Introducción a las GANs",
+     "slides": [
+      {
+       "i": 7,
+       "title": "Introducción a las GANs",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 8,
+       "title": "Generative Adversarial Networks (GANs)",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 9,
+       "title": "Punto de partida",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 10,
+       "title": "El origen: una noche en un bar (2014)",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 11,
+       "title": "Modelo Mental Para Entenderlo",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 12,
+       "title": "Arquitectura de una GAN",
+       "key": true,
+       "tp": false
+      },
+      {
+       "i": 13,
+       "title": "Arquitectura de una \"Vanilla\" GAN",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 14,
+       "title": "Entrenamiento paso a paso",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 7,
+     "last": 14,
+     "ntp": 0,
+     "nkey": 1
+    },
+    {
+     "label": "Slanted Land",
+     "slides": [
+      {
+       "i": 15,
+       "title": "Slanted Land",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 16,
+       "title": "El Problema: ¡Bienvenidos a Slanted Land! 🌀",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 17,
+       "title": "El problema urgente",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 18,
+       "title": "El mundo de Slanted Land",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 19,
+       "title": "Los datos reales: caras con patrón",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 20,
+       "title": "Caras vs. ruido: los dos tipos de imágenes",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 21,
+       "title": "Construyendo el Discriminador",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 22,
+       "title": "Construyendo el Discriminador",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 23,
+       "title": "Discriminador Como red neuronal",
+       "key": true,
+       "tp": true
+      },
+      {
+       "i": 24,
+       "title": "Función Sigmoid: la activación del Discriminador",
+       "key": true,
+       "tp": true
+      },
+      {
+       "i": 25,
+       "title": "Pongamos todo junto del Discriminador",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 26,
+       "title": "El Generador: el objetivo opuesto",
+       "key": true,
+       "tp": false
+      },
+      {
+       "i": 27,
+       "title": "Construyendo el Generador",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 28,
+       "title": "Proceso de Entrenamiento",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 29,
+       "title": "Binary cross-entropy: los dos casos del Discriminador",
+       "key": true,
+       "tp": true
+      },
+      {
+       "i": 30,
+       "title": "Loss Function: Discriminador — imagen real",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 31,
+       "title": "Loss Function: Generador — imagen falsa",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 32,
+       "title": "Backpropagation: el procedimiento paso a paso",
+       "key": true,
+       "tp": true
+      },
+      {
+       "i": 33,
+       "title": "Backpropagation: ejemplo con Slanted Land",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 34,
+       "title": "El ciclo completo: Generador y Discriminador juntos",
+       "key": true,
+       "tp": true
+      },
+      {
+       "i": 35,
+       "title": "El error del Discriminador",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 36,
+       "title": "Para los curiosos: la derivada del error",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 15,
+     "last": 36,
+     "ntp": 5,
+     "nkey": 6
+    },
+    {
+     "label": "Tipos y aplicaciones",
+     "slides": [
+      {
+       "i": 37,
+       "title": "Tipos y aplicaciones",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 38,
+       "title": "Tipos de GANs: el punto de partida",
+       "key": true,
+       "tp": false
+      },
+      {
+       "i": 39,
+       "title": "Tipos de GANs: cómo se ven sus imágenes",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 40,
+       "title": "El salto que lo cambió todo: StyleGAN (2018)",
+       "key": true,
+       "tp": false
+      },
+      {
+       "i": 41,
+       "title": "StyleGAN: arquitectura",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 42,
+       "title": "StyleGAN: Innovaciones Clave (Resumen)",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 43,
+       "title": "ThisPersonDoesNotExist.com en números",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 44,
+       "title": "Fortaleza 1: Generación de imágenes realistas",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 45,
+       "title": "Fortaleza 2: Transformación de imágenes (Image Translation)",
+       "key": true,
+       "tp": false
+      },
+      {
+       "i": 46,
+       "title": "Image Translation: modelos y librerías",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 47,
+       "title": "Fortaleza 3: Completado de imágenes (Image Inpainting)",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 48,
+       "title": "El dataset importa: lo que le das es lo que obtenés",
+       "key": false,
+       "tp": true
+      }
+     ],
+     "first": 37,
+     "last": 48,
+     "ntp": 1,
+     "nkey": 3
+    },
+    {
+     "label": "Limitaciones y cierre",
+     "slides": [
+      {
+       "i": 49,
+       "title": "Limitaciones y cierre",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 50,
+       "title": "Limitaciones (1 de 2): los problemas de entrenamiento",
+       "key": true,
+       "tp": false
+      },
+      {
+       "i": 51,
+       "title": "Limitaciones (2 de 2): evaluación, coste y sesgo",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 52,
+       "title": "Cierre: lo que aprendimos y lo que sigue",
+       "key": true,
+       "tp": false
+      },
+      {
+       "i": 53,
+       "title": "Práctica: entrenar una GAN",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 49,
+     "last": 53,
+     "ntp": 0,
+     "nkey": 2
+    }
+   ],
+   "tab": "Redes generativas antagónicas (GANs)",
+   "extra": false,
+   "total": 54
+  }
+ ],
+ "multi": false,
+ "prev": "10",
+ "next": "12",
+ "snippets": [
+  {
+   "id": "baseline-mlp-32-32",
+   "titulo": "MLP baseline Dense(32)→Dense(32)→Dense(1, linear) (celda 10)",
+   "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
+   "desde": 31,
+   "hasta": 41,
+   "lenguaje": "python",
+   "codigo": "def build_baseline_model(n_features):\n    model = Sequential([\n        Input(shape=(n_features,)),\n        Dense(32, activation='relu'),\n        Dense(32, activation='relu'),\n        Dense(1, activation='linear'),\n    ])\n    # Salida real -> activación lineal + loss de regresión (mse). 'accuracy' no aplica acá:\n    # no hay clases que acertar, hay una distancia en dólares que minimizar.\n    model.compile(optimizer='adam', loss='mse', metrics=['mae'])\n    return model",
+   "que_hace": "Construye y compila el MLP del baseline numérico: dos capas ocultas de 32 ReLU y una salida lineal para predecir un real.",
+   "como_funciona": "- `Input(shape=(n_features,))` recibe la fila de floats (13 numéricas + flag).\n- Cada `Dense(32, activation='relu')` calcula $W\\cdot x+b$ y aplica ReLU.\n- `Dense(1, activation='linear')` devuelve un número sin acotar (el precio escalado).\n- `compile(optimizer='adam', loss='mse', metrics=['mae'])`: el comentario explica por qué `accuracy` no aplica.",
+   "proposito": "Pasar de la sigmoide + BCE del notebook de clase a lineal + MSE es el cambio central de la misión: la tarea (predecir dólares) fija la salida y la loss.",
+   "interaccion": "La usan `train_and_report` (celda 10) y el experimento con `ListingId` (celda 21). En el Milestone 3, `build_model_categorical` repite el mismo tronco 32-32-1 con la API funcional.",
+   "teoria": "Neurona/capa = combinación lineal + no linealidad; ReLU en ocultas y salida lineal + MSE para regresión.",
+   "key": "tp2-baseline-mlp-32-32",
+   "tp": 2,
+   "tp_titulo": "¿Cuánto vale esta casa?",
+   "usos": [
+    {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "introduccion",
+     "i": 26,
+     "title": "Redes Neuronales — Estructura y Celda Básica",
+     "url": "/clases/01/#d=introduccion&s=26"
+    },
+    {
+     "clase": 3,
+     "cnn": "03",
+     "slug": "intro-redes-neuronales",
+     "i": 9,
+     "title": "La capa: el bloque que se repite",
+     "url": "/clases/03/#d=intro-redes-neuronales&s=9"
+    },
+    {
+     "clase": 3,
+     "cnn": "03",
+     "slug": "intro-redes-neuronales",
+     "i": 24,
+     "title": "Sin activación, la red colapsa",
+     "url": "/clases/03/#d=intro-redes-neuronales&s=24"
+    },
+    {
+     "clase": 3,
+     "cnn": "03",
+     "slug": "intro-redes-neuronales",
+     "i": 25,
+     "title": "Las funciones de activación más comunes",
+     "url": "/clases/03/#d=intro-redes-neuronales&s=25"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 22,
+     "title": "Un catálogo para elegir sin dudar",
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=22"
+    },
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
+     "i": 23,
+     "title": "La feed-forward: la misma red para cada posición",
+     "url": "/clases/08/#d=transformers-a-fondo&s=23"
+    },
+    {
+     "clase": 11,
+     "cnn": "11",
+     "slug": "redes-generativas-antagonicas",
+     "i": 23,
+     "title": "Discriminador Como red neuronal",
+     "url": "/clases/11/#d=redes-generativas-antagonicas&s=23"
+    }
+   ],
+   "nusos": 7
+  },
+  {
+   "id": "clase-sigmoide",
+   "titulo": "Notebook de clase: Dense(1, sigmoid) para AboveMedianPrice (house-prices.ipynb, celda 25)",
+   "archivo": "house-prices.ipynb",
+   "desde": 1,
+   "hasta": 5,
+   "lenguaje": "python",
+   "codigo": "model = Sequential([\n    Dense(32, activation='relu', input_shape=(10,)),\n    Dense(32, activation='relu'),\n    Dense(1, activation='sigmoid'),\n])",
+   "que_hace": "Es el modelo del notebook de clase del que partió el TP: el mismo 32-32 pero con una neurona sigmoide de salida.",
+   "como_funciona": "- `Dense(32, relu, input_shape=(10,))` y `Dense(32, relu)` sobre las 10 numéricas escaladas con MinMax.\n- `Dense(1, activation='sigmoid')` devuelve una probabilidad en (0,1) de estar sobre la mediana.",
+   "proposito": "Muestra el punto de partida: en el TP2 solo la salida cambió a `linear`, porque una sigmoide acotaría el precio a (0,1).",
+   "interaccion": "En el notebook de clase lo compila la celda 29 con BCE; en el TP2 lo reemplaza `build_baseline_model` (celda 10 del notebook del grupo).",
+   "teoria": "Sigmoide como activación de salida para probabilidades; el catálogo salida ↔ tarea.",
+   "key": "tp2-clase-sigmoide",
+   "tp": 2,
+   "tp_titulo": "¿Cuánto vale esta casa?",
+   "usos": [
+    {
+     "clase": 3,
+     "cnn": "03",
+     "slug": "intro-redes-neuronales",
+     "i": 8,
+     "title": "La sigmoide: la no linealidad clásica",
+     "url": "/clases/03/#d=intro-redes-neuronales&s=8"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 63,
+     "title": "Los notebooks de la clase",
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=63"
+    },
+    {
+     "clase": 11,
+     "cnn": "11",
+     "slug": "redes-generativas-antagonicas",
+     "i": 24,
+     "title": "Función Sigmoid: la activación del Discriminador",
+     "url": "/clases/11/#d=redes-generativas-antagonicas&s=24"
+    }
+   ],
+   "nusos": 3
+  },
+  {
+   "id": "clase-compile-bce",
+   "titulo": "Notebook de clase: SGD + binary_crossentropy + accuracy (house-prices.ipynb, celda 29)",
+   "archivo": "house-prices.ipynb",
+   "desde": 1,
+   "hasta": 3,
+   "lenguaje": "python",
+   "codigo": "model.compile(optimizer='sgd',\n              loss='binary_crossentropy',\n              metrics=['accuracy'])",
+   "que_hace": "Compila el clasificador de clase con BCE y accuracy.",
+   "como_funciona": "- `optimizer='sgd'`.\n- `loss='binary_crossentropy'`: la pérdida natural para una salida sigmoide 0/1.\n- `metrics=['accuracy']`.",
+   "proposito": "Es el contraste directo con el TP2, que pasó a `adam` + `mse` + `mae` porque el objetivo es un real en dólares, donde accuracy no significa nada.",
+   "interaccion": "Se aplica al `model` de la celda 25 del notebook de clase y lo entrena la celda 31.",
+   "teoria": "Binary cross-entropy para clasificación binaria vs MSE para regresión.",
+   "key": "tp2-clase-compile-bce",
+   "tp": 2,
+   "tp_titulo": "¿Cuánto vale esta casa?",
+   "usos": [
+    {
+     "clase": 11,
+     "cnn": "11",
+     "slug": "redes-generativas-antagonicas",
+     "i": 29,
+     "title": "Binary cross-entropy: los dos casos del Discriminador",
+     "url": "/clases/11/#d=redes-generativas-antagonicas&s=29"
+    }
+   ],
+   "nusos": 1
+  },
+  {
+   "id": "train-and-report",
+   "titulo": "Escalado del target, fit y desescalado a dólares (celda 10)",
+   "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
+   "desde": 43,
+   "hasta": 68,
+   "lenguaje": "python",
+   "codigo": "def train_and_report(fill_value, add_indicator, epochs=100, verbose=0):\n    X_train, y_train_raw, scaler = prepare_numeric_split(df_train, fill_value, add_indicator, fit_scaler=True)\n    X_val, y_val_raw, _ = prepare_numeric_split(df_val, fill_value, add_indicator, scaler=scaler)\n    X_test, y_test_raw, _ = prepare_numeric_split(df_test, fill_value, add_indicator, scaler=scaler)\n\n    # SalePrice va de ~50 mil a ~1,6 millones: sin escalar el target, el gradiente\n    # tiene que moverse en un rango enorme y la red no converge en 100 épocas.\n    # Escalamos y TAMBIÉN ajustando el scaler solo con train, y deshacemos el\n    # escalado sobre las predicciones para reportar todo en dólares.\n    y_scaler = StandardScaler().fit(y_train_raw.reshape(-1, 1))\n    y_train = y_scaler.transform(y_train_raw.reshape(-1, 1)).ravel()\n    y_val = y_scaler.transform(y_val_raw.reshape(-1, 1)).ravel()\n\n    keras.utils.set_random_seed(SEED)\n    model = build_baseline_model(X_train.shape[1])\n    hist = model.fit(X_train, y_train, batch_size=32, epochs=epochs,\n                      validation_data=(X_val, y_val), verbose=verbose)\n\n    y_pred_scaled = model.predict(X_test, verbose=0).ravel()\n    y_pred = y_scaler.inverse_transform(y_pred_scaled.reshape(-1, 1)).ravel()\n    mae = mean_absolute_error(y_test_raw, y_pred)\n    rmse = np.sqrt(mean_squared_error(y_test_raw, y_pred))\n    mape = 100 * mean_absolute_percentage_error(y_test_raw, y_pred)\n    return {'model': model, 'history': hist, 'scaler': scaler, 'y_scaler': y_scaler,\n            'mae': mae, 'rmse': rmse, 'mape': mape,\n            'X_test': X_test, 'y_test': y_test_raw, 'y_pred': y_pred}",
+   "que_hace": "Entrena una variante del baseline de punta a punta: prepara los tres splits, escala `SalePrice`, corre `fit` y reporta MAE, RMSE y MAPE en dólares.",
+   "como_funciona": "1. Llama a `prepare_numeric_split` para train/val/test.\n2. `y_scaler = StandardScaler().fit(y_train_raw...)`: el target también se z-normaliza con estadísticas de train.\n3. `keras.utils.set_random_seed(SEED)` y `build_baseline_model`.\n4. `model.fit(..., batch_size=32, epochs=epochs, validation_data=(X_val, y_val))`: forward + backward por lotes durante 100 épocas.\n5. `y_scaler.inverse_transform` vuelve las predicciones a dólares y calcula `mae`, `rmse`, `mape`.",
+   "proposito": "El comentario lo dice: con `SalePrice` crudo (50 mil a 1,6 millones) los gradientes eran enormes para el paso de Adam y no convergía en 100 épocas; escalar el target lo resolvió sin tocar el learning rate.",
+   "interaccion": "La llama la celda 11 con tres imputaciones; el resultado `variant_median_flag` pasa a ser `baseline` (celdas 15, 17, 18) y la referencia del Milestone 3.",
+   "teoria": "Paso de actualización $w\\leftarrow w-\\eta\\,\\partial E/\\partial w$: la escala del target condiciona el tamaño del gradiente; épocas y batches del ciclo de entrenamiento.",
+   "key": "tp2-train-and-report",
+   "tp": 2,
+   "tp_titulo": "¿Cuánto vale esta casa?",
+   "usos": [
+    {
+     "clase": 3,
+     "cnn": "03",
+     "slug": "intro-redes-neuronales",
+     "i": 29,
+     "title": "Ida y vuelta: forward y backward",
+     "url": "/clases/03/#d=intro-redes-neuronales&s=29"
+    },
+    {
+     "clase": 3,
+     "cnn": "03",
+     "slug": "intro-redes-neuronales",
+     "i": 34,
+     "title": "El paso de actualización",
+     "url": "/clases/03/#d=intro-redes-neuronales&s=34"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 43,
+     "title": "El learning rate es el paso",
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=43"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 44,
+     "title": "Batch y época no son lo mismo",
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=44"
+    },
+    {
+     "clase": 11,
+     "cnn": "11",
+     "slug": "redes-generativas-antagonicas",
+     "i": 32,
+     "title": "Backpropagation: el procedimiento paso a paso",
+     "url": "/clases/11/#d=redes-generativas-antagonicas&s=32"
+    },
+    {
+     "clase": 11,
+     "cnn": "11",
+     "slug": "redes-generativas-antagonicas",
+     "i": 34,
+     "title": "El ciclo completo: Generador y Discriminador juntos",
+     "url": "/clases/11/#d=redes-generativas-antagonicas&s=34"
+    }
+   ],
+   "nusos": 6
+  },
+  {
+   "id": "seleccionar-ids",
+   "titulo": "Solo las filas correctas entran al SFT",
+   "archivo": "scripts/seleccionar_entrenamiento.py",
+   "desde": 40,
+   "hasta": 66,
+   "lenguaje": "python",
+   "codigo": "def seleccionar_ids(\n    filas: list[dict[str, str]],\n    clasificacion: dict[str, str],\n    costumbre: dict,\n) -> tuple[list[str], dict]:\n    faltantes = {fila[\"id\"] for fila in filas} - clasificacion.keys()\n    if faltantes:\n        raise ValueError(f\"faltan clasificaciones para {len(faltantes)} filas\")\n    ids_error = sorted(i for i, tipo in clasificacion.items() if tipo == \"error\")\n    ids_ruido = sorted(i for i, tipo in clasificacion.items() if tipo == \"ruido\")\n    seleccionados = [fila[\"id\"] for fila in filas if clasificacion[fila[\"id\"]] == \"correcta\"]\n    # Toda fila correcta sigue la costumbre completa; si no, la clasificación y el informe\n    # de costumbres no corresponden entre sí y no se arma el dataset.\n    inconsistentes = sorted(\n        fila[\"id\"] for fila in filas\n        if clasificacion[fila[\"id\"]] == \"correcta\"\n        and aviso_segun_costumbre(fila, costumbre) != (fila[\"aviso_al_voluntariado\"] == SI)\n    )\n    if inconsistentes:\n        raise ValueError(f\"filas correctas que contradicen la costumbre: {inconsistentes[:5]}\")\n    return seleccionados, {\n        \"total_historial\": len(filas),\n        \"correctas_clasificadas\": len(seleccionados),\n        \"excluidas_error\": len(ids_error),\n        \"excluidas_ruido\": len(ids_ruido),\n        \"seleccionadas\": len(seleccionados),\n    }",
+   "que_hace": "Selecciona del historial solo las filas clasificadas como `correcta` y excluye errores y ruido, controlando consistencia con la costumbre.",
+   "como_funciona": "- Falla si alguna fila no tiene clasificación.\n- Separa `ids_error` e `ids_ruido` y toma como `seleccionados` solo las `correcta`.\n- Revisa que toda fila correcta siga la costumbre del aviso (`aviso_segun_costumbre`); si no, no arma el dataset.\n- Devuelve los ids y un resumen (2.000 → 1.600; 240 y 160 excluidas).",
+   "proposito": "El SFT imita las demostraciones: si entraran errores o desvíos, el modelo los aprendería. Se descartan en vez de corregirlos.",
+   "interaccion": "Lo llama `scripts/generar_conversaciones.generar_dataset` con `historial_clasificado.csv` y `historial_costumbres.json`; los ids elegidos filtran `historial/trazas.jsonl`.",
+   "teoria": "Curado del dataset de demostraciones: la calidad de los datos de SFT determina lo que aprende el modelo.",
+   "key": "tp4-seleccionar-ids",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 22,
+     "title": "Quiz: ¿qué aprende el SFT?",
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=22"
+    },
+    {
+     "clase": 11,
+     "cnn": "11",
+     "slug": "redes-generativas-antagonicas",
+     "i": 48,
+     "title": "El dataset importa: lo que le das es lo que obtenés",
+     "url": "/clases/11/#d=redes-generativas-antagonicas&s=48"
+    }
+   ],
+   "nusos": 2
+  }
+ ]
+}

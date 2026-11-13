@@ -1,0 +1,613 @@
+[
+ {
+  "i": 0,
+  "section": "",
+  "title": "Inteligencia Artificial Generativa (AI Gen)",
+  "lead": "",
+  "visible_text": "Inteligencia Artificial Generativa (AI Gen) Redes generativas antagónicas (GANs) Autor: Paulo Veiga, Claudio Righetti, Marco Sorondo (Universidad Austral) Última modificación: 2026-10-21",
+  "details": [],
+  "speaker_notes": ""
+ },
+ {
+  "i": 1,
+  "section": "IA generativa de visión",
+  "title": "IA generativa de visión",
+  "lead": "",
+  "visible_text": "01 IA generativa de visión 02 Introducción a las GANs 03 Slanted Land 04 Tipos y aplicaciones 05 Limitaciones y cierre 01 IA generativa de visión",
+  "details": [],
+  "speaker_notes": ""
+ },
+ {
+  "i": 2,
+  "section": "IA generativa de visión",
+  "title": "IA Generativa de Visión",
+  "lead": "",
+  "visible_text": "IA generativa de visión IA Generativa de Visión IA generativa de visión: modelos que aprenden la distribución de un conjunto de imágenes, o sea su estructura interna, y con ella crean imágenes nuevas: no estaban en los datos, pero podrían haber estado. Esta es la definición que vamos a usar toda la clase. Dos palabras para retener: distribución, que es lo que aprende, e imágenes nuevas, que es lo que produce. La próxima slide la contrasta con la IA visual que ya conocen, la discriminativa.",
+  "details": [],
+  "speaker_notes": "Esta es la definición que vamos a usar toda la clase. Dos palabras para retener: distribución, que es lo que aprende, e imágenes nuevas, que es lo que produce. La próxima slide la contrasta con la IA visual que ya conocen, la discriminativa."
+ },
+ {
+  "i": 3,
+  "section": "IA generativa de visión",
+  "title": "¿Qué es la IA Generativa de Visión?",
+  "lead": "**La IA visual se diseñó primero para analizar imágenes que ya existen: clasificarlas, detectar objetos o medir estructuras. Eso es la IA discriminativa, que aprende a distinguir entre categorías. La IA generativa aprende a crear contenido visual que no existía antes.**",
+  "visible_text": "IA generativa de visión ¿Qué es la IA Generativa de Visión? La IA visual se diseñó primero para analizar imágenes que ya existen: clasificarlas, detectar objetos o medir estructuras. Eso es la IA discriminativa, que aprende a distinguir entre categorías. La IA generativa aprende a crear contenido visual que no existía antes. Aspecto IA Discriminativa IA Generativa ¿Qué hace? Analiza y clasifica lo que ya existe Crea contenido nuevo que no existía Pregunta típica \"¿Este dígito es un 7?\" \"Genera u",
+  "details": [],
+  "speaker_notes": ""
+ },
+ {
+  "i": 4,
+  "section": "IA generativa de visión",
+  "title": "Línea de tiempo: el camino hasta hoy",
+  "lead": "Un campo en aceleración constante. Este curso arranca con el hito más influyente de la era de las GANs.",
+  "visible_text": "IA generativa de visión Línea de tiempo: el camino hasta hoy Un campo en aceleración constante. Este curso arranca con el hito más influyente de la era de las GANs. 1 Era Estadística · 1950s–2000s Redes neuronales, backpropagation. Resultados prometedores en teoría, pero muy limitados visualmente en la práctica. 2 Redes convolucionales (CNN) · 2012–hoy Redes que aprenden filtros para analizar imágenes y dominan la visión supervisada. También entran en la IA generativa: con CNN más rápidas y prof",
+  "details": [
+   "Este curso empieza con el hito más influyente de la era de las GANs: las Generative Adversarial Networks."
+  ],
+  "speaker_notes": ""
+ },
+ {
+  "i": 5,
+  "section": "IA generativa de visión",
+  "title": "Los modelos que veremos en el curso",
+  "lead": "Tres familias de redes — tres bloques temáticos dedicados. Cada modelo responde una pregunta diferente: al final del curso, sabremos cuándo usar cada uno.",
+  "visible_text": "IA generativa de visión Los modelos que veremos en el curso Tres familias de redes — tres bloques temáticos dedicados. Cada modelo responde una pregunta diferente: al final del curso, sabremos cuándo usar cada uno. GANs — Generative Adversarial Networks Dos redes que compiten: una genera, la otra evalúa. Casos Deepfakes StyleGAN Generación de datos sintéticos (imágenes médicas, entre otras) Pregunta: ¿Cómo generar imágenes realistas que \"engañen\" a un evaluador? Diffusion Networks Aprenden a rec",
+  "details": [],
+  "speaker_notes": ""
+ },
+ {
+  "i": 6,
+  "section": "IA generativa de visión",
+  "title": "Tabla comparativa rápida",
+  "lead": "Esta tabla no es para memorizar — es para consultar cuando tengas un problema real y necesites decidir qué herramienta usar.",
+  "visible_text": "IA generativa de visión Tabla comparativa rápida Esta tabla no es para memorizar — es para consultar cuando tengas un problema real y necesites decidir qué herramienta usar. Criterio GANs Diffusion Networks CNN ¿Para qué sirve? Generar imágenes realistas, transformar modalidades, aumentar datos Generar imágenes desde texto o guías visuales con alta diversidad Reconocer qué hay en una imagen (clasificar, detectar, segmentar) y transformarla, por ejemplo aumentar su resolución Velocidad Muy rápida",
+  "details": [],
+  "speaker_notes": ""
+ },
+ {
+  "i": 7,
+  "section": "Introducción a las GANs",
+  "title": "Introducción a las GANs",
+  "lead": "",
+  "visible_text": "01 IA generativa de visión 02 Introducción a las GANs 03 Slanted Land 04 Tipos y aplicaciones 05 Limitaciones y cierre 02 Introducción a las GANs",
+  "details": [],
+  "speaker_notes": ""
+ },
+ {
+  "i": 8,
+  "section": "Introducción a las GANs",
+  "title": "Generative Adversarial Networks (GANs)",
+  "lead": "",
+  "visible_text": "Introducción a las GANs Generative Adversarial Networks (GANs)",
+  "details": [],
+  "speaker_notes": ""
+ },
+ {
+  "i": 9,
+  "section": "Introducción a las GANs",
+  "title": "Punto de partida",
+  "lead": "**\"¿Cómo enseñarle a una máquina a crear algo que nunca ha visto?\"**",
+  "visible_text": "Introducción a las GANs Punto de partida \"¿Cómo enseñarle a una máquina a crear algo que nunca ha visto?\" Esta es la pregunta que Ian Goodfellow se hizo en 2014. La respuesta que encontró cambió el campo de la inteligencia artificial para siempre y puso en marcha una de las líneas de investigación más prolíficas de la historia de la IA. La idea central En lugar de enseñarle a una red a crear directamente, haz que compita contra otra red que aprende a detectar sus errores. La presión de la compet",
+  "details": [
+   "**Esta es la pregunta que Ian Goodfellow se hizo en 2014. La respuesta que encontró cambió el campo de la inteligencia artificial para siempre y puso en marcha una de las líneas de investigación más prolíficas de la historia de la IA.**"
+  ],
+  "speaker_notes": ""
+ },
+ {
+  "i": 10,
+  "section": "Introducción a las GANs",
+  "title": "El origen: una noche en un bar (2014)",
+  "lead": "",
+  "visible_text": "Introducción a las GANs El origen: una noche en un bar (2014) Montreal, junio de 2014. Ian Goodfellow, 27 años, propone en una conversación de bar una idea aparentemente simple: ¿y si en lugar de una sola red, usamos dos? Una que genera, otra que evalúa. Que compitan. Sus colegas son escépticos. Esa misma noche implementa el prototipo. Funciona en el primer intento. 70K+ : Citas del paper original \"La idea más interesante en machine learning en los últimos 20 años.\" — Yann LeCun",
+  "details": [
+   "Montreal, junio de 2014. Ian Goodfellow, 27 años, propone en una conversación de bar una idea aparentemente simple: ¿y si en lugar de una sola red, usamos dos? Una que genera, otra que evalúa. Que compitan.",
+   "Sus colegas son escépticos. Esa misma noche implementa el prototipo. Funciona en el primer intento.",
+   "70K+: Citas del paper original",
+   "\"La idea más interesante en machine learning en los últimos 20 años.\" — Yann LeCun"
+  ],
+  "speaker_notes": ""
+ },
+ {
+  "i": 11,
+  "section": "Introducción a las GANs",
+  "title": "Modelo Mental Para Entenderlo",
+  "lead": "**Un experimento mental: el mundo de los rostros. Imaginad una sociedad donde existen miles de rostros reales con características reconocibles. En esa sociedad aparecen dos personajes con objetivos opuestos:**",
+  "visible_text": "Introducción a las GANs Modelo Mental Para Entenderlo Un experimento mental: el mundo de los rostros. Imaginad una sociedad donde existen miles de rostros reales con características reconocibles. En esa sociedad aparecen dos personajes con objetivos opuestos: El Falsificador El Detective Objetivo: crear rostros que parezcan pertenecer a ese mundo. Objetivo: distinguir los rostros reales de los falsos. Método: prueba y error. Genera un rostro, recibe feedback, ajusta, repite. Puede estudiar todos",
+  "details": [
+   "**¿Qué pasa cuando estos dos compiten durante miles — o millones — de rondas? Los dos se vuelven extraordinariamente buenos en lo suyo.**"
+  ],
+  "speaker_notes": ""
+ },
+ {
+  "i": 12,
+  "section": "Introducción a las GANs",
+  "title": "Arquitectura de una GAN",
+  "lead": "Lo que acabamos de describir con el falsificador y el detective tiene una arquitectura técnica precisa. Cada elemento de la analogía corresponde a un componente real de la red:",
+  "visible_text": "Introducción a las GANs Arquitectura de una GAN Lo que acabamos de describir con el falsificador y el detective tiene una arquitectura técnica precisa. Cada elemento de la analogía corresponde a un componente real de la red: Analogía Componente técnico Función El Falsificador Generador (G) Transforma ruido aleatorio en imágenes sintéticas Los rostros falsos Imágenes generadas Output del Generador — al principio, puro ruido visual El Detective Discriminador (D) Clasifica cada imagen como \"real\" o",
+  "details": [],
+  "speaker_notes": ""
+ },
+ {
+  "i": 13,
+  "section": "Introducción a las GANs",
+  "title": "Arquitectura de una \"Vanilla\" GAN",
+  "lead": "",
+  "visible_text": "Introducción a las GANs Arquitectura de una \"Vanilla\" GAN ¿Qué es una GAN? - Explicación sobre las redes generativas antagónicas - AWS",
+  "details": [
+   "**[¿Qué es una GAN? - Explicación sobre las redes generativas antagónicas - AWS](https://aws.amazon.com/es/what-is/gan/)**"
+  ],
+  "speaker_notes": ""
+ },
+ {
+  "i": 14,
+  "section": "Introducción a las GANs",
+  "title": "Entrenamiento paso a paso",
+  "lead": "Cuatro pasos que se repiten miles de veces — así es como una GAN aprende a engañar.",
+  "visible_text": "Introducción a las GANs Entrenamiento paso a paso Cuatro pasos que se repiten miles de veces — así es como una GAN aprende a engañar. 1 El Generador produce su primer intento Recibe como entrada un vector de ruido aleatorio — números al azar que representan un punto en un espacio de posibilidades. Con ese ruido como semilla, produce una imagen. Al principio del entrenamiento, esa imagen es literalmente ruido visual — manchas sin forma ni sentido. Analogía: el falsificador en su primer día. No sa",
+  "details": [
+   "El Generador produce su primer intento: Recibe como entrada un vector de ruido aleatorio — números al azar que representan un punto en un espacio de posibilidades. Con ese ruido como semilla, produce una imagen. Al principio del entrenamiento, esa imagen es literalmente ruido visual — manchas sin forma ni sentido. Analogía: el falsificador en su primer día. No sabe nada de los rostros reales — produce garabatos.",
+   "El Discriminador evalúa: Recibe dos tipos de inputs en cada ronda: imágenes reales del dataset de entrenamiento e imágenes falsas producidas por el Generador en el Paso 1. Su tarea: asignar a cada imagen una probabilidad de ser real (entre 0 y 1). Al principio tiene la tarea fácil — las imágenes del Generador son obviamente falsas.",
+   "El Discriminador emite su veredicto: Produce un número entre 0 y 1: cerca de 1 → \"Esto es real\"; cerca de 0 → \"Esto es claramente falso\"; cerca de 0.5 → \"No tengo idea\". Cuando el Generador logra que el Discriminador dé 0.5 de forma consistente, es el éxito.",
+   "Ambos aprenden del resultado: El veredicto se convierte en señal de aprendizaje: el Generador ajusta sus parámetros para engañar mejor la próxima vez; el Discriminador ajusta los suyos para detectar mejor. Ambos actualizan simultáneamente — cada uno aprende del error del otro.",
+   "El ciclo se repite miles de veces: Generar → evaluar → aprender. Este loop puede repetirse cientos de miles de veces. Con cada iteración, el Generador produce imágenes más convincentes y el Discriminador se vuelve más exigente. Al final, el ojo humano no puede distinguir lo real de lo generado."
+  ],
+  "speaker_notes": ""
+ },
+ {
+  "i": 15,
+  "section": "Slanted Land",
+  "title": "Slanted Land",
+  "lead": "",
+  "visible_text": "01 IA generativa de visión 02 Introducción a las GANs 03 Slanted Land 04 Tipos y aplicaciones 05 Limitaciones y cierre 03 Slanted Land",
+  "details": [],
+  "speaker_notes": ""
+ },
+ {
+  "i": 16,
+  "section": "Slanted Land",
+  "title": "El Problema: ¡Bienvenidos a Slanted Land! 🌀",
+  "lead": "Imagina un mundo peculiar llamado Slanted Land, donde absolutamente todo se inclina: los árboles, las casas, las personas e incluso la pizza que comen los gatos. En este universo, la norma es la inclinación.",
+  "visible_text": "Slanted Land El Problema: ¡Bienvenidos a Slanted Land! 🌀 Imagina un mundo peculiar llamado Slanted Land, donde absolutamente todo se inclina: los árboles, las casas, las personas e incluso la pizza que comen los gatos. En este universo, la norma es la inclinación. Los habitantes de Slanted Land solo conocen rostros con una ligera inclinación. Para ellos, un rostro completamente recto sería una anomalía, algo totalmente extraño e incomprensible. Universo Inclinado Todo, desde la gravedad hasta la",
+  "details": [
+   "Universo Inclinado: Todo, desde la gravedad hasta las cejas de sus habitantes, está en un ángulo distintivo.",
+   "Rostros \"Normales\": Solo existen los rostros inclinados; un rostro recto les resulta completamente alienígena.",
+   "Los habitantes de Slanted Land solo conocen rostros con una ligera inclinación. Para ellos, un rostro completamente recto sería una anomalía, algo totalmente extraño e incomprensible."
+  ],
+  "speaker_notes": ""
+ },
+ {
+  "i": 17,
+  "section": "Slanted Land",
+  "title": "El problema urgente",
+  "lead": "",
+  "visible_text": "Slanted Land El problema urgente La app de citas de Slanted Land, TiltedTinder, necesita generar fotos de perfil para sus usuarios. Pero solo tienen 4 fotos reales en toda su base de datos. Con tan pocos datos, nadie encuentra pareja. ¡La supervivencia romántica de toda una civilización inclinada depende de nuestra GAN! 💘 Basado en «A Friendly Introduction to Generative Adversarial Networks», de Luis Serrano (ver video)",
+  "details": [
+   "[Basado en «A Friendly Introduction to Generative Adversarial Networks», de Luis Serrano (ver video)](https://www.youtube.com/watch?v=8L11aMN5KY8&t=16s)"
+  ],
+  "speaker_notes": ""
+ },
+ {
+  "i": 18,
+  "section": "Slanted Land",
+  "title": "El mundo de Slanted Land",
+  "lead": "",
+  "visible_text": "Slanted Land El mundo de Slanted Land Imágenes 2×2 píxeles Cada imagen se representa como una pantalla con 4 celdas — cada celda tiene un valor entre 0 (blanco) y 1 (negro). Dataset real Son imágenes de personas inclinadas. El Generador va a aprender a producir imágenes que se parezcan a esas personas. Red de una sola capa La arquitectura más simple posible — ideal para entender los fundamentos sin complejidad adicional.",
+  "details": [
+   "Imágenes 2×2 píxeles: Cada imagen se representa como una pantalla con 4 celdas — cada celda tiene un valor entre 0 (blanco) y 1 (negro).",
+   "Dataset real: Son imágenes de personas inclinadas. El Generador va a aprender a producir imágenes que se parezcan a esas personas.",
+   "Red de una sola capa: La arquitectura más simple posible — ideal para entender los fundamentos sin complejidad adicional."
+  ],
+  "speaker_notes": ""
+ },
+ {
+  "i": 19,
+  "section": "Slanted Land",
+  "title": "Los datos reales: caras con patrón",
+  "lead": "Las \"caras\" de Slanted Land, codificadas como píxeles, tienen un patrón consistente:",
+  "visible_text": "Slanted Land Los datos reales: caras con patrón Las \"caras\" de Slanted Land, codificadas como píxeles, tienen un patrón consistente: Esquinas oscuras en la diagonal principal (arriba-izquierda y abajo-derecha): valor alto Esquinas claras en la diagonal secundaria (arriba-derecha y abajo-izquierda): valor bajo Ese patrón diagonal es la \"firma\" de una cara real. El Discriminador tiene que aprenderlo para poder distinguirla del ruido.",
+  "details": [
+   "Esquinas oscuras en la diagonal principal (arriba-izquierda y abajo-derecha): valor alto",
+   "Esquinas claras en la diagonal secundaria (arriba-derecha y abajo-izquierda): valor bajo",
+   "Ese patrón diagonal es la \"firma\" de una cara real. El Discriminador tiene que aprenderlo para poder distinguirla del ruido."
+  ],
+  "speaker_notes": ""
+ },
+ {
+  "i": 20,
+  "section": "Slanted Land",
+  "title": "Caras vs. ruido: los dos tipos de imágenes",
+  "lead": "",
+  "visible_text": "Slanted Land Caras vs. ruido: los dos tipos de imágenes Caras (imágenes reales) Ruido (imágenes falsas) Valores altos en la diagonal principal, bajos en la secundaria. Patrón estructurado y reconocible. Valores sin patrón, distribuidos aleatoriamente. Sin estructura diagonal. El Discriminador debe aprender a distinguirlos a partir de esos valores numéricos.",
+  "details": [],
+  "speaker_notes": ""
+ },
+ {
+  "i": 21,
+  "section": "Slanted Land",
+  "title": "Construyendo el Discriminador",
+  "lead": "**¿qué píxeles importan?**",
+  "visible_text": "Slanted Land Construyendo el Discriminador ¿qué píxeles importan? El Discriminador aprende que en las caras de Slanted Land: Los píxeles de la diagonal principal son grandes → reciben peso positivo (+1) Los píxeles de la diagonal secundaria son pequeños → reciben peso negativo (−1) Asigna estos pesos a cada posición: +1 para las que caracterizan una cara, −1 para las que no la caracterizan.",
+  "details": [
+   "Los píxeles de la diagonal principal son grandes → reciben peso positivo (+1)",
+   "Los píxeles de la diagonal secundaria son pequeños → reciben peso negativo (−1)",
+   "El Discriminador aprende que en las caras de Slanted Land:",
+   "Asigna estos pesos a cada posición: +1 para las que caracterizan una cara, −1 para las que no la caracterizan."
+  ],
+  "speaker_notes": ""
+ },
+ {
+  "i": 22,
+  "section": "Slanted Land",
+  "title": "Construyendo el Discriminador",
+  "lead": "**Calculo del Score**",
+  "visible_text": "Slanted Land Construyendo el Discriminador Calculo del Score El score de una imagen = suma ponderada de sus valores de píxel × pesos aprendidos: Cara prototipo Imagen de ruido 1×(+1) + 0×(−1) + 0×(−1) + 1×(+1) = 2 0.25×(+1) + 1×(−1) + 0.5×(−1) + 0.75×(+1) = −0.5 Score > 1 → Real ✓ Score < 1 → Falsa ✓ El umbral 1 de esta slide es el que en la siguiente entra a la neurona como sesgo: restarle 1 al score (b = −1) y comparar σ con 0,5 es lo mismo que preguntar si el score supera 1.",
+  "details": [
+   "El score de una imagen = suma ponderada de sus valores de píxel × pesos aprendidos:"
+  ],
+  "speaker_notes": "El umbral 1 de esta slide es el que en la siguiente entra a la neurona como sesgo: restarle 1 al score (b = −1) y comparar σ con 0,5 es lo mismo que preguntar si el score supera 1."
+ },
+ {
+  "i": 23,
+  "section": "Slanted Land",
+  "title": "Discriminador Como red neuronal",
+  "lead": "La entrada no calcula: x₁…x₄ son los píxeles. El cálculo lo hace la primera capa, que acá es una sola neurona. Para la cara prototipo: σ(1×(+1) + 0×(−1) + 0×(−1) + 1×(+1) − 1) = σ(1)",
+  "visible_text": "Slanted Land Discriminador Como red neuronal La entrada no calcula: x₁…x₄ son los píxeles. El cálculo lo hace la primera capa, que acá es una sola neurona. Para la cara prototipo: σ(1×(+1) + 0×(−1) + 0×(−1) + 1×(+1) − 1) = σ(1) Entradas (x) x₁=1, x₂=0, x₃=0, x₄=1 Pesos (w) w₁=+1, w₂=−1, w₃=−1, w₄=+1 Sesgo (b) b = −1, parte de la neurona de salida Suma ponderada 1(+1)+0(−1)+0(−1)+1(+1) + b = 2 − 1 = 1 Sigmoid σ(1) ≈ 0.73 → imagen real Es el mismo dibujo de la clase de MLP: la entrada no calcula, ",
+  "details": [
+   "Entradas (x): x₁=1, x₂=0, x₃=0, x₄=1",
+   "Pesos (w): w₁=+1, w₂=−1, w₃=−1, w₄=+1",
+   "Sesgo (b): b = −1, parte de la neurona de salida",
+   "Suma ponderada: 1(+1)+0(−1)+0(−1)+1(+1) + b = 2 − 1 = 1",
+   "Sigmoid: σ(1) ≈ 0.73 → imagen real"
+  ],
+  "speaker_notes": "Es el mismo dibujo de la clase de MLP: la entrada no calcula, x₁…x₄ son los píxeles; la primera capa hace w·x + b y la activación. Acá esa capa es una sola neurona, así que no es un MLP: no tiene capa oculta. Ojo con la letra: en GANs z es el ruido que entra al Generador, no la pre-activación de la clase de MLP."
+ },
+ {
+  "i": 24,
+  "section": "Slanted Land",
+  "title": "Función Sigmoid: la activación del Discriminador",
+  "lead": "**La función sigmoid convierte cualquier número real en una probabilidad entre 0 y 1. Es la función de activación que usa el Discriminador para emitir su veredicto.**",
+  "visible_text": "Slanted Land Función Sigmoid: la activación del Discriminador La función sigmoid convierte cualquier número real en una probabilidad entre 0 y 1. Es la función de activación que usa el Discriminador para emitir su veredicto. Rango acotado Devuelve valores entre 0 y 1; se lee como probabilidad. Diferenciable Es suave en todo punto; permite backpropagation. Monótona creciente Si sube la entrada, sube la salida; conserva el orden. Punto medio en 0 σ(0) = 0.5; umbral natural de decisión. σ(x) = 1 / ",
+  "details": [
+   "Rango acotado: Devuelve valores entre 0 y 1; se lee como probabilidad.",
+   "Diferenciable: Es suave en todo punto; permite backpropagation.",
+   "Monótona creciente: Si sube la entrada, sube la salida; conserva el orden.",
+   "Punto medio en 0: σ(0) = 0.5; umbral natural de decisión.",
+   "σ(x) = 1 / (1 + e⁻ˣ)"
+  ],
+  "speaker_notes": ""
+ },
+ {
+  "i": 25,
+  "section": "Slanted Land",
+  "title": "Pongamos todo junto del Discriminador",
+  "lead": "",
+  "visible_text": "Slanted Land Pongamos todo junto del Discriminador Cuando la cara prototipo pasa por la red completa Cuando la imagen de ruido pasa por la misma red σ(1) = 0.73 → \"Estoy un 73% seguro de que esto es real\" σ(−1.5) = 0.18 → \"Estoy solo un 18% seguro de que esto sea real\" Como 0.73 > 0.5, clasifica correctamente la imagen como real ✓ Como 0.18 < 0.5, clasifica correctamente la imagen como falsa ✓",
+  "details": [],
+  "speaker_notes": ""
+ },
+ {
+  "i": 26,
+  "section": "Slanted Land",
+  "title": "El Generador: el objetivo opuesto",
+  "lead": "Las dos redes leen el mismo número, D(·), pero quieren resultados contrarios.",
+  "visible_text": "Slanted Land El Generador: el objetivo opuesto Las dos redes leen el mismo número, D(·), pero quieren resultados contrarios. Factor Discriminador (D) Generador (G) Entrada Una imagen x de 4 píxeles Un número aleatorio z, entre 0 y 1 Salida Un número, D(x) Una imagen G(z) de 2×2 Quiere D(x) → 1 si la imagen es real; D(G(z)) → 0 si es falsa D(G(z)) → 1 En redes reales : G sube de resolución con capas de upsampling y convoluciones transpuestas. El Generador nunca ve una cara real. Aprende solo a tr",
+  "details": [
+   "En redes reales: G sube de resolución con capas de upsampling y convoluciones transpuestas."
+  ],
+  "speaker_notes": "El Generador nunca ve una cara real. Aprende solo a través del gradiente que le devuelve el Discriminador por D(G(z)), y por eso su objetivo se define sobre la salida de D. El paper original lo formula así: G se entrena para maximizar la probabilidad de que D se equivoque (Goodfellow et al., 2014).\n\nEl número z es aleatorio para que cada valor produzca una imagen distinta. El conjunto de valores posibles de z forma el espacio latente. Más adelante en la clase, StyleGAN transforma z en un vector de estilo w para controlar los rasgos de la imagen generada.\n\nEn Slanted Land la arquitectura es mínima: entra 1 número y salen 4 píxeles. Es la estructura inversa del Discriminador, que recibe 4 píxeles y devuelve 1 número. En una GAN de imágenes reales el esquema es el mismo, pero parte de un vector de ruido y llega a imágenes de hasta 1024×1024 (StyleGAN) con capas de upsampling y convoluciones transpuestas."
+ },
+ {
+  "i": 27,
+  "section": "Slanted Land",
+  "title": "Construyendo el Generador",
+  "lead": "**El Generador en acción: z = 0.7 → imagen**",
+  "visible_text": "Slanted Land Construyendo el Generador El Generador en acción: z = 0.7 → imagen Con z = 0.7 como entrada y los pesos aprendidos, el Generador produce una imagen que reproduce el patrón diagonal de las caras reales. El Generador aprendió a engañar al Discriminador. El resultado muestra el patrón diagonal característico de las caras de Slanted Land: valores altos en la diagonal principal, bajos en la secundaria. El Generador internalizó la estructura del dataset real.",
+  "details": [
+   "Con z = 0.7 como entrada y los pesos aprendidos, el Generador produce una imagen que reproduce el patrón diagonal de las caras reales. El Generador aprendió a engañar al Discriminador.",
+   "El resultado muestra el patrón diagonal característico de las caras de Slanted Land: valores altos en la diagonal principal, bajos en la secundaria. El Generador internalizó la estructura del dataset real."
+  ],
+  "speaker_notes": ""
+ },
+ {
+  "i": 28,
+  "section": "Slanted Land",
+  "title": "Proceso de Entrenamiento",
+  "lead": "Hasta acá pusimos los pesos a mano (+1 y −1, y los sesgos). En la práctica, cada red los aprende sola, repitiendo tres pasos:",
+  "visible_text": "Slanted Land Proceso de Entrenamiento Hasta acá pusimos los pesos a mano (+1 y −1, y los sesgos). En la práctica, cada red los aprende sola, repitiendo tres pasos: 1 Predecir El Discriminador mira una imagen y da un score entre 0 y 1. 2 Medir el error Compara el score con el objetivo: 1 si la imagen es real, 0 si es falsa. La función que mide cuánto se equivocó se llama binary cross-entropy. 3 Ajustar los pesos Backpropagation mueve cada peso en la dirección que baja el error. El Generador hace ",
+  "details": [
+   "Predecir: El Discriminador mira una imagen y da un score entre 0 y 1.",
+   "Medir el error: Compara el score con el objetivo: 1 si la imagen es real, 0 si es falsa. La función que mide cuánto se equivocó se llama binary cross-entropy.",
+   "Ajustar los pesos: Backpropagation mueve cada peso en la dirección que baja el error. El Generador hace lo mismo con el objetivo contrario: que el Discriminador se equivoque."
+  ],
+  "speaker_notes": "Es la bisagra entre los pesos puestos a mano y el entrenamiento. Las dos fórmulas de binary cross-entropy, −ln(D(x)) con imagen real y −ln(1 − D(G(z))) con imagen falsa, están en la slide siguiente con números; las curvas, en las dos que siguen; backpropagation, a partir de 3.17."
+ },
+ {
+  "i": 29,
+  "section": "Slanted Land",
+  "title": "Binary cross-entropy: los dos casos del Discriminador",
+  "lead": "**La propiedad clave: el error es grande cuando la predicción está lejos del objetivo, y pequeño cuando está cerca. Esto guía el aprendizaje en la dirección correcta.**",
+  "visible_text": "Slanted Land Binary cross-entropy: los dos casos del Discriminador La propiedad clave: el error es grande cuando la predicción está lejos del objetivo, y pequeño cuando está cerca. Esto guía el aprendizaje en la dirección correcta. La binary cross-entropy (en algunos textos, log-loss) es la misma de la clase de diseño de redes. Para una etiqueta y (1 = real, 0 = falsa) y una predicción p, el error vale −[y·ln(p) + (1 − y)·ln(1 − p)]. Con y = 1 sobrevive solo el primer término, −ln(p). Con y = 0 ",
+  "details": [],
+  "speaker_notes": "La binary cross-entropy (en algunos textos, log-loss) es la misma de la clase de diseño de redes. Para una etiqueta y (1 = real, 0 = falsa) y una predicción p, el error vale −[y·ln(p) + (1 − y)·ln(1 − p)]. Con y = 1 sobrevive solo el primer término, −ln(p). Con y = 0 sobrevive solo el segundo, −ln(1 − p). Los dos paneles de la slide son esos dos términos.\n\nEl logaritmo castiga sin tope la confianza equivocada, porque −ln(p) crece hacia infinito cuando p se acerca a 0. Por eso pasar de una predicción de 0.9 a una de 0.1 lleva el error de 0.1 a 2.3. Su derivada también es grande justo cuando el modelo se equivoca, así que el ajuste de pesos es más fuerte donde más hace falta. Un error lineal como 1 − p no tiene ninguna de las dos propiedades.\n\nLos dos paneles son el error del Discriminador. D minimiza −ln(D(x)) con imágenes reales y −ln(1 − D(G(z))) con imágenes falsas. El Generador se entrena con el objetivo contrario, que D se equivoque: en la práctica minimiza −ln(D(G(z))), que crece cuando D detecta la falsificación. El paper original formaliza esta tensión como un juego minimax entre G y D (Goodfellow et al., 2014)."
+ },
+ {
+  "i": 30,
+  "section": "Slanted Land",
+  "title": "Loss Function: Discriminador — imagen real",
+  "lead": "",
+  "visible_text": "Slanted Land Loss Function: Discriminador — imagen real Predicción = 1 (imagen real). Error = −ln(predicción). Predicción baja → alto error. Predicción alta → bajo error. El Discriminador quiere acercarse a 1 cuando ve imágenes reales.",
+  "details": [
+   "Predicción = 1 (imagen real).",
+   "Error = −ln(predicción).",
+   "Predicción baja → alto error. Predicción alta → bajo error.",
+   "El Discriminador quiere acercarse a 1 cuando ve imágenes reales."
+  ],
+  "speaker_notes": ""
+ },
+ {
+  "i": 31,
+  "section": "Slanted Land",
+  "title": "Loss Function: Generador — imagen falsa",
+  "lead": "",
+  "visible_text": "Slanted Land Loss Function: Generador — imagen falsa Predicción = 0 (imagen falsa). Error = −ln(1−predicción). Predicción alta → alto error. El Generador quiere que el Discriminador le asigne score alto (cercano a 1) — lo opuesto al objetivo del Discriminador.",
+  "details": [
+   "Predicción = 0 (imagen falsa).",
+   "Error = −ln(1−predicción).",
+   "Predicción alta → alto error.",
+   "El Generador quiere que el Discriminador le asigne score alto (cercano a 1) — lo opuesto al objetivo del Discriminador."
+  ],
+  "speaker_notes": ""
+ },
+ {
+  "i": 32,
+  "section": "Slanted Land",
+  "title": "Backpropagation: el procedimiento paso a paso",
+  "lead": "",
+  "visible_text": "Slanted Land Backpropagation: el procedimiento paso a paso 1 Calcular el error La binary cross-entropy da un número que mide qué tan lejos estuvo la red de la respuesta correcta. 2 Derivar la sensibilidad de cada peso Con la regla de la cadena se calcula ∂E/∂w para cada peso: si subo este peso un poco, ¿el error sube o baja? 3 Actualizar en la dirección opuesta al gradiente w_nuevo = w_actual − α · (∂E/∂w) — α (learning rate) controla el tamaño del paso. 4 Repetir para todos los pesos, en ambas ",
+  "details": [
+   "Calcular el error: **La binary cross-entropy da un número que mide qué tan lejos estuvo la red de la respuesta correcta.**",
+   "Derivar la sensibilidad de cada peso: **Con la regla de la cadena se calcula ∂E/∂w para cada peso: si subo este peso un poco, ¿el error sube o baja?**",
+   "Actualizar en la dirección opuesta al gradiente: **w_nuevo = w_actual − α · (∂E/∂w) — α (learning rate) controla el tamaño del paso.**",
+   "Repetir para todos los pesos, en ambas redes: **El cálculo se ejecuta para cada peso del Discriminador y del Generador de forma simultánea.**"
+  ],
+  "speaker_notes": ""
+ },
+ {
+  "i": 33,
+  "section": "Slanted Land",
+  "title": "Backpropagation: ejemplo con Slanted Land",
+  "lead": "**Con el error del Discriminador = 1.14 y output D(G(z)) = 0.68, calculamos el ajuste concreto usando la derivada ∂E/∂wᵢ = −[1 − D(x)] · xᵢ:**",
+  "visible_text": "Slanted Land Backpropagation: ejemplo con Slanted Land Con el error del Discriminador = 1.14 y output D(G(z)) = 0.68, calculamos el ajuste concreto usando la derivada ∂E/∂wᵢ = −[1 − D(x)] · xᵢ: Píxel Valor xᵢ ∂E/∂w α = 0.1 w_nuevo Arriba-izq (diagonal) 0.25 −0.32 × 0.25 = −0.08 −0.1 × (−0.08) 1 + 0.008 = 1.008 ↑ Arriba-der 1.00 −0.32 × 1.00 = −0.32 −0.1 × (−0.32) −1 + 0.032 = −0.968 ↑ Los pesos se mueven en la dirección que hace al Discriminador más exigente: en la próxima iteración dará un scor",
+  "details": [
+   "**Los pesos se mueven en la dirección que hace al Discriminador más exigente: en la próxima iteración dará un score más bajo a imágenes similares.**"
+  ],
+  "speaker_notes": ""
+ },
+ {
+  "i": 34,
+  "section": "Slanted Land",
+  "title": "El ciclo completo: Generador y Discriminador juntos",
+  "lead": "En cada vuelta entra un lote: m imágenes reales y m generadas. El Discriminador da un veredicto por imagen, y con esos veredictos se hacen dos pasos de backpropagation, uno por red: el del Discriminador usa los errores de las reales y de las generadas; el del Generador, solo los de las generadas.",
+  "visible_text": "Slanted Land El ciclo completo: Generador y Discriminador juntos En cada vuelta entra un lote: m imágenes reales y m generadas. El Discriminador da un veredicto por imagen, y con esos veredictos se hacen dos pasos de backpropagation, uno por red: el del Discriminador usa los errores de las reales y de las generadas; el del Generador, solo los de las generadas. Las cuentas de las slides anteriores eran con una sola imagen para que se vieran los números. En el entrenamiento real entra un lote: var",
+  "details": [],
+  "speaker_notes": "Las cuentas de las slides anteriores eran con una sola imagen para que se vieran los números. En el entrenamiento real entra un lote: varias imágenes reales y varias generadas a la vez, y el error que se propaga es el promedio del lote. Con esos veredictos hay dos pasos. En el del Discriminador, las reales tienen objetivo 1 y las generadas objetivo 0, y se actualiza solo el Discriminador. En el del Generador se usan solo las generadas, ahora con objetivo 1, porque el Generador quiere que el Discriminador se las crea; el error vuelve atravesando al Discriminador sin cambiarlo y se actualiza solo el Generador. Los veredictos del dibujo son ilustrativos; los errores sí están calculados: −ln(veredicto) si el objetivo es 1 y −ln(1 − veredicto) si es 0. Lo que hay que mirar es la forma: un error por imagen, un solo promedio por lote y un solo paso de backpropagation con ese promedio. En la práctica los lotes son de decenas de imágenes, no de seis."
+ },
+ {
+  "i": 35,
+  "section": "Slanted Land",
+  "title": "El error del Discriminador",
+  "lead": "El Discriminador recibió una imagen falsa pero le asignó un score de 0.68 (quería dar 0):",
+  "visible_text": "Slanted Land El error del Discriminador El Discriminador recibió una imagen falsa pero le asignó un score de 0.68 (quería dar 0): Error_D = −ln(1 − 0.68) = −ln(0.32) ≈ 1.14 Un error considerable. El Discriminador va a ajustar sus pesos para clasificar mejor estas imágenes en la próxima iteración — volviéndose más exigente y difícil de engañar.",
+  "details": [
+   "Error_D = −ln(1 − 0.68) = −ln(0.32) ≈ 1.14",
+   "Un error considerable. El Discriminador va a ajustar sus pesos para clasificar mejor estas imágenes en la próxima iteración — volviéndose más exigente y difícil de engañar."
+  ],
+  "speaker_notes": ""
+ },
+ {
+  "i": 36,
+  "section": "Slanted Land",
+  "title": "Para los curiosos: la derivada del error",
+  "lead": "La derivada del error del Discriminador respecto a sus pesos permite calcular exactamente cuánto ajustar cada uno:",
+  "visible_text": "Slanted Land Para los curiosos: la derivada del error La derivada del error del Discriminador respecto a sus pesos permite calcular exactamente cuánto ajustar cada uno: ∂E/∂wᵢ = −[1 − D(x)] · xᵢ Este cálculo es lo que backpropagation ejecuta automáticamente en cada iteración, para todas las capas y todos los pesos de la red. La regla de la cadena lo hace computacionalmente eficiente incluso con millones de parámetros. Slide opcional — para quien quiera profundizar en la matemática. Fuente: A Fri",
+  "details": [
+   "∂E/∂wᵢ = −[1 − D(x)] · xᵢ",
+   "Este cálculo es lo que backpropagation ejecuta automáticamente en cada iteración, para todas las capas y todos los pesos de la red. La regla de la cadena lo hace computacionalmente eficiente incluso con millones de parámetros.",
+   "Slide opcional — para quien quiera profundizar en la matemática.",
+   "Fuente: A Friendly Introduction to Generative Adversarial Networks — Luis Serrano Academy."
+  ],
+  "speaker_notes": ""
+ },
+ {
+  "i": 37,
+  "section": "Tipos y aplicaciones",
+  "title": "Tipos y aplicaciones",
+  "lead": "",
+  "visible_text": "01 IA generativa de visión 02 Introducción a las GANs 03 Slanted Land 04 Tipos y aplicaciones 05 Limitaciones y cierre 04 Tipos y aplicaciones",
+  "details": [],
+  "speaker_notes": ""
+ },
+ {
+  "i": 38,
+  "section": "Tipos y aplicaciones",
+  "title": "Tipos de GANs: el punto de partida",
+  "lead": "Todo lo que describimos corresponde a la Vanilla GAN — el modelo original de Goodfellow (2014). Pero ese modelo base tiene limitaciones importantes, y surgieron variantes especializadas que resuelven problemas concretos.",
+  "visible_text": "Tipos y aplicaciones Tipos de GANs: el punto de partida Todo lo que describimos corresponde a la Vanilla GAN — el modelo original de Goodfellow (2014). Pero ese modelo base tiene limitaciones importantes, y surgieron variantes especializadas que resuelven problemas concretos. Vanilla GAN · Goodfellow et al. 2014 Generador produce imágenes desde ruido aleatorio. Sin control sobre el resultado. Inestable y de baja calidad visual. Uso: punto de partida teórico. Conditional GAN (cGAN) · Mirza & Osin",
+  "details": [
+   "Vanilla GAN · Goodfellow et al. 2014: Generador produce imágenes desde ruido aleatorio. Sin control sobre el resultado. Inestable y de baja calidad visual. Uso: punto de partida teórico.",
+   "Conditional GAN (cGAN) · Mirza & Osindero, 2014: Generador y Discriminador reciben etiquetas de clase como condición. \"Genera un 7\" (dígitos de MNIST en el paper original). Uso: síntesis por clase y aumentación controlada.",
+   "DCGAN · Radford et al., 2015: Reemplaza capas densas con redes convolucionales. Entrenamiento estable, imágenes nítidas. Uso: base estándar para generación de imágenes de calidad.",
+   "SRGAN · Ledig et al., 2017: Especializado en ampliar imágenes de baja a alta resolución. Infiere detalles finos que no estaban en la imagen original. Uso: ampliar fotos e imágenes de menor calidad, médicas incluidas (factor 4× en el paper original)."
+  ],
+  "speaker_notes": ""
+ },
+ {
+  "i": 39,
+  "section": "Tipos y aplicaciones",
+  "title": "Tipos de GANs: cómo se ven sus imágenes",
+  "lead": "Las imágenes con que cada paper mostró su modelo:",
+  "visible_text": "Tipos y aplicaciones Tipos de GANs: cómo se ven sus imágenes Las imágenes con que cada paper mostró su modelo: Los cuatro papers: Vanilla GAN, Goodfellow et al., 2014; Conditional GAN, Mirza y Osindero, 2014; DCGAN, Radford et al., 2015; SRGAN, Ledig et al., 2017. Es la misma lista de la slide anterior, ahora con lo que cada uno produce. Qué muestra cada imagen. Vanilla GAN: Caras generadas en blanco y negro y a baja resolución. La columna de la derecha, en amarillo, es la foto real más parecida",
+  "details": [],
+  "speaker_notes": "Los cuatro papers: Vanilla GAN, Goodfellow et al., 2014; Conditional GAN, Mirza y Osindero, 2014; DCGAN, Radford et al., 2015; SRGAN, Ledig et al., 2017. Es la misma lista de la slide anterior, ahora con lo que cada uno produce. Qué muestra cada imagen. Vanilla GAN: Caras generadas en blanco y negro y a baja resolución. La columna de la derecha, en amarillo, es la foto real más parecida del entrenamiento: no la copió. Conditional GAN: Dígitos de MNIST generados con una etiqueta: cada fila es un «generá un 0», «generá un 1»… hasta el 9. DCGAN: Dormitorios generados con capas convolucionales (dataset LSUN): ya son imágenes en color y con escenas reconocibles. SRGAN: La misma ilustración ampliada 4×: a la izquierda con interpolación bicúbica, a la derecha con SRGAN, que inventa el detalle fino. Conviene recorrerla como una línea de tiempo: de caras grises y borrosas en 2014 a dormitorios en color en 2015, y después a usos concretos, como pedir una clase o ampliar una imagen. En la de la Vanilla GAN, la columna amarilla es la forma en que el paper muestra que el modelo no memorizó: pone al lado la foto real más parecida. En la de SRGAN, mirar el detalle del pelo y de las plumas: la bicúbica lo pierde y la SRGAN lo inventa."
+ },
+ {
+  "i": 40,
+  "section": "Tipos y aplicaciones",
+  "title": "El salto que lo cambió todo: StyleGAN (2018)",
+  "lead": "El problema que nadie había resuelto en cuatro años: las GANs generaban imágenes, pero no podías pedirle \"genera una cara joven, con pelo castaño y expresión neutral\". El Generador mezclaba todos los atributos juntos sin control.",
+  "visible_text": "Tipos y aplicaciones El salto que lo cambió todo: StyleGAN (2018) El problema que nadie había resuelto en cuatro años: las GANs generaban imágenes, pero no podías pedirle \"genera una cara joven, con pelo castaño y expresión neutral\". El Generador mezclaba todos los atributos juntos sin control. ¿Qué cambió exactamente en StyleGAN? En una GAN clásica, el ruido entra directamente y todo (forma, color, textura) sale del mismo vector mezclado. StyleGAN lo separa en capas independientes: Componente Q",
+  "details": [
+   "¿Qué cambió exactamente en StyleGAN? En una GAN clásica, el ruido entra directamente y todo (forma, color, textura) sale del mismo vector mezclado. StyleGAN lo separa en capas independientes:",
+   "Style mixing: StyleGAN permite tomar la estructura de una cara (pose, forma) y el estilo de otra (color de pelo, edad) para generar una cara completamente nueva con coherencia total. Esto no era posible en ninguna GAN anterior."
+  ],
+  "speaker_notes": "Durante cuatro años las GANs generaron imágenes cada vez mejores, pero no se les podía pedir \"una cara joven, con pelo castaño y expresión neutral\": el Generador mezclaba todos los atributos y no había forma de tocar uno sin mover los demás.\n\nLa causa está en cómo entra el ruido. En una GAN clásica el vector de ruido entra directamente en la primera capa, y todo (forma, color, textura) sale de ese mismo vector entrelazado. StyleGAN lo separa en capas independientes: la red de mapeo convierte el ruido en un vector de estilo w, ese estilo se inyecta en cada capa de síntesis mediante AdaIN, y un ruido aleatorio por capa aporta los detalles finos. Las capas de baja resolución deciden la pose y la forma; las de alta resolución, la textura y el color.\n\nEsa separación es lo que hace posible el *style mixing*: tomar la estructura de una cara (pose, forma) y el estilo de otra (color de pelo, edad) para generar una cara completamente nueva y coherente. Ninguna GAN anterior podía hacerlo."
+ },
+ {
+  "i": 41,
+  "section": "Tipos y aplicaciones",
+  "title": "StyleGAN: arquitectura",
+  "lead": "Dos redes en lugar de una: la red de mapeo convierte el ruido z en un estilo w, y la red de síntesis arma la imagen de 4×4 a 1024×1024 inyectando ese estilo en cada bloque.",
+  "visible_text": "Tipos y aplicaciones StyleGAN: arquitectura Dos redes en lugar de una: la red de mapeo convierte el ruido z en un estilo w, y la red de síntesis arma la imagen de 4×4 a 1024×1024 inyectando ese estilo en cada bloque. La clave: el estilo se inyecta en cada capa mediante AdaIN (Adaptive Instance Normalization), no solo al inicio. Esto da control granular sobre cada aspecto visual. En una GAN clásica el ruido entra una sola vez, en la primera capa, y todo sale mezclado de ahí. StyleGAN lo separa: l",
+  "details": [],
+  "speaker_notes": "La clave: el estilo se inyecta en cada capa mediante AdaIN (Adaptive Instance Normalization), no solo al inicio. Esto da control granular sobre cada aspecto visual. En una GAN clásica el ruido entra una sola vez, en la primera capa, y todo sale mezclado de ahí. StyleGAN lo separa: la red de mapeo, 8 capas densas, convierte el ruido z en un vector de estilo w de 512 números, y la red de síntesis arranca de un bloque constante de 4×4 y lo va agrandando hasta 1024×1024. En cada bloque el estilo w entra por AdaIN, que reescala las activaciones con valores que salen de w, y se suma un ruido propio del bloque que pone los detalles finos. Por eso los bloques chicos deciden la pose y la forma de la cara y los grandes la textura y el color: se puede tomar la estructura de una cara y el estilo de otra. El diagrama del paper tiene más piezas (las capas convolucionales 3×3, el sobremuestreo, las transformaciones A y B y el Discriminador de ProGAN con que se entrena); está en Cut material."
+ },
+ {
+  "i": 42,
+  "section": "Tipos y aplicaciones",
+  "title": "StyleGAN: Innovaciones Clave (Resumen)",
+  "lead": "StyleGAN (NVIDIA) redefine la generación de imágenes al modificar únicamente el Generador, manteniendo el Discriminador estándar. Sus tres innovaciones arquitectónicas permiten control fino sobre el estilo y alta calidad visual.",
+  "visible_text": "Tipos y aplicaciones StyleGAN: Innovaciones Clave (Resumen) StyleGAN (NVIDIA) redefine la generación de imágenes al modificar únicamente el Generador, manteniendo el Discriminador estándar. Sus tres innovaciones arquitectónicas permiten control fino sobre el estilo y alta calidad visual. Progressive Growing Entrena comenzando con imágenes de 4×4 píxeles y agrega capas progresivamente hasta 1024×1024. Mejora la estabilidad del entrenamiento y la calidad final. Bi-linear Sampling Reemplaza el mues",
+  "details": [
+   "Progressive Growing: Entrena comenzando con imágenes de 4×4 píxeles y agrega capas progresivamente hasta 1024×1024. Mejora la estabilidad del entrenamiento y la calidad final.",
+   "Bi-linear Sampling: Reemplaza el muestreo nearest-neighbor por bi-linear sampling en up/downsampling, reduciendo artefactos y logrando transiciones más suaves.",
+   "Mapping Network + AdaIN: Una red de 8 capas transforma el vector latente z en un vector intermedio w, que modula las características vía AdaIN. Permite controlar textura, iluminación y estilo de forma independiente por nivel.",
+   "Fuente: GeeksforGeeks — StyleGAN: Style Generative Adversarial Networks"
+  ],
+  "speaker_notes": ""
+ },
+ {
+  "i": 43,
+  "section": "Tipos y aplicaciones",
+  "title": "ThisPersonDoesNotExist.com en números",
+  "lead": "Cada vez que se recarga thispersondoesnotexist.com (Phillip Wang, febrero de 2019), StyleGAN de NVIDIA genera una cara nueva a partir de un vector de 512 números. Lo que hay detrás:",
+  "visible_text": "Tipos y aplicaciones ThisPersonDoesNotExist.com en números Cada vez que se recarga thispersondoesnotexist.com (Phillip Wang, febrero de 2019), StyleGAN de NVIDIA genera una cara nueva a partir de un vector de 512 números. Lo que hay detrás: 70.000 fotos de caras reales de Flickr (dataset FFHQ), de 1024 × 1024 píxeles 26,2 millones de parámetros en el Generador de StyleGAN 25 millones de imágenes vistas por el Discriminador durante el entrenamiento: cada foto pasa cientos de veces ≈ USD 1.000 par",
+  "details": [
+   "**En Slanted Land el Discriminador tenía 5 números: 4 pesos y un sesgo.**"
+  ],
+  "speaker_notes": "La comparación que importa es con Slanted Land: allá el Discriminador tenía 5 números y el Generador 8; acá el Generador tiene 26,2 millones. La idea es la misma, el lote, el veredicto, el promedio y los dos pasos; lo que cambia es la escala. Una métrica para tener a mano es el FID, que compara la distribución de las imágenes generadas con la de las reales (más bajo es mejor): StyleGAN llegó a 4,40 en FFHQ y StyleGAN2 a 2,84. StyleGAN2 entrenó con lotes de 32 imágenes, así que 25 millones de imágenes son unos 780.000 pasos de entrenamiento; le llevó 9 días en las mismas 8 GPUs, y el proyecto entero, con todos los experimentos, consumió 132 MWh de electricidad. El sitio arrancó en 2019 con StyleGAN; no encontré una fuente confiable sobre qué versión usa hoy. Cuánto costaría hoy: la corrida final fueron 6 días y 14 horas en 8 V100, o sea unas 1.264 horas de GPU. En AWS (p3.16xlarge, USD 24,48 la hora por las 8 GPUs) son unos USD 3.900; en Lambda (USD 0,79 por GPU por hora), unos USD 1.000; en los mercados de GPUs usadas como Vast.ai o RunPod (USD 0,08 a 0,19 por GPU por hora), entre USD 100 y 240. Es solo la corrida final: el proyecto entero, con todos los experimentos, cuesta muchas veces más (StyleGAN2 informa 132 MWh para todo el proyecto, contra 0,68 MWh de su modelo final). Precios de octubre de 2026."
+ },
+ {
+  "i": 44,
+  "section": "Tipos y aplicaciones",
+  "title": "Fortaleza 1: Generación de imágenes realistas",
+  "lead": "El resultado más sorprendente de las GANs: imágenes que el ojo humano no puede distinguir de las reales. Después de millones de rondas de entrenamiento, el Generador aprendió la estructura profunda de cómo lucen esas imágenes — proporciones, distribución de luz, imperfecciones que hacen que algo parezca real.",
+  "visible_text": "Tipos y aplicaciones Fortaleza 1: Generación de imágenes realistas El resultado más sorprendente de las GANs: imágenes que el ojo humano no puede distinguir de las reales. Después de millones de rondas de entrenamiento, el Generador aprendió la estructura profunda de cómo lucen esas imágenes — proporciones, distribución de luz, imperfecciones que hacen que algo parezca real. ThisPersonDoesNotExist.com Cada recarga genera un rostro humano completamente inventado con StyleGAN. Ninguno existe en el",
+  "details": [
+   "ThisPersonDoesNotExist.com: Cada recarga genera un rostro humano completamente inventado con StyleGAN. Ninguno existe en el mundo real.",
+   "Test de Turing visual (Salimans et al., 2016): Jueces humanos no distinguen las muestras de MNIST de los dígitos reales. Con CIFAR-10 se equivocan en el 21,3 % de los casos.",
+   "Videojuegos y entretenimiento: Las GANs generan texturas, escenarios y personajes con un nivel de detalle que antes requería artistas trabajando manualmente durante días."
+  ],
+  "speaker_notes": "El 21,3 % es la tasa de error de los jueces humanos, y no un porcentaje de realismo del modelo. Si las muestras fueran indistinguibles, los jueces acertarían al azar y el error llegaría al 50 %. Con CIFAR-10 los jueces se equivocaron una de cada cinco veces, así que todavía detectaban la mayoría de las falsificaciones. Con MNIST, en cambio, no las distinguían.\n\nEs el único estudio ciego con jueces humanos y un número publicado en el corpus de la clase, junto con el MOS de SRGAN. Sirve como modelo de cómo validar el realismo de un generador: jueces ciegos, una tarea definida y una tasa de error reportada."
+ },
+ {
+  "i": 45,
+  "section": "Tipos y aplicaciones",
+  "title": "Fortaleza 2: Transformación de imágenes (Image Translation)",
+  "lead": "Las GANs pueden transformar una imagen en otra y conservar la estructura subyacente.",
+  "visible_text": "Tipos y aplicaciones Fortaleza 2: Transformación de imágenes (Image Translation) Las GANs pueden transformar una imagen en otra y conservar la estructura subyacente. Pix2Pix: aprende de pares de imágenes alineadas El mismo modelo, entrenado con distintos datos: de etiquetas a una calle, de foto aérea a mapa, de día a noche, de boceto a foto, de blanco y negro a color. CycleGAN: aprende sin pares, y para muchas tareas no hay pares disponibles De caballo a cebra y de cebra a caballo, de foto a pin",
+  "details": [],
+  "speaker_notes": ""
+ },
+ {
+  "i": 46,
+  "section": "Tipos y aplicaciones",
+  "title": "Image Translation: modelos y librerías",
+  "lead": "En medicina, la misma técnica convierte MRI en CT sin escanear dos veces al paciente, lo que reduce costes, tiempo y exposición a radiación.",
+  "visible_text": "Tipos y aplicaciones Image Translation: modelos y librerías En medicina, la misma técnica convierte MRI en CT sin escanear dos veces al paciente, lo que reduce costes, tiempo y exposición a radiación. Input Output Modelo Librería o referencia Boceto de un edificio Foto del edificio terminado Pix2Pix pytorch-CycleGAN-and-pix2pix Foto de día La misma foto de noche Pix2Pix pytorch-CycleGAN-and-pix2pix Imagen de un caballo La misma imagen con una cebra CycleGAN pytorch-CycleGAN-and-pix2pix Imagen de",
+  "details": [],
+  "speaker_notes": "Los links son para que los alumnos lo prueben: el repositorio de Pix2Pix y CycleGAN trae datasets y modelos preentrenados (caballo ↔ cebra, día ↔ noche). Real-ESRGAN es lo que se usa hoy para ampliar fotos; DeOldify sigue funcionando pero ya no se mantiene."
+ },
+ {
+  "i": 47,
+  "section": "Tipos y aplicaciones",
+  "title": "Fortaleza 3: Completado de imágenes (Image Inpainting)",
+  "lead": "Las GANs pueden reconstruir regiones faltantes de forma coherente con el contexto. La red recibe una imagen con una región enmascarada e infiere el contenido más probable basándose en colores, texturas y estructuras adyacentes. No copia píxeles cercanos — entiende el contenido semántico de la escena completa.",
+  "visible_text": "Tipos y aplicaciones Fortaleza 3: Completado de imágenes (Image Inpainting) Las GANs pueden reconstruir regiones faltantes de forma coherente con el contexto. La red recibe una imagen con una región enmascarada e infiere el contenido más probable basándose en colores, texturas y estructuras adyacentes. No copia píxeles cercanos — entiende el contenido semántico de la escena completa. En la imagen : a la izquierda, la foto con zonas borradas en blanco; a la derecha, lo que completó la GAN, sin re",
+  "details": [
+   "En la imagen: a la izquierda, la foto con zonas borradas en blanco; a la derecha, lo que completó la GAN, sin retoques (DeepFill, Yu et al., 2018).",
+   "Tomografías con dosis reducida: Recupera la información sacrificada en protocolos de baja radiación, protegiendo al paciente sin perder calidad diagnóstica."
+  ],
+  "speaker_notes": ""
+ },
+ {
+  "i": 48,
+  "section": "Tipos y aplicaciones",
+  "title": "El dataset importa: lo que le das es lo que obtenés",
+  "lead": "Una GAN solo puede generar lo que aprendió. Si el dataset mezcla clases sin etiquetas, el Generador produce híbridos incoherentes, inútiles para entrenar clasificadores. Cada clase del dataset tiene que ser homogénea, o hace falta una Conditional GAN.",
+  "visible_text": "Tipos y aplicaciones El dataset importa: lo que le das es lo que obtenés Una GAN solo puede generar lo que aprendió. Si el dataset mezcla clases sin etiquetas, el Generador produce híbridos incoherentes, inútiles para entrenar clasificadores. Cada clase del dataset tiene que ser homogénea, o hace falta una Conditional GAN. Tipo de dataset Lo que genera la GAN Solo imágenes de gatos Gatos variados y realistas ✓ Solo imágenes de perros Perros variados y realistas ✓ Gatos + perros sin etiqueta Híbr",
+  "details": [
+   "Antes de entrenar hay que validar el dataset como cualquier entrada de un pipeline de datos: limpio, bien etiquetado y homogéneo dentro de cada clase."
+  ],
+  "speaker_notes": ""
+ },
+ {
+  "i": 49,
+  "section": "Limitaciones y cierre",
+  "title": "Limitaciones y cierre",
+  "lead": "",
+  "visible_text": "01 IA generativa de visión 02 Introducción a las GANs 03 Slanted Land 04 Tipos y aplicaciones 05 Limitaciones y cierre 05 Limitaciones y cierre",
+  "details": [],
+  "speaker_notes": ""
+ },
+ {
+  "i": 50,
+  "section": "Limitaciones y cierre",
+  "title": "Limitaciones (1 de 2): los problemas de entrenamiento",
+  "lead": "",
+  "visible_text": "Limitaciones y cierre Limitaciones (1 de 2): los problemas de entrenamiento Mode Collapse — el más común y frustrante El Generador descubre un \"truco\": produce siempre el mismo tipo de imagen que engaña al Discriminador, en lugar de aprender toda la variedad posible. Analogía: el falsificador que solo falsifica un tipo de billete. Con MNIST, una GAN colapsada genera siempre el mismo dígito, y ese dataset sintético no sirve para entrenar un clasificador de los diez. Inestabilidad en el entrenamie",
+  "details": [],
+  "speaker_notes": ""
+ },
+ {
+  "i": 51,
+  "section": "Limitaciones y cierre",
+  "title": "Limitaciones (2 de 2): evaluación, coste y sesgo",
+  "lead": "",
+  "visible_text": "Limitaciones y cierre Limitaciones (2 de 2): evaluación, coste y sesgo Dificultad para evaluar la calidad No existe una métrica universal. Las más usadas — FID e Inception Score (IS) — son aproximaciones imperfectas que no reemplazan la evaluación humana experta. Alta demanda computacional Entrenar una GAN de calidad requiere GPUs potentes, datasets grandes y horas o días de entrenamiento. Una barrera real para equipos con recursos limitados. Sesgo heredado del dataset Si los datos tienen sesgos",
+  "details": [
+   "Dificultad para evaluar la calidad: No existe una métrica universal. Las más usadas — FID e Inception Score (IS) — son aproximaciones imperfectas que no reemplazan la evaluación humana experta.",
+   "Alta demanda computacional: Entrenar una GAN de calidad requiere GPUs potentes, datasets grandes y horas o días de entrenamiento. Una barrera real para equipos con recursos limitados.",
+   "Sesgo heredado del dataset: Si los datos tienen sesgos — subrepresentación de grupos demográficos o patologías concretas — las imágenes generadas van a heredar y amplificar esos sesgos."
+  ],
+  "speaker_notes": ""
+ },
+ {
+  "i": 52,
+  "section": "Limitaciones y cierre",
+  "title": "Cierre: lo que aprendimos y lo que sigue",
+  "lead": "**En este capítulo construimos la comprensión de las GANs desde cero, siguiendo una narrativa completa:**",
+  "visible_text": "Limitaciones y cierre Cierre: lo que aprendimos y lo que sigue En este capítulo construimos la comprensión de las GANs desde cero, siguiendo una narrativa completa: 1 La intuición El falsificador y el detective, compitiendo para mejorar mutuamente. 2 La arquitectura Generador y Discriminador como implementación técnica de esa intuición. 3 El entrenamiento El ciclo de cinco pasos que hace converger al sistema, con el ejemplo de Slanted Land. 4 La lógica matemática El juego minimax como marco conc",
+  "details": [
+   "La intuición: El falsificador y el detective, compitiendo para mejorar mutuamente.",
+   "La arquitectura: Generador y Discriminador como implementación técnica de esa intuición.",
+   "El entrenamiento: El ciclo de cinco pasos que hace converger al sistema, con el ejemplo de Slanted Land.",
+   "La lógica matemática: El juego minimax como marco conceptual, binary cross-entropy y backpropagation.",
+   "Fortalezas y limitaciones: Tres capacidades concretas (generar, traducir y completar imágenes) y los problemas a resolver antes de usar GANs en producción."
+  ],
+  "speaker_notes": ""
+ },
+ {
+  "i": 53,
+  "section": "Limitaciones y cierre",
+  "title": "Práctica: entrenar una GAN",
+  "lead": "El repositorio pytorch-gans implementa en PyTorch las tres GANs de la clase. Escaneen el QR y sigan la sección Training:",
+  "visible_text": "Limitaciones y cierre Práctica: entrenar una GAN El repositorio pytorch-gans implementa en PyTorch las tres GANs de la clase. Escaneen el QR y sigan la sección Training: Vanilla GAN : python train_vanilla_gan.py: entrena con MNIST, que se descarga solo. Conditional GAN : python train_cgan.py: genera el dígito que le piden, del 0 al 9. DCGAN : python train_dcgan.py: entrena con caras de CelebA. Link : github.com/gordicaleksa/pytorch-gans#training Es la práctica de la clase. El repositorio es de A",
+  "details": [
+   "Vanilla GAN: python train_vanilla_gan.py: entrena con MNIST, que se descarga solo.",
+   "Conditional GAN: python train_cgan.py: genera el dígito que le piden, del 0 al 9.",
+   "DCGAN: python train_dcgan.py: entrena con caras de CelebA.",
+   "Link: github.com/gordicaleksa/pytorch-gans#training"
+  ],
+  "speaker_notes": "Es la práctica de la clase. El repositorio es de Aleksa Gordić, con licencia MIT. Cada script guarda checkpoints en models/checkpoints, el modelo final en models/binaries, imágenes de prueba en data/debug_imagery y los logs de TensorBoard en runs, así que se puede ver cómo mejora el Generador durante el entrenamiento. El tamaño del lote se ajusta con --batch_size según la memoria de la GPU. La Vanilla GAN con MNIST es la que arranca más rápido y la más parecida a Slanted Land."
+ }
+]

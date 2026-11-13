@@ -1,0 +1,586 @@
+[
+ {
+  "i": 0,
+  "resumen": "Portada de la clase 11: redes generativas antagónicas (GANs).",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 1,
+  "resumen": "Agenda: IA generativa de visión, GANs, Slanted Land, tipos y aplicaciones, limitaciones.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 2,
+  "resumen": "La IA generativa de visión aprende la **distribución** de un conjunto de imágenes y crea imágenes nuevas que podrían haber estado en los datos.",
+  "claves": [
+   "ia-generativa-vs-discriminativa",
+   "distribución"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 3,
+  "resumen": "**Discriminativa** analiza y clasifica lo que existe («¿es un 7?»); **generativa** crea contenido nuevo («generá un 7»). Es la distinción base de la clase.",
+  "claves": [
+   "ia-generativa-vs-discriminativa",
+   "generativo-vs-discriminativo"
+  ],
+  "clave_examen": true,
+  "ver": [
+   {
+    "ref": "introduccion#60",
+    "por": "La misma distinción en la clase 1"
+   }
+  ]
+ },
+ {
+  "i": 4,
+  "resumen": "Recorrido histórico: redes estadísticas, CNN, GANs (2014) y difusión. El bloque arranca por las GANs, el hito más influyente de su era.",
+  "claves": [
+   "gan",
+   "cnn",
+   "difusion"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 5,
+  "resumen": "Tres familias del bloque: **GANs** (generador contra evaluador), **difusión** (quitar ruido) y **CNN** (analizar imágenes). Cada una responde una pregunta distinta.",
+  "claves": [
+   "gan",
+   "difusion",
+   "cnn"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 6,
+  "resumen": "Tabla de consulta para elegir herramienta: GANs rápidas y realistas, difusión diversa y guiada por texto, CNN para reconocer y transformar.",
+  "claves": [
+   "gan",
+   "difusion",
+   "cnn"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 7,
+  "resumen": "Separador: introducción a las GANs.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 8,
+  "resumen": "Portada de sección: Generative Adversarial Networks.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 9,
+  "resumen": "Idea central de Goodfellow (2014): en vez de enseñarle a una red a crear directamente, ponerla a competir contra otra que detecta sus errores.",
+  "claves": [
+   "gan",
+   "generador",
+   "discriminador"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 10,
+  "resumen": "Anécdota del origen: Goodfellow propone dos redes que compiten y el prototipo funciona esa misma noche. LeCun la llamó la idea más interesante en 20 años.",
+  "claves": [
+   "gan"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 11,
+  "resumen": "Modelo mental: el **falsificador** crea rostros y el **detective** los distingue de los reales; compitiendo millones de rondas, ambos mejoran.",
+  "claves": [
+   "generador",
+   "discriminador",
+   "juego-minimax"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 12,
+  "resumen": "Analogía → técnica: falsificador = **Generador** (ruido → imagen sintética), detective = **Discriminador** (real o falsa). El veredicto de D entrena a ambos.",
+  "claves": [
+   "gan",
+   "generador",
+   "discriminador"
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 13,
+  "resumen": "Diagrama de la Vanilla GAN: ruido → G → imagen falsa; D recibe reales y falsas y emite un veredicto.",
+  "claves": [
+   "gan",
+   "generador",
+   "discriminador"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 14,
+  "resumen": "Ciclo de entrenamiento: G genera desde ruido, D juzga reales y falsas, ambos reciben su error y ajustan pesos; se repite miles de veces.",
+  "claves": [
+   "gan",
+   "backpropagation"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 15,
+  "resumen": "Separador: Slanted Land.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 16,
+  "resumen": "Slanted Land: un mundo donde todos los rostros están inclinados. Es el ejemplo de juguete para construir una GAN a mano.",
+  "claves": [
+   "slanted-land"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 17,
+  "resumen": "El problema: TiltedTinder tiene solo 4 fotos reales y necesita más perfiles. Una GAN debe generar caras nuevas y plausibles.",
+  "claves": [
+   "slanted-land",
+   "datos-sinteticos"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 18,
+  "resumen": "Simplificación: imágenes de 2×2 píxeles con valores entre 0 y 1, y redes de una sola capa, para seguir cada número.",
+  "claves": [
+   "slanted-land"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 19,
+  "resumen": "La «firma» de una cara: diagonal principal oscura (valores altos) y secundaria clara (bajos). El Discriminador tiene que aprender ese patrón.",
+  "claves": [
+   "slanted-land",
+   "discriminador"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 20,
+  "resumen": "Las caras reales tienen estructura diagonal; el ruido no tiene patrón. D debe separarlos solo a partir de los valores numéricos.",
+  "claves": [
+   "slanted-land",
+   "discriminador"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 21,
+  "resumen": "D asigna peso **+1** a los píxeles de la diagonal principal y **−1** a los de la secundaria: así premia el patrón de cara.",
+  "claves": [
+   "discriminador",
+   "matriz-de-pesos"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 22,
+  "resumen": "Score = suma ponderada píxel × peso: la cara prototipo da 2 y el ruido −0,5. El umbral 1 pasa a la neurona como sesgo $b=-1$.",
+  "claves": [
+   "discriminador",
+   "sesgo"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 23,
+  "resumen": "D es una sola neurona: $\\sigma(w\\cdot x+b)$ con $b=-1$; la cara da $\\sigma(1)\\approx0{,}73$ → real. Sin capa oculta no es MLP. Ojo: acá $z$ es el ruido de G.",
+  "claves": [
+   "neurona",
+   "discriminador",
+   "sesgo"
+  ],
+  "clave_examen": true,
+  "tp": [
+   {
+    "tp": 2,
+    "texto": "En el TP2 cada `Dense` hacía lo mismo ($W\\cdot x+b$ + activación), pero con dos capas ocultas de 32 ReLU y salida lineal."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "intro-redes-neuronales#7",
+    "por": "La neurona como combinación lineal"
+   }
+  ]
+ },
+ {
+  "i": 24,
+  "resumen": "**Sigmoide** $\\sigma(x)=1/(1+e^{-x})$: acota a (0,1), es diferenciable y $\\sigma(0)=0{,}5$ da el umbral. Por eso D la usa como probabilidad de «real».",
+  "claves": [
+   "sigmoide",
+   "funcion-de-activacion"
+  ],
+  "clave_examen": true,
+  "tp": [
+   {
+    "tp": 2,
+    "texto": "En el TP2 la salida fue `Dense(1, linear)`: una sigmoide habría acotado el precio a (0,1). Sirve para probabilidades, como en D."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "intro-redes-neuronales#8",
+    "por": "La sigmoide en la clase 3"
+   }
+  ]
+ },
+ {
+  "i": 25,
+  "resumen": "Todo junto: la cara prototipo da $\\sigma(1)=0{,}73$ (real) y el ruido $\\sigma(-1{,}5)=0{,}18$ (falsa). D clasifica bien ambas.",
+  "claves": [
+   "discriminador",
+   "sigmoide"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 26,
+  "resumen": "Objetivos opuestos sobre el mismo $D(\\cdot)$: D quiere $D(G(z))\\to0$, G quiere $\\to1$. G nunca ve caras reales: aprende por el gradiente de D. Los $z$ forman el **espacio latente**.",
+  "claves": [
+   "generador",
+   "espacio-latente",
+   "juego-minimax"
+  ],
+  "clave_examen": true,
+  "ver": [
+   {
+    "ref": "segmentacion-y-stable-diffusion#31",
+    "por": "Convoluciones transpuestas para subir resolución"
+   }
+  ]
+ },
+ {
+  "i": 27,
+  "resumen": "Con $z=0{,}7$ y pesos aprendidos, G produce una imagen con el patrón diagonal: internalizó la estructura del dataset y engaña a D.",
+  "claves": [
+   "generador",
+   "espacio-latente"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 28,
+  "resumen": "Bisagra: en la práctica los pesos no se ponen a mano. Cada red predice, mide su error con **binary cross-entropy** y ajusta con backpropagation.",
+  "claves": [
+   "entropia-cruzada",
+   "backpropagation"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 29,
+  "resumen": "**BCE**: $-[y\\ln p+(1-y)\\ln(1-p)]$. Con $y=1$ queda $-\\ln p$; con $y=0$, $-\\ln(1-p)$. Castiga sin tope la confianza equivocada.",
+  "claves": [
+   "entropia-cruzada",
+   "funcion-de-perdida"
+  ],
+  "clave_examen": true,
+  "tp": [
+   {
+    "tp": 2,
+    "texto": "El TP2 era regresión: entrenó con MSE (no BCE) y reportó MAE en dólares. BCE es la del clasificador `AboveMedianPrice` del notebook de clase."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "modelado-redes-neuronales#29",
+    "por": "BCE en la clase de diseño"
+   }
+  ]
+ },
+ {
+  "i": 30,
+  "resumen": "Con imagen real el error es $-\\ln(D(x))$: alto si D predice bajo. D quiere acercarse a 1 con lo real.",
+  "claves": [
+   "entropia-cruzada",
+   "discriminador"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 31,
+  "resumen": "Con imagen generada el error de D es $-\\ln(1-D(G(z)))$; G quiere lo contrario: que D le dé un score cercano a 1.",
+  "claves": [
+   "entropia-cruzada",
+   "generador"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 32,
+  "resumen": "Backprop en cuatro pasos: calcular el error, derivar $\\partial E/\\partial w$ con la regla de la cadena, actualizar $w\\leftarrow w-\\alpha\\,\\partial E/\\partial w$ y repetir en ambas redes.",
+  "claves": [
+   "backpropagation",
+   "regla-de-la-cadena",
+   "learning-rate"
+  ],
+  "clave_examen": true,
+  "tp": [
+   {
+    "tp": 2,
+    "texto": "En el TP2 Keras corrió este ciclo con Adam (lr 0,001); escalaron `SalePrice` porque sin escalar los gradientes eran enormes y no convergía."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "intro-redes-neuronales#34",
+    "por": "El paso de actualización"
+   }
+  ]
+ },
+ {
+  "i": 33,
+  "resumen": "Ejemplo numérico con $\\partial E/\\partial w_i=-[1-D(x)]\\,x_i$ y $\\alpha=0{,}1$: los pesos se mueven poco y D se vuelve más exigente con imágenes similares.",
+  "claves": [
+   "backpropagation",
+   "learning-rate"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 34,
+  "resumen": "Entra un **lote** de m reales y m generadas. D se actualiza con ambas (objetivos 1 y 0); G solo con las generadas, objetivo 1, atravesando D sin cambiarlo.",
+  "claves": [
+   "batch",
+   "gan",
+   "backpropagation"
+  ],
+  "clave_examen": true,
+  "tp": [
+   {
+    "tp": 2,
+    "texto": "En el TP2, `batch_size=32` sobre 1022 casas: unos 32 ajustes de pesos por época, con el error promediado en cada lote."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "modelado-redes-neuronales#44",
+    "por": "Batch y época no son lo mismo"
+   }
+  ]
+ },
+ {
+  "i": 35,
+  "resumen": "D le dio 0,68 a una falsa: $E_D=-\\ln(0{,}32)\\approx1{,}14$. Un error considerable que lo empuja a ser más exigente.",
+  "claves": [
+   "discriminador",
+   "entropia-cruzada"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 36,
+  "resumen": "Opcional: la derivada $\\partial E/\\partial w_i=-[1-D(x)]\\,x_i$. Backprop la calcula para todos los pesos y la regla de la cadena lo hace eficiente.",
+  "claves": [
+   "regla-de-la-cadena",
+   "backpropagation"
+  ],
+  "clave_examen": false,
+  "ver": [
+   {
+    "ref": "intro-redes-neuronales#31",
+    "por": "La regla de la cadena"
+   }
+  ]
+ },
+ {
+  "i": 37,
+  "resumen": "Separador: tipos y aplicaciones.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 38,
+  "resumen": "Variantes: **Vanilla** (sin control, inestable), **cGAN** (condiciona por etiqueta), **DCGAN** (convolucional, más estable) y **SRGAN** (super-resolución).",
+  "claves": [
+   "cgan",
+   "dcgan",
+   "srgan"
+  ],
+  "clave_examen": true,
+  "ver": [
+   {
+    "ref": "segmentacion-y-stable-diffusion#53",
+    "por": "La condición: de etiqueta a texto"
+   }
+  ]
+ },
+ {
+  "i": 39,
+  "resumen": "Lo que muestra cada paper: caras en B/N (Vanilla, sin copiar el entrenamiento), dígitos por etiqueta (cGAN), dormitorios en color (DCGAN) e imágenes ampliadas (SRGAN).",
+  "claves": [
+   "cgan",
+   "dcgan",
+   "srgan"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 40,
+  "resumen": "**StyleGAN** resolvió el control de atributos: una red de mapeo convierte $z$ en un estilo $w$ que se inyecta por capa; las capas chicas deciden pose, las grandes detalles.",
+  "claves": [
+   "stylegan",
+   "espacio-latente"
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 41,
+  "resumen": "Arquitectura: red de mapeo (8 capas densas, $z\\to w$ de 512) y red de síntesis de 4×4 a 1024×1024; $w$ entra en cada bloque por **AdaIN**, más un ruido propio.",
+  "claves": [
+   "stylegan",
+   "adain"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 42,
+  "resumen": "StyleGAN solo cambia el Generador: progressive growing (4×4 → 1024×1024), muestreo bilineal y estilo por capa dan estabilidad y control fino.",
+  "claves": [
+   "stylegan"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 43,
+  "resumen": "Escala real: 70.000 caras FFHQ y 26,2M parámetros en G, contra los 5 números del D de Slanted Land. Misma idea; **FID** 4,40 (más bajo, mejor).",
+  "claves": [
+   "stylegan",
+   "fid"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 44,
+  "resumen": "Realismo medido: en CIFAR-10 los jueces humanos se equivocan 21,3% (azar sería 50%). Modelo de validación: jueces ciegos, tarea definida, error reportado.",
+  "claves": [
+   "gan",
+   "fid"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 45,
+  "resumen": "Image translation: **Pix2Pix** aprende de pares alineados (boceto → foto); **CycleGAN** aprende sin pares (caballo ↔ cebra).",
+  "claves": [
+   "pix2pix",
+   "cyclegan"
+  ],
+  "clave_examen": true,
+  "ver": [
+   {
+    "ref": "segmentacion-y-stable-diffusion#45",
+    "por": "U-Net también hace image-to-image"
+   }
+  ]
+ },
+ {
+  "i": 46,
+  "resumen": "Usos y librerías: MRI → CT, día → noche, caballo → cebra (pytorch-CycleGAN-and-pix2pix); Real-ESRGAN es lo que se usa hoy para ampliar fotos.",
+  "claves": [
+   "pix2pix",
+   "cyclegan",
+   "srgan"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 47,
+  "resumen": "**Inpainting**: la GAN reconstruye regiones faltantes coherentes con el contexto (DeepFill); en medicina recupera información de tomografías de baja dosis.",
+  "claves": [
+   "gan",
+   "inpainting"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 48,
+  "resumen": "Una GAN solo genera lo que aprendió: clases mezcladas sin etiqueta dan híbridos. Hay que validar el dataset (limpio, etiquetado, homogéneo) o usar cGAN.",
+  "claves": [
+   "datos-sinteticos",
+   "cgan"
+  ],
+  "clave_examen": false,
+  "tp": [
+   {
+    "tp": 4,
+    "texto": "En el TP4 sacaron del SFT las 240 filas con error y las 160 de ruido: el modelo copia lo que ve, igual que una GAN."
+   }
+  ]
+ },
+ {
+  "i": 49,
+  "resumen": "Separador: limitaciones y cierre.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 50,
+  "resumen": "Problemas de entrenamiento: **mode collapse** (G produce siempre lo mismo que engaña a D) e **inestabilidad** del equilibrio entre las dos redes.",
+  "claves": [
+   "mode-collapse",
+   "inestabilidad-gan"
+  ],
+  "clave_examen": true,
+  "ver": [
+   {
+    "ref": "segmentacion-y-stable-diffusion#56",
+    "por": "Difusión: sin mode collapse"
+   }
+  ]
+ },
+ {
+  "i": 51,
+  "resumen": "Más límites: no hay métrica universal (FID e IS aproximan), entrenar es caro y la GAN hereda los **sesgos** del dataset.",
+  "claves": [
+   "fid",
+   "sesgo del dataset"
+  ],
+  "clave_examen": false,
+  "ver": [
+   {
+    "ref": "cierre-magnifica-humanitas#32",
+    "por": "Sesgos como desafío ético"
+   }
+  ]
+ },
+ {
+  "i": 52,
+  "resumen": "Recap: intuición (falsificador y detective), arquitectura, entrenamiento con Slanted Land, el **juego minimax** como marco, variantes y limitaciones.",
+  "claves": [
+   "juego-minimax",
+   "gan"
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 53,
+  "resumen": "Práctica: repo pytorch-gans con Vanilla GAN (MNIST), cGAN (genera el dígito pedido) y DCGAN (CelebA). La Vanilla es la más parecida a Slanted Land.",
+  "claves": [
+   "gan",
+   "cgan",
+   "dcgan"
+  ],
+  "clave_examen": false
+ }
+]

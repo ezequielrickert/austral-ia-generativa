@@ -1,0 +1,851 @@
+[
+ {
+  "i": 0,
+  "resumen": "Portada de la clase 12: convolución, segmentación, multimodalidad y Stable Diffusion.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 1,
+  "resumen": "Agenda: convolución, segmentación, FCN y U-Net, SAM, generación por texto, Stable Diffusion y notebook.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 2,
+  "resumen": "Puente desde lo conocido: una red densa funciona porque cada fila trae las mismas columnas. La pregunta es qué pasa si la entrada cambia de largo.",
+  "claves": [
+   "perceptron-multicapa",
+   "entrada de largo fijo"
+  ],
+  "clave_examen": false,
+  "tp": [
+   {
+    "tp": 2,
+    "texto": "Tu TP2 es exactamente este caso: cada casa, un vector fijo (z-score, one-hot, mes sin/cos) entrando a un MLP 32-32-1."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "modelado-redes-neuronales#2",
+    "por": "La red ve una fila de números"
+   }
+  ]
+ },
+ {
+  "i": 3,
+  "resumen": "Un **MLP** fija la cantidad de entradas en la primera capa, porque cada entrada tiene sus propios pesos. Sirve para precios, MNIST aplanado (784) o riesgo crediticio.",
+  "claves": [
+   "perceptron-multicapa",
+   "entrada de largo fijo"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 4,
+  "resumen": "Repaso con un MLP de juguete: forward, pérdida $-\\log p$, backward con deltas y $W\\leftarrow W-\\eta\\,\\partial L/\\partial W$. Es el ciclo que entrena todos los modelos de la clase.",
+  "claves": [
+   "backpropagation",
+   "delta",
+   "learning-rate"
+  ],
+  "clave_examen": true,
+  "tp": [
+   {
+    "tp": 2,
+    "texto": "En el TP2 `fit` corrió este ciclo con Adam y `batch_size=32`; con early stopping la red 512-512-512 cortó en la época 76 de 150."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "intro-redes-neuronales#29",
+    "por": "Forward y backward en la clase 3"
+   }
+  ]
+ },
+ {
+  "i": 5,
+  "resumen": "Forzar todos los audios a un largo L es arbitrario: corto pierde información, largo es casi todo relleno. Y queda otro problema que la densa no modela.",
+  "claves": [
+   "largo variable"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 6,
+  "resumen": "Detector de voz: cada audio dura distinto. Con un MLP hay que recortar (se puede perder la voz) o rellenar con ceros (silencio artificial).",
+  "claves": [
+   "largo variable",
+   "perceptron-multicapa"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 7,
+  "resumen": "**Sesgo inductivo**: lo que la arquitectura asume antes de ver datos. La densa no asume orden ni invariancia a traslación: bien para tablas, mal para audio e imágenes.",
+  "claves": [
+   "sesgo-inductivo"
+  ],
+  "clave_examen": true,
+  "ver": [
+   {
+    "ref": "palabra-al-transformer#21",
+    "por": "Promediar una frase pierde el orden"
+   }
+  ]
+ },
+ {
+  "i": 8,
+  "resumen": "El problema aparece en cualquier señal (clasificar, filtrar, generar) y en imágenes en 2D: alto y ancho cambian, y un MLP obliga a redimensionar y aplanar.",
+  "claves": [
+   "largo variable",
+   "cnn"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 9,
+  "resumen": "Un kernel de 9 pesos de 1/9 (promedio móvil) filtra audio. Es una suma ponderada como la neurona, pero sobre una ventana y reutilizada en cada posición.",
+  "claves": [
+   "convolucion"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 10,
+  "resumen": "**Convolución**: un vector chico de pesos recorre la señal, multiplica, suma y escribe una salida por posición. Con **pesos compartidos** detecta el patrón esté donde esté.",
+  "claves": [
+   "convolucion"
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 11,
+  "resumen": "Los kernels del ejemplo están diseñados a mano; en una CNN arrancan al azar y el descenso por gradiente los ajusta.",
+  "claves": [
+   "convolucion",
+   "cnn"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 12,
+  "resumen": "Otro kernel (ventana larga sobre la señal al cuadrado) mide la energía local: donde supera un umbral, hay voz. En una CNN esos pesos se aprenden.",
+  "claves": [
+   "convolucion",
+   "cnn"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 13,
+  "resumen": "Clave de la sección: la cantidad de pesos depende del tamaño del kernel, no del largo de la entrada. El pooling global conecta la parte convolucional con la densa.",
+  "claves": [
+   "convolucion",
+   "pooling global"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 14,
+  "resumen": "El mismo kernel sirve para audios de 2 s o de 5 s; un **pooling global** (promedio o máximo) resume a largo fijo antes de la capa densa.",
+  "claves": [
+   "convolucion",
+   "pooling global"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 15,
+  "resumen": "Dos soluciones al largo variable: **convolución** (localidad, menos datos) y **atención** (todos con todos, más datos, costo cuadrático). Elegir arquitectura es elegir sesgo inductivo.",
+  "claves": [
+   "convolucion",
+   "atencion",
+   "sesgo-inductivo",
+   "costo-cuadratico"
+  ],
+  "clave_examen": true,
+  "ver": [
+   {
+    "ref": "palabra-al-transformer#27",
+    "por": "Atención: cada token mira a todos"
+   }
+  ]
+ },
+ {
+  "i": 16,
+  "resumen": "896 parámetros de una capa convolucional contra 38,5 millones de una densa: por eso las CNN entrenan con imágenes grandes y una red densa no.",
+  "claves": [
+   "convolucion",
+   "cnn"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 17,
+  "resumen": "En imágenes el kernel es una grilla (3×3) que recorre alto y ancho; cada posición da una celda del **feature map** (7×7 → 5×5 sin relleno).",
+  "claves": [
+   "convolucion",
+   "feature map"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 18,
+  "resumen": "32 kernels en una capa dan 32 feature maps, uno por rasgo; la capa siguiente los combina y detecta algo más complejo que un borde.",
+  "claves": [
+   "cnn",
+   "feature map"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 19,
+  "resumen": "Cada kernel detecta un rasgo; apilando capas: bordes → texturas → partes → objetos. Esa pila es el **encoder** de FCN y U-Net.",
+  "claves": [
+   "cnn",
+   "convolucion"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 20,
+  "resumen": "Aprender un kernel: arranca al azar, pérdida MSE contra un mapa de bordes; su gradiente suma las contribuciones de las 25 posiciones. Termina en $[-1\\ 0\\ +1]$.",
+  "claves": [
+   "convolucion",
+   "backpropagation",
+   "mse"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 21,
+  "resumen": "La idea de **embedding** se generaliza a cualquier modalidad. CLIP alineará dos encoders en un mismo espacio; el latente del VAE comprime, pero sin garantizar que cerca = parecido.",
+  "claves": [
+   "embedding",
+   "clip",
+   "vae"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 22,
+  "resumen": "El encoder de una CNN termina en un vector fijo: un **embedding** donde vectores cercanos son contenidos parecidos. Vale para imagen, texto o audio.",
+  "claves": [
+   "embedding",
+   "multimodalidad"
+  ],
+  "clave_examen": false,
+  "tp": [
+   {
+    "tp": 2,
+    "texto": "En el TP2 `District` (72 valores) pasó por `Embedding(73, 8)`: el MAE bajó de 30.956 a 25.380."
+   },
+   {
+    "tp": 3,
+    "texto": "En el TP3 usaste embeddings de texto: e5-base con chunking por sección logró Context Recall 0,967 contra 0,350 de BERT promediado."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "palabra-al-transformer#16",
+    "por": "El espacio de embeddings"
+   }
+  ]
+ },
+ {
+  "i": 23,
+  "resumen": "Separador: segmentación, qué es y para qué sirve.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 24,
+  "resumen": "**Segmentar** es darle significado a la imagen píxel por píxel: clasificación da una etiqueta, detección da cajas y segmentación da una máscara.",
+  "claves": [
+   "segmentacion"
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 25,
+  "resumen": "Tres niveles: **semántica** (clase por píxel, sin individuos), **de instancias** (cada objeto aparte) y **panóptica** (ambas a la vez).",
+  "claves": [
+   "segmentacion-semantica"
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 26,
+  "resumen": "Usos: autos autónomos, satélites, fondo en videollamadas, tumores, ventrículos. En biomedicina la máscara final suele ser la respuesta clínica.",
+  "claves": [
+   "segmentacion"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 27,
+  "resumen": "La salida es una matriz del tamaño de la imagen con la clase de cada píxel (0/1 o 0..N−1); se ve como máscara, overlay o mapa de probabilidad.",
+  "claves": [
+   "segmentacion",
+   "máscara"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 28,
+  "resumen": "Separador: de FCN a U-Net.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 29,
+  "resumen": "**FCN** (Long et al., 2015): quitar la densa final y usar convoluciones que devuelven un mapa espacial. Un clasificador de imágenes se vuelve clasificador de píxeles.",
+  "claves": [
+   "fcn",
+   "segmentacion"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 30,
+  "resumen": "Diagrama de FCN: encoder convolucional, convoluciones 1×1 y upsampling hasta el tamaño original.",
+  "claves": [
+   "fcn"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 31,
+  "resumen": "FCN: el encoder comprime, convoluciones **1×1** reemplazan la densa y **convoluciones transpuestas** estiran el mapa. Primera segmentación end-to-end con deep learning.",
+  "claves": [
+   "fcn",
+   "convolucion-transpuesta"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 32,
+  "resumen": "Problema de FCN: 512×512 baja a 16×16 y al reconstruir los detalles ya se perdieron. Contornos borrosos; en medicina, 2 píxeles cambian el volumen del tumor.",
+  "claves": [
+   "fcn",
+   "segmentacion"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 33,
+  "resumen": "En **U-Net** las **skip connections** llevan los detalles del encoder al decoder; sin ellas sería un FCN más elegante. Sigue siendo la base de la segmentación médica.",
+  "claves": [
+   "u-net",
+   "skip-connections"
+  ],
+  "clave_examen": true,
+  "ver": [
+   {
+    "ref": "transformers-a-fondo#25",
+    "por": "Residuales: otro atajo en la red"
+   }
+  ]
+ },
+ {
+  "i": 34,
+  "resumen": "U-Net (2015, células al microscopio): el encoder baja resolución y duplica canales («qué hay»), el decoder la recupera («dónde»), los atajos copian los detalles.",
+  "claves": [
+   "u-net",
+   "skip-connections",
+   "convolucion-transpuesta"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 35,
+  "resumen": "Entrenar una U-Net de juguete: cross-entropy por píxel promediada (L = 0,264); los errores se concentran en bordes y partes finas. El gradiente vuelve por decoder, skips y encoder.",
+  "claves": [
+   "u-net",
+   "entropia-cruzada"
+  ],
+  "clave_examen": false,
+  "ver": [
+   {
+    "ref": "modelado-redes-neuronales#29",
+    "por": "BCE en la clase de diseño"
+   }
+  ]
+ },
+ {
+  "i": 36,
+  "resumen": "Por qué en medicina: entrena con cientos de imágenes (los skips regularizan), da contornos precisos y se adapta a MRI, patología, retina o ecografía.",
+  "claves": [
+   "u-net",
+   "skip-connections"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 37,
+  "resumen": "Separador: SAM, segmentar lo que le señalás.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 38,
+  "resumen": "**SAM** trae a segmentación el paradigma foundation model + prompt: no se entrena por tarea, separa objetos en general y el prompt elige cuál. Sin el dataset SA-1B no funcionaría.",
+  "claves": [
+   "sam",
+   "foundation-model"
+  ],
+  "clave_examen": true,
+  "ver": [
+   {
+    "ref": "introduccion#46",
+    "por": "Modelos fundacionales en la clase 1"
+   }
+  ]
+ },
+ {
+  "i": 39,
+  "resumen": "SAM (Meta, 2023): imagen + pista (click, caja, máscara; texto desde SAM 3) → máscara. La imagen se codifica una vez con un ViT y se prueban muchos prompts.",
+  "claves": [
+   "sam",
+   "foundation-model"
+  ],
+  "clave_examen": false,
+  "ver": [
+   {
+    "ref": "transformers-a-fondo#35",
+    "por": "ViT: transformer sobre parches"
+   }
+  ]
+ },
+ {
+  "i": 40,
+  "resumen": "SAM de juguete: el prompt se sortea dentro de la máscara verdadera, la pérdida es focal + dice y los tres módulos se entrenan juntos; luego se simulan clics correctores.",
+  "claves": [
+   "sam"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 41,
+  "resumen": "SAM 2 agrega memoria (memory encoder + memory bank), que también es la base del tracker de SAM 3.",
+  "claves": [
+   "sam"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 42,
+  "resumen": "SAM 2 (2024) lleva SAM a video: cada máscara se guarda en un memory bank y la memory attention la usa en el frame siguiente para seguir al objeto.",
+  "claves": [
+   "sam",
+   "atencion"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 43,
+  "resumen": "SAM 2 de juguete: clip de 8 frames, pérdida focal + dice por frame, sumada; el gradiente viaja por la memoria a frames anteriores (el bank no tiene pesos).",
+  "claves": [
+   "sam"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 44,
+  "resumen": "Evolución: SAM (imagen) → SAM 2 (video) → SAM 3 (texto) → 3.1 (multiobjeto). En clínica conviven: U-Net para medir, SAM para anotación asistida.",
+  "claves": [
+   "sam",
+   "u-net"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 45,
+  "resumen": "U-Net es modular: encoder + decoder + skips sirve para cualquier tarea con entrada y salida del mismo tamaño: restauración, MRI → CT y el denoiser de Stable Diffusion.",
+  "claves": [
+   "u-net",
+   "stable-diffusion"
+  ],
+  "clave_examen": false,
+  "ver": [
+   {
+    "ref": "redes-generativas-antagonicas#45",
+    "por": "Pix2Pix: image translation con GANs"
+   }
+  ]
+ },
+ {
+  "i": 46,
+  "resumen": "Separador: generación condicionada por texto.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 47,
+  "resumen": "Vuelve TilTedTinder: la Vanilla GAN llenó la base desde 4 fotos; ahora cada usuario describe en lenguaje natural lo que le atrae.",
+  "claves": [
+   "slanted-land",
+   "text-to-image"
+  ],
+  "clave_examen": false,
+  "ver": [
+   {
+    "ref": "redes-generativas-antagonicas#17",
+    "por": "El problema original de TiltedTinder"
+   }
+  ]
+ },
+ {
+  "i": 48,
+  "resumen": "Por qué la GAN no alcanza: Vanilla no recibe descripciones, cGAN usa etiquetas cerradas y StyleGAN controla estilo, no semántica. Hace falta **text-to-image**.",
+  "claves": [
+   "cgan",
+   "stylegan",
+   "text-to-image"
+  ],
+  "clave_examen": false,
+  "ver": [
+   {
+    "ref": "redes-generativas-antagonicas#38",
+    "por": "Tipos de GANs y sus límites"
+   }
+  ]
+ },
+ {
+  "i": 49,
+  "resumen": "Cronología: DALL·E (2021), Imagen y Midjourney (2022), **Stable Diffusion 1.4** (agosto 2022, primer open source serio), FLUX y Sora (2024).",
+  "claves": [
+   "stable-diffusion",
+   "text-to-image"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 50,
+  "resumen": "CLIP proyecta el texto a un espacio donde «perro corriendo en la playa» cae cerca de una foto real de eso; la U-Net usa ese embedding como entrada.",
+  "claves": [
+   "clip",
+   "embedding"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 51,
+  "resumen": "**CLIP** (2021): un encoder de imagen y otro de texto entrenados contrastivamente con 400M pares, para que los pares reales queden cerca en el mismo espacio.",
+  "claves": [
+   "clip",
+   "embedding",
+   "multimodalidad"
+  ],
+  "clave_examen": true,
+  "tp": [
+   {
+    "tp": 3,
+    "texto": "e5-base, el encoder que elegiste en el TP3, también es contrastivo (consulta–pasaje): por eso el fragmento correcto queda a 3,94 desvíos y con BERT crudo a 1,56."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "transformers-a-fondo#34",
+    "por": "Del encoder al embedding de oración"
+   }
+  ]
+ },
+ {
+  "i": 52,
+  "resumen": "Entrenar CLIP: matriz S de cosenos del batch, cross-entropy simétrica con objetivo en la diagonal y temperatura $\\tau$. El gradiente llega a ambos encoders; no hay decoder.",
+  "claves": [
+   "clip",
+   "similitud-coseno",
+   "entropia-cruzada"
+  ],
+  "clave_examen": false,
+  "tp": [
+   {
+    "tp": 3,
+    "texto": "En el TP3 normalizaste los embeddings con L2, así el producto punto es el coseno, igual que en la matriz S de CLIP."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "rag-y-mcp#21",
+    "por": "Coseno: importa el ángulo"
+   }
+  ]
+ },
+ {
+  "i": 53,
+  "resumen": "**Condicionar**: ruido + condición → imagen que la respeta. La condición puede ser una etiqueta (cGAN), una imagen (Pix2Pix) o un embedding de texto (SD), y guía cada paso.",
+  "claves": [
+   "cgan",
+   "pix2pix",
+   "stable-diffusion"
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 54,
+  "resumen": "Separador: Stable Diffusion por dentro.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 55,
+  "resumen": "Difusión vs GAN: una sola red que aprende a quitar ruido; más estable, sin mode collapse y más diversa. SD «talla» la imagen desde un bloque de ruido.",
+  "claves": [
+   "difusion",
+   "mode-collapse"
+  ],
+  "clave_examen": false,
+  "ver": [
+   {
+    "ref": "redes-generativas-antagonicas#50",
+    "por": "Mode collapse e inestabilidad en GANs"
+   }
+  ]
+ },
+ {
+  "i": 56,
+  "resumen": "**Difusión**: el forward agrega ruido gaussiano hasta ruido puro (entrenamiento); el reverse lo quita paso a paso guiado por la condición. La red aprende a predecir el ruido.",
+  "claves": [
+   "difusion",
+   "proceso-forward"
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 57,
+  "resumen": "Figura del proceso inverso: de ruido puro $x_T$ a la imagen limpia $x_0$.",
+  "claves": [
+   "proceso-forward",
+   "difusion"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 58,
+  "resumen": "**Latent diffusion**: difundir en un latente de 64×64×4 (16.384 valores) en vez de 512×512×3 (786.432): 48× menos por paso. Así SD corre en GPUs de consumo.",
+  "claves": [
+   "latent-diffusion",
+   "stable-diffusion"
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 59,
+  "resumen": "Flujo: prompt → CLIP → embedding; la U-Net desruidiza el latente guiada por él; el decoder del VAE lo convierte en imagen.",
+  "claves": [
+   "stable-diffusion",
+   "clip",
+   "u-net",
+   "vae"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 60,
+  "resumen": "Tres piezas: **VAE** (~80M, comprime), **U-Net** (~860M, denoiser condicional) y **CLIP text encoder** (~123M). Las dos últimas ya aparecieron en la clase.",
+  "claves": [
+   "stable-diffusion",
+   "vae",
+   "u-net",
+   "clip"
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 61,
+  "resumen": "El VAE convierte «generar 800K píxeles» en «generar 16K números latentes». Lo variacional: el latente es una distribución, no un punto fijo.",
+  "claves": [
+   "vae",
+   "espacio-latente"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 62,
+  "resumen": "VAE: encoder 512×512×3 → 64×64×4 y decoder al revés. Se entrena aparte (decoder(encoder(x)) ≈ x) y queda congelado; en inferencia solo se usa el decoder.",
+  "claves": [
+   "vae",
+   "latent-diffusion"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 63,
+  "resumen": "Entrenar un VAE: el encoder da $\\mu,\\sigma$; $z=\\mu+\\sigma\\varepsilon$; pérdida = reconstrucción + $\\beta$·KL. La **reparametrización** deja pasar el gradiente por el sorteo.",
+  "claves": [
+   "vae",
+   "espacio-latente"
+  ],
+  "clave_examen": false,
+  "ver": [
+   {
+    "ref": "redes-generativas-antagonicas#26",
+    "por": "El z de la GAN: espacio latente"
+   }
+  ]
+ },
+ {
+  "i": 64,
+  "resumen": "Se cierra el círculo: la U-Net que en 2015 segmentaba células hoy es el corazón de la generación de imágenes. Es un patrón arquitectónico reutilizable.",
+  "claves": [
+   "u-net"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 65,
+  "resumen": "La U-Net de SD recibe latente ruidoso, timestep y embedding del prompt, y predice el **ruido**. La **cross-attention** cruza features de imagen con cada token de CLIP en cada nivel.",
+  "claves": [
+   "u-net",
+   "cross-attention"
+  ],
+  "clave_examen": true,
+  "ver": [
+   {
+    "ref": "transformers-a-fondo#31",
+    "por": "Encoder-decoder y cross-attention de 2017"
+   }
+  ]
+ },
+ {
+  "i": 66,
+  "resumen": "SD 1.x usa el text encoder de CLIP ViT-L/14 congelado: el prompt se tokeniza a 77 tokens y sale una matriz 77×768 que entra a la cross-attention.",
+  "claves": [
+   "clip",
+   "token",
+   "cross-attention"
+  ],
+  "clave_examen": false,
+  "ver": [
+   {
+    "ref": "prompting#6",
+    "por": "Cómo se tokeniza"
+   }
+  ]
+ },
+ {
+  "i": 67,
+  "resumen": "SD no es un modelo monolítico: son tres piezas modulares orquestadas por un loop iterativo.",
+  "claves": [
+   "stable-diffusion"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 68,
+  "resumen": "Inferencia: prompt → CLIP (77×768); latente aleatorio 64×64×4 según la seed; ~50 pasos donde la U-Net predice el ruido y el scheduler lo resta; VAE decoder → 512×512.",
+  "claves": [
+   "stable-diffusion",
+   "latent-diffusion"
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 69,
+  "resumen": "Entrenar SD: CLIP y VAE congelados; se sortean $t$ y $\\varepsilon$, $z_t=\\sqrt{\\bar\\alpha_t}z_0+\\sqrt{1-\\bar\\alpha_t}\\varepsilon$, y solo la U-Net aprende con $L=\\|\\varepsilon-\\hat\\varepsilon\\|^2$.",
+  "claves": [
+   "stable-diffusion",
+   "proceso-forward",
+   "mse"
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 70,
+  "resumen": "Perillas: `num_inference_steps` (50; menos de 20 degrada), `guidance_scale` (7,5; bajo diverso, alto saturado) y `seed` (misma seed + prompt = misma imagen).",
+  "claves": [
+   "classifier-free-guidance",
+   "stable-diffusion"
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 71,
+  "resumen": "Límites: manos y anatomía, texto en la imagen, conteo y composición, y sesgos de LAION-5B. Saber dónde falla importa tanto como saber qué hace.",
+  "claves": [
+   "stable-diffusion",
+   "sesgo del dataset"
+  ],
+  "clave_examen": false,
+  "ver": [
+   {
+    "ref": "cierre-magnifica-humanitas#32",
+    "por": "Sesgos como desafío ético"
+   }
+  ]
+ },
+ {
+  "i": 72,
+  "resumen": "Separador: TilTedTinder v2 y notebook.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 73,
+  "resumen": "Recap: el usuario escribe, CLIP codifica, la U-Net talla y el VAE decodifica. La imagen depende del prompt tanto como del modelo; la seed reproduce el perfil.",
+  "claves": [
+   "stable-diffusion",
+   "prompt-engineering"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 74,
+  "resumen": "Buen prompt = sujeto + atributos + estilo + luz. Mismo prompt + misma seed = el mismo perfil cada vez que el usuario vuelve a la app.",
+  "claves": [
+   "prompt-engineering",
+   "stable-diffusion"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 75,
+  "resumen": "Lo que falta: LAION no tiene caras inclinadas, así que hay que hacer fine-tuning con **DreamBooth** o **LoRA**; además auditar sesgos y usar ControlNet o inpainting.",
+  "claves": [
+   "lora",
+   "fine-tuning",
+   "stable-diffusion"
+  ],
+  "clave_examen": false,
+  "tp": [
+   {
+    "tp": 4,
+    "texto": "En el TP4 aplicaste LoRA (r=8, α=16, solo `q_proj`/`v_proj`) sobre el LLM, pero solo en corridas de humo: el entrenamiento real quedó pendiente."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "como-se-entrena-un-llm#55",
+    "por": "Fine-tuning local: el recorrido"
+   }
+  ]
+ },
+ {
+  "i": 76,
+  "resumen": "Notebook: Colab T4 + Diffusers + SD v1.4 en float16. Pipeline de alto nivel, hiperparámetros, grids, dimensiones y el pipeline manual con el bucle de denoising.",
+  "claves": [
+   "stable-diffusion"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 77,
+  "resumen": "Separador: conclusiones.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 78,
+  "resumen": "Takeaways: la convolución acepta cualquier largo, segmentar es etiquetar píxeles, U-Net recupera bordes, SAM segmenta por pista y SD combina CLIP, U-Net y VAE en el latente.",
+  "claves": [
+   "convolucion",
+   "u-net",
+   "sam",
+   "stable-diffusion"
+  ],
+  "clave_examen": true
+ }
+]

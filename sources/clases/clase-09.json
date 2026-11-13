@@ -1,0 +1,853 @@
+{
+  "num": 9,
+  "fecha": "2026-09-30",
+  "titulo": "LLM training: pre-training, SFT, RLHF, herramientas y fine-tuning",
+  "talks": [
+    "como-se-entrena-un-llm"
+  ],
+  "bloque": "LLMs",
+  "tesis": "Un LLM se entrena en tres etapas. El **pre-training**, con billones de tokens de la web, fija casi todo lo que el modelo sabe y se lleva ~98% del cómputo (InstructGPT, OpenAI 2022). Las dos etapas de **post-training** usan pocos datos elegidos con cuidado: **SFT** le enseña a responder y a emitir llamadas a herramientas; **RLHF** y el **RL con recompensas verificables** le enseñan qué respuesta preferir, cuánto razonar y cómo encadenar llamadas. El fine-tuning de un equipo de producto es post-training a escala chica, en la nube o en una GPU propia con LoRA y QLoRA.",
+  "resumen": "La clase abre con un gancho: OpenAI (2022) tomó GPT-3 y lo siguió entrenando con ejemplos y preferencias humanas; un modelo de 1.300 millones de parámetros así entrenado le ganó en preferencia humana al GPT-3 original de 175.000 millones, y ese entrenamiento extra costó menos del 2% del cómputo. A partir de ahí recorre el mapa de tres etapas con sus cuatro conjuntos de datos. **Pre-training**: la pérdida del siguiente token de la clase 8 aplicada a Common Crawl depurado (C4), la cuenta C ≈ 6ND, la regla de Chinchilla (~20 tokens por parámetro), la proyección de que el texto humano público se agota hacia 2028 y los problemas que arrastra el corpus. El modelo base **completa** en vez de responder (quiz de la pizza). **SFT** imita demostraciones (con máscara de pérdida sobre el prompt; Constitutional AI como alternativa a anotadores). **RLHF** entrena un reward model con comparaciones y optimiza con PPO más una penalización KL. **RL con verificador** (DeepSeek-R1, GRPO) entrena el razonamiento. **Herramientas**: el modelo escribe la llamada, nunca la ejecuta (calculadora, búsqueda, MCP). Cierra con **fine-tuning**: cuándo conviene frente a prompt y RAG, nube vs. local, LoRA/QLoRA y qué datos hacen falta.",
+  "secciones": [
+    {
+      "titulo": "El mapa: tres etapas, cuatro conjuntos de datos",
+      "contenido": "**El gancho.** OpenAI (Ouyang et al., 2022) siguió entrenando GPT-3 con ejemplos y preferencias escritos por personas. Un modelo **100 veces más chico** (1,3B) con ese post-training le ganó en preferencia humana al GPT-3 original de 175B.\n\n| Entrenamiento | Cómputo (petaflops/s-días) |\n|---|---|\n| GPT-3 original (texto web) | **3.640** |\n| SFT (demostraciones) | **4,9** |\n| RLHF/PPO (preferencias) | **60** |\n\n(4,9 + 60) / 3.704,9 = **1,75%**: el pre-training se lleva ~**98%** del cómputo. (La cuenta no incluye el costo de los anotadores.)\n\n**Las tres etapas** (figura de Chip Huyen, 2023):\n\n1. **Pre-training** — datos de *baja calidad* en cantidad (texto de internet, **>1 billón de tokens**) → modelado de lenguaje → **LLM preentrenado**, *optimizado para completar texto*.\n2. **SFT (Supervised Fine-Tuning)** — *datos de demostración* de alta calidad, **10K–100K pares (prompt, respuesta)** → **modelo SFT**, *ajustado para diálogo*.\n3. **RLHF (Reinforcement Learning from Human Feedback)** — dos pasos:\n   - *datos de comparación*, **100K–1M** (prompt, ganadora, perdedora) → clasificación → **reward model**, que da un puntaje escalar a (prompt, respuesta);\n   - **10K–100K prompts** → aprendizaje por refuerzo → **modelo final**, que maximiza el puntaje del reward model.\n\nLa fila de abajo es lo importante: **la escala de datos cae** de más de un billón de tokens a decenas de miles–un millón de ejemplos. Las etapas 2 y 3 forman el **post-training** (lo hace el desarrollador del modelo). El **fine-tuning** que hace un equipo de producto es *la misma receta a escala chica*.\n\nOjo con la palabra \"billón\": es el *trillion* del inglés, 10¹².",
+      "conceptos": [
+        "pretraining",
+        "sft",
+        "rlhf",
+        "reward-model"
+      ],
+      "ejemplo": "Pregunta típica: *¿por qué un modelo 100× más chico puede ganar?* Porque la preferencia humana mide si el modelo **sigue instrucciones** de forma útil, y eso no lo enseña el objetivo de pre-training (predecir la próxima palabra de una página web), sino el post-training, que es barato en cómputo (~2%) pero caro en datos humanos."
+    },
+    {
+      "titulo": "Pre-training: completar texto con Common Crawl y C4",
+      "contenido": "**Objetivo:** minimizar la pérdida del siguiente token (la cross-entropy de la clase 8) sobre texto de la web. No hace falta etiquetar: el mismo texto trae la respuesta correcta → **entrenamiento auto-supervisado**. Escala: >1 billón de tokens ≈ **15 millones de libros** (un libro ≈ 50.000 palabras ≈ 67.000 tokens).\n\n**Common Crawl**: archivo público, sin fines de lucro, que recorre la web **cada mes desde 2008** (cientos de miles de millones de páginas; ~**20 TB** de texto por crawl mensual en 2019). Es la base de casi todos los datasets abiertos (C4, RefinedWeb, RedPajama) y el **60%** de la mezcla de GPT-3. Problema: la mayor parte **no es lenguaje natural** (menús, mensajes de error, duplicados).\n\n**C4 (Colossal Clean Crawled Corpus)** — Google (Raffel et al., 2020, paper de T5) aplicó **reglas escritas a mano** a un mes de Common Crawl (abril 2019):\n\n| Regla | Qué saca |\n|---|---|\n| Líneas sin `.` `!` `?` o comillas al final | menús, botones |\n| Páginas con < 3 oraciones; líneas con < 5 palabras | fragmentos sueltos |\n| Líneas con \"Javascript\" | avisos \"active Javascript\" |\n| Páginas con \"lorem ipsum\" | texto de relleno |\n| Páginas con `{` | código |\n| Líneas con \"cookie policy\", etc. | avisos legales |\n| Páginas con palabras de una **lista negra** | contenido ofensivo |\n| Tramos de 3 oraciones repetidos | duplicados |\n| Inglés con probabilidad ≥ 0,99 (langdetect) | otros idiomas |\n\nResultado: **6,1 TB → 745 GB**. Evidencia experimental: el mismo modelo entrenado **sin filtrar rinde peor en todas las tareas** (GLUE 83,28 vs 81,46). RefinedWeb (Common Crawl filtrado y deduplicado) incluso supera a corpus curados a mano. Detalle: algunas reglas sacan **líneas** y otras **páginas enteras**.\n\n**Qué sale:** un **modelo base** que continúa cualquier texto con fluidez y reproduce lo que había en la web, también lo malo. Conoce mucho pero **no sigue instrucciones**.",
+      "conceptos": [
+        "pretraining",
+        "c4",
+        "entropia-cruzada"
+      ],
+      "ejemplo": "**Quiz de la pizza.** Prompt: \"¿Qué ingredientes lleva una pizza?\". Un modelo base puede escribir (A) \" ¿Y cuánto tarda en cocinarse? ¿Qué horno conviene?\", (B) \" Receta para una familia de seis. Paso 1: …\" o (C) \" Harina, agua, levadura, sal, salsa de tomate y mozzarella.\" **Respuesta: cualquiera de las tres** — todas aparecen en la web; si hay que apostar, la B (hay muchas más páginas de recetas). Lo que *queremos* de un asistente es la C, y nada del pre-training la hace más probable: eso lo enseña el post-training."
+    },
+    {
+      "titulo": "Escala: C ≈ 6ND, Chinchilla y el techo de datos",
+      "contenido": "**Tres perillas:** N parámetros, D tokens y C cómputo, unidas por $C \\approx 6ND$ FLOPs (2 operaciones por parámetro y token hacia adelante, 4 hacia atrás en backprop). Una **ley de escala** responde: dado un presupuesto C, ¿qué N y qué D minimizan la pérdida?\n\n**Kaplan (2020)** recomendaba gastar el cómputo sobre todo en parámetros (×10 cómputo → ×5,5 modelo, ×1,8 tokens). Así se entrenaron GPT-3 y Gopher con < 2 tokens/parámetro. **Chinchilla (Hoffmann et al., 2022)** mostró que, con el **mismo cómputo que Gopher**, un modelo **4× más chico con ~5× más tokens** gana en casi todo:\n\n| Modelo | Parámetros | Tokens | Tokens/param |\n|---|---|---|---|\n| GPT-3 (2020) | 175B | 300B | 1,7 |\n| Gopher (2021) | 280B | 300B | 1,1 |\n| Chinchilla (2022) | 70B | 1,4T | **20** |\n| Llama 3 70B (2024) | 70B | 15T | **214** |\n\n**Regla de Chinchilla:** si duplicás el modelo, duplicá los tokens → ~**20 tokens por parámetro** (un 3B → 60B tokens). MMLU (57 materias): Chinchilla **67,6%** vs Gopher **60,0%**.\n\n**Por qué hoy se sobreentrena:** el entrenamiento se paga **una vez**, la inferencia en **cada token**. Un modelo más chico con más datos abarata la inferencia. Llama 3 70B está ~11× por encima de Chinchilla, el 8B ~100×. *El tamaño en parámetros ya no dice cuánto se entrenó un modelo.*\n\n**¿Cuánto más puede crecer? (Villalobos et al., 2024)** Los datasets crecen ~**2,4× por año** (0,38 órdenes de magnitud/año; en 4 años ×30+). El **stock efectivo** de texto humano público es ~**320 billones de tokens** (ajustado por calidad y por repetir épocas). Se alcanza hacia **2028 (rango 2026–2032)**; sobreentrenar lo adelanta 1–2 años. Pagar personas para escribir no alcanza: 10 millones de personas escribiendo 8 h/día producen ~70 billones de palabras por año, a un costo de cientos de miles de millones de dólares. En escala logarítmica, una recta es crecimiento exponencial.\n\n**Problemas a tener en cuenta:**\n- **Sesgo del filtro:** la lista negra de C4 saca el **42%** de documentos en inglés afroamericano vs **6,2%** en inglés blanco (Dodge et al. recomiendan no usar listas negras).\n- **Dominio del inglés:** en Llama 2, inglés **89,70%**, castellano **0,13%**.\n- **Texto generado / colapso de modelos** (Shumailov): entrenar con texto de modelos hace perder las colas de la distribución.\n- **Acceso restringido** (Longpre, 2024): robots.txt bloqueó ~5% de los tokens de C4; >28% en las fuentes más activas.\n- **Sesgos heredados:** Llama 2 tras SFT escribe un mail de estafa por 10.000 dólares; tras RLHF lo rechaza.",
+      "conceptos": [
+        "chinchilla",
+        "stock-de-datos",
+        "c4"
+      ],
+      "ejemplo": "Chequeo de la fórmula con Chinchilla: $6 \\times 70\\times10^9 \\times 1{,}4\\times10^{12} = 5{,}88\\times10^{23}$ FLOPs, consistente con el presupuesto de Gopher ($5{,}76\\times10^{23}$). Para un modelo de 8B (como el del TP final), Chinchilla-óptimo serían 160B tokens; Llama 3 8B se entrenó con 15T, ~100× más."
+    },
+    {
+      "titulo": "SFT: imitar demostraciones (y Constitutional AI)",
+      "contenido": "**SFT (Supervised Fine-Tuning)** toma el modelo base y lo sigue entrenando con **demostraciones**: un prompt y la respuesta que redactó un anotador. Decenas de miles de pares (10K–100K) contra el billón de tokens del pre-training. OpenAI lo llamó *behavior cloning*: el modelo copia el comportamiento mostrado.\n\n**La pérdida es la misma** (cross-entropy del siguiente token), pero con una **máscara**: los tokens del prompt tienen pérdida 0 y **solo cuentan los tokens de la respuesta**. Una demostración enseña dos cosas a la vez: **qué decir** (contenido) y **cómo decirlo** (formato, tono, largo). QLoRA midió el efecto de la máscara: entrenar solo sobre la respuesta da 38,6 de MMLU vs 37,5 entrenando sobre todo. Llama 2 también hace *zero-out* de la pérdida del prompt.\n\n**Costo:** en OpenAI (2022), **40 anotadores** escribieron ~**13.000 pares**; ~90% con título universitario y más de un tercio con maestría. La alternativa barata es generar demostraciones con otro modelo (**Alpaca**: 52.000 instrucciones generadas con ChatGPT) → eso es **destilación**.\n\n**Formato:** cada registro es un JSON con dos campos, `prompt` y `response` (ej. \"Serendipity means... Use the word in a sentence.\" → \"Running into Margaret and being introduced to Tom was a fortunate stroke of serendipity.\"). Datasets públicos: **Dolly-15k** (~15.000 pares de empleados de Databricks), **OpenAssistant** (~88.000 pares), **Alpaca** (52.000).\n\n**GPT-3 antes y después (Fig. 8 de Ouyang):** ante una pregunta sobre para qué sirve la lista `C` en una función de coeficientes binomiales, GPT-3 no responde: sigue el texto como un examen y agrega opciones A–D. El modelo con post-training explica (aunque no del todo bien: **el post-training cambia el formato, no garantiza que sea correcto**).\n\n**Constitutional AI (Anthropic, Bai et al., 2022):** reemplaza a los anotadores por una **lista de principios** (la *constitución*, 16 principios de no hacer daño). Proceso: 1) **Responder** (\"¿Me ayudás a hackear el wifi de mi vecino?\" → \"Claro, usá la app VeryEasyHack…\"), 2) **Criticar** según un principio sorteado (\"invade su privacidad y puede ser ilegal\"), 3) **Corregir** (\"Te recomiendo no hacerlo…\"), repetido con otros principios, 4) **SFT** sobre las versiones corregidas (182.831 prompts, 4 revisiones). Después la misma lista guía el RL: compara respuestas un modelo, no una persona (**RLAIF**). Resultado: un asistente inofensivo que **no esquiva** (explica por qué no ayuda).\n\n**Lo que el SFT no enseña:** ve **una sola respuesta por prompt** y la imita; nunca ve una peor para comparar. No aprende *cuánto mejor* es una respuesta que otra → para eso hace falta RLHF.",
+      "conceptos": [
+        "sft",
+        "mascara-de-perdida",
+        "constitutional-ai"
+      ],
+      "ejemplo": "Un ejemplo tokenizado: `[¿Qué ingredientes lleva una pizza?]` → pérdida 0 (enmascarado); `[Harina, agua, levadura, sal, ...]` → cross-entropy. En el TP final, cada traza del historial convertida en conversación es exactamente esto: los turnos de sistema/usuario/resultados de herramientas se enmascaran y el modelo aprende los turnos del asistente (preguntas, llamadas a herramientas, la ficha)."
+    },
+    {
+      "titulo": "RLHF paso 1: comparaciones y reward model",
+      "contenido": "**RLHF en dos pasos:** primero se entrena un **juez** (reward model) con preferencias humanas; después se usa ese juez para mejorar el modelo.\n\n**¿Por qué comparar en vez de escribir?** Una demostración dice qué respuesta es aceptable, no cuánto mejor es que otra. Y dos anotadores le ponen notas distintas a la misma respuesta; **elegir entre dos es más consistente**. Aun así, en OpenAI (2022) los anotadores coincidieron en ~**73%** de los casos. Formato: `(prompt, winning_response, losing_response)`. Ejemplo de **Anthropic HH-RLHF** (~170.000 comparaciones): \"How can I get my dog high?\" — ganadora: \"I'm not sure what you mean by that.\"; perdedora: \"I don't know that we should get the dog high...\". Chip Huyen prefiere la perdedora: las preferencias no caben en una fórmula única y el modelo queda alineado con **un grupo concreto de anotadores**.\n\n**El reward model** recibe (prompt, respuesta) y devuelve **un número**. Sale del **modelo SFT** cambiando la capa de salida (se quita la *unembedding* que elige el próximo token) por una que da un **escalar**. En OpenAI era de **6B**, más chico que el modelo que juzgaba. El **mismo modelo (mismos pesos)** puntúa ganadora ($s_w$) y perdedora ($s_l$); entrenar es lograr $s_w > s_l$.\n\n**Pérdida por par:** $-\\log \\sigma(s_w - s_l)$. σ convierte la diferencia en la probabilidad de que gane la preferida; la pérdida es grande si el modelo ordenó al revés y ~0 si $s_w \\gg s_l$.\n\n**Rankings:** cada anotador ordena de **4 a 9** respuestas por prompt → $\\binom{4}{2}=6$ a $\\binom{9}{2}=36$ pares por prompt. Llama 2 usó **>1,4 millones** de comparaciones propias y **dos reward models** (utilidad y seguridad, que a veces se oponen).\n\n**Cómo se arma un batch** (ejemplo del presentador): 64 pares → **128 filas**, cada una repite el prompt (fila 0: P₁+A₁ preferida, fila 1: P₁+B₁, …, fila 126: P₆₄+A₆₄, fila 127: P₆₄+B₆₄). **Un solo forward** → 128 puntajes → se **reagrupan de a dos** (0 con 1, 2 con 3…; *el orden importa*) → pérdida por par → **promedio de 64 pérdidas → un solo backward**. **Padding:** A y B casi nunca tienen el mismo largo; se rellena hasta el máximo del batch y el puntaje se toma del **último token real**, no de la última posición (que puede ser padding). OpenAI metía todos los pares de un mismo prompt en un solo elemento del batch porque mezclados el RM se **sobreajustaba**.",
+      "conceptos": [
+        "rlhf",
+        "reward-model"
+      ],
+      "ejemplo": "Si $s_w = 2$ y $s_l = 0$: $\\sigma(2) \\approx 0{,}88$, pérdida $\\approx 0{,}13$. Si está al revés ($s_w=0$, $s_l=2$): $\\sigma(-2)\\approx 0{,}12$, pérdida $\\approx 2{,}13$. El gradiente empuja a subir $s_w$ y bajar $s_l$."
+    },
+    {
+      "titulo": "RLHF paso 2: PPO, KL y DPO",
+      "contenido": "**El lazo:** un prompt (sin respuesta) → el LLM (la **política**) genera una respuesta → el reward model la puntúa (r) → **PPO (Proximal Policy Optimization)** actualiza los pesos para subir el puntaje → se repite muchas veces.\n\n**En términos de RL:** la política es el LLM; cada **acción** es elegir un token; la **recompensa** la da el RM.\n\n**El objetivo** no es solo r:\n$$\\text{objetivo} = r(x,y) - \\beta\\, \\mathrm{KL}(\\pi_{RL} \\,\\|\\, \\pi_{SFT})$$\nLa **penalización KL** (divergencia de Kullback-Leibler, por token) mide cuánto se aleja el modelo del SFT. **¿Por qué?** El RM se equivoca con respuestas que nunca vio y puede dar puntajes extremos por error; sin freno, el modelo aprende a **explotar esos errores** → **reward hacking**. El KL lo mantiene cerca de la distribución que el RM sabe juzgar.\n\n**Detalles de OpenAI (2022):** ~31.000–40.000 prompts de RL; además mezclan gradientes de pre-training (**PPO-ptx**) para no perder rendimiento en tareas clásicas, lo que el paper llama **\"impuesto de alineación\"**.\n\n**Problemas de PPO:** necesita **cuatro modelos en memoria** (política, referencia, recompensa, valor) y es inestable.\n\n**DPO (Direct Preference Optimization, Rafailov et al., 2023)** llega al mismo objetivo con una **pérdida de clasificación directa sobre los pares de preferencia**, **sin reward model ni PPO** y sin muestrear del modelo durante el entrenamiento. Idea: el propio modelo define una **recompensa implícita** — cuánto subió la probabilidad de una respuesta respecto del modelo de referencia (\"Your Language Model Is Secretly a Reward Model\"). La pérdida tiene la misma forma que la del reward model, con log-ratios en lugar de puntajes. En resúmenes, DPO gana 61% vs 57% de PPO. Es el método de preferencias que ofrecen las plataformas de fine-tuning (OpenAI, Azure) y una opción explícita del TP final (pares de respuestas buena/mala al mismo paso del caso). En la clase quedó como mención en las notas.",
+      "conceptos": [
+        "ppo",
+        "reward-hacking",
+        "dpo"
+      ],
+      "ejemplo": "Sin KL, un modelo podría descubrir que el RM puntúa alto respuestas larguísimas o llenas de disculpas, aunque a los humanos no les gusten: sube r, baja la calidad real. El término $-\\beta\\,\\mathrm{KL}$ resta cuanto más se aleja del SFT, y así acota la explotación."
+    },
+    {
+      "titulo": "Razonamiento con RL: verificadores y GRPO (DeepSeek-R1)",
+      "contenido": "**RL con recompensas verificables:** los datos son **problemas con una respuesta que se puede comprobar**, y en lugar de una persona (o un reward model neuronal) **una regla decide** si la respuesta es correcta.\n\n**Datos de DeepSeek-R1:** matemática **26K**, código **17K**, STEM **22K**, lógica **15K**.\n\n**Proceso:**\n1. El modelo genera **16 respuestas por problema**, con la plantilla `<think> razonamiento </think> <answer> respuesta </answer>`.\n2. **Verificador** (reglas, sin personas): ¿coincide con la referencia / pasa los tests ocultos / es la opción correcta? ¿respeta el formato `<think>`? Recompensa = **exactitud + formato**.\n3. Salen 16 recompensas (1, 0, 1, 1, 0, …).\n4. **GRPO (Group Relative Policy Optimization)**: compara cada recompensa con el **promedio del grupo**; sube la probabilidad de las respuestas mejores que el promedio y baja la de las peores. **GRPO es PPO sin modelo de valor**: no hay reward model ni value model que entrenar.\n\n| Tipo | Ejemplo (ilustrativo) | Verificación |\n|---|---|---|\n| Matemática | ¿Enteros positivos < 100 múltiplos de 3 o de 5? `<think>`33+19−6`</think><answer>`46`</answer>` | coincide con la referencia |\n| Código | función que suma los pares | pasa los tests ocultos |\n| STEM | gas que libera Zn + HCl: A) O₂ B) H₂ … | opción correcta (B) |\n| Lógica | Ana, Beto y Caro con perro, gato, pez | opción correcta (C) |\n\nEl verificador **lee solo lo que está en `<answer>`**; del razonamiento solo se premia que esté entre las tags, **su contenido no se evalúa**. Por eso no hay preguntas abiertas (\"escribí un poema\") y se excluyen demostraciones matemáticas: no hay regla que las verifique.\n\n**¿Por qué no un RM neuronal?** Porque el modelo puede engañarlo (**reward hacking**); una regla que compara con la respuesta correcta no se deja engañar.\n\n**Resultado:** **DeepSeek-R1-Zero** arranca del modelo base **sin SFT previo** y aprende a razonar solo con RL. En **AIME** pasa de **15,6% a 77,9%**, y el largo de las respuestas crece **de cientos a miles de tokens** sin que nadie se lo pida: pensar más da más recompensa. El modelo final adapta el esfuerzo: **< 100 tokens** para \"1 + 1\" y **> 18.000** en lo más difícil. Es el dominio donde también funcionan los **datos sintéticos** (respuestas verificables).",
+      "conceptos": [
+        "rl-con-verificador",
+        "grpo",
+        "reward-hacking"
+      ],
+      "ejemplo": "Un grupo de 4 respuestas con recompensas 1, 0, 1, 0: promedio 0,5. Las dos correctas quedan +0,5 por encima → sube su probabilidad; las incorrectas −0,5 → baja. Si las 4 aciertan (o fallan), todas quedan en el promedio y **no hay señal**: por eso conviene que los problemas no sean ni triviales ni imposibles. En el TP final, los **9 controles de la ficha** pueden hacer de verificador."
+    },
+    {
+      "titulo": "Herramientas: el modelo escribe la llamada, nunca la ejecuta",
+      "contenido": "**Las piezas de una plataforma** (vLLM, Ollama o un proveedor): tu aplicación manda JSON (`messages` + `tools`) → la **API** → la **plantilla de chat** convierte el JSON en texto con **tags especiales** que el modelo vio al entrenarse (el modelo ve la *definición* de cada herramienta, nunca su código) → el **modelo** escribe la llamada como texto → el **parser de llamadas** (uno por familia: `llama3_json`, `hermes`, `mistral`) la extrae como `tool_calls` (a veces mal formada). Una herramienta corre en **dos lugares posibles**: **tu aplicación** (client tools) o **la plataforma** (herramientas nativas: búsqueda web, ejecución de código).\n\n**El circuito con un agente:** el chat **es** el agente. Manda historial + herramientas al LLM → el LLM devuelve una llamada (`get_weather(location=\"Córdoba\")`, `stop_reason: \"tool_use\"`) → el agente la ejecuta y agrega un `tool_result` con el **mismo id** → vuelve a llamar → respuesta final (`end_turn`). Los pasos se repiten mientras el LLM pida herramientas. El **modelo** decide cuándo llamar y con qué argumentos (*es la parte que se entrena*); el **agente** ejecuta y corta cuando no hay llamadas. Texto que no es una llamada válida = acción inválida.\n\n**Tres problemas, tres herramientas:**\n- **Calcular.** Un LLM genera por probabilidad; en GSM8K los modelos de OpenAI fallaban seguido en las cuentas, y un modelo autoregresivo **no puede corregir su propio error**. Extrapolando, harían falta **10¹⁶ parámetros** para 80% de GSM8K solo con fine-tuning. **Llama 3.1** trae **Wolfram Alpha**: escribe `<|python_tag|> wolfram_alpha.call(query=\"100th decimal of pi\") <|eom_id|>` — `<|eom_id|>` significa \"paro acá, falta la herramienta\"; el agente agrega el resultado con rol `ipython` y el modelo sigue hasta `<|eot_id|>`. El servidor traduce tags ↔ JSON (`tool_calls` / rol `tool`): *el modelo nunca ve el JSON de la API y tu código nunca ve los tags*.\n- **Buscar.** El modelo no sabe nada posterior a su **fecha de corte** (ej. \"Cutting Knowledge Date: December 2023\" / \"Today Date: 21 September 2024\"; precio del oro). Se entrena como cualquier conducta: **demostraciones** de personas que buscan y citan (SFT) + **preferencias** sobre las respuestas (reward model) — WebGPT: ~6.000 demostraciones y ~21.500 comparaciones; un modelo recién preentrenado no conoce el formato de los comandos. En los proveedores la búsqueda es **nativa**: el modelo escribe la consulta (`server_tool_use`), la **plataforma** ejecuta y agrega `web_search_tool_result`, y el modelo responde con citas, todo en una sola respuesta de la API.\n- **MCP.** Estándar abierto (\"puerto USB-C para IA\"): el **host** crea **un cliente por servidor**; `tools/list` descubre, `tools/call` ejecuta; STDIO (local) o Streamable HTTP (remoto). El modelo queda **fuera del protocolo**: el host junta las tools de todos los servidores y se las pasa como **definiciones** (nombre, descripción, `inputSchema`).\n\n**Cómo se entrena:** el modelo aprende **function calling genérico** con SFT: registros con las funciones en el system prompt, el pedido y la llamada esperada (ej. `live_giveaways_by_type(type='beta')` y `(type='game')`, dos llamadas en paralelo). Por eso **no hace falta entrenar para cada servidor MCP**. **La salida de la herramienta se enmascara en la pérdida**: el modelo no debe aprender a predecir lo que devuelve la calculadora. Preferencias y RL enseñan a **encadenar** llamadas en tareas de varios pasos. **Toolformer** genera datos solo: se queda con las llamadas candidatas que **bajan la pérdida** del texto siguiente.",
+      "conceptos": [
+        "function-calling",
+        "tool-calling",
+        "mascara-de-perdida",
+        "mcp"
+      ],
+      "ejemplo": "Ida y vuelta con Ollama: pedido con `tools: [calcular(expresion)]` → respuesta `tool_calls: [{name: \"calcular\", arguments: {expresion: \"1234 * 5678\"}}]` → tu código calcula 7006652 y manda `{role: \"tool\", tool_name: \"calcular\", content: \"7006652\"}` → respuesta final \"1234 × 5678 = 7.006.652\". Por debajo, el modelo escribió `<|python_tag|>{...}<|eom_id|>` y recibió un turno `ipython`."
+    },
+    {
+      "titulo": "Fine-tuning: cuándo, dónde, cómo y cuánta memoria",
+      "contenido": "**Dónde entra:** el proveedor hace pre-training → SFT → preferencias; el **equipo** toma el modelo resultante (base o instruct) y hace **la misma receta a escala chica**: datos propios en **JSONL**; método **SFT**, a veces **DPO** o **RFT** (RL con un evaluador, el nombre de OpenAI/Azure, parecido al RL con verificador); técnica **LoRA/QLoRA** o ajuste completo. Conviene partir de un **modelo instruct**.\n\n**Prompt, RAG o fine-tuning:** **RAG corrige fallas de información** (no conoce los datos); **fine-tuning corrige fallas de comportamiento** (forma, formato, estilo) — \"RAG is for facts, finetuning is for form\". Orden habitual: **prompt → ejemplos en el prompt → RAG → fine-tuning**. No se excluyen; si hacen falta los dos, **empezar por RAG**. Prompt y RAG cambian la **entrada**; el fine-tuning cambia los **pesos**.\n\n**Cuándo vale la pena:** forzar un **formato de salida** (JSON/YAML, código que compile), un **estilo fijo**, una **tarea poco vista** (dialecto de SQL raro), un **modelo chico** que imite a uno grande (**destilación**). **Cuándo no:** si faltan datos → RAG; además puede **degradar otras tareas**, exige inversión inicial y **un modelo base nuevo puede superar al ajustado**.\n\n**La cuenta de memoria** (13B, 16 bits = 2 bytes/valor):\n- Inferencia: $13\\text{B}\\times 2 = 26$ GB × 1,2 (activaciones, KV) ≈ **31 GB**.\n- Fine-tuning completo con Adam: además **gradientes (1 valor) + Adam (2 valores: media y varianza)** = $13\\text{B}\\times3\\times2$ = **78 GB** → total ≈ **109 GB**. Una GPU de 48 GB no alcanza; tampoco dos. LLaMA 65B en 16 bits: **> 780 GB**.\n\n**LoRA (Hu et al., 2021):** congela W y entrena solo una corrección de rango bajo $W_0 + BA$, con $r \\ll d$; B arranca en **cero** (al inicio el modelo es igual al original); al desplegar, BA se suma a W → **sin latencia extra**. En una matriz de GPT-3 (d = 12.288, r = 4): **98.304** valores en lugar de ~**151 millones** (1.536× menos). En GPT-3 175B: checkpoint de **350 GB → 35 MB**, memoria de entrenamiento 1,2 TB → 350 GB.\n\n**QLoRA (Dettmers et al., 2023):** además guarda el modelo congelado en **4 bits (NF4)**; los adaptadores en 16 bits. Un **65B se ajusta en una GPU de 48 GB** sin perder rendimiento. Memoria total con QLoRA: 7B **6,9 GB**, 13B **11,3 GB**, 33B 24,7 GB, 65B **45 GB** (batch 1, secuencias de 512). Unsloth: empezar por QLoRA y pasar al ajuste completo solo si no alcanza.\n\n**En la nube (sept. 2026):** OpenAI **cierra** su plataforma a usuarios nuevos; siguen **Azure Foundry** (SFT/DPO/RFT con LoRA) y **Google Cloud** (Gemini con adaptadores; Gemma, Qwen, Llama). Recorrido: subir JSONL → lanzar trabajo → modelo propio.\n\n**Local:** modelo abierto (Llama, Qwen3, Gemma 4) → JSONL → **TRL SFTTrainer + PEFT (LoraConfig)** o **Unsloth** (QLoRA: base en 4 bits) → **adaptador** o modelo unido (`merge_and_unload`) → servir: **GGUF + llama.cpp → Ollama/LM Studio** (una máquina) o **vLLM** (varios usuarios). (Guía de Google: Gemma 4 E2B en NF4, LoRA r = 16, máscara −100 antes de la respuesta.)\n\n**Datos:** *\"finetuning is easy, but getting data for finetuning is hard\"* (Huyen). Formato `messages` (system/user/assistant) o `prompt`/`completion`. Azure: mínimo **10**, empezar con **50 bien armados**, idealmente cientos o miles. **Adecuación > tamaño:** 9.000 ejemplos de OASST1 superan a 450.000 de FLAN v2 como chatbot (QLoRA); **LIMA**: 1.000 ejemplos curados alcanzan un modelo competitivo (menos robusto).",
+      "conceptos": [
+        "fine-tuning",
+        "lora",
+        "qlora",
+        "rag",
+        "dpo"
+      ],
+      "ejemplo": "**Aplicado al TP final** (Gemma 4 E4B, tope 8B, A100 de **40 GB**): un 8B en bf16 ocupa **16 GB** solo de pesos. Con la regla del curso, un ajuste completo con Adam sumaría $8\\text{B}\\times3\\times2 = 48$ GB más → ~67 GB: **no entra** en 40 GB. Con LoRA solo se guardan gradientes y estados de Adam de los adaptadores (millones de parámetros, no miles de millones), y con QLoRA el base baja a ~4 GB. Además, el prompt de sistema y los resultados del buscador ocupan VRAM en cada ejemplo: acortarlos permite batches más grandes y entrenar con menos tokens."
+    }
+  ],
+  "conceptos": [
+    {
+      "id": "pretraining",
+      "termino": "Pre-training",
+      "definicion": "Primera etapa: entrenar al modelo para predecir el siguiente token sobre >1 billón de tokens de texto web (auto-supervisado). Sale un modelo base optimizado para completar texto.",
+      "por_que_importa": "Fija casi todo lo que el modelo sabe y consume ~98% del cómputo (InstructGPT).",
+      "trampa": "Creer que el modelo base 'responde preguntas': solo continúa texto; responder es una continuación más entre muchas."
+    },
+    {
+      "id": "c4",
+      "termino": "C4 (Colossal Clean Crawled Corpus)",
+      "definicion": "Dataset de Google (Raffel et al., 2020) obtenido filtrando un mes de Common Crawl (abril 2019) con reglas heurísticas: puntuación final, mínimo de oraciones/palabras, sin 'Javascript', 'lorem ipsum', '{', lista negra, deduplicación, inglés ≥ 0,99. 6,1 TB → 745 GB.",
+      "por_que_importa": "Muestra que el curado mejora el modelo en todas las tareas y que el filtrado es una decisión con consecuencias.",
+      "trampa": "Pensar que filtrar es neutral: la lista negra saca 42% del inglés afroamericano vs 6,2% del blanco."
+    },
+    {
+      "id": "chinchilla",
+      "termino": "Ley de escala y regla de Chinchilla",
+      "definicion": "Una ley de escala dice qué N parámetros y D tokens minimizan la pérdida para un cómputo C ≈ 6ND (2 FLOPs forward + 4 backward por parámetro y token). Chinchilla: Con cómputo fijo, conviene escalar modelo y datos en igual proporción: ~20 tokens por parámetro (Chinchilla 70B con 1,4T le gana a Gopher 280B con 300B, mismo cómputo).",
+      "por_que_importa": "Cambió la práctica de Kaplan (crecer en parámetros) y explica por qué los modelos modernos son más chicos y con más datos.",
+      "trampa": "Chinchilla es óptimo para el costo de entrenamiento; hoy se sobreentrena (Llama 3 70B: 214 tokens/param) porque la inferencia se paga en cada token."
+    },
+    {
+      "id": "stock-de-datos",
+      "termino": "Stock de datos (Villalobos et al., 2024)",
+      "definicion": "Los datasets crecen ~2,4× por año y alcanzan el stock efectivo de texto humano público (~320 billones de tokens) hacia 2028 (rango 2026–2032); sobreentrenar lo adelanta 1–2 años.",
+      "por_que_importa": "El texto humano es un recurso finito; motiva datos sintéticos verificables, datos propietarios y otras modalidades.",
+      "trampa": "No es que 'se acabe internet' mañana: es una proyección con rango amplio y ajustada por calidad y repetición de épocas."
+    },
+    {
+      "id": "sft",
+      "termino": "SFT (Supervised Fine-Tuning)",
+      "definicion": "Seguir entrenando el modelo base con demostraciones (prompt, respuesta) escritas por personas, minimizando la cross-entropy solo sobre los tokens de la respuesta (behavior cloning).",
+      "por_que_importa": "Enseña qué decir y cómo decirlo: formato, tono, diálogo y emisión de llamadas a herramientas.",
+      "trampa": "SFT no aprende cuál de dos respuestas correctas es mejor: solo imita la única respuesta que ve por prompt."
+    },
+    {
+      "id": "mascara-de-perdida",
+      "termino": "Máscara de pérdida",
+      "definicion": "Poner pérdida 0 (label −100) en los tokens que el modelo no debe aprender a generar: el prompt en SFT y la salida de las herramientas en datos de tool use.",
+      "por_que_importa": "El modelo aprende a responder y a escribir llamadas, no a predecir la pregunta ni lo que devuelve la calculadora (QLoRA: 38,6 vs 37,5 MMLU).",
+      "trampa": "Pensar que la función de pérdida cambia en SFT: es la misma cross-entropy de la clase 8; cambian los datos y la máscara."
+    },
+    {
+      "id": "constitutional-ai",
+      "termino": "Constitutional AI",
+      "definicion": "Método de Anthropic (Bai et al., 2022) que reemplaza anotadores por una constitución (16 principios de no hacer daño): el modelo responde, critica su respuesta según un principio sorteado, la corrige, y se hace SFT sobre las versiones corregidas; luego RL con feedback de IA (RLAIF).",
+      "por_que_importa": "Abarata los datos de seguridad y produce un asistente inofensivo pero no evasivo.",
+      "trampa": "La constitución de 2022 solo cubre inocuidad; para utilidad siguieron usando etiquetas humanas."
+    },
+    {
+      "id": "rlhf",
+      "termino": "RLHF",
+      "definicion": "Reinforcement Learning from Human Feedback: (1) entrenar un reward model con comparaciones humanas; (2) optimizar el LLM con RL (PPO) para maximizar ese puntaje sin alejarse del SFT.",
+      "por_que_importa": "Enseña preferencias entre respuestas que el SFT no puede capturar; mejora significativamente sobre SFT solo.",
+      "trampa": "Las personas no puntúan en vivo durante el RL: puntúa el reward model, que aprendió de las comparaciones."
+    },
+    {
+      "id": "reward-model",
+      "termino": "Reward model",
+      "definicion": "Copia del modelo SFT con la capa de salida reemplazada por un escalar; recibe (prompt, respuesta) y devuelve un puntaje. Se entrena con −log σ(s_w − s_l) sobre pares ganadora/perdedora.",
+      "por_que_importa": "Es el juez que permite hacer RL sobre millones de respuestas sin personas.",
+      "trampa": "Se equivoca fuera de su distribución: optimizar contra él sin freno produce reward hacking."
+    },
+    {
+      "id": "ppo",
+      "termino": "PPO y penalización KL",
+      "definicion": "Proximal Policy Optimization: algoritmo de RL que actualiza la política (el LLM) para maximizar r − β·KL(π_RL‖π_SFT); cada acción es elegir un token.",
+      "por_que_importa": "Es el paso 2 de RLHF en InstructGPT y Llama 2.",
+      "trampa": "Necesita 4 modelos en memoria (política, referencia, recompensa, valor) y es inestable; por eso existen DPO y GRPO."
+    },
+    {
+      "id": "reward-hacking",
+      "termino": "Reward hacking",
+      "definicion": "Cuando el modelo aprende a explotar errores del reward model (puntajes altos para respuestas malas) en vez de mejorar de verdad.",
+      "por_que_importa": "Motiva la penalización KL en RLHF y el uso de verificadores por reglas en el RL de razonamiento.",
+      "trampa": "Una regla que compara con la respuesta correcta no se deja engañar; un RM neuronal sí."
+    },
+    {
+      "id": "dpo",
+      "termino": "DPO (Direct Preference Optimization)",
+      "definicion": "Optimiza el mismo objetivo que RLHF con una pérdida de clasificación directa sobre los pares de preferencia, usando el log-ratio de probabilidades contra un modelo de referencia como recompensa implícita; sin reward model ni PPO.",
+      "por_que_importa": "Es más simple y estable; es el método de preferencias que ofrecen las plataformas de fine-tuning y una opción del TP final.",
+      "trampa": "Sigue necesitando datos de comparación (buena/mala) y un modelo de referencia; no elimina las preferencias, elimina el RM explícito y el muestreo."
+    },
+    {
+      "id": "rl-con-verificador",
+      "termino": "RL con recompensas verificables",
+      "definicion": "RL sobre problemas con respuesta comprobable (matemática, código con tests, opción múltiple, lógica) donde una regla da recompensa 1/0 por exactitud más una por formato (<think>).",
+      "por_que_importa": "Entrena el razonamiento (DeepSeek-R1-Zero: AIME 15,6% → 77,9%) sin anotadores ni reward model.",
+      "trampa": "El contenido del razonamiento no se evalúa, solo la respuesta final y el formato; no sirve para tareas abiertas como 'escribí un poema'."
+    },
+    {
+      "id": "grpo",
+      "termino": "GRPO",
+      "definicion": "Group Relative Policy Optimization: muestrea un grupo de respuestas por problema (16 en R1) y usa como ventaja (r_i − media)/desvío del grupo; es PPO sin modelo de valor.",
+      "por_que_importa": "Abarata el RL: no hay value model ni reward model que entrenar.",
+      "trampa": "Si todas las respuestas del grupo reciben la misma recompensa, la ventaja es 0 y no hay aprendizaje."
+    },
+    {
+      "id": "function-calling",
+      "termino": "Function calling / tool calling",
+      "definicion": "Habilidad entrenada (sobre todo con SFT) de leer definiciones de funciones en el contexto y emitir una llamada estructurada (nombre + argumentos), que ejecuta otro sistema.",
+      "por_que_importa": "Permite calcular, buscar y usar cualquier servidor MCP sin reentrenar para cada herramienta.",
+      "trampa": "El modelo nunca ejecuta la herramienta: la ejecuta tu agente o la plataforma (herramientas nativas)."
+    },
+    {
+      "id": "mcp",
+      "termino": "MCP (Model Context Protocol)",
+      "definicion": "Estándar abierto para conectar aplicaciones de IA con herramientas y datos: el host crea un cliente por servidor; tools/list descubre y tools/call ejecuta; transporte STDIO (local) o Streamable HTTP (remoto).",
+      "por_que_importa": "Una sola interfaz para cualquier sistema; el modelo solo ve definiciones (nombre, descripción, inputSchema).",
+      "trampa": "El LLM no habla con los servidores MCP: el agente del host intercepta la llamada y la enruta."
+    },
+    {
+      "id": "lora",
+      "termino": "LoRA",
+      "definicion": "Low-Rank Adaptation: congela W y entrena una corrección de rango bajo BA (B de d×r, A de r×d, r ≪ d, B inicializada en 0); al desplegar BA se suma a W.",
+      "por_que_importa": "Reduce enormemente los parámetros entrenables y el checkpoint (GPT-3: 350 GB → 35 MB) sin latencia extra.",
+      "trampa": "Para igualar al ajuste completo hay que aplicarlo a todas las capas lineales; en general puede no llegar al fine-tuning completo."
+    },
+    {
+      "id": "qlora",
+      "termino": "QLoRA",
+      "definicion": "LoRA con el modelo base congelado guardado en 4 bits (NF4), doble cuantización y optimizador paginado; los adaptadores se entrenan en 16 bits.",
+      "por_que_importa": "Un 65B se ajusta en una sola GPU de 48 GB (45 GB) en vez de >780 GB; un 7B en ~6,9 GB.",
+      "trampa": "Ahorra memoria a cambio de más tiempo de cómputo; los 4 bits son para guardar, para multiplicar se descuantiza a 16 bits."
+    },
+    {
+      "id": "fine-tuning",
+      "termino": "Fine-tuning (del equipo de producto)",
+      "definicion": "Post-training a escala chica sobre un modelo ya post-entrenado, con datos propios en JSONL (SFT, a veces DPO o RFT), usualmente con LoRA/QLoRA.",
+      "por_que_importa": "Corrige fallas de comportamiento (formato, estilo, tarea poco vista, destilación) que prompt y RAG no arreglan.",
+      "trampa": "No sirve para agregar conocimiento que cambia (eso es RAG), puede degradar otras tareas y un modelo base nuevo puede superarlo."
+    }
+  ],
+  "formulas": [
+    {
+      "nombre": "Cómputo de entrenamiento",
+      "tex": "C \\approx 6\\,N\\,D",
+      "explicacion": "C en FLOPs; N parámetros; D tokens. 6 = 2 operaciones por parámetro y token en el forward + 4 en el backward."
+    },
+    {
+      "nombre": "Regla de Chinchilla",
+      "tex": "D_{\\text{óptimo}} \\approx 20\\,N",
+      "explicacion": "Tokens de entrenamiento compute-óptimos ≈ 20 por parámetro (3B → 60B tokens; 70B → 1,4T)."
+    },
+    {
+      "nombre": "Pérdida de SFT con máscara",
+      "tex": "\\mathcal{L}_{SFT} = -\\sum_{t \\in \\text{respuesta}} \\log p_\\theta(y_t \\mid x, y_{<t})",
+      "explicacion": "Cross-entropy del siguiente token, sumada solo sobre los tokens de la respuesta y; los tokens del prompt x (y de salidas de herramientas) tienen pérdida 0."
+    },
+    {
+      "nombre": "Pérdida del reward model (por par)",
+      "tex": "\\mathcal{L} = -\\log \\sigma\\big(r_\\theta(x, y_w) - r_\\theta(x, y_l)\\big)",
+      "explicacion": "y_w ganadora, y_l perdedora, r_θ puntaje escalar del RM, σ sigmoide (probabilidad de que gane y_w). En el batch se promedian las pérdidas de todos los pares y se hace un solo backward."
+    },
+    {
+      "nombre": "Objetivo de RLHF con PPO",
+      "tex": "\\max_\\pi \\; \\mathbb{E}\\big[r(x,y)\\big] - \\beta\\,\\mathrm{KL}\\big(\\pi_{RL}(y\\mid x)\\,\\|\\,\\pi_{SFT}(y\\mid x)\\big)",
+      "explicacion": "r: puntaje del reward model; β: peso de la penalización; KL: cuánto se aleja la política del modelo SFT (freno contra reward hacking)."
+    },
+    {
+      "nombre": "Ventaja en GRPO",
+      "tex": "A_i = \\frac{r_i - \\mathrm{media}(r_1,\\dots,r_G)}{\\mathrm{desvío}(r_1,\\dots,r_G)}",
+      "explicacion": "r_i: recompensa (exactitud + formato) de la respuesta i entre G = 16 del mismo problema. A_i > 0 sube su probabilidad; A_i < 0 la baja. No requiere modelo de valor."
+    },
+    {
+      "nombre": "Pérdida de DPO",
+      "tex": "\\mathcal{L}_{DPO} = -\\log \\sigma\\Big(\\beta\\Big[\\log\\frac{\\pi(y_w\\mid x)}{\\pi_{ref}(y_w\\mid x)} - \\log\\frac{\\pi(y_l\\mid x)}{\\pi_{ref}(y_l\\mid x)}\\Big]\\Big)",
+      "explicacion": "Misma forma que la pérdida del RM, con log-ratios del modelo π contra el de referencia π_ref (SFT) en lugar de puntajes: recompensa implícita."
+    },
+    {
+      "nombre": "LoRA",
+      "tex": "W = W_0 + BA,\\quad B \\in \\mathbb{R}^{d\\times r},\\; A \\in \\mathbb{R}^{r\\times k},\\; r \\ll \\min(d,k)",
+      "explicacion": "W_0 congelada; solo se entrenan A y B (B arranca en 0). Parámetros entrenables por matriz: r(d+k). GPT-3, d = k = 12.288, r = 4: 98.304 vs 150.994.944."
+    },
+    {
+      "nombre": "Memoria (regla rápida del curso)",
+      "tex": "M_{inf} \\approx N \\cdot b \\cdot 1{,}2 \\qquad M_{FT\\,completo} \\approx M_{inf} + 3\\,N\\,b",
+      "explicacion": "N parámetros, b bytes por valor (2 en 16 bits). El ×1,2 cubre activaciones y KV cache. En fine-tuning completo con Adam se suman gradiente + 2 estados de Adam = 3 valores por parámetro. 13B: 31 + 78 ≈ 109 GB."
+    }
+  ],
+  "comparaciones": [
+    {
+      "titulo": "Las tres etapas del entrenamiento",
+      "columnas": [
+        "Aspecto",
+        "Pre-training",
+        "SFT",
+        "RLHF"
+      ],
+      "filas": [
+        [
+          "Datos",
+          "Texto web, baja calidad",
+          "Demostraciones (prompt, respuesta)",
+          "Comparaciones (prompt, ganadora, perdedora) + prompts"
+        ],
+        [
+          "Escala",
+          ">1 billón de tokens",
+          "10K–100K pares",
+          "100K–1M comparaciones; 10K–100K prompts"
+        ],
+        [
+          "Objetivo",
+          "Siguiente token (auto-supervisado)",
+          "Siguiente token solo sobre la respuesta",
+          "RM: −log σ(s_w − s_l); política: r − β·KL"
+        ],
+        [
+          "Sale",
+          "Modelo base: completa texto",
+          "Modelo SFT: conversa",
+          "Modelo final: prefiere lo que eligen los anotadores"
+        ],
+        [
+          "Cómputo (InstructGPT)",
+          "3.640 PF/s-días (~98%)",
+          "4,9",
+          "60"
+        ]
+      ]
+    },
+    {
+      "titulo": "RLHF (PPO) vs DPO vs RL con verificador (GRPO)",
+      "columnas": [
+        "Aspecto",
+        "RLHF con PPO",
+        "DPO",
+        "RL con verificador (GRPO)"
+      ],
+      "filas": [
+        [
+          "Señal",
+          "Reward model entrenado con preferencias humanas",
+          "Pares de preferencia, directo",
+          "Regla: respuesta correcta + formato"
+        ],
+        [
+          "Modelos extra",
+          "RM + valor + referencia",
+          "Solo referencia",
+          "Ninguno (sin RM ni valor)"
+        ],
+        [
+          "Muestrea durante el entrenamiento",
+          "Sí",
+          "No",
+          "Sí (16 respuestas por problema)"
+        ],
+        [
+          "Riesgo",
+          "Reward hacking (freno: KL)",
+          "Limitado a los pares disponibles",
+          "Solo tareas verificables"
+        ],
+        [
+          "Para qué",
+          "Alinear con preferencias (útil, inofensivo)",
+          "Preferencias, más simple y estable",
+          "Razonamiento (matemática, código, lógica)"
+        ]
+      ]
+    },
+    {
+      "titulo": "Prompt vs RAG vs fine-tuning",
+      "columnas": [
+        "Aspecto",
+        "Prompt / few-shot",
+        "RAG",
+        "Fine-tuning"
+      ],
+      "filas": [
+        [
+          "Qué cambia",
+          "La entrada",
+          "La entrada (trae documentos)",
+          "Los pesos"
+        ],
+        [
+          "Corrige",
+          "Instrucciones poco claras",
+          "Fallas de información (hechos que no conoce o que cambian)",
+          "Fallas de comportamiento (formato, estilo, tarea poco vista)"
+        ],
+        [
+          "Costo inicial",
+          "Bajo",
+          "Medio (índice, buscador)",
+          "Alto (datos, entrenamiento, serving)"
+        ],
+        [
+          "Orden habitual",
+          "1°",
+          "2° (si hacen falta ambos, empezar por RAG)",
+          "Último"
+        ],
+        [
+          "Riesgos",
+          "Prompt largo = costo por llamada",
+          "Contexto ocupado, recall del buscador",
+          "Degrada otras tareas; queda viejo con un base nuevo"
+        ]
+      ]
+    },
+    {
+      "titulo": "Ajuste completo vs LoRA vs QLoRA",
+      "columnas": [
+        "Aspecto",
+        "Ajuste completo",
+        "LoRA",
+        "QLoRA"
+      ],
+      "filas": [
+        [
+          "Qué se entrena",
+          "Todos los pesos",
+          "Dos matrices chicas por capa (BA)",
+          "Igual que LoRA"
+        ],
+        [
+          "Modelo base",
+          "16 bits, entrenable",
+          "16 bits, congelado",
+          "4 bits (NF4), congelado"
+        ],
+        [
+          "Memoria (ejemplo)",
+          "13B ≈ 109 GB; 65B > 780 GB",
+          "Pesos + estados solo de los adaptadores",
+          "7B 6,9 GB; 13B 11,3 GB; 65B 45 GB"
+        ],
+        [
+          "Checkpoint",
+          "Modelo entero (GPT-3: 350 GB)",
+          "Adaptador (GPT-3: 35 MB)",
+          "Adaptador"
+        ],
+        [
+          "Cuándo",
+          "Muchos datos, si LoRA no alcanza",
+          "Pocos datos de calidad, modelo fuerte",
+          "Recomendado para empezar (Unsloth)"
+        ]
+      ]
+    },
+    {
+      "titulo": "Herramientas: qué genera el modelo y quién ejecuta",
+      "columnas": [
+        "Herramienta",
+        "Qué genera el modelo",
+        "Quién ejecuta",
+        "Cómo se entrenó"
+      ],
+      "filas": [
+        [
+          "Calculadora (Llama 3.1 / Wolfram Alpha)",
+          "<|python_tag|> llamada <|eom_id|>",
+          "El agente (tu código); resultado con rol ipython",
+          "Post-training con conversaciones en ese formato; salida enmascarada"
+        ],
+        [
+          "Búsqueda web",
+          "La consulta y la respuesta con citas",
+          "Tu código (modelo abierto) o la plataforma (nativa)",
+          "Demostraciones de personas buscando + preferencias (WebGPT)"
+        ],
+        [
+          "MCP",
+          "Llamada según la definición en el contexto",
+          "El host, que enruta al servidor (tools/call)",
+          "Function calling genérico con SFT"
+        ]
+      ]
+    }
+  ],
+  "flashcards": [
+    {
+      "q": "¿Qué porcentaje del cómputo se llevó el pre-training en InstructGPT?",
+      "a": "~98% (3.640 de 3.704,9 PF/s-días); SFT 4,9 y PPO 60 suman ~1,75%."
+    },
+    {
+      "q": "¿Qué modelo ganó en preferencia humana en Ouyang et al. 2022?",
+      "a": "Un GPT-3 de 1,3B con post-training le ganó al GPT-3 original de 175B (~100× más grande)."
+    },
+    {
+      "q": "Escala de datos de cada etapa",
+      "a": "Pre-training >1 billón de tokens; SFT 10K–100K pares; RM 100K–1M comparaciones; RL 10K–100K prompts."
+    },
+    {
+      "q": "¿Por qué el pre-training es auto-supervisado?",
+      "a": "Porque el mismo texto trae la respuesta correcta (el token siguiente); no hay que etiquetar."
+    },
+    {
+      "q": "Nombrá 4 reglas de limpieza de C4",
+      "a": "Líneas sin puntuación final; páginas < 3 oraciones / líneas < 5 palabras; 'Javascript', 'lorem ipsum', '{'; lista negra; deduplicación de 3 oraciones; inglés ≥ 0,99."
+    },
+    {
+      "q": "¿Cuánto se reduce C4 al filtrar?",
+      "a": "De 6,1 TB sin filtrar a 745 GB."
+    },
+    {
+      "q": "¿De dónde sale el 6 en C ≈ 6ND?",
+      "a": "2 operaciones por parámetro y token en el forward y 4 en el backward."
+    },
+    {
+      "q": "Regla de Chinchilla",
+      "a": "~20 tokens por parámetro: duplicar el modelo implica duplicar los tokens (3B → 60B tokens)."
+    },
+    {
+      "q": "¿Por qué hoy se sobreentrena por encima de Chinchilla?",
+      "a": "El entrenamiento se paga una vez y la inferencia en cada token; un modelo chico con más datos abarata la inferencia."
+    },
+    {
+      "q": "¿Cuándo se agota el texto humano público según Villalobos et al.?",
+      "a": "Hacia 2028 (rango 2026–2032); stock efectivo ~320 billones de tokens; datasets crecen ~2,4× por año."
+    },
+    {
+      "q": "¿Qué tokens cuentan en la pérdida de SFT?",
+      "a": "Solo los de la respuesta; el prompt se enmascara (pérdida 0)."
+    },
+    {
+      "q": "¿Qué es Constitutional AI?",
+      "a": "Anthropic: una lista de principios reemplaza a los anotadores; el modelo responde, se critica, se corrige y se entrena con SFT sobre lo corregido; después RLAIF."
+    },
+    {
+      "q": "¿Por qué comparar en vez de puntuar o escribir?",
+      "a": "Elegir entre dos es más consistente entre anotadores (aun así ~73% de acuerdo) y da información de 'cuánto mejor'."
+    },
+    {
+      "q": "¿De dónde sale el reward model?",
+      "a": "Del modelo SFT, reemplazando la capa que elige el token por una salida escalar."
+    },
+    {
+      "q": "¿Por qué el puntaje del RM se toma del último token real?",
+      "a": "Porque las secuencias se rellenan con padding y la última posición de la fila puede ser padding."
+    },
+    {
+      "q": "¿Para qué sirve la penalización KL en RLHF?",
+      "a": "Para que la política no se aleje del SFT y explote errores del reward model (reward hacking)."
+    },
+    {
+      "q": "¿Qué es GRPO?",
+      "a": "PPO sin modelo de valor: compara la recompensa de cada respuesta con el promedio de su grupo (16 por problema en R1)."
+    },
+    {
+      "q": "¿Qué evalúa el verificador en DeepSeek-R1?",
+      "a": "La respuesta en <answer> contra la referencia/tests y que el razonamiento esté entre <think>; no el contenido del razonamiento."
+    },
+    {
+      "q": "¿Qué significa <|eom_id|> en Llama 3.1?",
+      "a": "'Paro acá, falta el resultado de la herramienta'; el agente ejecuta y agrega un turno ipython."
+    },
+    {
+      "q": "Cuenta de memoria: 13B con fine-tuning completo y Adam",
+      "a": "Pesos+activaciones ~31 GB + gradientes y 2 estados de Adam 13B×3×2 = 78 GB ≈ 109 GB."
+    }
+  ],
+  "quiz": [
+    {
+      "q": "Ante el prompt \"¿Qué ingredientes lleva una pizza?\", ¿qué escribe un modelo base solo con pre-training?",
+      "opciones": [
+        "Siempre la lista de ingredientes, porque es la respuesta correcta",
+        "Cualquier continuación plausible de la web: más preguntas, una receta o la lista",
+        "Una negativa, porque no tiene instrucciones",
+        "Nada, porque un modelo base no genera texto"
+      ],
+      "correcta": 1,
+      "explicacion": "El modelo base está optimizado para completar texto; las tres continuaciones aparecen en la web. Que elija responder (la lista) lo enseña el post-training. No se niega (eso también lo enseña el post-training) y sí genera texto."
+    },
+    {
+      "q": "Con el mismo presupuesto de cómputo que Gopher (280B, 300B tokens), Chinchilla ganó usando:",
+      "opciones": [
+        "Un modelo 4× más grande con menos tokens",
+        "Un modelo 4× más chico con ~5× más tokens",
+        "El mismo modelo con mejor arquitectura",
+        "Más épocas sobre los mismos 300B tokens"
+      ],
+      "correcta": 1,
+      "explicacion": "Chinchilla: 70B parámetros y 1,4T tokens (~20 tokens/param). Mostró que Kaplan sobreinvertía en parámetros. No fue un cambio de arquitectura ni repetir datos."
+    },
+    {
+      "q": "¿Cuántos FLOPs aproximados cuesta entrenar un modelo de 70B con 1,4T tokens?",
+      "opciones": [
+        "≈ 9,8 × 10²²",
+        "≈ 5,9 × 10²³",
+        "≈ 1,96 × 10²³",
+        "≈ 5,9 × 10²⁶"
+      ],
+      "correcta": 1,
+      "explicacion": "C ≈ 6ND = 6 × 7·10¹⁰ × 1,4·10¹² = 5,88·10²³. La opción 1,96·10²³ olvida el 6 (usa 2, solo forward); 9,8·10²² usa N·D; 10²⁶ es error de exponente."
+    },
+    {
+      "q": "En SFT, la pérdida se calcula:",
+      "opciones": [
+        "Sobre todos los tokens del ejemplo, prompt incluido",
+        "Solo sobre los tokens de la respuesta; el prompt se enmascara",
+        "Solo sobre el último token",
+        "Con una pérdida distinta de la cross-entropy, basada en el reward model"
+      ],
+      "correcta": 1,
+      "explicacion": "Es la misma cross-entropy del pre-training, pero con máscara: el prompt tiene pérdida 0. El reward model aparece en RLHF, no en SFT."
+    },
+    {
+      "q": "Para un mismo prompt hay dos respuestas correctas y una es mejor. ¿Qué aprende de eso un modelo entrenado solo con SFT?",
+      "opciones": [
+        "Que una es mejor que la otra",
+        "Nada sobre cuál es mejor: solo imita la respuesta que escribió la persona",
+        "Que las dos valen lo mismo",
+        "A rechazar la peor"
+      ],
+      "correcta": 1,
+      "explicacion": "SFT ve una respuesta por prompt y la imita; nunca ve una peor para comparar. Aprender preferencias requiere comparaciones (RLHF o DPO)."
+    },
+    {
+      "q": "Un anotador ordena 9 respuestas a un prompt. ¿Cuántos pares de comparación genera?",
+      "opciones": [
+        "9",
+        "18",
+        "36",
+        "81"
+      ],
+      "correcta": 2,
+      "explicacion": "C(9,2) = 9·8/2 = 36. Con 4 respuestas serían 6. 81 contaría pares ordenados con repetición."
+    },
+    {
+      "q": "En el batch del reward model con 64 pares de preferencia, ¿cuántas secuencias entran al forward?",
+      "opciones": [
+        "64, una por par",
+        "128, cada par como dos secuencias que repiten el prompt",
+        "192, prompt + dos respuestas separadas",
+        "2.304"
+      ],
+      "correcta": 1,
+      "explicacion": "Cada par se despliega en dos filas (P+A preferida, P+B), 128 en un solo forward; luego se reagrupan de a dos y se promedian 64 pérdidas. 2.304 es el máximo de comparaciones de OpenAI con 64 prompts × 36."
+    },
+    {
+      "q": "¿Por qué el objetivo de PPO en RLHF incluye −β·KL respecto del modelo SFT?",
+      "opciones": [
+        "Para acelerar la convergencia",
+        "Para que el modelo no se aleje y explote errores del reward model (reward hacking)",
+        "Para reducir la memoria usada",
+        "Para reemplazar al reward model"
+      ],
+      "correcta": 1,
+      "explicacion": "El RM se equivoca con respuestas que nunca vio; sin freno, la política aprende a sacar puntajes altos falsos. El KL no ahorra memoria ni reemplaza al RM."
+    },
+    {
+      "q": "¿Qué diferencia principal tiene DPO respecto de RLHF con PPO?",
+      "opciones": [
+        "No usa datos de preferencia",
+        "Optimiza directamente sobre los pares de preferencia, sin reward model ni muestreo durante el entrenamiento",
+        "Usa un verificador de reglas",
+        "Solo funciona con modelos base sin SFT"
+      ],
+      "correcta": 1,
+      "explicacion": "DPO sigue usando pares (buena/mala) y un modelo de referencia, pero elimina el RM explícito y PPO. El verificador por reglas es del RL de razonamiento."
+    },
+    {
+      "q": "En DeepSeek-R1, 16 respuestas a un problema reciben recompensas 1,1,1,1,0,…; ¿qué hace GRPO?",
+      "opciones": [
+        "Entrena un value model para estimar cada estado",
+        "Compara cada recompensa con el promedio del grupo y sube la probabilidad de las mejores que el promedio",
+        "Pide a un anotador que elija la mejor",
+        "Descarta todas las respuestas incorrectas y hace SFT sobre las correctas"
+      ],
+      "correcta": 1,
+      "explicacion": "GRPO usa la ventaja relativa al grupo y no necesita modelo de valor. No hay anotadores; descartar y hacer SFT sería rejection sampling, no GRPO."
+    },
+    {
+      "q": "¿Por qué DeepSeek-R1 usa una regla y no un reward model neuronal?",
+      "opciones": [
+        "Porque es más rápido de entrenar el RM",
+        "Porque un RM neuronal es susceptible a reward hacking en RL a gran escala; una regla que compara con la respuesta correcta no se deja engañar",
+        "Porque no tenía datos de comparación en inglés",
+        "Porque las reglas evalúan la calidad del razonamiento"
+      ],
+      "correcta": 1,
+      "explicacion": "Es la razón dada en el paper. Ojo: las reglas NO evalúan el contenido del razonamiento, solo la respuesta final y el formato."
+    },
+    {
+      "q": "En el circuito con herramientas, ¿quién ejecuta get_weather(location=\"Córdoba\")?",
+      "opciones": [
+        "El LLM, internamente",
+        "El agente (tu aplicación), que luego devuelve un tool_result con el mismo id",
+        "El parser de llamadas del servidor",
+        "El servidor MCP directamente, sin pasar por el host"
+      ],
+      "correcta": 1,
+      "explicacion": "El modelo solo escribe la llamada (stop_reason tool_use). El parser solo convierte texto a JSON. En MCP, el host enruta la llamada al servidor; el LLM nunca habla con el servidor."
+    },
+    {
+      "q": "Con miles de servidores MCP, ¿hay que entrenar al modelo para cada uno?",
+      "opciones": [
+        "Sí, un fine-tuning por servidor",
+        "No: aprende function calling genérico y el host le pasa cada herramienta como definición (nombre, descripción, esquema)",
+        "Sí, pero solo con RLHF",
+        "No, porque MCP no usa el modelo"
+      ],
+      "correcta": 1,
+      "explicacion": "El SFT con funciones en el system prompt enseña a leer definiciones y emitir llamadas; cualquier herramienta MCP llega con esa forma."
+    },
+    {
+      "q": "Un modelo genera SQL de un dialecto poco común que no compila, aunque tiene la documentación en el contexto. ¿Qué conviene?",
+      "opciones": [
+        "Más RAG con más documentos",
+        "Fine-tuning: es una falla de comportamiento/formato",
+        "Pre-training desde cero",
+        "Subir la temperatura"
+      ],
+      "correcta": 1,
+      "explicacion": "RAG corrige fallas de información; acá falla la forma. Es el ejemplo típico de la clase para fine-tuning. Pre-entrenar desde cero es desproporcionado."
+    },
+    {
+      "q": "Para el TP final (modelo de 8B en bf16, A100 de 40 GB), ¿por qué un ajuste completo con Adam no entra y LoRA/QLoRA sí?",
+      "opciones": [
+        "Porque 8B en bf16 ocupa 80 GB",
+        "Pesos 16 GB + gradientes y 2 estados de Adam (8B×3×2 = 48 GB) superan 40 GB; con LoRA solo se guardan gradientes y estados de los adaptadores, y QLoRA además baja el base a 4 bits",
+        "Porque LoRA no usa gradientes",
+        "Porque Adam no funciona en A100"
+      ],
+      "correcta": 1,
+      "explicacion": "Aplicando la regla del curso: 16 + 48 GB (más activaciones) ≫ 40 GB. LoRA sí usa gradientes, pero solo de las matrices A y B. 8B en bf16 son 16 GB, no 80."
+    }
+  ],
+  "desarrollo": [
+    {
+      "pregunta": "Explicá las tres etapas de entrenamiento de un LLM: qué datos usa cada una, en qué escala, qué se optimiza y qué modelo sale. ¿Por qué un modelo 100 veces más chico puede ganarle a uno grande?",
+      "respuesta_modelo": "**Pre-training:** texto web de baja calidad (Common Crawl filtrado, p. ej. C4), >1 billón de tokens; minimiza la cross-entropy del siguiente token (auto-supervisado). Sale un **modelo base** que completa texto y reproduce la web, sin seguir instrucciones.\n\n**SFT:** 10K–100K demostraciones (prompt, respuesta) escritas por personas (OpenAI: 40 anotadores, ~13.000 pares). Misma cross-entropy pero **solo sobre la respuesta** (máscara). Sale un modelo que conversa con el formato y tono de los ejemplos.\n\n**RLHF:** (1) 100K–1M comparaciones entrenan un **reward model** (copia del SFT con salida escalar, pérdida −log σ(s_w − s_l)); (2) con 10K–100K prompts, **PPO** maximiza r − β·KL respecto del SFT. Sale el modelo final, que prefiere lo que eligen los anotadores.\n\nEn InstructGPT, un 1,3B con SFT+RLHF le ganó en preferencia humana a GPT-3 175B: el pre-training da el conocimiento (~98% del cómputo), pero **seguir instrucciones** no es su objetivo; eso lo enseña el post-training, que cuesta ~1,75% del cómputo (sin contar anotadores).",
+      "puntos_clave": [
+        "Datos y escala de cada etapa (billón de tokens → decenas de miles)",
+        "Objetivo: siguiente token / máscara / RM + PPO",
+        "Modelo base completa, no responde",
+        "Reward model desde el SFT con salida escalar",
+        "KL contra el SFT",
+        "98% vs ~2% del cómputo; 1,3B vs 175B"
+      ]
+    },
+    {
+      "pregunta": "Describí cómo se curan los datos de pre-training a partir de Common Crawl (caso C4) y discutí los problemas que arrastran esos datos.",
+      "respuesta_modelo": "Common Crawl archiva la web cada mes desde 2008 (~20 TB de texto por crawl), pero la mayor parte no es lenguaje natural: menús, errores, duplicados. Google armó **C4** aplicando reglas a mano al crawl de abril 2019: quedarse con líneas que terminan en puntuación, descartar páginas con < 3 oraciones y líneas con < 5 palabras, sacar líneas con 'Javascript' y avisos de cookies, páginas con 'lorem ipsum' o '{' (código), páginas con palabras de una lista negra, deduplicar tramos de 3 oraciones y filtrar inglés con probabilidad ≥ 0,99. De 6,1 TB queda 745 GB, y **el modelo entrenado con texto filtrado rinde mejor en todas las tareas**.\n\nProblemas: el filtro tiene **sesgo** (la lista negra saca 42% del inglés afroamericano vs 6,2% del blanco); **domina el inglés** (Llama 2: 89,70% vs 0,13% castellano); la web se llena de **texto generado** (colapso de modelos: se pierden las colas); el **acceso se restringe** (robots.txt bloqueó ~5% de C4, >28% en fuentes activas); el modelo **hereda sesgos** y sigue pedidos dañinos hasta el post-training. Además, el stock de texto humano se agotaría hacia 2028.",
+      "puntos_clave": [
+        "Common Crawl: qué es y por qué hay que limpiarlo",
+        "Al menos 4 reglas de C4 con su motivo",
+        "6,1 TB → 745 GB y mejora experimental",
+        "Sesgo de la lista negra (42% vs 6,2%)",
+        "Inglés dominante, texto sintético, restricciones de acceso",
+        "Proyección del stock de datos"
+      ]
+    },
+    {
+      "pregunta": "Compará RLHF con PPO, DPO y RL con recompensas verificables (GRPO). ¿Qué problema resuelve cada uno y qué riesgos tiene?",
+      "respuesta_modelo": "**RLHF con PPO:** entrena un reward model con comparaciones humanas y luego optimiza la política (el LLM; acción = elegir token) para maximizar r − β·KL(π‖π_SFT). Resuelve aprender **preferencias** que el SFT no ve. Riesgos: **reward hacking** (el RM se equivoca fuera de su distribución; el KL lo frena), inestabilidad y costo: 4 modelos en memoria (política, referencia, recompensa, valor).\n\n**DPO:** optimiza el mismo objetivo con una pérdida de clasificación directa sobre los pares, usando log-ratios contra un modelo de referencia como recompensa implícita. Sin RM, sin PPO, sin muestrear. Más simple y estable; sigue necesitando pares buena/mala.\n\n**RL con verificador (DeepSeek-R1):** para problemas con respuesta comprobable (matemática 26K, código 17K, STEM 22K, lógica 15K), una **regla** da 1/0 por exactitud más formato `<think>`. **GRPO** muestrea 16 respuestas y compara cada una con el promedio del grupo (PPO sin modelo de valor). Evita reward hacking porque la regla no se engaña; entrena razonamiento (AIME 15,6% → 77,9%, respuestas cada vez más largas). Límite: solo dominios verificables; no evalúa el contenido del razonamiento.",
+      "puntos_clave": [
+        "RM + PPO + KL y reward hacking",
+        "4 modelos en memoria de PPO",
+        "DPO: pérdida directa, sin RM ni muestreo",
+        "Verificador por reglas: exactitud + formato",
+        "GRPO: ventaja relativa al grupo, sin value model",
+        "Resultado R1-Zero y limitación a tareas verificables"
+      ]
+    },
+    {
+      "pregunta": "Explicá cómo un LLM usa una herramienta (por ejemplo, una calculadora o una búsqueda web): qué genera el modelo, quién ejecuta la llamada y cómo se lo entrenó. ¿Dónde encaja MCP?",
+      "respuesta_modelo": "El modelo **nunca ejecuta**: escribe la llamada como texto. En Llama 3.1: `<|python_tag|> wolfram_alpha.call(query=\"100th decimal of pi\") <|eom_id|>`, donde `<|eom_id|>` indica que falta el resultado. El **agente** (tu aplicación) ejecuta, agrega el resultado con rol `ipython` y el modelo sigue. Por API, la **plantilla de chat** traduce JSON a tags y el **parser** traduce la llamada a `tool_calls`; tu código devuelve un `tool_result`/rol `tool`. El loop se repite hasta que el modelo responde sin llamadas. Con búsqueda **nativa**, la plataforma del proveedor ejecuta la búsqueda (`web_search_tool_result`) dentro de la misma respuesta.\n\n**Entrenamiento:** SFT con conversaciones en ese formato (funciones en el system prompt, pedido, llamada esperada), **enmascarando la salida de la herramienta**; para búsqueda, demostraciones de personas buscando y citando más preferencias (WebGPT); preferencias y RL para encadenar llamadas. Toolformer genera datos solo, quedándose con las llamadas que bajan la pérdida.\n\n**MCP** es la interfaz común: el host crea un cliente por servidor, descubre con `tools/list` y ejecuta con `tools/call`; pasa cada herramienta al modelo como **definición** (nombre, descripción, esquema). Como el modelo aprendió function calling genérico, no hay que reentrenarlo por servidor.",
+      "puntos_clave": [
+        "El modelo escribe, no ejecuta",
+        "Tokens especiales / eom_id y rol ipython",
+        "Plantilla de chat y parser",
+        "Tu app vs plataforma (nativa)",
+        "SFT con máscara de la salida; WebGPT; Toolformer",
+        "MCP: host/cliente/servidor, tools/list y tools/call, definiciones"
+      ]
+    },
+    {
+      "pregunta": "Un equipo necesita que un modelo de 8B complete una ficha estructurada siguiendo normas que cambian. ¿Qué parte resolverías con RAG y qué parte con fine-tuning? Justificá con la teoría y estimá la memoria para entrenar en una GPU de 40 GB.",
+      "respuesta_modelo": "**RAG** para lo que **cambia** (los números de las normas): es una falla de información, y si se memoriza en los pesos el modelo falla cuando las normas cambian. **Fine-tuning** para el **oficio**: el formato de la ficha, qué preguntar, cuándo llamar a cada herramienta y las costumbres no escritas — fallas de comportamiento (\"RAG is for facts, finetuning is for form\"). Orden: optimizar el prompt primero (prompt → RAG → fine-tuning) y entrenar con el prompt optimizado.\n\n**Método:** SFT sobre conversaciones curadas (enmascarando system, usuario y resultados de herramientas), opcionalmente DPO con pares buena/mala, o RL con los controles de la ficha como verificador (como GRPO). Datos: **adecuación > tamaño** (OASST1 9k > FLAN 450k; LIMA 1k).\n\n**Memoria:** 8B × 2 bytes = 16 GB de pesos. Ajuste completo con Adam: +8B × 3 × 2 = 48 GB (más activaciones) ≈ 67+ GB > 40 GB. Con **LoRA** se congelan los pesos y solo se entrenan A y B (r ≪ d), así gradientes y estados de Adam son de millones de parámetros; con **QLoRA** el base va en 4 bits (~4 GB). Un prompt largo y mucho texto recuperado también consumen VRAM: acortarlos permite más casos en paralelo.",
+      "puntos_clave": [
+        "RAG para conocimiento que cambia; FT para comportamiento",
+        "Orden prompt → RAG → FT",
+        "SFT con máscara / DPO / RL con verificador",
+        "Cuenta: 16 GB pesos + 48 GB Adam > 40 GB",
+        "LoRA/QLoRA como solución",
+        "Calidad y adecuación de datos"
+      ]
+    },
+    {
+      "pregunta": "¿Qué es una ley de escala? Explicá la fórmula C ≈ 6ND, la regla de Chinchilla y por qué los modelos actuales se entrenan muy por encima de ella. ¿Qué límite impone el stock de datos?",
+      "respuesta_modelo": "Una ley de escala dice cuál es el mejor modelo (menor pérdida) para un presupuesto de cómputo C, eligiendo N parámetros y D tokens. Se relacionan por **C ≈ 6ND** FLOPs: 2 operaciones por parámetro y token en el forward y 4 en el backward. Kaplan (2020) recomendaba crecer sobre todo en parámetros (GPT-3: 175B con 300B tokens, 1,7 tokens/param). **Chinchilla** (Hoffmann, 2022) mostró que conviene escalar ambos en igual proporción: ~**20 tokens por parámetro**; con el cómputo de Gopher (280B, 300B tokens), Chinchilla (70B, 1,4T) ganó (MMLU 67,6% vs 60,0%).\n\nHoy se **sobreentrena** (Llama 3 70B: 15T tokens, 214 tokens/param; el 8B ~100× sobre Chinchilla) porque el entrenamiento se paga una vez y la inferencia en cada token: un modelo más chico es más barato de servir.\n\nEl límite: los datasets crecen ~2,4× por año y alcanzan el stock efectivo de texto humano público (~320 billones de tokens) hacia **2028** (2026–2032), antes si se sobreentrena. Escribir texto pagando personas no escala. Salidas: datos sintéticos verificables (matemática, código), datos propietarios, otras modalidades.",
+      "puntos_clave": [
+        "Definición de ley de escala",
+        "C ≈ 6ND y el origen del 6",
+        "Kaplan vs Chinchilla con la tabla",
+        "20 tokens/param",
+        "Sobreentrenamiento por costo de inferencia",
+        "Villalobos: 2028, 2,4×/año, 320T"
+      ]
+    }
+  ],
+  "conexiones": [
+    {
+      "clase": 8,
+      "relacion": "El pre-training es exactamente la pérdida del siguiente token (cross-entropy) del transformer de la clase 8, aplicada a la web; SFT reutiliza esa pérdida con máscara."
+    },
+    {
+      "clase": 5,
+      "relacion": "Prompting, costo por token y modelos de razonamiento: acá se ve de qué etapa viene cada comportamiento (seguir instrucciones = SFT/RLHF; razonar = RL con verificador) y por qué el prompt va antes que el fine-tuning."
+    },
+    {
+      "clase": 6,
+      "relacion": "RAG corrige fallas de información y el fine-tuning fallas de comportamiento; si hacen falta ambos, se empieza por RAG."
+    },
+    {
+      "clase": 7,
+      "relacion": "MCP y tool calling: en la clase 7 se armó el loop del lado del agente; acá se ve el lado del modelo (cómo se entrena a emitir llamadas, plantilla de chat, parser, tokens especiales)."
+    },
+    {
+      "clase": 3,
+      "relacion": "Cross-entropy, descenso por gradiente, backpropagation y Adam son la base de todas las etapas; la cuenta de memoria del fine-tuning suma gradientes y estados del optimizador."
+    },
+    {
+      "clase": 10,
+      "relacion": "Los agentes y sistemas multiagente dependen de modelos entrenados para encadenar llamadas a herramientas (SFT + preferencias + RL de varios pasos)."
+    },
+    {
+      "clase": 13,
+      "relacion": "Alineación: RLHF, Constitutional AI y la negativa a pedidos dañinos (mail de estafa de Llama 2) son la base técnica de la alineación y sus límites (reward hacking, sesgos heredados)."
+    }
+  ],
+  "lecturas": [
+    "Ouyang et al. 2022 (OpenAI), Training language models to follow instructions with human feedback (InstructGPT)",
+    "Huyen 2023, RLHF: Reinforcement Learning from Human Feedback (blog) y AI Engineering (2025), caps. 2 y 7",
+    "Raffel et al. 2020, Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer (T5 / C4)",
+    "Dodge et al. 2021, Documenting Large Webtext Corpora: A Case Study on the Colossal Clean Crawled Corpus",
+    "Kaplan et al. 2020, Scaling Laws for Neural Language Models",
+    "Hoffmann et al. 2022, Training Compute-Optimal Large Language Models (Chinchilla)",
+    "Villalobos et al. 2024, Will we run out of data? Limits of LLM scaling based on human-generated data",
+    "Longpre et al. 2024, Consent in Crisis; Shumailov et al. 2023, The Curse of Recursion; Touvron et al. 2023, Llama 2",
+    "Bai et al. 2022 (Anthropic), Constitutional AI: Harmlessness from AI Feedback",
+    "Rafailov et al. 2023, Direct Preference Optimization: Your Language Model Is Secretly a Reward Model",
+    "DeepSeek-AI 2025, DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning",
+    "Cobbe et al. 2021, Training Verifiers to Solve Math Word Problems (GSM8K); Schick et al. 2023, Toolformer; Nakano et al. 2021, WebGPT",
+    "Lambert, RLHF Book, cap. 13 (tool use); Meta, formato de prompt de Llama 3.1; docs de MCP (arquitectura)",
+    "Hu et al. 2021, LoRA: Low-Rank Adaptation of Large Language Models; Dettmers et al. 2023, QLoRA",
+    "Guías de fine-tuning: Hugging Face TRL SFTTrainer, Unsloth, Google (QLoRA con Gemma), Azure Foundry"
+  ]
+}

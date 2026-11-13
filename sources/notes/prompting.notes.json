@@ -1,0 +1,788 @@
+[
+ {
+  "i": 0,
+  "resumen": "Portada de la clase 5: prompts, costos y uso de LLMs en producción.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 1,
+  "resumen": "Agenda: primero cómo funciona el modelo y cuánto cuesta, después el oficio de escribir prompts y razonar.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 2,
+  "resumen": "El **prompt** es la única palanca de control una vez elegido el modelo: como un ticket, si es vago, la implementación sale distinta.",
+  "claves": [
+   "prompt-engineering",
+   "llm"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 3,
+  "resumen": "En la ventana entran system prompt, historial, datos inyectados y respuestas previas; todo compite por atención. **Más contexto no es mejor contexto.**",
+  "claves": [
+   "ventana-de-contexto",
+   "system-prompt",
+   "contexto-sobre-prompting"
+  ],
+  "tp": [
+   {
+    "tp": 4,
+    "texto": "En el TP4 mediste el reparto del contexto por caso: el prompt de sistema era el 55 % y las búsquedas el 25 %."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "agentes-y-multiagentes#41",
+    "por": "El contexto se degrada (context rot)"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 4,
+  "resumen": "La **ventana de contexto** es memoria de trabajo (RAM, no disco): finita, no persiste entre sesiones, y lo que queda afuera no existe para el modelo.",
+  "claves": [
+   "ventana-de-contexto",
+   "token"
+  ],
+  "tp": [
+   {
+    "tp": 4,
+    "texto": "El agente del TP4 corta un caso si no entra en la ventana, en vez de recortar en silencio."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "cowork-intro#12",
+    "por": "Manejo del contexto en agentes"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 5,
+  "resumen": "Un millón de tokens ≈ El Señor de los Anillos más El Hobbit (~750 mil tokens), y sobra lugar. La ventana dejó de ser el límite práctico.",
+  "claves": [
+   "ventana-de-contexto",
+   "token"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 6,
+  "resumen": "**BPE** fusiona los pares de caracteres más frecuentes: lo común es un token, lo raro se parte. Cada familia de modelos tiene su vocabulario.",
+  "claves": [
+   "tokenizacion",
+   "token"
+  ],
+  "ver": [
+   {
+    "ref": "palabra-al-transformer#10",
+    "por": "Los modelos no leen letras"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 7,
+  "resumen": "Se procesa y se factura en **tokens**, no palabras. El código y el JSON tokenizan peor que la prosa; centavos que se multiplican por miles de llamadas.",
+  "claves": [
+   "token",
+   "costo-por-token"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 8,
+  "resumen": "**Costo = tokens entrada × precio + tokens salida × precio.** Cada turno reenvía todo el historial: un chat de 20 turnos paga el primero 20 veces.",
+  "claves": [
+   "costo-por-token",
+   "token"
+  ],
+  "tp": [
+   {
+    "tp": 3,
+    "texto": "Tus logs del TP3 registraban tokens y costo por llamada: ~USD 0,0015 por corrida del agente contra ~0,017 del juez (más de 10×)."
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 9,
+  "resumen": "El **caching** guarda el cómputo de un **prefijo**, no respuestas. Si cambia un byte, todo lo posterior se recalcula: lo estable va adelante.",
+  "claves": [
+   "prompt-caching",
+   "kv-cache"
+  ],
+  "ver": [
+   {
+    "ref": "transformers-a-fondo#11",
+    "por": "Ciclo de generación del transformer"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 10,
+  "resumen": "En un chat el prefijo crece solo; en una aplicación vos armás el pedido y decidís dónde corta lo reutilizable de lo variable.",
+  "claves": [
+   "prompt-caching"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 11,
+  "resumen": "Se marca con `cache_control` lo estático (system prompt, guías, docs) arriba y lo dinámico (diff, consulta) abajo. Mal ordenado falla en silencio.",
+  "claves": [
+   "prompt-caching",
+   "system-prompt"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 12,
+  "resumen": "Transición: todo lo anterior es **economía de tokens**. Ya se mide el costo; la pregunta abierta es el valor que genera.",
+  "claves": [
+   "costo-por-token"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 13,
+  "resumen": "La Linux Foundation lanzó la **Tokenomics Foundation** (2026) para estandarizar la medición: el token es la unidad común, pero no hay forma estándar de comparar proveedores.",
+  "claves": [
+   "costo-por-token"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 14,
+  "resumen": "Tres fallas de familia: **alucinaciones**, **no-determinismo** y **sesgo de recencia** (importa más el principio y el final). Se administran con diseño, no con mejor modelo.",
+  "claves": [
+   "alucinacion",
+   "no-determinismo",
+   "sesgo de recencia"
+  ],
+  "tp": [
+   {
+    "tp": 3,
+    "texto": "En el TP3 usaste temperatura 0 y aun así concluiste que, con 12 preguntas y una corrida, una pregunta de diferencia era ruido."
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 15,
+  "resumen": "El modelo genera el token más probable aunque no tenga el dato: no tiene un canal para decir «no sé», y lo inventado suena igual de seguro.",
+  "claves": [
+   "alucinacion",
+   "llm"
+  ],
+  "ver": [
+   {
+    "ref": "introduccion#13",
+    "por": "Limitaciones de la IA generativa"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 16,
+  "resumen": "Air Canada respondió por lo que inventó su chatbot: **quien despliega el modelo responde** por lo que dice. Hay más de mil casos judiciales documentados.",
+  "claves": [
+   "alucinacion",
+   "responsabilidad"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 17,
+  "resumen": "Palancas dentro de la llamada, de barata a cara: **grounding** (responder solo con el contexto y admitir «no sé»), RAG, self-consistency y revisión humana.",
+  "claves": [
+   "alucinacion",
+   "rag",
+   "system-prompt"
+  ],
+  "tp": [
+   {
+    "tp": 3,
+    "texto": "El prompt del TP3 obligaba a usar solo datos de las herramientas y decir cuando faltaban: Faithfulness 5,00 en las 4 corridas."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "rag-y-mcp#2",
+    "por": "RAG: lo que no está en los pesos"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 18,
+  "resumen": "Testear prompts como código: eval set de 50–100 casos con ground truth, métricas (faithfulness), regresión en cada cambio y red teaming.",
+  "claves": [
+   "evals",
+   "alucinacion"
+  ],
+  "tp": [
+   {
+    "tp": 4,
+    "texto": "En el TP4 elegiste prompts en un prompt-dev propio y dejaste práctica solo para reportar, para no sobreajustar al conjunto de evaluación."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "modelado-redes-neuronales#16",
+    "por": "Train, validación y test"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 19,
+  "resumen": "Los LLM son **motores de completado**: un buen prompt es un patrón fácil de completar. Esa idea explica XML, few-shot y CoT.",
+  "claves": [
+   "llm",
+   "prompt-engineering"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 20,
+  "resumen": "Separador: tarifas por familia, cuándo conviene cada modelo, caching y cascading.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 21,
+  "resumen": "En la familia Claude la **salida cuesta 5×** la entrada; entre Haiku y el tope, ×10. Cache hit = 10 % del precio de entrada; batch = 50 %.",
+  "claves": [
+   "costo-por-token",
+   "prompt-caching"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 22,
+  "resumen": "Árbol para elegir modelo: primero dificultad de la tarea, después contexto necesario y recién al final costo. Las preguntas duran más que los nombres.",
+  "claves": [
+   "eleccion de modelo",
+   "costo-por-token"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 23,
+  "resumen": "**Model cascading**: primero el modelo barato y, si la confianza es baja, se escala al caro. Todo el ahorro depende de que el gate sea confiable.",
+  "claves": [
+   "model-cascading",
+   "costo-por-token"
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 24,
+  "resumen": "El gate es un campo `confianza` del esquema de salida, garantizado por structured outputs. Aun escalando 8 de cada 10, la cascada empata con el caro.",
+  "claves": [
+   "model-cascading",
+   "structured-output"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 25,
+  "resumen": "Conviene con alto volumen, señal de confianza clara y presión de costo. Es un componente más que mantener: primero probá el buen modelo con effort bajo.",
+  "claves": [
+   "model-cascading",
+   "effort"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 26,
+  "resumen": "Separador: armar un prompt en seis partes, con etiquetas XML y salidas JSON validables.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 27,
+  "resumen": "Seis componentes en orden: **rol, contexto, instrucciones, restricciones, ejemplos e input**. La estructura separa un prototipo de un sistema de producción.",
+  "claves": [
+   "prompt-engineering",
+   "system-prompt"
+  ],
+  "tp": [
+   {
+    "tp": 4,
+    "texto": "Tu prompt procedimiento-v1 del TP4 agregó instrucciones paso a paso (buscar cada tema por separado): de 10/10/7 a 14/16/12 casos resueltos."
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 28,
+  "resumen": "Ejemplo completo para revisar un PR. Las **restricciones** son el bloque que más trabaja y el ejemplo fija el formato exacto que el modelo copia.",
+  "claves": [
+   "prompt-engineering",
+   "few-shot"
+  ],
+  "ver": [
+   {
+    "ref": "cowork-intro#16",
+    "por": "Un ejemplo de CLAUDE.md"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 29,
+  "resumen": "Pedir JSON en el prompt es una sugerencia; las **salidas estructuradas** de la API lo garantizan al decodificar. Si la salida alimenta código, se usa la garantía.",
+  "claves": [
+   "structured-output"
+  ],
+  "tp": [
+   {
+    "tp": 4,
+    "texto": "El agente del TP4 responde con acciones JSON y tiene un mensaje de corrección cuando el JSON llega inválido."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "como-se-entrena-un-llm#41",
+    "por": "De los tokens al JSON"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 30,
+  "resumen": "Las **etiquetas XML** marcan dónde empieza y termina cada parte; además separan instrucción de dato, cerrando una puerta a la prompt injection.",
+  "claves": [
+   "prompt-engineering",
+   "prompt-injection"
+  ],
+  "ver": [
+   {
+    "ref": "cierre-magnifica-humanitas#15",
+    "por": "Para el modelo, todo es texto"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 31,
+  "resumen": "Separador: enseñar con ejemplos dentro del prompt (zero, few y many-shot).",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 32,
+  "resumen": "**In-context learning**: el modelo toma el patrón de los ejemplos del prompt **sin tocar los pesos**. Zero-shot sin ejemplos, few-shot 2–10, many-shot decenas o cientos.",
+  "claves": [
+   "in-context-learning",
+   "few-shot"
+  ],
+  "ver": [
+   {
+    "ref": "como-se-entrena-un-llm#52",
+    "por": "Prompt, RAG o fine-tuning"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 33,
+  "resumen": "Mismo issue: en zero-shot el modelo inventa su escala y no se puede parsear; con dos ejemplos la escala deja de ser suya.",
+  "claves": [
+   "few-shot",
+   "in-context-learning"
+  ],
+  "tp": [
+   {
+    "tp": 3,
+    "texto": "En el TP3 sacaste del ejemplo de la descripción la pregunta A01 de dev, para no filtrar el conjunto de evaluación al sistema."
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 34,
+  "resumen": "**Many-shot**: cuando few-shot no cubre la variabilidad. Cada error en producción se agrega como ejemplo: mejora continua sin reentrenar, con costo lineal en tokens.",
+  "claves": [
+   "few-shot",
+   "in-context-learning"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 35,
+  "resumen": "Separador: la sección central, todo lo que el modelo escribe antes de contestar.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 36,
+  "resumen": "CoT, self-consistency, ToT y prompt chaining comparten una idea: **hacen que el modelo escriba más antes de responder**.",
+  "claves": [
+   "chain-of-thought",
+   "self-consistency",
+   "tree-of-thought",
+   "prompt-chaining"
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 37,
+  "resumen": "**Chain of Thought**: pedir o mostrar el razonamiento paso a paso. Las mejoras publicadas son relativas a CoT, no precisión absoluta: leer bien los papers.",
+  "claves": [
+   "chain-of-thought"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 38,
+  "resumen": "Con y sin CoT el resultado coincide, pero solo uno se puede **auditar**: con los pasos escritos, el error se ve donde ocurre.",
+  "claves": [
+   "chain-of-thought"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 39,
+  "resumen": "**Self-consistency**: muestrear varias cadenas del mismo prompt y votar por mayoría. Para alto riesgo; N llamadas cuestan N veces.",
+  "claves": [
+   "self-consistency",
+   "chain-of-thought"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 40,
+  "resumen": "Cinco corridas sobre el mismo diff: la disidente no alucina, lee distinto. La «confianza» del 67 % es proporción de votos, no probabilidad calibrada.",
+  "claves": [
+   "self-consistency"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 41,
+  "resumen": "**Tree of Thought**: explorar ramas, puntuarlas y podar. CoT es el árbol con una sola rama y sin vuelta atrás. Mucho más caro.",
+  "claves": [
+   "tree-of-thought",
+   "chain-of-thought"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 42,
+  "resumen": "Tres refactors defendibles: gana el que acota el riesgo y se puede testear aparte, no el más elegante. ToT rinde cuando hay varias respuestas válidas.",
+  "claves": [
+   "tree-of-thought"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 43,
+  "resumen": "**Prompt chaining**: dividir la tarea en prompts simples encadenados. Cada paso es más preciso y se puede evaluar por separado; suma latencia.",
+  "claves": [
+   "prompt-chaining"
+  ],
+  "ver": [
+   {
+    "ref": "agentes-y-multiagentes#14",
+    "por": "Workflow o agente"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 44,
+  "resumen": "Encadenar facilita el debug y los reintentos por paso, y puede salir **más barato**: modelo chico en pasos simples, caro solo al final.",
+  "claves": [
+   "prompt-chaining",
+   "model-cascading"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 45,
+  "resumen": "Tabla comparativa: todas las contras son la misma, **más tokens o más llamadas**. Ninguna técnica compra calidad gratis.",
+  "claves": [
+   "chain-of-thought",
+   "self-consistency",
+   "tree-of-thought",
+   "prompt-chaining"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 46,
+  "resumen": "Más calidad es más tokens generados y más segundos: CoT 2–5× de latencia, self-consistency N× (en paralelo cuesta N en plata y 1 en tiempo).",
+  "claves": [
+   "costo-por-token",
+   "latencia"
+  ],
+  "tp": [
+   {
+    "tp": 4,
+    "texto": "procedimiento-v1 del TP4 mejoró los casos resueltos, pero subió el contexto ~2,6× (~52 mil caracteres por caso) y de ~16 a ~25 s por caso."
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 47,
+  "resumen": "La tesis: el LLM **predice token a token** y cada token depende solo de los anteriores. Escribir los pasos no documenta el razonamiento: **es** el cómputo.",
+  "claves": [
+   "chain-of-thought",
+   "llm"
+  ],
+  "ver": [
+   {
+    "ref": "transformers-a-fondo#20",
+    "por": "La máscara causal"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 48,
+  "resumen": "Separador: controlar cuánto razona el modelo por parámetro, no por texto.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 49,
+  "resumen": "**Thinking adaptativo**: el modelo decide en cada pedido si piensa y cuánto. El código no puede asumir que siempre llega un bloque de thinking.",
+  "claves": [
+   "thinking-adaptativo"
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 50,
+  "resumen": "En código, `display` va dentro de `thinking`, y la respuesta es una lista de bloques: `content[0].text` se rompe si no hubo thinking.",
+  "claves": [
+   "thinking-adaptativo"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 51,
+  "resumen": "Sin thinking, el modelo responde en una sola pasada: sin borrador ni verificación, y cada token emitido lo ata a lo que ya dijo.",
+  "claves": [
+   "thinking-adaptativo",
+   "chain-of-thought"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 52,
+  "resumen": "El bloque separado es un **borrador**: puede equivocarse, verificar y cambiar de rumbo antes de la respuesta. No es una función de la interfaz.",
+  "claves": [
+   "thinking-adaptativo"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 53,
+  "resumen": "**DeepSeek-R1** (Nature, 2025) mostró que el razonamiento surge con **refuerzo puro** y recompensa verificable, sin razonamientos anotados por humanos.",
+  "claves": [
+   "rl-con-verificador",
+   "thinking-adaptativo"
+  ],
+  "ver": [
+   {
+    "ref": "como-se-entrena-un-llm#31",
+    "por": "RL con verificador: el proceso"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 54,
+  "resumen": "CoT sigue valiendo, pero los modelos de razonamiento ya lo traen del entrenamiento: el mecanismo es el mismo y cambió quién pide los pasos.",
+  "claves": [
+   "chain-of-thought",
+   "thinking-adaptativo"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 55,
+  "resumen": "**effort** es un parámetro de la petición (en `output_config`, no en `thinking`) que gradúa cuántos tokens gasta el mismo modelo. `high` es el default.",
+  "claves": [
+   "effort"
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 56,
+  "resumen": "Cinco niveles, de rápido a exhaustivo. Afecta texto, tools y thinking: es una **señal de comportamiento**, no un presupuesto de tokens.",
+  "claves": [
+   "effort"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 57,
+  "resumen": "Por dentro, el effort son tokens que el modelo **lee** junto al prompt; el comportamiento por nivel es aprendido, no programado.",
+  "claves": [
+   "effort"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 58,
+  "resumen": "Pensar es **promptable**: el effort fija la postura general y el lenguaje natural ajusta cada turno.",
+  "claves": [
+   "effort",
+   "thinking-adaptativo",
+   "prompt-engineering"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 59,
+  "resumen": "Frases textuales de la documentación para subir o bajar el thinking: la del system prompt afecta toda la conversación; la del turno, solo ese turno.",
+  "claves": [
+   "thinking-adaptativo",
+   "system-prompt"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 60,
+  "resumen": "Separador: dónde entran los LLM en el ciclo de vida del software, con riesgos y mitigaciones.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 61,
+  "resumen": "Del issue a producción, el LLM aporta en cada etapa: triage, diseño, implementación, review, tests y operación.",
+  "claves": [
+   "agente-de-codigo"
+  ],
+  "ver": [
+   {
+    "ref": "cowork-intro#4",
+    "por": "Delegar una tarea completa"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 62,
+  "resumen": "El uso que más tiempo ahorra es **entender código existente**: búsqueda por intención (dónde se decide algo), no por texto como `grep`.",
+  "claves": [
+   "agente-de-codigo",
+   "busqueda semantica"
+  ],
+  "ver": [
+   {
+    "ref": "rag-y-mcp#19",
+    "por": "Encontrar por significado"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 63,
+  "resumen": "Casos ya desplegados. Ojo: un test generado desde el código verifica que hace lo que hace, no que hace lo correcto.",
+  "claves": [
+   "agente-de-codigo",
+   "tdd"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 64,
+  "resumen": "Caso Glasswing (2026): un modelo encontró de forma autónoma miles de vulnerabilidades críticas, algunas de 27 años. La misma capacidad sirve para atacar.",
+  "claves": [
+   "seguridad",
+   "vulnerabilidades"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 65,
+  "resumen": "Oportunidades (bajar el piso, liberar tiempo) contra riesgos técnicos y organizacionales. El más silencioso es la **dependencia excesiva**.",
+  "claves": [
+   "deskilling",
+   "sesgo-de-automatizacion"
+  ],
+  "ver": [
+   {
+    "ref": "cierre-magnifica-humanitas#35",
+    "por": "El riesgo del deskilling"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 66,
+  "resumen": "Mitigaciones de siempre aplicadas al prompt: **revisión humana obligatoria**, tests y versionado. La revisión humana es el piso no negociable.",
+  "claves": [
+   "humano-en-el-circuito",
+   "evals"
+  ],
+  "tp": [
+   {
+    "tp": 4,
+    "texto": "En el TP4 versionaste los prompts en un PromptSpec con sha256: cada número reportado dice qué prompt lo produjo."
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 67,
+  "resumen": "Para discutir: la evidencia de productividad es floja y la brecha de uso es real. ¿Quién firma el código generado? Quien lo mergea.",
+  "claves": [
+   "humano-en-el-circuito"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 68,
+  "resumen": "Un **benchmark** compara modelos en una tarea cerrada; dice poco de cómo rinden en tu repo. Lo que vale es tu propio eval set.",
+  "claves": [
+   "saturacion-de-benchmarks",
+   "evals"
+  ],
+  "ver": [
+   {
+    "ref": "cierre-magnifica-humanitas#5",
+    "por": "Los benchmarks se agotan"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 69,
+  "resumen": "Separador: cierre y práctica domiciliaria.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 70,
+  "resumen": "Tarea: cuatro módulos de aitutorial.dev (45–60 min) sobre fundamentos, estructura, técnicas avanzadas y testing de prompts.",
+  "claves": [
+   "prompt-engineering"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 71,
+  "resumen": "Tres ideas: el modelo **completa, no razona**; cada punto de calidad se paga en tokens, latencia y plata; la habilidad es emparejar técnica y modelo con la dificultad real.",
+  "claves": [
+   "llm",
+   "costo-por-token",
+   "chain-of-thought"
+  ],
+  "clave_examen": true
+ }
+]

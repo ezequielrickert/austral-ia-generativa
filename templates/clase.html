@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block title %}Clase {{ page.extra.num }} · {{ page.title }} · IA Generativa{% endblock title %}
+{% block main_class %}is-viewer{% endblock main_class %}
+{% block content %}
+{% set c = load_data(path=page.extra.data) %}
+<div class="viewer-page" id="viewer" data-class="{{ c.num }}">
+<header class="page-header">
+  <div class="ph-main">
+    <nav class="crumbs"><a href="{{ config.base_url }}/">Clases</a><span class="sep">/</span><span>Clase {{ c.nn }}</span><span class="sep">·</span><span>{{ c.fecha }}</span><span class="sep">·</span><span>{{ c.bloque }}</span></nav>
+    <h1>{{ c.titulo }}</h1>
+  </div>
+  <div class="ph-actions">
+    {% if c.multi %}
+    <div class="seg" role="tablist" aria-label="Presentaciones de la clase">
+      {% for d in c.decks %}<button role="tab" data-deck="{{ d.slug }}" aria-selected="{% if loop.first %}true{% else %}false{% endif %}" title="{% if d.extra %}Complementaria: no figura en el calendario de la materia{% else %}{{ d.titulo }}{% endif %}">{{ d.tab }}{% if d.extra %}<span class="pill" style="height:18px;font-size:10.5px">Complementaria</span>{% endif %}</button>{% endfor %}
+    </div>
+    {% endif %}
+    <button class="btn icon" id="focus-btn" aria-pressed="false" title="Modo foco: ocultar el menú (f)" aria-label="Modo foco"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg></button>
+    <a class="btn" href="{{ config.base_url }}/practica/#c{{ c.num }}">Practicar</a>
+    <a class="btn icon {% if not c.prev %}disabled{% endif %}" {% if c.prev %}href="{{ config.base_url }}/clases/{{ c.prev }}/"{% endif %} aria-label="Clase anterior" title="Clase anterior"><svg class="i" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></a>
+    <a class="btn icon {% if not c.next %}disabled{% endif %}" {% if c.next %}href="{{ config.base_url }}/clases/{{ c.next }}/"{% endif %} aria-label="Clase siguiente" title="Clase siguiente"><svg class="i" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></a>
+  </div>
+</header>
+
+<div class="viewer-area">
+<div class="viewer">
+  <section class="card stage-card">
+    <div class="card-header">
+      <span class="card-sub" id="sec-name">&nbsp;</span>
+      <div class="seg" id="filter" aria-label="Filtrar diapositivas">
+        <button aria-pressed="true" data-f="all">Todas<span class="fc mono" data-fc="all"></span></button>
+        <button aria-pressed="false" data-f="key"><span class="bar"></span>Clave<span class="fc mono" data-fc="key"></span></button>
+        <button aria-pressed="false" data-f="tp"><span class="dot"></span>En TPs<span class="fc mono" data-fc="tp"></span></button>
+      </div>
+    </div>
+    <div class="stage" id="stage">
+      <iframe id="deck-frame" title="Diapositivas de la clase" allow="autoplay; fullscreen"></iframe>
+      <button class="tp-mark" id="tp-mark" hidden aria-expanded="false" aria-controls="tp-pop" title="¿Dónde lo usaste? (t)"><b>?</b><span id="tp-mark-label">TP</span></button>
+      <div class="tp-pop card" id="tp-pop" hidden role="dialog" aria-label="Dónde lo usaste en los TPs"></div>
+    </div>
+    <div class="card-footer">
+      <button class="btn icon sm" id="prev" aria-label="Diapositiva anterior"><svg class="i" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>
+      <span class="pos" id="pos">—</span>
+      <button class="btn icon sm" id="next" aria-label="Diapositiva siguiente"><svg class="i" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>
+      {% for d in c.decks %}
+      <div class="scrub" data-scrub="{{ d.slug }}" {% if not loop.first %}hidden{% endif %} role="slider" aria-label="Ir a una diapositiva" aria-valuemin="0" aria-valuemax="{{ d.total - 1 }}" tabindex="0">
+        {% for s in d.slides %}<span class="tk{% if s.key %} key{% endif %}{% if s.tp %} tp{% endif %}" data-i="{{ s.i }}" data-t="{{ s.title }}"></span>{% endfor %}
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <aside class="card side-card" id="side-card">
+    <div class="card-header">
+      <div class="seg" role="tablist" data-tabs="side-card">
+        <button role="tab" data-tab="nota" aria-selected="true">Nota</button>
+        <button role="tab" data-tab="indice" aria-selected="false">Índice</button>
+      </div>
+      <span class="count mono faint" id="note-pos" style="font-size:12px"></span>
+    </div>
+
+    <div class="side-panel" data-panel="nota" id="notes" aria-live="polite">
+      {% for d in c.decks %}
+        {% for s in d.slides %}
+        <article class="note" data-deck="{{ d.slug }}" data-i="{{ s.i }}" hidden>
+          <div class="card-section head">
+            <h2>{{ s.title }}</h2>
+            {% if s.key %}<span class="pill key" style="align-self:flex-start">Clave para el examen</span>{% endif %}
+            {% if s.resumen %}<p class="summary">{{ s.resumen | markdown(inline=true) | safe }}</p>{% endif %}
+          </div>
+          {% if s.claves %}
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords">{% for k in s.claves %}{% if k.glos %}<a href="{{ config.base_url }}/glosario/#{{ k.id }}">{{ k.label }}</a>{% else %}<span>{{ k.label }}</span>{% endif %}{% endfor %}</div>
+          </div>
+          {% endif %}
+          {% if s.ver %}
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div>{% for v in s.ver %}<a href="{{ config.base_url }}{{ v.url }}"><span class="ref">{{ v.cnn }}·{{ v.i }}</span><span><span class="t">{{ v.title }}</span>{% if v.por and v.por != v.title %}<small>{{ v.por }}</small>{% endif %}</span></a>{% endfor %}</div>
+          </div>
+          {% endif %}
+          {% if s.tp %}
+          <template class="tp-data">{% for t in s.tp %}<div class="tp-ref" data-tp="{{ t.tp }}"><a href="{{ config.base_url }}/tp/{{ t.tp }}/">TP{{ t.tp }} · {{ t.tp_titulo }}</a><span>{{ t.texto | markdown(inline=true) | safe }}</span>{% if t.code %}<button class="btn sm code-btn" data-code="{{ t.code }}" data-nota="{{ t.nota }}"><svg class="i" viewBox="0 0 24 24"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></svg>Ver en el código</button>{% endif %}</div>{% endfor %}</template>
+          {% endif %}
+        </article>
+        {% endfor %}
+      {% endfor %}
+    </div>
+
+    <div class="side-panel" data-panel="indice" hidden>
+      {% for d in c.decks %}
+      <div data-index="{{ d.slug }}" {% if not loop.first %}hidden{% endif %}>
+        {% for g in d.groups %}
+        <details class="idx-sec" data-first="{{ g.first }}" data-last="{{ g.last }}">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">{{ g.label }}</span>
+            <span class="range">{{ g.first }}–{{ g.last }}</span>
+          </summary>
+          <div class="idx-list">
+            {% for s in g.slides %}<button class="idx-row" data-i="{{ s.i }}"><span class="n">{{ s.i }}</span><span class="t">{{ s.title }}</span><span class="marks">{% if s.tp %}<span class="mk-tp"></span>{% endif %}{% if s.key %}<span class="mk-key"></span>{% endif %}</span></button>{% endfor %}
+          </div>
+        </details>
+        {% endfor %}
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="card-footer side-foot">
+      <button class="btn sm" id="star" title="Marcar para repasar (m)"><svg class="i" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg><span>Marcar</span></button>
+      <span class="hints"><kbd>←</kbd><kbd>→</kbd> <kbd>t</kbd> <kbd>m</kbd></span>
+    </div>
+  </aside>
+</div>
+</div>
+</div>
+{% for sn in c.snippets %}{% include "partials/snippet.html" %}{% endfor %}
+{% endblock content %}
+{% block scripts %}<script src="{{ get_url(path='js/viewer.js') }}"></script>{% endblock scripts %}

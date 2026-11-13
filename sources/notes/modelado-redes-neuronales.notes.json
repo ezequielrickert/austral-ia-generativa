@@ -1,0 +1,863 @@
+[
+ {
+  "i": 0,
+  "resumen": "Portada de la clase 4: modelado de un MLP.",
+  "claves": [],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 1,
+  "resumen": "Agenda: qué se diseña, entrada, partición, salida, loss, backpropagation, medir clasificadores y capas ocultas.",
+  "claves": [],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 2,
+  "resumen": "La red solo ve una **fila de floats** de largo fijo. Convertir el dato en esa fila es una traducción con pérdida.",
+  "claves": [
+   "codificacion-de-entrada"
+  ],
+  "tp": [
+   {
+    "tp": 2,
+    "texto": "La lección central del TP2: con la misma red 32-32, solo cambiar cómo armaste la entrada bajó el MAE 60%."
+   }
+  ],
+  "ver": [],
+  "clave_examen": true
+ },
+ {
+  "i": 3,
+  "resumen": "Cada dato tiene una **forma natural** (cuántos ejes necesita); esa forma decide la arquitectura, no al revés. Tabla → MLP.",
+  "claves": [
+   "perceptron-multicapa",
+   "sesgo-inductivo"
+  ],
+  "tp": [],
+  "ver": [
+   {
+    "ref": "segmentacion-y-stable-diffusion#2",
+    "por": "Por qué el MLP no sirve para imágenes"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 4,
+  "resumen": "**MLP**: entrada, una o más capas ocultas densas (cada neurona conectada a todas las anteriores) y salida.",
+  "claves": [
+   "perceptron-multicapa",
+   "capa"
+  ],
+  "tp": [],
+  "ver": [
+   {
+    "ref": "intro-redes-neuronales#11",
+    "por": "Capas ocultas, de la clase 3"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 5,
+  "resumen": "Repaso: $z=W\\cdot x+b$ y $a=f(z)$. Sin la no linealidad, cinco capas son una regresión lineal. Parámetros por capa: $m\\cdot n+m$.",
+  "claves": [
+   "neurona",
+   "no-linealidad"
+  ],
+  "tp": [],
+  "ver": [
+   {
+    "ref": "intro-redes-neuronales#24",
+    "por": "Demostración del colapso lineal"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 6,
+  "resumen": "Diseñar un MLP son seis decisiones (entrada, partición, salida, loss, métrica, capas). Cuántas capas es la que **menos** pesa.",
+  "claves": [
+   "perceptron-multicapa",
+   "diseño"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 7,
+  "resumen": "Aplanar lo pide el MLP, no el dato: una tabla da nodos sueltos; secuencias, imágenes y RGB son otra forma.",
+  "claves": [
+   "codificacion-de-entrada"
+  ],
+  "tp": [],
+  "ver": [
+   {
+    "ref": "segmentacion-y-stable-diffusion#3",
+    "por": "Entradas de largo fijo"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 8,
+  "resumen": "Separador: modelar la entrada.",
+  "claves": [],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 9,
+  "resumen": "Dato **tabular**: una fila por ejemplo, una columna por variable, sin vecindad ni orden entre columnas. Por eso encaja con el MLP.",
+  "claves": [
+   "tabular",
+   "perceptron-multicapa"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 10,
+  "resumen": "La pregunta que decide la codificación: **¿qué significa la resta entre dos valores?** Cantidad real, solo orden, o nada.",
+  "claves": [
+   "codificacion-de-entrada"
+  ],
+  "tp": [
+   {
+    "tp": 2,
+    "texto": "Tu tabla de decisiones del M1 aplicó esta pregunta columna por columna y detectó las tres trampas: `ListingId`, `MonthSold` y `District`."
+   }
+  ],
+  "ver": [],
+  "clave_examen": true
+ },
+ {
+  "i": 11,
+  "resumen": "**Normalizar** ($z$-score $(x-\\mu)/\\sigma$) pone las variables en escala comparable: el gradiente apunta mejor y no satura neuronas.",
+  "claves": [
+   "normalizacion"
+  ],
+  "tp": [
+   {
+    "tp": 2,
+    "texto": "Numéricas con `StandardScaler` ajustado solo en train; también escalaste el target `SalePrice` y desescalaste para reportar dólares."
+   }
+  ],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 12,
+  "resumen": "Categórica sin orden: **one-hot** si hay pocos valores, **embedding** si hay muchos. La tabla $k\\times d$ es un parámetro, no una entrada.",
+  "claves": [
+   "one-hot-encoding",
+   "embeddings-categoricos"
+  ],
+  "tp": [
+   {
+    "tp": 2,
+    "texto": "`State` (12) con one-hot y `District` (72) con `Embedding(73, 8)`: el MAE bajó de 51.411 a 30.956 y luego a 25.380."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "palabra-al-transformer#16",
+    "por": "Embeddings de palabras"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 13,
+  "resumen": "Cuatro errores silenciosos: código como número, ID único como feature, variable cíclica plana y faltante rellenado con 0.",
+  "claves": [
+   "codificacion-de-entrada",
+   "overfitting"
+  ],
+  "tp": [
+   {
+    "tp": 2,
+    "texto": "Las tres trampas del dataset más `LotFrontage`. `District` como entero entrenó sin error pero dio MAE 25.856 vs 20.844 con embedding."
+   }
+  ],
+  "ver": [],
+  "clave_examen": true
+ },
+ {
+  "i": 14,
+  "resumen": "La tabla de referencia: tipo de variable → codificación → cuántos floats. Ordinal, código e ID único son las filas que más fallan.",
+  "claves": [
+   "codificacion-de-entrada",
+   "one-hot-encoding",
+   "embeddings-categoricos"
+  ],
+  "tp": [
+   {
+    "tp": 2,
+    "texto": "`ListingId` descartado (0 floats), `MonthSold` como seno y coseno (2 floats), `CentralAir` 0/1, `LotFrontage` mediana 70,0 + flag."
+   }
+  ],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 15,
+  "resumen": "Separador: partir el dataset.",
+  "claves": [],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 16,
+  "resumen": "Tres porciones con tres trabajos: **train** ajusta, **validación** decide, **test** mide. Medir con datos de entrenamiento hace mentir la métrica.",
+  "claves": [
+   "particion-train-val-test"
+  ],
+  "tp": [
+   {
+    "tp": 2,
+    "texto": "Partición 70/20/10 en dos pasos con `random_state=42`: 1022 casas de train, 292 de validación y 146 de test."
+   }
+  ],
+  "ver": [],
+  "clave_examen": true
+ },
+ {
+  "i": 17,
+  "resumen": "La validación no actualiza pesos: la usás vos para elegir. El test se abre **una vez**, al final; si lo usás para elegir, deja de medir.",
+  "claves": [
+   "particion-train-val-test"
+  ],
+  "tp": [
+   {
+    "tp": 2,
+    "texto": "Ojo: comparaste todas las variantes con el MAE de test. En rigor esa elección era trabajo de validación."
+   },
+   {
+    "tp": 4,
+    "texto": "Lo hiciste bien: prompts elegidos en un prompt-dev propio y el set de práctica solo para reportar."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "como-se-entrena-un-llm#3",
+    "por": "Conjuntos de datos en un LLM"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 18,
+  "resumen": "μ, σ, medianas y diccionarios se calculan **solo con train** y viajan con el modelo. Calcularlos sobre todo el dataset es **data leakage**.",
+  "claves": [
+   "data-leakage",
+   "normalizacion"
+  ],
+  "tp": [
+   {
+    "tp": 2,
+    "texto": "Scaler, mediana, encoders y mapa de distritos ajustados solo en train. Pero el M5 (preprocesamiento dentro del modelo) quedó pendiente."
+   }
+  ],
+  "ver": [],
+  "clave_examen": true
+ },
+ {
+  "i": 19,
+  "resumen": "Errores que mejoran la métrica falsamente: duplicados entre conjuntos, no estratificar, partir al azar una serie de tiempo.",
+  "claves": [
+   "data-leakage",
+   "particion-train-val-test"
+  ],
+  "tp": [],
+  "ver": [
+   {
+    "ref": "como-se-entrena-un-llm#7",
+    "por": "Deduplicación a escala (C4)"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 20,
+  "resumen": "Reglas: partir antes de explorar, por grupo, con semilla fija. No tunear contra test ni volver a partir si el número no cierra.",
+  "claves": [
+   "particion-train-val-test",
+   "data-leakage"
+  ],
+  "tp": [
+   {
+    "tp": 2,
+    "texto": "Partiste antes de calcular cualquier estadística y con semilla 42, como pide la regla."
+   }
+  ],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 21,
+  "resumen": "Separador: modelar la salida.",
+  "claves": [],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 22,
+  "resumen": "Catálogo: real → 1 lineal + MSE; sí/no → sigmoide + BCE; N clases → softmax + CE; percentiles → pinball. La tarea fija la salida.",
+  "claves": [
+   "capa-de-salida",
+   "mse",
+   "entropia-cruzada"
+  ],
+  "tp": [
+   {
+    "tp": 2,
+    "texto": "Para dólares usaste `Dense(1, activation='linear')` con MSE, en lugar de la sigmoide + BCE del notebook de clase."
+   }
+  ],
+  "ver": [],
+  "clave_examen": true
+ },
+ {
+  "i": 23,
+  "resumen": "En la salida la activación define rango e interpretación: lineal (todo ℝ), sigmoide (0,1), softmax (suma 1), softplus (≥0).",
+  "claves": [
+   "capa-de-salida",
+   "sigmoide",
+   "softmax"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 24,
+  "resumen": "Las formas explican el uso: la lineal no tiene techo (precio), la sigmoide sí (probabilidad), softplus tiene piso (conteos).",
+  "claves": [
+   "capa-de-salida"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 25,
+  "resumen": "Separador: la loss function.",
+  "claves": [],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 26,
+  "resumen": "La IA diseña agentes racionales que maximizan un **objetivo dado**; la loss es literalmente ese objetivo escrito en una fórmula.",
+  "claves": [
+   "agente-racional",
+   "funcion-de-perdida"
+  ],
+  "tp": [],
+  "ver": [
+   {
+    "ref": "introduccion#24",
+    "por": "Definición de IA en C1"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 27,
+  "resumen": "Vocabulario: **loss** (un ejemplo), **cost** (promedio del dataset) y **objective** (cost + regularización). Se usan como sinónimos, pero no lo son.",
+  "claves": [
+   "funcion-de-perdida",
+   "regularizacion"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 28,
+  "resumen": "Regresión: **MSE** castiga al cuadrado (errores 1, 2, 10 → 1, 4, 100), **MAE** lineal, **Huber** mezcla. Cambia cuánto pesa un outlier.",
+  "claves": [
+   "mse",
+   "funcion-de-perdida"
+  ],
+  "tp": [
+   {
+    "tp": 2,
+    "texto": "Sacar la casa de Wheatfield (error \\$226.171) bajó el RMSE 3,3% y el MAE solo 2,3%: el cuadrado pesa más los errores grandes."
+   }
+  ],
+  "ver": [],
+  "clave_examen": true
+ },
+ {
+  "i": 29,
+  "resumen": "**BCE**: $-[t\\log y+(1-t)\\log(1-y)]$. Como $t$ es 0 o 1, siempre queda un solo término vivo.",
+  "claves": [
+   "entropia-cruzada",
+   "sigmoide"
+  ],
+  "tp": [],
+  "ver": [
+   {
+    "ref": "redes-generativas-antagonicas#29",
+    "por": "BCE en el discriminador"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 30,
+  "resumen": "**Cross-entropy** multiclase: $L=-\\log y_c$, solo mira la probabilidad de la clase correcta (0,80 → 0,22; 0,05 → 3,00).",
+  "claves": [
+   "entropia-cruzada",
+   "softmax"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 31,
+  "resumen": "Losses especializadas: Poisson para conteos, pinball para rangos, NLL gaussiana para distribución. La de siempre falla sin avisar.",
+  "claves": [
+   "pinball-loss",
+   "funcion-de-perdida"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 32,
+  "resumen": "**Pinball**: la loss decide si la red aprende la media, la mediana o el P90. La loss no mide el error: lo **define**.",
+  "claves": [
+   "pinball-loss"
+  ],
+  "tp": [
+   {
+    "tp": 2,
+    "texto": "El extra P10/P50/P90 con pinball loss quedó pendiente en tu TP2."
+   }
+  ],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 33,
+  "resumen": "Separador: backpropagation.",
+  "claves": [],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 34,
+  "resumen": "Con el dataset fijo, la loss depende **solo de los pesos**: es una superficie, y entrenar es bajar por ella (descenso por gradiente).",
+  "claves": [
+   "backpropagation",
+   "descenso por gradiente"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 35,
+  "resumen": "Backprop **calcula el gradiente** de todos los pesos en una pasada hacia atrás; el aprendizaje en sí es el descenso por gradiente.",
+  "claves": [
+   "backpropagation"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": true
+ },
+ {
+  "i": 36,
+  "resumen": "Forward predice; backward anota cuánto culpa tiene cada peso. Los pesos todavía no se mueven: se acumula.",
+  "claves": [
+   "backpropagation"
+  ],
+  "tp": [],
+  "ver": [
+   {
+    "ref": "intro-redes-neuronales#29",
+    "por": "Forward y backward, en C3"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 37,
+  "resumen": "Lo que se deriva es la loss, fijada por la tarea. Precio de una casa: salida lineal y $\\tfrac12(y-t)^2$; el ½ no cambia el mínimo.",
+  "claves": [
+   "funcion-de-perdida",
+   "mse"
+  ],
+  "tp": [],
+  "ver": [
+   {
+    "ref": "intro-redes-neuronales#30",
+    "por": "La pérdida L2, en C3"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 38,
+  "resumen": "Regla de la cadena: peso → suma → activación → error. El gradiente es el producto de los tres efectos parciales.",
+  "claves": [
+   "regla-de-la-cadena"
+  ],
+  "tp": [],
+  "ver": [
+   {
+    "ref": "intro-redes-neuronales#31",
+    "por": "La misma regla, en C3"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 39,
+  "resumen": "Video: un empujón en $w$ viaja por la cadena hasta el error. Atención a la notación del video ($y$ es otra cosa).",
+  "claves": [
+   "regla-de-la-cadena"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 40,
+  "resumen": "Valor de cada factor: $(y-t)$, $f'(z)$ y la entrada $x$. Si la activación satura, $f'$ es casi cero y no aprende.",
+  "claves": [
+   "regla-de-la-cadena",
+   "gradiente-que-se-desvanece"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 41,
+  "resumen": "Para un peso más atrás la cadena **se estira**, no se rehace: se suman tres factores del mismo tipo ($w$, $f'$, $x$).",
+  "claves": [
+   "backpropagation",
+   "capa-oculta"
+  ],
+  "tp": [],
+  "ver": [
+   {
+    "ref": "intro-redes-neuronales#33",
+    "por": "Propagar el delta hacia atrás"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 42,
+  "resumen": "Cerrado el batch, $w\\leftarrow w-\\eta\\,\\nabla$. **η** es uno de los hiperparámetros más sensibles; puede terminar en un mínimo local.",
+  "claves": [
+   "learning-rate"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 43,
+  "resumen": "Diagnóstico: si la loss oscila, η es grande; si baja plana y no llega, es chico.",
+  "claves": [
+   "learning-rate"
+  ],
+  "tp": [
+   {
+    "tp": 2,
+    "texto": "Con Adam (η=0,001) y dólares crudos no convergía en 100 épocas; lo resolviste escalando el target."
+   }
+  ],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 44,
+  "resumen": "El train se parte en **batches**; cada batch produce **un** ajuste. Una **época** = tantos ajustes como batches (10.000 filas, batch 100 → 100).",
+  "claves": [
+   "batch",
+   "epoca"
+  ],
+  "tp": [
+   {
+    "tp": 2,
+    "texto": "Con 1022 casas y `batch_size=32`, cada época fueron unos 32 ajustes de pesos."
+   }
+  ],
+  "ver": [],
+  "clave_examen": true
+ },
+ {
+  "i": 45,
+  "resumen": "Dentro del batch se acumula, al cerrarlo se aplica. El batch size cambia cuántos ajustes hay y cuánto ruido trae cada uno.",
+  "claves": [
+   "batch",
+   "backpropagation"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 46,
+  "resumen": "Se minimiza $J=\\text{cost}+\\lambda R(w)$. **L2** achica todos los pesos, **L1** lleva algunos a cero; **dropout** regulariza apagando neuronas al entrenar.",
+  "claves": [
+   "regularizacion",
+   "dropout",
+   "overfitting"
+  ],
+  "tp": [
+   {
+    "tp": 2,
+    "texto": "En la red 512-512-512 usaste L2 con λ=0,001 (`kernel_regularizer`) y Dropout 0,3 entre capas."
+   }
+  ],
+  "ver": [],
+  "clave_examen": true
+ },
+ {
+  "i": 47,
+  "resumen": "Leer la curva: no baja → η chico o gradiente desvanecido; oscila → η grande; train baja y val sube → **overfitting**.",
+  "claves": [
+   "overfitting",
+   "early-stopping",
+   "learning-rate"
+  ],
+  "tp": [
+   {
+    "tp": 2,
+    "texto": "Tu 512-512-512 terminó con train 0,0121 y val 0,1273. Con regularización y early stopping (cortó en la época 76), el MAE bajó a 16.538."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "transformers-a-fondo#24",
+    "por": "El gradiente se pierde al apilar"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 48,
+  "resumen": "Separador: medir un clasificador.",
+  "claves": [],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 49,
+  "resumen": "Un detector de fraude que siempre dice \"no\" logra 99% de **accuracy** y 0% de fraudes detectados. Con clases desbalanceadas, accuracy engaña.",
+  "claves": [
+   "matriz-de-confusion",
+   "desbalance"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 50,
+  "resumen": "**Matriz de confusión** 2×2: TP, FP, FN y TN. Separa los tipos de error; accuracy es solo la diagonal.",
+  "claves": [
+   "matriz-de-confusion"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 51,
+  "resumen": "**Precisión** $=TP/(TP+FP)$, **recall** $=TP/(TP+FN)$, **F1** su media armónica. Cuál priorizar depende del error caro.",
+  "claves": [
+   "precision-recall"
+  ],
+  "tp": [],
+  "ver": [
+   {
+    "ref": "rag-y-mcp#39",
+    "por": "Recall aplicado a recuperación"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 52,
+  "resumen": "Spam: bloquear un mail legítimo (FP) es lo caro → priorizar **precisión**.",
+  "claves": [
+   "precision-recall"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 53,
+  "resumen": "Enfermedad grave: no detectar a un enfermo (FN) es lo caro → priorizar **recall**. La métrica la elige el negocio.",
+  "claves": [
+   "precision-recall"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 54,
+  "resumen": "Churn: los dos errores cuestan parecido → **F1**.",
+  "claves": [
+   "precision-recall"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 55,
+  "resumen": "El clasificador devuelve una probabilidad; el **umbral** la convierte en decisión. Bajarlo sube recall y baja precisión.",
+  "claves": [
+   "umbral-de-decision",
+   "precision-recall"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 56,
+  "resumen": "Separador: capas ocultas.",
+  "claves": [],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 57,
+  "resumen": "Ancho y profundidad: arrancar chico, 1 a 3 capas para tabulares. Train alto → agrandar; val mal y train bien → achicar o regularizar.",
+  "claves": [
+   "profundidad-y-ancho",
+   "overfitting"
+  ],
+  "tp": [
+   {
+    "tp": 2,
+    "texto": "La 512-512-512 tenía 550.985 parámetros para 1022 casas (unos 540 por ejemplo) y memorizó. Tu 32-32 era el punto de partida razonable."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "como-se-entrena-un-llm#9",
+    "por": "Chinchilla: parámetros contra datos"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 58,
+  "resumen": "Las activaciones ocultas rompen la linealidad. **ReLU** gana por simple y porque no satura.",
+  "claves": [
+   "relu",
+   "funcion-de-activacion"
+  ],
+  "tp": [],
+  "ver": [
+   {
+    "ref": "intro-redes-neuronales#25",
+    "por": "Tabla de activaciones en C3"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 59,
+  "resumen": "Pesos al azar pero con escala justa: todos en cero dejan neuronas idénticas; el efecto es multiplicativo ($1{,}5^{10}\\approx58$). No toques el default.",
+  "claves": [
+   "inicializacion",
+   "gradiente-que-se-desvanece"
+  ],
+  "tp": [],
+  "ver": [
+   {
+    "ref": "transformers-a-fondo#26",
+    "por": "Layer norm mantiene el rango"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 60,
+  "resumen": "Separador: conclusiones.",
+  "claves": [],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 61,
+  "resumen": "El modelo se gana en la entrada y la salida, no en las capas. La partición hace honesta la métrica, la loss viene con la salida y accuracy sola engaña.",
+  "claves": [
+   "codificacion-de-entrada",
+   "particion-train-val-test",
+   "capa-de-salida"
+  ],
+  "tp": [
+   {
+    "tp": 2,
+    "texto": "Tu conclusión fue la misma: el salto no vino de la arquitectura sino de codificar la ubicación (MAE de 51 mil a 21 mil)."
+   }
+  ],
+  "ver": [],
+  "clave_examen": true
+ },
+ {
+  "i": 62,
+  "resumen": "Checklist por variable: tipo, qué significa la resta, cardinalidad, si puede faltar y si la tendrás al predecir.",
+  "claves": [
+   "codificacion-de-entrada",
+   "one-hot-encoding",
+   "embeddings-categoricos"
+  ],
+  "tp": [
+   {
+    "tp": 2,
+    "texto": "La pregunta \"¿puede faltar?\" es tu `LotFrontage`: faltaba en 7%, y esas casas valen 12% menos, así que el flag aporta señal."
+   }
+  ],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 63,
+  "resumen": "Dos notebooks de clase sobre las mismas 2000 casas: uno para la entrada y otro para la salida. Base directa del TP.",
+  "claves": [
+   "codificacion-de-entrada",
+   "capa-de-salida"
+  ],
+  "tp": [
+   {
+    "tp": 2,
+    "texto": "Tu repo partía del notebook de clase `house-prices.ipynb` (clasificador `AboveMedianPrice`) y lo pasó a regresión en dólares."
+   }
+  ],
+  "ver": [],
+  "clave_examen": false
+ }
+]

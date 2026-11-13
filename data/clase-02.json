@@ -1,0 +1,2931 @@
+{
+ "num": 2,
+ "nn": "02",
+ "fecha": "12 ago",
+ "titulo": "CoWork: agentes de código, contexto, CLAUDE.md, Skills, subagentes y MCP",
+ "bloque": "Herramientas de trabajo con IA",
+ "decks": [
+  {
+   "slug": "cowork-intro",
+   "titulo": "Clase 2: Agentes de código y la misión Corta",
+   "slides": [
+    {
+     "i": 0,
+     "title": "Inteligencia Artificial Generativa (AI Gen)",
+     "section": "",
+     "resumen": "Portada de la Clase 2: agentes de código y la misión Corta.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Portada",
+     "last": 33
+    },
+    {
+     "i": 1,
+     "title": "Agentes de código",
+     "section": "",
+     "resumen": "Agenda: agentes de código, repo como contexto, contrato, Skills, subagentes, MCP, conclusiones y misión Corta.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Portada",
+     "last": 33
+    },
+    {
+     "i": 2,
+     "title": "El problema: el trabajo que no es escribir código",
+     "section": "Agentes de código",
+     "resumen": "Gran parte del desarrollo no es escribir código nuevo: entender repos heredados, ordenar, migrar, deployar. Hasta ahora la IA solo ayudaba a tipear.",
+     "claves": [
+      {
+       "id": "agente-de-codigo",
+       "label": "Agente de código",
+       "glos": true
+      },
+      {
+       "id": "código heredado",
+       "label": "código heredado",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Agentes de código",
+     "last": 33
+    },
+    {
+     "i": 3,
+     "title": "Agentes de código: Claude Code y Codex",
+     "section": "Agentes de código",
+     "resumen": "**Agente de código**: recibe una tarea en lenguaje natural y, en un loop, planifica, edita, corre comandos y verifica hasta entregar. Claude Code y Codex.",
+     "claves": [
+      {
+       "id": "agente-de-codigo",
+       "label": "Agente de código",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 1,
+       "texto": "Corta se hizo con Claude Code y Codex parados en `corta/`: el agente editó, corrió `npm test`, commiteó y deployó.",
+       "tp_titulo": "Corta, del caos a producción",
+       "code": "tp1-claude-md-commits-correr",
+       "nota": ""
+      }
+     ],
+     "ver": [
+      {
+       "url": "/clases/10/#d=agentes-y-multiagentes&s=12",
+       "clase": 10,
+       "cnn": "10",
+       "i": 12,
+       "title": "Agente = LLM + planificación + tools",
+       "por": "Agente = LLM + planificación + tools"
+      }
+     ],
+     "key": true,
+     "section_label": "Agentes de código",
+     "last": 33
+    },
+    {
+     "i": 4,
+     "title": "Delegar una tarea completa",
+     "section": "Agentes de código",
+     "resumen": "Cambia la unidad de trabajo: de una línea a una tarea completa. El agente planifica y ejecuta; el humano revisa el plan y los diffs.",
+     "claves": [
+      {
+       "id": "agente-de-codigo",
+       "label": "Agente de código",
+       "glos": true
+      },
+      {
+       "id": "humano-en-el-circuito",
+       "label": "Humano en el circuito",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 1,
+       "texto": "El ejemplo de la lámina pasó en Corta: delegaste «migrá la persistencia a Postgres», con `tests/postgres.test.js` escrito antes.",
+       "tp_titulo": "Corta, del caos a producción",
+       "code": "tp1-test-postgres-pool-falso",
+       "nota": ""
+      }
+     ],
+     "ver": [],
+     "key": false,
+     "section_label": "Agentes de código",
+     "last": 33
+    },
+    {
+     "i": 5,
+     "title": "El mapa: piezas que se apilan",
+     "section": "Agentes de código",
+     "resumen": "Las piezas se apilan: agente, repo como contexto, MCP, CLAUDE.md, Skills y subagentes. Cada una resuelve un problema concreto.",
+     "claves": [
+      {
+       "id": "claude-md",
+       "label": "CLAUDE.md / AGENTS.md",
+       "glos": true
+      },
+      {
+       "id": "skill",
+       "label": "Skill",
+       "glos": true
+      },
+      {
+       "id": "mcp",
+       "label": "MCP (Model Context Protocol)",
+       "glos": true
+      },
+      {
+       "id": "subagente",
+       "label": "Subagente",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Agentes de código",
+     "last": 33
+    },
+    {
+     "i": 6,
+     "title": "Dónde se empieza: pararse en una carpeta",
+     "section": "Agentes de código",
+     "resumen": "Se abre el agente parado en la carpeta del proyecto: ese directorio define el **alcance** (contexto y límite de seguridad). Primero, una pregunta de reconocimiento.",
+     "claves": [
+      {
+       "id": "contexto-de-agente",
+       "label": "El repo como contexto",
+       "glos": true
+      },
+      {
+       "id": "agente-de-codigo",
+       "label": "Agente de código",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 1,
+       "texto": "Paso 0 de Corta: pararse en `corta/`, configurar los MCP de GitHub y Railway y hacer que el agente explique qué tools expone cada uno.",
+       "tp_titulo": "Corta, del caos a producción",
+       "code": "tp1-claude-md-reglas",
+       "nota": "La regla 4 es la consecuencia del paso 0: con los MCP configurados en `corta/`, el agente debe usarlos en vez de comandos sueltos."
+      }
+     ],
+     "ver": [],
+     "key": false,
+     "section_label": "Agentes de código",
+     "last": 33
+    },
+    {
+     "i": 7,
+     "title": "El repo como contexto",
+     "section": "",
+     "resumen": "Sección 2: el repo como contexto.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Portada",
+     "last": 33
+    },
+    {
+     "i": 8,
+     "title": "El modelo responde de memoria",
+     "section": "El repo como contexto",
+     "resumen": "El modelo no conoce tu repo: responde de memoria. Por **in-context learning**, la calidad del agente depende del contexto que le llega.",
+     "claves": [
+      {
+       "id": "in-context-learning",
+       "label": "In-context learning",
+       "glos": true
+      },
+      {
+       "id": "contexto-sobre-prompting",
+       "label": "Contexto > prompting",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/01/#d=claude-desktop-chat&s=9",
+       "clase": 1,
+       "cnn": "01",
+       "i": 9,
+       "title": "El chat responde de memoria",
+       "por": "El mismo argumento, en la clase 1"
+      }
+     ],
+     "key": false,
+     "section_label": "El repo como contexto",
+     "last": 33
+    },
+    {
+     "i": 9,
+     "title": "Qué lee el agente al pararse en el repo",
+     "section": "El repo como contexto",
+     "resumen": "No carga el repo entero: lo **explora** con herramientas (árbol, README, configs, grep, `git log`). El orden del repo es contexto.",
+     "claves": [
+      {
+       "id": "contexto-de-agente",
+       "label": "El repo como contexto",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 1,
+       "texto": "En el M2 ordenaste Corta (`src/`, `tests/`, `docs/`, README) y borraste `server_OLD.js` e `index_v2_FINAL.js`: entenderlo en menos de 2 minutos.",
+       "tp_titulo": "Corta, del caos a producción",
+       "code": "tp1-readme-estructura",
+       "nota": ""
+      }
+     ],
+     "ver": [],
+     "key": false,
+     "section_label": "El repo como contexto",
+     "last": 33
+    },
+    {
+     "i": 10,
+     "title": "Markdown, el formato del ecosistema",
+     "section": "El repo como contexto",
+     "resumen": "Contrato, Skills y subagentes son `.md` con **frontmatter** YAML: el modelo los lee nativo y entran en diffs, commits y PRs como el código.",
+     "claves": [
+      {
+       "id": "markdown-frontmatter",
+       "label": "Markdown con frontmatter",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "El repo como contexto",
+     "last": 33
+    },
+    {
+     "i": 11,
+     "title": "El conocimiento del proyecto en .md",
+     "section": "El repo como contexto",
+     "resumen": "Regla: lo que el agente deba saber va en **.md dentro del repo**: memoria, especificaciones (`SPEC.md`) y conocimiento general.",
+     "claves": [
+      {
+       "id": "spec-md",
+       "label": "SPEC.md",
+       "glos": true
+      },
+      {
+       "id": "contexto-de-agente",
+       "label": "El repo como contexto",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 1,
+       "texto": "Tu `SPEC.md` de Corta tiene modelo de datos, endpoints y casos borde; ojo: promete 400 para URLs inválidas y el código no lo valida ni lo testea.",
+       "tp_titulo": "Corta, del caos a producción",
+       "code": "tp1-spec-post-redirect",
+       "nota": "Mirá la línea del 400 por URL inválida: está en el SPEC, pero ni `src/server.js` ni los tests la cubren."
+      }
+     ],
+     "ver": [],
+     "key": false,
+     "section_label": "El repo como contexto",
+     "last": 33
+    },
+    {
+     "i": 12,
+     "title": "El manejo del contexto",
+     "section": "El repo como contexto",
+     "resumen": "Ventana finita: lo más chica posible con la máxima información relevante. Una ventana grande degrada al modelo y acumula instrucciones contradictorias; `/compact` o sesión nueva.",
+     "claves": [
+      {
+       "id": "ventana-de-contexto",
+       "label": "Ventana de contexto",
+       "glos": true
+      },
+      {
+       "id": "compact",
+       "label": "/compact y sesiones frescas",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 1,
+       "texto": "`docs/PROGRESS.md` guardó el estado por milestone para que cada sesión nueva arrancara con ventana chica y sin re-explicar.",
+       "tp_titulo": "Corta, del caos a producción",
+       "code": "tp1-progress-md-milestones",
+       "nota": ""
+      }
+     ],
+     "ver": [
+      {
+       "url": "/clases/10/#d=agentes-y-multiagentes&s=41",
+       "clase": 10,
+       "cnn": "10",
+       "i": 41,
+       "title": "El contexto se degrada",
+       "por": "El contexto se degrada (context rot)"
+      }
+     ],
+     "key": true,
+     "section_label": "El repo como contexto",
+     "last": 33
+    },
+    {
+     "i": 13,
+     "title": "Iterar con el agente sobre el código",
+     "section": "El repo como contexto",
+     "resumen": "Nada sale bien a la primera: **vueltas chicas** de pedir, verificar y corregir. Los tests son la unidad de revisión; TDD con tests derivados del SPEC, escritos antes.",
+     "claves": [
+      {
+       "id": "iteracion-en-vueltas-chicas",
+       "label": "Iterar en vueltas chicas",
+       "glos": true
+      },
+      {
+       "id": "tdd",
+       "label": "TDD con agentes",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 1,
+       "texto": "Cuatro ciclos `test:`→`fix:`/`feat:` en `git log` (redirect, colisión, stats, Postgres); la colisión se forzó mockeando `Math.random`.",
+       "tp_titulo": "Corta, del caos a producción",
+       "code": "tp1-test-colision",
+       "nota": ""
+      }
+     ],
+     "ver": [],
+     "key": true,
+     "section_label": "El repo como contexto",
+     "last": 33
+    },
+    {
+     "i": 14,
+     "title": "El contrato de trabajo",
+     "section": "",
+     "resumen": "Sección 3: el contrato de trabajo.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Portada",
+     "last": 33
+    },
+    {
+     "i": 15,
+     "title": "CLAUDE.md / AGENTS.md: la memoria del repo",
+     "section": "El contrato de trabajo",
+     "resumen": "**CLAUDE.md / AGENTS.md**: archivo en la raíz que el agente lee al arrancar cada sesión. Lleva cómo correr y testear, convenciones y reglas duras.",
+     "claves": [
+      {
+       "id": "claude-md",
+       "label": "CLAUDE.md / AGENTS.md",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 1,
+       "texto": "Tu `CLAUDE.md` de Corta fija spec-first, test-first con commits separados, `node:test`, cero secretos y push solo al cerrar un milestone.",
+       "tp_titulo": "Corta, del caos a producción",
+       "code": "tp1-claude-md-reglas",
+       "nota": ""
+      },
+      {
+       "tp": 4,
+       "texto": "En el TP4 el estándar común del equipo fue `AGENTS.md`.",
+       "tp_titulo": "El agente de admisión de guardia (TP final)",
+       "code": "tp4-agents-md",
+       "nota": ""
+      }
+     ],
+     "ver": [],
+     "key": true,
+     "section_label": "El contrato de trabajo",
+     "last": 33
+    },
+    {
+     "i": 16,
+     "title": "Un ejemplo de CLAUDE.md",
+     "section": "El contrato de trabajo",
+     "resumen": "Nadie lo escribe de cero: el agente lo genera leyendo el repo y recolectando las instrucciones que le das. El humano revisa que quede corto y correcto.",
+     "claves": [
+      {
+       "id": "claude-md",
+       "label": "CLAUDE.md / AGENTS.md",
+       "glos": true
+      },
+      {
+       "id": "memoria del agente",
+       "label": "memoria del agente",
+       "glos": false
+      }
+     ],
+     "tp": [
+      {
+       "tp": 1,
+       "texto": "La consigna pedía la Skill `/collect-memory` para mantener `CLAUDE.md`; resolviste la memoria con la Skill `progress-log` y `CLAUDE.md` mantenido aparte.",
+       "tp_titulo": "Corta, del caos a producción",
+       "code": "tp1-claude-md-estado",
+       "nota": "La consigna pedía `/collect-memory` para mantener esta sección; acá se mantiene por instrucción («Actualizá esta sección…»)."
+      }
+     ],
+     "ver": [],
+     "key": false,
+     "section_label": "El contrato de trabajo",
+     "last": 33
+    },
+    {
+     "i": 17,
+     "title": "Skills y comandos",
+     "section": "",
+     "resumen": "Sección 4: Skills y comandos.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Portada",
+     "last": 33
+    },
+    {
+     "i": 18,
+     "title": "Qué es una Skill",
+     "section": "Skills y comandos",
+     "resumen": "«Lo que explicás más de una vez es una **Skill** que escribís una vez»: carpeta con `SKILL.md` (metadata + pasos en prosa). Un trabajo por Skill.",
+     "claves": [
+      {
+       "id": "skill",
+       "label": "Skill",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 1,
+       "texto": "Armaste la Skill `progress-log`: un script determinista lista los commits sin log y el modelo redacta un `.md` por commit.",
+       "tp_titulo": "Corta, del caos a producción",
+       "code": "tp1-script-progress-log",
+       "nota": ""
+      }
+     ],
+     "ver": [],
+     "key": true,
+     "section_label": "Skills y comandos",
+     "last": 33
+    },
+    {
+     "i": 19,
+     "title": "Cómo se dispara una Skill",
+     "section": "Skills y comandos",
+     "resumen": "Dos disparos: explícito con `/nombre` o automático cuando el pedido coincide con la **description**. Con una descripción vaga, nunca se activa sola.",
+     "claves": [
+      {
+       "id": "descripcion-como-disparador",
+       "label": "La descripción como disparador",
+       "glos": true
+      },
+      {
+       "id": "skill",
+       "label": "Skill",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 1,
+       "texto": "La `description` de `progress-log` enumera frases como «log progress» o «update the progress log» para dispararse sola.",
+       "tp_titulo": "Corta, del caos a producción",
+       "code": "tp1-skill-progress-log",
+       "nota": "Fijate en la `description` del frontmatter: enumera las frases que disparan la Skill sola."
+      }
+     ],
+     "ver": [
+      {
+       "url": "/clases/06/#d=rag-y-mcp&s=68",
+       "clase": 6,
+       "cnn": "06",
+       "i": 68,
+       "title": "La descripción dice cuándo NO usarla",
+       "por": "La descripción dice cuándo NO usarla"
+      }
+     ],
+     "key": false,
+     "section_label": "Skills y comandos",
+     "last": 33
+    },
+    {
+     "i": 20,
+     "title": "Subagentes",
+     "section": "",
+     "resumen": "Sección 5: subagentes.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Portada",
+     "last": 33
+    },
+    {
+     "i": 21,
+     "title": "Subagentes: varios trabajando a la vez",
+     "section": "Subagentes",
+     "resumen": "**Subagente**: asistente aislado con su propia ventana de contexto que devuelve un resumen. Sirve para tareas pesadas o paralelas, como auditar 6 módulos a la vez.",
+     "claves": [
+      {
+       "id": "subagente",
+       "label": "Subagente",
+       "glos": true
+      },
+      {
+       "id": "orquestador-workers",
+       "label": "Fan-out / fan-in (orquestador y workers)",
+       "glos": true
+      },
+      {
+       "id": "aislamiento-de-contexto",
+       "label": "Aislamiento de contexto",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/10/#d=agentes-y-multiagentes&s=45",
+       "clase": 10,
+       "cnn": "10",
+       "i": 45,
+       "title": "Estrella: orquestador y subagentes",
+       "por": "Estrella: orquestador y subagentes"
+      }
+     ],
+     "key": true,
+     "section_label": "Subagentes",
+     "last": 33
+    },
+    {
+     "i": 22,
+     "title": "Un subagente propio, por dentro",
+     "section": "Subagentes",
+     "resumen": "Un subagente propio es un `.md` en `.claude/agents/` con frontmatter (nombre, description, tools) y prosa. La description vuelve a ser el disparador.",
+     "claves": [
+      {
+       "id": "subagente",
+       "label": "Subagente",
+       "glos": true
+      },
+      {
+       "id": "markdown-frontmatter",
+       "label": "Markdown con frontmatter",
+       "glos": true
+      },
+      {
+       "id": "descripcion-como-disparador",
+       "label": "La descripción como disparador",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Subagentes",
+     "last": 33
+    },
+    {
+     "i": 23,
+     "title": "MCP servers",
+     "section": "",
+     "resumen": "Sección 6: MCP servers.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Portada",
+     "last": 33
+    },
+    {
+     "i": 24,
+     "title": "Qué es MCP",
+     "section": "MCP servers",
+     "resumen": "**MCP**: estándar abierto en el que un server expone las acciones de un servicio (GitHub, base de datos, deploy) como tools que el agente llama dentro de su loop.",
+     "claves": [
+      {
+       "id": "mcp",
+       "label": "MCP (Model Context Protocol)",
+       "glos": true
+      },
+      {
+       "id": "tool-calling",
+       "label": "Uso de herramientas (tool calling)",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 1,
+       "texto": "Usaste el MCP de GitHub para versionar y el de Railway para crear la base Postgres, setear variables y deployar Corta.",
+       "tp_titulo": "Corta, del caos a producción",
+       "code": "tp1-readme-deploy",
+       "nota": ""
+      }
+     ],
+     "ver": [
+      {
+       "url": "/clases/06/#d=rag-y-mcp&s=46",
+       "clase": 6,
+       "cnn": "06",
+       "i": 46,
+       "title": "MCP conecta modelos con herramientas",
+       "por": "MCP conecta modelos con herramientas"
+      }
+     ],
+     "key": true,
+     "section_label": "MCP servers",
+     "last": 33
+    },
+    {
+     "i": 25,
+     "title": "Cómo el agente descubre y usa una herramienta",
+     "section": "MCP servers",
+     "resumen": "Al conectar un server, el agente recibe el catálogo (nombre, descripción, parámetros) y elige por descripción. Cuándo conviene cada tool lo dice la documentación.",
+     "claves": [
+      {
+       "id": "mcp",
+       "label": "MCP (Model Context Protocol)",
+       "glos": true
+      },
+      {
+       "id": "descripcion-como-disparador",
+       "label": "La descripción como disparador",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 3,
+       "texto": "En el TP3 las descripciones de tus tools dicen qué fuente consultan, qué NO tienen y los valores válidos del parámetro.",
+       "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+       "code": "tp3-descripciones-tools",
+       "nota": "El agente descubre cuándo usar cada tool solo por este texto."
+      }
+     ],
+     "ver": [
+      {
+       "url": "/clases/06/#d=rag-y-mcp&s=54",
+       "clase": 6,
+       "cnn": "06",
+       "i": 54,
+       "title": "El ciclo de vida de una herramienta MCP",
+       "por": "El ciclo de vida de una tool MCP"
+      }
+     ],
+     "key": false,
+     "section_label": "MCP servers",
+     "last": 33
+    },
+    {
+     "i": 26,
+     "title": "El ecosistema MCP para desarrollo",
+     "section": "MCP servers",
+     "resumen": "Casi todo el toolchain ya tiene server MCP: GitHub, Postgres, Playwright, Sentry, Jira, Figma, Context7 e infraestructura de deploy.",
+     "claves": [
+      {
+       "id": "mcp",
+       "label": "MCP (Model Context Protocol)",
+       "glos": true
+      },
+      {
+       "id": "toolchain",
+       "label": "toolchain",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "MCP servers",
+     "last": 33
+    },
+    {
+     "i": 27,
+     "title": "Dónde buscar servidores MCP publicados",
+     "section": "MCP servers",
+     "resumen": "Primero los catálogos oficiales (Claude, ChatGPT), después repos y directorios comunitarios. Siempre mirar quién publica el server.",
+     "claves": [
+      {
+       "id": "mcp",
+       "label": "MCP (Model Context Protocol)",
+       "glos": true
+      },
+      {
+       "id": "confianza",
+       "label": "confianza",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "MCP servers",
+     "last": 33
+    },
+    {
+     "i": 28,
+     "title": "Conclusiones",
+     "section": "",
+     "resumen": "Sección 7: conclusiones.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Portada",
+     "last": 33
+    },
+    {
+     "i": 29,
+     "title": "El nuevo rol: Diseñar, delegar y revisar",
+     "section": "Conclusiones",
+     "resumen": "El rol pasa a **diseñar, delegar y revisar**. Contrato, Skills y subagentes son archivos versionados que el equipo hereda con un clone.",
+     "claves": [
+      {
+       "id": "agente-de-codigo",
+       "label": "Agente de código",
+       "glos": true
+      },
+      {
+       "id": "humano-en-el-circuito",
+       "label": "Humano en el circuito",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 1,
+       "texto": "Conclusión de Corta: el agente tipeó casi todo; lo confiable fue el contexto en `.md` y los tests verificando cada vuelta chica.",
+       "tp_titulo": "Corta, del caos a producción",
+       "code": "tp1-server-rutas",
+       "nota": "Este código lo tipeó el agente; lo que lo hace confiable son los tests y el SPEC escritos antes."
+      }
+     ],
+     "ver": [],
+     "key": false,
+     "section_label": "Conclusiones",
+     "last": 33
+    },
+    {
+     "i": 30,
+     "title": "Antes de cerrar: cuidados",
+     "section": "Conclusiones",
+     "resumen": "El agente se equivoca con confianza: leer cada diff. **Secretos** fuera del código y del contexto. El contenido externo puede traer instrucciones (prompt injection).",
+     "claves": [
+      {
+       "id": "gestion-de-secretos",
+       "label": "Secretos fuera del código y del contexto",
+       "glos": true
+      },
+      {
+       "id": "prompt-injection",
+       "label": "Prompt injection",
+       "glos": true
+      },
+      {
+       "id": "defensa-en-profundidad",
+       "label": "Capas de guardarraíles",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 1,
+       "texto": "`notas.txt` traía una credencial de Postgres: quedó fuera del primer commit, se reescribió la historia antes del push y `DATABASE_URL` va solo por variable de entorno.",
+       "tp_titulo": "Corta, del caos a producción",
+       "code": "tp1-gitignore-secretos",
+       "nota": ""
+      }
+     ],
+     "ver": [
+      {
+       "url": "/clases/13/#d=cierre-magnifica-humanitas&s=23",
+       "clase": 13,
+       "cnn": "13",
+       "i": 23,
+       "title": "Defensa en profundidad",
+       "por": "Defensa en profundidad"
+      }
+     ],
+     "key": true,
+     "section_label": "Conclusiones",
+     "last": 33
+    },
+    {
+     "i": 31,
+     "title": "La misión: Corta",
+     "section": "",
+     "resumen": "Sección 8: la misión Corta.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Portada",
+     "last": 33
+    },
+    {
+     "i": 32,
+     "title": "La historia de Corta",
+     "section": "La misión: Corta",
+     "resumen": "Corta: acortador de URLs heredado sin git ni README, con duplicados y bugs. Meta: llevarlo a producción con la historia completa en GitHub.",
+     "claves": [
+      {
+       "id": "misión corta",
+       "label": "misión corta",
+       "glos": false
+      },
+      {
+       "id": "agente-de-codigo",
+       "label": "Agente de código",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 1,
+       "texto": "El primer commit (`a6061b7`) subió el caos tal cual, salvo `node_modules/` y `notas.txt` (credencial).",
+       "tp_titulo": "Corta, del caos a producción",
+       "code": "tp1-progress-log-0001",
+       "nota": ""
+      }
+     ],
+     "ver": [],
+     "key": false,
+     "section_label": "La misión: Corta",
+     "last": 33
+    },
+    {
+     "i": 33,
+     "title": "La misión: del caos a producción",
+     "section": "La misión: Corta",
+     "resumen": "Cinco milestones (trackear, ordenar, corregir, completar stats, producción en Railway) con SPEC.md + TDD. Pregunta clave: ¿dónde viven los datos?",
+     "claves": [
+      {
+       "id": "spec-md",
+       "label": "SPEC.md",
+       "glos": true
+      },
+      {
+       "id": "tdd",
+       "label": "TDD con agentes",
+       "glos": true
+      },
+      {
+       "id": "mcp",
+       "label": "MCP (Model Context Protocol)",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 1,
+       "texto": "Los datos pasaron de `links.json` a PostgreSQL en Railway; el link `v4v` sobrevivió a un redeploy forzado con `clicks: 1`.",
+       "tp_titulo": "Corta, del caos a producción",
+       "code": "tp1-postgres-repo",
+       "nota": ""
+      }
+     ],
+     "ver": [],
+     "key": false,
+     "section_label": "La misión: Corta",
+     "last": 33
+    }
+   ],
+   "groups": [
+    {
+     "label": "Portada",
+     "slides": [
+      {
+       "i": 0,
+       "title": "Inteligencia Artificial Generativa (AI Gen)",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 1,
+       "title": "Agentes de código",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 0,
+     "last": 1,
+     "ntp": 0,
+     "nkey": 0
+    },
+    {
+     "label": "Agentes de código",
+     "slides": [
+      {
+       "i": 2,
+       "title": "El problema: el trabajo que no es escribir código",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 3,
+       "title": "Agentes de código: Claude Code y Codex",
+       "key": true,
+       "tp": true
+      },
+      {
+       "i": 4,
+       "title": "Delegar una tarea completa",
+       "key": false,
+       "tp": true
+      },
+      {
+       "i": 5,
+       "title": "El mapa: piezas que se apilan",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 6,
+       "title": "Dónde se empieza: pararse en una carpeta",
+       "key": false,
+       "tp": true
+      }
+     ],
+     "first": 2,
+     "last": 6,
+     "ntp": 3,
+     "nkey": 1
+    },
+    {
+     "label": "Portada",
+     "slides": [
+      {
+       "i": 7,
+       "title": "El repo como contexto",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 7,
+     "last": 7,
+     "ntp": 0,
+     "nkey": 0
+    },
+    {
+     "label": "El repo como contexto",
+     "slides": [
+      {
+       "i": 8,
+       "title": "El modelo responde de memoria",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 9,
+       "title": "Qué lee el agente al pararse en el repo",
+       "key": false,
+       "tp": true
+      },
+      {
+       "i": 10,
+       "title": "Markdown, el formato del ecosistema",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 11,
+       "title": "El conocimiento del proyecto en .md",
+       "key": false,
+       "tp": true
+      },
+      {
+       "i": 12,
+       "title": "El manejo del contexto",
+       "key": true,
+       "tp": true
+      },
+      {
+       "i": 13,
+       "title": "Iterar con el agente sobre el código",
+       "key": true,
+       "tp": true
+      }
+     ],
+     "first": 8,
+     "last": 13,
+     "ntp": 4,
+     "nkey": 2
+    },
+    {
+     "label": "Portada",
+     "slides": [
+      {
+       "i": 14,
+       "title": "El contrato de trabajo",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 14,
+     "last": 14,
+     "ntp": 0,
+     "nkey": 0
+    },
+    {
+     "label": "El contrato de trabajo",
+     "slides": [
+      {
+       "i": 15,
+       "title": "CLAUDE.md / AGENTS.md: la memoria del repo",
+       "key": true,
+       "tp": true
+      },
+      {
+       "i": 16,
+       "title": "Un ejemplo de CLAUDE.md",
+       "key": false,
+       "tp": true
+      }
+     ],
+     "first": 15,
+     "last": 16,
+     "ntp": 2,
+     "nkey": 1
+    },
+    {
+     "label": "Portada",
+     "slides": [
+      {
+       "i": 17,
+       "title": "Skills y comandos",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 17,
+     "last": 17,
+     "ntp": 0,
+     "nkey": 0
+    },
+    {
+     "label": "Skills y comandos",
+     "slides": [
+      {
+       "i": 18,
+       "title": "Qué es una Skill",
+       "key": true,
+       "tp": true
+      },
+      {
+       "i": 19,
+       "title": "Cómo se dispara una Skill",
+       "key": false,
+       "tp": true
+      }
+     ],
+     "first": 18,
+     "last": 19,
+     "ntp": 2,
+     "nkey": 1
+    },
+    {
+     "label": "Portada",
+     "slides": [
+      {
+       "i": 20,
+       "title": "Subagentes",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 20,
+     "last": 20,
+     "ntp": 0,
+     "nkey": 0
+    },
+    {
+     "label": "Subagentes",
+     "slides": [
+      {
+       "i": 21,
+       "title": "Subagentes: varios trabajando a la vez",
+       "key": true,
+       "tp": false
+      },
+      {
+       "i": 22,
+       "title": "Un subagente propio, por dentro",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 21,
+     "last": 22,
+     "ntp": 0,
+     "nkey": 1
+    },
+    {
+     "label": "Portada",
+     "slides": [
+      {
+       "i": 23,
+       "title": "MCP servers",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 23,
+     "last": 23,
+     "ntp": 0,
+     "nkey": 0
+    },
+    {
+     "label": "MCP servers",
+     "slides": [
+      {
+       "i": 24,
+       "title": "Qué es MCP",
+       "key": true,
+       "tp": true
+      },
+      {
+       "i": 25,
+       "title": "Cómo el agente descubre y usa una herramienta",
+       "key": false,
+       "tp": true
+      },
+      {
+       "i": 26,
+       "title": "El ecosistema MCP para desarrollo",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 27,
+       "title": "Dónde buscar servidores MCP publicados",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 24,
+     "last": 27,
+     "ntp": 2,
+     "nkey": 1
+    },
+    {
+     "label": "Portada",
+     "slides": [
+      {
+       "i": 28,
+       "title": "Conclusiones",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 28,
+     "last": 28,
+     "ntp": 0,
+     "nkey": 0
+    },
+    {
+     "label": "Conclusiones",
+     "slides": [
+      {
+       "i": 29,
+       "title": "El nuevo rol: Diseñar, delegar y revisar",
+       "key": false,
+       "tp": true
+      },
+      {
+       "i": 30,
+       "title": "Antes de cerrar: cuidados",
+       "key": true,
+       "tp": true
+      }
+     ],
+     "first": 29,
+     "last": 30,
+     "ntp": 2,
+     "nkey": 1
+    },
+    {
+     "label": "Portada",
+     "slides": [
+      {
+       "i": 31,
+       "title": "La misión: Corta",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 31,
+     "last": 31,
+     "ntp": 0,
+     "nkey": 0
+    },
+    {
+     "label": "La misión: Corta",
+     "slides": [
+      {
+       "i": 32,
+       "title": "La historia de Corta",
+       "key": false,
+       "tp": true
+      },
+      {
+       "i": 33,
+       "title": "La misión: del caos a producción",
+       "key": false,
+       "tp": true
+      }
+     ],
+     "first": 32,
+     "last": 33,
+     "ntp": 2,
+     "nkey": 0
+    }
+   ],
+   "tab": "Agentes de código y la misión Corta",
+   "extra": false,
+   "total": 34
+  },
+  {
+   "slug": "claude-cowork",
+   "titulo": "Claude Cowork",
+   "slides": [
+    {
+     "i": 0,
+     "title": "Agentes Inteligentes",
+     "section": "",
+     "resumen": "Portada: Claude Cowork.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Portada",
+     "last": 31
+    },
+    {
+     "i": 1,
+     "title": "Claude Cowork",
+     "section": "",
+     "resumen": "Agenda: Cowork, knowledge y output, Projects, Skills, subagentes, conclusiones y misión parte 2.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Portada",
+     "last": 31
+    },
+    {
+     "i": 2,
+     "title": "Cowork, de propósito general",
+     "section": "Claude Cowork",
+     "resumen": "**Cowork**: Claude instalado en la computadora, trabajando sobre tus carpetas y archivos. Herramienta de propósito general donde el «lenguaje de programación» es el español.",
+     "claves": [
+      {
+       "id": "cowork",
+       "label": "cowork",
+       "glos": false
+      },
+      {
+       "id": "agente",
+       "label": "Agente",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Claude Cowork",
+     "last": 31
+    },
+    {
+     "i": 3,
+     "title": "De chatear a delegar",
+     "section": "Claude Cowork",
+     "resumen": "Chatear es un mensaje a la vez; **delegar** es describir un resultado que el agente planifica y ejecuta sobre archivos mientras vos supervisás.",
+     "claves": [
+      {
+       "id": "agente",
+       "label": "Agente",
+       "glos": true
+      },
+      {
+       "id": "humano-en-el-circuito",
+       "label": "Humano en el circuito",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/10/#d=agentes-y-multiagentes&s=14",
+       "clase": 10,
+       "cnn": "10",
+       "i": 14,
+       "title": "Workflow o agente",
+       "por": "Workflow o agente"
+      }
+     ],
+     "key": true,
+     "section_label": "Claude Cowork",
+     "last": 31
+    },
+    {
+     "i": 4,
+     "title": "El mapa: piezas que se apilan",
+     "section": "Claude Cowork",
+     "resumen": "Bloques apilados: chat, búsqueda, Connectors y Schedule, y ahora carpeta, Project, Skills y subagentes. Cada tarea usa solo los que necesita.",
+     "claves": [
+      {
+       "id": "cowork",
+       "label": "cowork",
+       "glos": false
+      },
+      {
+       "id": "skill",
+       "label": "Skill",
+       "glos": true
+      },
+      {
+       "id": "subagente",
+       "label": "Subagente",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Claude Cowork",
+     "last": 31
+    },
+    {
+     "i": 5,
+     "title": "Dónde se empieza en Cowork",
+     "section": "Claude Cowork",
+     "resumen": "Tres pasos en la app: `+ New`, elegir modo Cowork y conceder un Project o carpeta. Desde ahí Claude trabaja sobre archivos reales.",
+     "claves": [
+      {
+       "id": "cowork",
+       "label": "cowork",
+       "glos": false
+      },
+      {
+       "id": "carpeta concedida",
+       "label": "carpeta concedida",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Claude Cowork",
+     "last": 31
+    },
+    {
+     "i": 6,
+     "title": "Knowledge & Output",
+     "section": "",
+     "resumen": "Sección 2: knowledge y output.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Portada",
+     "last": 31
+    },
+    {
+     "i": 7,
+     "title": "Qué lee el agente en la carpeta",
+     "section": "Knowledge & Output",
+     "resumen": "El agente lee y escribe en la carpeta, que casi siempre tiene **conocimiento e instrucciones**. Ese material necesita un formato pensado para la IA.",
+     "claves": [
+      {
+       "id": "contexto-de-agente",
+       "label": "El repo como contexto",
+       "glos": true
+      },
+      {
+       "id": "carpeta concedida",
+       "label": "carpeta concedida",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Knowledge & Output",
+     "last": 31
+    },
+    {
+     "i": 8,
+     "title": "Qué es un .md: el texto y lo que se ve",
+     "section": "Knowledge & Output",
+     "resumen": "Markdown: texto plano con marcas simples (`#`, `-`, `**`, `|`) y frontmatter opcional. Lo abre cualquier editor y la IA lo lee nativo.",
+     "claves": [
+      {
+       "id": "markdown-frontmatter",
+       "label": "Markdown con frontmatter",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Knowledge & Output",
+     "last": 31
+    },
+    {
+     "i": 9,
+     "title": "Iterar en .md, exportar al final",
+     "section": "Knowledge & Output",
+     "resumen": "Nada sale bien a la primera: muchas vueltas chicas sobre el mismo `.md`, donde editar es barato. Exportar a Word o PDF recién al final.",
+     "claves": [
+      {
+       "id": "iteracion-en-vueltas-chicas",
+       "label": "Iterar en vueltas chicas",
+       "glos": true
+      },
+      {
+       "id": "markdown-frontmatter",
+       "label": "Markdown con frontmatter",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": true,
+     "section_label": "Knowledge & Output",
+     "last": 31
+    },
+    {
+     "i": 10,
+     "title": "Projects",
+     "section": "",
+     "resumen": "Sección 3: Projects.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Portada",
+     "last": 31
+    },
+    {
+     "i": 11,
+     "title": "Qué es un Project",
+     "section": "Projects",
+     "resumen": "**Project**: espacio autocontenido con carpeta, memoria e instrucciones. Los chats del Project no comparten contexto entre sí, solo instrucciones y knowledge base.",
+     "claves": [
+      {
+       "id": "project",
+       "label": "project",
+       "glos": false
+      },
+      {
+       "id": "contexto-de-agente",
+       "label": "El repo como contexto",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": true,
+     "section_label": "Projects",
+     "last": 31
+    },
+    {
+     "i": 12,
+     "title": "Conceder una carpeta y ver el contexto",
+     "section": "Projects",
+     "resumen": "Cowork solo ve la carpeta concedida: esa carpeta es el control de privacidad. Usar una dedicada y nunca datos sensibles.",
+     "claves": [
+      {
+       "id": "minimo-privilegio",
+       "label": "Mínimo privilegio",
+       "glos": true
+      },
+      {
+       "id": "privacidad",
+       "label": "privacidad",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Projects",
+     "last": 31
+    },
+    {
+     "i": 13,
+     "title": "¿Los lee todos?",
+     "section": "Projects",
+     "resumen": "Con pocos archivos los lee completos (precisión, pero llena la ventana); con muchos, **busca** y lee lo relevante. No elegís el modo: elegís qué material entra.",
+     "claves": [
+      {
+       "id": "ventana-de-contexto",
+       "label": "Ventana de contexto",
+       "glos": true
+      },
+      {
+       "id": "rag",
+       "label": "RAG (Retrieval-Augmented Generation)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/06/#d=rag-y-mcp&s=6",
+       "clase": 6,
+       "cnn": "06",
+       "i": 6,
+       "title": "Con 1M de tokens, ¿para qué recuperar?",
+       "por": "Con 1M de tokens, ¿para qué recuperar?"
+      }
+     ],
+     "key": true,
+     "section_label": "Projects",
+     "last": 31
+    },
+    {
+     "i": 14,
+     "title": "Instrucciones: el contrato de trabajo",
+     "section": "Projects",
+     "resumen": "Instrucciones = **contrato de trabajo** del Project: reglas en lenguaje natural, escritas una vez y válidas para todos los chats. Cortas y claras.",
+     "claves": [
+      {
+       "id": "system-prompt",
+       "label": "System prompt",
+       "glos": true
+      },
+      {
+       "id": "claude-md",
+       "label": "CLAUDE.md / AGENTS.md",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/05/#d=prompting&s=27",
+       "clase": 5,
+       "cnn": "05",
+       "i": 27,
+       "title": "Los 6 componentes",
+       "por": "Los 6 componentes de un prompt"
+      }
+     ],
+     "key": false,
+     "section_label": "Projects",
+     "last": 31
+    },
+    {
+     "i": 15,
+     "title": "Un ejemplo de Instrucciones",
+     "section": "Projects",
+     "resumen": "Ejemplo: rol, audiencia, material y reglas. La regla de oro, que toda cifra lleve fuente y fecha, es una restricción que el agente nunca saltea.",
+     "claves": [
+      {
+       "id": "system-prompt",
+       "label": "System prompt",
+       "glos": true
+      },
+      {
+       "id": "regla de oro",
+       "label": "regla de oro",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Projects",
+     "last": 31
+    },
+    {
+     "i": 16,
+     "title": "Skills",
+     "section": "",
+     "resumen": "Sección 4: Skills.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Portada",
+     "last": 31
+    },
+    {
+     "i": 17,
+     "title": "Qué es una Skill",
+     "section": "Skills",
+     "resumen": "Una **Skill** es un instructivo escrito en español, no código: se enseña una vez y la tarea sale siempre igual. Un trabajo por Skill.",
+     "claves": [
+      {
+       "id": "skill",
+       "label": "Skill",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 1,
+       "texto": "Tu Skill `progress-log` de Corta vive en `.claude/skills/`, con su gemela para Codex en `.codex/prompts/`.",
+       "tp_titulo": "Corta, del caos a producción",
+       "code": "tp1-skill-progress-log",
+       "nota": ""
+      }
+     ],
+     "ver": [],
+     "key": true,
+     "section_label": "Skills",
+     "last": 31
+    },
+    {
+     "i": 18,
+     "title": "Cómo se usa una Skill",
+     "section": "Skills",
+     "resumen": "Explícita con `/informe-mensual` o automática cuando el pedido coincide con la **description**: la descripción decide si se activa sola.",
+     "claves": [
+      {
+       "id": "descripcion-como-disparador",
+       "label": "La descripción como disparador",
+       "glos": true
+      },
+      {
+       "id": "skill",
+       "label": "Skill",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Skills",
+     "last": 31
+    },
+    {
+     "i": 19,
+     "title": "Tres formas de crear una Skill",
+     "section": "Skills",
+     "resumen": "Tres caminos para crear una Skill: desde el panel, desde el prompt o grabando la pantalla mientras hacés la tarea.",
+     "claves": [
+      {
+       "id": "skill",
+       "label": "Skill",
+       "glos": true
+      },
+      {
+       "id": "crear skill",
+       "label": "crear skill",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Skills",
+     "last": 31
+    },
+    {
+     "i": 20,
+     "title": "Metodo 1: Crear desde el panel",
+     "section": "Skills",
+     "resumen": "Configuración → Habilidades → Agregar: «Crear con Claude», «Escribir las instrucciones» o «Grabá tu pantalla». Importar una Skill es otra cosa.",
+     "claves": [
+      {
+       "id": "skill",
+       "label": "Skill",
+       "glos": true
+      },
+      {
+       "id": "crear skill",
+       "label": "crear skill",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Skills",
+     "last": 31
+    },
+    {
+     "i": 21,
+     "title": "Metodo 2: Crear desde el prompt",
+     "section": "Skills",
+     "resumen": "Pedir la Skill en el chat; Claude pregunta por el proceso. Contalo con el detalle que necesitaría alguien capaz que nunca hizo la tarea.",
+     "claves": [
+      {
+       "id": "skill",
+       "label": "Skill",
+       "glos": true
+      },
+      {
+       "id": "crear skill",
+       "label": "crear skill",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Skills",
+     "last": 31
+    },
+    {
+     "i": 22,
+     "title": "Metodo 3: Crear grabando una Skill",
+     "section": "Skills",
+     "resumen": "Grabar la pantalla haciendo la tarea y narrándola; Claude mira la grabación y propone la Skill. Ideal para lo que tenés «en los dedos».",
+     "claves": [
+      {
+       "id": "skill",
+       "label": "Skill",
+       "glos": true
+      },
+      {
+       "id": "crear skill",
+       "label": "crear skill",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Skills",
+     "last": 31
+    },
+    {
+     "i": 23,
+     "title": "Subagentes",
+     "section": "",
+     "resumen": "Sección 5: subagentes.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Portada",
+     "last": 31
+    },
+    {
+     "i": 24,
+     "title": "Subagentes: varios trabajando a la vez",
+     "section": "Subagentes",
+     "resumen": "**Subagente**: contexto propio, devuelve un resumen. Ej.: 8 propuestas de proveedores, un subagente por propuesta en paralelo; el principal arma la tabla comparativa.",
+     "claves": [
+      {
+       "id": "subagente",
+       "label": "Subagente",
+       "glos": true
+      },
+      {
+       "id": "orquestador-workers",
+       "label": "Fan-out / fan-in (orquestador y workers)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/10/#d=agentes-y-multiagentes&s=43",
+       "clase": 10,
+       "cnn": "10",
+       "i": 43,
+       "title": "Multiagente: orquestador y workers",
+       "por": "Multiagente: orquestador y workers"
+      }
+     ],
+     "key": true,
+     "section_label": "Subagentes",
+     "last": 31
+    },
+    {
+     "i": 25,
+     "title": "Armar un subagente propio",
+     "section": "Subagentes",
+     "resumen": "No hay botón: un subagente es un `.md` (name, description, tools, model) empaquetado en un **plugin** para que quede siempre disponible.",
+     "claves": [
+      {
+       "id": "subagente",
+       "label": "Subagente",
+       "glos": true
+      },
+      {
+       "id": "markdown-frontmatter",
+       "label": "Markdown con frontmatter",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Subagentes",
+     "last": 31
+    },
+    {
+     "i": 26,
+     "title": "Un subagente, por dentro",
+     "section": "Subagentes",
+     "resumen": "Ejemplo `revisor-de-informes`: encabezado con herramientas acotadas (Read, Grep, Glob) y prosa. Se le pide a Claude que lo escriba y se revisa la description.",
+     "claves": [
+      {
+       "id": "subagente",
+       "label": "Subagente",
+       "glos": true
+      },
+      {
+       "id": "minimo-privilegio",
+       "label": "Mínimo privilegio",
+       "glos": true
+      },
+      {
+       "id": "descripcion-como-disparador",
+       "label": "La descripción como disparador",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Subagentes",
+     "last": 31
+    },
+    {
+     "i": 27,
+     "title": "Conclusions",
+     "section": "",
+     "resumen": "Separador: conclusiones.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Portada",
+     "last": 31
+    },
+    {
+     "i": 28,
+     "title": "Lo que se llevan: cambió el rol",
+     "section": "Conclusions",
+     "resumen": "Se delega un resultado completo y se guía el proceso. Los `.md`, el Project, las Instrucciones, las Skills y los subagentes están al servicio de eso.",
+     "claves": [
+      {
+       "id": "agente",
+       "label": "Agente",
+       "glos": true
+      },
+      {
+       "id": "humano-en-el-circuito",
+       "label": "Humano en el circuito",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Conclusions",
+     "last": 31
+    },
+    {
+     "i": 29,
+     "title": "Antes de cerrar: cuidados",
+     "section": "Conclusions",
+     "resumen": "Toda salida es borrador. Nada de datos de clientes, financieros o PII: la actividad de Cowork no entra en la auditoría estándar. Capas de guardarraíles.",
+     "claves": [
+      {
+       "id": "defensa-en-profundidad",
+       "label": "Capas de guardarraíles",
+       "glos": true
+      },
+      {
+       "id": "alucinacion",
+       "label": "Alucinación",
+       "glos": true
+      },
+      {
+       "id": "privacidad",
+       "label": "privacidad",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/13/#d=cierre-magnifica-humanitas&s=14",
+       "clase": 13,
+       "cnn": "13",
+       "i": 14,
+       "title": "Clasificá antes de pegar",
+       "por": "Clasificá antes de pegar"
+      }
+     ],
+     "key": true,
+     "section_label": "Conclusions",
+     "last": 31
+    },
+    {
+     "i": 30,
+     "title": "La misión · parte 2",
+     "section": "",
+     "resumen": "Sección 7: la misión, parte 2.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Portada",
+     "last": 31
+    },
+    {
+     "i": 31,
+     "title": "La misión, parte 2: Faro en Cowork",
+     "section": "La misión · parte 2",
+     "resumen": "Faro, parte 2: el analista baja a Cowork y trabaja sobre la carpeta real del equipo; entrega un tablero para el jefe, armado en `.md` y exportado.",
+     "claves": [
+      {
+       "id": "misión faro",
+       "label": "misión faro",
+       "glos": false
+      },
+      {
+       "id": "cowork",
+       "label": "cowork",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "La misión · parte 2",
+     "last": 31
+    }
+   ],
+   "groups": [
+    {
+     "label": "Portada",
+     "slides": [
+      {
+       "i": 0,
+       "title": "Agentes Inteligentes",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 1,
+       "title": "Claude Cowork",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 0,
+     "last": 1,
+     "ntp": 0,
+     "nkey": 0
+    },
+    {
+     "label": "Claude Cowork",
+     "slides": [
+      {
+       "i": 2,
+       "title": "Cowork, de propósito general",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 3,
+       "title": "De chatear a delegar",
+       "key": true,
+       "tp": false
+      },
+      {
+       "i": 4,
+       "title": "El mapa: piezas que se apilan",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 5,
+       "title": "Dónde se empieza en Cowork",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 2,
+     "last": 5,
+     "ntp": 0,
+     "nkey": 1
+    },
+    {
+     "label": "Portada",
+     "slides": [
+      {
+       "i": 6,
+       "title": "Knowledge & Output",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 6,
+     "last": 6,
+     "ntp": 0,
+     "nkey": 0
+    },
+    {
+     "label": "Knowledge & Output",
+     "slides": [
+      {
+       "i": 7,
+       "title": "Qué lee el agente en la carpeta",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 8,
+       "title": "Qué es un .md: el texto y lo que se ve",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 9,
+       "title": "Iterar en .md, exportar al final",
+       "key": true,
+       "tp": false
+      }
+     ],
+     "first": 7,
+     "last": 9,
+     "ntp": 0,
+     "nkey": 1
+    },
+    {
+     "label": "Portada",
+     "slides": [
+      {
+       "i": 10,
+       "title": "Projects",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 10,
+     "last": 10,
+     "ntp": 0,
+     "nkey": 0
+    },
+    {
+     "label": "Projects",
+     "slides": [
+      {
+       "i": 11,
+       "title": "Qué es un Project",
+       "key": true,
+       "tp": false
+      },
+      {
+       "i": 12,
+       "title": "Conceder una carpeta y ver el contexto",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 13,
+       "title": "¿Los lee todos?",
+       "key": true,
+       "tp": false
+      },
+      {
+       "i": 14,
+       "title": "Instrucciones: el contrato de trabajo",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 15,
+       "title": "Un ejemplo de Instrucciones",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 11,
+     "last": 15,
+     "ntp": 0,
+     "nkey": 2
+    },
+    {
+     "label": "Portada",
+     "slides": [
+      {
+       "i": 16,
+       "title": "Skills",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 16,
+     "last": 16,
+     "ntp": 0,
+     "nkey": 0
+    },
+    {
+     "label": "Skills",
+     "slides": [
+      {
+       "i": 17,
+       "title": "Qué es una Skill",
+       "key": true,
+       "tp": true
+      },
+      {
+       "i": 18,
+       "title": "Cómo se usa una Skill",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 19,
+       "title": "Tres formas de crear una Skill",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 20,
+       "title": "Metodo 1: Crear desde el panel",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 21,
+       "title": "Metodo 2: Crear desde el prompt",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 22,
+       "title": "Metodo 3: Crear grabando una Skill",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 17,
+     "last": 22,
+     "ntp": 1,
+     "nkey": 1
+    },
+    {
+     "label": "Portada",
+     "slides": [
+      {
+       "i": 23,
+       "title": "Subagentes",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 23,
+     "last": 23,
+     "ntp": 0,
+     "nkey": 0
+    },
+    {
+     "label": "Subagentes",
+     "slides": [
+      {
+       "i": 24,
+       "title": "Subagentes: varios trabajando a la vez",
+       "key": true,
+       "tp": false
+      },
+      {
+       "i": 25,
+       "title": "Armar un subagente propio",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 26,
+       "title": "Un subagente, por dentro",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 24,
+     "last": 26,
+     "ntp": 0,
+     "nkey": 1
+    },
+    {
+     "label": "Portada",
+     "slides": [
+      {
+       "i": 27,
+       "title": "Conclusions",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 27,
+     "last": 27,
+     "ntp": 0,
+     "nkey": 0
+    },
+    {
+     "label": "Conclusions",
+     "slides": [
+      {
+       "i": 28,
+       "title": "Lo que se llevan: cambió el rol",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 29,
+       "title": "Antes de cerrar: cuidados",
+       "key": true,
+       "tp": false
+      }
+     ],
+     "first": 28,
+     "last": 29,
+     "ntp": 0,
+     "nkey": 1
+    },
+    {
+     "label": "Portada",
+     "slides": [
+      {
+       "i": 30,
+       "title": "La misión · parte 2",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 30,
+     "last": 30,
+     "ntp": 0,
+     "nkey": 0
+    },
+    {
+     "label": "La misión · parte 2",
+     "slides": [
+      {
+       "i": 31,
+       "title": "La misión, parte 2: Faro en Cowork",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 31,
+     "last": 31,
+     "ntp": 0,
+     "nkey": 0
+    }
+   ],
+   "tab": "Claude Cowork",
+   "extra": true,
+   "total": 32
+  }
+ ],
+ "multi": true,
+ "prev": "01",
+ "next": "03",
+ "snippets": [
+  {
+   "id": "claude-md-commits-correr",
+   "titulo": "CLAUDE.md: commits, política de push y cómo correr",
+   "archivo": "CLAUDE.md",
+   "desde": 53,
+   "hasta": 73,
+   "lenguaje": "markdown",
+   "codigo": "## Convenciones de commits\n\n- Conventional commits (`feat:`, `fix:`, `test:`, `chore:`, `docs:`, `refactor:`).\n- El commit de test y el de implementación van separados, no amontonados.\n- Sin atribución de IA en los mensajes de commit.\n\n## Cuándo pushear\n\n- Se commitea localmente con la frecuencia que haga falta (test rojo, fix, doc, etc.) — eso no\n  cambia.\n- El **push** a `origin` se hace recién cuando se cierra un milestone completo (ver\n  `docs/PROGRESS.md`), no commit a commit. Excepción: si el usuario pide explícitamente pushear\n  antes.\n\n## Cómo correr la app\n\n```bash\nnpm install\nnpm start        # levanta server.js en localhost:3000\nnpm test         # corre la suite de tests (node:test)\n```",
+   "que_hace": "Define el formato de los commits, cuándo se puede pushear y los tres comandos para instalar, levantar y testear.",
+   "como_funciona": "- Conventional commits (`feat:`, `fix:`, `test:`…) con test e implementación en commits separados y sin atribución de IA.\n- Commits locales libres, pero **push a `origin` solo al cerrar un milestone** (o si el usuario lo pide).\n- `npm install`, `npm start`, `npm test`: lo que el agente corre en su loop para verificar.",
+   "proposito": "Le da al agente el «cómo verifico» (`npm test`) y pone un punto de control humano antes de que algo salga al remoto. Es la razón por la que en `git log` se ven pares `test:`→`fix:`.",
+   "interaccion": "`npm test` ejecuta `node --test` (definido en `package.json`), que descubre los archivos de `tests/`. La política de push se apoya en `docs/PROGRESS.md` para saber cuándo un milestone está cerrado.",
+   "teoria": "Agente de código en loop (planificar, editar, correr, verificar) con un humano que controla los puntos irreversibles.",
+   "key": "tp1-claude-md-commits-correr",
+   "tp": 1,
+   "tp_titulo": "Corta, del caos a producción",
+   "usos": [
+    {
+     "clase": 2,
+     "cnn": "02",
+     "slug": "cowork-intro",
+     "i": 3,
+     "title": "Agentes de código: Claude Code y Codex",
+     "url": "/clases/02/#d=cowork-intro&s=3"
+    },
+    {
+     "clase": 13,
+     "cnn": "13",
+     "slug": "cierre-magnifica-humanitas",
+     "i": 23,
+     "title": "Defensa en profundidad",
+     "url": "/clases/13/#d=cierre-magnifica-humanitas&s=23"
+    }
+   ],
+   "nusos": 2
+  },
+  {
+   "id": "test-postgres-pool-falso",
+   "titulo": "Tests de Postgres con un pool falso",
+   "archivo": "tests/postgres.test.js",
+   "desde": 5,
+   "hasta": 45,
+   "lenguaje": "javascript",
+   "codigo": "function poolFalso(resultados) {\n  const consultas = [];\n  return {\n    consultas,\n    async query(texto, valores) {\n      consultas.push({ texto, valores });\n      return resultados.shift() || { rows: [], rowCount: 0 };\n    },\n    async end() {}\n  };\n}\n\ntest('inicializa en PostgreSQL una tabla con codigo unico y datos del link', async function () {\n  const pool = poolFalso([]);\n  const repositorio = crearRepositorioPostgres(pool);\n\n  await repositorio.inicializar();\n\n  assert.match(pool.consultas[0].texto, /CREATE TABLE IF NOT EXISTS links/i);\n  assert.match(pool.consultas[0].texto, /codigo\\s+VARCHAR\\(3\\)\\s+PRIMARY KEY/i);\n  assert.match(pool.consultas[0].texto, /clicks\\s+INTEGER\\s+NOT NULL/i);\n});\n\ntest('crea un link sin pisar otro codigo y avisa si hubo colision', async function () {\n  const pool = poolFalso([\n    { rows: [{ codigo: 'a3k' }], rowCount: 1 },\n    { rows: [], rowCount: 0 }\n  ]);\n  const repositorio = crearRepositorioPostgres(pool);\n  const link = {\n    codigo: 'a3k',\n    url: 'https://ejemplo.com',\n    clicks: 0,\n    creado: '2026-03-02T14:11:09.000Z'\n  };\n\n  assert.equal(await repositorio.crear(link), true);\n  assert.equal(await repositorio.crear(link), false);\n  assert.match(pool.consultas[0].texto, /ON CONFLICT \\(codigo\\) DO NOTHING/i);\n  assert.deepEqual(pool.consultas[0].valores, ['a3k', 'https://ejemplo.com', 0, link.creado]);\n});",
+   "que_hace": "Testea el repositorio PostgreSQL sin base real, con un `pool` falso que registra las consultas y devuelve resultados preparados.",
+   "como_funciona": "- `poolFalso(resultados)` guarda cada `query` en `consultas` y devuelve el siguiente resultado de la lista.\n- El primer test exige `CREATE TABLE IF NOT EXISTS links` con `codigo VARCHAR(3) PRIMARY KEY`.\n- El segundo simula un insert exitoso (`rowCount: 1`) y uno que choca (`rowCount: 0`), y exige `ON CONFLICT (codigo) DO NOTHING` con los valores correctos.",
+   "proposito": "Fijó el contrato de la migración a Postgres antes de implementarla (commit `d541d7c`, test; `c331778`, feat). Así se pudo delegar «migrá la persistencia a Postgres» y revisar el resultado contra un criterio objetivo, sin necesitar una base para correr `npm test`.",
+   "interaccion": "Importa `crearRepositorioPostgres` de `src/postgres.js`, que recibe el pool por parámetro justamente para poder inyectar este falso.",
+   "teoria": "Delegar una tarea completa: el humano define el criterio (tests) y revisa el diff; el agente planifica y ejecuta.",
+   "key": "tp1-test-postgres-pool-falso",
+   "tp": 1,
+   "tp_titulo": "Corta, del caos a producción",
+   "usos": [
+    {
+     "clase": 2,
+     "cnn": "02",
+     "slug": "cowork-intro",
+     "i": 4,
+     "title": "Delegar una tarea completa",
+     "url": "/clases/02/#d=cowork-intro&s=4"
+    }
+   ],
+   "nusos": 1
+  },
+  {
+   "id": "claude-md-reglas",
+   "titulo": "CLAUDE.md: reglas no negociables (spec-first, test-first, secretos, MCP)",
+   "archivo": "CLAUDE.md",
+   "desde": 28,
+   "hasta": 51,
+   "lenguaje": "markdown",
+   "codigo": "## Prácticas de trabajo\n\n1. **Documentar el comportamiento esperado antes de tocarlo.** Mantené `docs/SPEC.md` con el\n   comportamiento de cada endpoint y los casos borde relevantes (entradas inválidas, duplicados,\n   recursos inexistentes). Se actualiza cada vez que el entendimiento del sistema cambia — no es\n   un documento que se escribe una vez y se abandona.\n\n2. **Test-first.** Para cada fix o feature: primero el test, después la implementación que lo\n   hace pasar. Commits separados para uno y otro, así queda trazable en `git log`.\n   - Framework: `node:test` (nativo, sin dependencias nuevas). Correr con `npm test`.\n   - Los tests viven en `tests/` (no `test/` — un directorio llamado `test` hace que Node trate\n     cualquier `.js` adentro como archivo de test, incluidos los helpers). Los archivos de test\n     siguen el patrón `*.test.js`.\n   - `manual-check.js` en la raíz es el script manual heredado (requiere el server ya levantado\n     con `npm start`, se corre aparte con `node manual-check.js`); no es parte de la suite de\n     `npm test` — se renombró desde `test.js` porque ese nombre matcheaba el descubrimiento\n     automático de `node --test` y terminaba pegándole a un server real si había uno corriendo.\n\n3. **Nada de secretos versionados.** Ni hardcodeados en código, ni en archivos de texto o JSON\n   commiteados. Credenciales van en variables de entorno (del proveedor de hosting en\n   producción, `.env` gitignoreado en local).\n\n4. **Usar las herramientas de infraestructura disponibles**, no comandos manuales sueltos,\n   cuando el flujo lo soporta (gestión de repo/colaboradores, servicios, bases de datos, deploy).",
+   "que_hace": "Fija las cuatro prácticas de trabajo que el agente tiene que respetar en cualquier tarea dentro del repo.",
+   "como_funciona": "1. **Spec-first**: mantener `docs/SPEC.md` con endpoints y casos borde.\n2. **Test-first**: primero el test, después la implementación, en commits separados; framework `node:test`, tests en `tests/*.test.js` y la explicación de por qué `test.js` pasó a `manual-check.js`.\n3. **Nada de secretos versionados**: credenciales solo en variables de entorno.\n4. **Usar las herramientas de infraestructura disponibles** (los servidores MCP de GitHub y Railway) antes que comandos manuales sueltos.",
+   "proposito": "Convierte decisiones del equipo en reglas que el agente hereda en cada sesión, en vez de repetirlas en cada prompt. La regla 4 es la que empuja al agente a crear repo, base y deploy vía tools MCP; la regla 3 es una capa más de defensa contra filtrar la credencial que venía en `notas.txt`.",
+   "interaccion": "Lo lee el agente al arrancar. Gobierna cómo se escribieron `tests/*.test.js`, `src/server.js` y `src/postgres.js`, y cómo se configuró Railway (`railway.json`, `DATABASE_URL`).",
+   "teoria": "CLAUDE.md como contrato/memoria del repo: reglas duras, cómo testear y convenciones, en un .md versionado que el agente lee siempre.",
+   "key": "tp1-claude-md-reglas",
+   "tp": 1,
+   "tp_titulo": "Corta, del caos a producción",
+   "usos": [
+    {
+     "clase": 2,
+     "cnn": "02",
+     "slug": "cowork-intro",
+     "i": 6,
+     "title": "Dónde se empieza: pararse en una carpeta",
+     "url": "/clases/02/#d=cowork-intro&s=6"
+    },
+    {
+     "clase": 2,
+     "cnn": "02",
+     "slug": "cowork-intro",
+     "i": 15,
+     "title": "CLAUDE.md / AGENTS.md: la memoria del repo",
+     "url": "/clases/02/#d=cowork-intro&s=15"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 55,
+     "title": "Conectar un servidor MCP: tres caminos",
+     "url": "/clases/06/#d=rag-y-mcp&s=55"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 21,
+     "title": "Conectar un servidor: los caminos y la configuración",
+     "url": "/clases/07/#d=rag-mcp-rapida&s=21"
+    }
+   ],
+   "nusos": 4
+  },
+  {
+   "id": "readme-estructura",
+   "titulo": "README: uso y estructura del repo",
+   "archivo": "README.md",
+   "desde": 1,
+   "hasta": 28,
+   "lenguaje": "markdown",
+   "codigo": "# Corta\n\nAcortador de URLs interno.\n\nProducción: [https://corta-production-7bc5.up.railway.app](https://corta-production-7bc5.up.railway.app)\n\n## Uso\n\n```bash\nnpm install\ncp .env.example .env\n# editar DATABASE_URL en .env con una base PostgreSQL local\nnpm start         # levanta el server en http://localhost:3000\nnpm test          # corre la suite de tests (node:test, no requiere PostgreSQL)\n```\n\nInterfaz web en `http://localhost:3000` (crear links) y `http://localhost:3000/stats.html`\n(consultar estadísticas).\n\n## Estructura\n\n```\nsrc/      código de la app (server.js, utils.js)\ndata/     datos heredados que se importan a PostgreSQL sin pisar registros\npublic/   frontend estático\ntests/    suite de node:test\ndocs/      documentación del proyecto\n```",
+   "que_hace": "Explica en pocas líneas qué es Corta, cómo levantarlo y testearlo, y qué hay en cada carpeta.",
+   "como_funciona": "- Link a producción.\n- «Uso»: `npm install`, copiar `.env.example`, `npm start`, `npm test` (que no requiere PostgreSQL).\n- «Estructura»: `src/`, `data/`, `public/`, `tests/`, `docs/` con una línea cada una.",
+   "proposito": "Cumple el criterio del M2: entender el repo en menos de 2 minutos. El orden (y haber borrado `server_OLD.js` e `index_v2_FINAL.js`) también es contexto para el agente, que explora el repo leyendo README y árbol en vez de cargarlo entero.",
+   "interaccion": "Remite a `docs/MISSION.md`, `docs/SPEC.md`, `docs/PROGRESS.md` y `CLAUDE.md`; los comandos coinciden con los `scripts` de `package.json`.",
+   "teoria": "El agente explora el repo con herramientas (árbol, README, configs): el orden del repo es contexto.",
+   "key": "tp1-readme-estructura",
+   "tp": 1,
+   "tp_titulo": "Corta, del caos a producción",
+   "usos": [
+    {
+     "clase": 2,
+     "cnn": "02",
+     "slug": "cowork-intro",
+     "i": 9,
+     "title": "Qué lee el agente al pararse en el repo",
+     "url": "/clases/02/#d=cowork-intro&s=9"
+    }
+   ],
+   "nusos": 1
+  },
+  {
+   "id": "spec-post-redirect",
+   "titulo": "SPEC.md: contrato de POST /api/links y GET /:codigo",
+   "archivo": "docs/SPEC.md",
+   "desde": 31,
+   "hasta": 56,
+   "lenguaje": "markdown",
+   "codigo": "## Endpoints\n\n### `POST /api/links`\n\nCrea un link corto.\n\n- **Request**: `{ \"url\": string }`\n- **200**: `{ \"codigo\": string, \"corta\": \"/<codigo>\" }`\n- **400** si falta `url`, o si `url` no es una URL absoluta válida con esquema `http`/`https`\n  (ej: `\"no es una url\"`, `\"ftp://algo\"`, string vacío).\n- El código se genera al azar entre `[a-z0-9]{3}` (46656 combinaciones posibles). **Si el código\n  generado ya existe, se descarta y se genera otro** — se reintenta hasta encontrar uno libre.\n  Dos URLs nunca deben terminar compartiendo el mismo código. Cubierto por\n  `tests/collision.test.js`.\n\n### `GET /:codigo`\n\nRedirige al destino.\n\n- Si `codigo` existe: **redirección HTTP (302)** hacia la `url` guardada, e incrementa `clicks`\n  en 1 antes de responder.\n- Si `codigo` no existe: **404**, sin tocar ningún contador.\n\n> **Bug corregido** (era `res.send(link.url)` en vez de `res.redirect(...)`, y además el\n> incremento de `clicks` no se persistía en disco): ambos quedan cubiertos por\n> `tests/redirect.test.js`.",
+   "que_hace": "Especifica qué debe hacer cada endpoint principal, incluidos los códigos de error y el comportamiento ante colisiones.",
+   "como_funciona": "- `POST /api/links`: recibe `{ url }`, devuelve `{ codigo, corta }`; **400** si falta la url o no es `http`/`https` válida.\n- Colisión: si el código generado ya existe, se descarta y se genera otro (cubierto por `tests/collision.test.js`).\n- `GET /:codigo`: **302** al destino e incremento de `clicks`; **404** si no existe.\n- Nota «Bug corregido»: documenta el `res.send(link.url)` original y el clic que no se persistía.",
+   "proposito": "Es la fuente de la que se derivan los tests: «todo lo que describe acá tiene que estar cubierto por un test». Ojo para la defensa: la validación de URL inválida (400 para `\"ftp://algo\"`) está prometida acá pero `src/server.js` solo chequea `!url` y no hay test que la cubra.",
+   "interaccion": "Alimenta `tests/redirect.test.js` y `tests/collision.test.js`, que a su vez guiaron los cambios en `src/server.js`. `CLAUDE.md` obliga a mantenerlo al día.",
+   "teoria": "Especificación en .md dentro del repo (SPEC.md) como conocimiento del proyecto y base de TDD.",
+   "key": "tp1-spec-post-redirect",
+   "tp": 1,
+   "tp_titulo": "Corta, del caos a producción",
+   "usos": [
+    {
+     "clase": 2,
+     "cnn": "02",
+     "slug": "cowork-intro",
+     "i": 11,
+     "title": "El conocimiento del proyecto en .md",
+     "url": "/clases/02/#d=cowork-intro&s=11"
+    }
+   ],
+   "nusos": 1
+  },
+  {
+   "id": "progress-md-milestones",
+   "titulo": "docs/PROGRESS.md: estado por milestone",
+   "archivo": "docs/PROGRESS.md",
+   "desde": 1,
+   "hasta": 35,
+   "lenguaje": "markdown",
+   "codigo": "# Progreso — Corta\n\nRegistro del avance sobre los milestones definidos en `MISSION.md`. Se actualiza a medida que\nse cierra o arranca trabajo — no es un documento de una sola vez.\n\n## Milestone 1 — Trackear desde el principio\n\n**Estado: hecho.**\n\n- Repo inicializado con el estado heredado tal cual (salvo `node_modules/`), como primer commit.\n- `notas.txt` (contenía una credencial de Postgres) gitignoreado desde el inicio; la historia se\n  reescribió una vez para sacarla por completo antes del primer push.\n\n## Milestone 2 — Ordenar\n\n**Estado: hecho.**\n\n- [x] Archivos muertos eliminados: `server_OLD.js`, `index_v2_FINAL.js`,\n      `links_backup_marzo.json`, `public/estilos_viejos.css`.\n- [x] Dependencias sin uso eliminadas: `lodash`, `moment`.\n- [x] Estructura de directorios: `src/` (código), `data/` (persistencia), `docs/` (documentación),\n      `public/` (frontend), `tests/` (suite de `node:test`).\n- [x] `README.md`.\n\n## Milestone 3 — Corregir errores conocidos\n\n**Estado: hecho.**\n\n- [x] Bug de redirect: `GET /:codigo` hacía `res.send(link.url)` en vez de redirigir. Corregido a\n      `res.redirect(...)`. De paso se encontró y corrigió que el incremento de `clicks` no se\n      persistía en disco.\n- [x] Colisión de código: `POST /api/links` ahora reintenta la generación hasta encontrar un\n      código libre, en vez de pisar un link existente.\n- Ambos cubiertos con TDD (`tests/redirect.test.js`, `tests/collision.test.js`), test-first con\n  commits de test e implementación separados.",
+   "que_hace": "Registra el estado de cada milestone con checklist: qué se hizo y cómo quedó cubierto.",
+   "como_funciona": "- Encabezado: «se actualiza a medida que se cierra o arranca trabajo».\n- M1: estado heredado como primer commit; `notas.txt` gitignoreado y la historia reescrita antes del primer push.\n- M2: archivos muertos y dependencias eliminadas, estructura de carpetas, README.\n- M3: bug de redirect y colisión, ambos con TDD y commits separados.",
+   "proposito": "Mantiene la ventana de contexto chica: una sesión nueva lee este archivo y sabe qué falta, sin arrastrar la conversación anterior ni re-explicar. Además sirve como criterio para la política de push de `CLAUDE.md`.",
+   "interaccion": "`CLAUDE.md` lo nombra como lugar a actualizar al cerrar o arrancar un milestone; el commit `d777803` lo agregó y los siguientes lo fueron completando.",
+   "teoria": "Manejo del contexto: persistir el estado en un archivo en vez de en el historial de chat, para poder abrir sesiones nuevas (o `/compact`) sin perder información.",
+   "key": "tp1-progress-md-milestones",
+   "tp": 1,
+   "tp_titulo": "Corta, del caos a producción",
+   "usos": [
+    {
+     "clase": 2,
+     "cnn": "02",
+     "slug": "cowork-intro",
+     "i": 12,
+     "title": "El manejo del contexto",
+     "url": "/clases/02/#d=cowork-intro&s=12"
+    }
+   ],
+   "nusos": 1
+  },
+  {
+   "id": "test-colision",
+   "titulo": "Test de colisión con Math.random mockeado",
+   "archivo": "tests/collision.test.js",
+   "desde": 5,
+   "hasta": 33,
+   "lenguaje": "javascript",
+   "codigo": "test('POST /api/links reintenta el codigo si el generado ya existe', async function (t) {\n  const ctx = await iniciarServerDeTest([\n    { codigo: 'aaa', url: 'https://ya-existia.com', clicks: 0, creado: '2026-01-01T00:00:00.000Z' }\n  ]);\n\n  // primer intento de generarCodigo cae en \"aaa\" (colision), el segundo en \"sss\" (libre)\n  const secuencia = [0, 0, 0, 0.5, 0.5, 0.5];\n  t.mock.method(Math, 'random', function () {\n    return secuencia.shift();\n  });\n\n  try {\n    const res = await fetch(ctx.baseUrl + '/api/links', {\n      method: 'POST',\n      headers: { 'Content-Type': 'application/json' },\n      body: JSON.stringify({ url: 'https://ejemplo.com/nueva' })\n    });\n    const body = await res.json();\n\n    assert.equal(body.codigo, 'sss');\n\n    const links = ctx.leerDB();\n    assert.equal(links.length, 2);\n    assert.equal(links.find(function (l) { return l.codigo === 'aaa'; }).url, 'https://ya-existia.com');\n    assert.equal(links.find(function (l) { return l.codigo === 'sss'; }).url, 'https://ejemplo.com/nueva');\n  } finally {\n    await ctx.cerrar();\n  }\n});",
+   "que_hace": "Fuerza una colisión de códigos y verifica que `POST /api/links` genere otro sin pisar el link existente.",
+   "como_funciona": "- Arranca con un link existente `aaa`.\n- `t.mock.method(Math, 'random', …)` devuelve la secuencia `[0,0,0,0.5,0.5,0.5]`: el primer código es `aaa` (choca) y el segundo `sss`.\n- Comprueba que la respuesta trae `sss`, que hay 2 links y que `aaa` conserva su URL original.",
+   "proposito": "Con 46.656 códigos posibles una colisión es rara y no se puede esperar a que pase sola: mockear la aleatoriedad la vuelve determinista y testeable. Es uno de los ciclos `test:` (`c1ace5f`) → `fix:` (`dbcba0f`) visibles en `git log`.",
+   "interaccion": "Ejerce el bucle de reintento de `POST /api/links` en `src/server.js` y `generarCodigo()` de `src/utils.js`, a través de `tests/helpers.js`.",
+   "teoria": "Iterar en vueltas chicas con TDD: tests derivados del SPEC, escritos antes, como unidad de revisión.",
+   "key": "tp1-test-colision",
+   "tp": 1,
+   "tp_titulo": "Corta, del caos a producción",
+   "usos": [
+    {
+     "clase": 2,
+     "cnn": "02",
+     "slug": "cowork-intro",
+     "i": 13,
+     "title": "Iterar con el agente sobre el código",
+     "url": "/clases/02/#d=cowork-intro&s=13"
+    }
+   ],
+   "nusos": 1
+  },
+  {
+   "id": "agents-md",
+   "titulo": "AGENTS.md: estándar común del repo",
+   "archivo": "AGENTS.md",
+   "desde": 36,
+   "hasta": 50,
+   "lenguaje": "markdown",
+   "codigo": "## Contrato y arquitectura\n\n- No modifiques `admision/`: es el kit de la cátedra y será reemplazado por su copia.\n- `entrega.py` conecta las fábricas exigidas. Separá buscador, generación del modelo y\n  configuración; mantené Modal fuera de la lógica del agente y las dependencias pesadas lazy.\n- El agente operativo usa las cinco herramientas del kit, registra ocho campos y se evalúa\n  con nueve controles. Respetá el máximo de 40 llamadas por caso y devolvé conversaciones completas.\n- No llames servicios externos desde el agente operativo. W&B se usa para experimentos,\n  no como dependencia de inferencia. No expongas respuestas esperadas al agente.\n- Armá el buscador con la carpeta recibida y sus valores de `parametros.yaml`.\n  No fijes umbrales variables en código, prompts o datos para memorizarlos.\n- La referencia actual usa `AgenteJSON` y dos secciones completas por búsqueda.\n  `sin_comunes` es un candidato explícito, no el default: no cambies experimentos por defecto\n  sin registrar decisión y comparación. El límite de turnos del coordinador no es el del entorno.\n",
+   "que_hace": "Sección «Contrato y arquitectura» del archivo de instrucciones compartido por el equipo y los agentes de código.",
+   "como_funciona": "- No modificar `admision/` (kit de la cátedra).\n- `entrega.py` conecta las fábricas; separar buscador, modelo y configuración.\n- Respetar 5 herramientas, 8 campos, 9 controles y 40 llamadas.\n- Armar el buscador con la carpeta recibida y no fijar umbrales en código.",
+   "proposito": "Un solo archivo fuente para personas y agentes; `CLAUDE.md` solo contiene `@AGENTS.md`, así no hay instrucciones divergentes.",
+   "interaccion": "Lo leen Claude Code (vía `CLAUDE.md`) y otros agentes al trabajar en el repo; remite a `docs/progreso.md` como bitácora.",
+   "teoria": "Memoria del repo para agentes: reglas persistentes que el agente carga en cada sesión.",
+   "key": "tp4-agents-md",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 2,
+     "cnn": "02",
+     "slug": "cowork-intro",
+     "i": 15,
+     "title": "CLAUDE.md / AGENTS.md: la memoria del repo",
+     "url": "/clases/02/#d=cowork-intro&s=15"
+    }
+   ],
+   "nusos": 1
+  },
+  {
+   "id": "claude-md-estado",
+   "titulo": "CLAUDE.md: qué es Corta y en qué estado está",
+   "archivo": "CLAUDE.md",
+   "desde": 1,
+   "hasta": 26,
+   "lenguaje": "markdown",
+   "codigo": "# Corta — instrucciones para el agente\n\nCorta es un acortador de URLs interno heredado, sin documentación previa. Este archivo fija las\nprácticas de trabajo del repo — léelo antes de tocar código.\n\n## Estado del proyecto\n\n- Repo inicializado con el estado heredado tal cual, salvo `node_modules/` (excluido por ser\n  generado). Ese primer commit es el punto de partida trazable; todo lo posterior es diff sobre él.\n- Milestone 3 (bug de redirect + colisión de códigos) resuelto con TDD (`tests/`).\n- Milestone 2 (ordenar) hecho: se sacaron los archivos muertos (`server_OLD.js`,\n  `index_v2_FINAL.js`, `links_backup_marzo.json`, `public/estilos_viejos.css`), las dependencias\n  sin uso (`lodash`, `moment`), y se agregó `README.md`. Estructura actual:\n  - `src/` — código de la app (`server.js`, `utils.js`).\n  - `data/` — persistencia en disco (`links.json`), reemplazada por una base de datos en\n    Milestone 5.\n  - `public/` — frontend estático servido por Express.\n  - `tests/` — suite de `node:test`.\n  - `docs/` — `SPEC.md`, `MISSION.md` y `PROGRESS.md` (registro de avance por milestone,\n    actualizar al cerrar o arrancar trabajo en alguno).\n- Milestone 4 (endpoint de stats + `stats.html` conectado) hecho, con TDD (`tests/stats.test.js`).\n- Milestone 5 (producción) hecho: servicio y PostgreSQL desplegados en Railway, credenciales por\n  variable de entorno y persistencia comprobada después de un redeploy. URL pública:\n  `https://corta-production-7bc5.up.railway.app`.\n\nActualizá esta sección a medida que el proyecto avance. No la dejes desincronizada del estado real.",
+   "que_hace": "Es la primera mitad de `CLAUDE.md`: presenta el proyecto y resume el estado de cada milestone para que el agente arranque cada sesión sabiendo dónde está parado.",
+   "como_funciona": "- El encabezado le ordena al agente leer el archivo «antes de tocar código».\n- «Estado del proyecto» lista qué milestones están hechos (M1, M3, M2, M4, M5), la estructura `src/`, `data/`, `public/`, `tests/`, `docs/` y la URL pública.\n- La última línea es una instrucción para el propio agente: «Actualizá esta sección… No la dejes desincronizada del estado real».",
+   "proposito": "El modelo no recuerda sesiones anteriores: todo lo que sabe del proyecto es lo que entra en su contexto. Este bloque reemplaza el «re-explicar todo» de cada sesión. La consigna sugería una Skill `/collect-memory` para mantenerlo; el equipo lo mantuvo a mano/por instrucción y resolvió la memoria histórica con la Skill `progress-log`.",
+   "interaccion": "Claude Code lo carga automáticamente al abrir una sesión en `corta/`. Remite a `docs/SPEC.md`, `docs/MISSION.md` y `docs/PROGRESS.md`, que el agente lee cuando necesita detalle.",
+   "teoria": "In-context learning y memoria del repo: el contexto es la única palanca para que el modelo sepa reglas y estado sin depender de su memoria de entrenamiento.",
+   "key": "tp1-claude-md-estado",
+   "tp": 1,
+   "tp_titulo": "Corta, del caos a producción",
+   "usos": [
+    {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "claude-desktop-chat",
+     "i": 9,
+     "title": "El chat responde de memoria",
+     "url": "/clases/01/#d=claude-desktop-chat&s=9"
+    },
+    {
+     "clase": 2,
+     "cnn": "02",
+     "slug": "cowork-intro",
+     "i": 16,
+     "title": "Un ejemplo de CLAUDE.md",
+     "url": "/clases/02/#d=cowork-intro&s=16"
+    }
+   ],
+   "nusos": 2
+  },
+  {
+   "id": "script-progress-log",
+   "titulo": "Script determinista: commits sin log",
+   "archivo": "scripts/progress-log-missing.sh",
+   "desde": 15,
+   "hasta": 28,
+   "lenguaje": "bash",
+   "codigo": "set -euo pipefail\n\nREPO_ROOT=$(git rev-parse --show-toplevel)\nLOG_DIR=\"$REPO_ROOT/progress_log\"\nmkdir -p \"$LOG_DIR\"\n\nseq=0\nwhile IFS= read -r hash; do\n  seq=$((seq + 1))\n  num=$(printf \"%04d\" \"$seq\")\n  if ! ls \"$LOG_DIR\" 2>/dev/null | grep -q \"^${num}-\"; then\n    echo \"${num} ${hash}\"\n  fi\ndone < <(git -C \"$REPO_ROOT\" log --reverse --format='%H')",
+   "que_hace": "Lista, en orden cronológico, los commits que todavía no tienen archivo en `progress_log/`.",
+   "como_funciona": "- `set -euo pipefail` corta ante cualquier error.\n- Ubica la raíz con `git rev-parse --show-toplevel` y crea `progress_log/` si falta.\n- Recorre `git log --reverse --format='%H'`, incrementa `seq` y lo formatea a 4 dígitos (`num`).\n- Si no hay un archivo que empiece con `${num}-`, imprime `NNNN hash`.",
+   "proposito": "Separa lo determinista (qué commits faltan, con qué número) de lo que hace bien el modelo (resumir un diff en prosa). Así la numeración no depende de que el modelo cuente bien y la Skill es idempotente.",
+   "interaccion": "Lo invoca el paso 1 de `.claude/skills/progress-log/SKILL.md` y de `.codex/prompts/progress-log.md`; su salida decide qué `progress_log/NNNN-hash.md` escribe el agente.",
+   "teoria": "Skills que combinan instrucciones en prosa con scripts: el código hace lo exacto y el modelo lo interpretativo.",
+   "key": "tp1-script-progress-log",
+   "tp": 1,
+   "tp_titulo": "Corta, del caos a producción",
+   "usos": [
+    {
+     "clase": 2,
+     "cnn": "02",
+     "slug": "cowork-intro",
+     "i": 18,
+     "title": "Qué es una Skill",
+     "url": "/clases/02/#d=cowork-intro&s=18"
+    }
+   ],
+   "nusos": 1
+  },
+  {
+   "id": "skill-progress-log",
+   "titulo": "Skill progress-log: metadata y pasos",
+   "archivo": ".claude/skills/progress-log/SKILL.md",
+   "desde": 1,
+   "hasta": 33,
+   "lenguaje": "markdown",
+   "codigo": "---\nname: progress-log\ndescription: Backfill and update progress_log/ with one file per commit, summarizing what changed and why. Use when the user asks to \"log progress\", \"update the progress log\", \"document commit history\", or \"dump a log of what was done\" for this repo.\n---\n\n# progress-log\n\nMaintains `progress_log/` — one markdown file per commit in this repo's history, in\nchronological order. Each run finds commits that don't have a file yet and writes only those;\nit never edits or deletes files for commits already logged.\n\n## File naming\n\n`progress_log/NNNN-hash.md`, e.g. `progress_log/0007-dbcba0f.md`:\n\n- `NNNN` — the commit's 1-based position in the full history (`git log --reverse`), zero-padded\n  to 4 digits. This is a stable sequence number, not a \"how many logs exist\" counter — a commit\n  keeps its number even if earlier commits get logged later.\n- `hash` — the commit's short hash (7 chars).\n\n## Steps\n\n1. Run `scripts/progress-log-missing.sh` from the repo root. It prints one `NNNN hash` line per\n   commit that still needs a log file, oldest first. If it prints nothing, tell the user the log\n   is up to date and stop — don't touch existing files.\n\n2. For each missing commit, oldest first, one at a time:\n   a. `git show --format=fuller <hash>` — get author, date, full commit message, the diff, and\n      the list of changed files (`--stat` if you want that separated out).\n   b. Read the diff and write a prose summary of what actually changed and why — don't just\n      restate the commit message. Pull the \"why\" from the commit message/body when it explains\n      intent; infer it from context (e.g. `docs/PROGRESS.md`, `docs/SPEC.md`) when it doesn't.\n   c. Write `progress_log/NNNN-hash.md` with these sections:",
+   "que_hace": "Define la Skill `progress-log`: cuándo dispararse y cómo escribir un `.md` por commit en `progress_log/`.",
+   "como_funciona": "- Frontmatter: `name` y una `description` con frases gatillo («log progress», «update the progress log», «document commit history»).\n- Convención de nombres `NNNN-hash.md` con número estable por posición en la historia.\n- Pasos: correr `scripts/progress-log-missing.sh`; por cada commit faltante, `git show --format=fuller`, redactar un resumen propio (no copiar el mensaje) y escribir el archivo con secciones fijas.",
+   "proposito": "Empaqueta una tarea que se repetía (documentar commits) para que salga siempre igual. Reemplaza a la `/collect-memory` de la consigna: en vez de mantener `CLAUDE.md`, mantiene una bitácora que solo agrega y nunca reescribe.",
+   "interaccion": "Claude Code la carga desde `.claude/skills/`; su gemela para Codex es `.codex/prompts/progress-log.md`. Llama a `scripts/progress-log-missing.sh` y produce los archivos de `progress_log/`.",
+   "teoria": "Skill: carpeta con `SKILL.md` (metadata + pasos en prosa); se dispara con `/progress-log` o sola cuando el pedido coincide con la `description`.",
+   "key": "tp1-skill-progress-log",
+   "tp": 1,
+   "tp_titulo": "Corta, del caos a producción",
+   "usos": [
+    {
+     "clase": 2,
+     "cnn": "02",
+     "slug": "cowork-intro",
+     "i": 19,
+     "title": "Cómo se dispara una Skill",
+     "url": "/clases/02/#d=cowork-intro&s=19"
+    },
+    {
+     "clase": 2,
+     "cnn": "02",
+     "slug": "claude-cowork",
+     "i": 17,
+     "title": "Qué es una Skill",
+     "url": "/clases/02/#d=claude-cowork&s=17"
+    }
+   ],
+   "nusos": 2
+  },
+  {
+   "id": "readme-deploy",
+   "titulo": "README: configuración y deploy en Railway",
+   "archivo": "README.md",
+   "desde": 30,
+   "hasta": 48,
+   "lenguaje": "markdown",
+   "codigo": "## Configuración\n\n- `DATABASE_URL` (obligatoria): URL de conexión a PostgreSQL. Nunca se versiona su valor real.\n- `PORT` (opcional): puerto HTTP; por defecto `3000`. Railway lo define automáticamente.\n\nAl arrancar, la app crea la tabla `links` si no existe e importa los registros heredados de\n`data/links.json` con `ON CONFLICT DO NOTHING`. A partir de ahí, PostgreSQL es la única fuente de\nverdad. `GET /health` comprueba también que la base esté accesible.\n\n## Deploy en Railway\n\nEl repo incluye `railway.json` con Railpack y healthcheck en `/health`. El servicio web necesita\nuna base PostgreSQL en el mismo proyecto y una variable de referencia:\n\n```text\nDATABASE_URL=${{Postgres.DATABASE_URL}}\n```\n\nLuego se despliega con `railway up` y se genera el dominio público con `railway domain`.",
+   "que_hace": "Documenta las variables de entorno y cómo quedó armado el deploy en Railway.",
+   "como_funciona": "- `DATABASE_URL` obligatoria y nunca versionada; `PORT` lo define Railway.\n- Al arrancar se crea la tabla `links` y se importan los datos heredados con `ON CONFLICT DO NOTHING`.\n- El servicio web referencia la base del mismo proyecto con `DATABASE_URL=${{Postgres.DATABASE_URL}}`.",
+   "proposito": "Deja por escrito el resultado de lo que el agente hizo contra Railway vía MCP (provisionar Postgres, setear la variable de referencia, deployar y generar el dominio). La configuración de los servidores MCP en sí no está versionada en el repo: lo que queda es este resultado y `railway.json`.",
+   "interaccion": "Describe cómo se conectan `railway.json`, `src/server.js` (`iniciar()` lee `DATABASE_URL` y `PORT`) y `src/postgres.js`.",
+   "teoria": "MCP: el servidor expone acciones de un servicio (crear base, variables, deploy) como tools que el agente llama dentro de su loop.",
+   "key": "tp1-readme-deploy",
+   "tp": 1,
+   "tp_titulo": "Corta, del caos a producción",
+   "usos": [
+    {
+     "clase": 2,
+     "cnn": "02",
+     "slug": "cowork-intro",
+     "i": 24,
+     "title": "Qué es MCP",
+     "url": "/clases/02/#d=cowork-intro&s=24"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 46,
+     "title": "MCP conecta modelos con herramientas",
+     "url": "/clases/06/#d=rag-y-mcp&s=46"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 16,
+     "title": "MCP conecta modelos con herramientas",
+     "url": "/clases/07/#d=rag-mcp-rapida&s=16"
+    }
+   ],
+   "nusos": 3
+  },
+  {
+   "id": "descripciones-tools",
+   "titulo": "Descripciones de tools: fuente, uso, qué NO tienen, valores válidos",
+   "archivo": "hospital/descripciones.py",
+   "desde": 8,
+   "hasta": 38,
+   "lenguaje": "python",
+   "codigo": "BUSCAR_DOCUMENTOS = (\n    \"Busca en los documentos oficiales del Hospital Provincial Arroyo Claro: normas y procedimientos que no \"\n    \"cambian de un día a otro. Sirve para horarios fijos (visitas, altas, farmacia, laboratorio, vacunatorio, \"\n    \"donación de sangre), quién puede visitar o quedarse con un paciente, preparación para estudios y cirugías \"\n    \"(ayunos, dietas), requisitos y documentación para turnos, internación, farmacia y coberturas, triage de \"\n    \"la guardia, derechos del paciente, accesos al edificio, control de infecciones, maternidad, pediatría, \"\n    \"kinesiología, salud mental y telemedicina. NO tiene el estado de hoy (camas libres, profesionales de \"\n    \"guardia, turnos disponibles, stock de farmacia ni tiempos de espera actuales). \"\n    \"consulta: el tema a buscar, en español y con las mismas palabras que usó el paciente (por ejemplo \"\n    \"'cómo es una consulta por telemedicina'). Si la pregunta toca varios temas de los documentos, hacé una \"\n    \"búsqueda por tema. Devuelve los fragmentos más relevantes con su documento y sección de origen.\"\n)\n\nCONSULTAR_CAMAS = (\n    \"Estado de HOY de las camas de internación de un sector: total, ocupadas y libres. Usala para saber si hay \"\n    \"lugar o camas disponibles para internar. \"\n    \"sector: uno de clinica_medica, cirugia_general, terapia_intensiva, pediatria, neonatologia, maternidad.\"\n)\n\nCONSULTAR_GUARDIA = (\n    \"Profesionales que están de guardia HOY en una especialidad, con su horario (por ejemplo 08:00-20:00 es \"\n    \"el turno de día y 20:00-08:00 el de la noche). Usala para saber quién atiende hoy o esta noche. \"\n    \"especialidad: una de clinica_medica, cardiologia, pediatria, traumatologia, obstetricia, salud_mental.\"\n)\n\nCONSULTAR_TURNOS = (\n    \"Próximos turnos disponibles (fecha y hora) con una especialidad en consultorios externos. Usala para saber \"\n    \"cuándo es el primer turno libre. No dice qué hay que llevar al turno: eso está en los documentos. \"\n    \"especialidad: una de cardiologia, dermatologia, traumatologia, psicologia, gastroenterologia, \"\n    \"obstetricia, kinesiologia.\"\n)",
+   "que_hace": "Define el texto que lee el modelo para decidir qué herramienta llamar: `buscar_documentos` para normas fijas y las de la API para el estado de hoy.",
+   "como_funciona": "- `BUSCAR_DOCUMENTOS` lista los temas de los documentos y aclara que NO tiene el estado de hoy; pide buscar «con las mismas palabras que usó el paciente» y hacer una búsqueda por tema.\n- `CONSULTAR_CAMAS`, `CONSULTAR_GUARDIA` y `CONSULTAR_TURNOS` dicen que son el estado de HOY y enumeran los valores válidos del parámetro.\n- `CONSULTAR_TURNOS` agrega: «No dice qué hay que llevar al turno: eso está en los documentos».",
+   "proposito": "El ruteo depende solo de estas descripciones, así que separan norma (documentos) de estado (API) y dicen cuándo NO usar cada tool: ruteo 1,00 en las 4 corridas. La frase de las palabras del paciente arregló A11, y el ejemplo de consulta se cambió por uno de telemedicina para no filtrar la pregunta A01 de dev.",
+   "interaccion": "Las importa `hospital/herramientas.py` a través del diccionario `DESCRIPCIONES`; el PLAN prevé que el servidor MCP use exactamente los mismos textos para que la comparación parte 2 vs. parte 3 sea justa.",
+   "teoria": "Diseño de herramientas: la descripción es la interfaz para el modelo (qué hace, cuándo usarla, cuándo no, parámetros válidos).",
+   "key": "tp3-descripciones-tools",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 2,
+     "cnn": "02",
+     "slug": "cowork-intro",
+     "i": 25,
+     "title": "Cómo el agente descubre y usa una herramienta",
+     "url": "/clases/02/#d=cowork-intro&s=25"
+    },
+    {
+     "clase": 5,
+     "cnn": "05",
+     "slug": "prompting",
+     "i": 33,
+     "title": "Zero-shot vs. few-shot",
+     "url": "/clases/05/#d=prompting&s=33"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 10,
+     "title": "Las fuentes ponen el techo de calidad",
+     "url": "/clases/06/#d=rag-y-mcp&s=10"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 63,
+     "title": "Cuatro principios de diseño",
+     "url": "/clases/06/#d=rag-y-mcp&s=63"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 68,
+     "title": "La descripción dice cuándo NO usarla",
+     "url": "/clases/06/#d=rag-y-mcp&s=68"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 28,
+     "title": "La descripción dice cuándo NO usarla",
+     "url": "/clases/07/#d=rag-mcp-rapida&s=28"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 48,
+     "title": "MCP: una herramienta es una definición",
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=48"
+    },
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 20,
+     "title": "Principios para diseñar tools",
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=20"
+    }
+   ],
+   "nusos": 8
+  },
+  {
+   "id": "server-rutas",
+   "titulo": "Rutas de Corta: crear, stats y redirigir",
+   "archivo": "src/server.js",
+   "desde": 23,
+   "hasta": 63,
+   "lenguaje": "javascript",
+   "codigo": "  // crear un link corto\n  app.post('/api/links', rutaAsync(async function (req, res) {\n    const { url } = req.body;\n    if (!url) {\n      return res.status(400).json({ error: 'Falta la url' });\n    }\n\n    const creado = new Date().toISOString();\n    let codigo;\n    let creadoEnDB = false;\n\n    while (!creadoEnDB) {\n      codigo = generarCodigo();\n      creadoEnDB = await repositorio.crear({\n        codigo,\n        url,\n        clicks: 0,\n        creado\n      });\n    }\n\n    res.json({ codigo, corta: '/' + codigo });\n  }));\n\n  // estadisticas de un link\n  app.get('/api/links/:codigo/stats', rutaAsync(async function (req, res) {\n    const link = await repositorio.buscar(req.params.codigo);\n    if (!link) {\n      return res.status(404).json({ error: 'No existe ese link' });\n    }\n    res.json(link);\n  }));\n\n  // redirigir al destino e incrementar el contador en una sola operacion atomica\n  app.get('/:codigo', rutaAsync(async function (req, res) {\n    const link = await repositorio.incrementarClicks(req.params.codigo);\n    if (!link) {\n      return res.status(404).send('No existe ese link');\n    }\n    res.redirect(link.url);\n  }));",
+   "que_hace": "Define los tres endpoints de negocio: crear un link, consultar sus estadísticas y redirigir incrementando clicks.",
+   "como_funciona": "- `POST /api/links`: si falta `url` responde 400; después repite `generarCodigo()` + `repositorio.crear(...)` hasta que `creadoEnDB` sea `true` (resuelve colisiones).\n- `GET /api/links/:codigo/stats`: `repositorio.buscar` y 404 si no existe.\n- `GET /:codigo`: `repositorio.incrementarClicks` en una sola operación y `res.redirect(link.url)` (302); 404 si no existe.\n- Todo envuelto en `rutaAsync` para que los errores lleguen al middleware de 500.",
+   "proposito": "Es el código que el agente tipeó en las vueltas `fix:`/`feat:`; cada rama tiene un test que la fijó antes. Nótese que solo valida `!url`: el 400 por URL inválida que promete `SPEC.md` no está implementado.",
+   "interaccion": "Vive dentro de `crearApp(repositorio)`, que recibe Postgres en producción (`iniciar()`) o el repositorio en memoria de `tests/helpers.js` en los tests. `public/stats.html` consume la ruta de stats.",
+   "teoria": "Revisión humana del output del agente: el código se acepta porque los tests derivados del SPEC lo verifican, no porque «parezca bien».",
+   "key": "tp1-server-rutas",
+   "tp": 1,
+   "tp_titulo": "Corta, del caos a producción",
+   "usos": [
+    {
+     "clase": 2,
+     "cnn": "02",
+     "slug": "cowork-intro",
+     "i": 29,
+     "title": "El nuevo rol: Diseñar, delegar y revisar",
+     "url": "/clases/02/#d=cowork-intro&s=29"
+    }
+   ],
+   "nusos": 1
+  },
+  {
+   "id": "gitignore-secretos",
+   "titulo": ".gitignore: fuera notas.txt y los .env",
+   "archivo": ".gitignore",
+   "desde": 1,
+   "hasta": 5,
+   "lenguaje": "text",
+   "codigo": "node_modules/\n.DS_Store\nnotas.txt\n.env*\n!.env.example",
+   "que_hace": "Excluye del repositorio `node_modules/`, `.DS_Store`, `notas.txt` (que tenía una credencial de Postgres) y cualquier `.env*` salvo `.env.example`.",
+   "como_funciona": "- `notas.txt` está desde el primer commit (`a6061b7`): nunca viajó al remoto.\n- `.env*` + `!.env.example` (commit `9ac90f4`): se ignoran todos los archivos de entorno, pero se versiona la plantilla sin valores reales.\n- `node_modules/` se regenera con `npm install`.",
+   "proposito": "Materializa la respuesta a «¿todo merece viajar a un remoto?»: el estado heredado se subió tal cual menos lo regenerable y lo secreto. Como el archivo con la credencial ya había entrado a la historia local, además se reescribió la historia una vez antes del primer push.",
+   "interaccion": "Lo aplica git en cada `git add`. Se complementa con `README.md` (`cp .env.example .env`), con `package.json` (`--env-file-if-exists=.env`) y con `src/server.js`, que lee `DATABASE_URL` solo del entorno.",
+   "teoria": "Privacidad y secretos: clasificar el dato antes de compartirlo y mantener credenciales fuera del código y del contexto.",
+   "key": "tp1-gitignore-secretos",
+   "tp": 1,
+   "tp_titulo": "Corta, del caos a producción",
+   "usos": [
+    {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "introduccion",
+     "i": 13,
+     "title": "Limitaciones de la IA Generativa",
+     "url": "/clases/01/#d=introduccion&s=13"
+    },
+    {
+     "clase": 2,
+     "cnn": "02",
+     "slug": "cowork-intro",
+     "i": 30,
+     "title": "Antes de cerrar: cuidados",
+     "url": "/clases/02/#d=cowork-intro&s=30"
+    },
+    {
+     "clase": 13,
+     "cnn": "13",
+     "slug": "cierre-magnifica-humanitas",
+     "i": 14,
+     "title": "Clasificá antes de pegar",
+     "url": "/clases/13/#d=cierre-magnifica-humanitas&s=14"
+    }
+   ],
+   "nusos": 3
+  },
+  {
+   "id": "progress-log-0001",
+   "titulo": "progress_log/: el primer commit documentado",
+   "archivo": "progress_log/0001-a6061b7.md",
+   "desde": 1,
+   "hasta": 21,
+   "lenguaje": "markdown",
+   "codigo": "# 0001 — chore: estado inicial heredado de Corta\n\n- **Commit:** a6061b7f2f3aa89b9b2abccd011e820328a8dad3\n- **Author:** FranCalveyra\n- **Date:** Wed Aug 12 17:23:20 2026 -0300\n\n## Summary\n\nFirst commit of the repo: the Corta project dumped exactly as the previous developer left it,\ndeliberately uncurated. It's a small Express URL shortener: `server.js` is the real entrypoint\n(reads/writes `links.json`, exposes `POST /api/links` and `GET /:codigo`), with `utils.js` for\ncode generation. But it ships alongside dead weight typical of an unmaintained handoff:\n`index_v2_FINAL.js` and `server_OLD.js` (abandoned duplicate/older entrypoints),\n`links_backup_marzo.json` (a stale backup of the link store), `public/estilos_viejos.css` (an\nunused old stylesheet next to the real `public/estilos.css`), a stray `public/logo (1).png`, and\n`test.js` (a manual smoke-test script, not a real test suite). `package.json`/`package-lock.json`\ndeclare the original dependencies (`express`, `axios`, plus two that turn out unused —\n`lodash`, `moment`). Only `node_modules/` (regenerable via `npm install`) and a `notas.txt` that\nheld a plaintext credential were excluded, via a new `.gitignore`. The intent, per the commit\nmessage, is a trace-able starting point: everything from here on is a diff against this exact\ninherited state, duplicates and all.",
+   "que_hace": "Es el log generado para el primer commit (`a6061b7`): quién, cuándo, qué se subió y qué se dejó afuera.",
+   "como_funciona": "- Cabecera con hash completo, autor (`FranCalveyra`) y fecha.\n- «Summary» explica que el commit sube el caos heredado sin curar (`server_OLD.js`, `index_v2_FINAL.js`, backups, `test.js`).\n- Aclara las dos exclusiones: `node_modules/` y `notas.txt` con la credencial en texto plano.\n- El nombre `0001-a6061b7` es la posición en `git log --reverse` + el hash corto.",
+   "proposito": "Da trazabilidad: cada uno de los 21 commits tiene su `.md` con resumen, archivos e impacto, así cualquiera (o el agente) reconstruye por qué se hizo cada cambio sin leer todos los diffs. Este en particular documenta el punto de partida del M1.",
+   "interaccion": "Lo escribió el agente siguiendo `.claude/skills/progress-log/SKILL.md`, a partir de la lista que devuelve `scripts/progress-log-missing.sh` y de `git show`.",
+   "teoria": "Trazabilidad de decisiones, código y pruebas como entregable; el repo con historia completa como evidencia.",
+   "key": "tp1-progress-log-0001",
+   "tp": 1,
+   "tp_titulo": "Corta, del caos a producción",
+   "usos": [
+    {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "introduccion",
+     "i": 17,
+     "title": "Entregables de clase",
+     "url": "/clases/01/#d=introduccion&s=17"
+    },
+    {
+     "clase": 2,
+     "cnn": "02",
+     "slug": "cowork-intro",
+     "i": 32,
+     "title": "La historia de Corta",
+     "url": "/clases/02/#d=cowork-intro&s=32"
+    }
+   ],
+   "nusos": 2
+  },
+  {
+   "id": "postgres-repo",
+   "titulo": "Repositorio PostgreSQL: crear sin pisar e incremento atómico",
+   "archivo": "src/postgres.js",
+   "desde": 15,
+   "hasta": 56,
+   "lenguaje": "javascript",
+   "codigo": "function crearRepositorioPostgres(pool) {\n  return {\n    async inicializar() {\n      await pool.query(`\n        CREATE TABLE IF NOT EXISTS links (\n          codigo VARCHAR(3) PRIMARY KEY CHECK (codigo ~ '^[a-z0-9]{3}$'),\n          url TEXT NOT NULL,\n          clicks INTEGER NOT NULL DEFAULT 0 CHECK (clicks >= 0),\n          creado TIMESTAMPTZ NOT NULL\n        )\n      `);\n    },\n\n    async crear(link) {\n      const resultado = await pool.query(\n        `INSERT INTO links (codigo, url, clicks, creado)\n         VALUES ($1, $2, $3, $4)\n         ON CONFLICT (codigo) DO NOTHING\n         RETURNING codigo`,\n        [link.codigo, link.url, link.clicks, link.creado]\n      );\n      return resultado.rowCount === 1;\n    },\n\n    async buscar(codigo) {\n      const resultado = await pool.query(\n        'SELECT codigo, url, clicks, creado FROM links WHERE codigo = $1',\n        [codigo]\n      );\n      return normalizarLink(resultado.rows[0]);\n    },\n\n    async incrementarClicks(codigo) {\n      const resultado = await pool.query(\n        `UPDATE links\n         SET clicks = clicks + 1\n         WHERE codigo = $1\n         RETURNING codigo, url, clicks, creado`,\n        [codigo]\n      );\n      return normalizarLink(resultado.rows[0]);\n    },",
+   "que_hace": "Implementa la persistencia en PostgreSQL: crea la tabla, inserta links sin pisar códigos existentes, busca y suma clicks de forma atómica.",
+   "como_funciona": "- `inicializar()`: `CREATE TABLE IF NOT EXISTS links` con `codigo` como PRIMARY KEY y `CHECK` del formato `[a-z0-9]{3}`.\n- `crear(link)`: `INSERT … ON CONFLICT (codigo) DO NOTHING` y devuelve `rowCount === 1` (true si insertó, false si chocó).\n- `buscar(codigo)`: `SELECT` + `normalizarLink` para devolver `creado` como ISO.\n- `incrementarClicks(codigo)`: `UPDATE … SET clicks = clicks + 1 … RETURNING`, una sola sentencia.",
+   "proposito": "Responde «¿dónde viven los datos?»: el `links.json` en disco no sobrevive a un redeploy en Railway; Postgres sí (prueba: el link `v4v` siguió con `clicks: 1` tras un redeploy forzado). El `UPDATE` atómico evita perder clicks con redirecciones concurrentes, y `ON CONFLICT` sirve tanto para colisiones como para importar datos heredados.",
+   "interaccion": "Lo crea `conectarPostgres()` y lo usan `iniciar()` y `crearApp()` en `src/server.js`. Se testea con un pool falso en `tests/postgres.test.js`.",
+   "teoria": "Delegar una tarea completa al agente (migrar la persistencia) con el criterio de aceptación fijado antes en tests.",
+   "key": "tp1-postgres-repo",
+   "tp": 1,
+   "tp_titulo": "Corta, del caos a producción",
+   "usos": [
+    {
+     "clase": 2,
+     "cnn": "02",
+     "slug": "cowork-intro",
+     "i": 33,
+     "title": "La misión: del caos a producción",
+     "url": "/clases/02/#d=cowork-intro&s=33"
+    }
+   ],
+   "nusos": 1
+  }
+ ]
+}

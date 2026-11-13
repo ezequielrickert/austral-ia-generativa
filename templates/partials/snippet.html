@@ -1,0 +1,19 @@
+<template id="sn-{{ sn.key }}" data-title="{{ sn.titulo }}" data-tp="{{ sn.tp }}" data-tp-title="{{ sn.tp_titulo }}" data-file="{{ sn.archivo }}" data-from="{{ sn.desde }}" data-to="{{ sn.hasta }}">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">{{ sn.archivo }}</span>{% if sn.desde %}<span class="mono faint">L{{ sn.desde }}–{{ sn.hasta }}</span>{% endif %}</div>
+      <div class="code-scroll"><pre class="code"><code class="language-{{ sn.lenguaje }}" data-start="{{ sn.desde | default(value=1) }}">{{ sn.codigo }}</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose">{{ sn.que_hace | markdown | safe }}</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose">{{ sn.como_funciona | markdown | safe }}</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose">{{ sn.proposito | markdown | safe }}</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose">{{ sn.interaccion | markdown | safe }}</div></section>
+      {% if sn.teoria %}<section><span class="section-label">Teoría que aplica</span><div class="prose">{{ sn.teoria | markdown | safe }}</div></section>{% endif %}
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · {{ sn.nusos }}</span>
+        <div class="related">{% for u in sn.usos %}<a href="{{ config.base_url }}{{ u.url }}"><span class="ref">{{ u.cnn }}·{{ u.i }}</span><span class="t">{{ u.title }}</span></a>{% endfor %}</div>
+      </section>
+    </div>
+  </div>
+</template>

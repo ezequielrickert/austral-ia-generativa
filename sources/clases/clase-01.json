@@ -1,0 +1,752 @@
+{
+  "num": 1,
+  "fecha": "2026-08-05",
+  "titulo": "Bienvenida + CoWork: fundamentos de IA, modelos fundacionales y el chat extendido",
+  "talks": [
+    "introduccion",
+    "claude-desktop-chat"
+  ],
+  "bloque": "Fundamentos de redes",
+  "tesis": "La IA generativa amplía la capacidad de quienes diseñan, construyen y operan software **cuando la usan con criterio técnico, validación y responsabilidad**. La IA no es magia: es estadística, álgebra lineal y grandes cantidades de datos bien organizados; lo que queda como trabajo distintivo del ingeniero es el criterio, los controles y la responsabilidad sobre lo que el sistema hace.",
+  "resumen": "La clase inaugural encuadra la materia: la IA generativa ya cambia cómo se analizan requisitos, se escribe código, se prueba y se opera software, pero tiene límites (alucinaciones, sesgos, privacidad, sesgo de automatización, costo ambiental, degradación de habilidades) que obligan a exigir evidencia antes de aceptar una salida. Después construye un lenguaje común: la IA como **diseño de agentes racionales** (Russell & Norvig), una historia que va de la máquina de Turing (1936) y Shannon (1948) al perceptrón, los inviernos, backpropagation (1986), Deep Blue (1997), AlexNet (2012), AlphaGo y la jugada 37 (2016), el Transformer (2017), ChatGPT (2022), DeepSeek R1 y MCP (2025) y Claude Mythos (2026). Ordena los problemas en siete familias (predicción, percepción, representación, decisión secuencial, búsqueda/planificación, razonamiento simbólico y generación), define **modelo de lenguaje, foundation model, LLM y multimodal**, recorre los paradigmas de aprendizaje y la escala de datos y cómputo, y cierra con tipos de agentes y dimensiones del entorno. El material complementario de Claude Desktop agrega la idea operativa clave: el modelo responde de memoria y **el contexto es la única palanca** (in-context learning), que se enriquece con búsqueda web, Connectors/MCP y tareas programadas.",
+  "secciones": [
+    {
+      "titulo": "Por qué esta materia: IA generativa en Ingeniería de Software",
+      "contenido": "La materia busca que el alumno **entienda cómo funcionan los modelos y aprenda a construir con ellos con criterio de Ingeniería de Software**: explicar qué hacen los transformers, cómo intervienen datos, entrenamiento, inferencia y evaluación (no sólo usar un chat), trabajar hands-on (notebooks, repos, prompts, herramientas) y **usar IA sin delegar el juicio técnico**.\n\n**Impacto económico.** McKinsey (*The economic potential of generative AI*) estima que la GenAI podría añadir **entre 2,6 y 4,4 billones de dólares anuales** a la economía global (el PIB de un país como Reino Unido): impulso a la productividad como \"copiloto\", transformación de funciones (operaciones, marketing, ventas, atención al cliente, desarrollo de software) y nuevas industrias y roles (ingeniería de prompts, auditoría algorítmica).\n\n**Transformación de la Ingeniería de Software.** Los modelos asisten en leer repositorios, generar código, explicar errores y crear pruebas; ayudan a detectar patrones de fallas, resumir incidentes y automatizar runbooks. Pero:\n- *\"El equipo conserva la responsabilidad de revisar, integrar y desplegar.\"*\n- **El equipo se reorganiza alrededor de la revisión**: quien integra código generado responde por él.\n- Los asistentes trabajan sobre **representaciones incompletas del sistema** (no conocen dependencias privadas, decisiones de arquitectura, reglas de negocio ni el estado de producción). Un equipo confiable combina la velocidad de propuesta del modelo con **pruebas automatizadas, revisión de pares, despliegues graduales y observabilidad**.\n\n**\"Hoy desarrolla cualquiera\"**: un ingeniero químico arma su script de simulación y un contador automatiza un cierre con ChatGPT, Claude o Copilot. Lo que distingue al ingeniero de software es que **sabe exigir evidencia, pruebas y responsabilidad antes de que ese código llegue a producción**.\n\n**El riesgo macroeconómico (escenario).** Citrini Research, *The 2028 Global Intelligence Crisis*, es un **escenario hipotético, no una predicción**: el \"PIB fantasma\" (productividad y ganancias récord que no circulan porque las máquinas no consumen), el desplazamiento del \"cuello blanco\" (50% del empleo y 75% del gasto discrecional) y una **espiral deflacionaria** (despidos → cae el consumo → más inversión en IA para bajar costos). La premisa: la inteligencia humana tenía un premium por su escasez, y ese premium se está deshaciendo.\n\n**Logística de la materia**: equipos de 4 (2 de Sistemas y 2 de Ciencia de Datos), un entregable cada dos clases con trazabilidad de decisiones, prompts, código y pruebas; nota = **40% entregables + 60% trabajo final**.",
+      "conceptos": [
+        "criterio-de-ingenieria",
+        "humano-en-el-circuito"
+      ],
+      "ejemplo": "Pregunta que la cátedra deja para la clase: *¿Qué evidencia pedirían antes de aceptar una modificación de código generada por un modelo?* Respuesta esperada: pruebas reproducibles que pasen, contraste con documentación oficial y con las convenciones del repo, revisión de pares del diff y, en producción, despliegue gradual con observabilidad y posibilidad de revertir."
+    },
+    {
+      "titulo": "Limitaciones de la IA generativa",
+      "contenido": "La clase enumera **siete limitaciones**, cada una con un ejemplo de software:\n\n1. **Alucinaciones y respuestas falsas.** Los modelos generan secuencias *plausibles* a partir de patrones: pueden inventar una API, recomendar un paquete inexistente u omitir una condición de seguridad con tono convincente. Ejemplo: se pide una integración con una librería y el modelo produce funciones que no existen en esa versión; compila con sustitutos improvisados y falla en producción. Toda salida pasa por **pruebas, revisión y contraste con documentación oficial**.\n2. **Sesgos en los datos.** Repos y tickets históricos contienen prácticas inseguras, dependencias viejas y sesgos. Un sistema entrenado con tickets puede dar menor prioridad a problemas de un grupo poco representado; un asistente puede sugerir patrones antiguos porque son frecuentes en su entrenamiento. Hay que medir errores **por segmento**.\n3. **Privacidad y protección de datos.** Prompts y adjuntos pueden llevar código propietario, claves o datos personales; el proveedor puede retenerlos según contrato. *\"Un chat no reemplaza un canal seguro ni una revisión de cumplimiento.\"*\n4. **Sesgo de automatización.** Una respuesta bien escrita recibe más confianza que una verificada, sobre todo dentro del editor o del panel de operaciones. Ejemplo: un asistente propone silenciar una alerta como \"ruido\" y el operador acepta, ocultando un incidente real. La revisión humana necesita **criterios y tiempo asignado**, no una aprobación nominal.\n5. **Acceso desigual.** Costo de modelos, cómputo y conectividad; la calidad varía por idioma y contexto cultural.\n6. **Impacto ambiental.** Entrenar y servir consume energía y agua; antes de agregar una llamada al modelo, comparar con una regla determinista, una búsqueda, un modelo pequeño, un caché o un proceso asíncrono (precisión, latencia, costo y consumo).\n7. **Degradación de habilidades técnicas.** Aceptar parches sin entender erosiona la capacidad de depurar y diseñar; en un incidente grave, ese equipo tarda más en decidir qué hipótesis descartar.\n\n**Punto clave:** la IA debe **ampliar** la capacidad de ingeniería, no sustituir el aprendizaje ni la responsabilidad técnica. Pregunta de debate: *¿qué controles exigirían antes de permitir que un agente modifique datos, despliegue código o responda a usuarios?*",
+      "conceptos": [
+        "alucinacion",
+        "sesgo-de-automatizacion",
+        "sesgo-en-los-datos"
+      ],
+      "ejemplo": "Caso de operación: un agente puede resumir alertas y ejecutar acciones acotadas de un runbook, pero el diseño debe **limitar permisos, registrar cada acción y permitir detener o revertir** la automatización."
+    },
+    {
+      "titulo": "Qué es la IA y una breve historia (1936–1997)",
+      "contenido": "**Definición.** Intuitivamente, IA son \"máquinas haciendo cosas que requerirían inteligencia si las hiciera un humano\". Con rigor, siguiendo a **Russell & Norvig** (*Artificial Intelligence: A Modern Approach*): **la IA es el diseño de agentes racionales, sistemas que perciben su entorno y toman acciones para maximizar sus posibilidades de éxito en un objetivo dado**. Evita el debate sobre \"conciencia\" y se centra en la función que mapea secuencias de percepciones a acciones. *\"La IA no es magia: es estadística, álgebra lineal y grandes cantidades de datos bien organizados.\"* Intuición: un sistema de IA no lleva una regla escrita por cada situación; **aprende patrones de datos y los aplica a casos que nunca vio**.\n\n**Hitos (parte 1):**\n- **1936 – Máquina universal de Turing** (*On Computable Numbers*): cinta infinita, cabezal y tabla de estados; resuelve todo problema con solución algorítmica. **Problema de la parada**: no puede existir un programa que decida, para todo programa, si termina (el \"programa rebelde\" que se consulta a sí mismo es la paradoja de \"esta oración es falsa\"). Por eso **ningún modelo, por grande que sea, puede verificar en general que el código que generó es correcto**.\n- **1948 – Shannon**, *A Mathematical Theory of Communication*: bit, entropía, capacidad de canal. La entropía de Shannon es la base de la **entropía cruzada con la que se entrena un LLM** al predecir el próximo token; la perplejidad es su exponencial.\n- **1950 – Turing**, *Computing Machinery and Intelligence*: el **juego de la imitación** reemplaza \"¿pueden pensar las máquinas?\" por un experimento observable. ¿Mide inteligencia o imitación del lenguaje?\n- **1956 – Dartmouth**: McCarthy acuña \"Inteligencia Artificial\" (con Minsky, Rochester, Shannon). Optimismo de calendario que se repite en cada ola.\n- **1958 – Perceptrón** de Rosenblatt (Mark I, 400 fotoceldas): primera red que aprende de ejemplos. **1969 – Minsky y Papert** (*Perceptrons*) muestran que un perceptrón de una capa **no puede representar XOR** → primer invierno.\n- **1980-90s – Sistemas expertos** (MYCIN, DENDRAL, XCON): reglas escritas a mano + motor de inferencia; cayeron porque el mantenimiento crecía más rápido que el sistema y no generalizaban → segundo invierno. Paralelo: la ingeniería de prompts corre el mismo riesgo si se vuelve una colección de reglas inmantenible.\n- **1986 – Backpropagation** (Rumelhart, Hinton y Williams, *Nature*): entrena redes multicapa; con varias capas el límite de XOR desaparece. Faltaban datos y cómputo (GPUs).\n- **1997 – Deep Blue** vence a Kasparov 3½-2½: búsqueda alfa-beta, **200 millones de posiciones por segundo** y una evaluación ajustada por humanos. **No hay aprendizaje**: cierra la era de las reglas.\n\n**La neurona artificial:** entradas $x_i$, pesos $w_i$ (lo que se aprende), suma ponderada más bias, y una función de activación (ReLU, sigmoid, tanh) que introduce no-linealidad: $\\hat y = f(z)$.",
+      "conceptos": [
+        "agente-racional",
+        "problema-de-la-parada",
+        "test-de-turing",
+        "perceptron",
+        "neurona",
+        "backpropagation"
+      ],
+      "ejemplo": "XOR: (0,0)→0, (0,1)→1, (1,0)→1, (1,1)→0. No existe una recta que separe los 1 de los 0, por eso un perceptrón de una capa (frontera lineal) falla; una capa oculta entrenada con backpropagation lo resuelve."
+    },
+    {
+      "titulo": "Del deep learning a la era generativa (2011–2026)",
+      "contenido": "- **2011 – IBM Watson gana Jeopardy!** (2.880 núcleos POWER7, 16 TB de RAM, desconectado de internet). Arquitectura DeepQA: cientos de hipótesis por pregunta, ~100 algoritmos de puntuación y umbral de confianza. Error célebre: respondió **\"Toronto\"** en la categoría \"Ciudades de EE.UU.\" → un sistema puede ganar un torneo y errar algo que ningún humano erraría.\n- **2012 – AlexNet** (Krizhevsky, Sutskever, Hinton) gana ImageNet con **15,3% de error top-5 vs 26,2%** del segundo. No fue una idea nueva (las CNN son de los 80) sino la combinación de **datos etiquetados a escala + GPUs baratas (dos GTX 580) + ReLU y dropout**. Se pasa de *codificar* detectores a mano a *entrenarlos*.\n- **2016 – AlphaGo vence a Lee Sedol 4-1.** Go tiene factor de ramificación ~250 (ajedrez ~35): la fuerza bruta de Deep Blue no sirve. Red de **política** + red de **valor** guiando **búsqueda Monte Carlo en árbol**; entrenado primero supervisado con partidas humanas y luego por **refuerzo con self-play**. **Move 37** (partida 2): una jugada que un humano elegiría 1 en 10.000; el RL generó conocimiento estratégico que 2.500 años de Go no tenían. Contrapunto: la **jugada 78** de Lee Sedol (partida 4) desarmó a AlphaGo. AlphaGo Zero (un año después) aprendió **sin datos humanos** y jugaba mejor.\n- **2017 – \"Attention Is All You Need\"** (Vaswani et al.): elimina las RNN/LSTM. (1) **Paralelización total** en GPU, (2) mejor manejo de **contexto largo** (cualquier token conecta con cualquiera), (3) **escalabilidad** predecible. Costo: la atención es **cuadrática** en la longitud — duplicar el contexto cuadruplica el cómputo.\n- **2020 – GPT-3** (175.000 M de parámetros) resuelve tareas nuevas sólo viéndolas en el prompt. Leyes de escala de **Kaplan et al.** (arXiv:2001.08361) y el término **foundation model** (Stanford, arXiv:2108.07258).\n- **2022 – ChatGPT** (30/11/2022): 1 M de usuarios en 5 días, ~100 M en 2 meses (estimación de UBS; Threads lo superó en 2023). **No cambió el modelo (GPT-3.5 ya existía), cambió la interfaz.**\n- **2025 – DeepSeek R1** (pesos abiertos, razonamiento barato): Nvidia pierde ~US$589.000 M en un día; se rompe la tesis *económica* de que el razonamiento de frontera exige siempre más cómputo. Los **agentes pasan a producción** (problema de ingeniería, no de prompt) y **MCP** se consolida como estándar de conexión modelo-herramienta.\n- **2026 – Claude Mythos / Project Glasswing**: >10.000 vulnerabilidades en el primer mes (2.000 en Cloudflare, 271 de Firefox corregidas, verificada por Mozilla). El caso de un RCE de 17 años en el NFS de FreeBSD **no tiene CVE ni aviso** y llegó por tres saltos sin verificación independiente: la lección doble es la capacidad nueva (**el costo de buscar exhaustivamente se derrumbó**) y **cómo verificar una afirmación técnica antes de repetirla**.\n\nSíntesis de la cátedra: si el costo baja, el modelo actúa y conectarlo es estándar, **lo distintivo del ingeniero es el criterio, los controles y la responsabilidad**.",
+      "conceptos": [
+        "transformer",
+        "aprendizaje-por-refuerzo",
+        "mcp",
+        "leyes-de-escala"
+      ],
+      "ejemplo": "Pregunta de la clase sobre Move 37: si un sistema propone una decisión de arquitectura que nadie del equipo habría propuesto, ¿qué evidencia hace falta para aceptarla? Es la misma pregunta que enfrentaron los comentaristas en 2016, trasladada a un code review."
+    },
+    {
+      "titulo": "Taxonomía de problemas: las siete familias",
+      "contenido": "La IA es una **caja de herramientas**; la clase la ordena en siete familias de problemas:\n\n| Familia | Qué hace | Ejemplos / hito |\n|---|---|---|\n| **Predicción** | Aprende $X \\to Y$ de datos etiquetados (clasificación binaria/multiclase, regresión, series temporales); minimiza el error | ticket → prioridad; fraude; métricas Accuracy, F1, AUC-ROC, MAE, RMSE, R². Hito: AlexNet 2012 |\n| **Percepción** | Extrae estructura de señales crudas (píxeles, ondas, frames) | clasificación, detección (YOLO), segmentación semántica, ASR (Whisper), OCR de facturas. Hito: **ResNet 2015, 3,57% de error vs ~5% humano** |\n| **Representación** | Aprende embeddings/espacios latentes donde **la cercanía significa parecido** | búsqueda semántica, recomendación, anomalías, clustering. Hito: **Word2Vec 2013: Rey − Hombre + Mujer ≈ Reina** (base de las bases vectoriales y RAG) |\n| **Decisión secuencial** | Maximiza **recompensa acumulada**; RL: agente ↔ entorno, la recompensa llega tarde y evalúa una secuencia | juegos, robótica, trading, **RLHF**. Riesgo: una recompensa mal definida induce comportamientos útiles para la métrica y dañinos para el objetivo. Hito: AlphaGo; AlphaZero aprendió ajedrez, Go y shogi desde cero en <24 h |\n| **Búsqueda / planificación** | Mejor secuencia de acciones en un espacio de estados **con modelo del entorno conocido** | VRP, A*, MCTS, OR-Tools, orden de pruebas. Hito: DeepMind reduce **40% la energía de enfriamiento** de los data centers de Google |\n| **Razonamiento simbólico** | Reglas IF-THEN, ontologías, lógica: **interpretable, auditable, determinista** | sistemas expertos, validación normativa, grafos de conocimiento, verificación formal. Hoy: un LLM propone pasos y un motor simbólico los verifica. Hito: Deep Blue |\n| **Generación** | Modela la distribución $P(X)$ o $P(Y\\mid X)$ y produce muestras nuevas | texto, código, imagen, audio, datos sintéticos; Transformer, difusión, VAE, GAN |\n\n**Diferencias que se preguntan:**\n- Predicción vs decisión secuencial: en predicción hay una etiqueta correcta por ejemplo; en RL sólo una recompensa tardía sobre una secuencia.\n- Búsqueda vs RL: en búsqueda **el modelo del entorno es conocido**; en RL el agente **lo descubre por experiencia**.\n- Predicción vs generación: en generación **la cantidad de salidas válidas no está acotada**, así que la evaluación deja de apoyarse en accuracy.\n- Un **auto autónomo** combina percepción + decisión secuencial + planificación.",
+      "conceptos": [
+        "taxonomia-de-problemas",
+        "embedding",
+        "aprendizaje-por-refuerzo",
+        "razonamiento-simbolico"
+      ],
+      "ejemplo": "Clasificar tickets por prioridad (P1/P3) es **predicción multiclase**; agrupar clientes por comportamiento sin etiquetas es **representación/clustering**; elegir el orden de ejecución de pruebas con dependencias conocidas es **planificación**; redactar la documentación del cambio es **generación**."
+    },
+    {
+      "titulo": "Modelos fundacionales: LM, foundation model, LLM y multimodal",
+      "contenido": "**Foundation model**: *un modelo entrenado a escala sobre datos generales, que se adapta a muchas tareas sin volver a entrenarse* (por prompting o fine-tuning). El término lo acuña el reporte de **Stanford HAI de 2021**, *On the Opportunities and Risks of Foundation Models* (arXiv:2108.07258).\n\nLas cuatro nociones y cómo se relacionan (el punto que más cuesta):\n- **Modelo de lenguaje**: asigna probabilidades a secuencias; dado un contexto predice la siguiente palabra, $P(\\text{palabra}\\mid\\text{contexto})$. **Existe desde los años 50** (Shannon 1948, n-gramas, Markov, RNN). Modelar lenguaje es viejo; **lo nuevo es la escala**.\n- **Foundation model**: escala masiva (billones de tokens), generalista, base para aplicaciones específicas. Ej.: GPT-4, Gemini, Claude, LLaMA, DALL·E, Stable Diffusion.\n- **LLM**: un foundation model **especializado en texto** (tokens), arquitectura Transformer con atención, de 7B a +1T parámetros.\n- **Multimodal**: un foundation model que procesa y genera varios tipos de datos (texto, imagen, audio, video, código) en un modelo unificado, con razonamiento cruzado entre modalidades (GPT-4o, Gemini 1.5 Pro, LLaVA).\n\n**Relación:** *todo LLM es un foundation model, pero no todo foundation model es un LLM; todo multimodal es un foundation model que integra varias modalidades.* LLM y multimodal están **contenidos** en foundation model.\n\n**IA tradicional vs foundation models.** Antes la IA era \"artesanal\": **un modelo por tarea**, con datos etiquetados abundantes para cada caso y difícil de reutilizar (ejemplo de la cátedra: un detector de fallas en autopartes en el Parque Industrial de Pilar *sólo detecta eso*). Los foundation models adquieren una comprensión general y se adaptan a traducir, programar, analizar contratos o generar imágenes; se consumen **como SaaS o localmente**, sin necesitar un equipo de data science para empezar.\n\n**Discriminativos vs generativos** (anexo): los discriminativos aprenden $p(y\\mid x)$ y responden \"¿a qué clase pertenece este dato?\" (fraude, tickets); los generativos aprenden $p(x)$ o $p(x,y)$ y responden \"¿cómo se vería una instancia compatible con la distribución?\". Los LLM son generativos pero pueden asistir tareas discriminativas con prompting, herramientas y validación externa.\n\n**Ecosistema (agosto 2026, un mapa, no un ranking):** OpenAI GPT-5.2 (cerrado, por API), Gemini 3.6 Flash (potencia por latencia/costo), Claude 4 (Opus para lo difícil, Sonnet para el resto), Llama 4 (pesos abiertos), DeepSeek V4 (compite por costo por token), Kimi K3 (contexto largo, tools), Qwen3.7-Max. Antes de adoptar uno: versión, región, licencia, precio, límites y política de datos.",
+      "conceptos": [
+        "foundation-model",
+        "modelo-de-lenguaje",
+        "llm",
+        "multimodalidad",
+        "generativo-vs-discriminativo"
+      ],
+      "ejemplo": "¿Es Stable Diffusion un LLM? No: es un foundation model (generativo de imágenes) pero no procesa sólo texto/tokens de lenguaje. ¿Es GPT-4o un LLM? Es un foundation model multimodal; todo multimodal es un foundation model."
+    },
+    {
+      "titulo": "Datos, paradigmas de aprendizaje y escala",
+      "contenido": "**Paradigmas de aprendizaje** (¿cómo aprenden las máquinas?):\n\n| Paradigma | Datos | Ejemplo |\n|---|---|---|\n| **Supervisado** | pares $(X,Y)$ etiquetados por personas; limpio, balanceado, representativo | ticket → prioridad; fraude |\n| **No supervisado** | sólo $X$; descubre estructura latente; sensible a outliers | segmentar clientes, anomalías |\n| **Self-supervised** | **el propio dato genera la etiqueta** (predecir la próxima palabra); masivo | **preentrenamiento de LLMs**, embeddings |\n| **Semi-supervisado** | pocos etiquetados + muchos sin etiquetar | 5% de tickets etiquetados + 95% sin etiqueta |\n| **Reinforcement learning** | no hay dataset fijo; experiencias por interacción; críticos el simulador y la recompensa | Go, precios dinámicos |\n| **Active learning** | el modelo elige los ejemplos inciertos para que un humano los etiquete | qué cambios de código revisar |\n\nRegla general: supervisado maximiza precisión si hay etiquetas; **self-supervised escala con datos crudos**; RL aprende de interacción; active learning reduce el costo de etiquetado.\n\n**Por qué tantos datos:** como el self-supervised no requiere etiquetas humanas, se puede entrenar con volúmenes masivos. Escala de tokens de entrenamiento: **GPT-3 (2020) 300B** (~45 TB de texto) · PaLM 780B · **Chinchilla 1,4T — demostró que más datos > más parámetros** · LLaMA 1,4T · LLaMA-2 2T · GPT-4 ~6T (estimado) · **LLaMA-3 (2024) 15T**. En 2024-25 los modelos de frontera usan **decenas de trillones** de tokens.\n\n**Fuentes:** web pública (Common Crawl, C4, OpenWebText), libros (BooksCorpus, Gutenberg), Wikipedia, código (GitHub, The Stack), papers (arXiv), foros (Stack Overflow, Reddit), datos licenciados y datos humanos curados para fine-tuning y alineación. **Cada fuente introduce decisiones de calidad, licencias, privacidad y sesgo.**\n\n**Escala de un modelo frontier (orden de magnitud):** cientos de miles de millones de parámetros, decenas de trillones de tokens, miles a decenas de miles de GPUs durante **meses**, decenas de millones de GPU-horas, decenas de GWh, **decenas o cientos de millones de dólares**. Por eso la mayoría de los equipos **consume modelos existentes** en vez de entrenarlos. La relación datos–parámetros–cómputo se rige por las **scaling laws** (Kaplan et al., ley de potencia); muchos modelos actuales usan **Mixture-of-Experts**.\n\n**Estimar lo que los labs no publican:** el paper *Incompressible Knowledge Probes* (arXiv:2604.24827) calibra conocimiento factual contra el tamaño de modelos abiertos para estimar el de modelos cerrados; es **orden de magnitud** (intervalo al 90% ≈ factor 3 en cada dirección).",
+      "conceptos": [
+        "self-supervised",
+        "aprendizaje-supervisado",
+        "active-learning",
+        "pretraining",
+        "leyes-de-escala"
+      ],
+      "ejemplo": "Self-supervised en una línea: de la frase \"el gato duerme en el sillón\" salen solas las tareas \"el gato duerme en el ___\" → \"sillón\"; nadie etiquetó nada, el texto genera su propio objetivo."
+    },
+    {
+      "titulo": "Agentes y entornos: de la teoría al mundo real",
+      "contenido": "La definición clásica (Russell & Norvig): **un agente es cualquier cosa que percibe su entorno mediante sensores y actúa sobre él mediante actuadores.** No nombra ML ni LLMs, no exige software e incluye sistemas biológicos: **un LLM no es un agente por sí solo**, y hay muchos agentes sin LLM. Un **agente racional** elige la acción que se espera maximice la **medida de performance**, dada su secuencia de percepciones, conocimiento previo y acciones disponibles (racional ≠ omnisciente).\n\n**Tipos de agentes** (cada uno agrega una pieza al anterior):\n\n| Tipo | Base de decisión | Limitación |\n|---|---|---|\n| Reactivo simple | percepción actual (condición → acción) | sin memoria; falla si no ve todo |\n| Basado en modelos | + estado interno (memoria) | no planifica a futuro |\n| Basado en objetivos | + metas futuras; planifica | no distingue camino eficiente de costoso |\n| Basado en utilidad | + función de utilidad; optimiza | no se adapta solo a reglas nuevas |\n| Que aprende | + crítico y exploración | más complejo; requiere entrenamiento |\n\n**Dimensiones del entorno** — laboratorio vs mundo real:\n- totalmente vs **parcialmente observable** (ajedrez vs póker / niebla)\n- determinista vs **estocástico** (cubo Rubik vs frenar en asfalto mojado)\n- episódico vs **secuencial** (clasificar fotos vs invertir)\n- estático vs **dinámico** (Sudoku vs tráfico)\n- discreto vs **continuo** (damas vs volar un dron)\n- agente único vs **multiagente** (laberinto vs robots jugando fútbol)\n- conocido vs **desconocido** (solitario vs robot en Marte)\n\n*¿Por qué ganarle a Kasparov en 1997 fue \"fácil\" comparado con que un auto se maneje solo bajo la lluvia? **El entorno lo explica todo.*** El gran salto reciente fue pasar de la columna simple a la compleja.\n\n**PEAS** (knowledge library): Performance, Environment, Actuators, Sensors. Para un **LLM con tools**: ambiente digital, parcialmente observable y dinámico; sensores = pedido, contexto y resultados de tools; actuadores = texto, comandos, llamadas a APIs. **Un LLM se vuelve agente cuando tiene sensores y actuadores.**\n\n**El futuro según la clase:** agentes autónomos que planifican, usan APIs, ejecutan código (LangGraph, AutoGen, OpenAI Agents) e IA multimodal. *La autonomía requiere permisos acotados, auditoría de acciones, evaluación y capacidad de detener el sistema.*",
+      "conceptos": [
+        "agente",
+        "agente-racional",
+        "peas",
+        "dimensiones-del-entorno"
+      ],
+      "ejemplo": "PEAS de una aspiradora autónoma: ambiente = grilla n×m parcialmente observable y determinística; sensores = suciedad y posición; actuadores = motor de movimiento y de succión; performance = +10 limpiar celda sucia, −1 moverse, −5 aspirar celda limpia, −10 chocar."
+    },
+    {
+      "titulo": "El chat extendido: contexto, búsqueda web, Connectors/MCP y Schedule",
+      "contenido": "*(Material complementario: talk \"Claude Desktop – Chat\".)*\n\n**El chat responde de memoria.** De fábrica, el modelo responde desde su **memoria de entrenamiento**, una foto congelada hasta la **fecha de corte**: lo posterior no existe, puede **alucinar con confianza** y **no ve nada del usuario** (mails, calendario, archivos, apps). Metáfora: un colega brillante que leyó muchísimo hasta una fecha y desde entonces está incomunicado.\n\n**In-context learning:** la capacidad de un modelo de **adaptar su comportamiento o aprender una tarea nueva sólo a partir de lo que ve en el prompt, sin actualizar los pesos ni reentrenarse**. Como los pesos están congelados, **el contexto es la única palanca**. Enriquecerlo se llama **context augmentation**, y tiene dos formas:\n\n1. **Búsqueda web**: el chat consulta información actual y **cita fuentes** (el punto de verificación). **Regla: si la respuesta pudo cambiar desde el entrenamiento, la búsqueda es obligatoria** (precios, noticias, versiones, papers, normativa).\n2. **Connectors**: extensiones que conectan el chat a sistemas externos (mail, calendario, documentos). Funcionan en **dos direcciones: leer** (traer info) **y actuar** (dejar un borrador en Gmail, agendar en Calendar). Dos familias: **out of the box**, curados por Anthropic y activados desde el directorio; y **externos**, que se conectan **todos por MCP** (Model Context Protocol) y **no están verificados por Anthropic**. Un Connector externo se agrega con la **URL del servidor MCP**. *Los Connectors son \"las manos\" de la IA.* Criterio: antes de autorizar, mirar **quién publica** el servidor (directorios: modelcontextprotocol/servers, PulseMCP, Smithery, Glama, mcp.so).\n\n**Claude in Chrome** opera el navegador del usuario con sus sesiones ya iniciadas: entra a sistemas **sin API ni exportación** (cargar datos en un CRM, comparar proveedores en pestañas, relevar un portal). Su riesgo principal es la **prompt injection**: una página o un mail pueden traer instrucciones ocultas que la IA lea como si vinieran del usuario; Anthropic aplica clasificadores pero declara que **el riesgo no es cero**. Prácticas: sitios confiables, perfil de navegador separado y **aprobación humana antes de cada acción que importa** (borrador, no envío).\n\n**Schedule**: describir un trabajo una vez y fijarle una cadencia (\"todos los días 8:00, resumí mi inbox, lo urgente arriba\"); hereda los Connectors. Pregunta clave: **¿dónde corre?** Local (computadora prendida y app abierta; si se suspende, la corrida puede perderse) o nube (beta desde julio 2026). Las tareas que usan **archivos o apps locales corren local siempre**.\n\nLas **cuatro herramientas de Claude** (Chat/Web, Claude Code, Cowork, Design) corren sobre los **mismos modelos**; Code y Cowork comparten además el engine (Claude Agent SDK).",
+      "conceptos": [
+        "in-context-learning",
+        "context-augmentation",
+        "connector",
+        "mcp",
+        "prompt-injection",
+        "humano-en-el-circuito"
+      ],
+      "ejemplo": "Faro (misión de la cátedra), parte 1: un analista de mercado virtual de la empresa Atlas que, sólo con el chat, búsqueda web, Connectors y una tarea programada, sigue la actualidad del sector, consolida un reporte semanal y **deja un borrador** de correo en Gmail antes de la reunión del lunes (no lo envía)."
+    }
+  ],
+  "conceptos": [
+    {
+      "id": "agente-racional",
+      "termino": "Agente racional (definición de IA)",
+      "definicion": "Según Russell & Norvig, la IA es el diseño de agentes racionales: sistemas que perciben su entorno y toman la acción que se espera maximice su medida de performance (sus posibilidades de éxito en un objetivo dado).",
+      "por_que_importa": "Evita el debate filosófico sobre la conciencia y define la IA como un problema de ingeniería: una función de percepciones a acciones optimizada contra una métrica.",
+      "trampa": "Racional no es omnisciente ni infalible: se juzga la acción esperada con la información disponible. Y una medida de performance mal definida produce un agente 'racional' que hace algo indeseable."
+    },
+    {
+      "id": "agente",
+      "termino": "Agente",
+      "definicion": "Cualquier entidad que percibe su entorno mediante sensores y actúa sobre él mediante actuadores (Russell & Norvig).",
+      "por_que_importa": "Ordena todo el diseño de sistemas agénticos: qué percibe, qué puede hacer, en qué ambiente y con qué métrica (PEAS).",
+      "trampa": "Un LLM no es un agente por sí solo: se vuelve agente cuando tiene sensores (contexto, resultados de tools) y actuadores (llamar APIs, ejecutar comandos). Y existen agentes sin ML (un termostato)."
+    },
+    {
+      "id": "peas",
+      "termino": "PEAS",
+      "definicion": "Descripción de un agente por su medida de Performance, su ambiente (Environment), sus Actuadores y sus Sensores.",
+      "por_que_importa": "Sirve igual para una aspiradora y para un LLM con tools; obliga a explicitar ambiente y performance, los dos elementos que más se olvidan.",
+      "trampa": "Confundir sensores con actuadores en un agente LLM: los resultados de una tool entran como percepción (sensor); llamar la tool es la acción (actuador)."
+    },
+    {
+      "id": "dimensiones-del-entorno",
+      "termino": "Dimensiones del entorno",
+      "definicion": "Ejes que caracterizan un ambiente: observabilidad (total/parcial), certeza (determinista/estocástico), impacto temporal (episódico/secuencial), estabilidad (estático/dinámico), valores (discreto/continuo), participantes (único/multiagente) y reglas (conocido/desconocido).",
+      "por_que_importa": "Explican la dificultad de un problema: el ajedrez es totalmente observable, determinista, discreto y conocido; manejar bajo la lluvia es lo opuesto en todo.",
+      "trampa": "Pensar que ganarle a Kasparov (1997) era más difícil que manejar un auto: el entorno real es parcialmente observable, estocástico, dinámico, continuo y multiagente."
+    },
+    {
+      "id": "problema-de-la-parada",
+      "termino": "Problema de la parada",
+      "definicion": "Resultado de Turing (1936): no puede existir un programa que, dado cualquier otro programa, decida antes de ejecutarlo si termina o queda en bucle infinito; se demuestra por contradicción con un programa que se consulta a sí mismo.",
+      "por_que_importa": "Pone un límite teórico a la verificación automática: ningún modelo, por grande que sea, puede verificar en general que el código que generó es correcto.",
+      "trampa": "Creer que es un límite de memoria o velocidad: es un límite lógico, ningún hardware lo levanta."
+    },
+    {
+      "id": "test-de-turing",
+      "termino": "Test de Turing (juego de la imitación)",
+      "definicion": "Propuesta de Turing (1950) que reemplaza '¿pueden pensar las máquinas?' por un experimento: si un interrogador, comunicándose sólo por texto, no distingue a la máquina de un humano con más frecuencia que entre dos personas, la tratamos como inteligente.",
+      "por_que_importa": "Fundó el marco conceptual de la IA y sigue abriendo la discusión de qué medimos al evaluar un LLM.",
+      "trampa": "Los LLMs pasan versiones cortas del test y siguen fallando en aritmética de varios pasos: el test mide imitación del lenguaje, que es justo lo que Turing eligió medir."
+    },
+    {
+      "id": "perceptron",
+      "termino": "Perceptrón",
+      "definicion": "Primera red neuronal artificial capaz de aprender de ejemplos (Rosenblatt, 1958; el Mark I tenía 400 fotoceldas). Una neurona con pesos ajustables y frontera de decisión lineal.",
+      "por_que_importa": "Minsky y Papert (1969) mostraron que un perceptrón de una capa no puede representar XOR, lo que desató el primer invierno de la IA; backpropagation (1986) y las capas ocultas resolvieron el límite.",
+      "trampa": "El resultado de Minsky-Papert valía sólo para una capa, pero se leyó como una condena a todas las redes neuronales."
+    },
+    {
+      "id": "neurona",
+      "termino": "Neurona artificial",
+      "definicion": "Unidad que calcula una suma ponderada de sus entradas más un bias, $z = \\sum_i w_i x_i + b$, y le aplica una función de activación: $\\hat y = f(z)$.",
+      "por_que_importa": "Es el bloque básico de toda red; los pesos y el bias son lo que el modelo aprende en el entrenamiento.",
+      "trampa": "Sin activación no lineal, apilar neuronas sólo da otra función lineal."
+    },
+    {
+      "id": "taxonomia-de-problemas",
+      "termino": "Taxonomía de problemas de IA",
+      "definicion": "Siete familias: predicción, percepción, representación, decisión secuencial, búsqueda/planificación, razonamiento simbólico y generación.",
+      "por_que_importa": "Elegir la familia correcta determina herramientas, datos y métricas; muchos sistemas reales combinan varias (el auto autónomo: percepción + decisión secuencial + planificación).",
+      "trampa": "Confundir búsqueda con RL: en búsqueda el modelo del entorno es conocido; en RL el agente lo descubre por experiencia."
+    },
+    {
+      "id": "aprendizaje-por-refuerzo",
+      "termino": "Aprendizaje por refuerzo (RL)",
+      "definicion": "Paradigma donde un agente interactúa con un entorno, toma acciones y recibe recompensas, aprendiendo por ensayo y error qué secuencia maximiza la recompensa acumulada. No hay dataset fijo.",
+      "por_que_importa": "Está detrás de AlphaGo (self-play, Move 37) y de RLHF para alinear LLMs.",
+      "trampa": "Una recompensa mal definida induce comportamientos que optimizan la métrica y dañan el objetivo real."
+    },
+    {
+      "id": "foundation-model",
+      "termino": "Foundation model (modelo fundacional)",
+      "definicion": "Modelo entrenado a escala sobre datos generales que se adapta a muchas tareas con poco o ningún reentrenamiento (prompting o fine-tuning). Término acuñado por Stanford HAI en 2021 (arXiv:2108.07258).",
+      "por_que_importa": "Reemplaza el paradigma de 'un modelo por tarea' y permite usar IA vía SaaS sin un equipo propio de data science.",
+      "trampa": "LLM y foundation model no son categorías paralelas: todo LLM es un foundation model (especializado en texto), pero no todo foundation model es un LLM."
+    },
+    {
+      "id": "llm",
+      "termino": "LLM (Large Language Model)",
+      "definicion": "Foundation model especializado en texto: aprende la distribución del lenguaje natural sobre tokens con arquitectura Transformer y atención; de 7B a +1T parámetros.",
+      "por_que_importa": "Es la base de los asistentes y agentes que la materia usa y estudia.",
+      "trampa": "Modelo de lenguaje no es lo mismo que LLM: los modelos de lenguaje ($P(\\text{palabra}\\mid\\text{contexto})$) existen desde los 50 (n-gramas); lo nuevo es la escala."
+    },
+    {
+      "id": "generativo-vs-discriminativo",
+      "termino": "Modelo generativo vs discriminativo",
+      "definicion": "El discriminativo aprende $p(y\\mid x)$ y dibuja fronteras para clasificar; el generativo aprende $p(x)$ o $p(x,y)$, la distribución completa, y puede producir instancias nuevas.",
+      "por_que_importa": "Ayuda a elegir el enfoque técnico; en generación la cantidad de salidas válidas no está acotada y la evaluación deja de apoyarse en accuracy.",
+      "trampa": "Un LLM es generativo, pero puede asistir tareas discriminativas (clasificar tickets) vía prompting, herramientas y validación externa."
+    },
+    {
+      "id": "self-supervised",
+      "termino": "Aprendizaje self-supervised",
+      "definicion": "Paradigma en el que el propio dato genera las etiquetas (por ejemplo, predecir la próxima palabra), sin anotación humana.",
+      "por_que_importa": "Permite entrenar con volúmenes masivos (de 300B tokens en GPT-3 a 15T en LLaMA-3) y sostiene el preentrenamiento de los LLMs.",
+      "trampa": "No es 'no supervisado': hay un objetivo de predicción explícito, sólo que las etiquetas salen del dato mismo."
+    },
+    {
+      "id": "leyes-de-escala",
+      "termino": "Leyes de escala (scaling laws)",
+      "definicion": "Relaciones empíricas (Kaplan et al. 2020, arXiv:2001.08361) por las que la performance de un modelo mejora como una ley de potencia con más datos, parámetros y cómputo.",
+      "por_que_importa": "Explican la carrera por la escala; Chinchilla (DeepMind, 1,4T tokens) mostró que, a igual cómputo, más datos rinde más que más parámetros.",
+      "trampa": "La escala importa, pero no alcanza: la clase insiste en alineación, seguridad, evaluación y control sobre los datos."
+    },
+    {
+      "id": "alucinacion",
+      "termino": "Alucinación",
+      "definicion": "Salida falsa generada con tono convincente (APIs, paquetes o citas inexistentes) porque el modelo produce secuencias plausibles a partir de patrones, no verdades verificadas.",
+      "por_que_importa": "Obliga a pasar toda salida por pruebas, revisión y contraste con documentación oficial; para hechos recientes, a exigir búsqueda con fuentes.",
+      "trampa": "Que el código compile no prueba que sea correcto: puede compilar con sustitutos improvisados y fallar en producción."
+    },
+    {
+      "id": "sesgo-de-automatizacion",
+      "termino": "Sesgo de automatización",
+      "definicion": "Tendencia a confiar en exceso en un resultado sugerido por una herramienta, sobre todo cuando aparece integrado en el editor, el pipeline o el panel de operaciones.",
+      "por_que_importa": "Convierte la revisión humana en una aprobación nominal; la revisión necesita criterios y tiempo asignado, y la interfaz debe mostrar evidencia e incertidumbre.",
+      "trampa": "Una respuesta bien escrita no es una respuesta verificada."
+    },
+    {
+      "id": "in-context-learning",
+      "termino": "In-context learning",
+      "definicion": "Capacidad de un modelo de lenguaje de adaptar su comportamiento o aprender una tarea nueva sólo a partir de lo que ve en el prompt, sin que se le actualicen los pesos ni se reentrene.",
+      "por_que_importa": "Como los pesos están congelados, el contexto es la única palanca para cambiar el comportamiento: de ahí la búsqueda web, los Connectors, RAG y el repo como contexto.",
+      "trampa": "Usar el chat no lo reentrena: lo que 'aprende' en una conversación vive sólo en el contexto de esa conversación."
+    },
+    {
+      "id": "context-augmentation",
+      "termino": "Context augmentation y Connectors",
+      "definicion": "Enriquecer el contexto del modelo con información externa: búsqueda web (información actual con fuentes citadas) y Connectors (extensiones que leen y actúan sobre sistemas del usuario; los externos se conectan por MCP).",
+      "por_que_importa": "Resuelve los límites del modelo de fábrica (información vieja, alucinación, ceguera sobre los datos del usuario).",
+      "trampa": "Los Connectors externos por MCP no están curados por Anthropic: autorizarlos da acceso a los datos del usuario, así que hay que mirar quién publica el servidor."
+    },
+    {
+      "id": "prompt-injection",
+      "termino": "Prompt injection",
+      "definicion": "Ataque en el que contenido que la IA lee (una página, un mail, un README) trae instrucciones ocultas que el modelo interpreta como si vinieran del usuario.",
+      "por_que_importa": "Es el riesgo principal de toda IA que navega o lee contenido externo; Anthropic lo documenta como abierto ('the chances of an attack are still non-zero').",
+      "trampa": "Los clasificadores reducen pero no eliminan el riesgo: la defensa es por capas (sitios confiables, perfil separado, aprobación humana antes de acciones que importan)."
+    }
+  ],
+  "formulas": [
+    {
+      "nombre": "Neurona artificial",
+      "tex": "z = \\sum_{i=1}^{n} w_i x_i + b, \\qquad \\hat{y} = f(z)",
+      "explicacion": "$x_i$ son las entradas (datos o salidas de neuronas previas), $w_i$ los pesos que se aprenden, $b$ el bias que desplaza la activación, $f$ la función de activación no lineal (ReLU, sigmoid, tanh) y $\\hat y$ la salida."
+    },
+    {
+      "nombre": "Modelo de lenguaje",
+      "tex": "P(w_t \\mid w_1, \\dots, w_{t-1})",
+      "explicacion": "Un modelo de lenguaje asigna la probabilidad de la próxima palabra (token) dado el contexto anterior. La idea existe desde los años 50 (n-gramas); los LLMs la escalan."
+    },
+    {
+      "nombre": "Discriminativo vs generativo",
+      "tex": "\\text{discriminativo: } p(y \\mid x) \\qquad \\text{generativo: } p(x) \\text{ o } p(x, y)",
+      "explicacion": "El discriminativo modela la etiqueta dado el input (frontera de decisión); el generativo modela la distribución de los datos y puede muestrear instancias nuevas."
+    },
+    {
+      "nombre": "Costo de la atención",
+      "tex": "\\text{costo} \\propto n^2",
+      "explicacion": "La atención del Transformer compara cada token con todos los demás: es cuadrática en la longitud $n$ de la secuencia. Duplicar el contexto cuadruplica el cómputo, por eso el contexto largo es caro."
+    }
+  ],
+  "comparaciones": [
+    {
+      "titulo": "Modelo de lenguaje, foundation model, LLM y multimodal",
+      "columnas": [
+        "Aspecto",
+        "Modelo de lenguaje",
+        "Foundation model",
+        "LLM",
+        "Multimodal"
+      ],
+      "filas": [
+        [
+          "Qué es",
+          "Asigna $P(\\text{palabra}\\mid\\text{contexto})$",
+          "Modelo a escala sobre datos generales que se adapta a muchas tareas",
+          "Foundation model especializado en texto",
+          "Foundation model que integra varias modalidades"
+        ],
+        [
+          "Desde",
+          "Años 50 (Shannon, n-gramas, RNN)",
+          "Término de Stanford HAI, 2021",
+          "GPT-3 2020 en adelante",
+          "GPT-4o, Gemini 1.5"
+        ],
+        [
+          "Ejemplos",
+          "n-gramas, Markov, RNN",
+          "GPT-4, Claude, LLaMA, DALL·E, Stable Diffusion",
+          "GPT-4, Claude 3, LLaMA 3, Mistral",
+          "GPT-4o, Gemini 1.5 Pro, LLaVA"
+        ],
+        [
+          "Relación",
+          "Linaje más viejo y amplio",
+          "Contiene a LLM y multimodal",
+          "Todo LLM es foundation model",
+          "Todo multimodal es foundation model"
+        ]
+      ]
+    },
+    {
+      "titulo": "IA tradicional vs foundation models",
+      "columnas": [
+        "Aspecto",
+        "IA tradicional (in-house)",
+        "Foundation models"
+      ],
+      "filas": [
+        [
+          "Alcance",
+          "Un modelo por tarea (detector de fallas en autopartes de Pilar)",
+          "Generalista, se adapta a muchas tareas"
+        ],
+        [
+          "Datos",
+          "Etiquetados abundantes por caso de uso",
+          "Datos generales a escala; adaptación por prompting o fine-tuning"
+        ],
+        [
+          "Reutilización",
+          "Difícil entre dominios",
+          "Alta: traducir, programar, analizar contratos, generar imágenes"
+        ],
+        [
+          "Acceso",
+          "Requiere equipo de data science",
+          "SaaS o local, sin equipo propio para empezar"
+        ]
+      ]
+    },
+    {
+      "titulo": "Paradigmas de aprendizaje",
+      "columnas": [
+        "Paradigma",
+        "Datos",
+        "Ejemplo del curso"
+      ],
+      "filas": [
+        [
+          "Supervisado",
+          "Pares (X,Y) etiquetados",
+          "ticket → prioridad"
+        ],
+        [
+          "No supervisado",
+          "Sólo X",
+          "segmentar clientes"
+        ],
+        [
+          "Self-supervised",
+          "El dato genera la etiqueta",
+          "predecir la próxima palabra (LLMs)"
+        ],
+        [
+          "Semi-supervisado",
+          "Pocos etiquetados + muchos sin etiqueta",
+          "5% + 95% de tickets"
+        ],
+        [
+          "Reinforcement learning",
+          "Experiencia por interacción y recompensa",
+          "AlphaGo, precios dinámicos"
+        ],
+        [
+          "Active learning",
+          "El modelo pide etiquetar los casos inciertos",
+          "elegir qué cambios de código revisar"
+        ]
+      ]
+    },
+    {
+      "titulo": "Tipos de agentes (Russell & Norvig)",
+      "columnas": [
+        "Tipo",
+        "Base de decisión",
+        "Limitación"
+      ],
+      "filas": [
+        [
+          "Reactivo simple",
+          "Percepción actual (condición → acción)",
+          "Sin memoria"
+        ],
+        [
+          "Basado en modelos",
+          "+ estado interno",
+          "No planifica"
+        ],
+        [
+          "Basado en objetivos",
+          "+ metas futuras",
+          "No distingue eficiencia"
+        ],
+        [
+          "Basado en utilidad",
+          "+ función de utilidad",
+          "No se adapta solo a reglas nuevas"
+        ],
+        [
+          "Que aprende",
+          "+ crítico y exploración",
+          "Complejidad y costo de entrenamiento"
+        ]
+      ]
+    }
+  ],
+  "flashcards": [
+    {
+      "q": "Definición de IA según Russell & Norvig",
+      "a": "El diseño de agentes racionales: sistemas que perciben su entorno y actúan para maximizar sus posibilidades de éxito en un objetivo dado."
+    },
+    {
+      "q": "¿Qué demostraron Minsky y Papert en 1969?",
+      "a": "Que un perceptrón de una sola capa no puede representar XOR; se leyó como condena a las redes y empezó el primer invierno de la IA."
+    },
+    {
+      "q": "¿Qué popularizaron Rumelhart, Hinton y Williams en 1986?",
+      "a": "Backpropagation, que permite entrenar redes multicapa (Nature, 'Learning representations by back-propagating errors')."
+    },
+    {
+      "q": "¿Deep Blue aprendía?",
+      "a": "No. Búsqueda alfa-beta (200 M posiciones/s) + evaluación escrita por humanos. Cierra la era de las reglas."
+    },
+    {
+      "q": "Error top-5 de AlexNet en ImageNet 2012",
+      "a": "15,3% vs 26,2% del segundo; con dos GPUs GTX 580, ReLU y dropout."
+    },
+    {
+      "q": "¿Qué fue Move 37?",
+      "a": "La jugada de AlphaGo en la partida 2 vs Lee Sedol (2016) que un humano elegiría 1 en 10.000; conocimiento nuevo generado por RL con self-play."
+    },
+    {
+      "q": "Tres ventajas del Transformer (2017) y su costo",
+      "a": "Paralelización total, mejor contexto largo y escalabilidad. Costo: atención cuadrática en la longitud de la secuencia."
+    },
+    {
+      "q": "¿Qué cambió con ChatGPT en 2022?",
+      "a": "No el modelo (GPT-3.5 ya existía) sino la interfaz: un chat gratuito y sin fricción convirtió una API en producto masivo."
+    },
+    {
+      "q": "¿Qué acuñó el reporte de Stanford de 2021?",
+      "a": "El término 'foundation model' (arXiv:2108.07258)."
+    },
+    {
+      "q": "¿Qué mostró Chinchilla?",
+      "a": "Que, a igual cómputo, más datos rinde más que más parámetros (1,4T tokens)."
+    },
+    {
+      "q": "Las siete familias de problemas",
+      "a": "Predicción, percepción, representación, decisión secuencial, búsqueda/planificación, razonamiento simbólico y generación."
+    },
+    {
+      "q": "Hito de Word2Vec (2013)",
+      "a": "Rey − Hombre + Mujer ≈ Reina: la geometría del espacio de embeddings codifica relaciones semánticas."
+    },
+    {
+      "q": "¿Qué es in-context learning?",
+      "a": "Adaptar el comportamiento a partir de lo que se ve en el prompt, sin actualizar pesos. El contexto es la única palanca."
+    },
+    {
+      "q": "Regla de la búsqueda web",
+      "a": "Si la respuesta pudo cambiar desde el entrenamiento (precios, noticias, versiones, papers, normativa), la búsqueda es obligatoria."
+    },
+    {
+      "q": "¿Por qué protocolo se conectan los Connectors externos?",
+      "a": "MCP (Model Context Protocol); a diferencia de los out of the box, no están curados por Anthropic."
+    },
+    {
+      "q": "Composición de la nota de la materia",
+      "a": "40% entregables de clase + 60% trabajo final."
+    },
+    {
+      "q": "¿Qué limita el problema de la parada para los LLMs?",
+      "a": "Que ninguna máquina puede verificar en general si un programa arbitrario es correcto/termina: el modelo no puede autoverificar su código en general."
+    }
+  ],
+  "quiz": [
+    {
+      "q": "Según la definición de Russell & Norvig usada en clase, la IA es:",
+      "opciones": [
+        "La construcción de máquinas con conciencia similar a la humana",
+        "El diseño de agentes racionales que perciben su entorno y actúan para maximizar su éxito en un objetivo",
+        "Cualquier programa que use redes neuronales",
+        "Un sistema de reglas IF-THEN escritas por expertos"
+      ],
+      "correcta": 1,
+      "explicacion": "La definición evita el debate sobre conciencia (descarta a). No exige redes neuronales (c) ni reglas (d, eso es razonamiento simbólico)."
+    },
+    {
+      "q": "¿Por qué el primer invierno de la IA se asocia a Minsky y Papert (1969)?",
+      "opciones": [
+        "Demostraron que backpropagation no converge",
+        "Mostraron que un perceptrón de una capa no representa XOR, y se leyó como límite de todas las redes",
+        "Probaron el problema de la parada",
+        "Mostraron que los sistemas expertos no generalizan"
+      ],
+      "correcta": 1,
+      "explicacion": "El resultado era correcto pero limitado a una capa; backpropagation es de 1986 y el problema de la parada es de Turing (1936). Los sistemas expertos causaron el segundo invierno."
+    },
+    {
+      "q": "AlexNet (2012) fue un salto principalmente por:",
+      "opciones": [
+        "Inventar las redes convolucionales",
+        "Combinar datos etiquetados a escala, GPUs baratas y ReLU + dropout",
+        "Usar el mecanismo de atención",
+        "Entrenarse sin datos humanos por self-play"
+      ],
+      "correcta": 1,
+      "explicacion": "Las CNN son de los 80; la atención es de 2017; el self-play sin datos humanos es AlphaGo Zero."
+    },
+    {
+      "q": "¿Cuál de estas afirmaciones sobre la relación entre modelos es correcta?",
+      "opciones": [
+        "Todo foundation model es un LLM",
+        "LLM y foundation model son categorías paralelas sin relación",
+        "Todo LLM es un foundation model especializado en texto",
+        "Los modelos de lenguaje aparecieron con el Transformer"
+      ],
+      "correcta": 2,
+      "explicacion": "LLM y multimodal están contenidos en foundation model; los modelos de lenguaje existen desde los 50 (n-gramas)."
+    },
+    {
+      "q": "Un sistema que elige el orden óptimo de ejecución de pruebas conociendo todas las dependencias pertenece a la familia de:",
+      "opciones": [
+        "Decisión secuencial (RL)",
+        "Búsqueda / planificación",
+        "Percepción",
+        "Representación"
+      ],
+      "correcta": 1,
+      "explicacion": "El modelo del entorno (dependencias) es conocido: eso es planificación. En RL el agente descubre el entorno por experiencia."
+    },
+    {
+      "q": "El preentrenamiento de un LLM usa principalmente aprendizaje:",
+      "opciones": [
+        "Supervisado con etiquetas humanas",
+        "Self-supervised: el texto genera sus propias etiquetas",
+        "Active learning",
+        "No supervisado de clustering"
+      ],
+      "correcta": 1,
+      "explicacion": "Predecir la próxima palabra no requiere anotación humana y escala a trillones de tokens."
+    },
+    {
+      "q": "¿Qué propiedad del entorno explica mejor por qué ganar al ajedrez (1997) fue más fácil que manejar bajo la lluvia?",
+      "opciones": [
+        "El ajedrez es multiagente",
+        "El ajedrez es totalmente observable, determinista, discreto y conocido; manejar es lo opuesto",
+        "Manejar es episódico",
+        "El ajedrez es continuo"
+      ],
+      "correcta": 1,
+      "explicacion": "'El entorno lo explica todo': el mundo real es parcialmente observable, estocástico, dinámico, continuo y multiagente."
+    },
+    {
+      "q": "Un modelo discriminativo aprende:",
+      "opciones": [
+        "p(x)",
+        "p(x,y)",
+        "p(y|x)",
+        "La distribución de los píxeles para generar imágenes"
+      ],
+      "correcta": 2,
+      "explicacion": "Los discriminativos modelan la etiqueta dado el input; los generativos modelan p(x) o p(x,y)."
+    },
+    {
+      "q": "Según la clase, la atención del Transformer:",
+      "opciones": [
+        "Procesa la secuencia token por token como una RNN",
+        "Tiene costo lineal en la longitud del contexto",
+        "Tiene costo cuadrático: duplicar el contexto cuadruplica el cómputo",
+        "Elimina la necesidad de GPUs"
+      ],
+      "correcta": 2,
+      "explicacion": "La paralelización es una ventaja, pero comparar todos contra todos es cuadrático."
+    },
+    {
+      "q": "Un equipo acepta que un asistente silencie una alerta porque 'parece ruido' sin revisar señales relacionadas. ¿Qué limitación ilustra?",
+      "opciones": [
+        "Acceso desigual",
+        "Sesgo de automatización",
+        "Impacto ambiental",
+        "Alucinación de APIs"
+      ],
+      "correcta": 1,
+      "explicacion": "Es el ejemplo de la clase: confianza excesiva en una sugerencia integrada en la herramienta."
+    },
+    {
+      "q": "Le preguntás al chat por la última versión de una librería. Según la regla de la clase:",
+      "opciones": [
+        "Alcanza con la memoria de entrenamiento",
+        "Hay que exigir búsqueda web porque el dato pudo cambiar desde el entrenamiento",
+        "Hay que reentrenar el modelo",
+        "Hay que usar un Connector de Gmail"
+      ],
+      "correcta": 1,
+      "explicacion": "Versiones, precios, noticias, papers y normativa cambian: la búsqueda con fuentes citadas es obligatoria."
+    },
+    {
+      "q": "¿Qué diferencia a un Connector externo de uno out of the box?",
+      "opciones": [
+        "El externo sólo lee, no actúa",
+        "El externo se conecta por MCP y no está curado por Anthropic",
+        "El externo no requiere autenticación",
+        "El out of the box se conecta por MCP y el externo por API REST"
+      ],
+      "correcta": 1,
+      "explicacion": "Ambos pueden leer y actuar; la diferencia es quién los prepara y la ausencia de curación en los externos (por eso: mirar quién publica el servidor)."
+    },
+    {
+      "q": "El caso FreeBSD/Mythos se usa en clase además para enseñar:",
+      "opciones": [
+        "Que los humanos revisan mal el código",
+        "Cómo verificar una afirmación técnica antes de repetirla (no tiene CVE ni confirmación del proyecto)",
+        "Que los LLMs ya resolvieron la seguridad",
+        "Que el bug fue reportado con CVE oficial"
+      ],
+      "correcta": 1,
+      "explicacion": "La respuesta honesta: Anthropic lo afirma, la prensa lo repite y el proyecto no lo confirmó. Lo que cambió es el costo de buscar exhaustivamente."
+    }
+  ],
+  "desarrollo": [
+    {
+      "pregunta": "Explique qué es un foundation model, cómo se relaciona con los conceptos de modelo de lenguaje, LLM y modelo multimodal, y por qué cambiaron la forma de construir productos de IA.",
+      "respuesta_modelo": "Un **foundation model** es un modelo entrenado a escala masiva sobre datos generales que se adapta a muchas tareas con poco o ningún reentrenamiento (prompting o fine-tuning); el término lo acuñó Stanford HAI en 2021. Un **modelo de lenguaje** es una idea mucho más vieja y amplia: asignar $P(\\text{palabra}\\mid\\text{contexto})$, desde Shannon y los n-gramas; lo nuevo no es modelar lenguaje sino la escala. Un **LLM** es un foundation model especializado en texto (tokens, Transformer, de 7B a +1T parámetros) y un **multimodal** es un foundation model que procesa varias modalidades. Por eso *todo LLM es un foundation model, pero no al revés*.\n\nCambiaron la construcción de productos porque la IA tradicional era artesanal: **un modelo por tarea** con datos etiquetados propios (el detector de fallas en autopartes de Pilar sólo detecta eso). Un foundation model se consume como SaaS o local y se adapta a traducir, programar o analizar contratos sin un equipo de data science. Como entrenarlos cuesta decenas o cientos de millones de dólares, meses y miles de GPUs, la mayoría de los equipos **consume modelos existentes**, y su trabajo pasa a ser adaptar, evaluar y controlar.",
+      "puntos_clave": [
+        "Definición: escala + datos generales + adaptación sin reentrenar",
+        "Término de Stanford HAI 2021",
+        "LLM y multimodal contenidos en foundation model",
+        "Modelo de lenguaje es anterior (años 50); lo nuevo es la escala",
+        "Contraste con 'un modelo por tarea'",
+        "Costo de entrenamiento → consumir modelos existentes"
+      ]
+    },
+    {
+      "pregunta": "Recorra la historia de la IA desde Deep Blue (1997) hasta AlphaGo (2016) y el Transformer (2017), explicando qué cambió en el paradigma de construcción de sistemas.",
+      "respuesta_modelo": "**Deep Blue** (1997) vence a Kasparov 3½-2½ con búsqueda alfa-beta sobre el árbol de jugadas (~200 millones de posiciones por segundo) y una función de evaluación ajustada por grandes maestros: **no hay aprendizaje**, es búsqueda + cómputo + heurísticas humanas. Cierra la era de las reglas.\n\n**AlexNet** (2012) gana ImageNet con 15,3% de error top-5 contra 26,2%: la combinación de datos etiquetados, GPUs baratas y ReLU + dropout hace que **los detectores dejen de codificarse a mano y se entrenen**.\n\n**AlphaGo** (2016) vence a Lee Sedol 4-1 en Go, cuyo factor de ramificación (~250 vs ~35 del ajedrez) vuelve inútil la fuerza bruta. Usa redes de política y valor guiando una búsqueda Monte Carlo, entrenadas con partidas humanas y luego **RL con self-play**. La **jugada 37** muestra conocimiento que ningún humano tenía; AlphaGo Zero luego aprende sin datos humanos.\n\nEl **Transformer** (2017, Vaswani et al.) elimina las RNN: paraleliza, maneja contexto largo y escala de forma predecible (con costo cuadrático), base de GPT-3 y de los LLMs. El cambio de fondo: **de programar el conocimiento a aprenderlo de datos y experiencia a escala**.",
+      "puntos_clave": [
+        "Deep Blue sin aprendizaje: búsqueda + heurísticas humanas",
+        "AlexNet: datos + GPUs + ReLU/dropout; de codificar a entrenar",
+        "AlphaGo: política + valor + MCTS; supervisado y luego RL self-play",
+        "Move 37 / AlphaGo Zero",
+        "Transformer: paralelización, contexto largo, escalabilidad, costo cuadrático"
+      ]
+    },
+    {
+      "pregunta": "¿Qué limitaciones de la IA generativa identifica la clase y qué controles debería exigir un equipo de software antes de incorporar código o acciones generadas por IA?",
+      "respuesta_modelo": "La clase identifica siete limitaciones: **alucinaciones** (APIs o paquetes inexistentes con tono convincente), **sesgos en los datos** (prácticas viejas o inseguras, grupos subrepresentados), **privacidad** (código propietario, secretos o datos personales en prompts), **sesgo de automatización** (confiar en lo bien escrito por sobre lo verificado), **acceso desigual**, **impacto ambiental** y **degradación de habilidades técnicas**.\n\nLos controles derivan de que los asistentes trabajan sobre representaciones incompletas del sistema: **pruebas automatizadas reproducibles**, **revisión de pares** del diff (quien integra código generado responde por él), contraste con documentación oficial, **despliegues graduales y observabilidad**. Para agentes que actúan: **permisos acotados, registro de cada acción y capacidad de detener o revertir**. Para datos: políticas de qué puede enviarse, qué se anonimiza y qué modelos se autorizan por clase de dato. Para el sesgo de automatización: revisión con criterios y tiempo asignado, e interfaces que muestren evidencia e incertidumbre. Antes de agregar un modelo, comparar con alternativas más simples (regla, búsqueda, caché). La idea rectora: **la IA amplifica al equipo cuando el proceso conserva responsabilidad, trazabilidad y control humano**.",
+      "puntos_clave": [
+        "Enumerar las siete limitaciones",
+        "Tests, revisión de pares, docs oficiales",
+        "Despliegue gradual y observabilidad",
+        "Permisos acotados, logs, reversión para agentes",
+        "Políticas de datos/privacidad",
+        "Responsabilidad humana sobre el código integrado"
+      ]
+    },
+    {
+      "pregunta": "Explique por qué 'el contexto es la única palanca' de un modelo y describa las formas de context augmentation vistas, con sus riesgos.",
+      "respuesta_modelo": "El modelo de fábrica responde desde su **memoria de entrenamiento**, una foto congelada hasta la fecha de corte: no conoce lo posterior, puede alucinar y no ve los datos del usuario. Sus pesos no cambian al usarlo; lo único que modifica su comportamiento en el momento es lo que entra en el prompt, capacidad llamada **in-context learning**. Por eso mejorar resultados es, ante todo, **administrar el contexto**.\n\nFormas de enriquecerlo: (1) **búsqueda web**, que trae información actual con fuentes citadas (regla: obligatoria si el dato pudo cambiar desde el entrenamiento); (2) **Connectors**, que conectan el chat a mail, calendario, documentos o sistemas internos y además **actúan** (borrador en Gmail, evento en Calendar). Los externos usan **MCP**, el estándar que traduce el pedido en llamadas al servicio, y no están curados por Anthropic. Con **Schedule** el trabajo se describe una vez y corre con cadencia, heredando los Connectors.\n\nRiesgos: autorizar un servidor MCP de un tercero le da acceso a los datos (mirar quién lo publica); el contenido leído puede traer **prompt injection**; y una acción ejecutada sin revisión (un mail enviado) puede causar daño. De ahí la regla: **ninguna acción que importe sin aprobación humana**.",
+      "puntos_clave": [
+        "Memoria de entrenamiento y fecha de corte",
+        "Pesos congelados; in-context learning",
+        "Búsqueda web con fuentes + regla de cuándo exigirla",
+        "Connectors leen y actúan; externos por MCP sin curación",
+        "Prompt injection",
+        "Aprobación humana antes de acciones"
+      ]
+    }
+  ],
+  "conexiones": [
+    {
+      "clase": 2,
+      "relacion": "El in-context learning y la idea de que el contexto es la única palanca se trasladan al agente de código: el repo, CLAUDE.md y los MCP servers son el contexto y las manos del agente."
+    },
+    {
+      "clase": 3,
+      "relacion": "La neurona, las funciones de activación, el límite de XOR y backpropagation que aparecen en la historia se desarrollan formalmente en la introducción a redes neuronales."
+    },
+    {
+      "clase": 5,
+      "relacion": "Alucinaciones, fecha de corte y el modelo de lenguaje como P(token|contexto) son la base de trabajar con LLMs: prompting, costos y producción."
+    },
+    {
+      "clase": 6,
+      "relacion": "La familia de representación (Word2Vec, embeddings, búsqueda semántica) y el modo de buscar fragmentos en lugar de leer todo anticipan RAG y las bases vectoriales."
+    },
+    {
+      "clase": 7,
+      "relacion": "MCP aparece en 2025 como estándar de conexión y en los Connectors externos; la clase 7 lo estudia a fondo junto con tokens y word2vec."
+    },
+    {
+      "clase": 8,
+      "relacion": "'Attention Is All You Need' (2017), la paralelización y el costo cuadrático de la atención se explican por dentro en el Transformer."
+    },
+    {
+      "clase": 9,
+      "relacion": "Self-supervised (preentrenamiento), RLHF como decisión secuencial y las leyes de escala/Chinchilla reaparecen en cómo se entrena un LLM."
+    },
+    {
+      "clase": 10,
+      "relacion": "La definición de agente de Russell & Norvig, los tipos de agente, PEAS y las dimensiones del entorno son la base de agentes y sistemas multiagente."
+    },
+    {
+      "clase": 11,
+      "relacion": "La familia de generación (GAN, VAE, difusión modelan P(X)) y el contraste generativo vs discriminativo se desarrollan en GANs."
+    },
+    {
+      "clase": 13,
+      "relacion": "Limitaciones (sesgos, privacidad, ambiente, desplazamiento laboral), prompt injection y el control humano se retoman en seguridad y ética."
+    }
+  ],
+  "lecturas": [
+    "Russell & Norvig, Artificial Intelligence: A Modern Approach (4.ª ed., 2020)",
+    "Turing 1936, On Computable Numbers (máquina universal y problema de la parada)",
+    "Shannon 1948, A Mathematical Theory of Communication",
+    "Turing 1950, Computing Machinery and Intelligence (Mind)",
+    "Rosenblatt 1958, el Perceptrón; Minsky & Papert 1969, Perceptrons",
+    "Rumelhart, Hinton & Williams 1986, Learning representations by back-propagating errors (Nature)",
+    "Krizhevsky, Sutskever & Hinton 2012, AlexNet (ImageNet)",
+    "Mikolov et al. 2013, Word2Vec; He et al. 2015, ResNet",
+    "Silver et al. / DeepMind 2016, AlphaGo (Move 37) y AlphaGo Zero",
+    "Vaswani et al. 2017, Attention Is All You Need (arXiv:1706.03762)",
+    "Kaplan et al. 2020, Scaling Laws for Neural Language Models (arXiv:2001.08361)",
+    "Bommasani et al. / Stanford HAI 2021, On the Opportunities and Risks of Foundation Models (arXiv:2108.07258)",
+    "McKinsey, The economic potential of generative AI: the next productivity frontier",
+    "Citrini Research 2026, The 2028 Global Intelligence Crisis (escenario hipotético)",
+    "Incompressible Knowledge Probes, arXiv:2604.24827",
+    "Anthropic Support: Enabling and using web search; Custom connectors using remote MCP; Use Claude in Chrome safely",
+    "modelcontextprotocol.io (Model Context Protocol)"
+  ]
+}

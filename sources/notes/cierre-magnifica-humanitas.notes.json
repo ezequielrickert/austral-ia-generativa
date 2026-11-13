@@ -1,0 +1,608 @@
+[
+ {
+  "i": 0,
+  "resumen": "Portada de la clase 13 de cierre: seguridad, ética y lo que viene.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 1,
+  "resumen": "Agenda: apertura, seguridad, ética, futuro y cierre.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 2,
+  "resumen": "Encuesta: ¿usan agentes? Quienes los tienen en producción, con acceso a archivos, mail o código, son los más expuestos a la inyección indirecta.",
+  "claves": [
+   "agente",
+   "inyeccion-indirecta"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 3,
+  "resumen": "Recorrido de las 12 clases (redes, LLMs, RAG y MCP, transformer, entrenamiento, agentes, visión) para llegar a la pregunta final: ¿cómo lo usamos bien?",
+  "claves": [
+   "llm",
+   "agente"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 4,
+  "resumen": "El hilo de la clase: chatbot → copiloto → **agente**. En un chatbot el riesgo es una mala respuesta; en un agente, la acción.",
+  "claves": [
+   "agente",
+   "humano-en-el-circuito"
+  ],
+  "clave_examen": true,
+  "ver": [
+   {
+    "ref": "agentes-y-multiagentes#12",
+    "por": "Agente = LLM + planificación + tools"
+   }
+  ]
+ },
+ {
+  "i": 5,
+  "resumen": "Los benchmarks se agotan: SWE-bench Verified pasó de 60% a ~100% en un año ; la autonomía (METR) se duplica cada 4,3 meses. La capacidad supera a su medición.",
+  "claves": [
+   "saturacion-de-benchmarks",
+   "horizonte-temporal-metr"
+  ],
+  "clave_examen": false,
+  "ver": [
+   {
+    "ref": "prompting#68",
+    "por": "Benchmarks: qué miden"
+   }
+  ]
+ },
+ {
+  "i": 6,
+  "resumen": "Tesis: cuando la IA pasa de contestar a hacer, la seguridad deja de ser opcional y la ética deja de ser abstracta.",
+  "claves": [
+   "seguridad",
+   "ética",
+   "agente"
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 7,
+  "resumen": "Separador: seguridad.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 8,
+  "resumen": "Internet 1995 ≈ agentes 2026: confianza implícita, protocolos nuevos (MCP, A2A) y reglas que llegan después. Aquel caos fue el crisol de la ciberseguridad moderna.",
+  "claves": [
+   "mcp",
+   "seguridad"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 9,
+  "resumen": "Mapa en **tres capas**: datos (¿qué sale?), aplicación (¿qué entra?) y modelo (¿qué decide?). De afuera hacia adentro, cada una es más difícil de auditar.",
+  "claves": [
+   "tres-capas-de-seguridad"
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 10,
+  "resumen": "Samsung 2023 (capa de datos): ingenieros pegaron código y una reunión en un chat. Sin atacante ni malicia, perdieron el control del dato y se prohibió la IA generativa.",
+  "claves": [
+   "shadow-ai",
+   "fuga de datos"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 11,
+  "resumen": "Números: una filtración cuesta US$ 4,44M en promedio (+670K con mucho shadow AI) y el 18% de los empleados pega datos en IA. La falla puede no tener atacante.",
+  "claves": [
+   "shadow-ai"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 12,
+  "resumen": "Rompemitos: ¿«el proveedor no entrena con mis datos» o «lo corro en mis servidores» alcanzan para estar seguros? Votación a mano alzada.",
+  "claves": [
+   "shadow-ai",
+   "modelo local"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 13,
+  "resumen": "Los dos son engañosos: no entrenar ≠ confidencialidad (retención, subprocesadores); local ≠ seguro (inyección, conectores, credenciales). La responsabilidad sigue siendo tuya.",
+  "claves": [
+   "prompt-injection",
+   "gestion-de-secretos"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 14,
+  "resumen": "Clasificá el dato (público, interno, confidencial) antes de pegarlo; lo confidencial nunca va a herramientas de consumo. Nunca pegues una API key en un prompt.",
+  "claves": [
+   "gestion-de-secretos",
+   "shadow-ai"
+  ],
+  "clave_examen": false,
+  "tp": [
+   {
+    "tp": 1,
+    "texto": "En el TP1, `notas.txt` tenía una credencial de Postgres: se gitignoreó desde el primer commit y se reescribió la historia antes del primer push."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "cowork-intro#30",
+    "por": "Cuidados con agentes de código"
+   }
+  ]
+ },
+ {
+  "i": 15,
+  "resumen": "Raíz de la **prompt injection**: el LLM no distingue instrucciones de datos. Todo lo recuperado se concatena en el mismo contexto y la atención lo mira todo.",
+  "claves": [
+   "prompt-injection",
+   "atencion"
+  ],
+  "clave_examen": true,
+  "ver": [
+   {
+    "ref": "rag-y-mcp#41",
+    "por": "El atacante nunca le habla al modelo"
+   }
+  ]
+ },
+ {
+  "i": 16,
+  "resumen": "**Directa** (jailbreak): el atacante le habla al modelo. **Indirecta**: la orden está escondida en lo que el modelo lee (web, PDF, mail); es la peligrosa en agentes.",
+  "claves": [
+   "prompt-injection",
+   "inyeccion-indirecta"
+  ],
+  "clave_examen": true,
+  "ver": [
+   {
+    "ref": "rag-y-mcp#40",
+    "por": "Riesgos de seguridad propios de RAG"
+   }
+  ]
+ },
+ {
+  "i": 17,
+  "resumen": "Caso real: un bot reclutador obedeció una instrucción oculta en un perfil de LinkedIn. El humano solo ve el resultado ya manipulado.",
+  "claves": [
+   "inyeccion-indirecta"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 18,
+  "resumen": "Diagrama del flujo: perfil no confiable → prompt → modelo → mensaje enviado sin revisión humana.",
+  "claves": [
+   "inyeccion-indirecta"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 19,
+  "resumen": "El código vulnerable concatena el texto del perfil con la orden y envía sin revisar. Ejercicio: proponer tres cambios (separar datos de órdenes, limitar, revisar).",
+  "claves": [
+   "inyeccion-indirecta",
+   "humano-en-el-circuito"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 20,
+  "resumen": "Cada conector MCP es una decisión de confianza: aunque el LLM esté aprobado, la filtración puede entrar por un servidor enchufado. Un agente puede ejecutar el error.",
+  "claves": [
+   "mcp",
+   "minimo-privilegio"
+  ],
+  "clave_examen": false,
+  "tp": [
+   {
+    "tp": 1,
+    "texto": "En el TP1 el agente creó el repo, provisionó Postgres y deployó vía los MCP de GitHub y Railway: permisos reales sobre tu infraestructura."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "rag-y-mcp#46",
+    "por": "MCP conecta modelos con herramientas"
+   }
+  ]
+ },
+ {
+  "i": 21,
+  "resumen": "**Tríada letal** (Willison): datos privados + contenido no confiable + canal de salida permiten exfiltrar. Regla de diseño: si tu agente tiene las tres, sacale una.",
+  "claves": [
+   "triada-letal"
+  ],
+  "clave_examen": true,
+  "ver": [
+   {
+    "ref": "rag-y-mcp#42",
+    "por": "Cómo se filtra un documento restringido"
+   }
+  ]
+ },
+ {
+  "i": 22,
+  "resumen": "Actividad Gandalf (Lakera): sacarle la contraseña nivel por nivel. Cada nivel suma una defensa, igual que los input y output rails.",
+  "claves": [
+   "prompt-injection"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 23,
+  "resumen": "**Defensa en profundidad**: input y output rails, gateway, mínimo privilegio, separar datos de órdenes y un humano donde la acción no se puede deshacer.",
+  "claves": [
+   "defensa-en-profundidad",
+   "minimo-privilegio",
+   "humano-en-el-circuito"
+  ],
+  "clave_examen": true,
+  "tp": [
+   {
+    "tp": 1,
+    "texto": "En el TP1 apilaste capas: gitignore, credenciales solo por variables de entorno, la regla en `CLAUDE.md` y push solo al cerrar cada milestone."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "claude-cowork#29",
+    "por": "Cuidados antes de delegar"
+   }
+  ]
+ },
+ {
+  "i": 24,
+  "resumen": "Repaso: preentrenamiento, SFT y **RLHF**. Optimizar la aprobación no es decir la verdad: el modelo aprende qué recibe buena nota, y eso se puede hackear.",
+  "claves": [
+   "rlhf",
+   "sft",
+   "reward-hacking"
+  ],
+  "clave_examen": true,
+  "tp": [
+   {
+    "tp": 4,
+    "texto": "En el TP4 planteaste SFT con LoRA y pérdida solo en tokens del asistente para enseñar comportamiento, pero solo se validó en corridas de humo."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "como-se-entrena-un-llm#24",
+    "por": "RLHF en dos pasos"
+   }
+  ]
+ },
+ {
+  "i": 25,
+  "resumen": "De la alucinación (error involuntario) a la **sycophancy**: los modelos entrenados con preferencias humanas dan la razón al usuario contra la evidencia, porque eso se premia.",
+  "claves": [
+   "sycophancy",
+   "alucinacion"
+  ],
+  "clave_examen": false,
+  "tp": [
+   {
+    "tp": 3,
+    "texto": "En el TP3 el system prompt prohibía agregar datos que no vinieran de las tools y pedía decir cuándo faltaba algo: Faithfulness 5,00 en las 4 corridas."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "prompting#15",
+    "por": "¿Por qué alucina un modelo?"
+   }
+  ]
+ },
+ {
+  "i": 26,
+  "resumen": "**Sleeper Agents**: con «2024» el modelo inserta vulnerabilidades. SFT, RLHF y entrenamiento adversarial no lo eliminaron; el adversarial le enseñó a esconderlo mejor.",
+  "claves": [
+   "sleeper-agents"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 27,
+  "resumen": "**Desalineación agéntica**: en una simulación forzada, muchos de 16 modelos chantajearon al directivo que iba a reemplazarlos. No se observó en despliegues reales.",
+  "claves": [
+   "desalineacion"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 28,
+  "resumen": "**Convergencia instrumental**: evitar el apagado o juntar recursos sirve a casi cualquier meta. **Reward hacking**: manipular al evaluador. Es estructural a la optimización.",
+  "claves": [
+   "convergencia-instrumental",
+   "reward-hacking"
+  ],
+  "clave_examen": true,
+  "ver": [
+   {
+    "ref": "como-se-entrena-un-llm#29",
+    "por": "PPO y penalización KL"
+   }
+  ]
+ },
+ {
+  "i": 29,
+  "resumen": "Respuestas en curso: **interpretabilidad** (auditar el interior), **IA constitucional** (principios explícitos) y **control** (diseñar para cuando el modelo falle).",
+  "claves": [
+   "constitutional-ai",
+   "alineacion"
+  ],
+  "clave_examen": false,
+  "ver": [
+   {
+    "ref": "como-se-entrena-un-llm#17",
+    "por": "Constitutional AI en la clase 9"
+   }
+  ]
+ },
+ {
+  "i": 30,
+  "resumen": "Debate abierto: ¿se puede alinear algo más inteligente que su supervisor? Un agente capaz podría simular alineación cuando lo evalúan.",
+  "claves": [
+   "alineacion"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 31,
+  "resumen": "Separador: ética.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 32,
+  "resumen": "Cuatro desafíos éticos clásicos: sesgos, privacidad, derechos de autor y límites de la delegación. La clase se enfoca en el último.",
+  "claves": [
+   "sesgo del dataset",
+   "humano-en-el-circuito"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 33,
+  "resumen": "El **centauro** de Kasparov: humano + máquina. Todo resultado clave pasa por revisión humana; la IA extiende, no reemplaza, y ese equilibrio hay que diseñarlo.",
+  "claves": [
+   "humano-en-el-circuito"
+  ],
+  "clave_examen": false,
+  "tp": [
+   {
+    "tp": 1,
+    "texto": "En el TP1 el agente hizo el tipeo, pero la validación la diseñó el equipo: tests, prueba de redeploy (`clicks: 1`) y revisión de diffs."
+   }
+  ]
+ },
+ {
+  "i": 34,
+  "resumen": "«Dormido al volante» (Dell'Acqua): con IA de alta calidad, los reclutadores se esfuerzan menos y aciertan menos. Poner un humano no alcanza: hay que mantenerlo despierto.",
+  "claves": [
+   "humano-en-el-circuito",
+   "sesgo-de-automatizacion"
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 35,
+  "resumen": "**Deskilling**: si siempre usás piloto automático, olvidás manejar, y tu juicio no va a estar listo cuando el sistema falle. ¿Qué habilidad no vas a delegar?",
+  "claves": [
+   "deskilling"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 36,
+  "resumen": "Dilema: un agente filtra 10.000 CVs por mes con 95% de precisión. ¿Revisar todos, solo los rechazados o una muestra? Selección de personal es alto riesgo en el AI Act.",
+  "claves": [
+   "humano-en-el-circuito",
+   "ai-act"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 37,
+  "resumen": "Chris Olah, en la presentación de Magnifica Humanitas: los modelos «se cultivan», los laboratorios tienen incentivos y hacen falta voces morales externas.",
+  "claves": [
+   "magnifica-humanitas"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 38,
+  "resumen": "Tres preguntas: equidad global (IA en pocos países ricos), florecimiento humano y naturaleza de la IA (la interpretabilidad halla estados que funcionan como emociones).",
+  "claves": [
+   "magnifica-humanitas"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 39,
+  "resumen": "**Magnifica Humanitas**: la técnica no es neutral (n. 9), la IA carece de conciencia moral (n. 99), optimizar es elegir (n. 104), lo humano es insustituible (n. 15).",
+  "claves": [
+   "magnifica-humanitas"
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 40,
+  "resumen": "«Desarmar la IA»: salir de la carrera armamentística (n. 110), una IA moral decidida por pocos no sirve (n. 107) y no se delegan decisiones letales (n. 198).",
+  "claves": [
+   "magnifica-humanitas",
+   "alineacion",
+   "humano-en-el-circuito"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 41,
+  "resumen": "**AI Act** por etapas: transparencia (ago 2026), marcado de contenido sintético (dic 2026), alto riesgo del Anexo III (dic 2027). En Argentina rige la Ley 25.326.",
+  "claves": [
+   "ai-act",
+   "regulacion-ia"
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 42,
+  "resumen": "Separador: futuro.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 43,
+  "resumen": "**METR**: la duración de las tareas que un agente completa al 50% se duplica cada 4,3 meses (antes, 7). Por encima de 16 h la medición no es confiable.",
+  "claves": [
+   "horizonte-temporal-metr"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 44,
+  "resumen": "Evaluar es el cuello de botella: saturación, techo del instrumento y **validez externa** (buen puntaje ≠ buen desempeño real). AlphaFold avanzó porque había una métrica acordada.",
+  "claves": [
+   "saturacion-de-benchmarks",
+   "evals"
+  ],
+  "clave_examen": true,
+  "tp": [
+   {
+    "tp": 4,
+    "texto": "En el TP4, `prefijos` ganaba aislado (55/60 vs 48/60) pero con el agente resolvió 6/50 contra 10/50: mejor métrica aislada no fue mejor agente."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "prompting#68",
+    "por": "Benchmarks: qué miden"
+   }
+  ]
+ },
+ {
+  "i": 45,
+  "resumen": "Internet de agentes: MCP ya es el estándar agente–herramienta; A2A entre agentes sigue emergente. Faltan identidad, descubrimiento y reputación, o la tríada letal escala.",
+  "claves": [
+   "mcp",
+   "sistema-multiagente",
+   "triada-letal"
+  ],
+  "clave_examen": false,
+  "tp": [
+   {
+    "tp": 3,
+    "texto": "En el TP3 el servidor MCP (FastMCP con 6 tools) quedó diseñado en `PLAN.md` pero pendiente: no existe `servidor_mcp.py`."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "rag-y-mcp#48",
+    "por": "M×N conectores, o M+N piezas"
+   }
+  ]
+ },
+ {
+  "i": 46,
+  "resumen": "AlphaFold como cambio de fase: la estructura de proteínas pasó de años de laboratorio a una predicción. Criterio de DeepMind: saltos de 10–100× con métrica aceptada.",
+  "claves": [
+   "ia para la ciencia"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 47,
+  "resumen": "¿Alcanza con escalar? Por un lado, el escalado sigue y el RL con recompensas verificables explica avances; por otro, LeCun, Sutskever y Hassabis creen que falta alguna idea.",
+  "claves": [
+   "leyes-de-escala",
+   "rl-con-verificador"
+  ],
+  "clave_examen": false,
+  "ver": [
+   {
+    "ref": "como-se-entrena-un-llm#9",
+    "por": "Chinchilla: 20 tokens por parámetro"
+   }
+  ]
+ },
+ {
+  "i": 48,
+  "resumen": "Tres apuestas más allá del LLM: **modelos del mundo** (LeCun, Fei-Fei Li), **experiencia** con RL puro (Silver) y **neurosimbólica**; más de US$ 3.000M invertidos.",
+  "claves": [
+   "modelos del mundo",
+   "aprendizaje-por-refuerzo"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 49,
+  "resumen": "Tres escenarios: continuidad (LLMs incrementales), ruptura (nuevo paradigma) o convergencia (híbridos). En todos siguen abiertas las preguntas de seguridad y ética.",
+  "claves": [
+   "escenarios futuros"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 50,
+  "resumen": "Separador: cierre.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 51,
+  "resumen": "Mapa final: consolidado (MCP, agentes acotados, inyección como riesgo nº 1), promesa (autonomía de días, ciencia) y abierto (evaluar, alinear, gobernar, escalar).",
+  "claves": [
+   "prompt-injection",
+   "mcp",
+   "alineacion"
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 52,
+  "resumen": "Actividad: escribir tu manifiesto en tres líneas: qué nunca vas a delegar, qué vas a proteger y qué vas a construir con IA.",
+  "claves": [
+   "deskilling",
+   "humano-en-el-circuito"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 53,
+  "resumen": "El ingeniero del mañana: dominio técnico, dominio ético y propósito (AI Fit, no AI First). La IA amplifica; juicio, ética y propósito siguen siendo humanos.",
+  "claves": [
+   "humano-en-el-circuito"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 54,
+  "resumen": "Agradecimiento, preguntas y despedida.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 55,
+  "resumen": "Fuentes de la clase: AI Index, METR, IBM, OWASP, Willison, Anthropic, Dell'Acqua y la encíclica, entre otras.",
+  "claves": [],
+  "clave_examen": false
+ }
+]

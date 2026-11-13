@@ -1,0 +1,801 @@
+{
+ "num": 12,
+ "fecha": "2026-10-28",
+ "titulo": "Modelos generativos de señales, imágenes y multimodalidad",
+ "talks": [
+  "segmentacion-y-stable-diffusion"
+ ],
+ "bloque": "Visión y generativos",
+ "tesis": "La U-Net que nació para segmentar células píxel a píxel es la misma pieza que, junto con un VAE y el text encoder de CLIP, le permite a Stable Diffusion generar imágenes a partir de una descripción en texto libre. Con esas tres piezas a la vista, Stable Diffusion deja de ser una caja negra: sabés qué hace cada parte, qué perillas mover y dónde va a fallar.",
+ "resumen": "La clase arranca por la **convolución**: una red densa solo acepta entradas de largo fijo y no modela que en un audio o una imagen lo vecino está relacionado; un **kernel** chico de pesos compartidos que se desliza sobre la señal resuelve las dos cosas, y su encoder resume la entrada en un **embedding**. Con esa pieza se define **segmentar** (una etiqueta por píxel), se construye **FCN** y su problema de bordes borrosos, y la **U-Net** (Ronneberger et al., 2015) que los recupera con **skip connections**. Se contrasta con **SAM**, el foundation model de Meta que segmenta lo que le señalás (clicks, cajas, texto en SAM 3). Después vuelve **TilTedTinder**: ahora los usuarios describen en texto libre lo que les atrae, y una GAN no alcanza. **CLIP** pone texto e imagen en el mismo espacio. **Stable Diffusion** junta todo: difusión en un **espacio latente** (64×64×4, 48× menos que los píxeles), con la U-Net prediciendo el ruido guiada por el prompt vía **cross-attention**, y el **VAE** decodificando. Cierra con hiperparámetros (steps, guidance 7,5, seed), limitaciones, prompts para TilTedTinder y el notebook con Diffusers.",
+ "secciones": [
+  {
+   "titulo": "Por qué una red densa no alcanza: sesgo inductivo",
+   "contenido": "Una **red densa (MLP)** recibe un vector con una cantidad **fija** de números: la cantidad queda fija al definir la primera capa porque cada entrada tiene sus propios pesos. Funciona para el precio de una casa (TP de MLP), riesgo crediticio, o **MNIST** (28×28 aplanado en 784 números, todas del mismo tamaño).\n\n**El detector de voz:** un audio de 5 s tiene más muestras que uno de 2 s. Con un MLP hay que elegir un largo L y **recortar** (si la voz estaba en el tramo cortado, nunca entra) o **rellenar con ceros** (la red tiene que aprender a ignorar silencio artificial). L es arbitrario: corto pierde información, largo es casi todo relleno.\n\nAun con el largo resuelto, la densa tiene el **sesgo inductivo equivocado** (sesgo inductivo = lo que la arquitectura asume antes de ver un dato):\n- **Sin vecindad:** si mezclás el orden de las entradas (la misma mezcla en todos los ejemplos) y reentrenás, aprende igual de bien. Para tablas está bien; en audio e imágenes **el orden es la información**.\n- **Sin invariancia a traslación:** un \"hola\" al principio y al final pasan por pesos distintos; hay que aprender el patrón una vez por posición.\n- **Demasiados parámetros:** una imagen RGB 224×224 son **150.528** números; una primera capa densa de 256 neuronas ya tiene **≈ 38,5 millones** de pesos.\n\nEl problema aparece en cualquier señal: clasificación (¿hay voz?), regresión (frecuencia cardíaca desde ECG), filtrado (sacar ruido, salida del mismo largo), upscaling, generación (sintetizar voz). En filtrado y upscaling el largo variable aparece dos veces, en la entrada y en la salida. Las imágenes tienen el mismo problema en 2D.",
+   "conceptos": [
+    "sesgo-inductivo",
+    "perceptron-multicapa"
+   ],
+   "ejemplo": "Repaso del entrenamiento con un MLP de juguete (64→16→12→10, dígitos de 8×8): el \"3\" entra, p(3) = 0,04, L = −log p(3) = 3,12; backward con δ₃ = p − y; W ← W − η·∂L/∂W con η = 0,2. En 40 pasos L baja de 3,14 a 0,08 y p(3) sube a 0,92. Este ciclo (forward, pérdida, backward, actualización) entrena a todos los modelos de la clase; lo que cambia es la pérdida."
+  },
+  {
+   "titulo": "La convolución: un kernel que se desliza",
+   "contenido": "Un **kernel** es un vector chico de pesos que recorre la señal: en cada posición multiplica sus pesos por el tramo de abajo, suma y escribe un número en la salida; después avanza y repite. Es la misma suma ponderada de una neurona, pero que combina **solo una ventana** y se **reutiliza en cada posición** (pesos compartidos).\n\nConsecuencias: detecta un patrón **esté donde esté** (invariancia a traslación), cada salida combina valores **cercanos** (localidad), y **la cantidad de pesos depende del tamaño del kernel, no del largo de la entrada**.\n\n- Kernel de 9 pesos iguales a 1/9 = **promedio móvil**: filtra un audio ruidoso conservando la forma.\n- Otro kernel (ventana larga sobre la señal al cuadrado) mide la **energía local**; donde pasa un umbral, el detector marca voz.\n- En una CNN nadie elige los kernels: arrancan al azar y los ajusta el descenso por gradiente.\n\n**Largo variable resuelto:** sobre 2 s da una salida corta, sobre 5 s una larga, con los mismos pesos. Para clasificar toda la grabación se resume con **pooling global** (promedio o máximo) en un vector fijo, y recién ahí entra una capa densa.\n\n**Convolución vs. atención:** las dos aceptan cualquier largo. La convolución tiene sesgo inductivo **fuerte** (localidad): aprende con menos datos y relaciona puntos lejanos apilando capas. La atención combina cada posición con todas desde la primera capa; sesgo **débil** (el orden lo ponen los positional embeddings), necesita más datos, captura dependencias lejanas y su costo crece con el **cuadrado del largo** (doble de largo → cuatro veces más pares). *Elegir una arquitectura es elegir un sesgo inductivo.*\n\n**En imágenes:** el kernel es una grilla (p. ej. 3×3) que recorre alto y ancho. Sobre RGB abarca los 3 canales: 3×3×3 = **27 pesos**. `nn.Conv2d(3, 32, 3)` tiene **896 parámetros** (32×27 + 32 sesgos) contra 38,5 M de la densa. Sobre una grilla de **7×7**, un kernel **3×3 sin relleno** cabe en 5 posiciones por fila y columna: **feature map de 5×5**. Valores grandes (en valor absoluto) donde el kernel cruza un borde. Cada kernel detecta un rasgo (bordes verticales, horizontales); apilando capas: **bordes → texturas → partes → objetos**. Esa pila es el **encoder** de FCN y U-Net.",
+   "conceptos": [
+    "convolucion",
+    "cnn",
+    "atencion"
+   ],
+   "ejemplo": "Aprender un kernel: un 3×3 al azar se entrena para que su salida sobre una imagen de 7×7 se parezca al mapa de bordes verticales (MSE, L inicial = 83,93). Como el mismo kernel se aplicó en las 25 posiciones, su gradiente es la **suma** de las contribuciones: en cada una se suma (2/25)·(salida − objetivo)·ventana. En 60 pasos el kernel llega a [−1 0 +1] en las tres filas y L baja a 0,01."
+  },
+  {
+   "titulo": "Embeddings más allá del texto",
+   "contenido": "El encoder de una CNN termina en un **vector de largo fijo** que resume el contenido de la imagen. Un encoder de texto hace lo mismo con una oración y uno de audio con una grabación.\n\nUn **embedding** es una **representación densa aprendida donde la geometría del espacio codifica el significado**: vectores cercanos, contenidos parecidos. Sirve para cualquier modalidad, con o sin transformers. Lo vieron con palabras y tokens; acá se generaliza.\n\nVuelve dos veces en la clase:\n- **CLIP** pone imágenes y textos **en el mismo espacio** (la novedad es entrenar dos encoders para que caigan juntos).\n- El **VAE** de Stable Diffusion comprime la imagen en un **latente** donde trabaja la difusión. Es un pariente: no está entrenado para que lo cercano signifique lo mismo, pero también comprime.\n\nEl encoder de texto de CLIP es un **transformer**, y un **ViT** (Vision Transformer) trata la imagen como una secuencia de **parches**: atención aplicada a imágenes. El encoder de imagen de SAM es un ViT.",
+   "conceptos": [
+    "embedding",
+    "multimodalidad"
+   ],
+   "ejemplo": "Con CLIP, la frase \"una foto de un perro corriendo en la playa\" aterriza en el mismo vecindario que una foto real de eso."
+  },
+  {
+   "titulo": "Segmentación: una etiqueta por píxel",
+   "contenido": "Tres preguntas a una imagen, de menos a más fina:\n\n| Tarea | Pregunta | Salida |\n|---|---|---|\n| Clasificación | ¿Qué hay? | Una etiqueta (\"perro\") |\n| Detección | ¿Dónde está y qué es? | Cajas con etiquetas |\n| **Segmentación** | ¿Qué representa cada píxel? | **Una etiqueta por píxel (máscara)** |\n\nFrase clave: segmentar es darle significado **píxel por píxel** a la imagen.\n\n**Tipos:**\n- **Semántica:** cada píxel con su clase, sin distinguir individuos (cinco autos, misma etiqueta; las tres ovejas del mismo color).\n- **De instancias:** distingue cada objeto (\"auto 1\", \"auto 2\").\n- **Panóptica:** combina ambas; la más completa.\n\n**Dónde se usa:** autos autónomos (carretera, peatones, semáforos), imagen satelital (bosques, urbanización, agua), videoconferencia y \"Seleccionar sujeto\" de Photoshop, neuroimagen y oncología (delinear tumores, medir volumen para radioterapia), cardiología (ventrículos → fracción de eyección), patología, oftalmología (vasos retinianos), dermatología. **En medicina la máscara es lo que se mide, se documenta y se compara**: no es un paso intermedio, es la respuesta.\n\n**Cómo se ve:** MRI cardíaca → **máscara binaria** (blanco estructura, negro fondo) → overlay → **mapa de probabilidad** por píxel. Internamente la máscara es una **matriz del mismo tamaño que la imagen**: 0/1 para 2 clases, 0..N−1 para N clases.",
+   "conceptos": [
+    "segmentacion",
+    "segmentacion-semantica"
+   ],
+   "ejemplo": "Una figura con cajas rojas sobre cortes de cerebro muestra **detección**, no segmentación: la cátedra la sacó del deck por eso."
+  },
+  {
+   "titulo": "De FCN a U-Net",
+   "contenido": "**Intuición:** tratar cada píxel como un mini-problema de clasificación. **FCN** (Fully Convolutional Network, Long et al., 2015): sacar la capa densa final de una CNN clasificadora y reemplazarla por más capas convolucionales que den una salida espacial. \"Convertí un clasificador de imágenes en un **clasificador de píxeles**\".\n- Encoder convolucional que comprime (bordes → texturas → estructuras → objetos).\n- **Convoluciones 1×1** en lugar de la densa: mantienen las dimensiones espaciales; sale un mapa chico con probabilidades por clase.\n- **Upsampling** con convoluciones traspuestas hasta el tamaño original. Primer modelo de segmentación end-to-end con deep learning.\n\n**El problema de FCN:** una imagen de **512×512** puede terminar en **16×16**; al reescalar, la información espacial fina ya se perdió → **bordes borrosos**. Si medís el volumen de un tumor para radioterapia, un borde 2 píxeles más adentro o afuera cambia el cálculo y puede cambiar la decisión clínica.\n\n**U-Net** (Ronneberger, Fischer y Brox, Friburgo, 2015), para células en microscopía electrónica con muy pocas imágenes etiquetadas:\n- **Encoder:** convoluciones + max pooling; en cada nivel la resolución se **reduce a la mitad** y los canales se **duplican**. Codifica cada vez mejor **\"qué hay\"** y pierde **\"dónde está\"**.\n- **Bottleneck:** la representación más comprimida.\n- **Decoder:** convoluciones traspuestas; la resolución se duplica y \"dónde\" se reconstruye.\n- **Skip connections:** la salida de cada nivel del encoder se **concatena** con el decoder del mismo nivel. El decoder recibe qué es (desde abajo) y dónde exactamente (desde el atajo). Sin skips, U-Net sería un FCN más elegante.\n\n**Por qué funciona en medicina:** pocos datos (las skips actúan como regularizador estructural; la original se entrenó con **30 imágenes**), contornos precisos (\"el borde es el dato\") y modular (MRI, patología, retina, ecografía: cambia el dataset, no la red).\n\n**Entrenamiento:** cross-entropy **por píxel** $\\ell=-[y\\log p+(1-y)\\log(1-p)]$, promediada sobre todos los píxeles.\n\n**U-Net es modular:** sirve donde entrada y salida tienen el **mismo tamaño espacial** y hay que preservar detalle: denoising, deblurring, super-resolución, image-to-image (MRI → CT) y el corazón de **Stable Diffusion**.",
+   "conceptos": [
+    "fcn",
+    "u-net",
+    "skip-connections",
+    "convolucion-transpuesta",
+    "segmentacion"
+   ],
+   "ejemplo": "U-Net de juguete en numpy (14.265 pesos) sobre un gato de 64×64: en un píxel de borde con y = 1 y p = 0,22 la pérdida es 1,52; en uno de fondo con y = 0 y p = 0,13 es 0,14; L es el promedio de 4.096 píxeles (0,264). Con η = 0,05, L baja de 0,67 a 0,04 y el **IoU** sube de 0,16 a 0,93; la pérdida que queda se concentra en los bordes."
+  },
+  {
+   "titulo": "SAM: segmentar lo que le señalás",
+   "contenido": "**SAM** (Segment Anything Model, Meta, 2023) es el opuesto de la U-Net: un **foundation model** masivo que segmenta cualquier cosa en cualquier imagen **sin reentrenamiento**.\n- Recibe imagen + **prompt** (un click, una caja, una máscara aproximada, o desde SAM 3 texto) y devuelve la máscara.\n- **La imagen se codifica una sola vez** con un image encoder (un **ViT**, la gran mayoría del cómputo); después se prueban decenas de prompts y solo se reejecuta el **mask decoder** liviano.\n- **SA-1B:** **1.000 millones de máscaras sobre 11 millones de imágenes**, armado con un **data engine**: SAM propone máscaras, anotadores corrigen, se reentrena, propone mejores. Sin SA-1B, SAM no funcionaría.\n- Trae a segmentación el paradigma \"foundation model + prompt en inferencia\" de los LLMs. No está entrenado para una tarea sino para separar objetos en general.\n\n**Entrenamiento:** prompts **simulados** (se sortea un punto dentro de la máscara verdadera), pérdida **focal** (castiga los píxeles difíciles) **+ dice** (solapamiento), y clics correctores sorteados en la zona de error (0,37 → 0,19 → 0,09).\n\n| Versión | Fecha | Novedad |\n|---|---|---|\n| SAM 1 | Abril 2023 | Prompts visuales en imágenes |\n| SAM 2 | Julio 2024 | Video: **memory encoder + memory bank + memory attention**; la máscara sigue al objeto entre frames |\n| SAM 3 | Noviembre 2025 | **Prompts de texto**, vocabulario abierto (\"todos los hepatocitos\") |\n| SAM 3.1 | Marzo 2026 | Object Multiplex: tracking multi-objeto con memoria compartida |\n\nEn SAM 2 el gradiente de un frame vuelve también a los frames anteriores a través de la memoria (el memory bank no tiene pesos, solo guarda); se entrenó con SA-V.\n\n**En la práctica clínica conviven:** U-Net cuando la salida tiene que ser **medible y reproducible**; SAM en **anotación asistida** (el radiólogo clickea, SAM propone).",
+   "conceptos": [
+    "sam",
+    "segmentacion"
+   ],
+   "ejemplo": "Patrón de la evolución de SAM: imagen → video, prompts visuales → texto, un objeto → muchos. Es la misma trayectoria de generalización que vivieron los LLMs."
+  },
+  {
+   "titulo": "Generación condicionada por texto: TilTedTinder y CLIP",
+   "contenido": "Una Vanilla GAN le llenó la base a **TilTedTinder** con 4 fotos reales. Un año después hay miles de usuarios que describen lo que les atrae: *\"Me atraen las personas inclinadas, altas, con anteojos y pelo rizado\"*. Pasamos de \"generá una persona inclinada cualquiera\" a \"generá una con **estos atributos en texto libre**\".\n\n**Por qué la GAN no alcanza:**\n- **Vanilla GAN:** no tiene canal para recibir descripciones.\n- **cGAN:** etiquetas predefinidas; las preferencias reales son frases con matices que no entran en categorías cerradas.\n- **StyleGAN:** control de estilo, no **semántico**: no podés pedir \"expresión melancólica al atardecer\".\n\nLa nueva tarea es **text-to-image**: permite combinar conceptos nunca vistos juntos (\"un astronauta montando un caballo\").\n\n**Línea de tiempo:** 2021 DALL·E 1 → 2022 DALL·E 2, Imagen, Midjourney → **agosto 2022 Stable Diffusion 1.4** (primer open source serio, pesos publicados, GPU de consumo) → 2023 DALL·E 3, SDXL → 2024 FLUX, SD 3, Sora.\n\n**CLIP** (OpenAI, 2021): el texto se tokeniza, cada token pasa a vector y un **transformer** produce el embedding de la oración. CLIP entrena **dos encoders en paralelo** (imagen y texto) para que sus salidas vivan en el **mismo espacio vectorial**, con **400 millones de pares** (imagen, descripción) de internet: pares reales cerca, mal apareados lejos. Es **entrenamiento contrastivo**: se arma la matriz de cosenos del batch y la pérdida es **cross-entropy simétrica** (softmax por filas y columnas, objetivo la diagonal) con temperatura τ (0,07; en CLIP real se aprende). El gradiente llega a **los dos encoders**; CLIP **no tiene decoder**.\n\n**La idea de condición:** incondicional = ruido → red → imagen. Condicionada = ruido + **condición** → imagen que la respeta. La condición puede ser una etiqueta (cGAN), una imagen de referencia (Pix2Pix) o un **embedding de texto** (Stable Diffusion), y **dirige cada paso** de la generación. En SD, el embedding de CLIP entra a la U-Net por **cross-attention**.",
+   "conceptos": [
+    "clip",
+    "multimodalidad",
+    "embedding"
+   ],
+   "ejemplo": "Paso de CLIP de juguete: batch de 4 pares, τ = 0,07. En 11 pasos L baja de 4,35 a 0,05 mientras la diagonal de cosenos sube solo hasta ~0,5: con τ chica alcanza con separar un poco los cosenos para que el softmax quede casi todo en la diagonal."
+  },
+  {
+   "titulo": "Difusión y latent diffusion",
+   "contenido": "**Difusión** viene de la física: una gota de tinta en agua se dispersa hasta volverse uniforme.\n- **Forward (entrenamiento):** a una imagen real se le agrega un poco de **ruido gaussiano** en cada paso, durante miles de pasos, hasta que queda ruido puro ($x_0 \\to x_T$).\n- **Reverse (inferencia):** la red hace el camino inverso: arranca de ruido puro y quita ruido paso a paso, guiada por la condición $c$ ($x_T \\to x_0$).\n- La red aprende **una sola cosa**: dado un latente ruidoso y un timestep, **predecir qué ruido fue agregado**. Con esa predicción el ruido se resta.\n\n**Diferencia con las GANs:** no hay dos redes compitiendo. Una sola red aprende a desruidizar: **más estable**, **sin mode collapse**, más diversidad (a cambio, lenta). Imagen de la clase: Stable Diffusion **talla** la imagen: arranca de un bloque de ruido (el mármol) y saca lo que sobra.\n\n**Latent diffusion** (Rombach et al., CompVis; preprint dic. 2021, CVPR 2022, \"High-Resolution Image Synthesis with Latent Diffusion Models\"): difundir sobre píxeles (DALL·E 2, Imagen) es caro: 512×512 RGB son **786.432 valores**, procesados en cada uno de los 50 a 1000 pasos. En cambio se difunde en un **latente** de **64×64×4 = 16.384 valores: 48× menos por paso**. Funciona porque las imágenes naturales son redundantes (píxeles vecinos se parecen): comprimir **8× por lado** preserva la estructura. Resultado: SD corre en una GPU de consumo (8–16 GB) en pocos segundos.\n\n**Entrenamiento de SD:** el par (imagen, texto) pasa por CLIP y el VAE encoder (**congelados**). Se sortean un timestep $t$ y un ruido $\\varepsilon$, y se arma $z_t=\\sqrt{\\bar\\alpha_t}\\,z_0+\\sqrt{1-\\bar\\alpha_t}\\,\\varepsilon$ (con $t=517$: $0.51\\,z_0+0.86\\,\\varepsilon$). La U-Net —**la única que se entrena**— recibe $(z_t, t, \\text{embedding})$ y devuelve $\\hat\\varepsilon$; pérdida $\\|\\varepsilon-\\hat\\varepsilon\\|^2$. Algunos pasos usan **texto vacío**: así aprende también la predicción sin condición, que usa la **classifier-free guidance**. SD 1.x se entrenó sobre pares de **LAION**.",
+   "conceptos": [
+    "difusion",
+    "proceso-forward",
+    "latent-diffusion",
+    "espacio-latente",
+    "classifier-free-guidance"
+   ],
+   "ejemplo": "Cuenta de la clase: 786.432 / 16.384 = 48. Sobre píxeles hacían falta GPUs muy grandes y minutos por imagen; en el latente, segundos en una GPU de consumo. Por eso pudo existir Stable Diffusion abierta."
+  },
+  {
+   "titulo": "Stable Diffusion por dentro: VAE, U-Net, CLIP y el pipeline",
+   "contenido": "| Componente | Qué hace | Tamaño aprox. |\n|---|---|---|\n| **VAE** | Comprime imagen ↔ latente | ~80M params |\n| **U-Net** | Denoiser condicional en el latente | ~860M params |\n| **CLIP Text Encoder** | Prompt → embedding | ~123M params |\n\n**VAE:** encoder 512×512×3 → latente 64×64×4 (~48×); decoder al revés. En el entrenamiento de SD se usa el encoder; **en inferencia solo el decoder**. Se entrena **antes y por separado**, con `decoder(encoder(imagen)) ≈ imagen`, y queda **congelado**. Lo *variacional*: el encoder da una **distribución** ($\\mu$, $\\sigma$), se sortea $\\varepsilon\\sim N(0,I)$ y $z=\\mu+\\sigma\\varepsilon$ (**reparametrización**: el sorteo no es derivable, pero $z$ sí, así el gradiente llega al encoder). Pérdida = reconstrucción $\\|x-\\hat x\\|^2$ + $\\beta\\cdot KL$ hacia $N(0,I)$.\n\n**U-Net de SD:** misma U con skips que en segmentación; cambia la tarea. Entran **latente ruidoso, timestep y embedding del prompt**; sale la **predicción del ruido**. En cada nivel, bajando y subiendo, un bloque de **cross-attention** calcula pesos entre las features de la imagen y cada token del embedding de CLIP: atención de transformer dentro de una red convolucional.\n\n**CLIP Text Encoder:** SD 1.x usa el de **CLIP ViT-L/14** (~123M, solo la parte de texto), **congelado**, prestado de OpenAI. El prompt se tokeniza a **77 tokens** (padding o truncado) y sale una matriz de **77 × 768**.\n\n**Pipeline de inferencia:**\n1. Prompt → tokenizer → CLIP → embedding 77×768.\n2. Latente inicial aleatorio 64×64×4 desde una normal, controlado por la **seed** (el bloque de mármol).\n3. Bucle de denoising (~50 pasos): la U-Net predice el ruido y el **scheduler** lo resta.\n4. Latente final → VAE decoder → imagen 512×512×3.\n\n**Hiperparámetros:** `num_inference_steps` (default 50; <20 degrada, >100 marginal); `guidance_scale` (CFG, default **7,5**; 1–3 diverso y poco fiel, 7–9 punto justo, 15+ fiel pero saturado); `seed` (misma seed + mismo prompt = misma imagen); `height`/`width` **múltiplos de 8** (el VAE comprime 8×). Para iterar: fijá seed y guidance y mové solo el prompt.\n\n**Limitaciones:** manos y anatomía, texto dentro de la imagen (mejoró en SD 3 y FLUX), conteo y composición (\"tres manzanas\"), sesgos de **LAION-5B**, costo de inferencia.",
+   "conceptos": [
+    "stable-diffusion",
+    "vae",
+    "u-net",
+    "clip",
+    "cross-attention"
+   ],
+   "ejemplo": "TilTedTinder v2: prompt = \"a tilted portrait of a tall person with round glasses and curly hair, soft natural lighting, photorealistic, 4k\" (sujeto + atributos + estilo + luz). Problemas: LAION-5B no tiene caras inclinadas → salen rectas → fine-tuning con las 4 fotos vía **DreamBooth o LoRA**; sesgo demográfico; detalle fino con ControlNet/Inpainting; costo → caché, batch offline, SDXL Turbo/FLUX Schnell; ética: ¿se avisa que el perfil es sintético? Notebook: Colab T4, Hugging Face Diffusers, SD v1.4 en float16."
+  }
+ ],
+ "conceptos": [
+  {
+   "id": "sesgo-inductivo",
+   "termino": "Sesgo inductivo",
+   "definicion": "Lo que una arquitectura asume sobre los datos antes de ver un solo ejemplo. La densa no asume orden; la convolución asume localidad e invariancia a traslación; la atención asume poco.",
+   "por_que_importa": "Elegir una arquitectura es elegir un sesgo inductivo: uno fuerte aprende con menos datos, uno débil necesita más pero es más flexible.",
+   "trampa": "Que una MLP pueda aprender igual con las entradas permutadas no es una virtud en imágenes: muestra que ignora la vecindad."
+  },
+  {
+   "id": "convolucion",
+   "termino": "Convolución",
+   "definicion": "Operación en la que un kernel chico de pesos compartidos se desliza sobre la señal y en cada posición calcula la suma ponderada de la ventana que cubre, produciendo un feature map.",
+   "por_que_importa": "Acepta entradas de cualquier largo, detecta un patrón esté donde esté y tiene muchos menos parámetros que una densa (896 vs 38,5 M en el ejemplo).",
+   "trampa": "La cantidad de pesos depende del tamaño del kernel y de los canales, no del tamaño de la imagen."
+  },
+  {
+   "id": "cnn",
+   "termino": "CNN (red convolucional)",
+   "definicion": "Red que apila capas convolucionales (con activaciones y pooling) y aprende sus kernels; las primeras capas detectan bordes, luego texturas, partes y objetos.",
+   "por_que_importa": "Es el encoder de FCN, de la U-Net y de DCGAN; base de la visión por computadora.",
+   "trampa": "Una CNN sola, entrenada con MSE para super-resolución, no inventa detalle fino (por eso SRGAN)."
+  },
+  {
+   "id": "embedding",
+   "termino": "Embedding (multimodal)",
+   "definicion": "Representación densa aprendida donde la geometría codifica el significado: vectores cercanos, contenidos parecidos. Vale para texto, imagen y audio.",
+   "por_que_importa": "CLIP pone textos e imágenes en el mismo espacio, y eso es lo que permite guiar la generación con un prompt.",
+   "trampa": "El latente del VAE no es un embedding semántico: comprime, pero no está entrenado para que cercano signifique parecido en sentido."
+  },
+  {
+   "id": "segmentacion",
+   "termino": "Segmentación",
+   "definicion": "Asignar una etiqueta a cada píxel de la imagen; la salida es una máscara del mismo tamaño que la imagen (0/1 o 0..N−1).",
+   "por_que_importa": "En medicina la máscara es el dato que se mide (volumen tumoral, fracción de eyección).",
+   "trampa": "Dibujar cajas alrededor de objetos es detección, no segmentación."
+  },
+  {
+   "id": "segmentacion-semantica",
+   "termino": "Segmentación semántica / de instancias / panóptica",
+   "definicion": "Semántica: clase por píxel sin distinguir individuos. De instancias: distingue cada objeto (auto 1, auto 2). Panóptica: combina ambas.",
+   "por_que_importa": "Define qué tipo de salida necesita el problema (contar objetos requiere instancias).",
+   "trampa": "En la semántica, cinco autos son una sola región \"auto\"."
+  },
+  {
+   "id": "fcn",
+   "termino": "FCN (Fully Convolutional Network)",
+   "definicion": "Long et al. (2015): reemplazar la capa densa final de un clasificador por convoluciones 1×1 y upsampling con convoluciones traspuestas para obtener una máscara; primer modelo de segmentación end-to-end.",
+   "por_que_importa": "Es el paso de \"clasificador de imágenes\" a \"clasificador de píxeles\".",
+   "trampa": "Su problema: comprime mucho (512×512 → 16×16) y al reescalar los bordes salen borrosos."
+  },
+  {
+   "id": "u-net",
+   "termino": "U-Net",
+   "definicion": "Ronneberger, Fischer y Brox (2015): encoder (resolución a la mitad, canales al doble), bottleneck y decoder simétrico, con skip connections que concatenan cada nivel del encoder al decoder.",
+   "por_que_importa": "Da contornos precisos con pocas imágenes (la original, 30) y es la misma pieza que predice el ruido en Stable Diffusion.",
+   "trampa": "En Stable Diffusion la U-Net no produce una máscara ni la imagen: predice el ruido presente en el latente."
+  },
+  {
+   "id": "skip-connections",
+   "termino": "Skip connections (U-Net)",
+   "definicion": "Atajos que llevan la salida de cada nivel del encoder al nivel correspondiente del decoder, donde se concatenan.",
+   "por_que_importa": "El decoder recibe \"qué es\" desde abajo y \"dónde está exactamente\" desde el atajo; además regularizan.",
+   "trampa": "En la U-Net se concatenan, no se suman como en una ResNet."
+  },
+  {
+   "id": "convolucion-transpuesta",
+   "termino": "Convolución transpuesta",
+   "definicion": "Capa aprendida que aumenta la resolución espacial de un mapa de features.",
+   "por_que_importa": "Es el upsampling del decoder de FCN/U-Net y del Generador de DCGAN.",
+   "trampa": "No es la inversa matemática de la convolución: es una operación de upsampling con pesos aprendidos."
+  },
+  {
+   "id": "sam",
+   "termino": "SAM (Segment Anything Model)",
+   "definicion": "Foundation model de Meta (2023) que segmenta cualquier objeto a partir de un prompt (click, caja, máscara; texto desde SAM 3); el image encoder (ViT) corre una vez y el mask decoder liviano responde a cada prompt.",
+   "por_que_importa": "Trae el paradigma \"foundation model + prompt\" a la segmentación; se entrenó con SA-1B (1.000 M de máscaras, 11 M de imágenes).",
+   "trampa": "No reemplaza a la U-Net en clínica: U-Net para salidas medibles y reproducibles, SAM para anotación asistida."
+  },
+  {
+   "id": "clip",
+   "termino": "CLIP",
+   "definicion": "Modelo de OpenAI (2021) que entrena un encoder de imagen y uno de texto con 400 M de pares para que sus embeddings compartan espacio, con pérdida contrastiva simétrica.",
+   "por_que_importa": "Su text encoder (ViT-L/14, ~123 M, congelado) convierte el prompt en la matriz 77×768 que condiciona la U-Net de Stable Diffusion.",
+   "trampa": "CLIP no genera imágenes ni tiene decoder: solo mide/produce embeddings alineados."
+  },
+  {
+   "id": "difusion",
+   "termino": "Modelo de difusión",
+   "definicion": "Modelo generativo que aprende a revertir un proceso que agrega ruido gaussiano a los datos: una red predice el ruido agregado en cada paso y, en inferencia, se resta iterativamente desde ruido puro.",
+   "por_que_importa": "Es una sola red, más estable que una GAN, sin mode collapse y muy diversa; base de DALL·E, Midjourney y Stable Diffusion.",
+   "trampa": "La red no predice la imagen limpia directamente: predice el ruido (ε)."
+  },
+  {
+   "id": "proceso-forward",
+   "termino": "Proceso forward y reverse",
+   "definicion": "Forward (entrenamiento): agregar ruido gaussiano paso a paso de x₀ a x_T. Reverse (inferencia): partir de ruido puro x_T y quitar ruido paso a paso, guiado por la condición, hasta x₀.",
+   "por_que_importa": "El forward tiene forma cerrada, así que en entrenamiento se salta directo a cualquier t: z_t = √ᾱ_t·z₀ + √(1−ᾱ_t)·ε.",
+   "trampa": "El forward no se aprende: es fijo. Lo que se aprende es el predictor de ruido del reverse."
+  },
+  {
+   "id": "latent-diffusion",
+   "termino": "Latent diffusion",
+   "definicion": "Rombach et al. (CompVis, 2021/CVPR 2022): hacer la difusión en el latente comprimido de un VAE (64×64×4 = 16.384 valores) en vez de en píxeles (786.432), 48× menos por paso.",
+   "por_que_importa": "Es lo que permite correr Stable Diffusion en una GPU de consumo en segundos.",
+   "trampa": "Funciona porque las imágenes son redundantes; la compresión es 8× por lado, no 8× total."
+  },
+  {
+   "id": "vae",
+   "termino": "VAE (Variational Autoencoder)",
+   "definicion": "Encoder que mapea la imagen a una distribución (μ, σ) en un latente y decoder que reconstruye; se entrena con reconstrucción + β·KL y la reparametrización z = μ + σ·ε.",
+   "por_que_importa": "En SD comprime 512×512×3 a 64×64×4; se entrena antes y queda congelado; en inferencia solo se usa el decoder.",
+   "trampa": "El VAE no genera desde el prompt: solo traduce entre píxeles y latente."
+  },
+  {
+   "id": "stable-diffusion",
+   "termino": "Stable Diffusion",
+   "definicion": "Modelo text-to-image de difusión latente (SD 1.4, agosto 2022, open source) formado por tres piezas: CLIP text encoder, U-Net denoiser en el latente con cross-attention, y VAE decoder.",
+   "por_que_importa": "Abrió el ecosistema (pesos publicados, GPU de consumo) y es modular: se puede desarmar y reconstruir a mano.",
+   "trampa": "No es un modelo monolítico: solo la U-Net se entrena en la etapa de difusión; CLIP y el VAE están congelados."
+  },
+  {
+   "id": "cross-attention",
+   "termino": "Cross-attention",
+   "definicion": "Bloque de atención en cada nivel de la U-Net de SD donde las features de la imagen (queries) se combinan con los tokens del embedding de CLIP (keys/values).",
+   "por_que_importa": "Es el mecanismo por el que el prompt guía el denoising en cada paso.",
+   "trampa": "Es atención de transformer dentro de una red convolucional: SD 1.x no es un transformer puro."
+  },
+  {
+   "id": "classifier-free-guidance",
+   "termino": "Classifier-free guidance (guidance_scale)",
+   "definicion": "En inferencia se combinan la predicción de ruido con el prompt y sin él (texto vacío) para amplificar el efecto del prompt; guidance_scale controla cuánto (default 7,5).",
+   "por_que_importa": "Es la perilla de fidelidad vs. diversidad: 1–3 diverso, 7–9 punto justo, 15+ saturado.",
+   "trampa": "Requiere que la U-Net haya aprendido también la predicción sin condición: por eso se entrena a veces con texto vacío."
+  },
+  {
+   "id": "multimodalidad",
+   "termino": "Multimodalidad",
+   "definicion": "Modelos que relacionan varias modalidades (texto, imagen, audio) en espacios de representación compartidos o condicionados entre sí.",
+   "por_que_importa": "CLIP + SD (texto → imagen) y SAM 3 (texto → máscara) son multimodales.",
+   "trampa": "No hace falta un único transformer: SD combina un transformer de texto con una U-Net convolucional."
+  }
+ ],
+ "formulas": [
+  {
+   "nombre": "Tamaño de salida de una convolución",
+   "tex": "n_{out} = \\left\\lfloor \\frac{n + 2p - k}{s} \\right\\rfloor + 1",
+   "explicacion": "n tamaño de entrada, k del kernel, p padding, s stride. Ejemplo de la clase: 7×7 con kernel 3×3, sin padding, stride 1 → 7 − 3 + 1 = 5 → feature map 5×5. (La clase solo usa el caso p = 0, s = 1.)"
+  },
+  {
+   "nombre": "Parámetros de una capa convolucional vs. densa",
+   "tex": "\\#_{conv} = C_{out}(k\\cdot k\\cdot C_{in} + 1) = 32(3\\cdot3\\cdot3+1)=896 \\qquad \\#_{densa} = 150{.}528 \\times 256 \\approx 38{,}5\\,\\text{M}",
+   "explicacion": "nn.Conv2d(3, 32, 3): 32 kernels de 3×3×3 = 27 pesos más un sesgo cada uno. La densa sobre RGB 224×224 (150.528 entradas) con 256 neuronas tiene ~38,5 millones de pesos."
+  },
+  {
+   "nombre": "Compresión del espacio latente",
+   "tex": "\\frac{512\\times512\\times3}{64\\times64\\times4} = \\frac{786{.}432}{16{.}384} = 48",
+   "explicacion": "El VAE comprime 8× por lado y pasa de 3 a 4 canales: cada paso de denoising procesa 48 veces menos valores."
+  },
+  {
+   "nombre": "Proceso forward (forma cerrada)",
+   "tex": "z_t = \\sqrt{\\bar\\alpha_t}\\, z_0 + \\sqrt{1-\\bar\\alpha_t}\\, \\varepsilon, \\quad \\varepsilon \\sim \\mathcal{N}(0, I)",
+   "explicacion": "z₀ es el latente limpio, ε el ruido sorteado y ᾱ_t un coeficiente del schedule que decrece con t. Con t = 517 en el schedule real de SD: z_t ≈ 0,51·z₀ + 0,86·ε."
+  },
+  {
+   "nombre": "Pérdida de entrenamiento de la difusión (predicción de ruido)",
+   "tex": "L = \\left\\| \\varepsilon - \\hat\\varepsilon_\\theta(z_t, t, c) \\right\\|^2",
+   "explicacion": "La U-Net recibe el latente ruidoso z_t, el timestep t y el embedding del texto c, y predice el ruido ε̂. Solo la U-Net se actualiza; CLIP y el VAE están congelados."
+  },
+  {
+   "nombre": "Paso reverse (idea)",
+   "tex": "z_{t-1} \\approx \\text{scheduler}\\big(z_t,\\; \\hat\\varepsilon_\\theta(z_t,t,c)\\big)",
+   "explicacion": "En inferencia, desde ruido puro z_T, en cada uno de ~50 pasos la U-Net predice el ruido y el scheduler lo resta; al final el VAE decoder convierte z₀ en imagen."
+  },
+  {
+   "nombre": "Classifier-free guidance",
+   "tex": "\\hat\\varepsilon = \\hat\\varepsilon(z_t, t, \\varnothing) + s\\,\\big(\\hat\\varepsilon(z_t, t, c) - \\hat\\varepsilon(z_t, t, \\varnothing)\\big)",
+   "explicacion": "s es guidance_scale (default 7,5); ∅ es el texto vacío. Fórmula estándar de CFG; la clase la describe como la perilla de qué tan estricto seguir el prompt."
+  },
+  {
+   "nombre": "Pérdida del VAE y reparametrización",
+   "tex": "L = \\|x - \\hat x\\|^2 + \\beta\\, KL\\big(\\mathcal{N}(\\mu,\\sigma^2)\\,\\|\\,\\mathcal{N}(0,I)\\big), \\qquad z = \\mu + \\sigma\\varepsilon",
+   "explicacion": "Reconstrucción más un término que empuja cada distribución latente hacia N(0, I). En el juguete de la clase, primer paso: 63,28 + 1 × 0,08 = 63,35."
+  },
+  {
+   "nombre": "Cross-entropy por píxel (segmentación)",
+   "tex": "\\ell = -[\\,y\\log p + (1-y)\\log(1-p)\\,], \\qquad L = \\frac{1}{HW}\\sum_{píxeles} \\ell",
+   "explicacion": "La misma BCE de las GANs, aplicada a cada píxel de la máscara y promediada. Píxel de borde con y = 1, p = 0,22 → 1,52; fondo con y = 0, p = 0,13 → 0,14."
+  }
+ ],
+ "comparaciones": [
+  {
+   "titulo": "Convolución vs. atención",
+   "columnas": [
+    "Aspecto",
+    "Convolución",
+    "Atención (transformer)"
+   ],
+   "filas": [
+    [
+     "Qué combina",
+     "Solo vecinos (ventana del kernel)",
+     "Cada posición con todas desde la primera capa"
+    ],
+    [
+     "Sesgo inductivo",
+     "Fuerte: localidad e invariancia a traslación",
+     "Débil: el orden lo ponen los positional embeddings"
+    ],
+    [
+     "Datos necesarios",
+     "Menos",
+     "Más"
+    ],
+    [
+     "Dependencias lejanas",
+     "Apilando capas",
+     "Directas"
+    ],
+    [
+     "Costo con el largo",
+     "Lineal",
+     "Cuadrático"
+    ],
+    [
+     "Largo variable",
+     "Sí",
+     "Sí"
+    ]
+   ]
+  },
+  {
+   "titulo": "Clasificación vs. detección vs. segmentación",
+   "columnas": [
+    "Tarea",
+    "Pregunta",
+    "Salida"
+   ],
+   "filas": [
+    [
+     "Clasificación",
+     "¿Qué hay en la imagen?",
+     "Una etiqueta"
+    ],
+    [
+     "Detección",
+     "¿Dónde está y qué es?",
+     "Cajas con etiquetas"
+    ],
+    [
+     "Segmentación",
+     "¿Qué representa cada píxel?",
+     "Una máscara (etiqueta por píxel)"
+    ]
+   ]
+  },
+  {
+   "titulo": "FCN vs. U-Net vs. SAM",
+   "columnas": [
+    "Aspecto",
+    "FCN",
+    "U-Net",
+    "SAM"
+   ],
+   "filas": [
+    [
+     "Origen",
+     "Long et al., 2015",
+     "Ronneberger et al., 2015 (células)",
+     "Meta, 2023"
+    ],
+    [
+     "Idea",
+     "Conv 1×1 + upsampling",
+     "Encoder-decoder en U + skip connections",
+     "Foundation model promptable"
+    ],
+    [
+     "Bordes",
+     "Borrosos",
+     "Precisos",
+     "Buenos, generales"
+    ],
+    [
+     "Datos",
+     "Muchos",
+     "Pocos (30 imágenes en el original)",
+     "SA-1B: 1.000 M de máscaras"
+    ],
+    [
+     "Uso típico",
+     "Primer end-to-end",
+     "Segmentación médica medible",
+     "Anotación asistida, cualquier objeto"
+    ]
+   ]
+  },
+  {
+   "titulo": "GAN vs. difusión",
+   "columnas": [
+    "Aspecto",
+    "GAN",
+    "Difusión"
+   ],
+   "filas": [
+    [
+     "Redes",
+     "Dos que compiten (G y D)",
+     "Una que predice ruido"
+    ],
+    [
+     "Estabilidad",
+     "Frágil",
+     "Estable"
+    ],
+    [
+     "Mode collapse",
+     "Sí",
+     "No"
+    ],
+    [
+     "Velocidad de inferencia",
+     "Una pasada",
+     "~50 pasos"
+    ],
+    [
+     "Control por texto",
+     "No (salvo condición cerrada)",
+     "Sí, vía CLIP + cross-attention"
+    ]
+   ]
+  },
+  {
+   "titulo": "Las tres piezas de Stable Diffusion",
+   "columnas": [
+    "Pieza",
+    "Entrada → salida",
+    "Params",
+    "¿Se entrena en SD?",
+    "¿Se usa en inferencia?"
+   ],
+   "filas": [
+    [
+     "CLIP text encoder (ViT-L/14)",
+     "Prompt (77 tokens) → 77×768",
+     "~123M",
+     "No (congelado, de OpenAI)",
+     "Sí"
+    ],
+    [
+     "U-Net",
+     "(z_t, t, embedding) → ruido ε̂",
+     "~860M",
+     "Sí, la única",
+     "Sí, ~50 veces"
+    ],
+    [
+     "VAE",
+     "512×512×3 ↔ 64×64×4",
+     "~80M",
+     "No (antes y por separado)",
+     "Solo el decoder"
+    ]
+   ]
+  }
+ ],
+ "flashcards": [
+  {
+   "q": "¿Qué es el sesgo inductivo?",
+   "a": "Lo que la arquitectura asume antes de ver los datos; elegir arquitectura es elegir sesgo inductivo."
+  },
+  {
+   "q": "¿Cuántos parámetros tiene nn.Conv2d(3, 32, 3)?",
+   "a": "896 = 32 × (3·3·3 + 1)."
+  },
+  {
+   "q": "Kernel 3×3 sin padding sobre una grilla de 7×7: ¿tamaño de salida?",
+   "a": "5×5 (7 − 3 + 1)."
+  },
+  {
+   "q": "¿Cómo se convierte la salida convolucional de largo variable en un vector fijo?",
+   "a": "Con pooling global (promedio o máximo)."
+  },
+  {
+   "q": "¿Por qué el costo de la atención crece con el cuadrado del largo?",
+   "a": "Porque compara cada posición con todas: doble de largo, cuatro veces más pares."
+  },
+  {
+   "q": "Segmentación semántica vs. de instancias",
+   "a": "Semántica: clase por píxel sin distinguir individuos; instancias: distingue cada objeto."
+  },
+  {
+   "q": "¿Cuál es el problema de FCN y cómo lo resuelve la U-Net?",
+   "a": "Bordes borrosos por compresión excesiva; la U-Net los recupera con skip connections que concatenan el encoder al decoder."
+  },
+  {
+   "q": "¿Con cuántas imágenes se entrenó la U-Net original y para qué?",
+   "a": "Con unas 30 imágenes anotadas, para segmentar células en microscopía electrónica."
+  },
+  {
+   "q": "¿Qué recibe SAM y qué corre una sola vez?",
+   "a": "Imagen + prompt (click, caja, máscara, texto desde SAM 3); el image encoder (ViT) corre una vez por imagen."
+  },
+  {
+   "q": "¿Qué agregó SAM 2?",
+   "a": "Video, con memory encoder, memory bank y memory attention."
+  },
+  {
+   "q": "¿Por qué una cGAN no sirve para TilTedTinder v2?",
+   "a": "Usa etiquetas cerradas; las preferencias son frases libres con matices."
+  },
+  {
+   "q": "¿Cómo se entrena CLIP?",
+   "a": "Contrastivamente, con 400 M de pares imagen-texto: pares reales cerca, mal apareados lejos (cross-entropy simétrica sobre la matriz de cosenos)."
+  },
+  {
+   "q": "¿Qué predice la U-Net de Stable Diffusion?",
+   "a": "El ruido presente en el latente, dado (latente ruidoso, timestep, embedding del prompt)."
+  },
+  {
+   "q": "¿Cuánto comprime el VAE de SD?",
+   "a": "De 512×512×3 (786.432) a 64×64×4 (16.384): 48×."
+  },
+  {
+   "q": "¿Qué partes de SD se usan en inferencia?",
+   "a": "CLIP text encoder, U-Net (~50 pasos con el scheduler) y solo el decoder del VAE."
+  },
+  {
+   "q": "Default y efecto de guidance_scale",
+   "a": "7,5; bajo = diverso y poco fiel, alto (15+) = fiel pero saturado."
+  },
+  {
+   "q": "¿Por qué height y width deben ser múltiplos de 8?",
+   "a": "Porque el VAE comprime 8× por lado."
+  },
+  {
+   "q": "¿Cómo se haría que SD genere caras inclinadas de Slanted Land?",
+   "a": "Fine-tuning con las 4 fotos reales vía DreamBooth o LoRA."
+  }
+ ],
+ "quiz": [
+  {
+   "q": "En una foto con cinco autos, ¿qué tarea los distingue como auto 1…auto 5 y además etiqueta el cielo y la calle?",
+   "opciones": [
+    "Segmentación panóptica",
+    "Detección",
+    "Clasificación",
+    "Segmentación semántica"
+   ],
+   "correcta": 0,
+   "explicacion": "La panóptica combina clase por píxel (cielo, calle) con instancias (cada auto). La semántica no distingue autos; la detección da cajas."
+  },
+  {
+   "q": "¿Qué hace eficiente a SAM al probar muchos prompts sobre una misma imagen?",
+   "opciones": [
+    "Codifica la imagen una sola vez y solo reejecuta el mask decoder liviano",
+    "Usa una U-Net chica",
+    "Baja la resolución",
+    "Reentrena el modelo para cada prompt"
+   ],
+   "correcta": 0,
+   "explicacion": "El image encoder (ViT) es lo caro y corre una vez; cada prompt pasa por el prompt encoder y el decoder."
+  },
+  {
+   "q": "TilTedTinder genera con SD y todas las caras salen rectas. ¿Causa y solución?",
+   "opciones": [
+    "Pocos pasos; subir a 200",
+    "El VAE está mal; reentrenarlo",
+    "LAION-5B no tiene caras inclinadas; fine-tuning con DreamBooth o LoRA con las fotos reales",
+    "guidance_scale bajo; subirlo a 15"
+   ],
+   "correcta": 2,
+   "explicacion": "El modelo genera lo que vio; Slanted Land no está en sus datos. Subir guidance o pasos no agrega el concepto."
+  },
+  {
+   "q": "Un hospital necesita medir volúmenes tumorales de forma reproducible en un protocolo fijo. ¿Qué conviene?",
+   "opciones": [
+    "Stable Diffusion",
+    "SAM sin ajuste",
+    "CLIP",
+    "Una U-Net entrenada para esa tarea"
+   ],
+   "correcta": 3,
+   "explicacion": "La clase: U-Net cuando la salida tiene que ser medible y reproducible; SAM para anotación asistida."
+  },
+  {
+   "q": "¿Por qué latent diffusion es mucho más barato que difundir en píxeles?",
+   "opciones": [
+    "Porque trabaja en 64×64×4 = 16.384 valores en vez de 786.432: 48× menos por paso",
+    "Porque usa menos pasos",
+    "Porque no usa U-Net",
+    "Porque no necesita GPU"
+   ],
+   "correcta": 0,
+   "explicacion": "El VAE comprime 8× por lado; la cantidad de pasos puede ser la misma."
+  },
+  {
+   "q": "Una capa nn.Conv2d(3, 32, 3) se aplica a una imagen RGB de 224×224. ¿Cuántos parámetros tiene?",
+   "opciones": [
+    "38,5 millones",
+    "896",
+    "Depende del tamaño de la imagen",
+    "150.528"
+   ],
+   "correcta": 1,
+   "explicacion": "32 kernels × (27 pesos + 1 sesgo) = 896, independiente del tamaño de la imagen. 38,5 M es la densa de 256 neuronas."
+  },
+  {
+   "q": "¿Qué ventaja tiene la atención sobre la convolución y a qué costo?",
+   "opciones": [
+    "No necesita entrenamiento; a costo de velocidad",
+    "Es invariante a traslación; a costo de más parámetros",
+    "Usa menos datos; a costo de no capturar dependencias lejanas",
+    "Captura dependencias lejanas desde la primera capa; a costo de más datos y costo cuadrático en el largo"
+   ],
+   "correcta": 3,
+   "explicacion": "La atención tiene sesgo inductivo débil: conecta todo con todo, necesita más datos y compara todos los pares."
+  },
+  {
+   "q": "Durante el entrenamiento de Stable Diffusion, ¿qué componente se actualiza?",
+   "opciones": [
+    "Solo el VAE",
+    "Los tres",
+    "Solo la U-Net; CLIP y el VAE están congelados",
+    "Solo CLIP"
+   ],
+   "correcta": 2,
+   "explicacion": "El gradiente vuelve solo a la U-Net y se corta en CLIP y el VAE (entrenados antes, por separado)."
+  },
+  {
+   "q": "En la U-Net, las skip connections:",
+   "opciones": [
+    "Conectan el prompt de texto con cada nivel",
+    "Suman la entrada a la salida final",
+    "Concatenan la salida de cada nivel del encoder con la entrada del decoder del mismo nivel",
+    "Reemplazan al bottleneck"
+   ],
+   "correcta": 2,
+   "explicacion": "Llevan el \"dónde\" de alta resolución al decoder. El prompt entra por cross-attention, que es otra cosa."
+  },
+  {
+   "q": "¿Cuál es la razón principal por la que una capa densa es un mal sesgo inductivo para audio?",
+   "opciones": [
+    "Trata la entrada como lista sin orden: no modela vecindad ni invariancia a traslación",
+    "Tiene muy pocos parámetros",
+    "No se puede entrenar con backpropagation",
+    "No puede usar ReLU"
+   ],
+   "correcta": 0,
+   "explicacion": "La densa no sabe que la muestra t está al lado de t+1 y aprende el patrón una vez por posición; además tiene demasiados parámetros, no pocos."
+  },
+  {
+   "q": "¿Qué aprende a predecir la red en un modelo de difusión?",
+   "opciones": [
+    "La imagen final directamente",
+    "La etiqueta de clase",
+    "El prompt",
+    "El ruido que fue agregado al latente en el timestep t"
+   ],
+   "correcta": 3,
+   "explicacion": "Con esa predicción el ruido se resta paso a paso; L = ‖ε − ε̂‖²."
+  },
+  {
+   "q": "Un kernel de 3×3 sin padding y stride 1 sobre una imagen de 7×7 produce un feature map de:",
+   "opciones": [
+    "7×7",
+    "9×9",
+    "5×5",
+    "3×3"
+   ],
+   "correcta": 2,
+   "explicacion": "Cabe en 7 − 3 + 1 = 5 posiciones por fila y por columna."
+  },
+  {
+   "q": "¿Cómo se entrena CLIP?",
+   "opciones": [
+    "Con difusión sobre texto",
+    "Con pérdida contrastiva: dos encoders cuyos embeddings de pares reales deben quedar cerca y los mal apareados lejos",
+    "Generando imágenes desde texto y comparando píxeles",
+    "Con un discriminador que juzga pares"
+   ],
+   "correcta": 1,
+   "explicacion": "CLIP no tiene decoder ni genera; alinea dos encoders con cross-entropy simétrica sobre la matriz de similitudes."
+  },
+  {
+   "q": "Fijás seed = 42 y guidance 7,5 y cambiás solo una palabra del prompt. ¿Para qué?",
+   "opciones": [
+    "Para que la imagen sea aleatoria",
+    "Para aislar el efecto del cambio de texto, ya que el ruido inicial es el mismo",
+    "Para evitar el mode collapse",
+    "Para acelerar la inferencia"
+   ],
+   "correcta": 1,
+   "explicacion": "La seed fija el latente inicial; si solo cambia el prompt, las diferencias se deben al texto."
+  },
+  {
+   "q": "¿Por qué FCN produce bordes borrosos?",
+   "opciones": [
+    "Porque no tiene encoder",
+    "Porque el encoder comprime mucho (p. ej. 512×512 → 16×16) y al reescalar ya se perdió la información espacial fina",
+    "Porque usa sigmoide",
+    "Porque usa atención"
+   ],
+   "correcta": 1,
+   "explicacion": "Las features codifican \"qué\" y pierden \"dónde\"; FCN no tiene un camino para recuperar el detalle, la U-Net sí (skips)."
+  }
+ ],
+ "desarrollo": [
+  {
+   "pregunta": "Explicá por qué la convolución resuelve los problemas de una red densa con audio e imágenes, con números del curso.",
+   "respuesta_modelo": "Una red densa acepta un vector de largo **fijo**, porque cada entrada tiene sus propios pesos. Con audios de distinta duración hay que recortar (se pierde voz) o rellenar con ceros (silencio artificial). Además tiene el **sesgo inductivo equivocado**: no modela vecindad (permutar las entradas no le cambia nada), no es invariante a traslación (un \"hola\" al principio y al final pasan por pesos distintos) y tiene demasiados parámetros: una imagen RGB 224×224 son 150.528 valores y una capa de 256 neuronas ya suma ~38,5 M de pesos.\n\nLa **convolución** desliza un **kernel** chico con los **mismos pesos** en todas las posiciones: cada salida combina solo una ventana (localidad) y el patrón se detecta esté donde esté. La cantidad de pesos depende del kernel, no del largo: `Conv2d(3, 32, 3)` tiene 896. Sobre un audio de 2 s da una salida corta y sobre uno de 5 s una larga; un **pooling global** resume eso en un vector fijo para la parte densa. En imágenes, un 3×3 sobre 7×7 da un feature map 5×5 y, apilando capas, se pasa de bordes a texturas, partes y objetos. El costo de este sesgo fuerte es que relacionar puntos lejanos requiere apilar capas; la atención lo hace directo pero necesita más datos y crece cuadráticamente.",
+   "puntos_clave": [
+    "Largo fijo de la densa y recortar/rellenar",
+    "Sesgo inductivo: vecindad, traslación, parámetros",
+    "Pesos compartidos y localidad",
+    "896 vs 38,5 M",
+    "Pooling global para largo variable",
+    "Comparación con atención"
+   ]
+  },
+  {
+   "pregunta": "Describí la arquitectura de la U-Net y explicá por qué recupera los bordes que FCN pierde.",
+   "respuesta_modelo": "FCN (Long et al., 2015) convierte un clasificador en clasificador de píxeles: encoder convolucional, convoluciones 1×1 en lugar de la densa y upsampling con convoluciones traspuestas. Su problema es que comprime mucho (512×512 → 16×16) y al reescalar la información espacial fina ya no está: bordes borrosos, inaceptables si medís un tumor.\n\nLa **U-Net** (Ronneberger, Fischer y Brox, 2015) tiene un **encoder** que en cada nivel aplica convoluciones y max pooling, reduciendo la resolución a la mitad y duplicando canales (aprende \"qué hay\", pierde \"dónde\"); un **bottleneck**; y un **decoder** simétrico con convoluciones traspuestas que duplica la resolución en cada nivel. La clave son las **skip connections**: la salida de cada nivel del encoder se **concatena** con el decoder del mismo nivel, así el decoder recibe la semántica desde abajo y el detalle espacial exacto desde el atajo. Por eso los contornos salen precisos. Además las skips actúan como regularizador estructural: la U-Net original se entrenó con ~30 imágenes de células. Se entrena con cross-entropy por píxel. Es modular: la misma U sirve para restauración, image-to-image y como denoiser de Stable Diffusion.",
+   "puntos_clave": [
+    "FCN y su compresión 512→16",
+    "Encoder: mitad resolución, doble canales",
+    "Decoder con convoluciones traspuestas",
+    "Skip connections concatenadas: qué + dónde",
+    "Pocos datos / regularización",
+    "Reuso en SD"
+   ]
+  },
+  {
+   "pregunta": "Explicá el pipeline completo de inferencia de Stable Diffusion y el rol de cada componente.",
+   "respuesta_modelo": "Stable Diffusion son tres piezas modulares orquestadas por un loop. (1) El **prompt** se tokeniza a 77 tokens y pasa por el **text encoder de CLIP ViT-L/14** (~123 M, congelado), que produce una matriz de 77×768. CLIP fue entrenado contrastivamente para que texto e imagen compartan espacio. (2) Se sortea un **latente inicial** de 64×64×4 desde una normal, controlado por la **seed**: el bloque de mármol. (3) **Bucle de denoising** (~50 pasos): la **U-Net** (~860 M) recibe el latente ruidoso, el timestep y el embedding, y **predice el ruido**; el prompt entra por **cross-attention** en cada nivel de la U. El **scheduler** resta ese ruido. Con **classifier-free guidance** (default 7,5) se compara la predicción con y sin texto para seguir más o menos el prompt. (4) El latente final pasa por el **decoder del VAE** (~80 M) y sale la imagen de 512×512×3.\n\nTodo ocurre en el **espacio latente** (latent diffusion, Rombach et al.): 16.384 valores en vez de 786.432, 48× menos, por eso corre en una GPU de consumo. En entrenamiento solo la U-Net se actualiza, con $\\|\\varepsilon-\\hat\\varepsilon\\|^2$; CLIP y el VAE están congelados.",
+   "puntos_clave": [
+    "CLIP: 77 tokens → 77×768, congelado",
+    "Latente 64×64×4 y seed",
+    "U-Net predice ruido con cross-attention",
+    "Scheduler y ~50 pasos; guidance",
+    "VAE decoder al final",
+    "Latente 48× más barato; solo U-Net se entrena"
+   ]
+  },
+  {
+   "pregunta": "Compará GANs y modelos de difusión como herramientas para TilTedTinder v2.",
+   "respuesta_modelo": "TilTedTinder v2 necesita generar caras inclinadas a partir de **descripciones en texto libre**. Una **Vanilla GAN** no tiene canal para recibir texto; una **cGAN** solo acepta etiquetas cerradas (\"alto\", \"con anteojos\"), que no capturan matices; **StyleGAN** da control de estilo pero no semántico. Las GANs son muy rápidas (una pasada), pero su entrenamiento es inestable (dos redes compitiendo) y sufren mode collapse.\n\nLa **difusión** usa una sola red que predice el ruido agregado: es más estable, no tiene mode collapse y da más diversidad, a cambio de ser lenta (~50 pasos). Combinada con **CLIP** y **cross-attention**, permite condicionar cada paso con un embedding del prompt, y como **latent diffusion** es viable en GPU de consumo. Por eso la cátedra elige **Stable Diffusion**.\n\nAun así el producto no está resuelto: LAION-5B no tiene caras inclinadas, así que hay que hacer fine-tuning con DreamBooth o LoRA usando las 4 fotos; hay sesgo demográfico que auditar; el detalle fino requiere ControlNet o inpainting; 50 perfiles por usuario en tiempo real es caro (caché, batch offline, SDXL Turbo, FLUX Schnell); y está la decisión ética de avisar que los perfiles son sintéticos. La misma seed y prompt permiten mostrar un perfil estable.",
+   "puntos_clave": [
+    "Por qué GAN/cGAN/StyleGAN no alcanzan: texto libre",
+    "Estabilidad y mode collapse vs una sola red",
+    "Velocidad: una pasada vs ~50 pasos",
+    "CLIP + cross-attention como condición",
+    "Fine-tuning DreamBooth/LoRA para Slanted Land",
+    "Costo, sesgo y ética del producto"
+   ]
+  }
+ ],
+ "conexiones": [
+  {
+   "clase": 3,
+   "relacion": "El ciclo forward, pérdida, backward con regla de la cadena y actualización W ← W − η·∂L/∂W es el mismo que entrena el MLP de juguete, el kernel, la U-Net, CLIP, el VAE y SD; lo que cambia es la pérdida."
+  },
+  {
+   "clase": 4,
+   "relacion": "El TP de precios de casas fue un MLP de entrada fija: el punto de partida para mostrar por qué hace falta la convolución."
+  },
+  {
+   "clase": 7,
+   "relacion": "Embeddings y tokens de \"De la palabra al transformer\" se generalizan a imagen y audio; CLIP tokeniza el prompt y lo pasa por un transformer."
+  },
+  {
+   "clase": 8,
+   "relacion": "La atención reaparece como alternativa a la convolución (sesgo débil, costo cuadrático), en el ViT de SAM y CLIP y como cross-attention dentro de la U-Net de SD."
+  },
+  {
+   "clase": 9,
+   "relacion": "Fine-tuning y LoRA vuelven como DreamBooth/LoRA para enseñarle a SD las caras inclinadas de Slanted Land."
+  },
+  {
+   "clase": 11,
+   "relacion": "TilTedTinder y Slanted Land continúan; la GAN de la clase anterior no acepta texto. DCGAN usaba convoluciones transpuestas, que aquí se explican; la difusión no sufre mode collapse."
+  },
+  {
+   "clase": 13,
+   "relacion": "Sesgos de LAION-5B, perfiles sintéticos y manipulación emocional son preguntas de ética; el AI Act exige marcar contenido sintético (2 dic 2026)."
+  }
+ ],
+ "lecturas": [
+  "Long, Shelhamer y Darrell (2015), Fully Convolutional Networks for Semantic Segmentation (FCN)",
+  "Ronneberger, Fischer y Brox (2015), U-Net: Convolutional Networks for Biomedical Image Segmentation",
+  "Kirillov et al. / Meta (2023), Segment Anything (SAM, SA-1B); SAM 2 (2024); SAM 3 (2025); SAM 3.1 (2026)",
+  "Radford et al. / OpenAI (2021), CLIP: Learning Transferable Visual Models From Natural Language Supervision",
+  "Rombach et al. / CompVis (2021, CVPR 2022), High-Resolution Image Synthesis with Latent Diffusion Models",
+  "Kingma y Welling, Variational Autoencoders (VAE, reparametrización)",
+  "Stable Diffusion v1.4 (CompVis, agosto 2022) y Hugging Face Diffusers (notebook de la clase)",
+  "DreamBooth, LoRA, ControlNet (para adaptar y controlar SD)"
+ ]
+}

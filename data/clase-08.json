@@ -1,0 +1,1774 @@
+{
+ "num": 8,
+ "nn": "08",
+ "fecha": "23 sep",
+ "titulo": "El transformer por dentro: atención, el bloque completo y la familia de modelos",
+ "bloque": "Transformers",
+ "decks": [
+  {
+   "slug": "transformers-a-fondo",
+   "titulo": "Clase 8: El transformer por dentro",
+   "slides": [
+    {
+     "i": 0,
+     "title": "Inteligencia Artificial Generativa (AI Gen)",
+     "section": "",
+     "resumen": "Clase 8: el transformer por dentro, con las cuentas a mano.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Portada",
+     "last": 42
+    },
+    {
+     "i": 1,
+     "title": "Repaso",
+     "section": "",
+     "resumen": "Agenda: repaso, atención con números, bloque completo, familia, cambios desde 2017, entrenamiento.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Portada",
+     "last": 42
+    },
+    {
+     "i": 2,
+     "title": "La salida del modelo",
+     "section": "Repaso",
+     "resumen": "Quiz: un modelo de lenguaje devuelve una **distribución** sobre |V| (softmax final), no una palabra.",
+     "claves": [
+      {
+       "id": "softmax",
+       "label": "Softmax",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Repaso",
+     "last": 42
+    },
+    {
+     "i": 3,
+     "title": "Ejemplos gratis",
+     "section": "Repaso",
+     "resumen": "Quiz: una frase de 6 tokens da 5 ejemplos gratis; la máscara causal los calcula todos a la vez.",
+     "claves": [
+      {
+       "id": "self-supervised",
+       "label": "Aprendizaje self-supervised",
+       "glos": true
+      },
+      {
+       "id": "mascara-causal",
+       "label": "Máscara causal",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Repaso",
+     "last": 42
+    },
+    {
+     "i": 4,
+     "title": "Por qué no una RNN",
+     "section": "Repaso",
+     "resumen": "Quiz: una RNN no se paraleliza porque cada estado depende del anterior; la atención no tiene ese bucle.",
+     "claves": [
+      {
+       "id": "rnn",
+       "label": "Red recurrente (RNN)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Repaso",
+     "last": 42
+    },
+    {
+     "i": 5,
+     "title": "Qué hace la atención",
+     "section": "Repaso",
+     "resumen": "Quiz: 'it' arma su representación con peso alto en 'animal' y bajo en el resto.",
+     "claves": [
+      {
+       "id": "atencion",
+       "label": "Atención",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Repaso",
+     "last": 42
+    },
+    {
+     "i": 6,
+     "title": "Una fila de pesos",
+     "section": "Repaso",
+     "resumen": "Quiz: cada fila de pesos de atención suma **1**, así que la salida es un promedio ponderado.",
+     "claves": [
+      {
+       "id": "atencion",
+       "label": "Atención",
+       "glos": true
+      },
+      {
+       "id": "softmax",
+       "label": "Softmax",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Repaso",
+     "last": 42
+    },
+    {
+     "i": 7,
+     "title": "El tamaño de la matriz",
+     "section": "Repaso",
+     "resumen": "Quiz: una cabeza calcula **n²** pesos por capa; de ahí sale el costo cuadrático.",
+     "claves": [
+      {
+       "id": "costo-cuadratico",
+       "label": "Costo cuadrático de la atención",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Repaso",
+     "last": 42
+    },
+    {
+     "i": 8,
+     "title": "¿Es simétrica?",
+     "section": "Repaso",
+     "resumen": "Quiz: la matriz de atención **no** es simétrica, porque lo que un token busca (Q) no es lo que ofrece (K).",
+     "claves": [
+      {
+       "id": "query-key-value",
+       "label": "Query, Key, Value",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Repaso",
+     "last": 42
+    },
+    {
+     "i": 9,
+     "title": "El chat no aprende",
+     "section": "Repaso",
+     "resumen": "Quiz: chatear es inferencia; los parámetros están congelados.",
+     "claves": [
+      {
+       "id": "inferencia",
+       "label": "inferencia",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/07/#d=palabra-al-transformer&s=35",
+       "clase": 7,
+       "cnn": "07",
+       "i": 35,
+       "title": "Entrenamiento e inferencia",
+       "por": "entrenamiento vs inferencia"
+      }
+     ],
+     "key": false,
+     "section_label": "Repaso",
+     "last": 42
+    },
+    {
+     "i": 10,
+     "title": "Dónde quedamos",
+     "section": "",
+     "resumen": "Separador: empieza la sección «Dónde quedamos».",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Portada",
+     "last": 42
+    },
+    {
+     "i": 11,
+     "title": "El ciclo de generación con el transformer abierto",
+     "section": "Dónde quedamos",
+     "resumen": "El transformer es un **bloque repetido N veces**: entra y sale una matriz n×d, y por eso se puede apilar. Ejemplo de toda la clase: 'the cat sat' con d=4.",
+     "claves": [
+      {
+       "id": "transformer",
+       "label": "Transformer",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 3,
+       "texto": "Es el ejemplo de los 14 tests de la parte 4 del TP3 ('the cat sat', d=4), que quedó pendiente.",
+       "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+       "code": "tp3-test-atencion-ejemplo-clase",
+       "nota": "Pendiente: estos tests con 'the cat sat' son los que tenía que pasar `atencion.py`."
+      }
+     ],
+     "ver": [
+      {
+       "url": "/clases/07/#d=palabra-al-transformer&s=32",
+       "clase": 7,
+       "cnn": "07",
+       "i": 32,
+       "title": "El ciclo de un LLM, token a token",
+       "por": "el ciclo token a token"
+      }
+     ],
+     "key": false,
+     "section_label": "Dónde quedamos",
+     "last": 42
+    },
+    {
+     "i": 12,
+     "title": "La frase como matriz",
+     "section": "Dónde quedamos",
+     "resumen": "La frase es una matriz **X** de n tokens × d dimensiones (aquí 3×4; en modelos reales d=512 o 768). La atención opera sobre esa matriz.",
+     "claves": [
+      {
+       "id": "embedding",
+       "label": "Embedding",
+       "glos": true
+      },
+      {
+       "id": "transformer",
+       "label": "Transformer",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Dónde quedamos",
+     "last": 42
+    },
+    {
+     "i": 13,
+     "title": "La posición entra con el embedding",
+     "section": "Dónde quedamos",
+     "resumen": "La atención no ve el orden: es invariante a permutar filas. Por eso se **suma** un vector de posición a cada embedding antes de todo.",
+     "claves": [
+      {
+       "id": "codificacion-posicional",
+       "label": "Codificación posicional",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": true,
+     "section_label": "Dónde quedamos",
+     "last": 42
+    },
+    {
+     "i": 14,
+     "title": "La atención con números",
+     "section": "",
+     "resumen": "Separador: empieza la sección «La atención con números».",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Portada",
+     "last": 42
+    },
+    {
+     "i": 15,
+     "title": "Tres proyecciones del mismo vector",
+     "section": "La atención con números",
+     "resumen": "Cada token se proyecta con tres matrices entrenables: **Q** (qué busca), **K** (qué ofrece) y **V** (qué aporta). Son tres por la asimetría entre buscar y ser encontrado.",
+     "claves": [
+      {
+       "id": "query-key-value",
+       "label": "Query, Key, Value",
+       "glos": true
+      },
+      {
+       "id": "self-attention",
+       "label": "Self-attention",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 4,
+       "texto": "En el TP4, LoRA (r=8) se aplicó solo a `q_proj`/`v_proj`, las $W_Q$ y $W_V$ de esta lámina; corrió solo en humo.",
+       "tp_titulo": "El agente de admisión de guardia (TP final)",
+       "code": "tp4-lora-config",
+       "nota": ""
+      }
+     ],
+     "ver": [],
+     "key": true,
+     "section_label": "La atención con números",
+     "last": 42
+    },
+    {
+     "i": 16,
+     "title": "Q y K en el ejemplo",
+     "section": "La atención con números",
+     "resumen": "Cálculo: Q = X, K = X con columnas intercambiadas de a pares, V baja a dimensión 2. $d_k$ tiene que coincidir entre Q y K; $d_v$ es libre.",
+     "claves": [
+      {
+       "id": "query-key-value",
+       "label": "Query, Key, Value",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "La atención con números",
+     "last": 42
+    },
+    {
+     "i": 17,
+     "title": "El producto punto mide afinidad",
+     "section": "La atención con números",
+     "resumen": "$QK^\\top$ es una matriz n×n de afinidades: cada consulta contra cada clave (cat·the = 3). Esa matriz es el costo cuadrático que atacan las variantes modernas.",
+     "claves": [
+      {
+       "id": "self-attention",
+       "label": "Self-attention",
+       "glos": true
+      },
+      {
+       "id": "costo-cuadratico",
+       "label": "Costo cuadrático de la atención",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "La atención con números",
+     "last": 42
+    },
+    {
+     "i": 18,
+     "title": "Escalar y repartir: el softmax",
+     "section": "La atención con números",
+     "resumen": "Se divide por $\\sqrt{d_k}$ para que la varianza no crezca con la dimensión (sin escala el softmax se satura), y cada fila pasa por **softmax**.",
+     "claves": [
+      {
+       "id": "escala-raiz-dk",
+       "label": "Escala por √d_k",
+       "glos": true
+      },
+      {
+       "id": "softmax",
+       "label": "Softmax",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 3,
+       "texto": "Pendiente en el TP3; el plan era `S = QKᵀ/√d_k` y softmax restando el máximo para estabilidad numérica.",
+       "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+       "code": "tp3-test-atencion-escala-multicabeza-ln",
+       "nota": "Pendiente: `test_escala_por_raiz_de_dk` y la estabilidad del softmax fijan el escalado y el truco de restar el máximo."
+      }
+     ],
+     "ver": [],
+     "key": true,
+     "section_label": "La atención con números",
+     "last": 42
+    },
+    {
+     "i": 19,
+     "title": "Mezclar los valores",
+     "section": "La atención con números",
+     "resumen": "Salida = **A·V**: cada token es un promedio ponderado de los V ('cat' = 0,45·the + 0,10·cat + 0,45·sat). Esa es la representación contextual.",
+     "claves": [
+      {
+       "id": "self-attention",
+       "label": "Self-attention",
+       "glos": true
+      },
+      {
+       "id": "atencion",
+       "label": "Atención",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": true,
+     "section_label": "La atención con números",
+     "last": 42
+    },
+    {
+     "i": 20,
+     "title": "La máscara causal",
+     "section": "La atención con números",
+     "resumen": "Para generar, los scores futuros se ponen en $-\\infty$ antes del softmax ($e^{-\\infty}=0$). Un 0 no alcanza: daría peso $e^0=1$. Así n tokens dan n ejemplos.",
+     "claves": [
+      {
+       "id": "mascara-causal",
+       "label": "Máscara causal",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 3,
+       "texto": "Quedó pendiente (plan: `np.triu(…,1) → −∞`). La parte 5 lo pide: con máscara, 'banco' queda igual en las dos frases.",
+       "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+       "code": "tp3-test-atencion-ejemplo-clase",
+       "nota": "Pendiente: `test_mascara_causal` exige ceros arriba de la diagonal; la parte 5 lo aplica a mano."
+      }
+     ],
+     "ver": [],
+     "key": true,
+     "section_label": "La atención con números",
+     "last": 42
+    },
+    {
+     "i": 21,
+     "title": "El bloque completo",
+     "section": "",
+     "resumen": "Separador: empieza la sección «El bloque completo».",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Portada",
+     "last": 42
+    },
+    {
+     "i": 22,
+     "title": "Varias cabezas en paralelo",
+     "section": "El bloque completo",
+     "resumen": "**Multi-head**: h atenciones en paralelo de dimensión d/h (8×64=512), concatenadas y mezcladas por $W_O$. Una sola cabeza promediaría motivos distintos.",
+     "claves": [
+      {
+       "id": "multi-head-attention",
+       "label": "Multi-head attention",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": true,
+     "section_label": "El bloque completo",
+     "last": 42
+    },
+    {
+     "i": 23,
+     "title": "La feed-forward: la misma red para cada posición",
+     "section": "El bloque completo",
+     "resumen": "Tras la atención, cada token pasa solo por una **FFN** (d→4d, ReLU, →d). Es la única no linealidad del bloque y concentra 2/3 de sus parámetros.",
+     "claves": [
+      {
+       "id": "feed-forward",
+       "label": "Feed-forward por posición",
+       "glos": true
+      },
+      {
+       "id": "relu",
+       "label": "ReLU",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 2,
+       "texto": "Es el mismo Dense + ReLU de tu MLP del TP2, pero aplicado token por token con los mismos pesos.",
+       "tp_titulo": "¿Cuánto vale esta casa?",
+       "code": "tp2-baseline-mlp-32-32",
+       "nota": "La FFN del Transformer es este mismo bloque Dense + ReLU, aplicado a cada token con los mismos pesos."
+      }
+     ],
+     "ver": [],
+     "key": false,
+     "section_label": "El bloque completo",
+     "last": 42
+    },
+    {
+     "i": 24,
+     "title": "El problema de apilar: el gradiente se pierde",
+     "section": "El bloque completo",
+     "resumen": "Apilar N bloques vuelve el gradiente un producto de N derivadas: $0{,}9^{48}\\approx 0{,}006$. El gradiente se desvanece.",
+     "claves": [
+      {
+       "id": "gradiente-que-se-desvanece",
+       "label": "Gradiente que se desvanece",
+       "glos": true
+      },
+      {
+       "id": "regla-de-la-cadena",
+       "label": "Regla de la cadena",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/04/#d=modelado-redes-neuronales&s=38",
+       "clase": 4,
+       "cnn": "04",
+       "i": 38,
+       "title": "La regla de la cadena",
+       "por": "la regla de la cadena"
+      }
+     ],
+     "key": false,
+     "section_label": "El bloque completo",
+     "last": 42
+    },
+    {
+     "i": 25,
+     "title": "Residuales: la salida es la entrada más una corrección",
+     "section": "El bloque completo",
+     "resumen": "**Residual**: $x + \\text{subcapa}(x)$. El atajo identidad deja pasar el gradiente y las capas aprenden solo la corrección (residual stream).",
+     "claves": [
+      {
+       "id": "conexion-residual",
+       "label": "Conexión residual",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=33",
+       "clase": 12,
+       "cnn": "12",
+       "i": 33,
+       "title": "U-Net: la U y sus atajos",
+       "por": "skip connections en U-Net"
+      }
+     ],
+     "key": true,
+     "section_label": "El bloque completo",
+     "last": 42
+    },
+    {
+     "i": 26,
+     "title": "Layer norm: mantener los números en rango",
+     "section": "El bloque completo",
+     "resumen": "**Layer norm** normaliza cada vector por separado (media 0, desvío 1) y lo reescala con γ y β. Es por token, no por batch: sirve con cualquier largo.",
+     "claves": [
+      {
+       "id": "layer-norm",
+       "label": "Layer normalization",
+       "glos": true
+      },
+      {
+       "id": "normalizacion",
+       "label": "Normalización (z-score)",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 3,
+       "texto": "Pendiente en el TP3; el plan era `layer_norm` sin γ/β, verificada por los tests.",
+       "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+       "code": "tp3-test-atencion-escala-multicabeza-ln",
+       "nota": "Pendiente: `TestLayerNorm` fija layer norm sin γ/β."
+      }
+     ],
+     "ver": [],
+     "key": false,
+     "section_label": "El bloque completo",
+     "last": 42
+    },
+    {
+     "i": 27,
+     "title": "La fórmula de la posición: senos y cosenos",
+     "section": "El bloque completo",
+     "resumen": "Posición fija del paper: $PE(pos,2i)=\\sin(pos/10000^{2i/d})$ y coseno en las impares; cada par de dimensiones a distinta frecuencia.",
+     "claves": [
+      {
+       "id": "codificacion-posicional",
+       "label": "Codificación posicional",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 2,
+       "texto": "Misma idea que `MonthSold` en el TP2: seno y coseno para que la posición en el ciclo quede bien codificada.",
+       "tp_titulo": "¿Cuánto vale esta casa?",
+       "code": "tp2-month-cyclical",
+       "nota": ""
+      }
+     ],
+     "ver": [],
+     "key": false,
+     "section_label": "El bloque completo",
+     "last": 42
+    },
+    {
+     "i": 28,
+     "title": "Cuenta de parámetros de un bloque",
+     "section": "El bloque completo",
+     "resumen": "Un bloque tiene unos **12d²** parámetros: 4d² en la atención ($W_Q,W_K,W_V,W_O$) y 8d² en la FFN. El decoder suma 4d² por la cross-attention.",
+     "claves": [
+      {
+       "id": "parametros-vs-hiperparametros",
+       "label": "Parámetros vs. hiperparámetros",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": true,
+     "section_label": "El bloque completo",
+     "last": 42
+    },
+    {
+     "i": 29,
+     "title": "Cuenta de parámetros de un bloque",
+     "section": "El bloque completo",
+     "resumen": "Sin embeddings, el total es $\\approx 12Nd^2$ (Kaplan). GPT-3, con d=12.288 y N=96, da ~174 mil millones; la tabla de embeddings pesa poco en modelos grandes.",
+     "claves": [
+      {
+       "id": "leyes-de-escala",
+       "label": "Leyes de escala (scaling laws)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/09/#d=como-se-entrena-un-llm&s=8",
+       "clase": 9,
+       "cnn": "09",
+       "i": 8,
+       "title": "Tres perillas y una cuenta",
+       "por": "tres perillas y una cuenta"
+      }
+     ],
+     "key": false,
+     "section_label": "El bloque completo",
+     "last": 42
+    },
+    {
+     "i": 30,
+     "title": "Encoder, decoder y la familia",
+     "section": "",
+     "resumen": "Separador: empieza la sección «Encoder, decoder y la familia».",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Portada",
+     "last": 42
+    },
+    {
+     "i": 31,
+     "title": "Encoder y decoder en el paper de 2017",
+     "section": "Encoder, decoder y la familia",
+     "resumen": "El paper apila 6 bloques de encoder y 6 de decoder. La **cross-attention** del decoder toma sus Q y las K, V del encoder.",
+     "claves": [
+      {
+       "id": "encoder-decoder",
+       "label": "Encoder-decoder",
+       "glos": true
+      },
+      {
+       "id": "cross-attention",
+       "label": "Cross-attention",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Encoder, decoder y la familia",
+     "last": 42
+    },
+    {
+     "i": 32,
+     "title": "Solo el decoder: GPT",
+     "section": "Encoder, decoder y la familia",
+     "resumen": "**Decoder-only** (GPT): self-attention causal + FFN y softmax final. Si entrada y salida son el mismo texto, el encoder sobra. Es la arquitectura de casi todos los LLM.",
+     "claves": [
+      {
+       "id": "decoder-only",
+       "label": "Decoder-only (GPT)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Encoder, decoder y la familia",
+     "last": 42
+    },
+    {
+     "i": 33,
+     "title": "Solo el encoder: BERT",
+     "section": "Encoder, decoder y la familia",
+     "resumen": "**Encoder-only** (BERT): sin máscara, entrenado con MLM (tapar tokens y predecirlos). No genera; da un vector contextual por token.",
+     "claves": [
+      {
+       "id": "bert",
+       "label": "BERT (encoder-only)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Encoder, decoder y la familia",
+     "last": 42
+    },
+    {
+     "i": 34,
+     "title": "Del encoder al embedding de oración",
+     "section": "Encoder, decoder y la familia",
+     "resumen": "BERT crudo promediado es un mal embedding de oración (STS 54,8, menos que GloVe 61,3). **Sentence-BERT** lo arregla con pooling y ajuste siamés.",
+     "claves": [
+      {
+       "id": "embedding-de-oracion",
+       "label": "Embedding de oración (Sentence-BERT)",
+       "glos": true
+      },
+      {
+       "id": "bert",
+       "label": "BERT (encoder-only)",
+       "glos": true
+      },
+      {
+       "id": "similitud-coseno",
+       "label": "Similitud coseno",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 3,
+       "texto": "Tu BERT promediado sacó CR 0,35 (z=1,56); e5-base, ajustado con pares consulta–pasaje, llegó a 1,00 con k=1 (z=3,94).",
+       "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+       "code": "tp3-informe-por-que-e5",
+       "nota": ""
+      }
+     ],
+     "ver": [
+      {
+       "url": "/clases/07/#d=rag-mcp-rapida&s=4",
+       "clase": 7,
+       "cnn": "07",
+       "i": 4,
+       "title": "Por significado: embeddings y similitud",
+       "por": "recuperar por similitud"
+      }
+     ],
+     "key": true,
+     "section_label": "Encoder, decoder y la familia",
+     "last": 42
+    },
+    {
+     "i": 35,
+     "title": "Fuera del texto: ViT",
+     "section": "Encoder, decoder y la familia",
+     "resumen": "El bloque no sabe que procesa texto: una imagen en 196 parches de 16×16 proyectados es **ViT**. Necesita más datos que una CNN por tener menos sesgo inductivo.",
+     "claves": [
+      {
+       "id": "transformer",
+       "label": "Transformer",
+       "glos": true
+      },
+      {
+       "id": "sesgo-inductivo",
+       "label": "Sesgo inductivo",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=7",
+       "clase": 12,
+       "cnn": "12",
+       "i": 7,
+       "title": "El sesgo inductivo equivocado",
+       "por": "sesgo inductivo"
+      }
+     ],
+     "key": false,
+     "section_label": "Encoder, decoder y la familia",
+     "last": 42
+    },
+    {
+     "i": 36,
+     "title": "El mapa de la familia",
+     "section": "Encoder, decoder y la familia",
+     "resumen": "Tres formas de apilar: encoder-only (MLM, embeddings), decoder-only (siguiente token, generar) y encoder-decoder (traducir). Para embeddings, encoder; para generar, decoder.",
+     "claves": [
+      {
+       "id": "encoder-decoder",
+       "label": "Encoder-decoder",
+       "glos": true
+      },
+      {
+       "id": "bert",
+       "label": "BERT (encoder-only)",
+       "glos": true
+      },
+      {
+       "id": "decoder-only",
+       "label": "Decoder-only (GPT)",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 3,
+       "texto": "En el TP3 combinaste las dos: el encoder e5-base recupera y el decoder deepseek responde como agente.",
+       "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+       "code": "tp3-encoder-e5-prefijos",
+       "nota": "Este es el lado encoder (e5-base recupera); el decoder es deepseek en `hospital/agente/modelo.py`."
+      }
+     ],
+     "ver": [],
+     "key": true,
+     "section_label": "Encoder, decoder y la familia",
+     "last": 42
+    },
+    {
+     "i": 37,
+     "title": "Lo que cambió desde 2017",
+     "section": "",
+     "resumen": "Separador: empieza la sección «Lo que cambió desde 2017».",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Portada",
+     "last": 42
+    },
+    {
+     "i": 38,
+     "title": "Qué cambió desde 2017",
+     "section": "Lo que cambió desde 2017",
+     "resumen": "Los cambios desde 2017 atacan dos costos: atención cuadrática en n y guardar K y V al generar (**KV cache** y variantes). Se ve en la clase 9.",
+     "claves": [
+      {
+       "id": "kv-cache",
+       "label": "KV cache",
+       "glos": true
+      },
+      {
+       "id": "costo-cuadratico",
+       "label": "Costo cuadrático de la atención",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Lo que cambió desde 2017",
+     "last": 42
+    },
+    {
+     "i": 39,
+     "title": "Cómo se entrena",
+     "section": "",
+     "resumen": "Separador: empieza la sección «Cómo se entrena».",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Portada",
+     "last": 42
+    },
+    {
+     "i": 40,
+     "title": "Qué se minimiza",
+     "section": "Cómo se entrena",
+     "resumen": "Se minimiza la **cross-entropy**, $-\\log p(\\text{token correcto})$, en cada posición. El mínimo no es cero: después de un contexto hay varios tokens razonables.",
+     "claves": [
+      {
+       "id": "entropia-cruzada",
+       "label": "Entropía cruzada (BCE y cross-entropy)",
+       "glos": true
+      },
+      {
+       "id": "pretraining",
+       "label": "Pre-training",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 4,
+       "texto": "En el SFT del TP4 esa pérdida solo cuenta los tokens del asistente (`labels = −100` en el resto).",
+       "tp_titulo": "El agente de admisión de guardia (TP final)",
+       "code": "tp4-tokenizar-mascara",
+       "nota": ""
+      }
+     ],
+     "ver": [
+      {
+       "url": "/clases/04/#d=modelado-redes-neuronales&s=30",
+       "clase": 4,
+       "cnn": "04",
+       "i": 30,
+       "title": "Clasificación multiclase: cross-entropy",
+       "por": "cross-entropy multiclase"
+      }
+     ],
+     "key": true,
+     "section_label": "Cómo se entrena",
+     "last": 42
+    },
+    {
+     "i": 41,
+     "title": "Conclusiones",
+     "section": "",
+     "resumen": "Separador: empieza la sección «Conclusiones».",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Portada",
+     "last": 42
+    },
+    {
+     "i": 42,
+     "title": "Un bloque repetido",
+     "section": "Conclusiones",
+     "resumen": "Un transformer es un bloque repetido: la atención mezcla entre tokens y la FFN procesa cada uno. $\\text{softmax}(QK^\\top/\\sqrt{d_k})V$ resume la clase.",
+     "claves": [
+      {
+       "id": "transformer",
+       "label": "Transformer",
+       "glos": true
+      },
+      {
+       "id": "atencion",
+       "label": "Atención",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 3,
+       "texto": "El ejercicio a mano es la parte 5 del TP3 ('El banco aguanta/presta'), pendiente en tu repo.",
+       "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+       "code": "tp3-ejercicio-a-mano",
+       "nota": ""
+      }
+     ],
+     "ver": [],
+     "key": false,
+     "section_label": "Conclusiones",
+     "last": 42
+    }
+   ],
+   "groups": [
+    {
+     "label": "Portada",
+     "slides": [
+      {
+       "i": 0,
+       "title": "Inteligencia Artificial Generativa (AI Gen)",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 1,
+       "title": "Repaso",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 0,
+     "last": 1,
+     "ntp": 0,
+     "nkey": 0
+    },
+    {
+     "label": "Repaso",
+     "slides": [
+      {
+       "i": 2,
+       "title": "La salida del modelo",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 3,
+       "title": "Ejemplos gratis",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 4,
+       "title": "Por qué no una RNN",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 5,
+       "title": "Qué hace la atención",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 6,
+       "title": "Una fila de pesos",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 7,
+       "title": "El tamaño de la matriz",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 8,
+       "title": "¿Es simétrica?",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 9,
+       "title": "El chat no aprende",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 2,
+     "last": 9,
+     "ntp": 0,
+     "nkey": 0
+    },
+    {
+     "label": "Portada",
+     "slides": [
+      {
+       "i": 10,
+       "title": "Dónde quedamos",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 10,
+     "last": 10,
+     "ntp": 0,
+     "nkey": 0
+    },
+    {
+     "label": "Dónde quedamos",
+     "slides": [
+      {
+       "i": 11,
+       "title": "El ciclo de generación con el transformer abierto",
+       "key": false,
+       "tp": true
+      },
+      {
+       "i": 12,
+       "title": "La frase como matriz",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 13,
+       "title": "La posición entra con el embedding",
+       "key": true,
+       "tp": false
+      }
+     ],
+     "first": 11,
+     "last": 13,
+     "ntp": 1,
+     "nkey": 1
+    },
+    {
+     "label": "Portada",
+     "slides": [
+      {
+       "i": 14,
+       "title": "La atención con números",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 14,
+     "last": 14,
+     "ntp": 0,
+     "nkey": 0
+    },
+    {
+     "label": "La atención con números",
+     "slides": [
+      {
+       "i": 15,
+       "title": "Tres proyecciones del mismo vector",
+       "key": true,
+       "tp": true
+      },
+      {
+       "i": 16,
+       "title": "Q y K en el ejemplo",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 17,
+       "title": "El producto punto mide afinidad",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 18,
+       "title": "Escalar y repartir: el softmax",
+       "key": true,
+       "tp": true
+      },
+      {
+       "i": 19,
+       "title": "Mezclar los valores",
+       "key": true,
+       "tp": false
+      },
+      {
+       "i": 20,
+       "title": "La máscara causal",
+       "key": true,
+       "tp": true
+      }
+     ],
+     "first": 15,
+     "last": 20,
+     "ntp": 3,
+     "nkey": 4
+    },
+    {
+     "label": "Portada",
+     "slides": [
+      {
+       "i": 21,
+       "title": "El bloque completo",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 21,
+     "last": 21,
+     "ntp": 0,
+     "nkey": 0
+    },
+    {
+     "label": "El bloque completo",
+     "slides": [
+      {
+       "i": 22,
+       "title": "Varias cabezas en paralelo",
+       "key": true,
+       "tp": false
+      },
+      {
+       "i": 23,
+       "title": "La feed-forward: la misma red para cada posición",
+       "key": false,
+       "tp": true
+      },
+      {
+       "i": 24,
+       "title": "El problema de apilar: el gradiente se pierde",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 25,
+       "title": "Residuales: la salida es la entrada más una corrección",
+       "key": true,
+       "tp": false
+      },
+      {
+       "i": 26,
+       "title": "Layer norm: mantener los números en rango",
+       "key": false,
+       "tp": true
+      },
+      {
+       "i": 27,
+       "title": "La fórmula de la posición: senos y cosenos",
+       "key": false,
+       "tp": true
+      },
+      {
+       "i": 28,
+       "title": "Cuenta de parámetros de un bloque",
+       "key": true,
+       "tp": false
+      },
+      {
+       "i": 29,
+       "title": "Cuenta de parámetros de un bloque",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 22,
+     "last": 29,
+     "ntp": 3,
+     "nkey": 3
+    },
+    {
+     "label": "Portada",
+     "slides": [
+      {
+       "i": 30,
+       "title": "Encoder, decoder y la familia",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 30,
+     "last": 30,
+     "ntp": 0,
+     "nkey": 0
+    },
+    {
+     "label": "Encoder, decoder y la familia",
+     "slides": [
+      {
+       "i": 31,
+       "title": "Encoder y decoder en el paper de 2017",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 32,
+       "title": "Solo el decoder: GPT",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 33,
+       "title": "Solo el encoder: BERT",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 34,
+       "title": "Del encoder al embedding de oración",
+       "key": true,
+       "tp": true
+      },
+      {
+       "i": 35,
+       "title": "Fuera del texto: ViT",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 36,
+       "title": "El mapa de la familia",
+       "key": true,
+       "tp": true
+      }
+     ],
+     "first": 31,
+     "last": 36,
+     "ntp": 2,
+     "nkey": 2
+    },
+    {
+     "label": "Portada",
+     "slides": [
+      {
+       "i": 37,
+       "title": "Lo que cambió desde 2017",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 37,
+     "last": 37,
+     "ntp": 0,
+     "nkey": 0
+    },
+    {
+     "label": "Lo que cambió desde 2017",
+     "slides": [
+      {
+       "i": 38,
+       "title": "Qué cambió desde 2017",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 38,
+     "last": 38,
+     "ntp": 0,
+     "nkey": 0
+    },
+    {
+     "label": "Portada",
+     "slides": [
+      {
+       "i": 39,
+       "title": "Cómo se entrena",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 39,
+     "last": 39,
+     "ntp": 0,
+     "nkey": 0
+    },
+    {
+     "label": "Cómo se entrena",
+     "slides": [
+      {
+       "i": 40,
+       "title": "Qué se minimiza",
+       "key": true,
+       "tp": true
+      }
+     ],
+     "first": 40,
+     "last": 40,
+     "ntp": 1,
+     "nkey": 1
+    },
+    {
+     "label": "Portada",
+     "slides": [
+      {
+       "i": 41,
+       "title": "Conclusiones",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 41,
+     "last": 41,
+     "ntp": 0,
+     "nkey": 0
+    },
+    {
+     "label": "Conclusiones",
+     "slides": [
+      {
+       "i": 42,
+       "title": "Un bloque repetido",
+       "key": false,
+       "tp": true
+      }
+     ],
+     "first": 42,
+     "last": 42,
+     "ntp": 1,
+     "nkey": 0
+    }
+   ],
+   "tab": "Clase 8: El transformer por dentro",
+   "extra": false,
+   "total": 43
+  }
+ ],
+ "multi": false,
+ "prev": "07",
+ "next": "09",
+ "snippets": [
+  {
+   "id": "test-atencion-ejemplo-clase",
+   "titulo": "Tests de la cátedra: 'the cat sat', softmax y máscara",
+   "archivo": "atencion/test_atencion.py",
+   "desde": 23,
+   "hasta": 61,
+   "lenguaje": "python",
+   "codigo": "X = np.array([[1, 0, 1, 0], [0, 2, 0, 1], [1, 1, 1, 1]], float)\nWQ = np.eye(4)\nWK = np.array([[0, 1, 0, 0], [1, 0, 0, 0], [0, 0, 0, 1], [0, 0, 1, 0]], float)\nWV = np.array([[1, 0], [0, 1], [1, 0], [0, 1]], float)\n\n\nclass TestSoftmax(unittest.TestCase):\n    def test_filas_suman_uno(self):\n        M = np.array([[1.5, 0, 1.5], [3, -2, 0.5]])\n        np.testing.assert_allclose(at.softmax(M).sum(-1), 1)\n\n    def test_valor_de_la_clase(self):\n        np.testing.assert_allclose(at.softmax(np.array([[1.5, 0, 1.5]])), [[0.4498, 0.1004, 0.4498]], atol=1e-3)\n\n    def test_estable_con_numeros_grandes(self):\n        s = at.softmax(np.array([[1000.0, 1000.0]]))\n        self.assertTrue(np.all(np.isfinite(s)))\n        np.testing.assert_allclose(s, [[0.5, 0.5]])\n\n\nclass TestAtencion(unittest.TestCase):\n    def test_matriz_de_atencion(self):\n        _, A = at.autoatencion(X, WQ, WK, WV)\n        np.testing.assert_allclose(A, [[0.1220, 0.5465, 0.3315], [0.4498, 0.1004, 0.4498], [0.1863, 0.3072, 0.5065]], atol=1e-3)\n\n    def test_salida(self):\n        out, _ = at.autoatencion(X, WQ, WK, WV)\n        np.testing.assert_allclose(out, [[0.9069, 2.3026], [1.7993, 1.2007], [1.3856, 1.9345]], atol=1e-3)\n\n    def test_formas_con_n_distinto_de_d(self):\n        out, A = at.autoatencion(X, WQ, WK, WV)\n        self.assertEqual(A.shape, (3, 3))\n        self.assertEqual(out.shape, (3, 2))\n\n    def test_mascara_causal(self):\n        out, A = at.autoatencion(X, WQ, WK, WV, mascara=True)\n        np.testing.assert_allclose(np.triu(A, 1), 0, atol=1e-12)\n        np.testing.assert_allclose(A.sum(-1), 1)\n        np.testing.assert_allclose(out, [[2, 0], [1.6351, 0.5474], [1.3856, 1.9345]], atol=1e-3)",
+   "que_hace": "Tests provistos por la cátedra para la parte 4 (pendiente): definen el ejemplo de clase ('the cat sat', d = 4) y los valores esperados de softmax, matriz de atención, salida y máscara causal.",
+   "como_funciona": "- `X` son 3 tokens de dimensión 4; `WQ` es la identidad, `WK` permuta dimensiones y `WV` proyecta a 2.\n- `TestSoftmax`: filas que suman 1, el valor de clase `[0.4498, 0.1004, 0.4498]` y estabilidad con `[1000, 1000]`.\n- `test_matriz_de_atencion` y `test_salida`: la `A` 3×3 y la salida 3×2 esperadas.\n- `test_mascara_causal`: el triángulo superior de `A` es 0 y la primera fila solo mira a sí misma (`[2, 0]`).",
+   "proposito": "Es la especificación ejecutable de lo que `atencion.py` tenía que cumplir; el archivo no se puede modificar. La implementación no existe todavía.",
+   "interaccion": "Carga dinámicamente el `atencion.py` que se le pase por argumento y llama a `softmax` y `autoatencion`; el PLAN (paso 4) lo usa como guía de TDD.",
+   "teoria": "Cada token mira a todos: A = softmax(QKᵀ/√d_k) y salida = A V; con máscara causal un token no ve los posteriores.",
+   "key": "tp3-test-atencion-ejemplo-clase",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
+     "i": 11,
+     "title": "El ciclo de generación con el transformer abierto",
+     "url": "/clases/08/#d=transformers-a-fondo&s=11"
+    },
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
+     "i": 20,
+     "title": "La máscara causal",
+     "url": "/clases/08/#d=transformers-a-fondo&s=20"
+    }
+   ],
+   "nusos": 2
+  },
+  {
+   "id": "lora-config",
+   "titulo": "LoRA r=8 sobre q_proj/v_proj",
+   "archivo": "admision_tp/entrenamiento.py",
+   "desde": 11,
+   "hasta": 23,
+   "lenguaje": "python",
+   "codigo": "# Solo la atención del modelo de lenguaje. Gemma 4 es multimodal: sus torres de visión y audio también\n# tienen q_proj/v_proj, pero son Gemma4ClippableLinear y PEFT no los soporta (falló en Kaggle). PEFT\n# aplica un string con re.fullmatch sobre el nombre completo del módulo (peft/utils/other.py:1521).\nLORA_OBJETIVO = r\"(.*\\.)?language_model\\.layers\\.\\d+\\.self_attn\\.(q_proj|v_proj)\"\nLORA = {\"r\": 8, \"lora_alpha\": 16, \"lora_dropout\": 0.0,\n        \"target_modules\": LORA_OBJETIVO, \"task_type\": \"CAUSAL_LM\"}\nPOLITICA = {\"save_steps\": 50, \"bf16\": True, \"gradient_checkpointing\": True,\n            \"gradient_checkpointing_kwargs\": {\"use_reentrant\": False}, \"save_only_model\": False}\n# Defaults de la entrega (A100 de 40 GB). fp16 y \"auto\" existen para T4 x2 (Kaggle, desarrollo):\n# la T4 no tiene bf16 nativo y \"auto\" reparte el modelo entre GPU (paralelismo de modelo en un proceso).\nPRECISIONES = {\"bf16\": \"bfloat16\", \"fp16\": \"float16\"}\nDISPOSITIVOS = (\"unico\", \"auto\")\nEJECUCION = {\"precision\": \"bf16\", \"dispositivos\": \"unico\", \"guardar_cada\": 50}",
+   "que_hace": "Define la configuración LoRA y la política de entrenamiento: rango 8, alfa 16, solo en las proyecciones Q y V de la atención del modelo de lenguaje.",
+   "como_funciona": "- `LORA_OBJETIVO` es una regex que solo toma `language_model.layers.N.self_attn.(q_proj|v_proj)`.\n- `LORA` fija `r=8`, `lora_alpha=16`, `dropout=0` y `task_type=CAUSAL_LM`.\n- `POLITICA` guarda checkpoint cada 50 pasos, bf16 y gradient checkpointing.\n- `PRECISIONES` y `DISPOSITIVOS` permiten fp16/`auto` para las T4 de Kaggle.",
+   "proposito": "Gemma 4 es multimodal y sus torres de visión/audio también tienen `q_proj`/`v_proj` que PEFT no soporta: la regex las excluye. QLoRA quedó como alternativa no hecha.",
+   "interaccion": "`_ejecutar_cuda` pasa `LoraConfig(**LORA)` a `get_peft_model`; `cargar_entradas` incluye `LORA` en la identidad de la corrida.",
+   "teoria": "LoRA agrega matrices de bajo rango a W_Q y W_V: se entrenan pocos parámetros y el modelo base queda congelado.",
+   "key": "tp4-lora-config",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
+     "i": 15,
+     "title": "Tres proyecciones del mismo vector",
+     "url": "/clases/08/#d=transformers-a-fondo&s=15"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 51,
+     "title": "Dónde entra el fine-tuning",
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=51"
+    },
+    {
+     "clase": 12,
+     "cnn": "12",
+     "slug": "segmentacion-y-stable-diffusion",
+     "i": 75,
+     "title": "Lo que el equipo va a encontrar",
+     "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=75"
+    }
+   ],
+   "nusos": 3
+  },
+  {
+   "id": "test-atencion-escala-multicabeza-ln",
+   "titulo": "Tests: escala √d_k, permutación, multicabeza y layer norm",
+   "archivo": "atencion/test_atencion.py",
+   "desde": 63,
+   "hasta": 101,
+   "lenguaje": "python",
+   "codigo": "    def test_permutar_filas_permuta_la_salida(self):\n        perm = [2, 0, 1]\n        out, _ = at.autoatencion(X, WQ, WK, WV)\n        out_p, _ = at.autoatencion(X[perm], WQ, WK, WV)\n        np.testing.assert_allclose(out_p, out[perm], atol=1e-9)\n\n    def test_escala_por_raiz_de_dk(self):\n        Q = np.array([[1.0, 0, 0, 0]]); K = np.array([[4.0, 0, 0, 0], [0, 0, 0, 0]]); V = np.eye(2)\n        _, A = at.atencion(Q, K, V)\n        np.testing.assert_allclose(A, [[np.exp(2) / (np.exp(2) + 1), 1 / (np.exp(2) + 1)]], atol=1e-6)\n\n\nclass TestMulticabeza(unittest.TestCase):\n    def test_una_cabeza_con_wo_identidad_es_autoatencion(self):\n        out1, _ = at.autoatencion(X, WQ, WK, WV)\n        outm = at.multicabeza(X, [(WQ, WK, WV)], np.eye(2))\n        np.testing.assert_allclose(outm, out1, atol=1e-9)\n\n    def test_dos_cabezas_concatenan_y_proyectan(self):\n        c1 = (WQ[:, :2], WK[:, :2], WV[:, :1]); c2 = (WQ[:, 2:], WK[:, 2:], WV[:, 1:])\n        Wo = np.array([[1.0, 2.0], [0.0, 1.0]])\n        esperado = np.concatenate([at.autoatencion(X, *c1)[0], at.autoatencion(X, *c2)[0]], axis=1) @ Wo\n        np.testing.assert_allclose(at.multicabeza(X, [c1, c2], Wo), esperado, atol=1e-9)\n        self.assertEqual(at.multicabeza(X, [c1, c2], Wo).shape, (3, 2))\n\n\nclass TestLayerNorm(unittest.TestCase):\n    def test_valor_de_la_clase(self):\n        np.testing.assert_allclose(at.layer_norm(np.array([[2.0, 0, 1, 1]])), [[1.4142, -1.4142, 0, 0]], atol=1e-3)\n\n    def test_invariante_a_escala_y_corrimiento(self):\n        x = np.array([[2.0, 0, 1, 1]])\n        np.testing.assert_allclose(at.layer_norm(2 * x), at.layer_norm(x), atol=1e-4)\n        np.testing.assert_allclose(at.layer_norm(x + 10), at.layer_norm(x), atol=1e-4)\n\n    def test_por_fila(self):\n        y = at.layer_norm(np.array([[1.0, 0, 1, 0], [0, 20, 0, 10], [300, 0, 100, 200]]))\n        np.testing.assert_allclose(y.mean(-1), 0, atol=1e-6)\n        np.testing.assert_allclose(y.var(-1), 1, atol=1e-3)",
+   "que_hace": "Resto de los tests de la parte 4 (pendiente): permutar la entrada permuta la salida, la escala por √d_k, multicabeza y layer norm.",
+   "como_funciona": "- `test_permutar_filas_permuta_la_salida`: sin posiciones, la atención es equivariante a permutaciones.\n- `test_escala_por_raiz_de_dk`: con d_k = 4, un producto de 4 se escala a 2 antes del softmax.\n- `TestMulticabeza`: una cabeza con `Wo` identidad es autoatención; dos cabezas se concatenan y se proyectan con `Wo`.\n- `TestLayerNorm`: `[2, 0, 1, 1]` → `[1.414, -1.414, 0, 0]`, invariancia a escala y corrimiento, media 0 y varianza 1 por fila.",
+   "proposito": "Fija propiedades que hay que entender para el final (por qué hacen falta posiciones, por qué se escala, qué normaliza layer norm). La implementación quedó pendiente.",
+   "interaccion": "Igual que los anteriores: se corre con `python3 atencion/test_atencion.py atencion.py` contra el `atencion.py` que faltaba escribir.",
+   "teoria": "Escalado del softmax, atención multi-cabeza, layer norm y que la atención por sí sola no conoce el orden.",
+   "key": "tp3-test-atencion-escala-multicabeza-ln",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
+     "i": 18,
+     "title": "Escalar y repartir: el softmax",
+     "url": "/clases/08/#d=transformers-a-fondo&s=18"
+    },
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
+     "i": 26,
+     "title": "Layer norm: mantener los números en rango",
+     "url": "/clases/08/#d=transformers-a-fondo&s=26"
+    }
+   ],
+   "nusos": 2
+  },
+  {
+   "id": "baseline-mlp-32-32",
+   "titulo": "MLP baseline Dense(32)→Dense(32)→Dense(1, linear) (celda 10)",
+   "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
+   "desde": 31,
+   "hasta": 41,
+   "lenguaje": "python",
+   "codigo": "def build_baseline_model(n_features):\n    model = Sequential([\n        Input(shape=(n_features,)),\n        Dense(32, activation='relu'),\n        Dense(32, activation='relu'),\n        Dense(1, activation='linear'),\n    ])\n    # Salida real -> activación lineal + loss de regresión (mse). 'accuracy' no aplica acá:\n    # no hay clases que acertar, hay una distancia en dólares que minimizar.\n    model.compile(optimizer='adam', loss='mse', metrics=['mae'])\n    return model",
+   "que_hace": "Construye y compila el MLP del baseline numérico: dos capas ocultas de 32 ReLU y una salida lineal para predecir un real.",
+   "como_funciona": "- `Input(shape=(n_features,))` recibe la fila de floats (13 numéricas + flag).\n- Cada `Dense(32, activation='relu')` calcula $W\\cdot x+b$ y aplica ReLU.\n- `Dense(1, activation='linear')` devuelve un número sin acotar (el precio escalado).\n- `compile(optimizer='adam', loss='mse', metrics=['mae'])`: el comentario explica por qué `accuracy` no aplica.",
+   "proposito": "Pasar de la sigmoide + BCE del notebook de clase a lineal + MSE es el cambio central de la misión: la tarea (predecir dólares) fija la salida y la loss.",
+   "interaccion": "La usan `train_and_report` (celda 10) y el experimento con `ListingId` (celda 21). En el Milestone 3, `build_model_categorical` repite el mismo tronco 32-32-1 con la API funcional.",
+   "teoria": "Neurona/capa = combinación lineal + no linealidad; ReLU en ocultas y salida lineal + MSE para regresión.",
+   "key": "tp2-baseline-mlp-32-32",
+   "tp": 2,
+   "tp_titulo": "¿Cuánto vale esta casa?",
+   "usos": [
+    {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "introduccion",
+     "i": 26,
+     "title": "Redes Neuronales — Estructura y Celda Básica",
+     "url": "/clases/01/#d=introduccion&s=26"
+    },
+    {
+     "clase": 3,
+     "cnn": "03",
+     "slug": "intro-redes-neuronales",
+     "i": 9,
+     "title": "La capa: el bloque que se repite",
+     "url": "/clases/03/#d=intro-redes-neuronales&s=9"
+    },
+    {
+     "clase": 3,
+     "cnn": "03",
+     "slug": "intro-redes-neuronales",
+     "i": 24,
+     "title": "Sin activación, la red colapsa",
+     "url": "/clases/03/#d=intro-redes-neuronales&s=24"
+    },
+    {
+     "clase": 3,
+     "cnn": "03",
+     "slug": "intro-redes-neuronales",
+     "i": 25,
+     "title": "Las funciones de activación más comunes",
+     "url": "/clases/03/#d=intro-redes-neuronales&s=25"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 22,
+     "title": "Un catálogo para elegir sin dudar",
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=22"
+    },
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
+     "i": 23,
+     "title": "La feed-forward: la misma red para cada posición",
+     "url": "/clases/08/#d=transformers-a-fondo&s=23"
+    },
+    {
+     "clase": 11,
+     "cnn": "11",
+     "slug": "redes-generativas-antagonicas",
+     "i": 23,
+     "title": "Discriminador Como red neuronal",
+     "url": "/clases/11/#d=redes-generativas-antagonicas&s=23"
+    }
+   ],
+   "nusos": 7
+  },
+  {
+   "id": "month-cyclical",
+   "titulo": "MonthSold como seno y coseno (celda 25)",
+   "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
+   "desde": 19,
+   "hasta": 22,
+   "lenguaje": "python",
+   "codigo": "def month_cyclical(month_series):\n    \"\"\"MonthSold (1-12) -> (seno, coseno): la codificación cíclica correcta.\"\"\"\n    radians = 2 * np.pi * month_series.to_numpy(dtype=float) / 12\n    return np.column_stack([np.sin(radians), np.cos(radians)])",
+   "que_hace": "Convierte el mes de venta (1–12) en dos columnas: seno y coseno del ángulo del mes en el ciclo anual.",
+   "como_funciona": "- `radians = 2 * np.pi * month / 12` ubica cada mes sobre un círculo.\n- `np.sin(radians)` y `np.cos(radians)` dan las dos coordenadas.\n- Devuelve una matriz de 2 columnas (2 floats por casa).",
+   "proposito": "Resuelve la trampa 2: como entero, diciembre (12) y enero (1) estarían a 11 de distancia; en el círculo quedan vecinos. Hace falta seno y coseno juntos para que cada mes tenga un punto único.",
+   "interaccion": "La llama `build_dense_features` (celda 26) cuando `cyclical_month=True`, que además saca `MonthSold` de las numéricas.",
+   "teoria": "Codificación cíclica con senos y cosenos, la misma idea que el positional encoding del Transformer.",
+   "key": "tp2-month-cyclical",
+   "tp": 2,
+   "tp_titulo": "¿Cuánto vale esta casa?",
+   "usos": [
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
+     "i": 27,
+     "title": "La fórmula de la posición: senos y cosenos",
+     "url": "/clases/08/#d=transformers-a-fondo&s=27"
+    }
+   ],
+   "nusos": 1
+  },
+  {
+   "id": "informe-por-que-e5",
+   "titulo": "Por qué ganó e5-base (z del fragmento correcto)",
+   "archivo": "INFORME.md",
+   "desde": 47,
+   "hasta": 66,
+   "lenguaje": "markdown",
+   "codigo": "### Por qué ganó e5-base\n\n| Encoder | Mejor CR | CR medio con k = 1 (10 configs) | Coseno medio entre fragmentos | z del fragmento correcto |\n|---|---|---|---|---|\n| BERT multilingüe (promedio) | 0,350 | 0,27 | 0,786 | 1,56 |\n| paraphrase-multilingual-MiniLM-L12-v2 | 0,950 | 0,76 | 0,365 | 3,07 |\n| multilingual-e5-small | 0,950 | 0,80 | 0,842 | 3,94 |\n| **multilingual-e5-base** | **1,000** | **0,85** | 0,830 | 3,94 |\n\n*z del fragmento correcto*: cuántos desvíos estándar está el coseno del fragmento con la evidencia por encima del\npromedio de todos los fragmentos para esa pregunta (secciones con metadatos, promedio sobre las 20 preguntas).\n\n- BERT sin ajustar no fue entrenado para que el coseno mida similitud de significado: el promedio de sus tokens\n  refleja sobre todo la forma superficial del texto, y el fragmento correcto apenas se separa del resto (z = 1,56).\n- Que los vectores estén \"amontonados\" no es el problema en sí: e5 tiene cosenos medios tan altos como BERT (0,83),\n  pero fue entrenado con pares consulta–pasaje (por eso los prefijos `query:` / `passage:`), así que ordena bien dentro\n  de esa franja: el fragmento correcto queda a 3,94 desvíos. MiniLM está entrenado para paráfrasis entre oraciones, no\n  para preguntas contra pasajes, y separa menos (3,07).\n- e5-base y e5-small separan igual en promedio, pero e5-base acierta el primer lugar en más configuraciones (CR medio\n  0,85 contra 0,80) y es el único que llega a 1,00 con k = 1. Corre en CPU en pocos segundos para las 56 secciones.",
+   "que_hace": "Compara los cuatro encoders con el mejor CR, el CR medio con k = 1, el coseno medio entre fragmentos y cuántos desvíos queda el fragmento correcto sobre el promedio.",
+   "como_funciona": "- BERT promediado: CR 0,350 y z = 1,56; el coseno refleja forma superficial, no significado.\n- e5 tiene cosenos medios altos (0,83, «amontonados») pero ordena bien: z = 3,94, porque fue entrenado con pares consulta–pasaje.\n- MiniLM, entrenado para paráfrasis, separa menos (3,07).\n- e5-base gana a e5-small por acertar el primer lugar en más configuraciones.",
+   "proposito": "Explica la elección del encoder con una medida propia (z-score del fragmento correcto) en lugar de quedarse solo con el CR.",
+   "interaccion": "Se apoya en las corridas de `experimentos/recuperacion/` y en las clases `BertPromedio` y `SentenceTransformerEncoder` de `hospital/rag/encoders.py`.",
+   "teoria": "Encoder sin ajustar vs. encoder contrastivo: lo que importa no es la escala absoluta del coseno sino cómo ordena consultas contra pasajes.",
+   "key": "tp3-informe-por-que-e5",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "introduccion",
+     "i": 36,
+     "title": "Ejemplos de problemas de representación",
+     "url": "/clases/01/#d=introduccion&s=36"
+    },
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
+     "i": 34,
+     "title": "Del encoder al embedding de oración",
+     "url": "/clases/08/#d=transformers-a-fondo&s=34"
+    }
+   ],
+   "nusos": 2
+  },
+  {
+   "id": "encoder-e5-prefijos",
+   "titulo": "Encoder de oraciones con prefijos query/passage",
+   "archivo": "hospital/rag/encoders.py",
+   "desde": 40,
+   "hasta": 68,
+   "lenguaje": "python",
+   "codigo": "class SentenceTransformerEncoder:\n    \"\"\"Modelos entrenados para embeddings de oraciones (MiniLM, e5, bge-m3). Los e5 piden prefijos.\"\"\"\n\n    def __init__(self, modelo, prefijo_consulta=\"\", prefijo_pasaje=\"\", lote=16):\n        from sentence_transformers import SentenceTransformer\n\n        self.nombre, self.lote = modelo, lote\n        self.prefijo_consulta, self.prefijo_pasaje = prefijo_consulta, prefijo_pasaje\n        self.modelo = SentenceTransformer(modelo, device=\"cpu\")\n\n    def _codificar(self, textos, prefijo):\n        m = self.modelo.encode([prefijo + t for t in textos], batch_size=self.lote,\n                               normalize_embeddings=True, show_progress_bar=False)\n        return np.asarray(m, dtype=np.float32)\n\n    def codificar_consultas(self, textos):\n        return self._codificar(textos, self.prefijo_consulta)\n\n    def codificar_pasajes(self, textos):\n        return self._codificar(textos, self.prefijo_pasaje)\n\n\ndef crear_encoder(cfg):\n    \"\"\"cfg: {\"tipo\": \"bert_promedio\" | \"sentence_transformer\", \"modelo\": ..., \"prefijo_consulta\": ..., \"prefijo_pasaje\": ...}\"\"\"\n    if cfg[\"tipo\"] == \"bert_promedio\":\n        return BertPromedio(cfg[\"modelo\"])\n    if cfg[\"tipo\"] == \"sentence_transformer\":\n        return SentenceTransformerEncoder(cfg[\"modelo\"], cfg.get(\"prefijo_consulta\", \"\"), cfg.get(\"prefijo_pasaje\", \"\"))\n    raise ValueError(f\"tipo de encoder desconocido: {cfg['tipo']}\")",
+   "que_hace": "Envuelve modelos de `sentence-transformers` (MiniLM, e5, bge-m3) con la misma interfaz que BERT y agrega los prefijos que piden los e5. `crear_encoder` elige la clase según la configuración.",
+   "como_funciona": "- `SentenceTransformerEncoder` guarda `prefijo_consulta` y `prefijo_pasaje`.\n- `_codificar(textos, prefijo)` antepone el prefijo a cada texto y llama a `self.modelo.encode(..., normalize_embeddings=True)`.\n- `codificar_consultas` usa el prefijo de consulta (`\"query: \"`) y `codificar_pasajes` el de pasaje (`\"passage: \"`).\n- `crear_encoder(cfg)` despacha por `cfg[\"tipo\"]`.",
+   "proposito": "e5 fue entrenado de forma contrastiva con pares consulta–pasaje y espera esos prefijos; sin ellos se pierde la asimetría pregunta/documento. Ganó e5-base: separó el fragmento correcto a z = 3,94 contra 3,07 de MiniLM (entrenado para paráfrasis).",
+   "interaccion": "`Recuperador.desde_config` lo crea a partir de `config.json` (`intfloat/multilingual-e5-base`, `query: ` / `passage: `). `Recuperador._puntuar` llama a `codificar_consultas` y `_embeddings` a `codificar_pasajes`.",
+   "teoria": "Embeddings de oración entrenados con aprendizaje contrastivo (como CLIP pero texto–texto): consulta y pasaje relevantes quedan cerca en el espacio.",
+   "key": "tp3-encoder-e5-prefijos",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 20,
+     "title": "Embeddings: cada texto es un punto",
+     "url": "/clases/06/#d=rag-y-mcp&s=20"
+    },
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
+     "i": 36,
+     "title": "El mapa de la familia",
+     "url": "/clases/08/#d=transformers-a-fondo&s=36"
+    },
+    {
+     "clase": 12,
+     "cnn": "12",
+     "slug": "segmentacion-y-stable-diffusion",
+     "i": 22,
+     "title": "Embeddings más allá del texto",
+     "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=22"
+    },
+    {
+     "clase": 12,
+     "cnn": "12",
+     "slug": "segmentacion-y-stable-diffusion",
+     "i": 51,
+     "title": "CLIP: el puente texto ↔ imagen",
+     "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=51"
+    }
+   ],
+   "nusos": 4
+  },
+  {
+   "id": "tokenizar-mascara",
+   "titulo": "Máscara assistant-only (labels = −100)",
+   "archivo": "admision_tp/tokenizacion.py",
+   "desde": 12,
+   "hasta": 48,
+   "lenguaje": "python",
+   "codigo": "def tokenizar_conversacion(registro, tokenizer, max_seq_length):\n    \"\"\"Incluye respuesta y cierre del turno; excluye encabezados y todo contexto.\n\n    Solo acepta plantillas/tokenizadores que preserven exactamente sus prefijos.\n    No pide máscaras nativas (Gemma fijado no tiene bloques generation).\n    \"\"\"\n    validar_registro(registro)\n    if type(max_seq_length) is not int or max_seq_length <= 0:\n        raise ValueError(\"max_seq_length requiere entero positivo\")\n    mensajes = registro[\"messages\"]\n\n    def tokens(historia, generar=False):\n        salida = tokenizer.apply_chat_template(\n            historia, tokenize=True, add_generation_prompt=generar,\n            enable_thinking=False, padding=False, truncation=False, return_dict=True)\n        ids = salida[\"input_ids\"]\n        if not isinstance(ids, list) or not ids or any(type(x) is not int or x < 0 for x in ids):\n            raise ValueError(\"tokenizador devolvió IDs inválidos o anidados\")\n        if salida.get(\"attention_mask\", [1] * len(ids)) != [1] * len(ids):\n            raise ValueError(\"tokenización individual no debe contener padding\")\n        return ids\n\n    ids = tokens(mensajes)\n    if len(ids) > max_seq_length:\n        raise ValueError(\"conversación excede max_seq_length; no se recorta\")\n    labels = [-100] * len(ids)\n    for i, mensaje in enumerate(mensajes):\n        if mensaje[\"role\"] != \"assistant\":\n            continue\n        inicio = tokens(mensajes[:i], True)\n        fin = tokens(mensajes[:i + 1])\n        if ids[:len(inicio)] != inicio or ids[:len(fin)] != fin or len(fin) <= len(inicio):\n            raise ValueError(\"plantilla/tokenizador no preserva prefijos; máscara insegura\")\n        labels[len(inicio):len(fin)] = ids[len(inicio):len(fin)]\n    if all(x == -100 for x in labels):\n        raise ValueError(\"conversación sin tokens supervisados\")\n    return {\"input_ids\": ids, \"attention_mask\": [1] * len(ids), \"labels\": labels}",
+   "que_hace": "Tokeniza una conversación con el chat template y deja como objetivo de la pérdida solo los tokens de las respuestas del asistente.",
+   "como_funciona": "- `tokens(historia)` aplica `apply_chat_template` sin truncar ni padding.\n- Si la conversación supera `max_seq_length`, falla: no se recorta.\n- Inicializa `labels = [-100] * len(ids)`.\n- Para cada mensaje `assistant` tokeniza el prefijo con `add_generation_prompt=True` y el prefijo con la respuesta; copia en `labels` solo ese tramo.\n- Verifica que la plantilla preserve prefijos; si no, la máscara sería insegura y lanza error.",
+   "proposito": "La pérdida no cuenta el sistema, el triage ni las observaciones: el modelo aprende a producir acciones JSON, no a repetir el contexto.",
+   "interaccion": "La llama `tokenizar_preparacion` (mismo archivo) y se vuelve a verificar en `entrenamiento._ejecutar_cuda`. Produce `tokens.jsonl`, que consume `entrenamiento.cargar_entradas`.",
+   "teoria": "Pérdida de entropía cruzada de próximo token, enmascarada (−100 se ignora) para entrenar solo sobre las respuestas.",
+   "key": "tp4-tokenizar-mascara",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
+     "i": 40,
+     "title": "Qué se minimiza",
+     "url": "/clases/08/#d=transformers-a-fondo&s=40"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 19,
+     "title": "Datos de demostración",
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=19"
+    }
+   ],
+   "nusos": 2
+  },
+  {
+   "id": "ejercicio-a-mano",
+   "titulo": "Parte 5: el bloque de transformer a mano (pendiente)",
+   "archivo": "a_mano/ejercicio.md",
+   "desde": 63,
+   "hasta": 93,
+   "lenguaje": "markdown",
+   "codigo": "## Parte A: el bloque completo como decoder (con máscara causal)\n\nPara cada una de las dos frases:\n\n1. **Entrada.** X = E + P, una fila por token.\n2. **Proyecciones.** Q = X Wq, K = X Wk, V = X Wv.\n3. **Afinidades.** S = Q Kᵀ.\n4. **Escala.** S / √d, con d = 4.\n5. **Máscara causal.** Poner −∞ donde un token mira a uno posterior.\n6. **Matriz de atención.** A = softmax por fila.\n7. **Mezcla.** A V, y después la proyección de salida (A V) Wo.\n8. **Residual.** Z = X + (A V) Wo.\n9. **Layer norm.** LN(Z), fila por fila (media y varianza de cada fila; ε despreciable).\n10. **Feed-forward.** FFN = ReLU(LN(Z) W1) W2.\n11. **Residual.** H = Z + FFN.\n12. **Layer norm final.** LN(H).\n13. **Predicción.** Con la última fila de LN(H), logits = fila · Wout (un valor por palabra del vocabulario) y softmax sobre esos seis valores. ¿Qué palabra completa la frase, y con qué probabilidad?\n\n## Parte B: la misma atención sin máscara (encoder)\n\nPara cada frase, repitan los pasos 5 a 9 sin la máscara causal y anoten la fila de \"banco\" en LN(Z).\n\n## Preguntas\n\nContesten en la misma hoja, en dos o tres líneas cada una:\n\n1. Comparen la fila de \"banco\" en LN(Z) entre las dos frases en la parte A y en la parte B. ¿En cuál de las dos partes el vector de \"banco\" cambia según la frase? ¿Por qué?\n2. En la parte A, ¿cómo \"sabe\" el modelo si tiene que predecir \"peso\" o \"dinero\", si el vector de \"banco\" es el mismo en las dos frases?\n3. La predicción de la parte A y la que resultaría de la parte B para la última posición, ¿son iguales o distintas? Expliquen por qué con lo que hace la máscara.\n4. ¿Qué modelo de la clase se parece a la parte A y cuál a la parte B? ¿Para qué se usa cada uno?\n5. Si P fuera todo ceros, ¿qué cambiaría en los resultados de este ejercicio? ¿Y en una frase donde el orden de las palabras cambie el sentido?",
+   "que_hace": "Es la consigna de la cátedra para la parte 5, que quedó pendiente en el repo: pasar «El banco aguanta» y «El banco presta» por un bloque completo, con y sin máscara causal.",
+   "como_funciona": "- Parte A (decoder): X = E + P, proyecciones Q/K/V, S = QKᵀ, escala por √d, máscara causal, softmax, A V y Wo, residual, layer norm, FFN con ReLU, residual, layer norm final y predicción con Wout.\n- Parte B (encoder): la misma atención sin máscara, mirando la fila de «banco».\n- Las preguntas comparan cómo cambia «banco» según el contexto y qué hace la máscara.",
+   "proposito": "Obliga a hacer a mano cada operación del bloque para entender qué aporta cada una. Por regla del TP se resuelve sin IA; no hay hojas escaneadas en el repo.",
+   "interaccion": "Usa los datos del mismo archivo (embeddings, posiciones y pesos); el PLAN preveía verificar las cuentas con `atencion.py` desde `a_mano/verificar.py`, que tampoco existe.",
+   "teoria": "Un bloque de transformer completo: atención, residuales, layer norm y feed-forward; diferencia entre decoder (máscara causal) y encoder (bidireccional).",
+   "key": "tp3-ejercicio-a-mano",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
+     "i": 42,
+     "title": "Un bloque repetido",
+     "url": "/clases/08/#d=transformers-a-fondo&s=42"
+    }
+   ],
+   "nusos": 1
+  }
+ ]
+}

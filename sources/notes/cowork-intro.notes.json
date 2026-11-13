@@ -1,0 +1,479 @@
+[
+ {
+  "i": 0,
+  "resumen": "Portada de la Clase 2: agentes de código y la misión Corta.",
+  "claves": [],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 1,
+  "resumen": "Agenda: agentes de código, repo como contexto, contrato, Skills, subagentes, MCP, conclusiones y misión Corta.",
+  "claves": [],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 2,
+  "resumen": "Gran parte del desarrollo no es escribir código nuevo: entender repos heredados, ordenar, migrar, deployar. Hasta ahora la IA solo ayudaba a tipear.",
+  "claves": [
+   "agente-de-codigo",
+   "código heredado"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 3,
+  "resumen": "**Agente de código**: recibe una tarea en lenguaje natural y, en un loop, planifica, edita, corre comandos y verifica hasta entregar. Claude Code y Codex.",
+  "claves": [
+   "agente-de-codigo"
+  ],
+  "tp": [
+   {
+    "tp": 1,
+    "texto": "Corta se hizo con Claude Code y Codex parados en `corta/`: el agente editó, corrió `npm test`, commiteó y deployó."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "agentes-y-multiagentes#12",
+    "por": "Agente = LLM + planificación + tools"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 4,
+  "resumen": "Cambia la unidad de trabajo: de una línea a una tarea completa. El agente planifica y ejecuta; el humano revisa el plan y los diffs.",
+  "claves": [
+   "agente-de-codigo",
+   "humano-en-el-circuito"
+  ],
+  "tp": [
+   {
+    "tp": 1,
+    "texto": "El ejemplo de la lámina pasó en Corta: delegaste «migrá la persistencia a Postgres», con `tests/postgres.test.js` escrito antes."
+   }
+  ],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 5,
+  "resumen": "Las piezas se apilan: agente, repo como contexto, MCP, CLAUDE.md, Skills y subagentes. Cada una resuelve un problema concreto.",
+  "claves": [
+   "claude-md",
+   "skill",
+   "mcp",
+   "subagente"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 6,
+  "resumen": "Se abre el agente parado en la carpeta del proyecto: ese directorio define el **alcance** (contexto y límite de seguridad). Primero, una pregunta de reconocimiento.",
+  "claves": [
+   "contexto-de-agente",
+   "agente-de-codigo"
+  ],
+  "tp": [
+   {
+    "tp": 1,
+    "texto": "Paso 0 de Corta: pararse en `corta/`, configurar los MCP de GitHub y Railway y hacer que el agente explique qué tools expone cada uno."
+   }
+  ],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 7,
+  "resumen": "Sección 2: el repo como contexto.",
+  "claves": [],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 8,
+  "resumen": "El modelo no conoce tu repo: responde de memoria. Por **in-context learning**, la calidad del agente depende del contexto que le llega.",
+  "claves": [
+   "in-context-learning",
+   "contexto-sobre-prompting"
+  ],
+  "tp": [],
+  "ver": [
+   {
+    "ref": "claude-desktop-chat#9",
+    "por": "El mismo argumento, en la clase 1"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 9,
+  "resumen": "No carga el repo entero: lo **explora** con herramientas (árbol, README, configs, grep, `git log`). El orden del repo es contexto.",
+  "claves": [
+   "contexto-de-agente"
+  ],
+  "tp": [
+   {
+    "tp": 1,
+    "texto": "En el M2 ordenaste Corta (`src/`, `tests/`, `docs/`, README) y borraste `server_OLD.js` e `index_v2_FINAL.js`: entenderlo en menos de 2 minutos."
+   }
+  ],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 10,
+  "resumen": "Contrato, Skills y subagentes son `.md` con **frontmatter** YAML: el modelo los lee nativo y entran en diffs, commits y PRs como el código.",
+  "claves": [
+   "markdown-frontmatter"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 11,
+  "resumen": "Regla: lo que el agente deba saber va en **.md dentro del repo**: memoria, especificaciones (`SPEC.md`) y conocimiento general.",
+  "claves": [
+   "spec-md",
+   "contexto-de-agente"
+  ],
+  "tp": [
+   {
+    "tp": 1,
+    "texto": "Tu `SPEC.md` de Corta tiene modelo de datos, endpoints y casos borde; ojo: promete 400 para URLs inválidas y el código no lo valida ni lo testea."
+   }
+  ],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 12,
+  "resumen": "Ventana finita: lo más chica posible con la máxima información relevante. Una ventana grande degrada al modelo y acumula instrucciones contradictorias; `/compact` o sesión nueva.",
+  "claves": [
+   "ventana-de-contexto",
+   "compact"
+  ],
+  "tp": [
+   {
+    "tp": 1,
+    "texto": "`docs/PROGRESS.md` guardó el estado por milestone para que cada sesión nueva arrancara con ventana chica y sin re-explicar."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "agentes-y-multiagentes#41",
+    "por": "El contexto se degrada (context rot)"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 13,
+  "resumen": "Nada sale bien a la primera: **vueltas chicas** de pedir, verificar y corregir. Los tests son la unidad de revisión; TDD con tests derivados del SPEC, escritos antes.",
+  "claves": [
+   "iteracion-en-vueltas-chicas",
+   "tdd"
+  ],
+  "tp": [
+   {
+    "tp": 1,
+    "texto": "Cuatro ciclos `test:`→`fix:`/`feat:` en `git log` (redirect, colisión, stats, Postgres); la colisión se forzó mockeando `Math.random`."
+   }
+  ],
+  "ver": [],
+  "clave_examen": true
+ },
+ {
+  "i": 14,
+  "resumen": "Sección 3: el contrato de trabajo.",
+  "claves": [],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 15,
+  "resumen": "**CLAUDE.md / AGENTS.md**: archivo en la raíz que el agente lee al arrancar cada sesión. Lleva cómo correr y testear, convenciones y reglas duras.",
+  "claves": [
+   "claude-md"
+  ],
+  "tp": [
+   {
+    "tp": 1,
+    "texto": "Tu `CLAUDE.md` de Corta fija spec-first, test-first con commits separados, `node:test`, cero secretos y push solo al cerrar un milestone."
+   },
+   {
+    "tp": 4,
+    "texto": "En el TP4 el estándar común del equipo fue `AGENTS.md`."
+   }
+  ],
+  "ver": [],
+  "clave_examen": true
+ },
+ {
+  "i": 16,
+  "resumen": "Nadie lo escribe de cero: el agente lo genera leyendo el repo y recolectando las instrucciones que le das. El humano revisa que quede corto y correcto.",
+  "claves": [
+   "claude-md",
+   "memoria del agente"
+  ],
+  "tp": [
+   {
+    "tp": 1,
+    "texto": "La consigna pedía la Skill `/collect-memory` para mantener `CLAUDE.md`; resolviste la memoria con la Skill `progress-log` y `CLAUDE.md` mantenido aparte."
+   }
+  ],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 17,
+  "resumen": "Sección 4: Skills y comandos.",
+  "claves": [],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 18,
+  "resumen": "«Lo que explicás más de una vez es una **Skill** que escribís una vez»: carpeta con `SKILL.md` (metadata + pasos en prosa). Un trabajo por Skill.",
+  "claves": [
+   "skill"
+  ],
+  "tp": [
+   {
+    "tp": 1,
+    "texto": "Armaste la Skill `progress-log`: un script determinista lista los commits sin log y el modelo redacta un `.md` por commit."
+   }
+  ],
+  "ver": [],
+  "clave_examen": true
+ },
+ {
+  "i": 19,
+  "resumen": "Dos disparos: explícito con `/nombre` o automático cuando el pedido coincide con la **description**. Con una descripción vaga, nunca se activa sola.",
+  "claves": [
+   "descripcion-como-disparador",
+   "skill"
+  ],
+  "tp": [
+   {
+    "tp": 1,
+    "texto": "La `description` de `progress-log` enumera frases como «log progress» o «update the progress log» para dispararse sola."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "rag-y-mcp#68",
+    "por": "La descripción dice cuándo NO usarla"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 20,
+  "resumen": "Sección 5: subagentes.",
+  "claves": [],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 21,
+  "resumen": "**Subagente**: asistente aislado con su propia ventana de contexto que devuelve un resumen. Sirve para tareas pesadas o paralelas, como auditar 6 módulos a la vez.",
+  "claves": [
+   "subagente",
+   "orquestador-workers",
+   "aislamiento-de-contexto"
+  ],
+  "tp": [],
+  "ver": [
+   {
+    "ref": "agentes-y-multiagentes#45",
+    "por": "Estrella: orquestador y subagentes"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 22,
+  "resumen": "Un subagente propio es un `.md` en `.claude/agents/` con frontmatter (nombre, description, tools) y prosa. La description vuelve a ser el disparador.",
+  "claves": [
+   "subagente",
+   "markdown-frontmatter",
+   "descripcion-como-disparador"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 23,
+  "resumen": "Sección 6: MCP servers.",
+  "claves": [],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 24,
+  "resumen": "**MCP**: estándar abierto en el que un server expone las acciones de un servicio (GitHub, base de datos, deploy) como tools que el agente llama dentro de su loop.",
+  "claves": [
+   "mcp",
+   "tool-calling"
+  ],
+  "tp": [
+   {
+    "tp": 1,
+    "texto": "Usaste el MCP de GitHub para versionar y el de Railway para crear la base Postgres, setear variables y deployar Corta."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "rag-y-mcp#46",
+    "por": "MCP conecta modelos con herramientas"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 25,
+  "resumen": "Al conectar un server, el agente recibe el catálogo (nombre, descripción, parámetros) y elige por descripción. Cuándo conviene cada tool lo dice la documentación.",
+  "claves": [
+   "mcp",
+   "descripcion-como-disparador"
+  ],
+  "tp": [
+   {
+    "tp": 3,
+    "texto": "En el TP3 las descripciones de tus tools dicen qué fuente consultan, qué NO tienen y los valores válidos del parámetro."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "rag-y-mcp#54",
+    "por": "El ciclo de vida de una tool MCP"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 26,
+  "resumen": "Casi todo el toolchain ya tiene server MCP: GitHub, Postgres, Playwright, Sentry, Jira, Figma, Context7 e infraestructura de deploy.",
+  "claves": [
+   "mcp",
+   "toolchain"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 27,
+  "resumen": "Primero los catálogos oficiales (Claude, ChatGPT), después repos y directorios comunitarios. Siempre mirar quién publica el server.",
+  "claves": [
+   "mcp",
+   "confianza"
+  ],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 28,
+  "resumen": "Sección 7: conclusiones.",
+  "claves": [],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 29,
+  "resumen": "El rol pasa a **diseñar, delegar y revisar**. Contrato, Skills y subagentes son archivos versionados que el equipo hereda con un clone.",
+  "claves": [
+   "agente-de-codigo",
+   "humano-en-el-circuito"
+  ],
+  "tp": [
+   {
+    "tp": 1,
+    "texto": "Conclusión de Corta: el agente tipeó casi todo; lo confiable fue el contexto en `.md` y los tests verificando cada vuelta chica."
+   }
+  ],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 30,
+  "resumen": "El agente se equivoca con confianza: leer cada diff. **Secretos** fuera del código y del contexto. El contenido externo puede traer instrucciones (prompt injection).",
+  "claves": [
+   "gestion-de-secretos",
+   "prompt-injection",
+   "defensa-en-profundidad"
+  ],
+  "tp": [
+   {
+    "tp": 1,
+    "texto": "`notas.txt` traía una credencial de Postgres: quedó fuera del primer commit, se reescribió la historia antes del push y `DATABASE_URL` va solo por variable de entorno."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "cierre-magnifica-humanitas#23",
+    "por": "Defensa en profundidad"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 31,
+  "resumen": "Sección 8: la misión Corta.",
+  "claves": [],
+  "tp": [],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 32,
+  "resumen": "Corta: acortador de URLs heredado sin git ni README, con duplicados y bugs. Meta: llevarlo a producción con la historia completa en GitHub.",
+  "claves": [
+   "misión corta",
+   "agente-de-codigo"
+  ],
+  "tp": [
+   {
+    "tp": 1,
+    "texto": "El primer commit (`a6061b7`) subió el caos tal cual, salvo `node_modules/` y `notas.txt` (credencial)."
+   }
+  ],
+  "ver": [],
+  "clave_examen": false
+ },
+ {
+  "i": 33,
+  "resumen": "Cinco milestones (trackear, ordenar, corregir, completar stats, producción en Railway) con SPEC.md + TDD. Pregunta clave: ¿dónde viven los datos?",
+  "claves": [
+   "spec-md",
+   "tdd",
+   "mcp"
+  ],
+  "tp": [
+   {
+    "tp": 1,
+    "texto": "Los datos pasaron de `links.json` a PostgreSQL en Railway; el link `v4v` sobrevivió a un redeploy forzado con `clicks: 1`."
+   }
+  ],
+  "ver": [],
+  "clave_examen": false
+ }
+]

@@ -1,0 +1,2841 @@
+{
+ "num": 9,
+ "nn": "09",
+ "fecha": "30 sep",
+ "titulo": "LLM training: pre-training, SFT, RLHF, herramientas y fine-tuning",
+ "bloque": "Entrenamiento de LLMs",
+ "decks": [
+  {
+   "slug": "como-se-entrena-un-llm",
+   "titulo": "Clase 9: Cómo se entrena un LLM",
+   "slides": [
+    {
+     "i": 0,
+     "title": "Inteligencia Artificial Generativa (AI Gen)",
+     "section": "",
+     "resumen": "Portada de la clase 9: cómo se entrena un LLM.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Portada",
+     "last": 59
+    },
+    {
+     "i": 1,
+     "title": "Introducción",
+     "section": "",
+     "resumen": "Agenda: pre-training, SFT, RLHF, razonamiento con RL, herramientas y fine-tuning.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Portada",
+     "last": 59
+    },
+    {
+     "i": 2,
+     "title": "Un modelo 100 veces más chico gana",
+     "section": "Introducción",
+     "resumen": "Gancho: un GPT-3 **100× más chico**, con un poco de entrenamiento extra con personas, le ganó al original. Ese extra costó menos del 2 % del cómputo.",
+     "claves": [
+      {
+       "id": "post-training",
+       "label": "post training",
+       "glos": false
+      },
+      {
+       "id": "rlhf",
+       "label": "RLHF",
+       "glos": true
+      },
+      {
+       "id": "sft",
+       "label": "SFT (Supervised Fine-Tuning)",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 4,
+       "texto": "Lo mismo en la consigna: Gemma de referencia pasa de 12/15/12 a 25/24/25 casos con un SFT simple.",
+       "tp_titulo": "El agente de admisión de guardia (TP final)",
+       "code": "tp4-plantilla-cuatro-filas",
+       "nota": ""
+      }
+     ],
+     "ver": [],
+     "key": false,
+     "section_label": "Introducción",
+     "last": 59
+    },
+    {
+     "i": 3,
+     "title": "Tres etapas, cuatro conjuntos de datos",
+     "section": "Introducción",
+     "resumen": "Mapa de la clase: **pre-training** (web, >1 billón de tokens), **SFT** (demostraciones) y **RLHF** (comparaciones). SFT + RLHF forman el post-training.",
+     "claves": [
+      {
+       "id": "pretraining",
+       "label": "Pre-training",
+       "glos": true
+      },
+      {
+       "id": "sft",
+       "label": "SFT (Supervised Fine-Tuning)",
+       "glos": true
+      },
+      {
+       "id": "rlhf",
+       "label": "RLHF",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": true,
+     "section_label": "Introducción",
+     "last": 59
+    },
+    {
+     "i": 4,
+     "title": "Pre-training",
+     "section": "",
+     "resumen": "Sección 1: pre-training.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Portada",
+     "last": 59
+    },
+    {
+     "i": 5,
+     "title": "Pre-training: completar texto",
+     "section": "Pre-training",
+     "resumen": "El pre-training minimiza la pérdida del **siguiente token** sobre texto web, sin etiquetas (auto-supervisado). Sale un **modelo base**: sabe mucho, pero no sigue instrucciones.",
+     "claves": [
+      {
+       "id": "pretraining",
+       "label": "Pre-training",
+       "glos": true
+      },
+      {
+       "id": "self-supervised",
+       "label": "Aprendizaje self-supervised",
+       "glos": true
+      },
+      {
+       "id": "foundation-model",
+       "label": "Foundation model (modelo fundacional)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/07/#d=palabra-al-transformer&s=8",
+       "clase": 7,
+       "cnn": "07",
+       "i": 8,
+       "title": "Predecir la palabra que sigue",
+       "por": "predecir la palabra que sigue"
+      },
+      {
+       "url": "/clases/08/#d=transformers-a-fondo&s=40",
+       "clase": 8,
+       "cnn": "08",
+       "i": 40,
+       "title": "Qué se minimiza",
+       "por": "la misma pérdida"
+      }
+     ],
+     "key": true,
+     "section_label": "Pre-training",
+     "last": 59
+    },
+    {
+     "i": 6,
+     "title": "Qué es Common Crawl",
+     "section": "Pre-training",
+     "resumen": "**Common Crawl**: archivo público de la web desde 2008, base de casi todos los datasets abiertos (60 % de GPT-3). Mayormente es ruido: menús, errores y duplicados.",
+     "claves": [
+      {
+       "id": "common crawl",
+       "label": "common crawl",
+       "glos": false
+      },
+      {
+       "id": "pretraining",
+       "label": "Pre-training",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/01/#d=introduccion&s=52",
+       "clase": 1,
+       "cnn": "01",
+       "i": 52,
+       "title": "¿Con qué datos se entrenan?",
+       "por": "con qué datos se entrenan"
+      }
+     ],
+     "key": false,
+     "section_label": "Pre-training",
+     "last": 59
+    },
+    {
+     "i": 7,
+     "title": "C4: cómo Google depuró Common Crawl",
+     "section": "Pre-training",
+     "resumen": "**C4**: Google filtró Common Crawl con reglas a mano, y el mismo modelo rinde mejor en todas las tareas. Filtrar datos funciona, aunque tiene costos.",
+     "claves": [
+      {
+       "id": "c4",
+       "label": "C4 (Colossal Clean Crawled Corpus)",
+       "glos": true
+      },
+      {
+       "id": "curado de datos",
+       "label": "curado de datos",
+       "glos": false
+      }
+     ],
+     "tp": [
+      {
+       "tp": 4,
+       "texto": "Curaste el historial: 2.000 filas → 1.600 correctas, 240 errores y 160 de ruido. Solo las correctas entran al entrenamiento.",
+       "tp_titulo": "El agente de admisión de guardia (TP final)",
+       "code": "tp4-clasificar-historial",
+       "nota": ""
+      }
+     ],
+     "ver": [],
+     "key": false,
+     "section_label": "Pre-training",
+     "last": 59
+    },
+    {
+     "i": 8,
+     "title": "Tres perillas y una cuenta",
+     "section": "Pre-training",
+     "resumen": "Cómputo de entrenamiento: $C \\approx 6ND$ (N parámetros, D tokens; 2 FLOPs adelante, 4 atrás). La **ley de escala** dice qué N y D convienen para un C dado.",
+     "claves": [
+      {
+       "id": "leyes-de-escala",
+       "label": "Leyes de escala (scaling laws)",
+       "glos": true
+      },
+      {
+       "id": "computo",
+       "label": "computo",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/01/#d=introduccion&s=53",
+       "clase": 1,
+       "cnn": "01",
+       "i": 53,
+       "title": "Escala, datos y poder de cómputo",
+       "por": "escala, datos y cómputo"
+      }
+     ],
+     "key": true,
+     "section_label": "Pre-training",
+     "last": 59
+    },
+    {
+     "i": 9,
+     "title": "Chinchilla: 20 tokens por parámetro",
+     "section": "Pre-training",
+     "resumen": "**Chinchilla**: con el mismo cómputo, conviene un modelo más chico con más datos, unos **20 tokens por parámetro**. Hoy se entrena muy por encima (Llama 3 8B, ~100×).",
+     "claves": [
+      {
+       "id": "chinchilla",
+       "label": "Ley de escala y regla de Chinchilla",
+       "glos": true
+      },
+      {
+       "id": "leyes-de-escala",
+       "label": "Leyes de escala (scaling laws)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": true,
+     "section_label": "Pre-training",
+     "last": 59
+    },
+    {
+     "i": 10,
+     "title": "¿Cuánto más puede crecer?",
+     "section": "Pre-training",
+     "resumen": "Los datasets crecen ~2,4× por año y se agotaría el texto humano público hacia **2028**. Pagar a personas para escribir no alcanza.",
+     "claves": [
+      {
+       "id": "stock-de-datos",
+       "label": "Stock de datos (Villalobos et al., 2024)",
+       "glos": true
+      },
+      {
+       "id": "escala",
+       "label": "escala",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/13/#d=cierre-magnifica-humanitas&s=47",
+       "clase": 13,
+       "cnn": "13",
+       "i": 47,
+       "title": "¿Alcanza con escalar?",
+       "por": "¿alcanza con escalar?"
+      }
+     ],
+     "key": false,
+     "section_label": "Pre-training",
+     "last": 59
+    },
+    {
+     "i": 11,
+     "title": "Problemas a tener en cuenta",
+     "section": "Pre-training",
+     "resumen": "Problemas de los datos: la lista negra de C4 **sesga** contra dialectos, el inglés domina (89,7 % vs 0,13 % de castellano) y crece el texto generado por modelos.",
+     "claves": [
+      {
+       "id": "sesgo",
+       "label": "Sesgo (bias)",
+       "glos": true
+      },
+      {
+       "id": "colapso de modelos",
+       "label": "colapso de modelos",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Pre-training",
+     "last": 59
+    },
+    {
+     "i": 12,
+     "title": "**Si el modelo base está optimizado para completar texto, ¿por qué los modelos que usamos parecen responder nuestras preguntas?**",
+     "section": "Pre-training",
+     "resumen": "Pregunta puente: si el modelo base solo completa texto, ¿por qué los chats responden?",
+     "claves": [
+      {
+       "id": "modelo base",
+       "label": "modelo base",
+       "glos": false
+      },
+      {
+       "id": "post-training",
+       "label": "post training",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Pre-training",
+     "last": 59
+    },
+    {
+     "i": 13,
+     "title": "Quiz: ¿qué va a responder?",
+     "section": "Pre-training",
+     "resumen": "Quiz: el modelo base puede seguir con otra pregunta, una receta o la respuesta. Las tres son continuaciones plausibles; no sabe que se espera una respuesta.",
+     "claves": [
+      {
+       "id": "modelo base",
+       "label": "modelo base",
+       "glos": false
+      },
+      {
+       "id": "pretraining",
+       "label": "Pre-training",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Pre-training",
+     "last": 59
+    },
+    {
+     "i": 14,
+     "title": "Quiz: ¿qué debería responder?",
+     "section": "Pre-training",
+     "resumen": "Queremos la respuesta directa, pero nada del pre-training la hace más probable. Eso lo enseña el **post-training**.",
+     "claves": [
+      {
+       "id": "post-training",
+       "label": "post training",
+       "glos": false
+      },
+      {
+       "id": "sft",
+       "label": "SFT (Supervised Fine-Tuning)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Pre-training",
+     "last": 59
+    },
+    {
+     "i": 15,
+     "title": "Supervised Fine-Tuning",
+     "section": "",
+     "resumen": "Sección 2: Supervised Fine-Tuning (SFT).",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Portada",
+     "last": 59
+    },
+    {
+     "i": 16,
+     "title": "SFT: Supervised Fine-Tuning",
+     "section": "Supervised Fine-Tuning",
+     "resumen": "**SFT** sigue entrenando el modelo base con pares (prompt, respuesta) escritos por personas: decenas de miles, no billones de tokens. El modelo que sale conversa.",
+     "claves": [
+      {
+       "id": "sft",
+       "label": "SFT (Supervised Fine-Tuning)",
+       "glos": true
+      },
+      {
+       "id": "demostraciones",
+       "label": "demostraciones",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Supervised Fine-Tuning",
+     "last": 59
+    },
+    {
+     "i": 17,
+     "title": "Constitutional AI: principios en vez de anotadores",
+     "section": "Supervised Fine-Tuning",
+     "resumen": "**Constitutional AI** (Anthropic, 2022): el modelo critica y corrige sus propias respuestas según principios escritos, y el SFT se hace con las versiones corregidas.",
+     "claves": [
+      {
+       "id": "constitutional-ai",
+       "label": "Constitutional AI",
+       "glos": true
+      },
+      {
+       "id": "sft",
+       "label": "SFT (Supervised Fine-Tuning)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/13/#d=cierre-magnifica-humanitas&s=24",
+       "clase": 13,
+       "cnn": "13",
+       "i": 24,
+       "title": "Repaso: cómo aprende a «portarse bien»",
+       "por": "cómo aprende a portarse bien"
+      }
+     ],
+     "key": false,
+     "section_label": "Supervised Fine-Tuning",
+     "last": 59
+    },
+    {
+     "i": 18,
+     "title": "GPT-3 antes y después del post-training",
+     "section": "Supervised Fine-Tuning",
+     "resumen": "El mismo GPT-3 antes y después del post-training: sin post-training, sigue el texto como si fuera un examen. Cambia el formato, pero no garantiza que sea correcto.",
+     "claves": [
+      {
+       "id": "post-training",
+       "label": "post training",
+       "glos": false
+      },
+      {
+       "id": "sft",
+       "label": "SFT (Supervised Fine-Tuning)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Supervised Fine-Tuning",
+     "last": 59
+    },
+    {
+     "i": 19,
+     "title": "Datos de demostración",
+     "section": "Supervised Fine-Tuning",
+     "resumen": "SFT usa la misma **cross-entropy** del siguiente token, pero sobre demostraciones y con la **pérdida solo en los tokens de la respuesta**. Es *behavior cloning*: copia el comportamiento.",
+     "claves": [
+      {
+       "id": "sft",
+       "label": "SFT (Supervised Fine-Tuning)",
+       "glos": true
+      },
+      {
+       "id": "mascara-de-perdida",
+       "label": "Máscara de pérdida",
+       "glos": true
+      },
+      {
+       "id": "entropia-cruzada",
+       "label": "Entropía cruzada (BCE y cross-entropy)",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 4,
+       "texto": "`tokenizacion.py`: labels = −100 en sistema, triage y observaciones; la pérdida cuenta solo las acciones JSON del asistente.",
+       "tp_titulo": "El agente de admisión de guardia (TP final)",
+       "code": "tp4-tokenizar-mascara",
+       "nota": ""
+      }
+     ],
+     "ver": [
+      {
+       "url": "/clases/08/#d=transformers-a-fondo&s=40",
+       "clase": 8,
+       "cnn": "08",
+       "i": 40,
+       "title": "Qué se minimiza",
+       "por": "qué se minimiza"
+      },
+      {
+       "url": "/clases/04/#d=modelado-redes-neuronales&s=30",
+       "clase": 4,
+       "cnn": "04",
+       "i": 30,
+       "title": "Clasificación multiclase: cross-entropy",
+       "por": "cross-entropy multiclase"
+      }
+     ],
+     "key": true,
+     "section_label": "Supervised Fine-Tuning",
+     "last": 59
+    },
+    {
+     "i": 20,
+     "title": "Un dataset de SFT",
+     "section": "Supervised Fine-Tuning",
+     "resumen": "Un dataset de SFT es un JSON con dos campos, prompt y respuesta. Hay públicos: Dolly-15k, OpenAssistant, Alpaca (generado con ChatGPT).",
+     "claves": [
+      {
+       "id": "sft",
+       "label": "SFT (Supervised Fine-Tuning)",
+       "glos": true
+      },
+      {
+       "id": "dataset",
+       "label": "dataset",
+       "glos": false
+      }
+     ],
+     "tp": [
+      {
+       "tp": 4,
+       "texto": "Armaste 2.900 conversaciones: 1.600 del historial correcto, 800 de la cátedra y 500 sintéticas.",
+       "tp_titulo": "El agente de admisión de guardia (TP final)",
+       "code": "tp4-generar-dataset",
+       "nota": ""
+      }
+     ],
+     "ver": [],
+     "key": false,
+     "section_label": "Supervised Fine-Tuning",
+     "last": 59
+    },
+    {
+     "i": 21,
+     "title": "**Si el SFT ya enseña a responder, ¿para qué hace falta otra etapa de entrenamiento?**",
+     "section": "Supervised Fine-Tuning",
+     "resumen": "Pregunta puente: si el SFT ya enseña a responder, ¿para qué otra etapa?",
+     "claves": [
+      {
+       "id": "sft",
+       "label": "SFT (Supervised Fine-Tuning)",
+       "glos": true
+      },
+      {
+       "id": "rlhf",
+       "label": "RLHF",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Supervised Fine-Tuning",
+     "last": 59
+    },
+    {
+     "i": 22,
+     "title": "Quiz: ¿qué aprende el SFT?",
+     "section": "Supervised Fine-Tuning",
+     "resumen": "El SFT ve una sola respuesta por prompt y la imita: no aprende **cuál es mejor**. Para eso hacen falta comparaciones (RLHF).",
+     "claves": [
+      {
+       "id": "sft",
+       "label": "SFT (Supervised Fine-Tuning)",
+       "glos": true
+      },
+      {
+       "id": "rlhf",
+       "label": "RLHF",
+       "glos": true
+      },
+      {
+       "id": "preferencias",
+       "label": "preferencias",
+       "glos": false
+      }
+     ],
+     "tp": [
+      {
+       "tp": 4,
+       "texto": "Por eso excluiste errores y ruido del entrenamiento: el SFT copiaría esos desvíos.",
+       "tp_titulo": "El agente de admisión de guardia (TP final)",
+       "code": "tp4-seleccionar-ids",
+       "nota": ""
+      }
+     ],
+     "ver": [],
+     "key": true,
+     "section_label": "Supervised Fine-Tuning",
+     "last": 59
+    },
+    {
+     "i": 23,
+     "title": "Reinforcement Learning from Human Feedback",
+     "section": "",
+     "resumen": "Sección 3: RLHF, aprender de preferencias humanas.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Portada",
+     "last": 59
+    },
+    {
+     "i": 24,
+     "title": "RLHF en dos pasos",
+     "section": "Reinforcement Learning from Human Feedback",
+     "resumen": "RLHF en dos pasos: entrenar un **juez** (reward model) con preferencias de personas y después mejorar el LLM contra ese juez.",
+     "claves": [
+      {
+       "id": "rlhf",
+       "label": "RLHF",
+       "glos": true
+      },
+      {
+       "id": "reward-model",
+       "label": "Reward model",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Reinforcement Learning from Human Feedback",
+     "last": 59
+    },
+    {
+     "i": 25,
+     "title": "RLHF: puntuar y reforzar",
+     "section": "Reinforcement Learning from Human Feedback",
+     "resumen": "**RLHF**: con 100 mil a 1 millón de comparaciones se entrena el **reward model**; después el LLM se ajusta para sacar puntajes altos con solo prompts.",
+     "claves": [
+      {
+       "id": "rlhf",
+       "label": "RLHF",
+       "glos": true
+      },
+      {
+       "id": "reward-model",
+       "label": "Reward model",
+       "glos": true
+      },
+      {
+       "id": "ppo",
+       "label": "PPO y penalización KL",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": true,
+     "section_label": "Reinforcement Learning from Human Feedback",
+     "last": 59
+    },
+    {
+     "i": 26,
+     "title": "Paso 1: comparar es más fácil que escribir",
+     "section": "Reinforcement Learning from Human Feedback",
+     "resumen": "Comparar dos respuestas es más consistente que escribirlas o puntuarlas. Aun así, los anotadores coinciden ~73 %: el modelo se alinea a un grupo concreto de personas.",
+     "claves": [
+      {
+       "id": "preferencias",
+       "label": "preferencias",
+       "glos": false
+      },
+      {
+       "id": "anotadores",
+       "label": "anotadores",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Reinforcement Learning from Human Feedback",
+     "last": 59
+    },
+    {
+     "i": 27,
+     "title": "Paso 1: el reward model",
+     "section": "Reinforcement Learning from Human Feedback",
+     "resumen": "El **reward model** es el modelo SFT con una salida escalar: recibe (prompt, respuesta) y aprende a puntuar más alta la respuesta elegida.",
+     "claves": [
+      {
+       "id": "reward-model",
+       "label": "Reward model",
+       "glos": true
+      },
+      {
+       "id": "rlhf",
+       "label": "RLHF",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": true,
+     "section_label": "Reinforcement Learning from Human Feedback",
+     "last": 59
+    },
+    {
+     "i": 28,
+     "title": "Paso 1: el reward model, en un batch",
+     "section": "Reinforcement Learning from Human Feedback",
+     "resumen": "En un batch, cada par entra como dos secuencias con padding. La pérdida $-\\log\\sigma(r_A - r_B)$ baja cuando la preferida puntúa más.",
+     "claves": [
+      {
+       "id": "reward-model",
+       "label": "Reward model",
+       "glos": true
+      },
+      {
+       "id": "batch",
+       "label": "Batch (lote)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Reinforcement Learning from Human Feedback",
+     "last": 59
+    },
+    {
+     "i": 29,
+     "title": "Paso 2: optimizar con PPO",
+     "section": "Reinforcement Learning from Human Feedback",
+     "resumen": "**PPO**: el LLM genera, el RM puntúa y se ajusta con un freno **KL** que lo ata al SFT. Es caro e inestable; **DPO** llega a lo mismo sin RM.",
+     "claves": [
+      {
+       "id": "ppo",
+       "label": "PPO y penalización KL",
+       "glos": true
+      },
+      {
+       "id": "dpo",
+       "label": "DPO (Direct Preference Optimization)",
+       "glos": true
+      },
+      {
+       "id": "reward-hacking",
+       "label": "Reward hacking",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 4,
+       "texto": "DPO con los errores del historial como respuestas malas quedó como opción; no se hizo.",
+       "tp_titulo": "El agente de admisión de guardia (TP final)",
+       "code": "tp4-mission-estrategias",
+       "nota": "DPO aparece como opción de la consigna; en el repo no hay código de DPO."
+      }
+     ],
+     "ver": [],
+     "key": true,
+     "section_label": "Reinforcement Learning from Human Feedback",
+     "last": 59
+    },
+    {
+     "i": 30,
+     "title": "Razonamiento con RL",
+     "section": "",
+     "resumen": "Sección 4: razonamiento con RL.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Portada",
+     "last": 59
+    },
+    {
+     "i": 31,
+     "title": "RL con verificador: el proceso",
+     "section": "Razonamiento con RL",
+     "resumen": "**RL con verificador**: una regla (no una persona) chequea la respuesta. **GRPO** genera 16 respuestas por problema y refuerza las que superan el promedio del grupo.",
+     "claves": [
+      {
+       "id": "rl-con-verificador",
+       "label": "Refuerzo con recompensa verificable (DeepSeek-R1)",
+       "glos": true
+      },
+      {
+       "id": "grpo",
+       "label": "GRPO",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 4,
+       "texto": "Quedó como alternativa no hecha: RL usando los 9 controles de la ficha como recompensa.",
+       "tp_titulo": "El agente de admisión de guardia (TP final)",
+       "code": "tp4-mission-estrategias",
+       "nota": "El RL con los 9 controles como recompensa es la tercera opción de la consigna; no se implementó."
+      }
+     ],
+     "ver": [
+      {
+       "url": "/clases/05/#d=prompting&s=53",
+       "clase": 5,
+       "cnn": "05",
+       "i": 53,
+       "title": "De dónde salió el thinking",
+       "por": "de dónde salió el thinking"
+      }
+     ],
+     "key": true,
+     "section_label": "Razonamiento con RL",
+     "last": 59
+    },
+    {
+     "i": 32,
+     "title": "RL con verificador: los prompts",
+     "section": "Razonamiento con RL",
+     "resumen": "Solo sirven problemas comprobables por programa: matemática, código con tests, opción múltiple. El modelo razona entre `<think>` y responde en formato legible para el verificador.",
+     "claves": [
+      {
+       "id": "rl-con-verificador",
+       "label": "Refuerzo con recompensa verificable (DeepSeek-R1)",
+       "glos": true
+      },
+      {
+       "id": "chain-of-thought",
+       "label": "Chain of Thought (CoT)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/05/#d=prompting&s=49",
+       "clase": 5,
+       "cnn": "05",
+       "i": 49,
+       "title": "Thinking: el mecanismo",
+       "por": "thinking: el mecanismo"
+      }
+     ],
+     "key": false,
+     "section_label": "Razonamiento con RL",
+     "last": 59
+    },
+    {
+     "i": 33,
+     "title": "RL con verificador: el resultado",
+     "section": "Razonamiento con RL",
+     "resumen": "**DeepSeek-R1-Zero** aprende a razonar solo con RL desde el modelo base: AIME pasa de 15,6 % a 77,9 % y los razonamientos se alargan solos.",
+     "claves": [
+      {
+       "id": "grpo",
+       "label": "GRPO",
+       "glos": true
+      },
+      {
+       "id": "rl-con-verificador",
+       "label": "Refuerzo con recompensa verificable (DeepSeek-R1)",
+       "glos": true
+      },
+      {
+       "id": "razonamiento",
+       "label": "razonamiento",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Razonamiento con RL",
+     "last": 59
+    },
+    {
+     "i": 34,
+     "title": "Herramientas",
+     "section": "",
+     "resumen": "Sección 5: herramientas.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Portada",
+     "last": 59
+    },
+    {
+     "i": 35,
+     "title": "Las piezas de una plataforma",
+     "section": "Herramientas",
+     "resumen": "Por API, el modelo **nunca ejecuta**: la plantilla pasa JSON a texto con tags y un parser lo revierte. La herramienta corre en tu app o en la plataforma.",
+     "claves": [
+      {
+       "id": "tool-calling",
+       "label": "Uso de herramientas (tool calling)",
+       "glos": true
+      },
+      {
+       "id": "plantilla de chat",
+       "label": "plantilla de chat",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Herramientas",
+     "last": 59
+    },
+    {
+     "i": 36,
+     "title": "El circuito con un agente",
+     "section": "Herramientas",
+     "resumen": "El chat es el agente: llama al LLM, ejecuta las tools pedidas, agrega el resultado con rol *tool* y repite hasta que el LLM responde. Pone un tope de vueltas.",
+     "claves": [
+      {
+       "id": "agente",
+       "label": "Agente",
+       "glos": true
+      },
+      {
+       "id": "tool-calling",
+       "label": "Uso de herramientas (tool calling)",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 3,
+       "texto": "`bucle.py`: el mismo loop a mano con `ToolMessage` y tope de 6 llamadas.",
+       "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+       "code": "tp3-bucle-tool-calling",
+       "nota": ""
+      },
+      {
+       "tp": 4,
+       "texto": "El agente de admisión tiene tope de 40 llamadas.",
+       "tp_titulo": "El agente de admisión de guardia (TP final)",
+       "code": "tp4-agente-bucle",
+       "nota": "El tope está en la última condición: `self.llamadas >= self.max_llamadas` (40, `MAX_LLAMADAS` del kit)."
+      }
+     ],
+     "ver": [
+      {
+       "url": "/clases/07/#d=rag-mcp-rapida&s=5",
+       "clase": 7,
+       "cnn": "07",
+       "i": 5,
+       "title": "Como herramienta: el agente decide cuándo buscar",
+       "por": "el agente decide cuándo buscar"
+      }
+     ],
+     "key": true,
+     "section_label": "Herramientas",
+     "last": 59
+    },
+    {
+     "i": 37,
+     "title": "El intercambio con la API",
+     "section": "Herramientas",
+     "resumen": "El intercambio en JSON: pedido con tools → respuesta `tool_use` → el chat ejecuta y manda `tool_result` con el mismo id → respuesta final `end_turn`.",
+     "claves": [
+      {
+       "id": "tool-calling",
+       "label": "Uso de herramientas (tool calling)",
+       "glos": true
+      },
+      {
+       "id": "function-calling",
+       "label": "Function calling / tool calling",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/06/#d=rag-y-mcp&s=54",
+       "clase": 6,
+       "cnn": "06",
+       "i": 54,
+       "title": "El ciclo de vida de una herramienta MCP",
+       "por": "ciclo de vida de una herramienta"
+      }
+     ],
+     "key": false,
+     "section_label": "Herramientas",
+     "last": 59
+    },
+    {
+     "i": 38,
+     "title": "Tres problemas, tres herramientas",
+     "section": "Herramientas",
+     "resumen": "Tres límites de los pesos y su herramienta: **calcular** (calculadora), **datos recientes** (búsqueda) y **otros sistemas** (MCP).",
+     "claves": [
+      {
+       "id": "tool-calling",
+       "label": "Uso de herramientas (tool calling)",
+       "glos": true
+      },
+      {
+       "id": "mcp",
+       "label": "MCP (Model Context Protocol)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/06/#d=rag-y-mcp&s=2",
+       "clase": 6,
+       "cnn": "06",
+       "i": 2,
+       "title": "RAG suma lo que no está en los pesos",
+       "por": "lo que no está en los pesos"
+      }
+     ],
+     "key": false,
+     "section_label": "Herramientas",
+     "last": 59
+    },
+    {
+     "i": 39,
+     "title": "Calcular: el modelo no calcula bien",
+     "section": "Herramientas",
+     "resumen": "El LLM genera por probabilidad y no puede volver atrás: un error en una cuenta de varios pasos arrastra al resto de la solución (GSM8K).",
+     "claves": [
+      {
+       "id": "alucinacion",
+       "label": "Alucinación",
+       "glos": true
+      },
+      {
+       "id": "calculo",
+       "label": "calculo",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Herramientas",
+     "last": 59
+    },
+    {
+     "i": 40,
+     "title": "Calcular: lo que escribe Llama 3.1",
+     "section": "Herramientas",
+     "resumen": "Llama 3.1 escribe la llamada entre `<|python_tag|>` y `<|eom_id|>` y se detiene; el agente ejecuta Wolfram Alpha y devuelve el resultado con rol *ipython*.",
+     "claves": [
+      {
+       "id": "function-calling",
+       "label": "Function calling / tool calling",
+       "glos": true
+      },
+      {
+       "id": "tokens especiales",
+       "label": "tokens especiales",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Herramientas",
+     "last": 59
+    },
+    {
+     "i": 41,
+     "title": "Calcular: de los tokens al JSON",
+     "section": "Herramientas",
+     "resumen": "El servidor traduce: los tags del modelo pasan a `tool_calls` en JSON, y el mensaje *tool* vuelve como turno *ipython*. El modelo nunca ve el JSON de la API.",
+     "claves": [
+      {
+       "id": "function-calling",
+       "label": "Function calling / tool calling",
+       "glos": true
+      },
+      {
+       "id": "plantilla de chat",
+       "label": "plantilla de chat",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Herramientas",
+     "last": 59
+    },
+    {
+     "i": 42,
+     "title": "Calcular: la misma cuenta por la API",
+     "section": "Herramientas",
+     "resumen": "Con Ollama, la API esconde los tokens especiales: llegan `tool_calls` en JSON, tu código calcula y devuelve un mensaje con rol *tool*.",
+     "claves": [
+      {
+       "id": "tool-calling",
+       "label": "Uso de herramientas (tool calling)",
+       "glos": true
+      },
+      {
+       "id": "modelo local",
+       "label": "modelo local",
+       "glos": false
+      }
+     ],
+     "tp": [
+      {
+       "tp": 4,
+       "texto": "Gemma corre local y responde acciones JSON; si el JSON es inválido, el `PromptSpec` trae un mensaje de corrección.",
+       "tp_titulo": "El agente de admisión de guardia (TP final)",
+       "code": "tp4-agente-bucle",
+       "nota": ""
+      }
+     ],
+     "ver": [],
+     "key": false,
+     "section_label": "Herramientas",
+     "last": 59
+    },
+    {
+     "i": 43,
+     "title": "Buscar: cómo se entrena",
+     "section": "Herramientas",
+     "resumen": "Buscar se aprende como cualquier conducta: SFT imitando a personas que buscan y citan, y después preferencias. En los chats actuales viene de fábrica.",
+     "claves": [
+      {
+       "id": "sft",
+       "label": "SFT (Supervised Fine-Tuning)",
+       "glos": true
+      },
+      {
+       "id": "rlhf",
+       "label": "RLHF",
+       "glos": true
+      },
+      {
+       "id": "busqueda web",
+       "label": "busqueda web",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Herramientas",
+     "last": 59
+    },
+    {
+     "i": 44,
+     "title": "Buscar: el modelo no sabe lo reciente",
+     "section": "Herramientas",
+     "resumen": "El modelo solo sabe lo que había antes de su **fecha de corte**. Para lo reciente, como el precio del oro de hoy, tiene que buscar o inventa.",
+     "claves": [
+      {
+       "id": "fecha de corte",
+       "label": "fecha de corte",
+       "glos": false
+      },
+      {
+       "id": "alucinacion",
+       "label": "Alucinación",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/01/#d=claude-desktop-chat&s=9",
+       "clase": 1,
+       "cnn": "01",
+       "i": 9,
+       "title": "El chat responde de memoria",
+       "por": "el chat responde de memoria"
+      }
+     ],
+     "key": false,
+     "section_label": "Herramientas",
+     "last": 59
+    },
+    {
+     "i": 45,
+     "title": "Buscar: lo que escribe Llama 3.1",
+     "section": "Herramientas",
+     "resumen": "Igual que con la calculadora: el modelo escribe la consulta (`brave_search.call`), se detiene, y el agente devuelve los resultados.",
+     "claves": [
+      {
+       "id": "function-calling",
+       "label": "Function calling / tool calling",
+       "glos": true
+      },
+      {
+       "id": "busqueda web",
+       "label": "busqueda web",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Herramientas",
+     "last": 59
+    },
+    {
+     "i": 46,
+     "title": "Buscar: la respuesta de la API",
+     "section": "Herramientas",
+     "resumen": "Con búsqueda nativa, la **plataforma** ejecuta la búsqueda dentro de una sola respuesta de la API. Por eso parece que «el modelo buscó».",
+     "claves": [
+      {
+       "id": "herramientas nativas",
+       "label": "herramientas nativas",
+       "glos": false
+      },
+      {
+       "id": "busqueda web",
+       "label": "busqueda web",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Herramientas",
+     "last": 59
+    },
+    {
+     "i": 47,
+     "title": "MCP: host, cliente y servidor",
+     "section": "Herramientas",
+     "resumen": "**MCP**: el host crea un cliente por servidor; `tools/list` descubre y `tools/call` ejecuta. El modelo queda fuera del protocolo.",
+     "claves": [
+      {
+       "id": "mcp",
+       "label": "MCP (Model Context Protocol)",
+       "glos": true
+      },
+      {
+       "id": "json-rpc",
+       "label": "JSON-RPC 2.0",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 3,
+       "texto": "El servidor MCP del TP3 (FastMCP, 6 tools) quedó pendiente: solo está diseñado en `PLAN.md`.",
+       "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+       "code": "tp3-plan-mcp-pendiente",
+       "nota": ""
+      }
+     ],
+     "ver": [
+      {
+       "url": "/clases/06/#d=rag-y-mcp&s=52",
+       "clase": 6,
+       "cnn": "06",
+       "i": 52,
+       "title": "JSON-RPC 2.0: la capa de mensajes de MCP",
+       "por": "JSON-RPC, la capa de mensajes"
+      }
+     ],
+     "key": false,
+     "section_label": "Herramientas",
+     "last": 59
+    },
+    {
+     "i": 48,
+     "title": "MCP: una herramienta es una definición",
+     "section": "Herramientas",
+     "resumen": "No hay que entrenar para cada servidor MCP: cada tool entra al contexto como **definición** (nombre, descripción, esquema). La descripción dice cuándo usarla.",
+     "claves": [
+      {
+       "id": "mcp",
+       "label": "MCP (Model Context Protocol)",
+       "glos": true
+      },
+      {
+       "id": "descripcion-como-disparador",
+       "label": "La descripción como disparador",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 3,
+       "texto": "`descripciones.py`: cada tool dice su fuente, qué NO tiene y los valores válidos; ruteo 1,00 en las 4 corridas.",
+       "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+       "code": "tp3-descripciones-tools",
+       "nota": "En MCP una herramienta es nombre + descripción + esquema; estas descripciones son las que iba a publicar el servidor."
+      }
+     ],
+     "ver": [
+      {
+       "url": "/clases/06/#d=rag-y-mcp&s=68",
+       "clase": 6,
+       "cnn": "06",
+       "i": 68,
+       "title": "La descripción dice cuándo NO usarla",
+       "por": "la descripción dice cuándo NO usarla"
+      }
+     ],
+     "key": false,
+     "section_label": "Herramientas",
+     "last": 59
+    },
+    {
+     "i": 49,
+     "title": "MCP: lo que aprende el modelo",
+     "section": "Herramientas",
+     "resumen": "El modelo aprende **function calling genérico** con SFT: funciones en el system prompt, el pedido y la llamada esperada, incluso varias en paralelo.",
+     "claves": [
+      {
+       "id": "function-calling",
+       "label": "Function calling / tool calling",
+       "glos": true
+      },
+      {
+       "id": "sft",
+       "label": "SFT (Supervised Fine-Tuning)",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 3,
+       "texto": "En las preguntas mixtas (A10–A12), el modelo pidió las dos tools en paralelo en el mismo paso.",
+       "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+       "code": "tp3-log-a10-paralelo",
+       "nota": ""
+      }
+     ],
+     "ver": [],
+     "key": false,
+     "section_label": "Herramientas",
+     "last": 59
+    },
+    {
+     "i": 50,
+     "title": "Fine-tuning",
+     "section": "",
+     "resumen": "Sección 6: fine-tuning.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Portada",
+     "last": 59
+    },
+    {
+     "i": 51,
+     "title": "Dónde entra el fine-tuning",
+     "section": "Fine-tuning",
+     "resumen": "El fine-tuning repite el post-training a escala chica con datos propios. **LoRA** congela los pesos y entrena dos matrices chicas; **QLoRA** además guarda el modelo en 4 bits.",
+     "claves": [
+      {
+       "id": "fine-tuning",
+       "label": "Fine-tuning (del equipo de producto)",
+       "glos": true
+      },
+      {
+       "id": "lora",
+       "label": "LoRA",
+       "glos": true
+      },
+      {
+       "id": "qlora",
+       "label": "QLoRA",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 4,
+       "texto": "LoRA r=8, α=16 sobre `q_proj`/`v_proj` de Gemma 4 E4B. QLoRA quedó como alternativa.",
+       "tp_titulo": "El agente de admisión de guardia (TP final)",
+       "code": "tp4-lora-config",
+       "nota": ""
+      }
+     ],
+     "ver": [
+      {
+       "url": "/clases/08/#d=transformers-a-fondo&s=15",
+       "clase": 8,
+       "cnn": "08",
+       "i": 15,
+       "title": "Tres proyecciones del mismo vector",
+       "por": "las proyecciones Q, K, V"
+      }
+     ],
+     "key": true,
+     "section_label": "Fine-tuning",
+     "last": 59
+    },
+    {
+     "i": 52,
+     "title": "Prompt, RAG o fine-tuning",
+     "section": "Fine-tuning",
+     "resumen": "**RAG** corrige fallas de **información**; el **fine-tuning**, fallas de **comportamiento** (forma, formato, estilo). Orden: prompt → ejemplos → RAG → fine-tuning.",
+     "claves": [
+      {
+       "id": "rag",
+       "label": "RAG (Retrieval-Augmented Generation)",
+       "glos": true
+      },
+      {
+       "id": "fine-tuning",
+       "label": "Fine-tuning (del equipo de producto)",
+       "glos": true
+      },
+      {
+       "id": "prompt-engineering",
+       "label": "Prompt / prompt engineering",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 4,
+       "texto": "La idea central del TP: los números de las normas van al BM25 y el oficio y las costumbres, a los pesos con SFT.",
+       "tp_titulo": "El agente de admisión de guardia (TP final)",
+       "code": "tp4-sinteticos-variados",
+       "nota": ""
+      }
+     ],
+     "ver": [
+      {
+       "url": "/clases/06/#d=rag-y-mcp&s=5",
+       "clase": 6,
+       "cnn": "06",
+       "i": 5,
+       "title": "Cinco razones para no reentrenar",
+       "por": "cinco razones para no reentrenar"
+      }
+     ],
+     "key": true,
+     "section_label": "Fine-tuning",
+     "last": 59
+    },
+    {
+     "i": 53,
+     "title": "Cuándo vale la pena el fine-tuning",
+     "section": "Fine-tuning",
+     "resumen": "El fine-tuning paga cuando el prompt ya no alcanza: un formato fijo (JSON), un estilo, una tarea poco vista o **destilar** en un modelo chico.",
+     "claves": [
+      {
+       "id": "fine-tuning",
+       "label": "Fine-tuning (del equipo de producto)",
+       "glos": true
+      },
+      {
+       "id": "destilacion",
+       "label": "destilacion",
+       "glos": false
+      }
+     ],
+     "tp": [
+      {
+       "tp": 4,
+       "texto": "Con `procedimiento-v1` siguieron las fallas de verificación, entidad y voluntariado: son de comportamiento, y eso le tocaba al SFT.",
+       "tp_titulo": "El agente de admisión de guardia (TP final)",
+       "code": "tp4-procedimiento-dev",
+       "nota": "Mirá el párrafo «Para #15»: lo que queda es comportamiento y se deja al SFT."
+      }
+     ],
+     "ver": [],
+     "key": false,
+     "section_label": "Fine-tuning",
+     "last": 59
+    },
+    {
+     "i": 54,
+     "title": "Fine-tuning en la nube",
+     "section": "Fine-tuning",
+     "resumen": "Fine-tuning administrado (sept. 2026): Azure y Google lo ofrecen; OpenAI cierra a usuarios nuevos. En todos se sube un JSONL, se lanza el trabajo y sale un modelo propio.",
+     "claves": [
+      {
+       "id": "fine-tuning",
+       "label": "Fine-tuning (del equipo de producto)",
+       "glos": true
+      },
+      {
+       "id": "nube",
+       "label": "nube",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Fine-tuning",
+     "last": 59
+    },
+    {
+     "i": 55,
+     "title": "Fine-tuning local: el recorrido",
+     "section": "Fine-tuning",
+     "resumen": "Fine-tuning local con pesos abiertos: TRL/PEFT o Unsloth en una GPU propia o en Colab. Sale un **adaptador** aparte, con la máscara −100 antes de la respuesta.",
+     "claves": [
+      {
+       "id": "lora",
+       "label": "LoRA",
+       "glos": true
+      },
+      {
+       "id": "fine-tuning",
+       "label": "Fine-tuning (del equipo de producto)",
+       "glos": true
+      },
+      {
+       "id": "mascara-de-perdida",
+       "label": "Máscara de pérdida",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 4,
+       "texto": "TRL/PEFT en Kaggle 2× T4 con checkpoints en HF. Solo corrió el humo (15,7 GB pico); faltó el entrenamiento con los datos curados.",
+       "tp_titulo": "El agente de admisión de guardia (TP final)",
+       "code": "tp4-trainer-cuda",
+       "nota": "En el código se ve PEFT con el `Trainer` de transformers (no `SFTTrainer` de TRL); la medición de 15,7 GB está en docs/informe-parte5.md."
+      }
+     ],
+     "ver": [],
+     "key": false,
+     "section_label": "Fine-tuning",
+     "last": 59
+    },
+    {
+     "i": 56,
+     "title": "Qué pedirle a los datos",
+     "section": "Fine-tuning",
+     "resumen": "Los datos son lo difícil: un dataset **chico y parecido a la tarea** le gana a uno grande y genérico. Formato JSONL con `messages`.",
+     "claves": [
+      {
+       "id": "fine-tuning",
+       "label": "Fine-tuning (del equipo de producto)",
+       "glos": true
+      },
+      {
+       "id": "calidad de datos",
+       "label": "calidad de datos",
+       "glos": false
+      }
+     ],
+     "tp": [
+      {
+       "tp": 4,
+       "texto": "500 conversaciones sintéticas (semilla 12012) con valores de normas variados, para que el modelo los lea y no los memorice.",
+       "tp_titulo": "El agente de admisión de guardia (TP final)",
+       "code": "tp4-sinteticos-variados",
+       "nota": ""
+      }
+     ],
+     "ver": [],
+     "key": false,
+     "section_label": "Fine-tuning",
+     "last": 59
+    },
+    {
+     "i": 57,
+     "title": "Fine-tuning: un ejemplo",
+     "section": "Fine-tuning",
+     "resumen": "Ejemplo práctico: notebook de fine-tuning en DataCamp.",
+     "claves": [
+      {
+       "id": "fine-tuning",
+       "label": "Fine-tuning (del equipo de producto)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Fine-tuning",
+     "last": 59
+    },
+    {
+     "i": 58,
+     "title": "Conclusiones",
+     "section": "",
+     "resumen": "Sección 7: conclusiones.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Portada",
+     "last": 59
+    },
+    {
+     "i": 59,
+     "title": "Dónde nace cada comportamiento",
+     "section": "Conclusiones",
+     "resumen": "Cada comportamiento nace en una etapa: sesgos en el pre-training, completar sin SFT, formato con SFT y preferencias con RLHF. Cada una tiene su arreglo.",
+     "claves": [
+      {
+       "id": "pretraining",
+       "label": "Pre-training",
+       "glos": true
+      },
+      {
+       "id": "sft",
+       "label": "SFT (Supervised Fine-Tuning)",
+       "glos": true
+      },
+      {
+       "id": "rlhf",
+       "label": "RLHF",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": true,
+     "section_label": "Conclusiones",
+     "last": 59
+    }
+   ],
+   "groups": [
+    {
+     "label": "Portada",
+     "slides": [
+      {
+       "i": 0,
+       "title": "Inteligencia Artificial Generativa (AI Gen)",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 1,
+       "title": "Introducción",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 0,
+     "last": 1,
+     "ntp": 0,
+     "nkey": 0
+    },
+    {
+     "label": "Introducción",
+     "slides": [
+      {
+       "i": 2,
+       "title": "Un modelo 100 veces más chico gana",
+       "key": false,
+       "tp": true
+      },
+      {
+       "i": 3,
+       "title": "Tres etapas, cuatro conjuntos de datos",
+       "key": true,
+       "tp": false
+      }
+     ],
+     "first": 2,
+     "last": 3,
+     "ntp": 1,
+     "nkey": 1
+    },
+    {
+     "label": "Portada",
+     "slides": [
+      {
+       "i": 4,
+       "title": "Pre-training",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 4,
+     "last": 4,
+     "ntp": 0,
+     "nkey": 0
+    },
+    {
+     "label": "Pre-training",
+     "slides": [
+      {
+       "i": 5,
+       "title": "Pre-training: completar texto",
+       "key": true,
+       "tp": false
+      },
+      {
+       "i": 6,
+       "title": "Qué es Common Crawl",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 7,
+       "title": "C4: cómo Google depuró Common Crawl",
+       "key": false,
+       "tp": true
+      },
+      {
+       "i": 8,
+       "title": "Tres perillas y una cuenta",
+       "key": true,
+       "tp": false
+      },
+      {
+       "i": 9,
+       "title": "Chinchilla: 20 tokens por parámetro",
+       "key": true,
+       "tp": false
+      },
+      {
+       "i": 10,
+       "title": "¿Cuánto más puede crecer?",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 11,
+       "title": "Problemas a tener en cuenta",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 12,
+       "title": "**Si el modelo base está optimizado para completar texto, ¿por qué los modelos que usamos parecen responder nuestras preguntas?**",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 13,
+       "title": "Quiz: ¿qué va a responder?",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 14,
+       "title": "Quiz: ¿qué debería responder?",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 5,
+     "last": 14,
+     "ntp": 1,
+     "nkey": 3
+    },
+    {
+     "label": "Portada",
+     "slides": [
+      {
+       "i": 15,
+       "title": "Supervised Fine-Tuning",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 15,
+     "last": 15,
+     "ntp": 0,
+     "nkey": 0
+    },
+    {
+     "label": "Supervised Fine-Tuning",
+     "slides": [
+      {
+       "i": 16,
+       "title": "SFT: Supervised Fine-Tuning",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 17,
+       "title": "Constitutional AI: principios en vez de anotadores",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 18,
+       "title": "GPT-3 antes y después del post-training",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 19,
+       "title": "Datos de demostración",
+       "key": true,
+       "tp": true
+      },
+      {
+       "i": 20,
+       "title": "Un dataset de SFT",
+       "key": false,
+       "tp": true
+      },
+      {
+       "i": 21,
+       "title": "**Si el SFT ya enseña a responder, ¿para qué hace falta otra etapa de entrenamiento?**",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 22,
+       "title": "Quiz: ¿qué aprende el SFT?",
+       "key": true,
+       "tp": true
+      }
+     ],
+     "first": 16,
+     "last": 22,
+     "ntp": 3,
+     "nkey": 2
+    },
+    {
+     "label": "Portada",
+     "slides": [
+      {
+       "i": 23,
+       "title": "Reinforcement Learning from Human Feedback",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 23,
+     "last": 23,
+     "ntp": 0,
+     "nkey": 0
+    },
+    {
+     "label": "Reinforcement Learning from Human Feedback",
+     "slides": [
+      {
+       "i": 24,
+       "title": "RLHF en dos pasos",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 25,
+       "title": "RLHF: puntuar y reforzar",
+       "key": true,
+       "tp": false
+      },
+      {
+       "i": 26,
+       "title": "Paso 1: comparar es más fácil que escribir",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 27,
+       "title": "Paso 1: el reward model",
+       "key": true,
+       "tp": false
+      },
+      {
+       "i": 28,
+       "title": "Paso 1: el reward model, en un batch",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 29,
+       "title": "Paso 2: optimizar con PPO",
+       "key": true,
+       "tp": true
+      }
+     ],
+     "first": 24,
+     "last": 29,
+     "ntp": 1,
+     "nkey": 3
+    },
+    {
+     "label": "Portada",
+     "slides": [
+      {
+       "i": 30,
+       "title": "Razonamiento con RL",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 30,
+     "last": 30,
+     "ntp": 0,
+     "nkey": 0
+    },
+    {
+     "label": "Razonamiento con RL",
+     "slides": [
+      {
+       "i": 31,
+       "title": "RL con verificador: el proceso",
+       "key": true,
+       "tp": true
+      },
+      {
+       "i": 32,
+       "title": "RL con verificador: los prompts",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 33,
+       "title": "RL con verificador: el resultado",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 31,
+     "last": 33,
+     "ntp": 1,
+     "nkey": 1
+    },
+    {
+     "label": "Portada",
+     "slides": [
+      {
+       "i": 34,
+       "title": "Herramientas",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 34,
+     "last": 34,
+     "ntp": 0,
+     "nkey": 0
+    },
+    {
+     "label": "Herramientas",
+     "slides": [
+      {
+       "i": 35,
+       "title": "Las piezas de una plataforma",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 36,
+       "title": "El circuito con un agente",
+       "key": true,
+       "tp": true
+      },
+      {
+       "i": 37,
+       "title": "El intercambio con la API",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 38,
+       "title": "Tres problemas, tres herramientas",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 39,
+       "title": "Calcular: el modelo no calcula bien",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 40,
+       "title": "Calcular: lo que escribe Llama 3.1",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 41,
+       "title": "Calcular: de los tokens al JSON",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 42,
+       "title": "Calcular: la misma cuenta por la API",
+       "key": false,
+       "tp": true
+      },
+      {
+       "i": 43,
+       "title": "Buscar: cómo se entrena",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 44,
+       "title": "Buscar: el modelo no sabe lo reciente",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 45,
+       "title": "Buscar: lo que escribe Llama 3.1",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 46,
+       "title": "Buscar: la respuesta de la API",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 47,
+       "title": "MCP: host, cliente y servidor",
+       "key": false,
+       "tp": true
+      },
+      {
+       "i": 48,
+       "title": "MCP: una herramienta es una definición",
+       "key": false,
+       "tp": true
+      },
+      {
+       "i": 49,
+       "title": "MCP: lo que aprende el modelo",
+       "key": false,
+       "tp": true
+      }
+     ],
+     "first": 35,
+     "last": 49,
+     "ntp": 5,
+     "nkey": 1
+    },
+    {
+     "label": "Portada",
+     "slides": [
+      {
+       "i": 50,
+       "title": "Fine-tuning",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 50,
+     "last": 50,
+     "ntp": 0,
+     "nkey": 0
+    },
+    {
+     "label": "Fine-tuning",
+     "slides": [
+      {
+       "i": 51,
+       "title": "Dónde entra el fine-tuning",
+       "key": true,
+       "tp": true
+      },
+      {
+       "i": 52,
+       "title": "Prompt, RAG o fine-tuning",
+       "key": true,
+       "tp": true
+      },
+      {
+       "i": 53,
+       "title": "Cuándo vale la pena el fine-tuning",
+       "key": false,
+       "tp": true
+      },
+      {
+       "i": 54,
+       "title": "Fine-tuning en la nube",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 55,
+       "title": "Fine-tuning local: el recorrido",
+       "key": false,
+       "tp": true
+      },
+      {
+       "i": 56,
+       "title": "Qué pedirle a los datos",
+       "key": false,
+       "tp": true
+      },
+      {
+       "i": 57,
+       "title": "Fine-tuning: un ejemplo",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 51,
+     "last": 57,
+     "ntp": 5,
+     "nkey": 2
+    },
+    {
+     "label": "Portada",
+     "slides": [
+      {
+       "i": 58,
+       "title": "Conclusiones",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 58,
+     "last": 58,
+     "ntp": 0,
+     "nkey": 0
+    },
+    {
+     "label": "Conclusiones",
+     "slides": [
+      {
+       "i": 59,
+       "title": "Dónde nace cada comportamiento",
+       "key": true,
+       "tp": false
+      }
+     ],
+     "first": 59,
+     "last": 59,
+     "ntp": 0,
+     "nkey": 1
+    }
+   ],
+   "tab": "Clase 9: Cómo se entrena un LLM",
+   "extra": false,
+   "total": 60
+  }
+ ],
+ "multi": false,
+ "prev": "08",
+ "next": "10",
+ "snippets": [
+  {
+   "id": "plantilla-cuatro-filas",
+   "titulo": "Las cuatro filas de la Parte 4",
+   "archivo": "configuraciones/evaluacion/plantilla-cuatro-filas.json",
+   "desde": 1,
+   "hasta": 40,
+   "lenguaje": "json",
+   "codigo": "{\n  \"version\": 1,\n  \"nombre\": \"parte4-cuatro-filas\",\n  \"descripcion\": \"PLANTILLA, no ejecutable: el runner la rechaza mientras tenga plantilla=true. Copiala, reemplazá los <...> por la ruta y el sha256 del prompt optimizado y por el repo y el commit HF (40 hex) del adapter publicado, y sacá el campo plantilla.\",\n  \"plantilla\": true,\n  \"cantidad\": 50,\n  \"versiones\": [\"original\", \"b\", \"c\"],\n  \"lote\": 4,\n  \"buscador\": \"baseline\",\n  \"configuraciones\": [\n    {\n      \"etiqueta\": \"sin_entrenar\",\n      \"descripcion\": \"Modelo base sin adapter y prompt baseline.\",\n      \"prompt\": \"configuraciones/prompts/baseline.json\",\n      \"prompt_sha256\": \"944ae7f6f52d2052b43be770f891593abfbefb86af088df672687590bfeaf474\",\n      \"adapter\": null\n    },\n    {\n      \"etiqueta\": \"solo_prompt\",\n      \"descripcion\": \"Modelo base sin adapter y prompt optimizado.\",\n      \"prompt\": \"<configuraciones/prompts/optimizado.json>\",\n      \"prompt_sha256\": \"<sha256 del prompt optimizado>\",\n      \"adapter\": null\n    },\n    {\n      \"etiqueta\": \"solo_entrenamiento\",\n      \"descripcion\": \"Adapter entrenado y prompt baseline.\",\n      \"prompt\": \"configuraciones/prompts/baseline.json\",\n      \"prompt_sha256\": \"944ae7f6f52d2052b43be770f891593abfbefb86af088df672687590bfeaf474\",\n      \"adapter\": {\"repo\": \"FranCalveyra/tp-admision\", \"revision\": \"<commit HF de 40 hex>\", \"subcarpeta\": \"final\"}\n    },\n    {\n      \"etiqueta\": \"ambos\",\n      \"descripcion\": \"Adapter entrenado y prompt optimizado.\",\n      \"prompt\": \"<configuraciones/prompts/optimizado.json>\",\n      \"prompt_sha256\": \"<sha256 del prompt optimizado>\",\n      \"adapter\": {\"repo\": \"FranCalveyra/tp-admision\", \"revision\": \"<commit HF de 40 hex>\", \"subcarpeta\": \"final\"}\n    }\n  ]\n}",
+   "que_hace": "Plantilla de evaluación con las cuatro configuraciones que pide la consigna: sin entrenar, solo prompt, solo entrenamiento y ambos, en normas original, b y c.",
+   "como_funciona": "- Cada fila combina un `prompt` (con su sha256) y un `adapter` (repo + commit HF) o `null`.\n- `plantilla: true` hace que el runner la rechace hasta completar los `<...>`.\n- Solo existe la fila `sin_entrenar` en `actual.json`: el adapter real no se publicó.",
+   "proposito": "Prepara la comparación contra la referencia de la cátedra (12/15/12 sin entrenar, 25/24/25 con SFT); la fila con adapter quedó pendiente.",
+   "interaccion": "La consume el runner de evaluación (`infra/kaggle_evaluacion.py`); `ModeloLocal.cargar` aplica el adapter si la fila lo tiene.",
+   "teoria": "Comparar prompting contra fine-tuning y su combinación: el SFT puede hacer que un modelo chico supere a uno sin ajustar.",
+   "key": "tp4-plantilla-cuatro-filas",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 2,
+     "title": "Un modelo 100 veces más chico gana",
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=2"
+    }
+   ],
+   "nusos": 1
+  },
+  {
+   "id": "clasificar-historial",
+   "titulo": "Curado simbólico del historial",
+   "archivo": "scripts/clasificar_historial.py",
+   "desde": 141,
+   "hasta": 173,
+   "lenguaje": "python",
+   "codigo": "def circuito_esperado(row: dict[str, str]) -> str:\n    if row[\"sospecha_sepsis\"] != \"no\":\n        return \"codigo_sepsis\"\n    if row[\"motivo\"] == \"dolor tor\\u00e1cico\":\n        return \"ecg\"\n    if row[\"motivo\"] == \"signos neurol\\u00f3gicos focales de inicio s\\u00fabito\":\n        return \"codigo_acv\"\n    return \"ninguno\"\n\n\ndef plazo_esperado(row: dict[str, str], parametros: dict[str, int]) -> str:\n    circuito = circuito_esperado(row)\n    bases = {\n        \"ecg\": parametros[\"P-TDE-1\"],\n        \"codigo_acv\": parametros[\"P-TDE-2\"],\n        \"codigo_sepsis\": (\n            parametros[\"P-TDE-3\"]\n            if row[\"sospecha_sepsis\"] in {\"probable\", \"con signos de shock\"}\n            else parametros[\"P-TDE-4\"]\n        ),\n    }\n    if circuito == \"ninguno\":\n        return \"\"\n    descuento = parametros[\"P-TDE-5\"] if row[\"llegada\"] == \"en ambulancia\" else 0\n    return str(bases[circuito] - descuento)\n\n\ndef registro_esperado(row: dict[str, str], parametros: dict[str, int]) -> str:\n    if not row[\"documento_tipo\"]:\n        return \"provisorio\"\n    if row[\"documento_tipo\"] == \"DNI\":\n        return \"definitivo\"\n    return \"provisorio\" if int(row[\"nivel\"]) <= parametros[\"P-ADM-3\"] else \"definitivo\"",
+   "que_hace": "Recalcula, con reglas y los valores de `parametros.yaml`, qué circuito, plazo y registro correspondían a cada fila del historial.",
+   "como_funciona": "- `circuito_esperado`: sepsis → `codigo_sepsis`, dolor torácico → `ecg`, signos neurológicos → `codigo_acv`, si no `ninguno`.\n- `plazo_esperado` toma la base del parámetro (`P-TDE-1..4`) y descuenta `P-TDE-5` si llegó en ambulancia.\n- `registro_esperado`: sin documento → provisorio; DNI → definitivo; otro documento depende del nivel contra `P-ADM-3`.\n- `razones_normativas` (más abajo) junta todos los campos que no coinciden; `clasificar` marca `error` si hay alguna razón, `ruido` si solo se aparta de una costumbre, y `correcta` si no.",
+   "proposito": "Se eligió un clasificador simbólico y reproducible, sin LLM: error tiene prioridad sobre ruido. Resultado: 1.600 correctas, 240 errores y 160 de ruido.",
+   "interaccion": "Lee `historial/historial.csv`, `historial/trazas.jsonl` y `normas/original/`; escribe `historial_clasificado.csv`, `historial_costumbres.json` y `costumbres.md`. `scripts/generar_conversaciones.py` reutiliza estas funciones para revalidar fichas.",
+   "teoria": "Razonamiento simbólico: reglas explícitas y verificables aplicadas a datos, en vez de un modelo estadístico.",
+   "key": "tp4-clasificar-historial",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "introduccion",
+     "i": 42,
+     "title": "Ejemplos de problemas de razonamiento simbólico",
+     "url": "/clases/01/#d=introduccion&s=42"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 7,
+     "title": "C4: cómo Google depuró Common Crawl",
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=7"
+    }
+   ],
+   "nusos": 2
+  },
+  {
+   "id": "tokenizar-mascara",
+   "titulo": "Máscara assistant-only (labels = −100)",
+   "archivo": "admision_tp/tokenizacion.py",
+   "desde": 12,
+   "hasta": 48,
+   "lenguaje": "python",
+   "codigo": "def tokenizar_conversacion(registro, tokenizer, max_seq_length):\n    \"\"\"Incluye respuesta y cierre del turno; excluye encabezados y todo contexto.\n\n    Solo acepta plantillas/tokenizadores que preserven exactamente sus prefijos.\n    No pide máscaras nativas (Gemma fijado no tiene bloques generation).\n    \"\"\"\n    validar_registro(registro)\n    if type(max_seq_length) is not int or max_seq_length <= 0:\n        raise ValueError(\"max_seq_length requiere entero positivo\")\n    mensajes = registro[\"messages\"]\n\n    def tokens(historia, generar=False):\n        salida = tokenizer.apply_chat_template(\n            historia, tokenize=True, add_generation_prompt=generar,\n            enable_thinking=False, padding=False, truncation=False, return_dict=True)\n        ids = salida[\"input_ids\"]\n        if not isinstance(ids, list) or not ids or any(type(x) is not int or x < 0 for x in ids):\n            raise ValueError(\"tokenizador devolvió IDs inválidos o anidados\")\n        if salida.get(\"attention_mask\", [1] * len(ids)) != [1] * len(ids):\n            raise ValueError(\"tokenización individual no debe contener padding\")\n        return ids\n\n    ids = tokens(mensajes)\n    if len(ids) > max_seq_length:\n        raise ValueError(\"conversación excede max_seq_length; no se recorta\")\n    labels = [-100] * len(ids)\n    for i, mensaje in enumerate(mensajes):\n        if mensaje[\"role\"] != \"assistant\":\n            continue\n        inicio = tokens(mensajes[:i], True)\n        fin = tokens(mensajes[:i + 1])\n        if ids[:len(inicio)] != inicio or ids[:len(fin)] != fin or len(fin) <= len(inicio):\n            raise ValueError(\"plantilla/tokenizador no preserva prefijos; máscara insegura\")\n        labels[len(inicio):len(fin)] = ids[len(inicio):len(fin)]\n    if all(x == -100 for x in labels):\n        raise ValueError(\"conversación sin tokens supervisados\")\n    return {\"input_ids\": ids, \"attention_mask\": [1] * len(ids), \"labels\": labels}",
+   "que_hace": "Tokeniza una conversación con el chat template y deja como objetivo de la pérdida solo los tokens de las respuestas del asistente.",
+   "como_funciona": "- `tokens(historia)` aplica `apply_chat_template` sin truncar ni padding.\n- Si la conversación supera `max_seq_length`, falla: no se recorta.\n- Inicializa `labels = [-100] * len(ids)`.\n- Para cada mensaje `assistant` tokeniza el prefijo con `add_generation_prompt=True` y el prefijo con la respuesta; copia en `labels` solo ese tramo.\n- Verifica que la plantilla preserve prefijos; si no, la máscara sería insegura y lanza error.",
+   "proposito": "La pérdida no cuenta el sistema, el triage ni las observaciones: el modelo aprende a producir acciones JSON, no a repetir el contexto.",
+   "interaccion": "La llama `tokenizar_preparacion` (mismo archivo) y se vuelve a verificar en `entrenamiento._ejecutar_cuda`. Produce `tokens.jsonl`, que consume `entrenamiento.cargar_entradas`.",
+   "teoria": "Pérdida de entropía cruzada de próximo token, enmascarada (−100 se ignora) para entrenar solo sobre las respuestas.",
+   "key": "tp4-tokenizar-mascara",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
+     "i": 40,
+     "title": "Qué se minimiza",
+     "url": "/clases/08/#d=transformers-a-fondo&s=40"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 19,
+     "title": "Datos de demostración",
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=19"
+    }
+   ],
+   "nusos": 2
+  },
+  {
+   "id": "generar-dataset",
+   "titulo": "Dataset de 2.900 conversaciones: tres fuentes",
+   "archivo": "scripts/generar_conversaciones.py",
+   "desde": 527,
+   "hasta": 568,
+   "lenguaje": "python",
+   "codigo": "def generar_dataset(salida: Path, *, raiz: Path = RAIZ, ruta_prompt: Path = RUTA_BASELINE,\n                    variante: str | None = None, semilla: int = SEMILLA, candidatos: int = CANDIDATOS) -> dict:\n    salida, raiz = Path(salida), Path(raiz)\n    if salida.exists() or salida.is_symlink():\n        raise FileExistsError(f\"la salida ya existe: {salida}\")\n    prompt = PromptSpec.cargar(ruta_prompt)\n    fabrica = fabrica_buscador(variante)\n    normas = raiz / \"normas/original\"\n    with tempfile.TemporaryDirectory(prefix=\"normas-variadas-\") as temporal:\n        carpetas = CarpetasNormas(normas, Path(temporal), fabrica)\n        _, buscador_original = carpetas.obtener({})\n        unidades = {p[\"codigo\"]: p[\"unidad\"] for p in parametros_base(normas)}\n        referencia = _leer_jsonl(raiz / \"entrenamiento/trazas.jsonl\")\n        contexto = {\n            \"prompt\": prompt, \"carpetas\": carpetas, \"unidades\": unidades,\n            \"candidatos\": valores_observados(referencia, unidades),\n            \"costumbres\": costumbres_por_tipo(json.loads((raiz / \"historial_costumbres.json\").read_text(\"utf-8\"))),\n            \"practica\": huellas_practica(raiz / \"practica/casos.jsonl\"),\n        }\n        ref, aud_ref, exc_ref = convertir_trazas(\n            referencia, origen=\"referencia\", referencia=\"entrenamiento/trazas.jsonl\", contexto=contexto)\n\n        filas = cargar_filas(raiz / \"historial/historial.csv\")\n        ids, seleccion = seleccionar_ids(filas, cargar_clasificacion(raiz / \"historial_clasificado.csv\"),\n                                         costumbre_aviso(raiz / \"historial_costumbres.json\"))\n        elegidas = set(ids)\n        historial = [t for t in _leer_jsonl(raiz / \"historial/trazas.jsonl\") if t[\"id\"] in elegidas]\n        csv_por_id = {f[\"id\"]: {k: v for k, v in f.items() if k not in (\"fecha\", \"operador\")}\n                      for f in filas if f[\"id\"] in elegidas}\n        his, aud_his, exc_his = convertir_trazas(\n            historial, origen=\"historial\", referencia=\"historial/trazas.jsonl\", contexto=contexto,\n            valores_fijos=csv_por_id)\n        sin, aud_sin, exc_sin = generar_sinteticos(contexto, semilla, candidatos)\n        carpetas_usadas = len(carpetas)\n        busqueda = {\"variante\": getattr(buscador_original, \"variante\", None),\n                    \"clase\": type(buscador_original).__name__,\n                    \"configuracion\": asdict(buscador_original.config) if hasattr(buscador_original, \"config\") else None,\n                    \"k_entorno\": getattr(buscador_original, \"k_entorno\", None),\n                    \"construido_con\": \"entrega.construir_buscador\" if variante is None\n                    else \"admision_tp.buscador.BuscadorBM25(ruta, variante)\"}\n\n    registros, auditorias = ref + his + sin, aud_ref + aud_his + aud_sin",
+   "que_hace": "Arma el dataset de entrenamiento uniendo 800 trazas de referencia, 1.600 del historial correcto y 500 sintéticas, todas renderizadas con el prompt y el buscador reales.",
+   "como_funciona": "- Carga el `PromptSpec` y una fábrica de buscador; crea `CarpetasNormas` en un temporal.\n- `convertir_trazas` convierte las 800 de `entrenamiento/trazas.jsonl` re-ejecutando las búsquedas con los valores de cada traza.\n- `seleccionar_ids` filtra el historial a las filas `correcta` y las convierte igual.\n- `generar_sinteticos` agrega los casos del generador.\n- Concatena `ref + his + sin` y registra el buscador usado.",
+   "proposito": "Las búsquedas se vuelven a ejecutar con el buscador de la entrega para que el modelo entrene con exactamente las observaciones que verá en inferencia.",
+   "interaccion": "Se corre con `python -m scripts.generar_conversaciones`; escribe `conversaciones.jsonl`, auditoría y manifiesto, validados por `validar_archivo`. La salida es la entrada de `admision_tp/preparacion.py` y `tokenizacion.py`.",
+   "teoria": "Dataset de SFT: conversaciones completas (sistema, usuario, asistente, observaciones) como demostraciones del comportamiento deseado.",
+   "key": "tp4-generar-dataset",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 20,
+     "title": "Un dataset de SFT",
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=20"
+    }
+   ],
+   "nusos": 1
+  },
+  {
+   "id": "seleccionar-ids",
+   "titulo": "Solo las filas correctas entran al SFT",
+   "archivo": "scripts/seleccionar_entrenamiento.py",
+   "desde": 40,
+   "hasta": 66,
+   "lenguaje": "python",
+   "codigo": "def seleccionar_ids(\n    filas: list[dict[str, str]],\n    clasificacion: dict[str, str],\n    costumbre: dict,\n) -> tuple[list[str], dict]:\n    faltantes = {fila[\"id\"] for fila in filas} - clasificacion.keys()\n    if faltantes:\n        raise ValueError(f\"faltan clasificaciones para {len(faltantes)} filas\")\n    ids_error = sorted(i for i, tipo in clasificacion.items() if tipo == \"error\")\n    ids_ruido = sorted(i for i, tipo in clasificacion.items() if tipo == \"ruido\")\n    seleccionados = [fila[\"id\"] for fila in filas if clasificacion[fila[\"id\"]] == \"correcta\"]\n    # Toda fila correcta sigue la costumbre completa; si no, la clasificación y el informe\n    # de costumbres no corresponden entre sí y no se arma el dataset.\n    inconsistentes = sorted(\n        fila[\"id\"] for fila in filas\n        if clasificacion[fila[\"id\"]] == \"correcta\"\n        and aviso_segun_costumbre(fila, costumbre) != (fila[\"aviso_al_voluntariado\"] == SI)\n    )\n    if inconsistentes:\n        raise ValueError(f\"filas correctas que contradicen la costumbre: {inconsistentes[:5]}\")\n    return seleccionados, {\n        \"total_historial\": len(filas),\n        \"correctas_clasificadas\": len(seleccionados),\n        \"excluidas_error\": len(ids_error),\n        \"excluidas_ruido\": len(ids_ruido),\n        \"seleccionadas\": len(seleccionados),\n    }",
+   "que_hace": "Selecciona del historial solo las filas clasificadas como `correcta` y excluye errores y ruido, controlando consistencia con la costumbre.",
+   "como_funciona": "- Falla si alguna fila no tiene clasificación.\n- Separa `ids_error` e `ids_ruido` y toma como `seleccionados` solo las `correcta`.\n- Revisa que toda fila correcta siga la costumbre del aviso (`aviso_segun_costumbre`); si no, no arma el dataset.\n- Devuelve los ids y un resumen (2.000 → 1.600; 240 y 160 excluidas).",
+   "proposito": "El SFT imita las demostraciones: si entraran errores o desvíos, el modelo los aprendería. Se descartan en vez de corregirlos.",
+   "interaccion": "Lo llama `scripts/generar_conversaciones.generar_dataset` con `historial_clasificado.csv` y `historial_costumbres.json`; los ids elegidos filtran `historial/trazas.jsonl`.",
+   "teoria": "Curado del dataset de demostraciones: la calidad de los datos de SFT determina lo que aprende el modelo.",
+   "key": "tp4-seleccionar-ids",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 22,
+     "title": "Quiz: ¿qué aprende el SFT?",
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=22"
+    },
+    {
+     "clase": 11,
+     "cnn": "11",
+     "slug": "redes-generativas-antagonicas",
+     "i": 48,
+     "title": "El dataset importa: lo que le das es lo que obtenés",
+     "url": "/clases/11/#d=redes-generativas-antagonicas&s=48"
+    }
+   ],
+   "nusos": 2
+  },
+  {
+   "id": "mission-estrategias",
+   "titulo": "Estrategias de post-entrenamiento de la consigna",
+   "archivo": "mission.md",
+   "desde": 131,
+   "hasta": 146,
+   "lenguaje": "markdown",
+   "codigo": "## Parte 3: optimización de prompt, antes de entrenar\n\nEs obligatoria y va **antes** del entrenamiento.\n\n- Optimicen el mensaje de sistema y el formato de los mensajes al modelo, con el modelo sin entrenar. Sugerimos DSPy, por ejemplo con su optimizador GEPA.\n- Valoramos la calidad del resultado y también el largo del prompt. El prompt se repite en cada llamada al modelo: cuesta cómputo y ocupa VRAM al usar el modelo y al entrenarlo. En la referencia de la cátedra, el mensaje de sistema es la quinta parte de cada conversación.\n- **Nunca optimicen sobre el test.** El test solo sirve para evaluar.\n- Después entrenen con el prompt optimizado.\n\n## Parte 4: entrenamiento\n\nCualquier estrategia de post-entrenamiento. Por ejemplo:\n\n- fine-tuning supervisado (SFT), con las conversaciones que armaron en la Parte 1;\n- DPO, con pares de respuestas al mismo paso del caso, una buena y una mala;\n- aprendizaje por refuerzo, con los 9 controles de la ficha como puntaje.",
+   "que_hace": "Fragmento de la consigna: optimizar el prompt antes de entrenar y elegir una estrategia de post-entrenamiento (SFT, DPO o RL con los 9 controles).",
+   "como_funciona": "- Parte 3: optimizar sistema y formato con el modelo sin entrenar, valorando también el largo.\n- Parte 4: SFT con las conversaciones, DPO con pares buena/mala, o RL con los 9 controles como puntaje.",
+   "proposito": "El TP implementó solo SFT con LoRA; DPO (con errores del historial como respuestas malas) y RL con verificador quedaron como alternativas no hechas, y así lo registra docs/informe-parte4-infra.md.",
+   "interaccion": "Es la consigna, no código: la estrategia elegida vive en `admision_tp/entrenamiento.py`.",
+   "teoria": "Alineamiento por preferencias (DPO/PPO) y RL con recompensa verificable como alternativas al SFT.",
+   "key": "tp4-mission-estrategias",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 29,
+     "title": "Paso 2: optimizar con PPO",
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=29"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 31,
+     "title": "RL con verificador: el proceso",
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=31"
+    }
+   ],
+   "nusos": 2
+  },
+  {
+   "id": "bucle-tool-calling",
+   "titulo": "El bucle de tool calling escrito a mano",
+   "archivo": "hospital/agente/bucle.py",
+   "desde": 25,
+   "hasta": 48,
+   "lenguaje": "python",
+   "codigo": "async def _ejecutar(por_nombre, llamada):\n    tool = por_nombre.get(llamada[\"name\"])\n    if tool is None:\n        return ToolMessage(f\"Error: la herramienta '{llamada['name']}' no existe. Herramientas disponibles: \"\n                           f\"{', '.join(sorted(por_nombre))}.\", tool_call_id=llamada[\"id\"], name=llamada[\"name\"])\n    try:\n        return await tool.ainvoke({**llamada, \"type\": \"tool_call\"})\n    except Exception as e:  # el error vuelve al modelo como texto para que pueda corregirse\n        return ToolMessage(f\"Error al ejecutar {llamada['name']}: {e}\", tool_call_id=llamada[\"id\"], name=llamada[\"name\"])\n\n\nasync def responder(llm, tools, pregunta):\n    \"\"\"Devuelve todos los mensajes de la conversación: sistema, pregunta, AIMessage y ToolMessage.\"\"\"\n    llm_con_tools = llm.bind_tools(tools)\n    por_nombre = {t.name: t for t in tools}\n    mensajes = [SystemMessage(PROMPT), HumanMessage(pregunta)]\n    for _ in range(MAX_PASOS):\n        ai = await llm_con_tools.ainvoke(mensajes)\n        mensajes.append(ai)\n        if not ai.tool_calls:\n            break\n        for llamada in ai.tool_calls:\n            mensajes.append(await _ejecutar(por_nombre, llamada))\n    return mensajes",
+   "que_hace": "Implementa el agente: el modelo pide herramientas, se ejecutan, sus resultados vuelven como `ToolMessage` y se repite hasta que responde sin pedir nada o se llega a 6 pasos.",
+   "como_funciona": "- `responder` enlaza las tools con `llm.bind_tools(tools)` y arma `por_nombre`.\n- Arranca con `[SystemMessage(PROMPT), HumanMessage(pregunta)]`.\n- En cada paso: `ai = await llm_con_tools.ainvoke(mensajes)`; si `ai.tool_calls` está vacío, termina.\n- Si no, ejecuta cada llamada con `_ejecutar` y agrega el `ToolMessage` (puede haber varias en paralelo en el mismo paso).\n- `_ejecutar` devuelve un `ToolMessage` de error si la tool no existe o lanza una excepción.",
+   "proposito": "Se escribió a mano, sin LangGraph ni AgentExecutor, para tener todos los mensajes y poder loguearlos. Es agnóstico del origen de las tools: el docstring lo prepara para las de `langchain-mcp-adapters` (parte 3, pendiente).",
+   "interaccion": "Lo llama `correr()` en `hospital/agente/corrida.py` por cada pregunta; devuelve la lista completa de mensajes, que `resumir()` convierte en respuesta, contextos, herramientas y costo. `tests/test_agente.py` lo prueba con un modelo falso.",
+   "teoria": "Agente ReAct / ciclo de vida de una tool: AIMessage con tool_calls → ejecución → ToolMessage → nueva llamada al modelo.",
+   "key": "tp3-bucle-tool-calling",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "introduccion",
+     "i": 62,
+     "title": "El futuro: agentes autónomos e IA multimodal",
+     "url": "/clases/01/#d=introduccion&s=62"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 57,
+     "title": "Demo: un servidor MCP mínimo",
+     "url": "/clases/06/#d=rag-y-mcp&s=57"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 20,
+     "title": "El ciclo de vida de una herramienta",
+     "url": "/clases/07/#d=rag-mcp-rapida&s=20"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 36,
+     "title": "El circuito con un agente",
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=36"
+    },
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 14,
+     "title": "Workflow o agente",
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=14"
+    },
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 26,
+     "title": "ReAct en LangGraph",
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=26"
+    }
+   ],
+   "nusos": 6
+  },
+  {
+   "id": "agente-bucle",
+   "titulo": "Ciclo del agente: JSON, corrección y tope de llamadas",
+   "archivo": "admision_tp/agente_prompt.py",
+   "desde": 25,
+   "hasta": 68,
+   "lenguaje": "python",
+   "codigo": "class _PartidaPrompt:\n    def __init__(self, entorno, prompt: PromptSpec, max_turnos: int, max_sin_json: int,\n                 max_llamadas: int):\n        self.entorno = entorno\n        self.prompt = prompt\n        self.max_turnos = max_turnos\n        self.max_sin_json = max_sin_json\n        self.max_llamadas = max_llamadas\n        self.mensajes = [\n            {\"role\": \"system\", \"content\": prompt.system_prompt},\n            {\"role\": \"user\", \"content\": prompt.mensaje_inicial_para(entorno.paciente_id)},\n        ]\n        self.turnos = self.sin_json = self.llamadas = 0\n        self.activa = True\n\n    def recibir(self, respuesta: str) -> None:\n        self.turnos += 1\n        self.mensajes.append({\"role\": \"assistant\", \"content\": respuesta})\n        obj = extraer_json(respuesta)\n        if obj is None:\n            self.sin_json += 1\n            if self.sin_json >= self.max_sin_json:\n                self.activa = False\n                return\n            self.mensajes.append({\"role\": \"user\", \"content\": self.prompt.mensaje_json_invalido})\n        else:\n            self.sin_json = 0\n            herramienta = str(obj.get(\"herramienta\", \"\"))\n            observacion, fin = self.entorno.paso(herramienta, obj.get(\"argumentos\") or {})\n            self.llamadas += 1\n            if fin:\n                self.activa = False\n                return\n            self.mensajes.append({\n                \"role\": \"user\",\n                \"content\": self.prompt.observacion_para(herramienta, observacion),\n            })\n        if self.turnos >= self.max_turnos or self.llamadas >= self.max_llamadas:\n            self.activa = False\n\n    def cortar_por_contexto(self, tokens: int, limite: int) -> None:\n        self.mensajes.append({\"role\": \"user\", \"content\": MENSAJE_CONTEXTO_EXCEDIDO.format(\n            tokens=tokens, limite=limite)})\n        self.activa = False",
+   "que_hace": "Mantiene la conversación de un caso: agrega la respuesta del modelo, ejecuta la herramienta pedida o, si no hay JSON válido, inserta el mensaje de corrección.",
+   "como_funciona": "- `_PartidaPrompt.__init__` arranca con `system_prompt` y `mensaje_inicial_para(paciente_id)` del `PromptSpec`.\n- `recibir` usa `extraer_json`; si es `None`, suma `sin_json` y agrega `prompt.mensaje_json_invalido` (corta tras `max_sin_json` seguidas).\n- Con JSON válido llama `entorno.paso(herramienta, argumentos)`, cuenta `llamadas` y agrega la observación con `observacion_para`.\n- Termina si el entorno cerró el caso (registrar_decision) o al llegar a `max_turnos` o `max_llamadas` (40, del kit).",
+   "proposito": "Es un agente de un solo modelo que decide el recorrido: el código no impone orden de herramientas. Los textos vienen del `PromptSpec` para que agente y generador de datos rendericen idéntico.",
+   "interaccion": "`AgentePrompt.jugar_lote` crea una `_PartidaPrompt` por caso y le pasa las respuestas de `ModeloLocal`; `entorno` es la `VistaDelAgente` del kit. `admision_tp/contexto.py` reusa este mismo ciclo para rejugar trazas.",
+   "teoria": "Salida estructurada con reintento ante JSON inválido, dentro de un bucle de agente con herramientas y un límite de pasos.",
+   "key": "tp4-agente-bucle",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 5,
+     "cnn": "05",
+     "slug": "prompting",
+     "i": 29,
+     "title": "Salidas estructuradas: JSON Schema",
+     "url": "/clases/05/#d=prompting&s=29"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 36,
+     "title": "El circuito con un agente",
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=36"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 42,
+     "title": "Calcular: la misma cuenta por la API",
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=42"
+    },
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 51,
+     "title": "Primero, un solo agente",
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=51"
+    }
+   ],
+   "nusos": 4
+  },
+  {
+   "id": "plan-mcp-pendiente",
+   "titulo": "Diseño del servidor y cliente MCP (pendiente)",
+   "archivo": "PLAN.md",
+   "desde": 155,
+   "hasta": 171,
+   "lenguaje": "markdown",
+   "codigo": "## Step 3 — Part 3: MCP server + LangChain MCP client (15 pts)\nDepends on Step 2.\n\n**3.1 `servidor_mcp.py`** — `mcp.server.fastmcp.FastMCP(\"hospital\")`, 6 `@mcp.tool(name=..., description=DESCRIPCIONES[...])`\nwrapping `hospital.api_cliente` and `Recuperador`; `mcp.run()` (stdio). Nothing on stdout except the protocol (logs → stderr);\nwarm up the retriever at startup so the first call doesn’t time out.\n\n**3.2 `agente_mcp.py`** — **no API/retriever code of its own**: `MultiServerMCPClient({\"hospital\": {\"command\": sys.executable, \"args\": [\"servidor_mcp.py\"], \"transport\": \"stdio\"}})`,\n`tools = await client.get_tools()` (tools/list; log the discovered names), then reuse `responder` + `correr(..., etiqueta=\"mcp\")`\nwith the same LLM and prompt.\n\n**3.3 Inspector** (manual, user) — `npx @modelcontextprotocol/inspector python3 servidor_mcp.py`, call all 6 tools, save screenshots to `experimentos/inspector/`.\n\n**3.4 Compare** — run benchmark → `respuestas_mcp.jsonl` + log + eval. `experimentos/comparar_agentes.py` prints a table\n(ruteo, CR, F, AR, agent cost from log totals, judge cost) for Part 2 vs 3. INFORME §3: table + explanation of any difference from the logs (e.g. tool-result formatting, nondeterminism).\n\n**Done when:** `python3 agente_mcp.py --preguntas datos/preguntas_agente_dev.jsonl --salida respuestas_mcp.jsonl` works with the API running, `grep -E \"urllib|Recuperador|localhost\" agente_mcp.py` is empty, 6 inspector screenshots exist.",
+   "que_hace": "Es el diseño, no código: la parte 3 quedó pendiente y no existen `servidor_mcp.py` ni `agente_mcp.py`. El PLAN describe un servidor FastMCP por stdio con las 6 tools y un cliente LangChain con `MultiServerMCPClient`.",
+   "como_funciona": "- 3.1: `FastMCP(\"hospital\")` con 6 `@mcp.tool(name=..., description=DESCRIPCIONES[...])` que envuelven `api_cliente` y el recuperador; `mcp.run()` por stdio; logs a stderr porque stdout es el canal del protocolo.\n- 3.2: `agente_mcp.py` sin código propio de API: `MultiServerMCPClient` lanza el servidor, `get_tools()` descubre las tools (tools/list) y se reusa `responder` y `correr`.\n- 3.3: probar con MCP Inspector.\n- 3.4: comparar parte 2 vs. parte 3.",
+   "proposito": "Separa herramienta y agente: el mismo set de tools podría usarlo cualquier host MCP. Reusar `descripciones.py` y el bucle agnóstico haría justa la comparación. Quedó pendiente en la entrega.",
+   "interaccion": "Se apoyaría en `hospital/descripciones.py`, `hospital/api_cliente.py`, `hospital/documentos.py`, `hospital/agente/bucle.py` y `corrida.py` (que ya normaliza bloques de contenido MCP en `texto()`).",
+   "teoria": "Arquitectura MCP: host, cliente y servidor; descubrimiento con tools/list y ejecución con tools/call sobre JSON-RPC 2.0 por stdio.",
+   "key": "tp3-plan-mcp-pendiente",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "claude-desktop-chat",
+     "i": 21,
+     "title": "Agregar un external connector",
+     "url": "/clases/01/#d=claude-desktop-chat&s=21"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 53,
+     "title": "El servidor separa herramienta y agente",
+     "url": "/clases/06/#d=rag-y-mcp&s=53"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 54,
+     "title": "El ciclo de vida de una herramienta MCP",
+     "url": "/clases/06/#d=rag-y-mcp&s=54"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 16,
+     "title": "MCP conecta modelos con herramientas",
+     "url": "/clases/07/#d=rag-mcp-rapida&s=16"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 18,
+     "title": "JSON-RPC 2.0: la capa de mensajes",
+     "url": "/clases/07/#d=rag-mcp-rapida&s=18"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 47,
+     "title": "MCP: host, cliente y servidor",
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=47"
+    },
+    {
+     "clase": 13,
+     "cnn": "13",
+     "slug": "cierre-magnifica-humanitas",
+     "i": 45,
+     "title": "Hacia un Internet de Agentes",
+     "url": "/clases/13/#d=cierre-magnifica-humanitas&s=45"
+    }
+   ],
+   "nusos": 7
+  },
+  {
+   "id": "descripciones-tools",
+   "titulo": "Descripciones de tools: fuente, uso, qué NO tienen, valores válidos",
+   "archivo": "hospital/descripciones.py",
+   "desde": 8,
+   "hasta": 38,
+   "lenguaje": "python",
+   "codigo": "BUSCAR_DOCUMENTOS = (\n    \"Busca en los documentos oficiales del Hospital Provincial Arroyo Claro: normas y procedimientos que no \"\n    \"cambian de un día a otro. Sirve para horarios fijos (visitas, altas, farmacia, laboratorio, vacunatorio, \"\n    \"donación de sangre), quién puede visitar o quedarse con un paciente, preparación para estudios y cirugías \"\n    \"(ayunos, dietas), requisitos y documentación para turnos, internación, farmacia y coberturas, triage de \"\n    \"la guardia, derechos del paciente, accesos al edificio, control de infecciones, maternidad, pediatría, \"\n    \"kinesiología, salud mental y telemedicina. NO tiene el estado de hoy (camas libres, profesionales de \"\n    \"guardia, turnos disponibles, stock de farmacia ni tiempos de espera actuales). \"\n    \"consulta: el tema a buscar, en español y con las mismas palabras que usó el paciente (por ejemplo \"\n    \"'cómo es una consulta por telemedicina'). Si la pregunta toca varios temas de los documentos, hacé una \"\n    \"búsqueda por tema. Devuelve los fragmentos más relevantes con su documento y sección de origen.\"\n)\n\nCONSULTAR_CAMAS = (\n    \"Estado de HOY de las camas de internación de un sector: total, ocupadas y libres. Usala para saber si hay \"\n    \"lugar o camas disponibles para internar. \"\n    \"sector: uno de clinica_medica, cirugia_general, terapia_intensiva, pediatria, neonatologia, maternidad.\"\n)\n\nCONSULTAR_GUARDIA = (\n    \"Profesionales que están de guardia HOY en una especialidad, con su horario (por ejemplo 08:00-20:00 es \"\n    \"el turno de día y 20:00-08:00 el de la noche). Usala para saber quién atiende hoy o esta noche. \"\n    \"especialidad: una de clinica_medica, cardiologia, pediatria, traumatologia, obstetricia, salud_mental.\"\n)\n\nCONSULTAR_TURNOS = (\n    \"Próximos turnos disponibles (fecha y hora) con una especialidad en consultorios externos. Usala para saber \"\n    \"cuándo es el primer turno libre. No dice qué hay que llevar al turno: eso está en los documentos. \"\n    \"especialidad: una de cardiologia, dermatologia, traumatologia, psicologia, gastroenterologia, \"\n    \"obstetricia, kinesiologia.\"\n)",
+   "que_hace": "Define el texto que lee el modelo para decidir qué herramienta llamar: `buscar_documentos` para normas fijas y las de la API para el estado de hoy.",
+   "como_funciona": "- `BUSCAR_DOCUMENTOS` lista los temas de los documentos y aclara que NO tiene el estado de hoy; pide buscar «con las mismas palabras que usó el paciente» y hacer una búsqueda por tema.\n- `CONSULTAR_CAMAS`, `CONSULTAR_GUARDIA` y `CONSULTAR_TURNOS` dicen que son el estado de HOY y enumeran los valores válidos del parámetro.\n- `CONSULTAR_TURNOS` agrega: «No dice qué hay que llevar al turno: eso está en los documentos».",
+   "proposito": "El ruteo depende solo de estas descripciones, así que separan norma (documentos) de estado (API) y dicen cuándo NO usar cada tool: ruteo 1,00 en las 4 corridas. La frase de las palabras del paciente arregló A11, y el ejemplo de consulta se cambió por uno de telemedicina para no filtrar la pregunta A01 de dev.",
+   "interaccion": "Las importa `hospital/herramientas.py` a través del diccionario `DESCRIPCIONES`; el PLAN prevé que el servidor MCP use exactamente los mismos textos para que la comparación parte 2 vs. parte 3 sea justa.",
+   "teoria": "Diseño de herramientas: la descripción es la interfaz para el modelo (qué hace, cuándo usarla, cuándo no, parámetros válidos).",
+   "key": "tp3-descripciones-tools",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 2,
+     "cnn": "02",
+     "slug": "cowork-intro",
+     "i": 25,
+     "title": "Cómo el agente descubre y usa una herramienta",
+     "url": "/clases/02/#d=cowork-intro&s=25"
+    },
+    {
+     "clase": 5,
+     "cnn": "05",
+     "slug": "prompting",
+     "i": 33,
+     "title": "Zero-shot vs. few-shot",
+     "url": "/clases/05/#d=prompting&s=33"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 10,
+     "title": "Las fuentes ponen el techo de calidad",
+     "url": "/clases/06/#d=rag-y-mcp&s=10"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 63,
+     "title": "Cuatro principios de diseño",
+     "url": "/clases/06/#d=rag-y-mcp&s=63"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 68,
+     "title": "La descripción dice cuándo NO usarla",
+     "url": "/clases/06/#d=rag-y-mcp&s=68"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 28,
+     "title": "La descripción dice cuándo NO usarla",
+     "url": "/clases/07/#d=rag-mcp-rapida&s=28"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 48,
+     "title": "MCP: una herramienta es una definición",
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=48"
+    },
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 20,
+     "title": "Principios para diseñar tools",
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=20"
+    }
+   ],
+   "nusos": 8
+  },
+  {
+   "id": "log-a10-paralelo",
+   "titulo": "Log real: A10 pide las dos fuentes en paralelo",
+   "archivo": "experimentos/corridas/agente_20260929-105719.md",
+   "desde": 302,
+   "hasta": 337,
+   "lenguaje": "markdown",
+   "codigo": "## A10: Quiero internar a mi nene en pediatría, ¿hay lugar y me puedo quedar con él?\n\n### Llamada al modelo 1\n\n- Tokens: entrada 1577 (cache 1536), salida 211 (razonamiento 116)\n- Costo: USD 0.000096\n- Generación: `gen-1790690305-njr9UFOvy47hBsCpf6aG`\n\n**Herramienta** `consultar_camas` con argumentos `{\"sector\": \"pediatria\"}`\n\n```\n{\"sector\": \"pediatria\", \"fecha\": \"2026-10-05\", \"datos\": {\"total\": 24, \"ocupadas\": 17, \"libres\": 7}}\n```\n\n**Herramienta** `buscar_documentos` con argumentos `{\"consulta\": \"acompañante de paciente pediátrico internado puede quedarse\"}`\n\n```\n[Ingreso a internación programada > Acompañante]\nSe permite un acompañante por paciente internado durante la noche, salvo en terapia intensiva. El acompañante recibe una tarjeta que presenta en el control de acceso.\n```\n\n### Llamada al modelo 2\n\n- Tokens: entrada 1787 (cache 1536), salida 153 (razonamiento 86)\n- Costo: USD 0.000081\n- Generación: `gen-1790690313-9NZL4I4ymMq06XPo3UnQ`\n\nTexto del modelo:\n\n> Sí, hoy hay lugar en pediatría: 7 camas libres de 24. Y sí, podés quedarte: se permite un acompañante por paciente internado durante la noche (excepto en terapia intensiva), que recibe una tarjeta para presentar en el control de acceso.\n\n**Respuesta final:**\n\nSí, hoy hay lugar en pediatría: 7 camas libres de 24. Y sí, podés quedarte: se permite un acompañante por paciente internado durante la noche (excepto en terapia intensiva), que recibe una tarjeta para presentar en el control de acceso.\n\n_Herramientas: consultar_camas, buscar_documentos · llamadas al modelo: 2 · tokens 3364 / 364 · USD 0.000177 · 15.1 s_",
+   "que_hace": "Extracto del log de la corrida 4 para la pregunta mixta A10: en la primera llamada el modelo pide `consultar_camas` y `buscar_documentos` a la vez y en la segunda responde.",
+   "como_funciona": "- Llamada 1: 1577 tokens de entrada (1536 de cache), 211 de salida (116 de razonamiento), USD 0,000096.\n- Dos herramientas en el mismo paso: camas de pediatría (7 libres de 24) y la norma de acompañantes.\n- Cada resultado vuelve como `ToolMessage` (fragmento con `[Ingreso a internación programada > Acompañante]`).\n- Llamada 2: el modelo combina ambos datos sin agregar nada que no esté en los resultados.",
+   "proposito": "Muestra en datos reales el ruteo entre norma (documentos) y estado (API), el tool calling paralelo y el registro de tokens y costo.",
+   "interaccion": "Lo generó `_log_pregunta` de `hospital/agente/corrida.py` al correr `agente.py`; es la corrida entregada (`respuestas.jsonl`).",
+   "teoria": "RAG como herramienta: el agente decide cuándo y con qué consulta buscar, y puede combinar varias fuentes en un mismo paso.",
+   "key": "tp3-log-a10-paralelo",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 5,
+     "title": "Como herramienta: el agente decide cuándo buscar",
+     "url": "/clases/07/#d=rag-mcp-rapida&s=5"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 49,
+     "title": "MCP: lo que aprende el modelo",
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=49"
+    }
+   ],
+   "nusos": 2
+  },
+  {
+   "id": "lora-config",
+   "titulo": "LoRA r=8 sobre q_proj/v_proj",
+   "archivo": "admision_tp/entrenamiento.py",
+   "desde": 11,
+   "hasta": 23,
+   "lenguaje": "python",
+   "codigo": "# Solo la atención del modelo de lenguaje. Gemma 4 es multimodal: sus torres de visión y audio también\n# tienen q_proj/v_proj, pero son Gemma4ClippableLinear y PEFT no los soporta (falló en Kaggle). PEFT\n# aplica un string con re.fullmatch sobre el nombre completo del módulo (peft/utils/other.py:1521).\nLORA_OBJETIVO = r\"(.*\\.)?language_model\\.layers\\.\\d+\\.self_attn\\.(q_proj|v_proj)\"\nLORA = {\"r\": 8, \"lora_alpha\": 16, \"lora_dropout\": 0.0,\n        \"target_modules\": LORA_OBJETIVO, \"task_type\": \"CAUSAL_LM\"}\nPOLITICA = {\"save_steps\": 50, \"bf16\": True, \"gradient_checkpointing\": True,\n            \"gradient_checkpointing_kwargs\": {\"use_reentrant\": False}, \"save_only_model\": False}\n# Defaults de la entrega (A100 de 40 GB). fp16 y \"auto\" existen para T4 x2 (Kaggle, desarrollo):\n# la T4 no tiene bf16 nativo y \"auto\" reparte el modelo entre GPU (paralelismo de modelo en un proceso).\nPRECISIONES = {\"bf16\": \"bfloat16\", \"fp16\": \"float16\"}\nDISPOSITIVOS = (\"unico\", \"auto\")\nEJECUCION = {\"precision\": \"bf16\", \"dispositivos\": \"unico\", \"guardar_cada\": 50}",
+   "que_hace": "Define la configuración LoRA y la política de entrenamiento: rango 8, alfa 16, solo en las proyecciones Q y V de la atención del modelo de lenguaje.",
+   "como_funciona": "- `LORA_OBJETIVO` es una regex que solo toma `language_model.layers.N.self_attn.(q_proj|v_proj)`.\n- `LORA` fija `r=8`, `lora_alpha=16`, `dropout=0` y `task_type=CAUSAL_LM`.\n- `POLITICA` guarda checkpoint cada 50 pasos, bf16 y gradient checkpointing.\n- `PRECISIONES` y `DISPOSITIVOS` permiten fp16/`auto` para las T4 de Kaggle.",
+   "proposito": "Gemma 4 es multimodal y sus torres de visión/audio también tienen `q_proj`/`v_proj` que PEFT no soporta: la regex las excluye. QLoRA quedó como alternativa no hecha.",
+   "interaccion": "`_ejecutar_cuda` pasa `LoraConfig(**LORA)` a `get_peft_model`; `cargar_entradas` incluye `LORA` en la identidad de la corrida.",
+   "teoria": "LoRA agrega matrices de bajo rango a W_Q y W_V: se entrenan pocos parámetros y el modelo base queda congelado.",
+   "key": "tp4-lora-config",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
+     "i": 15,
+     "title": "Tres proyecciones del mismo vector",
+     "url": "/clases/08/#d=transformers-a-fondo&s=15"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 51,
+     "title": "Dónde entra el fine-tuning",
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=51"
+    },
+    {
+     "clase": 12,
+     "cnn": "12",
+     "slug": "segmentacion-y-stable-diffusion",
+     "i": 75,
+     "title": "Lo que el equipo va a encontrar",
+     "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=75"
+    }
+   ],
+   "nusos": 3
+  },
+  {
+   "id": "sinteticos-variados",
+   "titulo": "500 sintéticas con valores de normas variados",
+   "archivo": "scripts/generar_conversaciones.py",
+   "desde": 404,
+   "hasta": 438,
+   "lenguaje": "python",
+   "codigo": "def generar_sinteticos(contexto, semilla, candidatos):\n    \"\"\"Casos del generador con valores sorteados entre los observados en la referencia.\"\"\"\n    sorteo = random.Random(f\"{semilla}:parametros\")\n    variables = contexto[\"candidatos\"]\n    casos = seleccionar_casos(generar(semilla=semilla, n=candidatos, prefijo=f\"cand-{semilla}\"))\n    registros, auditorias, excluidas = [], [], Counter()\n    for indice, caso in enumerate(casos, 1):\n        valores = {codigo: sorteo.choice(variables[codigo]) for codigo in sorted(variables)}\n        ruta, buscador = contexto[\"carpetas\"].obtener(valores)\n        parametros = cargar_parametros(ruta)\n        caso_final = replace(caso, id=f\"S-{semilla}-{indice:04d}\")\n        try:\n            fila, ficha = deducir_ficha(caso, parametros, contexto[\"costumbres\"])\n            verificar_no_practica(nota_de_triage(caso_final), fila, contexto[\"practica\"])\n        except Excluida as error:\n            excluidas[error.motivo] += 1\n            continue\n        except ValueError:\n            excluidas[\"deduccion_sintetica_invalida\"] += 1\n            continue\n        mensajes, observaciones = guion_sintetico(\n            caso_final, ficha, buscador, contexto[\"costumbres\"], contexto[\"prompt\"])\n        registro = {\"version\": 1, \"id\": caso_final.id, \"origen\": \"sintetico\",\n                    \"referencias\": [f\"generador:admision.generador:semilla={semilla}:caso={caso.id}\",\n                                    \"normas:normas/original+parametros-variados\",\n                                    \"costumbres:historial_costumbres.json\"],\n                    \"messages\": mensajes}\n        validar_registro(registro, contexto[\"prompt\"].formato_observacion)\n        registros.append(registro)\n        auditoria = _auditoria(registro, contexto, contexto[\"carpetas\"].completar(valores), [],\n                               evidencia(fila, parametros, observaciones, ficha[\"fundamentos\"]))\n        auditoria.update(circuito=circuito_caso(caso), dificultad=dificultad_caso(caso),\n                         busquedas_insertadas=[], fundamentos_quitados=[])\n        auditorias.append(auditoria)\n    return registros, auditorias, excluidas",
+   "que_hace": "Genera conversaciones sintéticas con `admision.generador` (semilla 12012) y, para cada caso, sortea un conjunto distinto de valores de parámetros de las normas.",
+   "como_funciona": "- `sorteo = random.Random(f\"{semilla}:parametros\")` hace el sorteo reproducible.\n- `generar(semilla, n=candidatos)` crea casos y `seleccionar_casos` balancea circuitos y dificultades.\n- Para cada caso elige valores entre los observados en la referencia y `carpetas.obtener(valores)` devuelve una carpeta de normas y su buscador.\n- `deducir_ficha` calcula la ficha correcta con esos parámetros; `verificar_no_practica` excluye casos parecidos a práctica.\n- `guion_sintetico` escribe la conversación con búsquedas reales.",
+   "proposito": "Si los números fueran siempre los mismos, el modelo los memorizaría; variándolos, tiene que leerlos de la sección recuperada. Así los números van al RAG y el oficio a los pesos.",
+   "interaccion": "Lo llama `generar_dataset`; usa `admision_tp/normas_variables.CarpetasNormas` y funciones de `scripts/generar_sinteticos_entrenamiento.py`. Sus registros se suman al resto del dataset.",
+   "teoria": "Datos sintéticos para SFT y la división de trabajo RAG vs. fine-tuning: conocimiento cambiante en el índice, comportamiento en los pesos.",
+   "key": "tp4-sinteticos-variados",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "introduccion",
+     "i": 44,
+     "title": "Ejemplos de problemas de generación",
+     "url": "/clases/01/#d=introduccion&s=44"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 52,
+     "title": "Prompt, RAG o fine-tuning",
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=52"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 56,
+     "title": "Qué pedirle a los datos",
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=56"
+    }
+   ],
+   "nusos": 3
+  },
+  {
+   "id": "procedimiento-dev",
+   "titulo": "procedimiento-v1 contra baseline en prompt-dev",
+   "archivo": "docs/analisis-errores.md",
+   "desde": 171,
+   "hasta": 202,
+   "lenguaje": "markdown",
+   "codigo": "### 2026-11-11 · Pasada 5: #13 `procedimiento-v1` contra `baseline` en el conjunto de desarrollo\n\n- **Corridas:** `corridas/kaggle/v25/prompt-dev-f1/{baseline,procedimiento-v1}-{n1,n2}` (runner del #13, commit\n  `f4d7300` limpio, buscador `baseline`, `datos/prompt-dev/v1`, **no práctica**). Salidas:\n  `corridas/analisis/2026-11-11-cmp-v25-procedimiento-vs-baseline-{n1,n2}/`. Las corridas descargadas no traían\n  `entradas/normas/`; se copió `datos/prompt-dev/v1/entradas/n<k>/normas` tras verificar que cada archivo coincide\n  con el sha256 del manifiesto de la corrida.\n- **Resultado:** n1 4 → 4 (gana 3, pierde 3), n2 4 → 5 (gana 2, pierde 1); signos p=1,0 en ambas. El baseline en el\n  dev repite el perfil de la pasada 1: buscador y modelo «no buscó» como fuentes principales, aviso solo costumbre.\n\n| Control | Arreglados n1/n2 | Rotos n1/n2 | Buscador antes → después (n1+n2) | Modelo antes → después (n1+n2) |\n|---|---|---|---|---|\n| registro | 4/4 | 0/2 | 7 → 0 | 6 → 7 |\n| box_antes_del_registro | 4/6 | 2/0 | 6 → 0 | 10 → 8 |\n| circuito | 0/2 | 0/0 | 0 → 0 | 2 → 0 |\n| plazo_circuito_min | 2/4 | 3/1 | 5 → 0 | 5 → 8 |\n| cobertura | 0/3 | 1/1 | 1 → 2 | 7 → 4 |\n| entidad_a_notificar | 0/1 | 3/1 | 1 → 1 | 4 → 6 |\n| aviso_al_voluntariado | 0/0 | 0/0 | 0 → 0 | 0 → 0 (8 → 8 costumbre) |\n| verificacion | 1/0 | 4/3 | 1 → 1 | 6 → 11 |\n\n- Costo: ~19.000 → ~53.000 caracteres/caso, 1,35 → 3,6 búsquedas, 4,8 → 6,75 llamadas.\n- **Hallazgo:** el procedimiento hace lo que se buscaba en el RAG: las fallas atribuibles al buscador pasan de 21 a\n  4 (registro, box y plazo quedan en 0), porque cada tema se busca por separado. Pero el modelo **decide mal con la\n  evidencia delante**: suben las fallas «buscó y decidió mal» en `verificacion` (6 → 11), `plazo` y `entidad`. El\n  aviso no se mueve (es costumbre; B no la menciona). La ganancia neta en casos es ruido.\n- **Para #15 (Fran):** el prompt solo ya no puede arreglar lo que queda: con la evidencia correcta en contexto, el\n  modelo base no aplica bien verificación, plazo y entidad, ni la costumbre del aviso. Eso es lo que tienen que\n  enseñar las conversaciones de #8 (decidir y verificar con la sección recuperada, y la costumbre). Comparar el\n  checkpoint contra estas corridas con `comparar`.\n- **C (`procedimiento-costumbres-v1`) no se analizó:** falla en GPU de forma reproducible (ver\n  [optimizacion-prompt.md](optimizacion-prompt.md#resultados-kaggle-v25v27)).",
+   "que_hace": "Registro del análisis del prompt `procedimiento-v1` frente a `baseline` en el conjunto de desarrollo: qué arregló, qué rompió y cuánto costó.",
+   "como_funciona": "- Corridas en `corridas/kaggle/v25/prompt-dev-f1/` (no práctica).\n- Las fallas atribuibles al buscador bajan de 21 a 4 porque cada tema se busca por separado.\n- Costo: ~19.000 → ~53.000 caracteres por caso, 1,35 → 3,6 búsquedas.\n- Suben las fallas «buscó y decidió mal» en verificación, plazo y entidad: el modelo decide mal con la evidencia delante.",
+   "proposito": "Muestra el trade-off del prompt con instrucciones paso a paso y deja la conclusión de que lo que queda es comportamiento, que debería enseñar el SFT (#15).",
+   "interaccion": "Los números salen de `scripts/analizar_errores.py` y `evaluacion_prompts.calcular_metricas_candidato`; el texto del prompt está en `corridas/kaggle/v25/prompt-dev-f1/procedimiento-v1-n1/entradas/prompt.json`.",
+   "teoria": "Prompt con instrucciones explícitas (descomposición en pasos): más llamadas y más contexto, por eso más latencia.",
+   "key": "tp4-procedimiento-dev",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 5,
+     "cnn": "05",
+     "slug": "prompting",
+     "i": 46,
+     "title": "¿Por qué tardan más?",
+     "url": "/clases/05/#d=prompting&s=46"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 53,
+     "title": "Cuándo vale la pena el fine-tuning",
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=53"
+    }
+   ],
+   "nusos": 2
+  },
+  {
+   "id": "trainer-cuda",
+   "titulo": "Entrenamiento SFT con PEFT y Trainer",
+   "archivo": "admision_tp/entrenamiento.py",
+   "desde": 232,
+   "hasta": 276,
+   "lenguaje": "python",
+   "codigo": "        ejecucion = auditoria.get(\"ejecucion\", EJECUCION)\n        # \"auto\" reparte las capas entre las GPU; Trainer lo detecta (hf_device_map) y no usa DataParallel.\n        reparto = {\"device_map\": \"auto\"} if ejecucion[\"dispositivos\"] == \"auto\" else {}\n        import transformers\n        from .carga import cargar_solo_texto\n        modelo = cargar_solo_texto(transformers, config[\"modelo\"], config[\"revision\"],\n                                   dtype=getattr(torch, PRECISIONES[ejecucion[\"precision\"]]), **reparto)\n        # Sin attn_implementation: forzar \"sdpa\" rompe la torre de audio de Gemma 4 (ver modelo.py).\n        modelo.config.use_cache = False\n        modelo = get_peft_model(modelo, LoraConfig(**LORA, revision=config[\"revision\"]))\n        modelo.enable_input_require_grads()\n\n        class Auditor(TrainerCallback):\n            def on_log(self, args, state, control, logs=None, **kwargs):\n                run.log({**(logs or {}), **_vram(torch), \"trainer_step\": state.global_step})\n\n            def guardar(self, carpeta, nombre):\n                (carpeta / \"corrida.json\").write_bytes(_canonical(auditoria))\n                hashes = {p.name: _sha(p.read_bytes()) for p in carpeta.iterdir()\n                          if p.is_file() and p.name != \"integridad.json\"}\n                (carpeta / \"integridad.json\").write_bytes(_canonical(hashes))\n                if persistir:\n                    persistir()\n                if auditoria[\"publicar\"]:\n                    publicaciones.append(publicar_checkpoint(carpeta, nombre, api, config[\"hf_repo\"], run))\n                    (destino / \"publicaciones.json\").write_bytes(_canonical(publicaciones))\n                    if persistir:\n                        persistir()\n\n            def on_save(self, args, state, control, **kwargs):\n                self.guardar(destino / f\"checkpoint-{state.global_step}\", f\"checkpoint-{state.global_step}\")\n\n        callback = Auditor()\n        args = TrainingArguments(output_dir=str(destino), seed=config[\"semilla\"], data_seed=config[\"semilla\"],\n            learning_rate=config[\"learning_rate\"], num_train_epochs=config[\"epochs\"],\n            per_device_train_batch_size=config[\"batch_size\"],\n            gradient_accumulation_steps=config[\"gradient_accumulation_steps\"],\n            **_politica(ejecucion), save_strategy=\"steps\", logging_steps=1,\n            report_to=\"none\", push_to_hub=False, remove_unused_columns=False)\n        def collator(filas):\n            return {k: torch.tensor(v, dtype=torch.long) for k, v in formar_lote(filas, tokenizer.pad_token_id).items()}\n        trainer = Trainer(model=modelo, args=args, train_dataset=ejemplos,\n                          data_collator=collator, processing_class=tokenizer, callbacks=[callback])\n        trainer.train(resume_from_checkpoint=str(checkpoint) if checkpoint else None)\n        trainer.save_model(str(destino / \"final\"))",
+   "que_hace": "Carga el modelo solo texto, le aplica LoRA, configura el `Trainer` de Hugging Face con un callback que audita y publica checkpoints, y entrena.",
+   "como_funciona": "- `cargar_solo_texto` carga Gemma con la precisión elegida (y `device_map='auto'` para dos GPU).\n- `get_peft_model(modelo, LoraConfig(**LORA))` y `enable_input_require_grads` para gradient checkpointing.\n- `Auditor` loguea VRAM a W&B y en cada `on_save` escribe `integridad.json` y publica el checkpoint en HF.\n- `TrainingArguments` con semilla, lr, épocas, batch y acumulación de la config; `collator` usa `formar_lote` (padding con −100).\n- `trainer.train(resume_from_checkpoint=...)` permite reanudar.",
+   "proposito": "Prioriza auditabilidad y reanudación (Kaggle corta sesiones). Solo se validó en corridas de humo; el entrenamiento con los datos curados quedó pendiente.",
+   "interaccion": "Lo llama `entrenar()` (mismo archivo) desde `scripts/entrenar.py`, lanzado por `infra/kaggle_entrenamiento.py`. Consume `tokens.jsonl`; el adapter final lo carga `ModeloLocal._fusionar_adapter`.",
+   "teoria": "Fine-tuning supervisado eficiente: SFT con LoRA sobre las demostraciones, con la pérdida solo en tokens del asistente.",
+   "key": "tp4-trainer-cuda",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 55,
+     "title": "Fine-tuning local: el recorrido",
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=55"
+    }
+   ],
+   "nusos": 1
+  }
+ ]
+}

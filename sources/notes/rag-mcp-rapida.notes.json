@@ -1,0 +1,501 @@
+[
+ {
+  "i": 0,
+  "resumen": "Clase 7: repaso rápido de RAG y foco en MCP y diseño de herramientas.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 1,
+  "resumen": "Agenda: formas de recuperar, hiperparámetros de RAG, evaluación, MCP y diseño de herramientas.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 2,
+  "resumen": "**RAG** indexa offline y en cada consulta recupera fragmentos y los concatena al prompt, sin tocar pesos. Una ventana enorme no lo reemplaza: el modelo se pierde en entradas largas.",
+  "claves": [
+   "rag",
+   "context-augmentation",
+   "ventana-de-contexto"
+  ],
+  "tp": [
+   {
+    "tp": 3,
+    "texto": "Tu pipeline: 56 secciones embebidas con e5-base, coseno contra la consulta y fragmentos entregados al agente vía `buscar_documentos`."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "rag-y-mcp#3",
+    "por": "versión completa de los tres pasos"
+   },
+   {
+    "ref": "rag-y-mcp#6",
+    "por": "por qué recuperar con 1M tokens"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 3,
+  "resumen": "El **índice invertido** guarda en qué documentos aparece cada término; TF-IDF/BM25 ordenan. Falla con sinónimos: 'timeout del upstream' no matchea 'el servicio no responde'.",
+  "claves": [
+   "indice-invertido",
+   "bm25",
+   "tf-idf"
+  ],
+  "tp": [
+   {
+    "tp": 4,
+    "texto": "En el TP4 escribiste BM25 propio (k1=1,5, b=0,75) por sección, sin tildes; la variante `prefijos` llegó a recall 0,933."
+   },
+   {
+    "tp": 3,
+    "texto": "El recuperador léxico ingenuo de la consigna sacaba 0,35 de Context Relevance, igual que BERT crudo."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "rag-y-mcp#15",
+    "por": "BM25 satura la frecuencia"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 4,
+  "resumen": "Consulta y fragmentos se vuelven vectores y gana el más cercano por **similitud coseno**, aunque no compartan palabras. HNSW evita comparar contra todos.",
+  "claves": [
+   "embedding",
+   "similitud-coseno",
+   "base-vectorial"
+  ],
+  "tp": [
+   {
+    "tp": 3,
+    "texto": "Normalizaste L2 para que `matriz @ q` sea el coseno; búsqueda exacta, sin HNSW, porque eran solo 56 secciones."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "rag-y-mcp#21",
+    "por": "coseno: importa el ángulo"
+   },
+   {
+    "ref": "transformers-a-fondo#34",
+    "por": "qué encoder sirve para embeddings"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 5,
+  "resumen": "Con la **recuperación como herramienta**, el modelo decide si busca, qué y cuántas veces. Gana flexibilidad y paga una llamada extra por ronda.",
+  "claves": [
+   "rag",
+   "tool-calling",
+   "agente"
+  ],
+  "tp": [
+   {
+    "tp": 3,
+    "texto": "Tu agente llama `buscar_documentos` solo cuando hace falta; en las mixtas (A10–A12) pidió documentos y API en paralelo."
+   },
+   {
+    "tp": 4,
+    "texto": "En el TP4, `procedimiento-v1` obliga a buscar cada tema por separado: de 10 a 14 casos resueltos."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "agentes-y-multiagentes#13",
+    "por": "dos formas de conectar LLM y tools"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 6,
+  "resumen": "**Búsqueda híbrida**: léxico y vectorial en paralelo, fusionados por posición con **RRF** ($\\sum 1/(k+\\text{pos})$), porque los scores de BM25 y coseno no se comparan.",
+  "claves": [
+   "busqueda-hibrida",
+   "rrf",
+   "bm25"
+  ],
+  "tp": [
+   {
+    "tp": 4,
+    "texto": "Probaste RRF con n-gramas entre 68 configuraciones, pero entregaste BM25 solo: embeddings no estaban permitidos."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "rag-y-mcp#30",
+    "por": "la cuenta de RRF"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 7,
+  "resumen": "Separador: empieza la sección «Los hiperparámetros de RAG».",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 8,
+  "resumen": "Dos perillas: **top-k** (cuántos fragmentos) y **umbral** de similitud (cuán parecidos). El umbral permite decir 'no sé', pero su valor depende del modelo: hay que calibrarlo.",
+  "claves": [
+   "recall-at-k",
+   "top-k",
+   "umbral"
+  ],
+  "tp": [
+   {
+    "tp": 3,
+    "texto": "Elegiste top-2 con margen 0,005: con k=3 ningún encoder pasaba 0,515 de CR y el umbral absoluto 0,88 no cubría empates."
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 9,
+  "resumen": "El **chunking** decide qué se recupera junto: chico es preciso pero sin contexto; grande diluye. Importa más dónde caen los cortes respecto de la estructura que el tamaño.",
+  "claves": [
+   "chunking"
+  ],
+  "tp": [
+   {
+    "tp": 3,
+    "texto": "Comparaste ventanas, párrafo, oración y sección `##`; ganó la sección y la oración fue la peor para los cuatro encoders."
+   },
+   {
+    "tp": 4,
+    "texto": "En el TP4 repetiste la idea: una sección entera de norma por fragmento para BM25."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "rag-y-mcp#36",
+    "por": "tamaño y solapamiento"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 10,
+  "resumen": "Los **metadatos** filtran antes de buscar y también se buscan: pegar 'título > sección' adelante del fragmento antes de embeber ubica su vector.",
+  "claves": [
+   "metadatos",
+   "chunking"
+  ],
+  "tp": [
+   {
+    "tp": 3,
+    "texto": "Anteponer 'Título > Sección' solo al texto embebido subió e5-base de 0,85 a 1,00 con k=1; el fragmento devuelto siguió literal."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "rag-y-mcp#37",
+    "por": "metadatos que filtran"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 11,
+  "resumen": "**Reranking** en serie: un recuperador rápido busca recall en un pool grande y un **cross-encoder**, lento pero preciso, reordena los mejores.",
+  "claves": [
+   "reranking",
+   "bi-encoder",
+   "precision-recall"
+  ],
+  "tp": [
+   {
+    "tp": 3,
+    "texto": "`recuperador.py` soporta cross-encoder, pero la entrega no lo usa (`reranker: null`)."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "rag-y-mcp#31",
+    "por": "cómo lee el cross-encoder"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 12,
+  "resumen": "Separador: empieza la sección «Evaluación y seguridad».",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 13,
+  "resumen": "Medir por etapa: **Context Relevance** para la recuperación; **Faithfulness** y **Answer Relevance** para la generación. Medirlas juntas no dice cuál se rompió.",
+  "claves": [
+   "evals",
+   "rag"
+  ],
+  "tp": [
+   {
+    "tp": 3,
+    "texto": "Tu juez gemini puntuó CR/F/AR más ruteo; la corrida 4 dio 5/5/5. A11 fallaba por la consulta, no por la generación."
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 14,
+  "resumen": "RAG abre dos superficies: **inyección indirecta** (texto de terceros en el prompt) y fuga de documentos restringidos. Ningún prompt la previene de forma confiable; los permisos se filtran antes de recuperar.",
+  "claves": [
+   "inyeccion-indirecta",
+   "prompt-injection"
+  ],
+  "ver": [
+   {
+    "ref": "cierre-magnifica-humanitas#21",
+    "por": "la tríada letal"
+   },
+   {
+    "ref": "rag-y-mcp#42",
+    "por": "cómo se filtra un documento"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 15,
+  "resumen": "Separador: empieza la sección «MCP: el protocolo».",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 16,
+  "resumen": "**MCP** estandariza cómo una app de IA pide datos y acciones: el servidor expone tools, recursos y prompts; el cliente los consume; el modelo elige leyendo descripciones.",
+  "claves": [
+   "mcp",
+   "tool-calling"
+  ],
+  "tp": [
+   {
+    "tp": 3,
+    "texto": "En el TP3 esta parte quedó pendiente: no existe `servidor_mcp.py`; el diseño en PLAN.md usa FastMCP reusando `descripciones.py`."
+   },
+   {
+    "tp": 1,
+    "texto": "En el TP1 usaste los MCP de GitHub y Railway para crear el repo, provisionar Postgres y deployar."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "como-se-entrena-un-llm#47",
+    "por": "host, cliente y servidor"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 17,
+  "resumen": "Sin protocolo, M apps × N fuentes = **M×N** conectores; con MCP, **M+N**. HTTP no trae descubrimiento ('¿qué sabés hacer?') y GraphQL no ejecuta acciones.",
+  "claves": [
+   "mcp"
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 18,
+  "resumen": "MCP usa **JSON-RPC 2.0**: `tools/list` y `tools/call`, un `id` que aparea pedido y respuesta, `result` o `error`. La sesión MCP tiene estado; JSON-RPC no.",
+  "claves": [
+   "json-rpc",
+   "mcp"
+  ],
+  "tp": [
+   {
+    "tp": 3,
+    "texto": "Pendiente: el cliente con `langchain-mcp-adapters` iba a descubrir con `tools/list` y llamar con `tools/call` sobre stdio."
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 19,
+  "resumen": "Tool hardcodeada: se conoce al compilar y se copia entre agentes. **Servidor MCP**: proceso aparte, descubierto en ejecución. Con stdio el cliente lanza el subproceso: no hay puerto.",
+  "claves": [
+   "mcp",
+   "stdio"
+  ],
+  "tp": [
+   {
+    "tp": 3,
+    "texto": "Tus 6 tools son `@tool` de LangChain (hardcodeadas); el bucle `responder` ya es agnóstico para enchufarlas por MCP."
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 20,
+  "resumen": "Ciclo: registrar, descubrir con `tools/list`, elegir, llamar. El modelo elige leyendo la **descripción**: escribirla es diseño, no documentación.",
+  "claves": [
+   "mcp",
+   "tool-calling",
+   "descripcion-como-disparador"
+  ],
+  "tp": [
+   {
+    "tp": 3,
+    "texto": "Tu bucle: AIMessage con `tool_calls` → ejecutar → ToolMessage, máximo 6 pasos; los errores de tool vuelven como texto."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "agentes-y-multiagentes#19",
+    "por": "una tool en código"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 21,
+  "resumen": "Tres caminos: extensión de escritorio, configuración stdio (`command`/`args`) o servidor HTTP (URL). Un servidor MCP corre con tus permisos: instalarlo es un riesgo.",
+  "claves": [
+   "mcp",
+   "minimo-privilegio"
+  ],
+  "tp": [
+   {
+    "tp": 1,
+    "texto": "En Corta les diste credenciales de GitHub y Railway a servidores MCP de terceros."
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 22,
+  "resumen": "Cada servidor es independiente, pero el agente ve todas las tools aplanadas: no se desambiguan nombres repetidos y un catálogo grande elige peor.",
+  "claves": [
+   "mcp",
+   "routing-de-herramientas"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 23,
+  "resumen": "Con servidores conectados, un pedido en lenguaje natural cruza GitHub, bases de datos y otros sistemas sin escribir código de pegamento.",
+  "claves": [
+   "mcp",
+   "agente"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 24,
+  "resumen": "Separador: empieza la sección «Diseño de herramientas».",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 25,
+  "resumen": "Cuatro principios: nombres `verbo_sustantivo_contexto`, descripciones exhaustivas (qué, cuándo, cuándo NO, formato), esquemas simples y errores accionables.",
+  "claves": [
+   "tool-calling",
+   "descripcion-como-disparador"
+  ],
+  "tp": [
+   {
+    "tp": 3,
+    "texto": "Tus descripciones dicen fuente, uso, qué NO tienen y valores válidos; los errores de tool vuelven al modelo para que se corrija."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "agentes-y-multiagentes#20",
+    "por": "principios para diseñar tools"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 26,
+  "resumen": "El modelo elige por coincidencia de patrones sobre descripciones: más tools, peor elección, y un modelo mejor no lo arregla. OpenAI recomienda menos de 20.",
+  "claves": [
+   "tool-calling",
+   "routing-de-herramientas"
+  ],
+  "tp": [
+   {
+    "tp": 3,
+    "texto": "Con 6 tools no hizo falta routing jerárquico: ruteo 1,00 en las 4 corridas."
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 27,
+  "resumen": "Dos patrones para no mostrar el catálogo entero: **routing jerárquico** (dominio y acción en el esquema) y catálogo por fase (2-3 tools visibles por etapa).",
+  "claves": [
+   "routing-jerarquico",
+   "routing-de-herramientas"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 28,
+  "resumen": "Con tres tools parecidas ya falla la elección. La descripción tiene que decir cuándo usar cada una y, sobre todo, cuándo **NO** usarla.",
+  "claves": [
+   "descripcion-como-disparador",
+   "tool-calling"
+  ],
+  "tp": [
+   {
+    "tp": 3,
+    "texto": "`CONSULTAR_TURNOS` aclara que no dice qué llevar ('eso está en los documentos'): separar norma de estado dio ruteo 1,00."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "cowork-intro#19",
+    "por": "la descripción dispara una Skill"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 29,
+  "resumen": "Medir cada tool (llamadas, éxito, latencia, último uso) para eliminar las que sobran y arreglar las que fallan. Sin medición, ajustar el catálogo es opinión.",
+  "claves": [
+   "evals",
+   "tool-calling"
+  ],
+  "tp": [
+   {
+    "tp": 3,
+    "texto": "Tu log `.md` por corrida guarda cada tool con argumentos, resultado, tokens y costo (~USD 0,0015 el agente vs 0,017 el juez)."
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 30,
+  "resumen": "Separador: empieza la sección «Conclusiones».",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 31,
+  "resumen": "Misma lección en RAG y MCP: darle al modelo **poco y bien elegido**. El cuello de botella está antes del modelo: corpus, cortes y descripciones.",
+  "claves": [
+   "rag",
+   "mcp"
+  ],
+  "tp": [
+   {
+    "tp": 3,
+    "texto": "Lo viste en A11: top-3 la arreglaba pero el ruido bajó CR a 4,417; la solución fue mejorar la consulta."
+   }
+  ],
+  "clave_examen": true
+ }
+]

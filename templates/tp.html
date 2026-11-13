@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}TP{{ page.extra.num }} · {{ page.title }} · IA Generativa{% endblock title %}
+{% block content %}
+{% set t = load_data(path=page.extra.data) %}
+<header class="page-header">
+  <div class="ph-main">
+    <nav class="crumbs"><span>Trabajos prácticos</span><span class="sep">/</span><span>TP{{ t.num }}</span></nav>
+    <h1>{{ t.titulo }}</h1>
+    <div class="ph-meta">{% if t.repo %}<span class="mono">{{ t.repo }}</span><span class="sep"></span>{% endif %}<span>{{ t.nrefs }} diapositivas relacionadas</span></div>
+  </div>
+  <div class="ph-actions">
+    <a class="btn primary" href="{{ config.base_url }}/practica/#t{{ t.num }}">Preguntas de defensa</a>
+  </div>
+</header>
+
+<div class="grid main-side">
+  <section class="card" id="tp-panels">
+    <div class="card-header">
+      <div class="seg" role="tablist" data-tabs="tp-panels">
+        <button role="tab" data-tab="res" aria-selected="true">Resultados</button>
+        <button role="tab" data-tab="con" aria-selected="false">Consigna</button>
+        <button role="tab" data-tab="hic" aria-selected="false">Qué hicimos</button>
+        {% if t.decisiones %}<button role="tab" data-tab="dec" aria-selected="false">Decisiones</button>{% endif %}
+        {% if t.snippets %}<button role="tab" data-tab="cod" aria-selected="false" id="tab-cod">Código <span class="mono faint">{{ t.snippets | length }}</span></button>{% endif %}
+      </div>
+    </div>
+    <div class="card-body" data-panel="res"><div class="prose">{{ t.resultados | markdown | safe }}</div></div>
+    <div class="card-body" data-panel="con" hidden><div class="prose">{{ t.consigna | markdown | safe }}</div></div>
+    <div class="card-body" data-panel="hic" hidden><div class="prose">{{ t.que_hicimos | markdown | safe }}</div></div>
+    {% if t.decisiones %}
+    <div class="card-body flush" data-panel="dec" hidden>
+      <div class="rows">
+        {% for d in t.decisiones %}
+        <div class="row-item" style="cursor:default;grid-template-columns:32px minmax(0,1fr)"><span class="ref">{{ loop.index }}</span><span><span class="t">{{ d.decision | markdown(inline=true) | safe }}</span><span class="d" style="-webkit-line-clamp:unset;display:block">{{ d.por_que | markdown(inline=true) | safe }}</span></span></div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+    {% if t.snippets %}
+    <div class="card-body flush" data-panel="cod" hidden>
+      <div class="rows">
+        {% for sn in t.snippets %}
+        <button class="row-item code-row" data-code="{{ sn.key }}" style="grid-template-columns:minmax(0,1fr) auto"><span><span class="t">{{ sn.titulo }}</span><span class="d mono" style="font-size:12px">{{ sn.archivo }}{% if sn.desde %} · L{{ sn.desde }}–{{ sn.hasta }}{% endif %}</span><span class="d">{{ sn.que_hace | markdown(inline=true) | safe }}</span></span><span class="pill">{{ sn.nusos }} diap.</span></button>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </section>
+
+  <section class="card sticky" style="max-height:calc(100vh - 48px)">
+    <div class="card-header">
+      <div class="card-title">Diapositivas relacionadas <span class="count">{{ t.nrefs }}</span></div>
+      <select class="input" id="rel-filter" style="width:auto;height:28px" aria-label="Filtrar por clase">
+        <option value="">Todas</option>
+        {% for g in t.groups %}<option value="{{ g.cnn }}">Clase {{ g.cnn }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="card-body flush scroll">
+      {% for g in t.groups %}
+      <div data-group="{{ g.cnn }}">
+        <div class="row-group"><span>Clase {{ g.cnn }} · {{ g.titulo }}</span><span class="mono">{{ g.items | length }}</span></div>
+        <div class="rows">
+          {% for r in g.items %}
+          <a class="row-item" href="{{ config.base_url }}{{ r.url }}"><span class="ref">{{ g.cnn }}·{{ r.i }}</span><span><span class="t">{{ r.title }}</span><span class="d">{{ r.texto | markdown(inline=true) | safe }}</span></span></a>
+          {% endfor %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+</div>
+{% for sn in t.snippets %}{% include "partials/snippet.html" %}{% endfor %}
+{% endblock content %}
+{% block scripts %}
+<script>
+if (location.hash.indexOf('#codigo') === 0) { var tc = document.getElementById('tab-cod'); if (tc) tc.click(); var k = location.hash.split('=')[1]; if (k) Study.openCode(k); }
+document.getElementById('rel-filter').addEventListener('change', function (e) {
+  var v = e.target.value;
+  document.querySelectorAll('[data-group]').forEach(function (g) { g.hidden = v && g.dataset.group !== v; });
+});
+</script>
+{% endblock scripts %}

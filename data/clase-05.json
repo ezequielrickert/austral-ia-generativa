@@ -1,0 +1,2753 @@
+{
+ "num": 5,
+ "nn": "05",
+ "fecha": "2 sep",
+ "titulo": "LLMs: prompting, costos y producción",
+ "bloque": "LLMs",
+ "decks": [
+  {
+   "slug": "prompting",
+   "titulo": "Trabajar con LLMs: prompts, costos y producción",
+   "slides": [
+    {
+     "i": 0,
+     "title": "Inteligencia Artificial Generativa (AI Gen)",
+     "section": "",
+     "resumen": "Portada de la clase 5: prompts, costos y uso de LLMs en producción.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Portada",
+     "last": 71
+    },
+    {
+     "i": 1,
+     "title": "Fundamentos",
+     "section": "Fundamentos",
+     "resumen": "Agenda: primero cómo funciona el modelo y cuánto cuesta, después el oficio de escribir prompts y razonar.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Fundamentos",
+     "last": 71
+    },
+    {
+     "i": 2,
+     "title": "¿Qué es un prompt?",
+     "section": "Fundamentos",
+     "resumen": "El **prompt** es la única palanca de control una vez elegido el modelo: como un ticket, si es vago, la implementación sale distinta.",
+     "claves": [
+      {
+       "id": "prompt-engineering",
+       "label": "Prompt / prompt engineering",
+       "glos": true
+      },
+      {
+       "id": "llm",
+       "label": "LLM (Large Language Model)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Fundamentos",
+     "last": 71
+    },
+    {
+     "i": 3,
+     "title": "¿Qué se guarda en un prompt?",
+     "section": "Fundamentos",
+     "resumen": "En la ventana entran system prompt, historial, datos inyectados y respuestas previas; todo compite por atención. **Más contexto no es mejor contexto.**",
+     "claves": [
+      {
+       "id": "ventana-de-contexto",
+       "label": "Ventana de contexto",
+       "glos": true
+      },
+      {
+       "id": "system-prompt",
+       "label": "System prompt",
+       "glos": true
+      },
+      {
+       "id": "contexto-sobre-prompting",
+       "label": "Contexto > prompting",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 4,
+       "texto": "En el TP4 mediste el reparto del contexto por caso: el prompt de sistema era el 55 % y las búsquedas el 25 %.",
+       "tp_titulo": "El agente de admisión de guardia (TP final)",
+       "code": "tp4-contexto-desglose",
+       "nota": ""
+      }
+     ],
+     "ver": [
+      {
+       "url": "/clases/10/#d=agentes-y-multiagentes&s=41",
+       "clase": 10,
+       "cnn": "10",
+       "i": 41,
+       "title": "El contexto se degrada",
+       "por": "El contexto se degrada (context rot)"
+      }
+     ],
+     "key": false,
+     "section_label": "Fundamentos",
+     "last": 71
+    },
+    {
+     "i": 4,
+     "title": "Ventana de contexto",
+     "section": "Fundamentos",
+     "resumen": "La **ventana de contexto** es memoria de trabajo (RAM, no disco): finita, no persiste entre sesiones, y lo que queda afuera no existe para el modelo.",
+     "claves": [
+      {
+       "id": "ventana-de-contexto",
+       "label": "Ventana de contexto",
+       "glos": true
+      },
+      {
+       "id": "token",
+       "label": "Token",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 4,
+       "texto": "El agente del TP4 corta un caso si no entra en la ventana, en vez de recortar en silencio.",
+       "tp_titulo": "El agente de admisión de guardia (TP final)",
+       "code": "tp4-agente-guarda-contexto",
+       "nota": ""
+      }
+     ],
+     "ver": [
+      {
+       "url": "/clases/02/#d=cowork-intro&s=12",
+       "clase": 2,
+       "cnn": "02",
+       "i": 12,
+       "title": "El manejo del contexto",
+       "por": "Manejo del contexto en agentes"
+      }
+     ],
+     "key": true,
+     "section_label": "Fundamentos",
+     "last": 71
+    },
+    {
+     "i": 5,
+     "title": "¿Cuánto es 1 millón de Tolkien tokens?",
+     "section": "Fundamentos",
+     "resumen": "Un millón de tokens ≈ El Señor de los Anillos más El Hobbit (~750 mil tokens), y sobra lugar. La ventana dejó de ser el límite práctico.",
+     "claves": [
+      {
+       "id": "ventana-de-contexto",
+       "label": "Ventana de contexto",
+       "glos": true
+      },
+      {
+       "id": "token",
+       "label": "Token",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Fundamentos",
+     "last": 71
+    },
+    {
+     "i": 6,
+     "title": "Cómo se tokeniza",
+     "section": "Fundamentos",
+     "resumen": "**BPE** fusiona los pares de caracteres más frecuentes: lo común es un token, lo raro se parte. Cada familia de modelos tiene su vocabulario.",
+     "claves": [
+      {
+       "id": "tokenizacion",
+       "label": "Tokenización (BPE)",
+       "glos": true
+      },
+      {
+       "id": "token",
+       "label": "Token",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/07/#d=palabra-al-transformer&s=10",
+       "clase": 7,
+       "cnn": "07",
+       "i": 10,
+       "title": "Los modelos no leen letras",
+       "por": "Los modelos no leen letras"
+      }
+     ],
+     "key": false,
+     "section_label": "Fundamentos",
+     "last": 71
+    },
+    {
+     "i": 7,
+     "title": "Economía de tokens",
+     "section": "Fundamentos",
+     "resumen": "Se procesa y se factura en **tokens**, no palabras. El código y el JSON tokenizan peor que la prosa; centavos que se multiplican por miles de llamadas.",
+     "claves": [
+      {
+       "id": "token",
+       "label": "Token",
+       "glos": true
+      },
+      {
+       "id": "costo-por-token",
+       "label": "Costo por token / fórmula del costo",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Fundamentos",
+     "last": 71
+    },
+    {
+     "i": 8,
+     "title": "La fórmula del costo",
+     "section": "Fundamentos",
+     "resumen": "**Costo = tokens entrada × precio + tokens salida × precio.** Cada turno reenvía todo el historial: un chat de 20 turnos paga el primero 20 veces.",
+     "claves": [
+      {
+       "id": "costo-por-token",
+       "label": "Costo por token / fórmula del costo",
+       "glos": true
+      },
+      {
+       "id": "token",
+       "label": "Token",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 3,
+       "texto": "Tus logs del TP3 registraban tokens y costo por llamada: ~USD 0,0015 por corrida del agente contra ~0,017 del juez (más de 10×).",
+       "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+       "code": "tp3-corrida-usage-resumen",
+       "nota": "Costo = tokens de entrada × precio de entrada + tokens de salida × precio de salida, calculado por llamada."
+      }
+     ],
+     "ver": [],
+     "key": true,
+     "section_label": "Fundamentos",
+     "last": 71
+    },
+    {
+     "i": 9,
+     "title": "Cómo funciona el caching",
+     "section": "Fundamentos",
+     "resumen": "El **caching** guarda el cómputo de un **prefijo**, no respuestas. Si cambia un byte, todo lo posterior se recalcula: lo estable va adelante.",
+     "claves": [
+      {
+       "id": "prompt-caching",
+       "label": "Prompt caching",
+       "glos": true
+      },
+      {
+       "id": "kv-cache",
+       "label": "KV cache",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/08/#d=transformers-a-fondo&s=11",
+       "clase": 8,
+       "cnn": "08",
+       "i": 11,
+       "title": "El ciclo de generación con el transformer abierto",
+       "por": "Ciclo de generación del transformer"
+      }
+     ],
+     "key": true,
+     "section_label": "Fundamentos",
+     "last": 71
+    },
+    {
+     "i": 10,
+     "title": "Del chat al caché programático",
+     "section": "Fundamentos",
+     "resumen": "En un chat el prefijo crece solo; en una aplicación vos armás el pedido y decidís dónde corta lo reutilizable de lo variable.",
+     "claves": [
+      {
+       "id": "prompt-caching",
+       "label": "Prompt caching",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Fundamentos",
+     "last": 71
+    },
+    {
+     "i": 11,
+     "title": "Prompt caching: implementación",
+     "section": "Fundamentos",
+     "resumen": "Se marca con `cache_control` lo estático (system prompt, guías, docs) arriba y lo dinámico (diff, consulta) abajo. Mal ordenado falla en silencio.",
+     "claves": [
+      {
+       "id": "prompt-caching",
+       "label": "Prompt caching",
+       "glos": true
+      },
+      {
+       "id": "system-prompt",
+       "label": "System prompt",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Fundamentos",
+     "last": 71
+    },
+    {
+     "i": 12,
+     "title": "La economía de los tokens",
+     "section": "Fundamentos",
+     "resumen": "Transición: todo lo anterior es **economía de tokens**. Ya se mide el costo; la pregunta abierta es el valor que genera.",
+     "claves": [
+      {
+       "id": "costo-por-token",
+       "label": "Costo por token / fórmula del costo",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Fundamentos",
+     "last": 71
+    },
+    {
+     "i": 13,
+     "title": "La Tokenomics Foundation",
+     "section": "Fundamentos",
+     "resumen": "La Linux Foundation lanzó la **Tokenomics Foundation** (2026) para estandarizar la medición: el token es la unidad común, pero no hay forma estándar de comparar proveedores.",
+     "claves": [
+      {
+       "id": "costo-por-token",
+       "label": "Costo por token / fórmula del costo",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Fundamentos",
+     "last": 71
+    },
+    {
+     "i": 14,
+     "title": "Limitaciones de los LLM",
+     "section": "Fundamentos",
+     "resumen": "Tres fallas de familia: **alucinaciones**, **no-determinismo** y **sesgo de recencia** (importa más el principio y el final). Se administran con diseño, no con mejor modelo.",
+     "claves": [
+      {
+       "id": "alucinacion",
+       "label": "Alucinación",
+       "glos": true
+      },
+      {
+       "id": "no-determinismo",
+       "label": "no determinismo",
+       "glos": false
+      },
+      {
+       "id": "sesgo de recencia",
+       "label": "sesgo de recencia",
+       "glos": false
+      }
+     ],
+     "tp": [
+      {
+       "tp": 3,
+       "texto": "En el TP3 usaste temperatura 0 y aun así concluiste que, con 12 preguntas y una corrida, una pregunta de diferencia era ruido.",
+       "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+       "code": "tp3-informe-a11",
+       "nota": "Mirá el último párrafo: aun con temperatura 0 la consulta varió entre corridas."
+      }
+     ],
+     "ver": [],
+     "key": true,
+     "section_label": "Fundamentos",
+     "last": 71
+    },
+    {
+     "i": 15,
+     "title": "¿Por qué alucina un modelo?",
+     "section": "Fundamentos",
+     "resumen": "El modelo genera el token más probable aunque no tenga el dato: no tiene un canal para decir «no sé», y lo inventado suena igual de seguro.",
+     "claves": [
+      {
+       "id": "alucinacion",
+       "label": "Alucinación",
+       "glos": true
+      },
+      {
+       "id": "llm",
+       "label": "LLM (Large Language Model)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/01/#d=introduccion&s=13",
+       "clase": 1,
+       "cnn": "01",
+       "i": 13,
+       "title": "Limitaciones de la IA Generativa",
+       "por": "Limitaciones de la IA generativa"
+      }
+     ],
+     "key": false,
+     "section_label": "Fundamentos",
+     "last": 71
+    },
+    {
+     "i": 16,
+     "title": "Alucinaciones: casos reales",
+     "section": "Fundamentos",
+     "resumen": "Air Canada respondió por lo que inventó su chatbot: **quien despliega el modelo responde** por lo que dice. Hay más de mil casos judiciales documentados.",
+     "claves": [
+      {
+       "id": "alucinacion",
+       "label": "Alucinación",
+       "glos": true
+      },
+      {
+       "id": "responsabilidad",
+       "label": "responsabilidad",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Fundamentos",
+     "last": 71
+    },
+    {
+     "i": 17,
+     "title": "Mitigar alucinaciones: el prompt",
+     "section": "Fundamentos",
+     "resumen": "Palancas dentro de la llamada, de barata a cara: **grounding** (responder solo con el contexto y admitir «no sé»), RAG, self-consistency y revisión humana.",
+     "claves": [
+      {
+       "id": "alucinacion",
+       "label": "Alucinación",
+       "glos": true
+      },
+      {
+       "id": "rag",
+       "label": "RAG (Retrieval-Augmented Generation)",
+       "glos": true
+      },
+      {
+       "id": "system-prompt",
+       "label": "System prompt",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 3,
+       "texto": "El prompt del TP3 obligaba a usar solo datos de las herramientas y decir cuando faltaban: Faithfulness 5,00 en las 4 corridas.",
+       "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+       "code": "tp3-prompt-sistema",
+       "nota": ""
+      }
+     ],
+     "ver": [
+      {
+       "url": "/clases/06/#d=rag-y-mcp&s=2",
+       "clase": 6,
+       "cnn": "06",
+       "i": 2,
+       "title": "RAG suma lo que no está en los pesos",
+       "por": "RAG: lo que no está en los pesos"
+      }
+     ],
+     "key": true,
+     "section_label": "Fundamentos",
+     "last": 71
+    },
+    {
+     "i": 18,
+     "title": "Mitigar alucinaciones: el proceso",
+     "section": "Fundamentos",
+     "resumen": "Testear prompts como código: eval set de 50–100 casos con ground truth, métricas (faithfulness), regresión en cada cambio y red teaming.",
+     "claves": [
+      {
+       "id": "evals",
+       "label": "Evals (eval set propio)",
+       "glos": true
+      },
+      {
+       "id": "alucinacion",
+       "label": "Alucinación",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 4,
+       "texto": "En el TP4 elegiste prompts en un prompt-dev propio y dejaste práctica solo para reportar, para no sobreajustar al conjunto de evaluación.",
+       "tp_titulo": "El agente de admisión de guardia (TP final)",
+       "code": "tp4-guarda-practica",
+       "nota": ""
+      }
+     ],
+     "ver": [
+      {
+       "url": "/clases/04/#d=modelado-redes-neuronales&s=16",
+       "clase": 4,
+       "cnn": "04",
+       "i": 16,
+       "title": "Un dataset, tres trabajos distintos",
+       "por": "Train, validación y test"
+      }
+     ],
+     "key": true,
+     "section_label": "Fundamentos",
+     "last": 71
+    },
+    {
+     "i": 19,
+     "title": "Modelo mental: motores de completado",
+     "section": "Fundamentos",
+     "resumen": "Los LLM son **motores de completado**: un buen prompt es un patrón fácil de completar. Esa idea explica XML, few-shot y CoT.",
+     "claves": [
+      {
+       "id": "llm",
+       "label": "LLM (Large Language Model)",
+       "glos": true
+      },
+      {
+       "id": "prompt-engineering",
+       "label": "Prompt / prompt engineering",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Fundamentos",
+     "last": 71
+    },
+    {
+     "i": 20,
+     "title": "Modelos y costos",
+     "section": "Modelos y costos",
+     "resumen": "Separador: tarifas por familia, cuándo conviene cada modelo, caching y cascading.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Modelos y costos",
+     "last": 71
+    },
+    {
+     "i": 21,
+     "title": "Tarifas: familia Claude",
+     "section": "Modelos y costos",
+     "resumen": "En la familia Claude la **salida cuesta 5×** la entrada; entre Haiku y el tope, ×10. Cache hit = 10 % del precio de entrada; batch = 50 %.",
+     "claves": [
+      {
+       "id": "costo-por-token",
+       "label": "Costo por token / fórmula del costo",
+       "glos": true
+      },
+      {
+       "id": "prompt-caching",
+       "label": "Prompt caching",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Modelos y costos",
+     "last": 71
+    },
+    {
+     "i": 22,
+     "title": "Elegir modelo: la primera pregunta que dé \"sí\" decide",
+     "section": "Modelos y costos",
+     "resumen": "Árbol para elegir modelo: primero dificultad de la tarea, después contexto necesario y recién al final costo. Las preguntas duran más que los nombres.",
+     "claves": [
+      {
+       "id": "eleccion de modelo",
+       "label": "eleccion de modelo",
+       "glos": false
+      },
+      {
+       "id": "costo-por-token",
+       "label": "Costo por token / fórmula del costo",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Modelos y costos",
+     "last": 71
+    },
+    {
+     "i": 23,
+     "title": "Model cascading",
+     "section": "Modelos y costos",
+     "resumen": "**Model cascading**: primero el modelo barato y, si la confianza es baja, se escala al caro. Todo el ahorro depende de que el gate sea confiable.",
+     "claves": [
+      {
+       "id": "model-cascading",
+       "label": "Model cascading",
+       "glos": true
+      },
+      {
+       "id": "costo-por-token",
+       "label": "Costo por token / fórmula del costo",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": true,
+     "section_label": "Modelos y costos",
+     "last": 71
+    },
+    {
+     "i": 24,
+     "title": "Cascading: el gate en código",
+     "section": "Modelos y costos",
+     "resumen": "El gate es un campo `confianza` del esquema de salida, garantizado por structured outputs. Aun escalando 8 de cada 10, la cascada empata con el caro.",
+     "claves": [
+      {
+       "id": "model-cascading",
+       "label": "Model cascading",
+       "glos": true
+      },
+      {
+       "id": "structured-output",
+       "label": "Salidas estructuradas (JSON Schema)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Modelos y costos",
+     "last": 71
+    },
+    {
+     "i": 25,
+     "title": "Cascading: cuándo sí y cuándo no",
+     "section": "Modelos y costos",
+     "resumen": "Conviene con alto volumen, señal de confianza clara y presión de costo. Es un componente más que mantener: primero probá el buen modelo con effort bajo.",
+     "claves": [
+      {
+       "id": "model-cascading",
+       "label": "Model cascading",
+       "glos": true
+      },
+      {
+       "id": "effort",
+       "label": "Effort",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Modelos y costos",
+     "last": 71
+    },
+    {
+     "i": 26,
+     "title": "Prompts estructurados",
+     "section": "Prompts estructurados",
+     "resumen": "Separador: armar un prompt en seis partes, con etiquetas XML y salidas JSON validables.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Prompts estructurados",
+     "last": 71
+    },
+    {
+     "i": 27,
+     "title": "Los 6 componentes",
+     "section": "Prompts estructurados",
+     "resumen": "Seis componentes en orden: **rol, contexto, instrucciones, restricciones, ejemplos e input**. La estructura separa un prototipo de un sistema de producción.",
+     "claves": [
+      {
+       "id": "prompt-engineering",
+       "label": "Prompt / prompt engineering",
+       "glos": true
+      },
+      {
+       "id": "system-prompt",
+       "label": "System prompt",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 4,
+       "texto": "Tu prompt procedimiento-v1 del TP4 agregó instrucciones paso a paso (buscar cada tema por separado): de 10/10/7 a 14/16/12 casos resueltos.",
+       "tp_titulo": "El agente de admisión de guardia (TP final)",
+       "code": "tp4-solo-prompt-practica",
+       "nota": "El componente agregado fue la instrucción paso a paso: buscar cada tema con su propia consulta."
+      }
+     ],
+     "ver": [],
+     "key": true,
+     "section_label": "Prompts estructurados",
+     "last": 71
+    },
+    {
+     "i": 28,
+     "title": "Un prompt completo",
+     "section": "Prompts estructurados",
+     "resumen": "Ejemplo completo para revisar un PR. Las **restricciones** son el bloque que más trabaja y el ejemplo fija el formato exacto que el modelo copia.",
+     "claves": [
+      {
+       "id": "prompt-engineering",
+       "label": "Prompt / prompt engineering",
+       "glos": true
+      },
+      {
+       "id": "few-shot",
+       "label": "In-context learning: zero / few / many-shot",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/02/#d=cowork-intro&s=16",
+       "clase": 2,
+       "cnn": "02",
+       "i": 16,
+       "title": "Un ejemplo de CLAUDE.md",
+       "por": "Un ejemplo de CLAUDE.md"
+      }
+     ],
+     "key": false,
+     "section_label": "Prompts estructurados",
+     "last": 71
+    },
+    {
+     "i": 29,
+     "title": "Salidas estructuradas: JSON Schema",
+     "section": "Prompts estructurados",
+     "resumen": "Pedir JSON en el prompt es una sugerencia; las **salidas estructuradas** de la API lo garantizan al decodificar. Si la salida alimenta código, se usa la garantía.",
+     "claves": [
+      {
+       "id": "structured-output",
+       "label": "Salidas estructuradas (JSON Schema)",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 4,
+       "texto": "El agente del TP4 responde con acciones JSON y tiene un mensaje de corrección cuando el JSON llega inválido.",
+       "tp_titulo": "El agente de admisión de guardia (TP final)",
+       "code": "tp4-agente-bucle",
+       "nota": "Mirá la rama `obj is None`: ahí entra `mensaje_json_invalido`."
+      }
+     ],
+     "ver": [
+      {
+       "url": "/clases/09/#d=como-se-entrena-un-llm&s=41",
+       "clase": 9,
+       "cnn": "09",
+       "i": 41,
+       "title": "Calcular: de los tokens al JSON",
+       "por": "De los tokens al JSON"
+      }
+     ],
+     "key": true,
+     "section_label": "Prompts estructurados",
+     "last": 71
+    },
+    {
+     "i": 30,
+     "title": "XML: estructura semántica",
+     "section": "Prompts estructurados",
+     "resumen": "Las **etiquetas XML** marcan dónde empieza y termina cada parte; además separan instrucción de dato, cerrando una puerta a la prompt injection.",
+     "claves": [
+      {
+       "id": "prompt-engineering",
+       "label": "Prompt / prompt engineering",
+       "glos": true
+      },
+      {
+       "id": "prompt-injection",
+       "label": "Prompt injection",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/13/#d=cierre-magnifica-humanitas&s=15",
+       "clase": 13,
+       "cnn": "13",
+       "i": 15,
+       "title": "Para el modelo, todo es texto",
+       "por": "Para el modelo, todo es texto"
+      }
+     ],
+     "key": false,
+     "section_label": "Prompts estructurados",
+     "last": 71
+    },
+    {
+     "i": 31,
+     "title": "In-context learning",
+     "section": "In-context learning",
+     "resumen": "Separador: enseñar con ejemplos dentro del prompt (zero, few y many-shot).",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "In-context learning",
+     "last": 71
+    },
+    {
+     "i": 32,
+     "title": "In-context learning (ICL)",
+     "section": "In-context learning",
+     "resumen": "**In-context learning**: el modelo toma el patrón de los ejemplos del prompt **sin tocar los pesos**. Zero-shot sin ejemplos, few-shot 2–10, many-shot decenas o cientos.",
+     "claves": [
+      {
+       "id": "in-context-learning",
+       "label": "In-context learning",
+       "glos": true
+      },
+      {
+       "id": "few-shot",
+       "label": "In-context learning: zero / few / many-shot",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/09/#d=como-se-entrena-un-llm&s=52",
+       "clase": 9,
+       "cnn": "09",
+       "i": 52,
+       "title": "Prompt, RAG o fine-tuning",
+       "por": "Prompt, RAG o fine-tuning"
+      }
+     ],
+     "key": true,
+     "section_label": "In-context learning",
+     "last": 71
+    },
+    {
+     "i": 33,
+     "title": "Zero-shot vs. few-shot",
+     "section": "In-context learning",
+     "resumen": "Mismo issue: en zero-shot el modelo inventa su escala y no se puede parsear; con dos ejemplos la escala deja de ser suya.",
+     "claves": [
+      {
+       "id": "few-shot",
+       "label": "In-context learning: zero / few / many-shot",
+       "glos": true
+      },
+      {
+       "id": "in-context-learning",
+       "label": "In-context learning",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 3,
+       "texto": "En el TP3 sacaste del ejemplo de la descripción la pregunta A01 de dev, para no filtrar el conjunto de evaluación al sistema.",
+       "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+       "code": "tp3-descripciones-tools",
+       "nota": "Fijate el ejemplo de `consulta` ('cómo es una consulta por telemedicina'): reemplazó a la pregunta A01 de dev para no filtrar la evaluación."
+      }
+     ],
+     "ver": [],
+     "key": false,
+     "section_label": "In-context learning",
+     "last": 71
+    },
+    {
+     "i": 34,
+     "title": "Many-shot learning",
+     "section": "In-context learning",
+     "resumen": "**Many-shot**: cuando few-shot no cubre la variabilidad. Cada error en producción se agrega como ejemplo: mejora continua sin reentrenar, con costo lineal en tokens.",
+     "claves": [
+      {
+       "id": "few-shot",
+       "label": "In-context learning: zero / few / many-shot",
+       "glos": true
+      },
+      {
+       "id": "in-context-learning",
+       "label": "In-context learning",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "In-context learning",
+     "last": 71
+    },
+    {
+     "i": 35,
+     "title": "Prompting avanzado",
+     "section": "Prompting avanzado",
+     "resumen": "Separador: la sección central, todo lo que el modelo escribe antes de contestar.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Prompting avanzado",
+     "last": 71
+    },
+    {
+     "i": 36,
+     "title": "Cuatro técnicas, una sola idea",
+     "section": "Prompting avanzado",
+     "resumen": "CoT, self-consistency, ToT y prompt chaining comparten una idea: **hacen que el modelo escriba más antes de responder**.",
+     "claves": [
+      {
+       "id": "chain-of-thought",
+       "label": "Chain of Thought (CoT)",
+       "glos": true
+      },
+      {
+       "id": "self-consistency",
+       "label": "Self-consistency",
+       "glos": true
+      },
+      {
+       "id": "tree-of-thought",
+       "label": "Tree of Thought (ToT)",
+       "glos": true
+      },
+      {
+       "id": "prompt-chaining",
+       "label": "Prompt chaining",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": true,
+     "section_label": "Prompting avanzado",
+     "last": 71
+    },
+    {
+     "i": 37,
+     "title": "Chain of Thought (CoT)",
+     "section": "Prompting avanzado",
+     "resumen": "**Chain of Thought**: pedir o mostrar el razonamiento paso a paso. Las mejoras publicadas son relativas a CoT, no precisión absoluta: leer bien los papers.",
+     "claves": [
+      {
+       "id": "chain-of-thought",
+       "label": "Chain of Thought (CoT)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Prompting avanzado",
+     "last": 71
+    },
+    {
+     "i": 38,
+     "title": "Chain of Thought: ejemplo",
+     "section": "Prompting avanzado",
+     "resumen": "Con y sin CoT el resultado coincide, pero solo uno se puede **auditar**: con los pasos escritos, el error se ve donde ocurre.",
+     "claves": [
+      {
+       "id": "chain-of-thought",
+       "label": "Chain of Thought (CoT)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Prompting avanzado",
+     "last": 71
+    },
+    {
+     "i": 39,
+     "title": "Self-consistency: votación",
+     "section": "Prompting avanzado",
+     "resumen": "**Self-consistency**: muestrear varias cadenas del mismo prompt y votar por mayoría. Para alto riesgo; N llamadas cuestan N veces.",
+     "claves": [
+      {
+       "id": "self-consistency",
+       "label": "Self-consistency",
+       "glos": true
+      },
+      {
+       "id": "chain-of-thought",
+       "label": "Chain of Thought (CoT)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Prompting avanzado",
+     "last": 71
+    },
+    {
+     "i": 40,
+     "title": "Self-consistency: ejemplo",
+     "section": "Prompting avanzado",
+     "resumen": "Cinco corridas sobre el mismo diff: la disidente no alucina, lee distinto. La «confianza» del 67 % es proporción de votos, no probabilidad calibrada.",
+     "claves": [
+      {
+       "id": "self-consistency",
+       "label": "Self-consistency",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Prompting avanzado",
+     "last": 71
+    },
+    {
+     "i": 41,
+     "title": "Tree of Thought (ToT)",
+     "section": "Prompting avanzado",
+     "resumen": "**Tree of Thought**: explorar ramas, puntuarlas y podar. CoT es el árbol con una sola rama y sin vuelta atrás. Mucho más caro.",
+     "claves": [
+      {
+       "id": "tree-of-thought",
+       "label": "Tree of Thought (ToT)",
+       "glos": true
+      },
+      {
+       "id": "chain-of-thought",
+       "label": "Chain of Thought (CoT)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Prompting avanzado",
+     "last": 71
+    },
+    {
+     "i": 42,
+     "title": "Tree of Thought: ejemplo",
+     "section": "Prompting avanzado",
+     "resumen": "Tres refactors defendibles: gana el que acota el riesgo y se puede testear aparte, no el más elegante. ToT rinde cuando hay varias respuestas válidas.",
+     "claves": [
+      {
+       "id": "tree-of-thought",
+       "label": "Tree of Thought (ToT)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Prompting avanzado",
+     "last": 71
+    },
+    {
+     "i": 43,
+     "title": "Prompt chaining",
+     "section": "Prompting avanzado",
+     "resumen": "**Prompt chaining**: dividir la tarea en prompts simples encadenados. Cada paso es más preciso y se puede evaluar por separado; suma latencia.",
+     "claves": [
+      {
+       "id": "prompt-chaining",
+       "label": "Prompt chaining",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/10/#d=agentes-y-multiagentes&s=14",
+       "clase": 10,
+       "cnn": "10",
+       "i": 14,
+       "title": "Workflow o agente",
+       "por": "Workflow o agente"
+      }
+     ],
+     "key": false,
+     "section_label": "Prompting avanzado",
+     "last": 71
+    },
+    {
+     "i": 44,
+     "title": "Prompt chaining: ejemplo",
+     "section": "Prompting avanzado",
+     "resumen": "Encadenar facilita el debug y los reintentos por paso, y puede salir **más barato**: modelo chico en pasos simples, caro solo al final.",
+     "claves": [
+      {
+       "id": "prompt-chaining",
+       "label": "Prompt chaining",
+       "glos": true
+      },
+      {
+       "id": "model-cascading",
+       "label": "Model cascading",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Prompting avanzado",
+     "last": 71
+    },
+    {
+     "i": 45,
+     "title": "Las cuatro técnicas: pros y contras",
+     "section": "Prompting avanzado",
+     "resumen": "Tabla comparativa: todas las contras son la misma, **más tokens o más llamadas**. Ninguna técnica compra calidad gratis.",
+     "claves": [
+      {
+       "id": "chain-of-thought",
+       "label": "Chain of Thought (CoT)",
+       "glos": true
+      },
+      {
+       "id": "self-consistency",
+       "label": "Self-consistency",
+       "glos": true
+      },
+      {
+       "id": "tree-of-thought",
+       "label": "Tree of Thought (ToT)",
+       "glos": true
+      },
+      {
+       "id": "prompt-chaining",
+       "label": "Prompt chaining",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Prompting avanzado",
+     "last": 71
+    },
+    {
+     "i": 46,
+     "title": "¿Por qué tardan más?",
+     "section": "Prompting avanzado",
+     "resumen": "Más calidad es más tokens generados y más segundos: CoT 2–5× de latencia, self-consistency N× (en paralelo cuesta N en plata y 1 en tiempo).",
+     "claves": [
+      {
+       "id": "costo-por-token",
+       "label": "Costo por token / fórmula del costo",
+       "glos": true
+      },
+      {
+       "id": "latencia",
+       "label": "latencia",
+       "glos": false
+      }
+     ],
+     "tp": [
+      {
+       "tp": 4,
+       "texto": "procedimiento-v1 del TP4 mejoró los casos resueltos, pero subió el contexto ~2,6× (~52 mil caracteres por caso) y de ~16 a ~25 s por caso.",
+       "tp_titulo": "El agente de admisión de guardia (TP final)",
+       "code": "tp4-procedimiento-dev",
+       "nota": ""
+      }
+     ],
+     "ver": [],
+     "key": false,
+     "section_label": "Prompting avanzado",
+     "last": 71
+    },
+    {
+     "i": 47,
+     "title": "¿Por qué funcionan?",
+     "section": "Prompting avanzado",
+     "resumen": "La tesis: el LLM **predice token a token** y cada token depende solo de los anteriores. Escribir los pasos no documenta el razonamiento: **es** el cómputo.",
+     "claves": [
+      {
+       "id": "chain-of-thought",
+       "label": "Chain of Thought (CoT)",
+       "glos": true
+      },
+      {
+       "id": "llm",
+       "label": "LLM (Large Language Model)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/08/#d=transformers-a-fondo&s=20",
+       "clase": 8,
+       "cnn": "08",
+       "i": 20,
+       "title": "La máscara causal",
+       "por": "La máscara causal"
+      }
+     ],
+     "key": true,
+     "section_label": "Prompting avanzado",
+     "last": 71
+    },
+    {
+     "i": 48,
+     "title": "Effort y thinking",
+     "section": "Effort y thinking",
+     "resumen": "Separador: controlar cuánto razona el modelo por parámetro, no por texto.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Effort y thinking",
+     "last": 71
+    },
+    {
+     "i": 49,
+     "title": "Thinking: el mecanismo",
+     "section": "Effort y thinking",
+     "resumen": "**Thinking adaptativo**: el modelo decide en cada pedido si piensa y cuánto. El código no puede asumir que siempre llega un bloque de thinking.",
+     "claves": [
+      {
+       "id": "thinking-adaptativo",
+       "label": "Thinking (razonamiento extendido adaptativo)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": true,
+     "section_label": "Effort y thinking",
+     "last": 71
+    },
+    {
+     "i": 50,
+     "title": "Thinking: cómo queda en código",
+     "section": "Effort y thinking",
+     "resumen": "En código, `display` va dentro de `thinking`, y la respuesta es una lista de bloques: `content[0].text` se rompe si no hubo thinking.",
+     "claves": [
+      {
+       "id": "thinking-adaptativo",
+       "label": "Thinking (razonamiento extendido adaptativo)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Effort y thinking",
+     "last": 71
+    },
+    {
+     "i": 51,
+     "title": "Una sola pasada, o una zona de trabajo aparte",
+     "section": "Effort y thinking",
+     "resumen": "Sin thinking, el modelo responde en una sola pasada: sin borrador ni verificación, y cada token emitido lo ata a lo que ya dijo.",
+     "claves": [
+      {
+       "id": "thinking-adaptativo",
+       "label": "Thinking (razonamiento extendido adaptativo)",
+       "glos": true
+      },
+      {
+       "id": "chain-of-thought",
+       "label": "Chain of Thought (CoT)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Effort y thinking",
+     "last": 71
+    },
+    {
+     "i": 52,
+     "title": "Qué cambia el bloque separado",
+     "section": "Effort y thinking",
+     "resumen": "El bloque separado es un **borrador**: puede equivocarse, verificar y cambiar de rumbo antes de la respuesta. No es una función de la interfaz.",
+     "claves": [
+      {
+       "id": "thinking-adaptativo",
+       "label": "Thinking (razonamiento extendido adaptativo)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Effort y thinking",
+     "last": 71
+    },
+    {
+     "i": 53,
+     "title": "De dónde salió el thinking",
+     "section": "Effort y thinking",
+     "resumen": "**DeepSeek-R1** (Nature, 2025) mostró que el razonamiento surge con **refuerzo puro** y recompensa verificable, sin razonamientos anotados por humanos.",
+     "claves": [
+      {
+       "id": "rl-con-verificador",
+       "label": "Refuerzo con recompensa verificable (DeepSeek-R1)",
+       "glos": true
+      },
+      {
+       "id": "thinking-adaptativo",
+       "label": "Thinking (razonamiento extendido adaptativo)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/09/#d=como-se-entrena-un-llm&s=31",
+       "clase": 9,
+       "cnn": "09",
+       "i": 31,
+       "title": "RL con verificador: el proceso",
+       "por": "RL con verificador: el proceso"
+      }
+     ],
+     "key": true,
+     "section_label": "Effort y thinking",
+     "last": 71
+    },
+    {
+     "i": 54,
+     "title": "¿CoT todavía sirve?",
+     "section": "Effort y thinking",
+     "resumen": "CoT sigue valiendo, pero los modelos de razonamiento ya lo traen del entrenamiento: el mecanismo es el mismo y cambió quién pide los pasos.",
+     "claves": [
+      {
+       "id": "chain-of-thought",
+       "label": "Chain of Thought (CoT)",
+       "glos": true
+      },
+      {
+       "id": "thinking-adaptativo",
+       "label": "Thinking (razonamiento extendido adaptativo)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Effort y thinking",
+     "last": 71
+    },
+    {
+     "i": 55,
+     "title": "Effort: un parámetro de la petición",
+     "section": "Effort y thinking",
+     "resumen": "**effort** es un parámetro de la petición (en `output_config`, no en `thinking`) que gradúa cuántos tokens gasta el mismo modelo. `high` es el default.",
+     "claves": [
+      {
+       "id": "effort",
+       "label": "Effort",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": true,
+     "section_label": "Effort y thinking",
+     "last": 71
+    },
+    {
+     "i": 56,
+     "title": "Los cinco niveles de effort",
+     "section": "Effort y thinking",
+     "resumen": "Cinco niveles, de rápido a exhaustivo. Afecta texto, tools y thinking: es una **señal de comportamiento**, no un presupuesto de tokens.",
+     "claves": [
+      {
+       "id": "effort",
+       "label": "Effort",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Effort y thinking",
+     "last": 71
+    },
+    {
+     "i": 57,
+     "title": "Effort por dentro: una señal, no un flag",
+     "section": "Effort y thinking",
+     "resumen": "Por dentro, el effort son tokens que el modelo **lee** junto al prompt; el comportamiento por nivel es aprendido, no programado.",
+     "claves": [
+      {
+       "id": "effort",
+       "label": "Effort",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Effort y thinking",
+     "last": 71
+    },
+    {
+     "i": 58,
+     "title": "Pedirle al modelo que piense",
+     "section": "Effort y thinking",
+     "resumen": "Pensar es **promptable**: el effort fija la postura general y el lenguaje natural ajusta cada turno.",
+     "claves": [
+      {
+       "id": "effort",
+       "label": "Effort",
+       "glos": true
+      },
+      {
+       "id": "thinking-adaptativo",
+       "label": "Thinking (razonamiento extendido adaptativo)",
+       "glos": true
+      },
+      {
+       "id": "prompt-engineering",
+       "label": "Prompt / prompt engineering",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Effort y thinking",
+     "last": 71
+    },
+    {
+     "i": 59,
+     "title": "Frases que suben o bajan el thinking",
+     "section": "Effort y thinking",
+     "resumen": "Frases textuales de la documentación para subir o bajar el thinking: la del system prompt afecta toda la conversación; la del turno, solo ese turno.",
+     "claves": [
+      {
+       "id": "thinking-adaptativo",
+       "label": "Thinking (razonamiento extendido adaptativo)",
+       "glos": true
+      },
+      {
+       "id": "system-prompt",
+       "label": "System prompt",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Effort y thinking",
+     "last": 71
+    },
+    {
+     "i": 60,
+     "title": "LLMs en ingeniería",
+     "section": "LLMs en ingeniería",
+     "resumen": "Separador: dónde entran los LLM en el ciclo de vida del software, con riesgos y mitigaciones.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "LLMs en ingeniería",
+     "last": 71
+    },
+    {
+     "i": 61,
+     "title": "Ciclo de vida: dónde entra el LLM",
+     "section": "LLMs en ingeniería",
+     "resumen": "Del issue a producción, el LLM aporta en cada etapa: triage, diseño, implementación, review, tests y operación.",
+     "claves": [
+      {
+       "id": "agente-de-codigo",
+       "label": "Agente de código",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/02/#d=cowork-intro&s=4",
+       "clase": 2,
+       "cnn": "02",
+       "i": 4,
+       "title": "Delegar una tarea completa",
+       "por": "Delegar una tarea completa"
+      }
+     ],
+     "key": false,
+     "section_label": "LLMs en ingeniería",
+     "last": 71
+    },
+    {
+     "i": 62,
+     "title": "Explorar y entender código",
+     "section": "LLMs en ingeniería",
+     "resumen": "El uso que más tiempo ahorra es **entender código existente**: búsqueda por intención (dónde se decide algo), no por texto como `grep`.",
+     "claves": [
+      {
+       "id": "agente-de-codigo",
+       "label": "Agente de código",
+       "glos": true
+      },
+      {
+       "id": "busqueda semantica",
+       "label": "busqueda semantica",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/06/#d=rag-y-mcp&s=19",
+       "clase": 6,
+       "cnn": "06",
+       "i": 19,
+       "title": "Encontrar por significado",
+       "por": "Encontrar por significado"
+      }
+     ],
+     "key": false,
+     "section_label": "LLMs en ingeniería",
+     "last": 71
+    },
+    {
+     "i": 63,
+     "title": "Casos de uso hoy",
+     "section": "LLMs en ingeniería",
+     "resumen": "Casos ya desplegados. Ojo: un test generado desde el código verifica que hace lo que hace, no que hace lo correcto.",
+     "claves": [
+      {
+       "id": "agente-de-codigo",
+       "label": "Agente de código",
+       "glos": true
+      },
+      {
+       "id": "tdd",
+       "label": "TDD con agentes",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "LLMs en ingeniería",
+     "last": 71
+    },
+    {
+     "i": 64,
+     "title": "Seguridad: el caso Glasswing",
+     "section": "LLMs en ingeniería",
+     "resumen": "Caso Glasswing (2026): un modelo encontró de forma autónoma miles de vulnerabilidades críticas, algunas de 27 años. La misma capacidad sirve para atacar.",
+     "claves": [
+      {
+       "id": "seguridad",
+       "label": "seguridad",
+       "glos": false
+      },
+      {
+       "id": "vulnerabilidades",
+       "label": "vulnerabilidades",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "LLMs en ingeniería",
+     "last": 71
+    },
+    {
+     "i": 65,
+     "title": "Oportunidades vs. riesgos",
+     "section": "LLMs en ingeniería",
+     "resumen": "Oportunidades (bajar el piso, liberar tiempo) contra riesgos técnicos y organizacionales. El más silencioso es la **dependencia excesiva**.",
+     "claves": [
+      {
+       "id": "deskilling",
+       "label": "Deskilling",
+       "glos": true
+      },
+      {
+       "id": "sesgo-de-automatizacion",
+       "label": "Sesgo de automatización",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/13/#d=cierre-magnifica-humanitas&s=35",
+       "clase": 13,
+       "cnn": "13",
+       "i": 35,
+       "title": "El riesgo del deskilling",
+       "por": "El riesgo del deskilling"
+      }
+     ],
+     "key": false,
+     "section_label": "LLMs en ingeniería",
+     "last": 71
+    },
+    {
+     "i": 66,
+     "title": "Mitigaciones que funcionan",
+     "section": "LLMs en ingeniería",
+     "resumen": "Mitigaciones de siempre aplicadas al prompt: **revisión humana obligatoria**, tests y versionado. La revisión humana es el piso no negociable.",
+     "claves": [
+      {
+       "id": "humano-en-el-circuito",
+       "label": "Humano en el circuito",
+       "glos": true
+      },
+      {
+       "id": "evals",
+       "label": "Evals (eval set propio)",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 4,
+       "texto": "En el TP4 versionaste los prompts en un PromptSpec con sha256: cada número reportado dice qué prompt lo produjo.",
+       "tp_titulo": "El agente de admisión de guardia (TP final)",
+       "code": "tp4-promptspec-sha256",
+       "nota": ""
+      }
+     ],
+     "ver": [],
+     "key": true,
+     "section_label": "LLMs en ingeniería",
+     "last": 71
+    },
+    {
+     "i": 67,
+     "title": "Para pensar",
+     "section": "LLMs en ingeniería",
+     "resumen": "Para discutir: la evidencia de productividad es floja y la brecha de uso es real. ¿Quién firma el código generado? Quien lo mergea.",
+     "claves": [
+      {
+       "id": "humano-en-el-circuito",
+       "label": "Humano en el circuito",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "LLMs en ingeniería",
+     "last": 71
+    },
+    {
+     "i": 68,
+     "title": "Benchmarks: qué miden",
+     "section": "LLMs en ingeniería",
+     "resumen": "Un **benchmark** compara modelos en una tarea cerrada; dice poco de cómo rinden en tu repo. Lo que vale es tu propio eval set.",
+     "claves": [
+      {
+       "id": "saturacion-de-benchmarks",
+       "label": "Saturación de benchmarks y validez externa",
+       "glos": true
+      },
+      {
+       "id": "evals",
+       "label": "Evals (eval set propio)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/13/#d=cierre-magnifica-humanitas&s=5",
+       "clase": 13,
+       "cnn": "13",
+       "i": 5,
+       "title": "El ritmo: los benchmarks se agotan",
+       "por": "Los benchmarks se agotan"
+      }
+     ],
+     "key": false,
+     "section_label": "LLMs en ingeniería",
+     "last": 71
+    },
+    {
+     "i": 69,
+     "title": "Resumen y práctica",
+     "section": "Resumen y práctica",
+     "resumen": "Separador: cierre y práctica domiciliaria.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Resumen y práctica",
+     "last": 71
+    },
+    {
+     "i": 70,
+     "title": "¡A practicar!",
+     "section": "Resumen y práctica",
+     "resumen": "Tarea: cuatro módulos de aitutorial.dev (45–60 min) sobre fundamentos, estructura, técnicas avanzadas y testing de prompts.",
+     "claves": [
+      {
+       "id": "prompt-engineering",
+       "label": "Prompt / prompt engineering",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Resumen y práctica",
+     "last": 71
+    },
+    {
+     "i": 71,
+     "title": "Key takeaways",
+     "section": "Conclusions",
+     "resumen": "Tres ideas: el modelo **completa, no razona**; cada punto de calidad se paga en tokens, latencia y plata; la habilidad es emparejar técnica y modelo con la dificultad real.",
+     "claves": [
+      {
+       "id": "llm",
+       "label": "LLM (Large Language Model)",
+       "glos": true
+      },
+      {
+       "id": "costo-por-token",
+       "label": "Costo por token / fórmula del costo",
+       "glos": true
+      },
+      {
+       "id": "chain-of-thought",
+       "label": "Chain of Thought (CoT)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": true,
+     "section_label": "Conclusions",
+     "last": 71
+    }
+   ],
+   "groups": [
+    {
+     "label": "Portada",
+     "slides": [
+      {
+       "i": 0,
+       "title": "Inteligencia Artificial Generativa (AI Gen)",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 0,
+     "last": 0,
+     "ntp": 0,
+     "nkey": 0
+    },
+    {
+     "label": "Fundamentos",
+     "slides": [
+      {
+       "i": 1,
+       "title": "Fundamentos",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 2,
+       "title": "¿Qué es un prompt?",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 3,
+       "title": "¿Qué se guarda en un prompt?",
+       "key": false,
+       "tp": true
+      },
+      {
+       "i": 4,
+       "title": "Ventana de contexto",
+       "key": true,
+       "tp": true
+      },
+      {
+       "i": 5,
+       "title": "¿Cuánto es 1 millón de Tolkien tokens?",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 6,
+       "title": "Cómo se tokeniza",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 7,
+       "title": "Economía de tokens",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 8,
+       "title": "La fórmula del costo",
+       "key": true,
+       "tp": true
+      },
+      {
+       "i": 9,
+       "title": "Cómo funciona el caching",
+       "key": true,
+       "tp": false
+      },
+      {
+       "i": 10,
+       "title": "Del chat al caché programático",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 11,
+       "title": "Prompt caching: implementación",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 12,
+       "title": "La economía de los tokens",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 13,
+       "title": "La Tokenomics Foundation",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 14,
+       "title": "Limitaciones de los LLM",
+       "key": true,
+       "tp": true
+      },
+      {
+       "i": 15,
+       "title": "¿Por qué alucina un modelo?",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 16,
+       "title": "Alucinaciones: casos reales",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 17,
+       "title": "Mitigar alucinaciones: el prompt",
+       "key": true,
+       "tp": true
+      },
+      {
+       "i": 18,
+       "title": "Mitigar alucinaciones: el proceso",
+       "key": true,
+       "tp": true
+      },
+      {
+       "i": 19,
+       "title": "Modelo mental: motores de completado",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 1,
+     "last": 19,
+     "ntp": 6,
+     "nkey": 6
+    },
+    {
+     "label": "Modelos y costos",
+     "slides": [
+      {
+       "i": 20,
+       "title": "Modelos y costos",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 21,
+       "title": "Tarifas: familia Claude",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 22,
+       "title": "Elegir modelo: la primera pregunta que dé \"sí\" decide",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 23,
+       "title": "Model cascading",
+       "key": true,
+       "tp": false
+      },
+      {
+       "i": 24,
+       "title": "Cascading: el gate en código",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 25,
+       "title": "Cascading: cuándo sí y cuándo no",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 20,
+     "last": 25,
+     "ntp": 0,
+     "nkey": 1
+    },
+    {
+     "label": "Prompts estructurados",
+     "slides": [
+      {
+       "i": 26,
+       "title": "Prompts estructurados",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 27,
+       "title": "Los 6 componentes",
+       "key": true,
+       "tp": true
+      },
+      {
+       "i": 28,
+       "title": "Un prompt completo",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 29,
+       "title": "Salidas estructuradas: JSON Schema",
+       "key": true,
+       "tp": true
+      },
+      {
+       "i": 30,
+       "title": "XML: estructura semántica",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 26,
+     "last": 30,
+     "ntp": 2,
+     "nkey": 2
+    },
+    {
+     "label": "In-context learning",
+     "slides": [
+      {
+       "i": 31,
+       "title": "In-context learning",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 32,
+       "title": "In-context learning (ICL)",
+       "key": true,
+       "tp": false
+      },
+      {
+       "i": 33,
+       "title": "Zero-shot vs. few-shot",
+       "key": false,
+       "tp": true
+      },
+      {
+       "i": 34,
+       "title": "Many-shot learning",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 31,
+     "last": 34,
+     "ntp": 1,
+     "nkey": 1
+    },
+    {
+     "label": "Prompting avanzado",
+     "slides": [
+      {
+       "i": 35,
+       "title": "Prompting avanzado",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 36,
+       "title": "Cuatro técnicas, una sola idea",
+       "key": true,
+       "tp": false
+      },
+      {
+       "i": 37,
+       "title": "Chain of Thought (CoT)",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 38,
+       "title": "Chain of Thought: ejemplo",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 39,
+       "title": "Self-consistency: votación",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 40,
+       "title": "Self-consistency: ejemplo",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 41,
+       "title": "Tree of Thought (ToT)",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 42,
+       "title": "Tree of Thought: ejemplo",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 43,
+       "title": "Prompt chaining",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 44,
+       "title": "Prompt chaining: ejemplo",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 45,
+       "title": "Las cuatro técnicas: pros y contras",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 46,
+       "title": "¿Por qué tardan más?",
+       "key": false,
+       "tp": true
+      },
+      {
+       "i": 47,
+       "title": "¿Por qué funcionan?",
+       "key": true,
+       "tp": false
+      }
+     ],
+     "first": 35,
+     "last": 47,
+     "ntp": 1,
+     "nkey": 2
+    },
+    {
+     "label": "Effort y thinking",
+     "slides": [
+      {
+       "i": 48,
+       "title": "Effort y thinking",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 49,
+       "title": "Thinking: el mecanismo",
+       "key": true,
+       "tp": false
+      },
+      {
+       "i": 50,
+       "title": "Thinking: cómo queda en código",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 51,
+       "title": "Una sola pasada, o una zona de trabajo aparte",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 52,
+       "title": "Qué cambia el bloque separado",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 53,
+       "title": "De dónde salió el thinking",
+       "key": true,
+       "tp": false
+      },
+      {
+       "i": 54,
+       "title": "¿CoT todavía sirve?",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 55,
+       "title": "Effort: un parámetro de la petición",
+       "key": true,
+       "tp": false
+      },
+      {
+       "i": 56,
+       "title": "Los cinco niveles de effort",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 57,
+       "title": "Effort por dentro: una señal, no un flag",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 58,
+       "title": "Pedirle al modelo que piense",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 59,
+       "title": "Frases que suben o bajan el thinking",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 48,
+     "last": 59,
+     "ntp": 0,
+     "nkey": 3
+    },
+    {
+     "label": "LLMs en ingeniería",
+     "slides": [
+      {
+       "i": 60,
+       "title": "LLMs en ingeniería",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 61,
+       "title": "Ciclo de vida: dónde entra el LLM",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 62,
+       "title": "Explorar y entender código",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 63,
+       "title": "Casos de uso hoy",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 64,
+       "title": "Seguridad: el caso Glasswing",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 65,
+       "title": "Oportunidades vs. riesgos",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 66,
+       "title": "Mitigaciones que funcionan",
+       "key": true,
+       "tp": true
+      },
+      {
+       "i": 67,
+       "title": "Para pensar",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 68,
+       "title": "Benchmarks: qué miden",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 60,
+     "last": 68,
+     "ntp": 1,
+     "nkey": 1
+    },
+    {
+     "label": "Resumen y práctica",
+     "slides": [
+      {
+       "i": 69,
+       "title": "Resumen y práctica",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 70,
+       "title": "¡A practicar!",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 69,
+     "last": 70,
+     "ntp": 0,
+     "nkey": 0
+    },
+    {
+     "label": "Conclusions",
+     "slides": [
+      {
+       "i": 71,
+       "title": "Key takeaways",
+       "key": true,
+       "tp": false
+      }
+     ],
+     "first": 71,
+     "last": 71,
+     "ntp": 0,
+     "nkey": 1
+    }
+   ],
+   "tab": "Trabajar con LLMs: prompts, costos y producción",
+   "extra": false,
+   "total": 72
+  }
+ ],
+ "multi": false,
+ "prev": "04",
+ "next": "06",
+ "snippets": [
+  {
+   "id": "contexto-desglose",
+   "titulo": "Desglose del contexto por tipo de mensaje",
+   "archivo": "admision_tp/contexto.py",
+   "desde": 70,
+   "hasta": 92,
+   "lenguaje": "python",
+   "codigo": "def desglose(mensajes: list[dict], prompt: PromptSpec) -> dict:\n    \"\"\"`caracteres_de_contexto` repartido por tipo de mensaje; la suma es el total del kit.\"\"\"\n    partes = Counter({parte: 0 for parte in PARTES})\n    restantes = sum(m[\"role\"] == \"assistant\" for m in mensajes)\n    herramienta = None\n    for i, mensaje in enumerate(mensajes):\n        contenido = str(mensaje[\"content\"])\n        if mensaje[\"role\"] == \"assistant\":\n            restantes -= 1\n            parte, obj = \"respuestas\", extraer_json(contenido)\n            herramienta = str(obj.get(\"herramienta\", \"\")) if obj else None\n        elif i == 0:\n            parte = \"sistema\"\n        elif i == 1:\n            parte = \"inicial\"\n        elif contenido == prompt.mensaje_json_invalido:\n            parte = \"correcciones\"\n        else:\n            parte = \"busquedas\" if herramienta == \"buscar_normativa\" else \"otras_observaciones\"\n        partes[parte] += len(contenido) * restantes\n    if sum(partes.values()) != caracteres_de_contexto(mensajes):\n        raise RuntimeError(\"el desglose no coincide con caracteres_de_contexto\")\n    return dict(partes)",
+   "que_hace": "Reparte la métrica `caracteres_de_contexto` del kit entre sistema, mensaje inicial, búsquedas, otras observaciones, correcciones y respuestas.",
+   "como_funciona": "- Recorre los mensajes llevando `restantes`: cuántas respuestas del modelo faltan, porque cada mensaje se reenvía en cada llamada posterior.\n- Clasifica: índice 0 = `sistema`, 1 = `inicial`, igual a `mensaje_json_invalido` = `correcciones`, observación tras `buscar_normativa` = `busquedas`.\n- Suma `len(contenido) * restantes` por parte.\n- Verifica que el total coincida con `caracteres_de_contexto(mensajes)`; si no, lanza error.",
+   "proposito": "Permite saber dónde está el gasto de contexto antes de optimizar: así se vio que el sistema era el 55 % y las búsquedas el 25 %, y que la palanca era el mensaje de sistema.",
+   "interaccion": "Lo usa `scripts/medir_contexto.py`, que rejuega trazas con `rejugar_traza` (mismo `AgentePrompt`) y agrega la participación por parte para cada `PromptSpec`.",
+   "teoria": "Qué ocupa un prompt: el sistema se repite en cada turno, así que su largo se multiplica por la cantidad de llamadas.",
+   "key": "tp4-contexto-desglose",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 5,
+     "cnn": "05",
+     "slug": "prompting",
+     "i": 3,
+     "title": "¿Qué se guarda en un prompt?",
+     "url": "/clases/05/#d=prompting&s=3"
+    }
+   ],
+   "nusos": 1
+  },
+  {
+   "id": "agente-guarda-contexto",
+   "titulo": "Cortar un caso que no entra en la ventana",
+   "archivo": "admision_tp/agente_prompt.py",
+   "desde": 71,
+   "hasta": 114,
+   "lenguaje": "python",
+   "codigo": "class AgentePrompt:\n    \"\"\"Mismo protocolo JSON y contrato de lotes que el agente de referencia.\n\n    `max_turnos=None` lo deriva del tope de llamadas del kit. Si `modelo_lote` ofrece\n    `medir_contexto(conversacion) -> (tokens, limite)`, antes de cada llamada se termina sin\n    decisión cada caso que no entra; los demás casos del lote siguen.\n    \"\"\"\n\n    def __init__(self, modelo_lote, prompt: PromptSpec, max_turnos: int | None = None,\n                 max_sin_json: int = 3, max_llamadas: int = MAX_LLAMADAS):\n        if not isinstance(prompt, PromptSpec):\n            raise TypeError(\"prompt debe ser PromptSpec\")\n        if max_turnos is None:\n            max_turnos = max_turnos_para(max_llamadas, max_sin_json)\n        self.modelo_lote = modelo_lote\n        self.prompt = prompt\n        self.max_turnos = max_turnos\n        self.max_sin_json = max_sin_json\n        self.max_llamadas = max_llamadas\n\n    @property\n    def identidad_prompt(self) -> dict:\n        \"\"\"Identidad que deben guardar los futuros manifiestos de experimentos.\"\"\"\n        return {\"nombre\": self.prompt.nombre, \"version\": self.prompt.version, \"sha256\": self.prompt.sha256}\n\n    def _activas(self, partidas: list) -> list:\n        activas = [partida for partida in partidas if partida.activa]\n        medir = getattr(self.modelo_lote, \"medir_contexto\", None)\n        if medir is None:\n            return activas\n        for partida in activas:\n            tokens, limite = medir(partida.mensajes)\n            if tokens > limite:\n                partida.cortar_por_contexto(tokens, limite)\n        return [partida for partida in activas if partida.activa]\n\n    def jugar_lote(self, entornos: list) -> list[list[dict]]:\n        partidas = [_PartidaPrompt(e, self.prompt, self.max_turnos, self.max_sin_json, self.max_llamadas)\n                    for e in entornos]\n        while activas := self._activas(partidas):\n            conversaciones = [partida.mensajes for partida in activas]\n            for partida, respuesta in zip(activas, self.modelo_lote(conversaciones), strict=True):\n                partida.recibir(respuesta)\n        return [partida.mensajes for partida in partidas]",
+   "que_hace": "Antes de cada llamada al modelo mide cada conversación activa y termina sin decisión la que ya no entra en el contexto, sin recortar mensajes.",
+   "como_funciona": "- `_activas` filtra partidas activas y, si el modelo ofrece `medir_contexto`, obtiene `(tokens, limite)` de cada una.\n- Si `tokens > limite`, `cortar_por_contexto` (definido en `_PartidaPrompt`) agrega el mensaje `MENSAJE_CONTEXTO_EXCEDIDO` (auditable) y marca la partida inactiva.\n- Los demás casos del lote siguen; `jugar_lote` itera mientras haya activas y devuelve todas las conversaciones completas.\n- `identidad_prompt` expone nombre, versión y sha256 del prompt para los manifiestos.",
+   "proposito": "Recortar el historial en silencio cambiaría lo que vio el modelo sin dejar rastro; se prefirió cortar el caso y dejarlo registrado. Antes un `ValueError` vaciaba el lote entero.",
+   "interaccion": "`ModeloLocal.medir_contexto` (admision_tp/modelo.py) tokeniza con el mismo chat template y devuelve `max_contexto - max_tokens_nuevos` como límite. `entrega.construir_agente` crea el `AgentePrompt`.",
+   "teoria": "La ventana de contexto es un límite duro: todo (sistema, historial, observaciones) tiene que entrar en tokens.",
+   "key": "tp4-agente-guarda-contexto",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 5,
+     "cnn": "05",
+     "slug": "prompting",
+     "i": 4,
+     "title": "Ventana de contexto",
+     "url": "/clases/05/#d=prompting&s=4"
+    }
+   ],
+   "nusos": 1
+  },
+  {
+   "id": "corrida-usage-resumen",
+   "titulo": "Tokens y costo por llamada al modelo",
+   "archivo": "hospital/agente/corrida.py",
+   "desde": 34,
+   "hasta": 67,
+   "lenguaje": "python",
+   "codigo": "def _usage(ai):\n    u = ai.usage_metadata or {}\n    uso = (ai.response_metadata or {}).get(\"token_usage\") or {}\n    entrada, salida = u.get(\"input_tokens\", 0), u.get(\"output_tokens\", 0)\n    costo = uso.get(\"cost\")\n    return {\n        \"tokens_entrada\": entrada,\n        \"tokens_cache\": (u.get(\"input_token_details\") or {}).get(\"cache_read\", 0),\n        \"tokens_salida\": salida,\n        \"tokens_razonamiento\": (u.get(\"output_token_details\") or {}).get(\"reasoning\", 0),\n        \"costo\": costo if costo is not None else entrada * PRECIO_ENTRADA + salida * PRECIO_SALIDA,\n        \"costo_estimado\": costo is None,\n        \"id\": (ai.response_metadata or {}).get(\"id\"),\n    }\n\n\ndef resumir(mensajes):\n    ais = [m for m in mensajes if isinstance(m, AIMessage)]\n    herramientas = []\n    for m in ais:\n        for c in m.tool_calls:\n            if c[\"name\"] not in herramientas:\n                herramientas.append(c[\"name\"])\n    llamadas = [_usage(m) for m in ais]\n    respuesta = next((texto(m.content).strip() for m in reversed(ais) if texto(m.content).strip()), \"\")\n    return {\n        \"respuesta\": respuesta,\n        \"contextos\": [texto(m.content) for m in mensajes if isinstance(m, ToolMessage)],\n        \"herramientas\": herramientas,\n        \"llamadas_modelo\": llamadas,\n        \"tokens_entrada\": sum(l[\"tokens_entrada\"] for l in llamadas),\n        \"tokens_salida\": sum(l[\"tokens_salida\"] for l in llamadas),\n        \"costo\": sum(l[\"costo\"] for l in llamadas),\n    }",
+   "que_hace": "Extrae de cada `AIMessage` los tokens (entrada, cache, salida, razonamiento) y el costo, y resume la conversación en respuesta, contextos y herramientas usadas.",
+   "como_funciona": "- `_usage(ai)` lee `usage_metadata` y `response_metadata[\"token_usage\"]`; si OpenRouter no trae `cost`, lo estima con `entrada * PRECIO_ENTRADA + salida * PRECIO_SALIDA` y marca `costo_estimado`.\n- Guarda también el `id` de generación.\n- `resumir(mensajes)` junta los nombres de tools en orden sin repetir, toma como respuesta el último `AIMessage` con texto y como `contextos` el texto de cada `ToolMessage`.\n- Suma tokens y costo de todas las llamadas.",
+   "proposito": "Responde al pedido de registrar usage y costo por llamada. Permitió ver que una corrida del agente cuesta ~USD 0,0015 y el juez más de 10 veces eso.",
+   "interaccion": "Lo usa `correr()` para escribir `respuestas.jsonl` (formato del evaluador) y el log `.md`; `tests/test_agente.py` verifica la extracción con un modelo falso.",
+   "teoria": "La fórmula del costo de un LLM: se paga por tokens de entrada y de salida, con precios distintos (y descuento por cache).",
+   "key": "tp3-corrida-usage-resumen",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 5,
+     "cnn": "05",
+     "slug": "prompting",
+     "i": 8,
+     "title": "La fórmula del costo",
+     "url": "/clases/05/#d=prompting&s=8"
+    }
+   ],
+   "nusos": 1
+  },
+  {
+   "id": "informe-a11",
+   "titulo": "A11: el problema era la consulta, no la cantidad de fragmentos",
+   "archivo": "INFORME.md",
+   "desde": 216,
+   "hasta": 247,
+   "lenguaje": "markdown",
+   "codigo": "### Dónde falló el agente y qué se cambió\n\n**A11** (\"Necesito turno con cardiología, ¿cuál es el primero y qué tengo que llevar?\") fue la única pregunta con\nproblemas en la corrida 1 (CR 4, AR 4). El log muestra que el ruteo estuvo bien: llamó a `consultar_turnos` y a\n`buscar_documentos`. Pero buscó *\"requisitos y documentación para turno en consultorios externos de cardiología\"*, y el\nrecuperador devolvió solo la sección \"Cómo se pide un turno\", que menciona la derivación. La sección \"Qué llevar a la\nprimera consulta\" (DNI, credencial, derivación, estudios previos) quedó tercera, a 0,018 del primero y fuera del\nmargen de 0,005. La respuesta fue fiel a lo que recibió (F 5), pero incompleta.\n\nPrimero se probó darle más fragmentos al agente, porque la métrica de la parte 1 castiga cada fragmento extra y la del\njuez no tanto:\n\n- Con **top-3 fijo** (corrida 2), A11 sube a 5, pero el ruido baja el CR de A01–A04 y A12 (3 y 4): el juez penaliza\n  los fragmentos que no hacen falta. El promedio de CR cae a 4,417.\n- Con **margen 0,02** (corrida 3), el resto vuelve a 5. Pero A11 falla otra vez (CR 3), porque el modelo redactó la\n  consulta de otra forma y la sección correcta ya no quedaba cerca del primero.\n\nEl problema no era la cantidad de fragmentos sino la consulta. Buscar \"requisitos y documentación\" no se parece al\nencabezado \"Qué llevar a la primera consulta\"; buscar con las palabras del paciente (\"qué tengo que llevar\") sí. Por\neso en la corrida 4 se volvió a la selección de la parte 1 y se cambió la descripción de `buscar_documentos`: la\nconsulta va \"con las mismas palabras que usó el paciente\" y, si la pregunta toca varios temas, se hace una búsqueda por\ntema. En A11 el modelo buscó *\"qué llevar a un turno de cardiología…\"*, recibió la sección correcta y contestó completo.\n\nEn el mismo cambio se reemplazó el ejemplo de la descripción (\"horario de visita de los abuelos en neonatología\"), que\nera literalmente la pregunta A01 de dev, por uno que no aparece en ninguna pregunta dev (\"cómo es una consulta por\ntelemedicina\"). Así se evita ajustar el agente a las preguntas dev.\n\n**Límites de esta medición.** Son 12 preguntas y una corrida por configuración. El modelo redacta la consulta distinto\nen cada corrida aun con temperatura 0: en A11, con la misma descripción, las corridas 1 a 3 buscaron \"…consultorios\nexternos de cardiología\", \"…consultorios externos cardiología\" y \"…consultorios externos\" a secas. Así que una\ndiferencia de una pregunta entre corridas está dentro del ruido. Lo que se sostiene en las cuatro corridas es el ruteo\n(1,00 siempre) y la fidelidad (5,00 siempre): el agente no inventó datos en ninguna respuesta.",
+   "que_hace": "Analiza la única pregunta que falló (A11, turno de cardiología y qué llevar), las dos soluciones que no funcionaron y la que sí, más los límites de la medición.",
+   "como_funciona": "- El ruteo estaba bien, pero el modelo buscó «requisitos y documentación…» y la sección «Qué llevar a la primera consulta» quedó tercera, fuera del margen.\n- Top-3 fijo la arreglaba pero el ruido bajó el CR general a 4,417; margen 0,02 falló por otra redacción de la consulta.\n- Solución: la descripción de `buscar_documentos` pide usar las palabras del paciente y una búsqueda por tema.\n- Se sacó del ejemplo la pregunta A01 de dev.\n- Con 12 preguntas y una corrida, una pregunta de diferencia es ruido.",
+   "proposito": "Muestra que se corrigió el síntoma «la sección correcta queda tercera» mejorando la consulta (descripción de la tool) en vez de agregar un reranker o más contexto.",
+   "interaccion": "Se apoya en los logs de `experimentos/corridas/` y explica el texto final de `BUSCAR_DOCUMENTOS` en `hospital/descripciones.py`.",
+   "teoria": "Diagnóstico de RAG: cuando falta una etapa (consulta mal formulada) más contexto mete ruido; y la variabilidad del LLM aun con temperatura 0.",
+   "key": "tp3-informe-a11",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 5,
+     "cnn": "05",
+     "slug": "prompting",
+     "i": 14,
+     "title": "Limitaciones de los LLM",
+     "url": "/clases/05/#d=prompting&s=14"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 29,
+     "title": "Tres síntomas de que falta una etapa",
+     "url": "/clases/06/#d=rag-y-mcp&s=29"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 31,
+     "title": "Poco y bien elegido",
+     "url": "/clases/07/#d=rag-mcp-rapida&s=31"
+    }
+   ],
+   "nusos": 3
+  },
+  {
+   "id": "prompt-sistema",
+   "titulo": "Prompt de sistema: solo datos de las herramientas",
+   "archivo": "hospital/agente/bucle.py",
+   "desde": 9,
+   "hasta": 22,
+   "lenguaje": "python",
+   "codigo": "MAX_PASOS = 6  # llamadas al modelo por pregunta\n\nPROMPT = \"\"\"Sos el asistente virtual del Hospital Provincial Arroyo Claro y respondés preguntas de pacientes y familiares.\n\nNo sabés nada de este hospital de antemano: toda la información sale de tus herramientas.\n- Normas, horarios fijos, procedimientos, requisitos, preparaciones y quién puede visitar o acompañar: buscar_documentos.\n- Estado de hoy (camas libres, profesionales de guardia, turnos disponibles, stock de farmacia, espera en la guardia): la herramienta de la API que corresponda.\n- Si la pregunta tiene varias partes, cubrí cada una con su fuente. Por ejemplo, \"¿hay lugar y me puedo quedar?\" necesita las camas de hoy y la norma de acompañantes.\n- Si una herramienta devuelve un error con opciones válidas, reintentá con la opción que corresponda.\n\nAl responder:\n- Usá solo datos que aparezcan en los resultados de las herramientas. No agregues horarios, nombres, cantidades ni requisitos que no estén ahí, aunque te parezcan razonables.\n- Si la información no está, decilo en vez de suponer.\n- Respondé en español, en pocas oraciones, contestando todo lo que se preguntó.\"\"\"",
+   "que_hace": "Fija el tope de pasos del bucle y el prompt de sistema del agente del hospital.",
+   "como_funciona": "- `MAX_PASOS = 6` limita las llamadas al modelo por pregunta.\n- El prompt dice que el modelo no sabe nada del hospital y que todo sale de las herramientas.\n- Rutea: normas y procedimientos → `buscar_documentos`; estado de hoy → la tool de la API; preguntas mixtas → cada parte con su fuente.\n- Pide reintentar ante errores con opciones válidas, usar solo datos de los resultados y decir si falta algo.",
+   "proposito": "Es la mitigación de alucinaciones por prompt: el hospital es ficticio, así que todo dato no recuperado sería inventado. Resultado: Faithfulness 5,00 en las 4 corridas. Es zero-shot: el único ejemplo (camas + acompañantes) ilustra el patrón mixto sin copiar preguntas de dev.",
+   "interaccion": "Lo usa `responder()` en el mismo archivo como `SystemMessage(PROMPT)`; aplica igual a las tools de LangChain y a las que cargaría el cliente MCP.",
+   "teoria": "Grounding: restringir la respuesta al contexto recuperado y admitir cuando falta información.",
+   "key": "tp3-prompt-sistema",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 5,
+     "cnn": "05",
+     "slug": "prompting",
+     "i": 17,
+     "title": "Mitigar alucinaciones: el prompt",
+     "url": "/clases/05/#d=prompting&s=17"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 2,
+     "title": "RAG suma lo que no está en los pesos",
+     "url": "/clases/06/#d=rag-y-mcp&s=2"
+    },
+    {
+     "clase": 13,
+     "cnn": "13",
+     "slug": "cierre-magnifica-humanitas",
+     "i": 25,
+     "title": "De la alucinación al engaño funcional",
+     "url": "/clases/13/#d=cierre-magnifica-humanitas&s=25"
+    }
+   ],
+   "nusos": 3
+  },
+  {
+   "id": "guarda-practica",
+   "titulo": "Guarda: nunca optimizar con práctica",
+   "archivo": "admision_tp/experimentos_prompt.py",
+   "desde": 135,
+   "hasta": 158,
+   "lenguaje": "python",
+   "codigo": "def _verificar_origen(casos, esperadas, normas, proposito) -> dict:\n    \"\"\"Guardas previas a copiar cualquier entrada; devuelve qué se verificó.\n\n    Las rutas se resuelven (incluidos symlinks) antes de comparar con ``practica/``. El\n    chequeo del kit se corre sobre las rutas ORIGINALES: la copia en ``salida/entradas``\n    nunca tiene esperadas al lado y por eso no lo dispararía.\n    \"\"\"\n    if proposito not in PROPOSITOS:\n        raise ValueError(f\"propósito inválido; usar uno de {', '.join(PROPOSITOS)}\")\n    practica = _PRACTICA.resolve()\n    en_practica = []\n    for nombre, ruta in ((\"casos\", casos), (\"esperadas\", esperadas)):\n        resuelta = Path(ruta).resolve()\n        if resuelta == practica or practica in resuelta.parents:\n            en_practica.append(nombre)\n    if proposito == \"plomeria\":\n        # Solo plomería puede usar práctica; la copia aislada sigue revisada por `jugar`.\n        return {\"datos_practica\": en_practica, \"esperadas_al_alcance\": \"omitida_plomeria\"}\n    if en_practica:\n        raise ValueError(\n            f\"{' y '.join(en_practica)} dentro de practica/: nunca se evalúan ni optimizan prompts \"\n            \"con práctica; para probar solo la plomería usar --solo-plomeria\")\n    revisar_que_no_haya_esperadas(Path(normas), Path(casos))\n    return {\"datos_practica\": [], \"esperadas_al_alcance\": \"verificada_en_origen\"}",
+   "que_hace": "Antes de una corrida de evaluación de prompts, rechaza casos o esperadas que estén dentro de `practica/` y verifica que no haya respuestas esperadas al alcance del agente.",
+   "como_funciona": "- Valida `proposito` (`evaluacion` o `plomeria`).\n- Resuelve rutas (incluidos symlinks) y comprueba si caen bajo `_PRACTICA`.\n- En `plomeria` (solo probar que el pipeline anda) lo permite y lo registra.\n- En `evaluacion` lanza `ValueError` si hay práctica y corre `revisar_que_no_haya_esperadas` del kit sobre las rutas originales.",
+   "proposito": "Materializa la decisión de elegir prompts en un conjunto prompt-dev propio y dejar la práctica solo para reportar una vez, para no sobreajustar al conjunto de evaluación.",
+   "interaccion": "La llama el runner de evaluación de prompts antes de copiar entradas; el resultado queda en el manifiesto (`guardas`). Sus métricas pasan por `evaluacion_prompts.calcular_metricas_candidato`.",
+   "teoria": "Separación de conjuntos: desarrollo para elegir, evaluación solo para medir; usar el test para elegir infla los resultados.",
+   "key": "tp4-guarda-practica",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 17,
+     "title": "Los tres, lado a lado",
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=17"
+    },
+    {
+     "clase": 5,
+     "cnn": "05",
+     "slug": "prompting",
+     "i": 18,
+     "title": "Mitigar alucinaciones: el proceso",
+     "url": "/clases/05/#d=prompting&s=18"
+    }
+   ],
+   "nusos": 2
+  },
+  {
+   "id": "solo-prompt-practica",
+   "titulo": "Fila solo_prompt en práctica: 10/10/7 → 14/16/12",
+   "archivo": "docs/analisis-errores.md",
+   "desde": 204,
+   "hasta": 228,
+   "lenguaje": "markdown",
+   "codigo": "### 2026-11-11 · Pasada 6: fila `solo_prompt` contra `sin_entrenar` en práctica (solo reporte)\n\n- **Corridas:** `corridas/kaggle/v25/evaluacion-actual/sin_entrenar-<v>` (prompt `baseline`, commit `f4d7300`) contra\n  `corridas/kaggle/v27/evaluacion-solo-prompt/solo_prompt-<v>` (prompt `procedimiento-v1`, commit `a5745f0`), v =\n  original, b, c; buscador `baseline`, lote 4, T4. Salidas: `corridas/analisis/2026-11-11-cmp-v27-solo-prompt-vs-sin-entrenar-<v>/`.\n  El prompt ya estaba elegido en el dev (pasada 5): esto no se usó para elegir.\n- **Resultado:** original 10 → 14 (gana 7, pierde 3), b 10 → 16 (9/3), c 7 → 12 (7/2); signos p=0,34 / 0,15 / 0,18\n  por versión. Las tres versiones comparten pacientes, así que no se suman como independientes.\n\n| Control (original) | Arreglados | Rotos | Fuentes antes (F/C/B/M) | Fuentes después (F/C/B/M) |\n|---|---|---|---|---|\n| registro | 4 | 1 | 0/0/8/4 | 0/0/0/9 |\n| box_antes_del_registro | 11 | 2 | 0/0/10/4 | 0/0/0/5 |\n| plazo_circuito_min | 3 | 0 | 0/0/2/2 | 0/0/0/1 |\n| cobertura | 4 | 5 | 0/1/2/7 | 0/3/0/8 |\n| entidad_a_notificar | 3 | 8 | 0/0/3/6 | 0/2/0/12 |\n| aviso_al_voluntariado | 0 | 0 | 0/14/0/0 | 0/14/0/0 |\n| verificacion | 3 | 11 | 0/1/2/9 | 0/3/0/17 |\n\n- **Hallazgo:** el mismo patrón que en el dev, más marcado. Las fallas del buscador pasan a 0 en registro, box y\n  plazo (en las tres versiones), y box gana 11–12 casos por versión. Lo que empeora es decisión del modelo con la\n  evidencia correcta: verificación (7–11 rotos por versión) y entidad a notificar (5–8). El aviso queda en 14\n  fallas de costumbre en las tres. **Línea de base para #15:** comparar `solo_entrenamiento` y `ambos` contra\n  estas corridas con `comparar`; el entrenamiento tiene que bajar «modelo» en verificación/entidad y «costumbre»\n  en el aviso sin devolver las fallas del buscador.",
+   "que_hace": "Resultado de reportar `procedimiento-v1` (ya elegido en dev) sobre los 50 casos de práctica con normas original, b y c.",
+   "como_funciona": "- original 10 → 14, b 10 → 16, c 7 → 12 casos resueltos.\n- Las fallas del buscador pasan a 0 en registro, box y plazo; box gana 11–12 casos por versión.\n- Empeoran verificación y entidad a notificar (decisión del modelo con la evidencia correcta) y el aviso al voluntariado sigue fallando por costumbre.\n- Aclara que la práctica no se usó para elegir.",
+   "proposito": "Es la evidencia de la Parte 3: el prompt mejora el uso de la herramienta de búsqueda pero no arregla el comportamiento, que queda como línea de base para el entrenamiento.",
+   "interaccion": "Compara corridas `corridas/kaggle/v25/evaluacion-actual/` y `corridas/kaggle/v27/evaluacion-solo-prompt/` con `comparar`; usa los 9 controles de `admision/comparar.py`.",
+   "teoria": "Los componentes del prompt (instrucciones, contexto, formato) cambian la conducta del agente, en especial cuándo y cómo usa la herramienta de búsqueda.",
+   "key": "tp4-solo-prompt-practica",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 5,
+     "cnn": "05",
+     "slug": "prompting",
+     "i": 27,
+     "title": "Los 6 componentes",
+     "url": "/clases/05/#d=prompting&s=27"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 5,
+     "title": "Como herramienta: el agente decide cuándo buscar",
+     "url": "/clases/07/#d=rag-mcp-rapida&s=5"
+    }
+   ],
+   "nusos": 2
+  },
+  {
+   "id": "agente-bucle",
+   "titulo": "Ciclo del agente: JSON, corrección y tope de llamadas",
+   "archivo": "admision_tp/agente_prompt.py",
+   "desde": 25,
+   "hasta": 68,
+   "lenguaje": "python",
+   "codigo": "class _PartidaPrompt:\n    def __init__(self, entorno, prompt: PromptSpec, max_turnos: int, max_sin_json: int,\n                 max_llamadas: int):\n        self.entorno = entorno\n        self.prompt = prompt\n        self.max_turnos = max_turnos\n        self.max_sin_json = max_sin_json\n        self.max_llamadas = max_llamadas\n        self.mensajes = [\n            {\"role\": \"system\", \"content\": prompt.system_prompt},\n            {\"role\": \"user\", \"content\": prompt.mensaje_inicial_para(entorno.paciente_id)},\n        ]\n        self.turnos = self.sin_json = self.llamadas = 0\n        self.activa = True\n\n    def recibir(self, respuesta: str) -> None:\n        self.turnos += 1\n        self.mensajes.append({\"role\": \"assistant\", \"content\": respuesta})\n        obj = extraer_json(respuesta)\n        if obj is None:\n            self.sin_json += 1\n            if self.sin_json >= self.max_sin_json:\n                self.activa = False\n                return\n            self.mensajes.append({\"role\": \"user\", \"content\": self.prompt.mensaje_json_invalido})\n        else:\n            self.sin_json = 0\n            herramienta = str(obj.get(\"herramienta\", \"\"))\n            observacion, fin = self.entorno.paso(herramienta, obj.get(\"argumentos\") or {})\n            self.llamadas += 1\n            if fin:\n                self.activa = False\n                return\n            self.mensajes.append({\n                \"role\": \"user\",\n                \"content\": self.prompt.observacion_para(herramienta, observacion),\n            })\n        if self.turnos >= self.max_turnos or self.llamadas >= self.max_llamadas:\n            self.activa = False\n\n    def cortar_por_contexto(self, tokens: int, limite: int) -> None:\n        self.mensajes.append({\"role\": \"user\", \"content\": MENSAJE_CONTEXTO_EXCEDIDO.format(\n            tokens=tokens, limite=limite)})\n        self.activa = False",
+   "que_hace": "Mantiene la conversación de un caso: agrega la respuesta del modelo, ejecuta la herramienta pedida o, si no hay JSON válido, inserta el mensaje de corrección.",
+   "como_funciona": "- `_PartidaPrompt.__init__` arranca con `system_prompt` y `mensaje_inicial_para(paciente_id)` del `PromptSpec`.\n- `recibir` usa `extraer_json`; si es `None`, suma `sin_json` y agrega `prompt.mensaje_json_invalido` (corta tras `max_sin_json` seguidas).\n- Con JSON válido llama `entorno.paso(herramienta, argumentos)`, cuenta `llamadas` y agrega la observación con `observacion_para`.\n- Termina si el entorno cerró el caso (registrar_decision) o al llegar a `max_turnos` o `max_llamadas` (40, del kit).",
+   "proposito": "Es un agente de un solo modelo que decide el recorrido: el código no impone orden de herramientas. Los textos vienen del `PromptSpec` para que agente y generador de datos rendericen idéntico.",
+   "interaccion": "`AgentePrompt.jugar_lote` crea una `_PartidaPrompt` por caso y le pasa las respuestas de `ModeloLocal`; `entorno` es la `VistaDelAgente` del kit. `admision_tp/contexto.py` reusa este mismo ciclo para rejugar trazas.",
+   "teoria": "Salida estructurada con reintento ante JSON inválido, dentro de un bucle de agente con herramientas y un límite de pasos.",
+   "key": "tp4-agente-bucle",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 5,
+     "cnn": "05",
+     "slug": "prompting",
+     "i": 29,
+     "title": "Salidas estructuradas: JSON Schema",
+     "url": "/clases/05/#d=prompting&s=29"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 36,
+     "title": "El circuito con un agente",
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=36"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 42,
+     "title": "Calcular: la misma cuenta por la API",
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=42"
+    },
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 51,
+     "title": "Primero, un solo agente",
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=51"
+    }
+   ],
+   "nusos": 4
+  },
+  {
+   "id": "descripciones-tools",
+   "titulo": "Descripciones de tools: fuente, uso, qué NO tienen, valores válidos",
+   "archivo": "hospital/descripciones.py",
+   "desde": 8,
+   "hasta": 38,
+   "lenguaje": "python",
+   "codigo": "BUSCAR_DOCUMENTOS = (\n    \"Busca en los documentos oficiales del Hospital Provincial Arroyo Claro: normas y procedimientos que no \"\n    \"cambian de un día a otro. Sirve para horarios fijos (visitas, altas, farmacia, laboratorio, vacunatorio, \"\n    \"donación de sangre), quién puede visitar o quedarse con un paciente, preparación para estudios y cirugías \"\n    \"(ayunos, dietas), requisitos y documentación para turnos, internación, farmacia y coberturas, triage de \"\n    \"la guardia, derechos del paciente, accesos al edificio, control de infecciones, maternidad, pediatría, \"\n    \"kinesiología, salud mental y telemedicina. NO tiene el estado de hoy (camas libres, profesionales de \"\n    \"guardia, turnos disponibles, stock de farmacia ni tiempos de espera actuales). \"\n    \"consulta: el tema a buscar, en español y con las mismas palabras que usó el paciente (por ejemplo \"\n    \"'cómo es una consulta por telemedicina'). Si la pregunta toca varios temas de los documentos, hacé una \"\n    \"búsqueda por tema. Devuelve los fragmentos más relevantes con su documento y sección de origen.\"\n)\n\nCONSULTAR_CAMAS = (\n    \"Estado de HOY de las camas de internación de un sector: total, ocupadas y libres. Usala para saber si hay \"\n    \"lugar o camas disponibles para internar. \"\n    \"sector: uno de clinica_medica, cirugia_general, terapia_intensiva, pediatria, neonatologia, maternidad.\"\n)\n\nCONSULTAR_GUARDIA = (\n    \"Profesionales que están de guardia HOY en una especialidad, con su horario (por ejemplo 08:00-20:00 es \"\n    \"el turno de día y 20:00-08:00 el de la noche). Usala para saber quién atiende hoy o esta noche. \"\n    \"especialidad: una de clinica_medica, cardiologia, pediatria, traumatologia, obstetricia, salud_mental.\"\n)\n\nCONSULTAR_TURNOS = (\n    \"Próximos turnos disponibles (fecha y hora) con una especialidad en consultorios externos. Usala para saber \"\n    \"cuándo es el primer turno libre. No dice qué hay que llevar al turno: eso está en los documentos. \"\n    \"especialidad: una de cardiologia, dermatologia, traumatologia, psicologia, gastroenterologia, \"\n    \"obstetricia, kinesiologia.\"\n)",
+   "que_hace": "Define el texto que lee el modelo para decidir qué herramienta llamar: `buscar_documentos` para normas fijas y las de la API para el estado de hoy.",
+   "como_funciona": "- `BUSCAR_DOCUMENTOS` lista los temas de los documentos y aclara que NO tiene el estado de hoy; pide buscar «con las mismas palabras que usó el paciente» y hacer una búsqueda por tema.\n- `CONSULTAR_CAMAS`, `CONSULTAR_GUARDIA` y `CONSULTAR_TURNOS` dicen que son el estado de HOY y enumeran los valores válidos del parámetro.\n- `CONSULTAR_TURNOS` agrega: «No dice qué hay que llevar al turno: eso está en los documentos».",
+   "proposito": "El ruteo depende solo de estas descripciones, así que separan norma (documentos) de estado (API) y dicen cuándo NO usar cada tool: ruteo 1,00 en las 4 corridas. La frase de las palabras del paciente arregló A11, y el ejemplo de consulta se cambió por uno de telemedicina para no filtrar la pregunta A01 de dev.",
+   "interaccion": "Las importa `hospital/herramientas.py` a través del diccionario `DESCRIPCIONES`; el PLAN prevé que el servidor MCP use exactamente los mismos textos para que la comparación parte 2 vs. parte 3 sea justa.",
+   "teoria": "Diseño de herramientas: la descripción es la interfaz para el modelo (qué hace, cuándo usarla, cuándo no, parámetros válidos).",
+   "key": "tp3-descripciones-tools",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 2,
+     "cnn": "02",
+     "slug": "cowork-intro",
+     "i": 25,
+     "title": "Cómo el agente descubre y usa una herramienta",
+     "url": "/clases/02/#d=cowork-intro&s=25"
+    },
+    {
+     "clase": 5,
+     "cnn": "05",
+     "slug": "prompting",
+     "i": 33,
+     "title": "Zero-shot vs. few-shot",
+     "url": "/clases/05/#d=prompting&s=33"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 10,
+     "title": "Las fuentes ponen el techo de calidad",
+     "url": "/clases/06/#d=rag-y-mcp&s=10"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 63,
+     "title": "Cuatro principios de diseño",
+     "url": "/clases/06/#d=rag-y-mcp&s=63"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 68,
+     "title": "La descripción dice cuándo NO usarla",
+     "url": "/clases/06/#d=rag-y-mcp&s=68"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 28,
+     "title": "La descripción dice cuándo NO usarla",
+     "url": "/clases/07/#d=rag-mcp-rapida&s=28"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 48,
+     "title": "MCP: una herramienta es una definición",
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=48"
+    },
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 20,
+     "title": "Principios para diseñar tools",
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=20"
+    }
+   ],
+   "nusos": 8
+  },
+  {
+   "id": "procedimiento-dev",
+   "titulo": "procedimiento-v1 contra baseline en prompt-dev",
+   "archivo": "docs/analisis-errores.md",
+   "desde": 171,
+   "hasta": 202,
+   "lenguaje": "markdown",
+   "codigo": "### 2026-11-11 · Pasada 5: #13 `procedimiento-v1` contra `baseline` en el conjunto de desarrollo\n\n- **Corridas:** `corridas/kaggle/v25/prompt-dev-f1/{baseline,procedimiento-v1}-{n1,n2}` (runner del #13, commit\n  `f4d7300` limpio, buscador `baseline`, `datos/prompt-dev/v1`, **no práctica**). Salidas:\n  `corridas/analisis/2026-11-11-cmp-v25-procedimiento-vs-baseline-{n1,n2}/`. Las corridas descargadas no traían\n  `entradas/normas/`; se copió `datos/prompt-dev/v1/entradas/n<k>/normas` tras verificar que cada archivo coincide\n  con el sha256 del manifiesto de la corrida.\n- **Resultado:** n1 4 → 4 (gana 3, pierde 3), n2 4 → 5 (gana 2, pierde 1); signos p=1,0 en ambas. El baseline en el\n  dev repite el perfil de la pasada 1: buscador y modelo «no buscó» como fuentes principales, aviso solo costumbre.\n\n| Control | Arreglados n1/n2 | Rotos n1/n2 | Buscador antes → después (n1+n2) | Modelo antes → después (n1+n2) |\n|---|---|---|---|---|\n| registro | 4/4 | 0/2 | 7 → 0 | 6 → 7 |\n| box_antes_del_registro | 4/6 | 2/0 | 6 → 0 | 10 → 8 |\n| circuito | 0/2 | 0/0 | 0 → 0 | 2 → 0 |\n| plazo_circuito_min | 2/4 | 3/1 | 5 → 0 | 5 → 8 |\n| cobertura | 0/3 | 1/1 | 1 → 2 | 7 → 4 |\n| entidad_a_notificar | 0/1 | 3/1 | 1 → 1 | 4 → 6 |\n| aviso_al_voluntariado | 0/0 | 0/0 | 0 → 0 | 0 → 0 (8 → 8 costumbre) |\n| verificacion | 1/0 | 4/3 | 1 → 1 | 6 → 11 |\n\n- Costo: ~19.000 → ~53.000 caracteres/caso, 1,35 → 3,6 búsquedas, 4,8 → 6,75 llamadas.\n- **Hallazgo:** el procedimiento hace lo que se buscaba en el RAG: las fallas atribuibles al buscador pasan de 21 a\n  4 (registro, box y plazo quedan en 0), porque cada tema se busca por separado. Pero el modelo **decide mal con la\n  evidencia delante**: suben las fallas «buscó y decidió mal» en `verificacion` (6 → 11), `plazo` y `entidad`. El\n  aviso no se mueve (es costumbre; B no la menciona). La ganancia neta en casos es ruido.\n- **Para #15 (Fran):** el prompt solo ya no puede arreglar lo que queda: con la evidencia correcta en contexto, el\n  modelo base no aplica bien verificación, plazo y entidad, ni la costumbre del aviso. Eso es lo que tienen que\n  enseñar las conversaciones de #8 (decidir y verificar con la sección recuperada, y la costumbre). Comparar el\n  checkpoint contra estas corridas con `comparar`.\n- **C (`procedimiento-costumbres-v1`) no se analizó:** falla en GPU de forma reproducible (ver\n  [optimizacion-prompt.md](optimizacion-prompt.md#resultados-kaggle-v25v27)).",
+   "que_hace": "Registro del análisis del prompt `procedimiento-v1` frente a `baseline` en el conjunto de desarrollo: qué arregló, qué rompió y cuánto costó.",
+   "como_funciona": "- Corridas en `corridas/kaggle/v25/prompt-dev-f1/` (no práctica).\n- Las fallas atribuibles al buscador bajan de 21 a 4 porque cada tema se busca por separado.\n- Costo: ~19.000 → ~53.000 caracteres por caso, 1,35 → 3,6 búsquedas.\n- Suben las fallas «buscó y decidió mal» en verificación, plazo y entidad: el modelo decide mal con la evidencia delante.",
+   "proposito": "Muestra el trade-off del prompt con instrucciones paso a paso y deja la conclusión de que lo que queda es comportamiento, que debería enseñar el SFT (#15).",
+   "interaccion": "Los números salen de `scripts/analizar_errores.py` y `evaluacion_prompts.calcular_metricas_candidato`; el texto del prompt está en `corridas/kaggle/v25/prompt-dev-f1/procedimiento-v1-n1/entradas/prompt.json`.",
+   "teoria": "Prompt con instrucciones explícitas (descomposición en pasos): más llamadas y más contexto, por eso más latencia.",
+   "key": "tp4-procedimiento-dev",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 5,
+     "cnn": "05",
+     "slug": "prompting",
+     "i": 46,
+     "title": "¿Por qué tardan más?",
+     "url": "/clases/05/#d=prompting&s=46"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 53,
+     "title": "Cuándo vale la pena el fine-tuning",
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=53"
+    }
+   ],
+   "nusos": 2
+  },
+  {
+   "id": "promptspec-sha256",
+   "titulo": "PromptSpec: prompt versionado con sha256",
+   "archivo": "admision_tp/prompts.py",
+   "desde": 29,
+   "hasta": 72,
+   "lenguaje": "python",
+   "codigo": "@dataclass(frozen=True)\nclass PromptSpec:\n    \"\"\"Todo texto configurable que el coordinador agrega a la conversación.\n\n    El hash cubre la versión del formato y los cuatro textos que afectan al modelo.\n    `nombre` es una etiqueta humana y no modifica la identidad del contenido.\n    \"\"\"\n\n    version: int\n    nombre: str\n    system_prompt: str\n    mensaje_inicial: str\n    formato_observacion: str\n    mensaje_json_invalido: str\n\n    def __post_init__(self):\n        if type(self.version) is not int or self.version <= 0:\n            raise ValueError(\"version requiere un entero positivo\")\n        if not isinstance(self.nombre, str) or not re.fullmatch(r\"[a-z0-9][a-z0-9._-]*\", self.nombre):\n            raise ValueError(\"nombre de prompt inválido\")\n        textos = (self.system_prompt, self.mensaje_inicial,\n                  self.formato_observacion, self.mensaje_json_invalido)\n        if any(not isinstance(texto, str) or not texto.strip() for texto in textos):\n            raise ValueError(\"los textos del prompt no pueden estar vacíos\")\n        if _placeholders(self.mensaje_inicial) != {\"paciente_id\"}:\n            raise ValueError(\"mensaje_inicial requiere únicamente {paciente_id}\")\n        if _placeholders(self.formato_observacion) != {\"herramienta\", \"observacion\"}:\n            raise ValueError(\"formato_observacion requiere {herramienta} y {observacion}\")\n\n    def _contenido(self) -> dict:\n        return {\n            \"version\": self.version,\n            \"system_prompt\": self.system_prompt,\n            \"mensaje_inicial\": self.mensaje_inicial,\n            \"formato_observacion\": self.formato_observacion,\n            \"mensaje_json_invalido\": self.mensaje_json_invalido,\n        }\n\n    @property\n    def sha256(self) -> str:\n        contenido = json.dumps(\n            self._contenido(), ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")\n        ).encode(\"utf-8\")\n        return hashlib.sha256(contenido).hexdigest()",
+   "que_hace": "Dataclass inmutable con todos los textos que el agente le manda al modelo y un hash sha256 que identifica su contenido.",
+   "como_funciona": "- Campos: `version`, `nombre`, `system_prompt`, `mensaje_inicial`, `formato_observacion`, `mensaje_json_invalido`.\n- `__post_init__` valida que los textos no estén vacíos y que las plantillas tengan solo los placeholders esperados (`{paciente_id}`, `{herramienta}`/`{observacion}`).\n- `_contenido` excluye `nombre` (es etiqueta humana) y `sha256` serializa JSON canónico (`sort_keys`, separadores fijos) y lo hashea.\n- `desde_dict` (más abajo) rechaza un archivo cuyo hash no coincide.",
+   "proposito": "Cada número reportado tiene que decir qué prompt lo produjo; con el hash, un cambio de una coma es otro prompt. Los cambios van en archivos nuevos en `configuraciones/prompts/` y el baseline no se edita.",
+   "interaccion": "`entrega.cargar_prompt` lo carga desde `PROMPT_SPEC`; `AgentePrompt` lo usa en cada turno; `scripts/generar_conversaciones.py` y los manifiestos de corridas guardan su `sha256`.",
+   "teoria": "Versionar y auditar prompts como artefactos: mitigación para reproducibilidad y para no confundir resultados de prompts distintos.",
+   "key": "tp4-promptspec-sha256",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 5,
+     "cnn": "05",
+     "slug": "prompting",
+     "i": 66,
+     "title": "Mitigaciones que funcionan",
+     "url": "/clases/05/#d=prompting&s=66"
+    }
+   ],
+   "nusos": 1
+  }
+ ]
+}

@@ -1,0 +1,3431 @@
+{
+ "num": 6,
+ "nn": "06",
+ "fecha": "9 sep",
+ "titulo": "RAG, bases vectoriales, inverted index",
+ "bloque": "RAG, MCP y herramientas",
+ "decks": [
+  {
+   "slug": "rag-y-mcp",
+   "titulo": "RAG y MCP: recuperar contexto y conectar herramientas",
+   "slides": [
+    {
+     "i": 0,
+     "title": "Inteligencia Artificial Generativa (AI Gen)",
+     "section": "",
+     "resumen": "Portada de la clase 6: RAG para recuperar contexto y MCP para conectar herramientas.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Portada",
+     "last": 70
+    },
+    {
+     "i": 1,
+     "title": "Fundamentos de RAG",
+     "section": "Fundamentos de RAG",
+     "resumen": "Agenda: seis secciones de RAG (léxica, semántica, reranking, chunking, evaluación) y tres de MCP.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Fundamentos de RAG",
+     "last": 70
+    },
+    {
+     "i": 2,
+     "title": "RAG suma lo que no está en los pesos",
+     "section": "Fundamentos de RAG",
+     "resumen": "El modelo no tiene en sus pesos tu documentación ni tus datos. **RAG** recupera fragmentos y los pone en el prompt: el recuperador trae texto y el modelo genera.",
+     "claves": [
+      {
+       "id": "rag",
+       "label": "RAG (Retrieval-Augmented Generation)",
+       "glos": true
+      },
+      {
+       "id": "llm",
+       "label": "LLM (Large Language Model)",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 3,
+       "texto": "El hospital del TP3 era ficticio a propósito: el modelo solo contestaba bien si recuperaba de los 20 Markdown o de la API.",
+       "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+       "code": "tp3-prompt-sistema",
+       "nota": "«No sabés nada de este hospital de antemano»: como es ficticio, nada está en los pesos y todo tiene que venir de las fuentes."
+      }
+     ],
+     "ver": [
+      {
+       "url": "/clases/07/#d=rag-mcp-rapida&s=2",
+       "clase": 7,
+       "cnn": "07",
+       "i": 2,
+       "title": "RAG en tres pasos",
+       "por": "RAG en tres pasos"
+      }
+     ],
+     "key": true,
+     "section_label": "Fundamentos de RAG",
+     "last": 70
+    },
+    {
+     "i": 3,
+     "title": "Recuperar, aumentar, generar",
+     "section": "Fundamentos de RAG",
+     "resumen": "**Recuperar, aumentar, generar.** Aumentar es solo concatenar texto al prompt. Todo lo demás de la clase mejora alguno de estos tres pasos.",
+     "claves": [
+      {
+       "id": "rag",
+       "label": "RAG (Retrieval-Augmented Generation)",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 3,
+       "texto": "Tu agente del TP3: buscar_documentos recupera con e5-base, los fragmentos vuelven como ToolMessage y deepseek genera la respuesta.",
+       "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+       "code": "tp3-documentos-buscar",
+       "nota": "Recuperar (recuperador e5), aumentar (fragmentos con fuente como ToolMessage); la generación la hace el bucle."
+      }
+     ],
+     "ver": [],
+     "key": false,
+     "section_label": "Fundamentos de RAG",
+     "last": 70
+    },
+    {
+     "i": 4,
+     "title": "Antes de consultar hay que indexar",
+     "section": "Fundamentos de RAG",
+     "resumen": "La **indexación** es trabajo offline: se corre una vez y se repite cuando cambia el corpus. Indexar y consultar exigen el mismo modelo de embeddings.",
+     "claves": [
+      {
+       "id": "rag",
+       "label": "RAG (Retrieval-Augmented Generation)",
+       "glos": true
+      },
+      {
+       "id": "embedding",
+       "label": "Embedding",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 4,
+       "texto": "En el TP4 el buscador indexa la carpeta de normas que llega en cada corrida (con parametros.yaml), así los números del test entran por búsqueda.",
+       "tp_titulo": "El agente de admisión de guardia (TP final)",
+       "code": "tp4-normas-valores",
+       "nota": ""
+      }
+     ],
+     "ver": [],
+     "key": false,
+     "section_label": "Fundamentos de RAG",
+     "last": 70
+    },
+    {
+     "i": 5,
+     "title": "Cinco razones para no reentrenar",
+     "section": "Fundamentos de RAG",
+     "resumen": "Por qué RAG y no reentrenar: datos actualizados, datos propietarios, citas auditables, menos alucinación y menor costo.",
+     "claves": [
+      {
+       "id": "rag",
+       "label": "RAG (Retrieval-Augmented Generation)",
+       "glos": true
+      },
+      {
+       "id": "fine-tuning",
+       "label": "Fine-tuning (del equipo de producto)",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 4,
+       "texto": "En el TP4: lo que cambia (los números de las normas) va al buscador, no a los pesos; el SFT queda para el comportamiento.",
+       "tp_titulo": "El agente de admisión de guardia (TP final)",
+       "code": "tp4-normas-valores",
+       "nota": "Los números cambian en b, c y el test; por eso se leen de `parametros.yaml` en cada corrida en vez de entrenarlos."
+      }
+     ],
+     "ver": [
+      {
+       "url": "/clases/09/#d=como-se-entrena-un-llm&s=52",
+       "clase": 9,
+       "cnn": "09",
+       "i": 52,
+       "title": "Prompt, RAG o fine-tuning",
+       "por": "Prompt, RAG o fine-tuning"
+      }
+     ],
+     "key": true,
+     "section_label": "Fundamentos de RAG",
+     "last": 70
+    },
+    {
+     "i": 6,
+     "title": "Con 1M de tokens, ¿para qué recuperar?",
+     "section": "Fundamentos de RAG",
+     "resumen": "Aunque haya ventanas de 1M de tokens, elegir los pasajes relevantes sigue siendo un problema, y el modelo **rinde peor** con entradas muy largas.",
+     "claves": [
+      {
+       "id": "ventana-de-contexto",
+       "label": "Ventana de contexto",
+       "glos": true
+      },
+      {
+       "id": "context-rot",
+       "label": "Context rot",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/05/#d=prompting&s=4",
+       "clase": 5,
+       "cnn": "05",
+       "i": 4,
+       "title": "Ventana de contexto",
+       "por": "Ventana de contexto"
+      }
+     ],
+     "key": false,
+     "section_label": "Fundamentos de RAG",
+     "last": 70
+    },
+    {
+     "i": 7,
+     "title": "Demo: un pipeline de RAG paso a paso",
+     "section": "Fundamentos de RAG",
+     "resumen": "Demo: pipeline RAG con LangChain hasta la primera respuesta con citas.",
+     "claves": [
+      {
+       "id": "rag",
+       "label": "RAG (Retrieval-Augmented Generation)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Fundamentos de RAG",
+     "last": 70
+    },
+    {
+     "i": 8,
+     "title": "Qué le falta a la demo para producción",
+     "section": "Fundamentos de RAG",
+     "resumen": "De la demo a producción faltan cuatro cosas: procesamiento de documentos, recuperación, evaluación y observabilidad.",
+     "claves": [
+      {
+       "id": "rag",
+       "label": "RAG (Retrieval-Augmented Generation)",
+       "glos": true
+      },
+      {
+       "id": "chunking",
+       "label": "Chunking",
+       "glos": true
+      },
+      {
+       "id": "evals",
+       "label": "Evals (eval set propio)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Fundamentos de RAG",
+     "last": 70
+    },
+    {
+     "i": 9,
+     "title": "Búsqueda léxica",
+     "section": "Búsqueda léxica",
+     "resumen": "Separador: búsqueda por palabras.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Búsqueda léxica",
+     "last": 70
+    },
+    {
+     "i": 10,
+     "title": "Las fuentes ponen el techo de calidad",
+     "section": "Búsqueda léxica",
+     "resumen": "La calidad de las fuentes pone el techo: documentos no estructurados, bases de datos, APIs. Filtrar en el corpus es más barato que corregir después.",
+     "claves": [
+      {
+       "id": "rag",
+       "label": "RAG (Retrieval-Augmented Generation)",
+       "glos": true
+      },
+      {
+       "id": "fuentes",
+       "label": "fuentes",
+       "glos": false
+      }
+     ],
+     "tp": [
+      {
+       "tp": 3,
+       "texto": "El TP3 combinaba dos fuentes: normas que casi no cambian (Markdown) y una API con el estado del día; las descripciones de tools las separaban.",
+       "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+       "code": "tp3-descripciones-tools",
+       "nota": "Dos fuentes con distinta frecuencia de cambio: normas en Markdown y estado del día en la API."
+      }
+     ],
+     "ver": [],
+     "key": false,
+     "section_label": "Búsqueda léxica",
+     "last": 70
+    },
+    {
+     "i": 11,
+     "title": "Palabras, significado, o las dos",
+     "section": "Búsqueda léxica",
+     "resumen": "Tres opciones: **índice invertido** (identificadores, jerga), **base vectorial** (lenguaje natural) o **búsqueda híbrida**, que corre las dos y funde rankings.",
+     "claves": [
+      {
+       "id": "indice-invertido",
+       "label": "Índice invertido",
+       "glos": true
+      },
+      {
+       "id": "base-vectorial",
+       "label": "Base vectorial y HNSW",
+       "glos": true
+      },
+      {
+       "id": "busqueda-hibrida",
+       "label": "Búsqueda híbrida",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/07/#d=rag-mcp-rapida&s=6",
+       "clase": 7,
+       "cnn": "07",
+       "i": 6,
+       "title": "En producción se usan las dos",
+       "por": "En producción se usan las dos"
+      }
+     ],
+     "key": false,
+     "section_label": "Búsqueda léxica",
+     "last": 70
+    },
+    {
+     "i": 12,
+     "title": "Cómo funciona un índice invertido",
+     "section": "Búsqueda léxica",
+     "resumen": "El **índice invertido** guarda en qué documentos aparece cada término. Pipeline: tokenizar (minúsculas, sin stopwords, raíces), indexar y luego intersectar listas.",
+     "claves": [
+      {
+       "id": "indice-invertido",
+       "label": "Índice invertido",
+       "glos": true
+      },
+      {
+       "id": "tokenizacion",
+       "label": "Tokenización (BPE)",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 4,
+       "texto": "Tu BM25 del TP4 normaliza a minúsculas y sin tildes; la variante prefijos hace stemming con los primeros 4 caracteres.",
+       "tp_titulo": "El agente de admisión de guardia (TP final)",
+       "code": "tp4-bm25-tokens-variantes",
+       "nota": ""
+      }
+     ],
+     "ver": [
+      {
+       "url": "/clases/07/#d=rag-mcp-rapida&s=3",
+       "clase": 7,
+       "cnn": "07",
+       "i": 3,
+       "title": "Por palabras: el índice invertido",
+       "por": "Por palabras: el índice invertido"
+      }
+     ],
+     "key": true,
+     "section_label": "Búsqueda léxica",
+     "last": 70
+    },
+    {
+     "i": 13,
+     "title": "TF-IDF: frecuente acá, raro afuera",
+     "section": "Búsqueda léxica",
+     "resumen": "**TF-IDF** = frecuencia en el documento × rareza en el corpus. $IDF = \\ln(N/df)$; el logaritmo evita que la rareza domine.",
+     "claves": [
+      {
+       "id": "tf-idf",
+       "label": "TF-IDF",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Búsqueda léxica",
+     "last": 70
+    },
+    {
+     "i": 14,
+     "title": "TF-IDF sobre tres documentos",
+     "section": "Búsqueda léxica",
+     "resumen": "Con tres documentos: «el» aparece en todos, su IDF es 0 y desaparece solo. Los términos raros son los que distinguen.",
+     "claves": [
+      {
+       "id": "tf-idf",
+       "label": "TF-IDF",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Búsqueda léxica",
+     "last": 70
+    },
+    {
+     "i": 15,
+     "title": "BM25 satura la frecuencia",
+     "section": "Búsqueda léxica",
+     "resumen": "**BM25** mejora TF-IDF: **satura** la frecuencia ($k_1$) y **normaliza por largo** ($b$). Es la línea de base léxica de todo RAG.",
+     "claves": [
+      {
+       "id": "bm25",
+       "label": "BM25",
+       "glos": true
+      },
+      {
+       "id": "tf-idf",
+       "label": "TF-IDF",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 4,
+       "texto": "En el TP4 implementaste BM25 a mano con k1 = 1,5 y b = 0,75, una sección por fragmento: 48/60 completas contra 51/60 de la cátedra.",
+       "tp_titulo": "El agente de admisión de guardia (TP final)",
+       "code": "tp4-bm25-recuperar",
+       "nota": ""
+      }
+     ],
+     "ver": [],
+     "key": true,
+     "section_label": "Búsqueda léxica",
+     "last": 70
+    },
+    {
+     "i": 16,
+     "title": "Solo Doc1 puntúa distinto de cero",
+     "section": "Búsqueda léxica",
+     "resumen": "Ejemplo: «timeout intermitente» solo puntúa en Doc1 (0,44). Pero si la consulta dice «no responde», el léxico da cero.",
+     "claves": [
+      {
+       "id": "tf-idf",
+       "label": "TF-IDF",
+       "glos": true
+      },
+      {
+       "id": "indice-invertido",
+       "label": "Índice invertido",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Búsqueda léxica",
+     "last": 70
+    },
+    {
+     "i": 17,
+     "title": "Demo: índice invertido en vivo",
+     "section": "Búsqueda léxica",
+     "resumen": "Demo: construir el índice invertido y consultarlo en vivo.",
+     "claves": [
+      {
+       "id": "indice-invertido",
+       "label": "Índice invertido",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Búsqueda léxica",
+     "last": 70
+    },
+    {
+     "i": 18,
+     "title": "Búsqueda por significado",
+     "section": "Búsqueda por significado",
+     "resumen": "Separador: búsqueda por significado.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Búsqueda por significado",
+     "last": 70
+    },
+    {
+     "i": 19,
+     "title": "Encontrar por significado",
+     "section": "Búsqueda por significado",
+     "resumen": "Se convierte cada texto en un vector, se mide la similitud y se buscan los vecinos. Se compara significado, no caracteres.",
+     "claves": [
+      {
+       "id": "embedding",
+       "label": "Embedding",
+       "glos": true
+      },
+      {
+       "id": "similitud-coseno",
+       "label": "Similitud coseno",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/07/#d=rag-mcp-rapida&s=4",
+       "clase": 7,
+       "cnn": "07",
+       "i": 4,
+       "title": "Por significado: embeddings y similitud",
+       "por": "Embeddings y similitud"
+      }
+     ],
+     "key": false,
+     "section_label": "Búsqueda por significado",
+     "last": 70
+    },
+    {
+     "i": 20,
+     "title": "Embeddings: cada texto es un punto",
+     "section": "Búsqueda por significado",
+     "resumen": "Un **embedding** ubica textos parecidos cerca. Se aprende con **entrenamiento contrastivo** (pares pregunta–respuesta relevante); 384 a 3072 dimensiones.",
+     "claves": [
+      {
+       "id": "embedding",
+       "label": "Embedding",
+       "glos": true
+      },
+      {
+       "id": "bi-encoder",
+       "label": "Bi-encoder",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 3,
+       "texto": "En el TP3, BERT sin ajustar sacó CR 0,350 y e5-base (contrastivo, con prefijos query/passage) 1,000 con k = 1.",
+       "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+       "code": "tp3-encoder-e5-prefijos",
+       "nota": ""
+      }
+     ],
+     "ver": [
+      {
+       "url": "/clases/08/#d=transformers-a-fondo&s=34",
+       "clase": 8,
+       "cnn": "08",
+       "i": 34,
+       "title": "Del encoder al embedding de oración",
+       "por": "Del encoder al embedding de oración"
+      }
+     ],
+     "key": true,
+     "section_label": "Búsqueda por significado",
+     "last": 70
+    },
+    {
+     "i": 21,
+     "title": "Coseno: importa el ángulo",
+     "section": "Búsqueda por significado",
+     "resumen": "La **similitud coseno** mide el ángulo, no el largo: $\\cos\\theta = \\frac{a \\cdot b}{\\|a\\|\\|b\\|}$. Así un fragmento corto compite con uno largo.",
+     "claves": [
+      {
+       "id": "similitud-coseno",
+       "label": "Similitud coseno",
+       "glos": true
+      },
+      {
+       "id": "embedding",
+       "label": "Embedding",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 3,
+       "texto": "En el TP3 normalizaste los vectores con L2, así `matriz @ q` es directamente el coseno contra todos los fragmentos.",
+       "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+       "code": "tp3-recuperador-coseno-exacto",
+       "nota": "`matriz @ q` es el coseno porque `encoders.py` normaliza todo a norma 1."
+      }
+     ],
+     "ver": [],
+     "key": true,
+     "section_label": "Búsqueda por significado",
+     "last": 70
+    },
+    {
+     "i": 22,
+     "title": "HNSW: no comparar contra todos",
+     "section": "Búsqueda por significado",
+     "resumen": "**HNSW**: índice por capas (como una skip list) para buscar vecinos aproximados sin comparar contra los n vectores.",
+     "claves": [
+      {
+       "id": "base-vectorial",
+       "label": "Base vectorial y HNSW",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 3,
+       "texto": "Con 56 secciones, el TP3 hizo búsqueda exacta contra todos; HNSW no hacía falta.",
+       "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+       "code": "tp3-recuperador-coseno-exacto",
+       "nota": "Con 56 fragmentos alcanza la búsqueda exacta contra todos; HNSW tiene sentido con millones."
+      }
+     ],
+     "ver": [],
+     "key": false,
+     "section_label": "Búsqueda por significado",
+     "last": 70
+    },
+    {
+     "i": 23,
+     "title": "Gana un documento sin palabras en común",
+     "section": "Búsqueda por significado",
+     "resumen": "La consulta «¿por qué se cuelga la API?» encuentra el documento de timeouts sin palabras en común: es lo que el léxico no puede.",
+     "claves": [
+      {
+       "id": "embedding",
+       "label": "Embedding",
+       "glos": true
+      },
+      {
+       "id": "similitud-coseno",
+       "label": "Similitud coseno",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Búsqueda por significado",
+     "last": 70
+    },
+    {
+     "i": 24,
+     "title": "Demo: búsqueda semántica en vivo",
+     "section": "Búsqueda por significado",
+     "resumen": "Demo: búsqueda semántica sobre el mismo corpus, con una consulta que el índice léxico no resolvería.",
+     "claves": [
+      {
+       "id": "embedding",
+       "label": "Embedding",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Búsqueda por significado",
+     "last": 70
+    },
+    {
+     "i": 25,
+     "title": "Cuándo conviene cada estrategia",
+     "section": "Búsqueda por significado",
+     "resumen": "**BM25** es rápido, exacto en identificadores y sin GPU, pero no ve sinónimos. Los **embeddings** ven paráfrasis, pero cuestan más. Las cifras se miden en tu corpus.",
+     "claves": [
+      {
+       "id": "bm25",
+       "label": "BM25",
+       "glos": true
+      },
+      {
+       "id": "embedding",
+       "label": "Embedding",
+       "glos": true
+      },
+      {
+       "id": "busqueda-hibrida",
+       "label": "Búsqueda híbrida",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 4,
+       "texto": "En el TP4 elegiste BM25 (local, sin descargas) y aceptaste que no une sinónimos como «pecho» y «dolor torácico».",
+       "tp_titulo": "El agente de admisión de guardia (TP final)",
+       "code": "tp4-informe-evaluacion-buscador",
+       "nota": ""
+      }
+     ],
+     "ver": [],
+     "key": true,
+     "section_label": "Búsqueda por significado",
+     "last": 70
+    },
+    {
+     "i": 26,
+     "title": "El flujo completo en producción",
+     "section": "Búsqueda por significado",
+     "resumen": "En producción: BM25 y búsqueda vectorial en paralelo, fusión y recién después el cross-encoder. **Lo barato filtra, lo caro ordena.**",
+     "claves": [
+      {
+       "id": "busqueda-hibrida",
+       "label": "Búsqueda híbrida",
+       "glos": true
+      },
+      {
+       "id": "rrf",
+       "label": "Reciprocal Rank Fusion (RRF)",
+       "glos": true
+      },
+      {
+       "id": "reranking",
+       "label": "Reranking con cross-encoder",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Búsqueda por significado",
+     "last": 70
+    },
+    {
+     "i": 27,
+     "title": "Reranking",
+     "section": "Reranking",
+     "resumen": "Separador: reordenar candidatos.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Reranking",
+     "last": 70
+    },
+    {
+     "i": 28,
+     "title": "Recuperar y ordenar son dos trabajos",
+     "section": "Reranking",
+     "resumen": "Dos etapas en serie: la primera busca **recall** (no dejar nada afuera) y la segunda **precisión** (ordenar bien unos pocos).",
+     "claves": [
+      {
+       "id": "reranking",
+       "label": "Reranking con cross-encoder",
+       "glos": true
+      },
+      {
+       "id": "recall-at-k",
+       "label": "Recall (recall@k) y precisión por etapa",
+       "glos": true
+      },
+      {
+       "id": "precision-recall",
+       "label": "Precisión, recall y F1",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/04/#d=modelado-redes-neuronales&s=51",
+       "clase": 4,
+       "cnn": "04",
+       "i": 51,
+       "title": "Precision, recall y F1",
+       "por": "Precision, recall y F1"
+      }
+     ],
+     "key": true,
+     "section_label": "Reranking",
+     "last": 70
+    },
+    {
+     "i": 29,
+     "title": "Tres síntomas de que falta una etapa",
+     "section": "Reranking",
+     "resumen": "Señales de que falta una etapa: respuestas inconsistentes, el documento correcto existe pero queda fuera del top-k, o tenés dos buscadores sin fusionar.",
+     "claves": [
+      {
+       "id": "reranking",
+       "label": "Reranking con cross-encoder",
+       "glos": true
+      },
+      {
+       "id": "recall-at-k",
+       "label": "Recall (recall@k) y precisión por etapa",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 3,
+       "texto": "Fue tu A11 del TP3: la sección correcta quedaba tercera. Lo arreglaste reescribiendo la descripción de la tool, sin rerankear.",
+       "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+       "code": "tp3-informe-a11",
+       "nota": ""
+      }
+     ],
+     "ver": [],
+     "key": false,
+     "section_label": "Reranking",
+     "last": 70
+    },
+    {
+     "i": 30,
+     "title": "RRF fusiona sumando posiciones",
+     "section": "Reranking",
+     "resumen": "**RRF** fusiona por posiciones, no por puntajes (no comparables): $\\sum 1/(k + rank)$, con $k = 60$ empírico y poco crítico.",
+     "claves": [
+      {
+       "id": "rrf",
+       "label": "Reciprocal Rank Fusion (RRF)",
+       "glos": true
+      },
+      {
+       "id": "busqueda-hibrida",
+       "label": "Búsqueda híbrida",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 4,
+       "texto": "En el TP4 probaste RRF con n-gramas entre 68 configuraciones; no quedó en la entrega.",
+       "tp_titulo": "El agente de admisión de guardia (TP final)",
+       "code": "tp4-rrf-fusion-lexica",
+       "nota": ""
+      }
+     ],
+     "ver": [],
+     "key": false,
+     "section_label": "Reranking",
+     "last": 70
+    },
+    {
+     "i": 31,
+     "title": "El cross-encoder lee los dos juntos",
+     "section": "Reranking",
+     "resumen": "Un **bi-encoder** codifica consulta y documento por separado; un **cross-encoder** los lee juntos con atención cruzada. Más preciso, pero una inferencia por documento.",
+     "claves": [
+      {
+       "id": "bi-encoder",
+       "label": "Bi-encoder",
+       "glos": true
+      },
+      {
+       "id": "reranking",
+       "label": "Reranking con cross-encoder",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 3,
+       "texto": "El recuperador del TP3 soporta un cross-encoder opcional, pero la entrega no lo usó (reranker: null).",
+       "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+       "code": "tp3-recuperador-coseno-exacto",
+       "nota": "La rama `if self.reranker` es el cross-encoder; la entrega lo deja en null."
+      }
+     ],
+     "ver": [
+      {
+       "url": "/clases/08/#d=transformers-a-fondo&s=33",
+       "clase": 8,
+       "cnn": "08",
+       "i": 33,
+       "title": "Solo el encoder: BERT",
+       "por": "Solo el encoder: BERT"
+      }
+     ],
+     "key": false,
+     "section_label": "Reranking",
+     "last": 70
+    },
+    {
+     "i": 32,
+     "title": "Ajustes de producción",
+     "section": "Reranking",
+     "resumen": "Ajustes típicos: de 20 a 100 candidatos para rerankear, de 3 a 5 en el prompt, búsquedas en paralelo y medir todo.",
+     "claves": [
+      {
+       "id": "recall-at-k",
+       "label": "Recall (recall@k) y precisión por etapa",
+       "glos": true
+      },
+      {
+       "id": "reranking",
+       "label": "Reranking con cross-encoder",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 3,
+       "texto": "En el TP3, con top-3 ningún encoder pasó de 0,515 porque había una sola evidencia por pregunta; elegiste top-2 con margen 0,005.",
+       "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+       "code": "tp3-informe-seleccion",
+       "nota": "Puntos 1 y 4: por qué k = 3 no pasaba 0,515 y por qué top-2 con margen 0,005."
+      }
+     ],
+     "ver": [],
+     "key": false,
+     "section_label": "Reranking",
+     "last": 70
+    },
+    {
+     "i": 33,
+     "title": "Demo: reranking en vivo",
+     "section": "Reranking",
+     "resumen": "Demo: los mismos candidatos antes y después del cross-encoder.",
+     "claves": [
+      {
+       "id": "reranking",
+       "label": "Reranking con cross-encoder",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Reranking",
+     "last": 70
+    },
+    {
+     "i": 34,
+     "title": "Chunking y metadatos",
+     "section": "Chunking y metadatos",
+     "resumen": "Separador: cómo cortar y qué guardar junto a cada fragmento.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Chunking y metadatos",
+     "last": 70
+    },
+    {
+     "i": 35,
+     "title": "El corte decide qué se recupera junto",
+     "section": "Chunking y metadatos",
+     "resumen": "El fragmento es la unidad de recuperación. **Chunking** de largo fijo, semántico (párrafos) o **estructural** (secciones). En documentación técnica, la estructura sale gratis.",
+     "claves": [
+      {
+       "id": "chunking",
+       "label": "Chunking",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 3,
+       "texto": "En el TP3 probaste las tres; ganó el estructural (una sección ## por fragmento) y por oración fue el peor para todos los encoders.",
+       "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+       "code": "tp3-informe-seleccion",
+       "nota": "Punto 3: se probaron las tres familias; ganó la estructural y por oración fue la peor."
+      }
+     ],
+     "ver": [
+      {
+       "url": "/clases/07/#d=rag-mcp-rapida&s=9",
+       "clase": 7,
+       "cnn": "07",
+       "i": 9,
+       "title": "Chunking: dónde cortar y cuánto solapar",
+       "por": "Dónde cortar y cuánto solapar"
+      }
+     ],
+     "key": true,
+     "section_label": "Chunking y metadatos",
+     "last": 70
+    },
+    {
+     "i": 36,
+     "title": "Tamaño del fragmento y solapamiento",
+     "section": "Chunking y metadatos",
+     "resumen": "Fragmentos chicos son precisos pero sin contexto; grandes conservan contexto pero diluyen. El **solapamiento** compensa. Los tamaños se miden en tu corpus.",
+     "claves": [
+      {
+       "id": "chunking",
+       "label": "Chunking",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 3,
+       "texto": "Tus secciones medían 223 caracteres de media: ventanas de 800–1000 habrían mezclado 4 o 5 temas. Probaste ventanas de 40/10 y 80/20 palabras.",
+       "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+       "code": "tp3-chunking-estrategias",
+       "nota": "`_ventanas` es longitud fija con solapamiento (40/10 y 80/20 palabras)."
+      }
+     ],
+     "ver": [],
+     "key": false,
+     "section_label": "Chunking y metadatos",
+     "last": 70
+    },
+    {
+     "i": 37,
+     "title": "Los metadatos filtran antes de buscar",
+     "section": "Chunking y metadatos",
+     "resumen": "Los **metadatos** (fuente, fecha, posición, tipo) permiten citar, reindexar y **filtrar antes de buscar**, que es más barato y preciso.",
+     "claves": [
+      {
+       "id": "metadatos",
+       "label": "Metadatos del fragmento",
+       "glos": true
+      },
+      {
+       "id": "chunking",
+       "label": "Chunking",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 3,
+       "texto": "En el TP3 los usaste como texto buscable: anteponer «Título > Sección» al embeber subió e5-base de 0,85 a 1,00 con k = 1.",
+       "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+       "code": "tp3-fragmento-con-metadatos",
+       "nota": ""
+      }
+     ],
+     "ver": [
+      {
+       "url": "/clases/07/#d=rag-mcp-rapida&s=10",
+       "clase": 7,
+       "cnn": "07",
+       "i": 10,
+       "title": "Metadatos: filtrar antes de buscar",
+       "por": "Metadatos: filtrar antes de buscar"
+      }
+     ],
+     "key": false,
+     "section_label": "Chunking y metadatos",
+     "last": 70
+    },
+    {
+     "i": 38,
+     "title": "Evaluación y seguridad",
+     "section": "Evaluación y seguridad",
+     "resumen": "Separador: medir el sistema y sus riesgos.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Evaluación y seguridad",
+     "last": 70
+    },
+    {
+     "i": 39,
+     "title": "Evaluar las dos etapas por separado",
+     "section": "Evaluación y seguridad",
+     "resumen": "Hay que **evaluar las dos etapas por separado**: Context Relevance (recuperación), Answer Faithfulness y Answer Relevance (generación). Juntas no dicen qué se rompió.",
+     "claves": [
+      {
+       "id": "evals",
+       "label": "Evals (eval set propio)",
+       "glos": true
+      },
+      {
+       "id": "recall-at-k",
+       "label": "Recall (recall@k) y precisión por etapa",
+       "glos": true
+      },
+      {
+       "id": "rag",
+       "label": "RAG (Retrieval-Augmented Generation)",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 3,
+       "texto": "El juez del TP3 puntuaba CR, Faithfulness y AR por separado; la corrida 4 dio 5/5/5.",
+       "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+       "code": "tp3-evaluar-juez",
+       "nota": ""
+      },
+      {
+       "tp": 4,
+       "texto": "En el TP4, «prefijos» ganó en evaluar_rag (55/60) y perdió con el agente (6/50 contra 10/50).",
+       "tp_titulo": "El agente de admisión de guardia (TP final)",
+       "code": "tp4-informe-agente-buscador",
+       "nota": ""
+      }
+     ],
+     "ver": [
+      {
+       "url": "/clases/07/#d=rag-mcp-rapida&s=13",
+       "clase": 7,
+       "cnn": "07",
+       "i": 13,
+       "title": "Evaluar las dos etapas por separado",
+       "por": "Evaluar las dos etapas por separado"
+      }
+     ],
+     "key": true,
+     "section_label": "Evaluación y seguridad",
+     "last": 70
+    },
+    {
+     "i": 40,
+     "title": "Riesgos de seguridad propios de RAG",
+     "section": "Evaluación y seguridad",
+     "resumen": "RAG suma dos superficies de ataque: un índice con datos internos y texto de terceros que entra al prompt. Los permisos van en la recuperación.",
+     "claves": [
+      {
+       "id": "seguridad rag",
+       "label": "seguridad rag",
+       "glos": false
+      },
+      {
+       "id": "minimo-privilegio",
+       "label": "Mínimo privilegio",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Evaluación y seguridad",
+     "last": 70
+    },
+    {
+     "i": 41,
+     "title": "El atacante nunca le habla al modelo",
+     "section": "Evaluación y seguridad",
+     "resumen": "**Inyección indirecta**: el atacante escribe en un documento que se recuperará después; para el modelo, ese fragmento y la instrucción son el mismo texto.",
+     "claves": [
+      {
+       "id": "inyeccion-indirecta",
+       "label": "Inyección indirecta",
+       "glos": true
+      },
+      {
+       "id": "prompt-injection",
+       "label": "Prompt injection",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/13/#d=cierre-magnifica-humanitas&s=16",
+       "clase": 13,
+       "cnn": "13",
+       "i": 16,
+       "title": "Inyección directa e indirecta",
+       "por": "Inyección directa e indirecta"
+      }
+     ],
+     "key": true,
+     "section_label": "Evaluación y seguridad",
+     "last": 70
+    },
+    {
+     "i": 42,
+     "title": "Cómo se filtra un documento restringido",
+     "section": "Evaluación y seguridad",
+     "resumen": "Escenario: si los permisos se aplican al mostrar y no al recuperar, el documento restringido ya entró al prompt y se filtra en la respuesta.",
+     "claves": [
+      {
+       "id": "minimo-privilegio",
+       "label": "Mínimo privilegio",
+       "glos": true
+      },
+      {
+       "id": "seguridad rag",
+       "label": "seguridad rag",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Evaluación y seguridad",
+     "last": 70
+    },
+    {
+     "i": 43,
+     "title": "Buenas prácticas para mitigar riesgos",
+     "section": "Evaluación y seguridad",
+     "resumen": "Mitigaciones: acceso granular en la recuperación, cifrado y anonimización, monitoreo y validar la salida. Reducen el riesgo, no lo eliminan.",
+     "claves": [
+      {
+       "id": "minimo-privilegio",
+       "label": "Mínimo privilegio",
+       "glos": true
+      },
+      {
+       "id": "defensa-en-profundidad",
+       "label": "Capas de guardarraíles",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/13/#d=cierre-magnifica-humanitas&s=23",
+       "clase": 13,
+       "cnn": "13",
+       "i": 23,
+       "title": "Defensa en profundidad",
+       "por": "Defensa en profundidad"
+      }
+     ],
+     "key": false,
+     "section_label": "Evaluación y seguridad",
+     "last": 70
+    },
+    {
+     "i": 44,
+     "title": "Resumen de RAG",
+     "section": "Evaluación y seguridad",
+     "resumen": "Resumen de RAG: qué resuelve, cómo (híbrida, fusión y reranking), dónde se rompe (casi siempre antes del modelo) y cómo se mide.",
+     "claves": [
+      {
+       "id": "rag",
+       "label": "RAG (Retrieval-Augmented Generation)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Evaluación y seguridad",
+     "last": 70
+    },
+    {
+     "i": 45,
+     "title": "Fundamentos de MCP",
+     "section": "Fundamentos de MCP",
+     "resumen": "Separador: el protocolo para conectar modelos con herramientas.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Fundamentos de MCP",
+     "last": 70
+    },
+    {
+     "i": 46,
+     "title": "MCP conecta modelos con herramientas",
+     "section": "Fundamentos de MCP",
+     "resumen": "**MCP** estandariza cómo una app de IA pide datos y acciones a sistemas externos. Un servidor expone herramientas, recursos y prompts; el modelo elige la herramienta por su **descripción**.",
+     "claves": [
+      {
+       "id": "mcp",
+       "label": "MCP (Model Context Protocol)",
+       "glos": true
+      },
+      {
+       "id": "tool-calling",
+       "label": "Uso de herramientas (tool calling)",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 1,
+       "texto": "En el TP1 el agente creó el repo, la base y el deploy llamando tools de los servidores MCP de GitHub y Railway.",
+       "tp_titulo": "Corta, del caos a producción",
+       "code": "tp1-readme-deploy",
+       "nota": ""
+      }
+     ],
+     "ver": [
+      {
+       "url": "/clases/02/#d=cowork-intro&s=24",
+       "clase": 2,
+       "cnn": "02",
+       "i": 24,
+       "title": "Qué es MCP",
+       "por": "Qué es MCP"
+      }
+     ],
+     "key": true,
+     "section_label": "Fundamentos de MCP",
+     "last": 70
+    },
+    {
+     "i": 47,
+     "title": "Cada integración era un conector",
+     "section": "Fundamentos de MCP",
+     "resumen": "Antes de MCP, cada par aplicación–fuente necesitaba su propio conector. El modelo no era tonto: estaba **desconectado**.",
+     "claves": [
+      {
+       "id": "mcp",
+       "label": "MCP (Model Context Protocol)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Fundamentos de MCP",
+     "last": 70
+    },
+    {
+     "i": 48,
+     "title": "M×N conectores, o M+N piezas",
+     "section": "Fundamentos de MCP",
+     "resumen": "Con M apps y N fuentes hacen falta **M×N** integraciones; con un protocolo, **M+N**. El costo real está en mantenerlas.",
+     "claves": [
+      {
+       "id": "mcp",
+       "label": "MCP (Model Context Protocol)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/07/#d=rag-mcp-rapida&s=17",
+       "clase": 7,
+       "cnn": "07",
+       "i": 17,
+       "title": "M×N conectores, o M+N piezas",
+       "por": "M×N conectores, o M+N piezas"
+      }
+     ],
+     "key": false,
+     "section_label": "Fundamentos de MCP",
+     "last": 70
+    },
+    {
+     "i": 49,
+     "title": "Noviembre de 2024: MCP se publica",
+     "section": "Fundamentos de MCP",
+     "resumen": "MCP se publicó en noviembre de 2024 con especificación, SDKs, soporte en Claude Desktop y servidores de ejemplo (GitHub, Slack, Postgres…).",
+     "claves": [
+      {
+       "id": "mcp",
+       "label": "MCP (Model Context Protocol)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Fundamentos de MCP",
+     "last": 70
+    },
+    {
+     "i": 50,
+     "title": "Por qué no alcanza HTTP ni GraphQL",
+     "section": "Fundamentos de MCP",
+     "resumen": "HTTP resuelve el transporte y GraphQL la consulta de datos, pero ninguno estandariza **descubrir capacidades** («¿qué sabés hacer?») ni ejecutar acciones.",
+     "claves": [
+      {
+       "id": "mcp",
+       "label": "MCP (Model Context Protocol)",
+       "glos": true
+      },
+      {
+       "id": "json-rpc",
+       "label": "JSON-RPC 2.0",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Fundamentos de MCP",
+     "last": 70
+    },
+    {
+     "i": 51,
+     "title": "Anatomía de un servidor",
+     "section": "Anatomía de un servidor",
+     "resumen": "Separador: cómo está hecho un servidor MCP.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Anatomía de un servidor",
+     "last": 70
+    },
+    {
+     "i": 52,
+     "title": "JSON-RPC 2.0: la capa de mensajes de MCP",
+     "section": "Anatomía de un servidor",
+     "resumen": "MCP usa **JSON-RPC 2.0**: pedidos con `id`, respuestas con `result` **o** `error` (nunca los dos), y notificaciones sin `id`. Es independiente del transporte.",
+     "claves": [
+      {
+       "id": "json-rpc",
+       "label": "JSON-RPC 2.0",
+       "glos": true
+      },
+      {
+       "id": "mcp",
+       "label": "MCP (Model Context Protocol)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/07/#d=rag-mcp-rapida&s=18",
+       "clase": 7,
+       "cnn": "07",
+       "i": 18,
+       "title": "JSON-RPC 2.0: la capa de mensajes",
+       "por": "JSON-RPC 2.0: la capa de mensajes"
+      }
+     ],
+     "key": true,
+     "section_label": "Anatomía de un servidor",
+     "last": 70
+    },
+    {
+     "i": 53,
+     "title": "El servidor separa herramienta y agente",
+     "section": "Anatomía de un servidor",
+     "resumen": "El servidor separa la herramienta del agente. Con **stdio** el cliente lanza el proceso (sin puerto); con HTTP el servidor ya está corriendo.",
+     "claves": [
+      {
+       "id": "mcp",
+       "label": "MCP (Model Context Protocol)",
+       "glos": true
+      },
+      {
+       "id": "json-rpc",
+       "label": "JSON-RPC 2.0",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 3,
+       "texto": "Quedó pendiente en el TP3: el PLAN.md diseña FastMCP por stdio, con logs a stderr porque stdout es el canal del protocolo.",
+       "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+       "code": "tp3-plan-mcp-pendiente",
+       "nota": "Pendiente: el diseño separa el servidor (tools) del agente y manda logs a stderr porque stdout es el canal MCP."
+      }
+     ],
+     "ver": [],
+     "key": false,
+     "section_label": "Anatomía de un servidor",
+     "last": 70
+    },
+    {
+     "i": 54,
+     "title": "El ciclo de vida de una herramienta MCP",
+     "section": "Anatomía de un servidor",
+     "resumen": "Ciclo: arranque, descubrimiento (`tools/list`), el modelo elige leyendo descripciones, `tools/call`, resultado y respuesta. Agregar una tool no obliga a tocar el agente.",
+     "claves": [
+      {
+       "id": "mcp",
+       "label": "MCP (Model Context Protocol)",
+       "glos": true
+      },
+      {
+       "id": "tool-calling",
+       "label": "Uso de herramientas (tool calling)",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 3,
+       "texto": "Pendiente en el TP3: el cliente con MultiServerMCPClient que descubre con tools/list y llama con tools/call no se implementó.",
+       "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+       "code": "tp3-plan-mcp-pendiente",
+       "nota": "Pendiente: `get_tools()` haría tools/list y cada ejecución un tools/call."
+      }
+     ],
+     "ver": [
+      {
+       "url": "/clases/09/#d=como-se-entrena-un-llm&s=47",
+       "clase": 9,
+       "cnn": "09",
+       "i": 47,
+       "title": "MCP: host, cliente y servidor",
+       "por": "MCP: host, cliente y servidor"
+      }
+     ],
+     "key": true,
+     "section_label": "Anatomía de un servidor",
+     "last": 70
+    },
+    {
+     "i": 55,
+     "title": "Conectar un servidor MCP: tres caminos",
+     "section": "Anatomía de un servidor",
+     "resumen": "Tres formas de conectar un servidor: extensiones, configuración manual (stdio) o remoto. Instalar un servidor se parece a instalar una extensión del navegador: riesgo.",
+     "claves": [
+      {
+       "id": "mcp",
+       "label": "MCP (Model Context Protocol)",
+       "glos": true
+      },
+      {
+       "id": "minimo-privilegio",
+       "label": "Mínimo privilegio",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 1,
+       "texto": "El paso 0 del TP1 fue configurar los MCP de GitHub y Railway y hacer que el agente explicara qué tools expone cada uno.",
+       "tp_titulo": "Corta, del caos a producción",
+       "code": "tp1-claude-md-reglas",
+       "nota": "La config de los servidores MCP no está versionada en el repo; lo que quedó es la regla 4 que obliga a usarlos."
+      }
+     ],
+     "ver": [],
+     "key": false,
+     "section_label": "Anatomía de un servidor",
+     "last": 70
+    },
+    {
+     "i": 56,
+     "title": "La configuración, en concreto",
+     "section": "Anatomía de un servidor",
+     "resumen": "La configuración concreta: `claude_desktop_config.json` con `command` y `args` (stdio, sin URL) o con URL para un servidor remoto. Después se reinicia el cliente.",
+     "claves": [
+      {
+       "id": "mcp",
+       "label": "MCP (Model Context Protocol)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Anatomía de un servidor",
+     "last": 70
+    },
+    {
+     "i": 57,
+     "title": "Demo: un servidor MCP mínimo",
+     "section": "Anatomía de un servidor",
+     "resumen": "Demo: pasar de una herramienta hardcodeada en el agente al mismo código expuesto como servidor MCP.",
+     "claves": [
+      {
+       "id": "mcp",
+       "label": "MCP (Model Context Protocol)",
+       "glos": true
+      },
+      {
+       "id": "tool-calling",
+       "label": "Uso de herramientas (tool calling)",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 3,
+       "texto": "El bucle del TP3 quedó agnóstico del origen de las tools para reusarlo con MCP, pero la parte 3 quedó pendiente.",
+       "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+       "code": "tp3-bucle-tool-calling",
+       "nota": "El bucle ya no depende del origen de las tools; el servidor MCP que lo usaría quedó pendiente."
+      }
+     ],
+     "ver": [],
+     "key": false,
+     "section_label": "Anatomía de un servidor",
+     "last": 70
+    },
+    {
+     "i": 58,
+     "title": "La complejidad de los esquemas, medida",
+     "section": "Anatomía de un servidor",
+     "resumen": "Microsoft Research midió 1.470 servidores y 12.643 herramientas. El gráfico de «90/80/65 %» que circula **no existe** en el paper: verificá las cifras.",
+     "claves": [
+      {
+       "id": "mcp",
+       "label": "MCP (Model Context Protocol)",
+       "glos": true
+      },
+      {
+       "id": "fuentes",
+       "label": "fuentes",
+       "glos": false
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Anatomía de un servidor",
+     "last": 70
+    },
+    {
+     "i": 59,
+     "title": "Un agente, varios servidores",
+     "section": "Anatomía de un servidor",
+     "resumen": "Un agente con varios servidores: cada uno es independiente, pero el agente ve todas las tools **juntas**, con riesgo de colisiones y peor elección.",
+     "claves": [
+      {
+       "id": "mcp",
+       "label": "MCP (Model Context Protocol)",
+       "glos": true
+      },
+      {
+       "id": "tool-calling",
+       "label": "Uso de herramientas (tool calling)",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 1,
+       "texto": "En el TP1 el agente combinó dos servidores: GitHub para versionar y Railway para la infraestructura y el deploy.",
+       "tp_titulo": "Corta, del caos a producción",
+       "code": "tp1-railway-json",
+       "nota": "Lo de Railway (esta config, base, deploy) y lo de GitHub (repo, commits) vinieron de dos servidores MCP distintos."
+      }
+     ],
+     "ver": [],
+     "key": false,
+     "section_label": "Anatomía de un servidor",
+     "last": 70
+    },
+    {
+     "i": 60,
+     "title": "Casos de uso con Claude",
+     "section": "Anatomía de un servidor",
+     "resumen": "Con servidores conectados, un pedido en lenguaje natural atraviesa GitHub, la base de datos, Slack y otros sin escribir código de integración.",
+     "claves": [
+      {
+       "id": "mcp",
+       "label": "MCP (Model Context Protocol)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Anatomía de un servidor",
+     "last": 70
+    },
+    {
+     "i": 61,
+     "title": "El ecosistema, con fechas y fuentes",
+     "section": "Anatomía de un servidor",
+     "resumen": "Los conteos de servidores de cada directorio no son comparables: cada uno cuenta otra cosa y en otra fecha.",
+     "claves": [
+      {
+       "id": "mcp",
+       "label": "MCP (Model Context Protocol)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Anatomía de un servidor",
+     "last": 70
+    },
+    {
+     "i": 62,
+     "title": "Diseño de herramientas",
+     "section": "Diseño de herramientas",
+     "resumen": "Separador: cómo diseñar herramientas que el modelo elija bien.",
+     "claves": [],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Diseño de herramientas",
+     "last": 70
+    },
+    {
+     "i": 63,
+     "title": "Cuatro principios de diseño",
+     "section": "Diseño de herramientas",
+     "resumen": "Cuatro principios: nombres `verbo_sustantivo_contexto`, **descripciones exhaustivas** (el campo que más pesa), parámetros simples y errores informativos.",
+     "claves": [
+      {
+       "id": "tool-calling",
+       "label": "Uso de herramientas (tool calling)",
+       "glos": true
+      },
+      {
+       "id": "descripcion-como-disparador",
+       "label": "La descripción como disparador",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 3,
+       "texto": "Cada tool del TP3 declaraba su fuente, para qué sirve, qué NO tiene y los valores válidos del parámetro: ruteo 1,00 en las 4 corridas.",
+       "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+       "code": "tp3-descripciones-tools",
+       "nota": ""
+      }
+     ],
+     "ver": [
+      {
+       "url": "/clases/10/#d=agentes-y-multiagentes&s=20",
+       "clase": 10,
+       "cnn": "10",
+       "i": 20,
+       "title": "Principios para diseñar tools",
+       "por": "Principios para diseñar tools"
+      }
+     ],
+     "key": true,
+     "section_label": "Diseño de herramientas",
+     "last": 70
+    },
+    {
+     "i": 64,
+     "title": "Más herramientas, peor elección",
+     "section": "Diseño de herramientas",
+     "resumen": "El modelo elige tools por **coincidencia de patrones** con las descripciones: cuantas más hay, peor elige, y un modelo mejor no lo arregla.",
+     "claves": [
+      {
+       "id": "tool-calling",
+       "label": "Uso de herramientas (tool calling)",
+       "glos": true
+      },
+      {
+       "id": "routing-jerarquico",
+       "label": "Routing jerárquico / catálogo por fase",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 3,
+       "texto": "Con 6 tools en el TP3 no hizo falta routing jerárquico.",
+       "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+       "code": "tp3-descripciones-api-y-registro",
+       "nota": "Seis tools en un solo nivel: no hizo falta routing jerárquico."
+      }
+     ],
+     "ver": [
+      {
+       "url": "/clases/07/#d=rag-mcp-rapida&s=26",
+       "clase": 7,
+       "cnn": "07",
+       "i": 26,
+       "title": "Más herramientas, peor elección",
+       "por": "Más herramientas, peor elección"
+      }
+     ],
+     "key": false,
+     "section_label": "Diseño de herramientas",
+     "last": 70
+    },
+    {
+     "i": 65,
+     "title": "El mismo problema, ya en el catálogo",
+     "section": "Diseño de herramientas",
+     "resumen": "En el catálogo real, la mediana es 4 tools por servidor, pero hay extremos de 256 y 775 colisiones exactas de nombre.",
+     "claves": [
+      {
+       "id": "mcp",
+       "label": "MCP (Model Context Protocol)",
+       "glos": true
+      },
+      {
+       "id": "tool-calling",
+       "label": "Uso de herramientas (tool calling)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Diseño de herramientas",
+     "last": 70
+    },
+    {
+     "i": 66,
+     "title": "Routing jerárquico: una sola entrada",
+     "section": "Diseño de herramientas",
+     "resumen": "**Routing jerárquico**: una sola tool de entrada recibe (dominio, acción) y despacha. Suma un salto extra y hay que definir qué pasa con pares inválidos.",
+     "claves": [
+      {
+       "id": "routing-jerarquico",
+       "label": "Routing jerárquico / catálogo por fase",
+       "glos": true
+      },
+      {
+       "id": "routing-de-herramientas",
+       "label": "Patrones de catálogo: routing jerárquico y catálogo por fase",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Diseño de herramientas",
+     "last": 70
+    },
+    {
+     "i": 67,
+     "title": "El catálogo cambia con la fase",
+     "section": "Diseño de herramientas",
+     "resumen": "**Catálogo por fase**: se exponen solo las tools de la fase actual. Funciona si la fase la decide la aplicación, no el mismo modelo.",
+     "claves": [
+      {
+       "id": "routing-jerarquico",
+       "label": "Routing jerárquico / catálogo por fase",
+       "glos": true
+      },
+      {
+       "id": "routing-de-herramientas",
+       "label": "Patrones de catálogo: routing jerárquico y catálogo por fase",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [],
+     "key": false,
+     "section_label": "Diseño de herramientas",
+     "last": 70
+    },
+    {
+     "i": 68,
+     "title": "La descripción dice cuándo NO usarla",
+     "section": "Diseño de herramientas",
+     "resumen": "Con tres tools que suenan igual alcanza para confundir al modelo. La descripción debe decir **cuándo usarla y cuándo NO**.",
+     "claves": [
+      {
+       "id": "tool-calling",
+       "label": "Uso de herramientas (tool calling)",
+       "glos": true
+      },
+      {
+       "id": "descripcion-como-disparador",
+       "label": "La descripción como disparador",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 3,
+       "texto": "Tu consultar_turnos del TP3 aclaraba: «No dice qué hay que llevar al turno: eso está en los documentos».",
+       "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+       "code": "tp3-descripciones-tools",
+       "nota": "Mirá `CONSULTAR_TURNOS`: dice explícitamente qué NO tiene y adónde ir."
+      }
+     ],
+     "ver": [
+      {
+       "url": "/clases/07/#d=rag-mcp-rapida&s=28",
+       "clase": 7,
+       "cnn": "07",
+       "i": 28,
+       "title": "La descripción dice cuándo NO usarla",
+       "por": "La descripción dice cuándo NO usarla"
+      }
+     ],
+     "key": true,
+     "section_label": "Diseño de herramientas",
+     "last": 70
+    },
+    {
+     "i": 69,
+     "title": "Analítica en producción",
+     "section": "Diseño de herramientas",
+     "resumen": "Instrumentar cada llamada (cantidad, tasa de éxito, latencia, último uso) vuelve medible el diseño del catálogo. Una tool que nunca se usa es un problema de diseño.",
+     "claves": [
+      {
+       "id": "evals",
+       "label": "Evals (eval set propio)",
+       "glos": true
+      },
+      {
+       "id": "tool-calling",
+       "label": "Uso de herramientas (tool calling)",
+       "glos": true
+      }
+     ],
+     "tp": [
+      {
+       "tp": 3,
+       "texto": "Cada corrida del TP3 dejaba un log .md con tokens, costo, id de generación y cada tool con sus argumentos y su resultado.",
+       "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+       "code": "tp3-corrida-log-md",
+       "nota": ""
+      }
+     ],
+     "ver": [],
+     "key": false,
+     "section_label": "Diseño de herramientas",
+     "last": 70
+    },
+    {
+     "i": 70,
+     "title": "Key takeaways",
+     "section": "Diseño de herramientas",
+     "resumen": "Las dos mitades resuelven el mismo problema: dar al modelo **poco y bien elegido**. Cinco documentos buenos superan a cincuenta, y tres tools claras a veinte.",
+     "claves": [
+      {
+       "id": "rag",
+       "label": "RAG (Retrieval-Augmented Generation)",
+       "glos": true
+      },
+      {
+       "id": "mcp",
+       "label": "MCP (Model Context Protocol)",
+       "glos": true
+      },
+      {
+       "id": "tool-calling",
+       "label": "Uso de herramientas (tool calling)",
+       "glos": true
+      }
+     ],
+     "tp": [],
+     "ver": [
+      {
+       "url": "/clases/07/#d=rag-mcp-rapida&s=31",
+       "clase": 7,
+       "cnn": "07",
+       "i": 31,
+       "title": "Poco y bien elegido",
+       "por": "Poco y bien elegido"
+      }
+     ],
+     "key": true,
+     "section_label": "Diseño de herramientas",
+     "last": 70
+    }
+   ],
+   "groups": [
+    {
+     "label": "Portada",
+     "slides": [
+      {
+       "i": 0,
+       "title": "Inteligencia Artificial Generativa (AI Gen)",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 0,
+     "last": 0,
+     "ntp": 0,
+     "nkey": 0
+    },
+    {
+     "label": "Fundamentos de RAG",
+     "slides": [
+      {
+       "i": 1,
+       "title": "Fundamentos de RAG",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 2,
+       "title": "RAG suma lo que no está en los pesos",
+       "key": true,
+       "tp": true
+      },
+      {
+       "i": 3,
+       "title": "Recuperar, aumentar, generar",
+       "key": false,
+       "tp": true
+      },
+      {
+       "i": 4,
+       "title": "Antes de consultar hay que indexar",
+       "key": false,
+       "tp": true
+      },
+      {
+       "i": 5,
+       "title": "Cinco razones para no reentrenar",
+       "key": true,
+       "tp": true
+      },
+      {
+       "i": 6,
+       "title": "Con 1M de tokens, ¿para qué recuperar?",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 7,
+       "title": "Demo: un pipeline de RAG paso a paso",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 8,
+       "title": "Qué le falta a la demo para producción",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 1,
+     "last": 8,
+     "ntp": 4,
+     "nkey": 2
+    },
+    {
+     "label": "Búsqueda léxica",
+     "slides": [
+      {
+       "i": 9,
+       "title": "Búsqueda léxica",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 10,
+       "title": "Las fuentes ponen el techo de calidad",
+       "key": false,
+       "tp": true
+      },
+      {
+       "i": 11,
+       "title": "Palabras, significado, o las dos",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 12,
+       "title": "Cómo funciona un índice invertido",
+       "key": true,
+       "tp": true
+      },
+      {
+       "i": 13,
+       "title": "TF-IDF: frecuente acá, raro afuera",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 14,
+       "title": "TF-IDF sobre tres documentos",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 15,
+       "title": "BM25 satura la frecuencia",
+       "key": true,
+       "tp": true
+      },
+      {
+       "i": 16,
+       "title": "Solo Doc1 puntúa distinto de cero",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 17,
+       "title": "Demo: índice invertido en vivo",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 9,
+     "last": 17,
+     "ntp": 3,
+     "nkey": 2
+    },
+    {
+     "label": "Búsqueda por significado",
+     "slides": [
+      {
+       "i": 18,
+       "title": "Búsqueda por significado",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 19,
+       "title": "Encontrar por significado",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 20,
+       "title": "Embeddings: cada texto es un punto",
+       "key": true,
+       "tp": true
+      },
+      {
+       "i": 21,
+       "title": "Coseno: importa el ángulo",
+       "key": true,
+       "tp": true
+      },
+      {
+       "i": 22,
+       "title": "HNSW: no comparar contra todos",
+       "key": false,
+       "tp": true
+      },
+      {
+       "i": 23,
+       "title": "Gana un documento sin palabras en común",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 24,
+       "title": "Demo: búsqueda semántica en vivo",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 25,
+       "title": "Cuándo conviene cada estrategia",
+       "key": true,
+       "tp": true
+      },
+      {
+       "i": 26,
+       "title": "El flujo completo en producción",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 18,
+     "last": 26,
+     "ntp": 4,
+     "nkey": 3
+    },
+    {
+     "label": "Reranking",
+     "slides": [
+      {
+       "i": 27,
+       "title": "Reranking",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 28,
+       "title": "Recuperar y ordenar son dos trabajos",
+       "key": true,
+       "tp": false
+      },
+      {
+       "i": 29,
+       "title": "Tres síntomas de que falta una etapa",
+       "key": false,
+       "tp": true
+      },
+      {
+       "i": 30,
+       "title": "RRF fusiona sumando posiciones",
+       "key": false,
+       "tp": true
+      },
+      {
+       "i": 31,
+       "title": "El cross-encoder lee los dos juntos",
+       "key": false,
+       "tp": true
+      },
+      {
+       "i": 32,
+       "title": "Ajustes de producción",
+       "key": false,
+       "tp": true
+      },
+      {
+       "i": 33,
+       "title": "Demo: reranking en vivo",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 27,
+     "last": 33,
+     "ntp": 4,
+     "nkey": 1
+    },
+    {
+     "label": "Chunking y metadatos",
+     "slides": [
+      {
+       "i": 34,
+       "title": "Chunking y metadatos",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 35,
+       "title": "El corte decide qué se recupera junto",
+       "key": true,
+       "tp": true
+      },
+      {
+       "i": 36,
+       "title": "Tamaño del fragmento y solapamiento",
+       "key": false,
+       "tp": true
+      },
+      {
+       "i": 37,
+       "title": "Los metadatos filtran antes de buscar",
+       "key": false,
+       "tp": true
+      }
+     ],
+     "first": 34,
+     "last": 37,
+     "ntp": 3,
+     "nkey": 1
+    },
+    {
+     "label": "Evaluación y seguridad",
+     "slides": [
+      {
+       "i": 38,
+       "title": "Evaluación y seguridad",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 39,
+       "title": "Evaluar las dos etapas por separado",
+       "key": true,
+       "tp": true
+      },
+      {
+       "i": 40,
+       "title": "Riesgos de seguridad propios de RAG",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 41,
+       "title": "El atacante nunca le habla al modelo",
+       "key": true,
+       "tp": false
+      },
+      {
+       "i": 42,
+       "title": "Cómo se filtra un documento restringido",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 43,
+       "title": "Buenas prácticas para mitigar riesgos",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 44,
+       "title": "Resumen de RAG",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 38,
+     "last": 44,
+     "ntp": 1,
+     "nkey": 2
+    },
+    {
+     "label": "Fundamentos de MCP",
+     "slides": [
+      {
+       "i": 45,
+       "title": "Fundamentos de MCP",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 46,
+       "title": "MCP conecta modelos con herramientas",
+       "key": true,
+       "tp": true
+      },
+      {
+       "i": 47,
+       "title": "Cada integración era un conector",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 48,
+       "title": "M×N conectores, o M+N piezas",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 49,
+       "title": "Noviembre de 2024: MCP se publica",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 50,
+       "title": "Por qué no alcanza HTTP ni GraphQL",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 45,
+     "last": 50,
+     "ntp": 1,
+     "nkey": 1
+    },
+    {
+     "label": "Anatomía de un servidor",
+     "slides": [
+      {
+       "i": 51,
+       "title": "Anatomía de un servidor",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 52,
+       "title": "JSON-RPC 2.0: la capa de mensajes de MCP",
+       "key": true,
+       "tp": false
+      },
+      {
+       "i": 53,
+       "title": "El servidor separa herramienta y agente",
+       "key": false,
+       "tp": true
+      },
+      {
+       "i": 54,
+       "title": "El ciclo de vida de una herramienta MCP",
+       "key": true,
+       "tp": true
+      },
+      {
+       "i": 55,
+       "title": "Conectar un servidor MCP: tres caminos",
+       "key": false,
+       "tp": true
+      },
+      {
+       "i": 56,
+       "title": "La configuración, en concreto",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 57,
+       "title": "Demo: un servidor MCP mínimo",
+       "key": false,
+       "tp": true
+      },
+      {
+       "i": 58,
+       "title": "La complejidad de los esquemas, medida",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 59,
+       "title": "Un agente, varios servidores",
+       "key": false,
+       "tp": true
+      },
+      {
+       "i": 60,
+       "title": "Casos de uso con Claude",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 61,
+       "title": "El ecosistema, con fechas y fuentes",
+       "key": false,
+       "tp": false
+      }
+     ],
+     "first": 51,
+     "last": 61,
+     "ntp": 5,
+     "nkey": 2
+    },
+    {
+     "label": "Diseño de herramientas",
+     "slides": [
+      {
+       "i": 62,
+       "title": "Diseño de herramientas",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 63,
+       "title": "Cuatro principios de diseño",
+       "key": true,
+       "tp": true
+      },
+      {
+       "i": 64,
+       "title": "Más herramientas, peor elección",
+       "key": false,
+       "tp": true
+      },
+      {
+       "i": 65,
+       "title": "El mismo problema, ya en el catálogo",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 66,
+       "title": "Routing jerárquico: una sola entrada",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 67,
+       "title": "El catálogo cambia con la fase",
+       "key": false,
+       "tp": false
+      },
+      {
+       "i": 68,
+       "title": "La descripción dice cuándo NO usarla",
+       "key": true,
+       "tp": true
+      },
+      {
+       "i": 69,
+       "title": "Analítica en producción",
+       "key": false,
+       "tp": true
+      },
+      {
+       "i": 70,
+       "title": "Key takeaways",
+       "key": true,
+       "tp": false
+      }
+     ],
+     "first": 62,
+     "last": 70,
+     "ntp": 4,
+     "nkey": 3
+    }
+   ],
+   "tab": "RAG y MCP: recuperar contexto y conectar herramientas",
+   "extra": false,
+   "total": 71
+  }
+ ],
+ "multi": false,
+ "prev": "05",
+ "next": "07",
+ "snippets": [
+  {
+   "id": "prompt-sistema",
+   "titulo": "Prompt de sistema: solo datos de las herramientas",
+   "archivo": "hospital/agente/bucle.py",
+   "desde": 9,
+   "hasta": 22,
+   "lenguaje": "python",
+   "codigo": "MAX_PASOS = 6  # llamadas al modelo por pregunta\n\nPROMPT = \"\"\"Sos el asistente virtual del Hospital Provincial Arroyo Claro y respondés preguntas de pacientes y familiares.\n\nNo sabés nada de este hospital de antemano: toda la información sale de tus herramientas.\n- Normas, horarios fijos, procedimientos, requisitos, preparaciones y quién puede visitar o acompañar: buscar_documentos.\n- Estado de hoy (camas libres, profesionales de guardia, turnos disponibles, stock de farmacia, espera en la guardia): la herramienta de la API que corresponda.\n- Si la pregunta tiene varias partes, cubrí cada una con su fuente. Por ejemplo, \"¿hay lugar y me puedo quedar?\" necesita las camas de hoy y la norma de acompañantes.\n- Si una herramienta devuelve un error con opciones válidas, reintentá con la opción que corresponda.\n\nAl responder:\n- Usá solo datos que aparezcan en los resultados de las herramientas. No agregues horarios, nombres, cantidades ni requisitos que no estén ahí, aunque te parezcan razonables.\n- Si la información no está, decilo en vez de suponer.\n- Respondé en español, en pocas oraciones, contestando todo lo que se preguntó.\"\"\"",
+   "que_hace": "Fija el tope de pasos del bucle y el prompt de sistema del agente del hospital.",
+   "como_funciona": "- `MAX_PASOS = 6` limita las llamadas al modelo por pregunta.\n- El prompt dice que el modelo no sabe nada del hospital y que todo sale de las herramientas.\n- Rutea: normas y procedimientos → `buscar_documentos`; estado de hoy → la tool de la API; preguntas mixtas → cada parte con su fuente.\n- Pide reintentar ante errores con opciones válidas, usar solo datos de los resultados y decir si falta algo.",
+   "proposito": "Es la mitigación de alucinaciones por prompt: el hospital es ficticio, así que todo dato no recuperado sería inventado. Resultado: Faithfulness 5,00 en las 4 corridas. Es zero-shot: el único ejemplo (camas + acompañantes) ilustra el patrón mixto sin copiar preguntas de dev.",
+   "interaccion": "Lo usa `responder()` en el mismo archivo como `SystemMessage(PROMPT)`; aplica igual a las tools de LangChain y a las que cargaría el cliente MCP.",
+   "teoria": "Grounding: restringir la respuesta al contexto recuperado y admitir cuando falta información.",
+   "key": "tp3-prompt-sistema",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 5,
+     "cnn": "05",
+     "slug": "prompting",
+     "i": 17,
+     "title": "Mitigar alucinaciones: el prompt",
+     "url": "/clases/05/#d=prompting&s=17"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 2,
+     "title": "RAG suma lo que no está en los pesos",
+     "url": "/clases/06/#d=rag-y-mcp&s=2"
+    },
+    {
+     "clase": 13,
+     "cnn": "13",
+     "slug": "cierre-magnifica-humanitas",
+     "i": 25,
+     "title": "De la alucinación al engaño funcional",
+     "url": "/clases/13/#d=cierre-magnifica-humanitas&s=25"
+    }
+   ],
+   "nusos": 3
+  },
+  {
+   "id": "documentos-buscar",
+   "titulo": "buscar_documentos: fragmentos con su fuente",
+   "archivo": "hospital/documentos.py",
+   "desde": 10,
+   "hasta": 27,
+   "lenguaje": "python",
+   "codigo": "import json\n\nfrom hospital.rag.recuperador import CONFIG, obtener_recuperador\n\nSEPARADOR = \"\\n\\n---\\n\\n\"\n\n\ndef seleccion_agente():\n    return json.loads(CONFIG.read_text(encoding=\"utf-8\")).get(\"agente\", {})\n\n\ndef buscar_documentos(consulta):\n    \"\"\"Fragmentos elegidos, cada uno con su fuente '[Documento > Sección]' arriba del texto literal.\"\"\"\n    bloques = []\n    for f in obtener_recuperador().buscar_fragmentos(consulta, **seleccion_agente()):\n        fuente = f\"{f.titulo} > {f.seccion}\" if f.seccion else f.titulo\n        bloques.append(f\"[{fuente}]\\n{f.texto}\")\n    return SEPARADOR.join(bloques) or \"No se encontraron documentos para esa consulta.\"",
+   "que_hace": "Es la parte «recuperar» del RAG vista desde el agente: busca con el recuperador de la parte 1 y devuelve cada fragmento con su origen `[Documento > Sección]`.",
+   "como_funciona": "- `seleccion_agente()` lee una clave opcional `agente` de `config.json` para pisar top-k/umbral/margen (la entrega no la define).\n- `obtener_recuperador().buscar_fragmentos(consulta, ...)` trae los `Fragmento`.\n- Para cada uno arma `\"[{titulo} > {seccion}]\\n{texto}\"`.\n- Los une con `SEPARADOR` (`---`) o devuelve «No se encontraron documentos…».",
+   "proposito": "Anteponer la fuente le dice al modelo de dónde sale cada dato. En las corridas 2 y 3 se probó darle más fragmentos al agente; empeoró el CR y se volvió a la selección de la parte 1.",
+   "interaccion": "La llama la tool `buscar_documentos` de `hospital/herramientas.py`; su salida vuelve al modelo como `ToolMessage` y queda en `contextos` para el juez.",
+   "teoria": "Recuperar → aumentar: los fragmentos recuperados entran al contexto del LLM como resultado de una herramienta.",
+   "key": "tp3-documentos-buscar",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 3,
+     "title": "Recuperar, aumentar, generar",
+     "url": "/clases/06/#d=rag-y-mcp&s=3"
+    }
+   ],
+   "nusos": 1
+  },
+  {
+   "id": "normas-valores",
+   "titulo": "Normas + parámetros de la carpeta recibida (kit)",
+   "archivo": "admision/normas.py",
+   "desde": 36,
+   "hasta": 56,
+   "lenguaje": "python",
+   "codigo": "def cargar_parametros(ruta: Path) -> dict[str, str]:\n    \"\"\"{código: valor con su unidad}, desde `ruta/parametros.yaml`.\"\"\"\n    datos = yaml.safe_load((Path(ruta) / \"parametros.yaml\").read_text(encoding=\"utf-8\"))\n    return {p[\"codigo\"]: valor_como_texto(p[\"valor\"], p[\"unidad\"]) for p in datos[\"parametros\"]}\n\n\ndef linea_de_valores(cuerpo: str, valores: dict[str, str]) -> str:\n    \"\"\"«Valores: P-TDE-3 = 15 min; P-TDE-4 = 60 min.» con los parámetros que cita el cuerpo, en orden de aparición.\"\"\"\n    citados = list(dict.fromkeys(f\"{prefijo}-{n}\" for prefijo, desde, hasta in PATRON_PARAMETRO.findall(cuerpo)\n                                 for n in range(int(desde), int(hasta or desde) + 1)))\n    return (\"Valores: \" + \"; \".join(f\"{c} = {valores[c]}\" for c in citados) + \".\") if citados else \"\"\n\n\ndef cargar_normas(ruta: Path) -> list[Seccion]:\n    \"\"\"Las secciones de `ruta`, en orden alfabético de archivo.\"\"\"\n    valores = cargar_parametros(ruta)\n    secciones = []\n    for archivo in sorted(Path(ruta).glob(\"NOR-*.md\")):\n        cuerpo = archivo.read_text(encoding=\"utf-8\").strip()\n        secciones.append(Seccion(archivo.stem, cuerpo, linea_de_valores(cuerpo, valores)))\n    return secciones",
+   "que_hace": "Carga `parametros.yaml` de la carpeta de normas y agrega a cada sección una línea «Valores: P-XXX-N = …» con los números vigentes que cita.",
+   "como_funciona": "- `cargar_parametros` lee el YAML y formatea cada valor con su unidad (`nivel 2`, `15 min`).\n- `linea_de_valores` busca con `PATRON_PARAMETRO` los códigos citados en el cuerpo (incluye rangos «P-ADM-1 a P-ADM-3») y arma la línea.\n- `cargar_normas` recorre `NOR-*.md` en orden alfabético y devuelve `Seccion(id, cuerpo, valores)`.",
+   "proposito": "Es código del kit de la cátedra (no se modifica), pero el TP se apoya en él a propósito: como el buscador se reconstruye con la carpeta que llega en cada corrida, los números de las normas b, c o del test entran por búsqueda y no quedan fijados en código ni en los pesos.",
+   "interaccion": "`BuscadorBM25.__init__` llama a `cargar_normas(ruta_normas)` y indexa `Seccion.texto` (cuerpo + valores). `normas_variables.escribir_normas` genera carpetas con otros valores usando el mismo formato.",
+   "teoria": "Indexación del RAG: antes de consultar se indexa el corpus actual; el conocimiento que cambia vive en el índice, no en los parámetros del modelo.",
+   "key": "tp4-normas-valores",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 4,
+     "title": "Antes de consultar hay que indexar",
+     "url": "/clases/06/#d=rag-y-mcp&s=4"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 5,
+     "title": "Cinco razones para no reentrenar",
+     "url": "/clases/06/#d=rag-y-mcp&s=5"
+    }
+   ],
+   "nusos": 2
+  },
+  {
+   "id": "descripciones-tools",
+   "titulo": "Descripciones de tools: fuente, uso, qué NO tienen, valores válidos",
+   "archivo": "hospital/descripciones.py",
+   "desde": 8,
+   "hasta": 38,
+   "lenguaje": "python",
+   "codigo": "BUSCAR_DOCUMENTOS = (\n    \"Busca en los documentos oficiales del Hospital Provincial Arroyo Claro: normas y procedimientos que no \"\n    \"cambian de un día a otro. Sirve para horarios fijos (visitas, altas, farmacia, laboratorio, vacunatorio, \"\n    \"donación de sangre), quién puede visitar o quedarse con un paciente, preparación para estudios y cirugías \"\n    \"(ayunos, dietas), requisitos y documentación para turnos, internación, farmacia y coberturas, triage de \"\n    \"la guardia, derechos del paciente, accesos al edificio, control de infecciones, maternidad, pediatría, \"\n    \"kinesiología, salud mental y telemedicina. NO tiene el estado de hoy (camas libres, profesionales de \"\n    \"guardia, turnos disponibles, stock de farmacia ni tiempos de espera actuales). \"\n    \"consulta: el tema a buscar, en español y con las mismas palabras que usó el paciente (por ejemplo \"\n    \"'cómo es una consulta por telemedicina'). Si la pregunta toca varios temas de los documentos, hacé una \"\n    \"búsqueda por tema. Devuelve los fragmentos más relevantes con su documento y sección de origen.\"\n)\n\nCONSULTAR_CAMAS = (\n    \"Estado de HOY de las camas de internación de un sector: total, ocupadas y libres. Usala para saber si hay \"\n    \"lugar o camas disponibles para internar. \"\n    \"sector: uno de clinica_medica, cirugia_general, terapia_intensiva, pediatria, neonatologia, maternidad.\"\n)\n\nCONSULTAR_GUARDIA = (\n    \"Profesionales que están de guardia HOY en una especialidad, con su horario (por ejemplo 08:00-20:00 es \"\n    \"el turno de día y 20:00-08:00 el de la noche). Usala para saber quién atiende hoy o esta noche. \"\n    \"especialidad: una de clinica_medica, cardiologia, pediatria, traumatologia, obstetricia, salud_mental.\"\n)\n\nCONSULTAR_TURNOS = (\n    \"Próximos turnos disponibles (fecha y hora) con una especialidad en consultorios externos. Usala para saber \"\n    \"cuándo es el primer turno libre. No dice qué hay que llevar al turno: eso está en los documentos. \"\n    \"especialidad: una de cardiologia, dermatologia, traumatologia, psicologia, gastroenterologia, \"\n    \"obstetricia, kinesiologia.\"\n)",
+   "que_hace": "Define el texto que lee el modelo para decidir qué herramienta llamar: `buscar_documentos` para normas fijas y las de la API para el estado de hoy.",
+   "como_funciona": "- `BUSCAR_DOCUMENTOS` lista los temas de los documentos y aclara que NO tiene el estado de hoy; pide buscar «con las mismas palabras que usó el paciente» y hacer una búsqueda por tema.\n- `CONSULTAR_CAMAS`, `CONSULTAR_GUARDIA` y `CONSULTAR_TURNOS` dicen que son el estado de HOY y enumeran los valores válidos del parámetro.\n- `CONSULTAR_TURNOS` agrega: «No dice qué hay que llevar al turno: eso está en los documentos».",
+   "proposito": "El ruteo depende solo de estas descripciones, así que separan norma (documentos) de estado (API) y dicen cuándo NO usar cada tool: ruteo 1,00 en las 4 corridas. La frase de las palabras del paciente arregló A11, y el ejemplo de consulta se cambió por uno de telemedicina para no filtrar la pregunta A01 de dev.",
+   "interaccion": "Las importa `hospital/herramientas.py` a través del diccionario `DESCRIPCIONES`; el PLAN prevé que el servidor MCP use exactamente los mismos textos para que la comparación parte 2 vs. parte 3 sea justa.",
+   "teoria": "Diseño de herramientas: la descripción es la interfaz para el modelo (qué hace, cuándo usarla, cuándo no, parámetros válidos).",
+   "key": "tp3-descripciones-tools",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 2,
+     "cnn": "02",
+     "slug": "cowork-intro",
+     "i": 25,
+     "title": "Cómo el agente descubre y usa una herramienta",
+     "url": "/clases/02/#d=cowork-intro&s=25"
+    },
+    {
+     "clase": 5,
+     "cnn": "05",
+     "slug": "prompting",
+     "i": 33,
+     "title": "Zero-shot vs. few-shot",
+     "url": "/clases/05/#d=prompting&s=33"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 10,
+     "title": "Las fuentes ponen el techo de calidad",
+     "url": "/clases/06/#d=rag-y-mcp&s=10"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 63,
+     "title": "Cuatro principios de diseño",
+     "url": "/clases/06/#d=rag-y-mcp&s=63"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 68,
+     "title": "La descripción dice cuándo NO usarla",
+     "url": "/clases/06/#d=rag-y-mcp&s=68"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 28,
+     "title": "La descripción dice cuándo NO usarla",
+     "url": "/clases/07/#d=rag-mcp-rapida&s=28"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 48,
+     "title": "MCP: una herramienta es una definición",
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=48"
+    },
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 20,
+     "title": "Principios para diseñar tools",
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=20"
+    }
+   ],
+   "nusos": 8
+  },
+  {
+   "id": "bm25-tokens-variantes",
+   "titulo": "Normalización y variantes del BM25",
+   "archivo": "admision_tp/buscador.py",
+   "desde": 24,
+   "hasta": 48,
+   "lenguaje": "python",
+   "codigo": "def _tokens(texto: str) -> list[str]:\n    normalizado = unicodedata.normalize(\"NFD\", texto.casefold())\n    sin_tildes = \"\".join(c for c in normalizado if unicodedata.category(c) != \"Mn\")\n    return re.findall(r\"[a-z0-9]+\", sin_tildes)\n\n\n@dataclass(frozen=True)\nclass ConfigBM25:\n    \"\"\"Cómo se indexa y cuántas secciones ve el agente.\n\n    prefijo: trunca cada término no numérico a sus primeras letras (stemming por prefijo).\n    umbral_relativo: descarta secciones con puntaje menor que esa fracción del primero.\n    \"\"\"\n\n    sin_comunes: bool = False\n    prefijo: int | None = None\n    umbral_relativo: float = 0.0\n    k_entorno: int = 2\n\n\nVARIANTES = {\n    \"baseline\": ConfigBM25(),\n    \"sin_comunes\": ConfigBM25(sin_comunes=True),\n    \"prefijos\": ConfigBM25(sin_comunes=True, prefijo=4, umbral_relativo=0.6, k_entorno=3),\n}",
+   "que_hace": "Define cómo se tokeniza el texto (minúsculas, sin tildes, solo alfanuméricos) y las tres variantes seleccionables del buscador.",
+   "como_funciona": "- `_tokens` aplica `casefold`, descompone con NFD y descarta las marcas diacríticas (categoría `Mn`), así «Tórax» y «torax» son el mismo término.\n- `re.findall(r\"[a-z0-9]+\")` corta en palabras y números.\n- `ConfigBM25` agrupa las perillas: quitar palabras comunes, `prefijo` (stemming por truncado), `umbral_relativo` y `k_entorno` (secciones por búsqueda).\n- `VARIANTES['prefijos']` usa prefijo 4, umbral 0,6 y hasta 3 secciones.",
+   "proposito": "Hace explícitas y reproducibles las variantes que se compararon en vez de tener ifs sueltos. El stemming por prefijo es un stemmer «pobre» pero sin dependencias, porque no se permitían descargas.",
+   "interaccion": "`BuscadorBM25._terminos` usa `_tokens` y la config tanto para indexar como para la consulta. `entrega.construir_buscador` elige la variante por nombre; `scripts/comparar_buscadores.py` y `scripts/explorar_buscadores.py` las reutilizan.",
+   "teoria": "Es el preprocesamiento del índice invertido: normalizar términos (y opcionalmente hacer stemming) antes de contar frecuencias.",
+   "key": "tp4-bm25-tokens-variantes",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 12,
+     "title": "Cómo funciona un índice invertido",
+     "url": "/clases/06/#d=rag-y-mcp&s=12"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 3,
+     "title": "Por palabras: el índice invertido",
+     "url": "/clases/07/#d=rag-mcp-rapida&s=3"
+    }
+   ],
+   "nusos": 2
+  },
+  {
+   "id": "bm25-recuperar",
+   "titulo": "BM25 a mano: índice y puntaje",
+   "archivo": "admision_tp/buscador.py",
+   "desde": 58,
+   "hasta": 99,
+   "lenguaje": "python",
+   "codigo": "    def __init__(self, ruta_normas: Path, variante: str | ConfigBM25 = \"baseline\"):\n        if isinstance(variante, ConfigBM25):\n            self.variante, self.config = \"personalizada\", variante\n        elif variante in VARIANTES:\n            self.variante, self.config = variante, VARIANTES[variante]\n        else:\n            raise ValueError(f\"BUSCADOR_VARIANTE debe ser una de: {', '.join(VARIANTES)}\")\n        self.k_entorno = self.config.k_entorno\n        self._secciones = cargar_normas(Path(ruta_normas))\n        self._frecuencias = [Counter(self._terminos(s.texto)) for s in self._secciones]\n        self._longitudes = [sum(f.values()) for f in self._frecuencias]\n        self._promedio = sum(self._longitudes) / len(self._longitudes) if self._longitudes else 0\n        documentos = Counter(t for f in self._frecuencias for t in f)\n        n = len(self._secciones)\n        self._idf = {t: math.log(1 + (n - df + 0.5) / (df + 0.5)) for t, df in documentos.items()}\n\n    def _terminos(self, texto: str) -> list[str]:\n        c = self.config\n        terminos = [t for t in _tokens(texto) if not (c.sin_comunes and t in PALABRAS_COMUNES)]\n        if c.prefijo:\n            terminos = [t if t.isdigit() else t[:c.prefijo] for t in terminos]\n        return terminos\n\n    def recuperar(self, consulta: str, k: int) -> list[Seccion]:\n        \"\"\"Devuelve hasta k secciones por relevancia BM25 (k1=1.5, b=0.75).\"\"\"\n        if k <= 0 or not self._promedio:\n            return []\n        terminos = sorted(set(self._terminos(consulta)))\n        puntuados = []\n        for i, frecuencias in enumerate(self._frecuencias):\n            normalizador = 1.5 * (0.25 + 0.75 * self._longitudes[i] / self._promedio)\n            puntaje = sum(\n                self._idf[t] * frecuencias[t] * 2.5 / (frecuencias[t] + normalizador)\n                for t in terminos if t in frecuencias\n            )\n            if puntaje > 0:\n                puntuados.append((i, puntaje))\n        puntuados.sort(key=lambda x: (-x[1], x[0]))\n        if puntuados:\n            minimo = self.config.umbral_relativo * puntuados[0][1]\n            puntuados = [(i, p) for i, p in puntuados if p >= minimo]\n        return [self._secciones[i] for i, _ in puntuados[:k]]",
+   "que_hace": "Construye el índice (frecuencias por sección, largos, IDF) y puntúa cada sección completa de las normas con BM25 para devolver las k mejores.",
+   "como_funciona": "- En `__init__` carga las secciones con `cargar_normas(ruta_normas)` (una sección = un documento) y arma un `Counter` de términos por sección.\n- Calcula `_promedio` de largo y el IDF `log(1 + (n - df + 0.5)/(df + 0.5))`.\n- `recuperar` recorre las secciones: `normalizador = 1.5 * (0.25 + 0.75 * largo/promedio)` es k1·(1−b+b·dl/avgdl) con k1=1,5 y b=0,75, y el término `frecuencias[t] * 2.5 / (frecuencias[t] + normalizador)` es la saturación (k1+1)·tf/(tf+…).\n- Ordena por puntaje (empate por orden de archivo), aplica `umbral_relativo` y devuelve hasta `k` objetos `Seccion`.",
+   "proposito": "Se implementó BM25 propio, local y sin descargas, con la sección entera como fragmento para que la evidencia (incluida la línea «Valores:») no quede partida. Embeddings y rerankers se descartaron porque requerían dependencias no autorizadas.",
+   "interaccion": "Lo llama el `Entorno` del kit en `buscar_normativa` con `k = buscador.k_entorno`, y `admision.evaluar_rag` para la evaluación aparte. Devuelve `Seccion` cuyo `.texto` se pega como observación en la conversación del agente.",
+   "teoria": "Es BM25 sobre índice invertido: IDF por rareza del término, saturación de la frecuencia con k1 y normalización por largo con b.",
+   "key": "tp4-bm25-recuperar",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 15,
+     "title": "BM25 satura la frecuencia",
+     "url": "/clases/06/#d=rag-y-mcp&s=15"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 9,
+     "title": "Chunking: dónde cortar y cuánto solapar",
+     "url": "/clases/07/#d=rag-mcp-rapida&s=9"
+    }
+   ],
+   "nusos": 2
+  },
+  {
+   "id": "encoder-e5-prefijos",
+   "titulo": "Encoder de oraciones con prefijos query/passage",
+   "archivo": "hospital/rag/encoders.py",
+   "desde": 40,
+   "hasta": 68,
+   "lenguaje": "python",
+   "codigo": "class SentenceTransformerEncoder:\n    \"\"\"Modelos entrenados para embeddings de oraciones (MiniLM, e5, bge-m3). Los e5 piden prefijos.\"\"\"\n\n    def __init__(self, modelo, prefijo_consulta=\"\", prefijo_pasaje=\"\", lote=16):\n        from sentence_transformers import SentenceTransformer\n\n        self.nombre, self.lote = modelo, lote\n        self.prefijo_consulta, self.prefijo_pasaje = prefijo_consulta, prefijo_pasaje\n        self.modelo = SentenceTransformer(modelo, device=\"cpu\")\n\n    def _codificar(self, textos, prefijo):\n        m = self.modelo.encode([prefijo + t for t in textos], batch_size=self.lote,\n                               normalize_embeddings=True, show_progress_bar=False)\n        return np.asarray(m, dtype=np.float32)\n\n    def codificar_consultas(self, textos):\n        return self._codificar(textos, self.prefijo_consulta)\n\n    def codificar_pasajes(self, textos):\n        return self._codificar(textos, self.prefijo_pasaje)\n\n\ndef crear_encoder(cfg):\n    \"\"\"cfg: {\"tipo\": \"bert_promedio\" | \"sentence_transformer\", \"modelo\": ..., \"prefijo_consulta\": ..., \"prefijo_pasaje\": ...}\"\"\"\n    if cfg[\"tipo\"] == \"bert_promedio\":\n        return BertPromedio(cfg[\"modelo\"])\n    if cfg[\"tipo\"] == \"sentence_transformer\":\n        return SentenceTransformerEncoder(cfg[\"modelo\"], cfg.get(\"prefijo_consulta\", \"\"), cfg.get(\"prefijo_pasaje\", \"\"))\n    raise ValueError(f\"tipo de encoder desconocido: {cfg['tipo']}\")",
+   "que_hace": "Envuelve modelos de `sentence-transformers` (MiniLM, e5, bge-m3) con la misma interfaz que BERT y agrega los prefijos que piden los e5. `crear_encoder` elige la clase según la configuración.",
+   "como_funciona": "- `SentenceTransformerEncoder` guarda `prefijo_consulta` y `prefijo_pasaje`.\n- `_codificar(textos, prefijo)` antepone el prefijo a cada texto y llama a `self.modelo.encode(..., normalize_embeddings=True)`.\n- `codificar_consultas` usa el prefijo de consulta (`\"query: \"`) y `codificar_pasajes` el de pasaje (`\"passage: \"`).\n- `crear_encoder(cfg)` despacha por `cfg[\"tipo\"]`.",
+   "proposito": "e5 fue entrenado de forma contrastiva con pares consulta–pasaje y espera esos prefijos; sin ellos se pierde la asimetría pregunta/documento. Ganó e5-base: separó el fragmento correcto a z = 3,94 contra 3,07 de MiniLM (entrenado para paráfrasis).",
+   "interaccion": "`Recuperador.desde_config` lo crea a partir de `config.json` (`intfloat/multilingual-e5-base`, `query: ` / `passage: `). `Recuperador._puntuar` llama a `codificar_consultas` y `_embeddings` a `codificar_pasajes`.",
+   "teoria": "Embeddings de oración entrenados con aprendizaje contrastivo (como CLIP pero texto–texto): consulta y pasaje relevantes quedan cerca en el espacio.",
+   "key": "tp3-encoder-e5-prefijos",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 20,
+     "title": "Embeddings: cada texto es un punto",
+     "url": "/clases/06/#d=rag-y-mcp&s=20"
+    },
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
+     "i": 36,
+     "title": "El mapa de la familia",
+     "url": "/clases/08/#d=transformers-a-fondo&s=36"
+    },
+    {
+     "clase": 12,
+     "cnn": "12",
+     "slug": "segmentacion-y-stable-diffusion",
+     "i": 22,
+     "title": "Embeddings más allá del texto",
+     "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=22"
+    },
+    {
+     "clase": 12,
+     "cnn": "12",
+     "slug": "segmentacion-y-stable-diffusion",
+     "i": 51,
+     "title": "CLIP: el puente texto ↔ imagen",
+     "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=51"
+    }
+   ],
+   "nusos": 4
+  },
+  {
+   "id": "recuperador-coseno-exacto",
+   "titulo": "Búsqueda exacta por coseno (y reranker opcional)",
+   "archivo": "hospital/rag/recuperador.py",
+   "desde": 51,
+   "hasta": 74,
+   "lenguaje": "python",
+   "codigo": "    def _puntuar(self, consulta):\n        \"\"\"[(Fragmento, score)] de todos los fragmentos (o de los candidatos rerankeados), de mayor a menor.\"\"\"\n        q = self.encoder.codificar_consultas([consulta])[0]\n        scores = self.matriz @ q\n        orden = np.argsort(-scores)\n        if self.reranker is None:\n            return [(self.fragmentos[i], float(scores[i])) for i in orden]\n        cand = orden[:self.candidatos]\n        pares = [(consulta, self.fragmentos[i].para_embedding(self.metadatos)) for i in cand]\n        re_scores = self.reranker.predict(pares, show_progress_bar=False)\n        return sorted(((self.fragmentos[i], float(s)) for i, s in zip(cand, re_scores)), key=lambda x: -x[1])\n\n    def puntuar(self, consulta):\n        \"\"\"[(texto, score)] de mayor a menor.\"\"\"\n        return [(f.texto, s) for f, s in self._puntuar(consulta)]\n\n    def buscar_fragmentos(self, consulta, **seleccion):\n        \"\"\"Los Fragmento elegidos (texto literal + documento, título y sección). top_k, umbral y margen se\n        pueden pisar por llamada; si no, se usan los de la configuración.\"\"\"\n        s = {\"top_k\": self.top_k, \"umbral\": self.umbral, \"margen\": self.margen, **seleccion}\n        return seleccionar(self._puntuar(consulta), s[\"top_k\"], s[\"umbral\"], s[\"margen\"])\n\n    def buscar(self, consulta):\n        return [f.texto for f in self.buscar_fragmentos(consulta)]",
+   "que_hace": "Puntúa todos los fragmentos contra la consulta con un producto matricial y los ordena; si hay cross-encoder configurado, rerankea los mejores candidatos.",
+   "como_funciona": "- `q = self.encoder.codificar_consultas([consulta])[0]`: vector de la consulta, ya normalizado.\n- `scores = self.matriz @ q`: como todo tiene norma 1, cada producto punto es el coseno contra los 56 fragmentos.\n- `np.argsort(-scores)` ordena de mayor a menor.\n- Si `self.reranker` no es `None`, toma `orden[:self.candidatos]`, arma pares `(consulta, texto)` y los vuelve a ordenar con `reranker.predict`.\n- `buscar_fragmentos` aplica `seleccionar` con top-k/umbral/margen; `buscar` devuelve solo los textos.",
+   "proposito": "Con 56 secciones, comparar contra todas es instantáneo y exacto, así que no hizo falta un índice aproximado como HNSW. El reranker quedó soportado pero la entrega usa `reranker: null`: no mejoraba sobre e5-base con metadatos.",
+   "interaccion": "`recuperar.py` llama a `buscar()` por pregunta; `hospital/documentos.py` llama a `buscar_fragmentos()` para la tool `buscar_documentos`; `correr_recuperacion.py` usa `puntuar()` una vez por pregunta y prueba varios k/umbral/margen sobre el mismo ranking.",
+   "teoria": "Similitud coseno sobre vectores normalizados y búsqueda exacta (fuerza bruta); el cross-encoder como segunda etapa que lee consulta y pasaje juntos.",
+   "key": "tp3-recuperador-coseno-exacto",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 21,
+     "title": "Coseno: importa el ángulo",
+     "url": "/clases/06/#d=rag-y-mcp&s=21"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 22,
+     "title": "HNSW: no comparar contra todos",
+     "url": "/clases/06/#d=rag-y-mcp&s=22"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 31,
+     "title": "El cross-encoder lee los dos juntos",
+     "url": "/clases/06/#d=rag-y-mcp&s=31"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 2,
+     "title": "RAG en tres pasos",
+     "url": "/clases/07/#d=rag-mcp-rapida&s=2"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 4,
+     "title": "Por significado: embeddings y similitud",
+     "url": "/clases/07/#d=rag-mcp-rapida&s=4"
+    }
+   ],
+   "nusos": 5
+  },
+  {
+   "id": "informe-evaluacion-buscador",
+   "titulo": "Evaluación aparte del buscador (INFORME)",
+   "archivo": "INFORME.md",
+   "desde": 241,
+   "hasta": 276,
+   "lenguaje": "markdown",
+   "codigo": "| Buscador | Secciones por búsqueda | Completas | Recall de evidencia | Precisión | Tokens/consulta |\n|---|---|---:|---:|---:|---:|\n| Referencia BM25 de la cátedra | 2 | 51/60 | 0,875 | 0,492 | 580 |\n| `baseline` (default de la entrega) | 2 | 48/60 | 0,817 | 0,467 | 618 |\n| `sin_comunes` | 2 | 50/60 | 0,850 | 0,483 | 591 |\n| `prefijos` | 1 a 3 (umbral 0,6) | **55/60** | **0,933** | **0,686** | **549** |\n\n- `baseline`: BM25 sobre la sección entera, 2 secciones. Queda por debajo de la referencia; las consultas\n  coloquiales tienen recall 0,25 porque depende de compartir palabras.\n- `sin_comunes`: quita una lista fija de palabras comunes del índice y de la consulta (conserva `no`, `sin`,\n  `ni` y números). Gana 3 consultas y pierde 1 contra `baseline`.\n- `prefijos`: sin palabras comunes, cada palabra recortada a sus primeras 4 letras (une `registro`,\n  `registrarlo`, `registra`) y hasta 3 secciones, descartando las que puntúan menos de 0,6 × la primera.\n  Supera la referencia en las cuatro métricas; gana 9 consultas y pierde 2 (d027 y d052, por colisiones de\n  prefijo). Coloquiales: recall 0,75.\n\n**Variantes probadas y descartadas.** Además de las tres seleccionables se midieron 68 configuraciones,\nreproducibles con `python -m scripts.explorar_buscadores --salida <carpeta nueva>`; la tabla completa está en\nla guía. En resumen:\n\n| Familia | Mejor resultado | Por qué se descartó |\n|---|---|---|\n| Fragmentos por párrafo (top 2–5, con o sin puntaje de sección) | 49/60, 0,833, 291–341 tokens | Menos tokens, pero menos recall que la referencia |\n| Sección recortada a los párrafos con coincidencia | 51/60, 0,867, 535 tokens | Pierde evidencia de párrafos sin palabras de la consulta |\n| Otros stemmers (plurales, sufijos, prefijo 5 o 6) | 51/60, 0,867 | Peores que prefijo 4 |\n| Título con más peso, ajustes de k1/b | 49–51/60 | Ganancia de 1 consulta como mucho |\n| Peso 0,25 para palabras comunes | 49/60, 0,833, 605 tokens | Pierde d011 igual que `sin_comunes`, gana menos |\n| Fusión BM25 + n-gramas de caracteres (RRF) | 48/60, 0,817, 612 tokens | No supera a `sin_comunes` |\n| `prefijos` sin umbral (k=3) | 56/60, 0,942, 895 tokens | +45 % de tokens por 1 consulta |\n| `prefijos` con umbral 0,4 / 0,5 / 0,7 / 0,8 | 56 / 55 / 53 / 52 de 60 | 0,6 es el codo entre recall y tokens |\n\nPrefijo, umbral y k se eligieron mirando estas mismas 60 consultas: son números de desarrollo, no una\nevaluación independiente. Con normas b y c el texto es el mismo y solo cambian los valores; con la evidencia\najustada a esos valores las tres variantes dan lo mismo que con original. Densos, híbridos con embeddings y\nrerankers quedaron fuera: requieren descargas o dependencias nuevas no autorizadas. Lo que sigue sin\nresolverse (d030 pecho ↔ dolor torácico, d023 abuela ↔ edad) necesita sinónimos.",
+   "que_hace": "Tabla de `admision.evaluar_rag` sobre 60 consultas de desarrollo: referencia de la cátedra, `baseline`, `sin_comunes` y `prefijos`, más las familias descartadas.",
+   "como_funciona": "- Compara completas, recall de evidencia, precisión y tokens por consulta.\n- `baseline` queda en 48/60 contra 51/60 de la referencia; `prefijos` llega a 55/60 y recall 0,933.\n- Explica la variante `prefijos` (prefijo de 4 letras, umbral 0,6, hasta 3 secciones).\n- Lista lo descartado (párrafos, stemmers, RRF) y lo que queda sin resolver: sinónimos como «pecho» ↔ «dolor torácico».",
+   "proposito": "Documenta la decisión de quedarse con un buscador léxico local y sus límites: no une sinónimos, cosa que un buscador denso sí haría pero requería descargas.",
+   "interaccion": "Los números salen de `python -m admision.evaluar_rag --entrega entrega.py ...` con `BUSCADOR_VARIANTE`; la configuración vive en `admision_tp/buscador.py`.",
+   "teoria": "Elegir entre búsqueda léxica y semántica: BM25 es exacto y barato pero falla con sinónimos; los embeddings los unen.",
+   "key": "tp4-informe-evaluacion-buscador",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 25,
+     "title": "Cuándo conviene cada estrategia",
+     "url": "/clases/06/#d=rag-y-mcp&s=25"
+    }
+   ],
+   "nusos": 1
+  },
+  {
+   "id": "informe-a11",
+   "titulo": "A11: el problema era la consulta, no la cantidad de fragmentos",
+   "archivo": "INFORME.md",
+   "desde": 216,
+   "hasta": 247,
+   "lenguaje": "markdown",
+   "codigo": "### Dónde falló el agente y qué se cambió\n\n**A11** (\"Necesito turno con cardiología, ¿cuál es el primero y qué tengo que llevar?\") fue la única pregunta con\nproblemas en la corrida 1 (CR 4, AR 4). El log muestra que el ruteo estuvo bien: llamó a `consultar_turnos` y a\n`buscar_documentos`. Pero buscó *\"requisitos y documentación para turno en consultorios externos de cardiología\"*, y el\nrecuperador devolvió solo la sección \"Cómo se pide un turno\", que menciona la derivación. La sección \"Qué llevar a la\nprimera consulta\" (DNI, credencial, derivación, estudios previos) quedó tercera, a 0,018 del primero y fuera del\nmargen de 0,005. La respuesta fue fiel a lo que recibió (F 5), pero incompleta.\n\nPrimero se probó darle más fragmentos al agente, porque la métrica de la parte 1 castiga cada fragmento extra y la del\njuez no tanto:\n\n- Con **top-3 fijo** (corrida 2), A11 sube a 5, pero el ruido baja el CR de A01–A04 y A12 (3 y 4): el juez penaliza\n  los fragmentos que no hacen falta. El promedio de CR cae a 4,417.\n- Con **margen 0,02** (corrida 3), el resto vuelve a 5. Pero A11 falla otra vez (CR 3), porque el modelo redactó la\n  consulta de otra forma y la sección correcta ya no quedaba cerca del primero.\n\nEl problema no era la cantidad de fragmentos sino la consulta. Buscar \"requisitos y documentación\" no se parece al\nencabezado \"Qué llevar a la primera consulta\"; buscar con las palabras del paciente (\"qué tengo que llevar\") sí. Por\neso en la corrida 4 se volvió a la selección de la parte 1 y se cambió la descripción de `buscar_documentos`: la\nconsulta va \"con las mismas palabras que usó el paciente\" y, si la pregunta toca varios temas, se hace una búsqueda por\ntema. En A11 el modelo buscó *\"qué llevar a un turno de cardiología…\"*, recibió la sección correcta y contestó completo.\n\nEn el mismo cambio se reemplazó el ejemplo de la descripción (\"horario de visita de los abuelos en neonatología\"), que\nera literalmente la pregunta A01 de dev, por uno que no aparece en ninguna pregunta dev (\"cómo es una consulta por\ntelemedicina\"). Así se evita ajustar el agente a las preguntas dev.\n\n**Límites de esta medición.** Son 12 preguntas y una corrida por configuración. El modelo redacta la consulta distinto\nen cada corrida aun con temperatura 0: en A11, con la misma descripción, las corridas 1 a 3 buscaron \"…consultorios\nexternos de cardiología\", \"…consultorios externos cardiología\" y \"…consultorios externos\" a secas. Así que una\ndiferencia de una pregunta entre corridas está dentro del ruido. Lo que se sostiene en las cuatro corridas es el ruteo\n(1,00 siempre) y la fidelidad (5,00 siempre): el agente no inventó datos en ninguna respuesta.",
+   "que_hace": "Analiza la única pregunta que falló (A11, turno de cardiología y qué llevar), las dos soluciones que no funcionaron y la que sí, más los límites de la medición.",
+   "como_funciona": "- El ruteo estaba bien, pero el modelo buscó «requisitos y documentación…» y la sección «Qué llevar a la primera consulta» quedó tercera, fuera del margen.\n- Top-3 fijo la arreglaba pero el ruido bajó el CR general a 4,417; margen 0,02 falló por otra redacción de la consulta.\n- Solución: la descripción de `buscar_documentos` pide usar las palabras del paciente y una búsqueda por tema.\n- Se sacó del ejemplo la pregunta A01 de dev.\n- Con 12 preguntas y una corrida, una pregunta de diferencia es ruido.",
+   "proposito": "Muestra que se corrigió el síntoma «la sección correcta queda tercera» mejorando la consulta (descripción de la tool) en vez de agregar un reranker o más contexto.",
+   "interaccion": "Se apoya en los logs de `experimentos/corridas/` y explica el texto final de `BUSCAR_DOCUMENTOS` en `hospital/descripciones.py`.",
+   "teoria": "Diagnóstico de RAG: cuando falta una etapa (consulta mal formulada) más contexto mete ruido; y la variabilidad del LLM aun con temperatura 0.",
+   "key": "tp3-informe-a11",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 5,
+     "cnn": "05",
+     "slug": "prompting",
+     "i": 14,
+     "title": "Limitaciones de los LLM",
+     "url": "/clases/05/#d=prompting&s=14"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 29,
+     "title": "Tres síntomas de que falta una etapa",
+     "url": "/clases/06/#d=rag-y-mcp&s=29"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 31,
+     "title": "Poco y bien elegido",
+     "url": "/clases/07/#d=rag-mcp-rapida&s=31"
+    }
+   ],
+   "nusos": 3
+  },
+  {
+   "id": "rrf-fusion-lexica",
+   "titulo": "Fusión BM25 + n-gramas con RRF (experimento)",
+   "archivo": "scripts/comparar_buscadores.py",
+   "desde": 24,
+   "hasta": 68,
+   "lenguaje": "python",
+   "codigo": "def ngramas(texto):\n    \"\"\"Caracteres 3..5 dentro de cada palabra alfanumérica, con espacios de borde.\"\"\"\n    cuentas = Counter()\n    for palabra in _tokens(texto):\n        palabra = f\" {palabra} \"\n        for n in range(3, 6):\n            # Las palabras más cortas que n aportan la palabra acolchada una vez.\n            if len(palabra) < n:\n                continue\n            cuentas.update(palabra[i:i + n] for i in range(len(palabra) - n + 1))\n    return cuentas\n\n\nclass FusionLexica:\n    \"\"\"Alternativa experimental, no seleccionable desde entrega.py. RRF igual, c=60.\"\"\"\n\n    k_entorno = 2\n\n    def __init__(self, ruta):\n        self.bm25 = BuscadorBM25(ruta, variante=\"sin_comunes\")\n        self.secciones = self.bm25._secciones\n        cuentas = [ngramas(s.texto) for s in self.secciones]\n        df = Counter(g for c in cuentas for g in c)\n        self.idf = {g: math.log((1 + len(cuentas)) / (1 + f)) + 1 for g, f in df.items()}\n        self.vectores = [self.vector(c) for c in cuentas]\n\n    def vector(self, cuentas):\n        pesos = {g: f * self.idf[g] for g, f in cuentas.items() if g in self.idf}\n        norma = math.sqrt(sum(p * p for p in pesos.values()))\n        return {g: p / norma for g, p in pesos.items()} if norma else {}\n\n    def recuperar(self, consulta, k):\n        if k <= 0:\n            return []\n        q = self.vector(ngramas(consulta))\n        cosenos = [(s.id, sum(v.get(g, 0) * p for g, p in q.items()))\n                   for s, v in zip(self.secciones, self.vectores)]\n        cosenos = sorted(((i, p) for i, p in cosenos if p > 0), key=lambda x: (-x[1], x[0]))\n        rankings = [[s.id for s in self.bm25.recuperar(consulta, len(self.secciones))],\n                    [i for i, _ in cosenos]]\n        rrf = Counter()\n        for ranking in rankings:\n            for puesto, codigo in enumerate(ranking, 1):\n                rrf[codigo] += 1 / (60 + puesto)\n        orden = sorted(rrf, key=lambda i: (-rrf[i], i))[:k]",
+   "que_hace": "Alternativa experimental: combina el ranking de BM25 con un ranking por coseno de n-gramas de caracteres usando Reciprocal Rank Fusion.",
+   "como_funciona": "- `ngramas` cuenta n-gramas de 3 a 5 caracteres dentro de cada palabra (con espacios de borde).\n- `FusionLexica.__init__` arma vectores TF-IDF normalizados L2 de n-gramas por sección.\n- `recuperar` calcula cosenos consulta-sección y obtiene dos rankings: BM25 (`sin_comunes`) y n-gramas.\n- Para cada ranking suma `1 / (60 + puesto)` por sección (RRF con c=60, pesos iguales) y devuelve las `k` de mayor suma.",
+   "proposito": "Buscaba una búsqueda «híbrida» sin embeddings: los n-gramas toleran variaciones de palabra. Midió 48/60 consultas completas, no superó a `sin_comunes`, y por eso no es seleccionable desde `entrega.py`.",
+   "interaccion": "Lo instancia `comparar()` en el mismo archivo junto con las variantes de `VARIANTES`; el resultado se mide con `admision.evaluar_rag.evaluar_buscador` y se reporta en INFORME.md (tabla de variantes descartadas).",
+   "teoria": "RRF fusiona rankings sumando 1/(c+posición): no necesita que los puntajes de cada buscador estén en la misma escala.",
+   "key": "tp4-rrf-fusion-lexica",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 30,
+     "title": "RRF fusiona sumando posiciones",
+     "url": "/clases/06/#d=rag-y-mcp&s=30"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 6,
+     "title": "En producción se usan las dos",
+     "url": "/clases/07/#d=rag-mcp-rapida&s=6"
+    }
+   ],
+   "nusos": 2
+  },
+  {
+   "id": "informe-seleccion",
+   "titulo": "Cómo se eligió chunking, metadatos y top-k",
+   "archivo": "INFORME.md",
+   "desde": 16,
+   "hasta": 45,
+   "lenguaje": "markdown",
+   "codigo": "### Cómo se eligió\n\n1. **Encoders × chunking × metadatos × k ∈ {1, 3}** para los cuatro encoders (80 corridas). Cada pregunta dev tiene una\n   sola frase de evidencia, así que devolver un fragmento extra baja la precisión a la mitad: con k = 3 ningún encoder\n   pasa de 0,515. Por eso el ajuste fino se hizo con k chico.\n2. **Metadatos:** anteponer \"título del documento > sección\" al texto del embedding (el fragmento devuelto sigue siendo\n   literal) mejora a los cuatro encoders con chunking estructural y k = 1: BERT 0,25 → 0,35, MiniLM 0,70 → 0,90,\n   e5-small 0,80 → 0,95, e5-base 0,85 → 1,00. La única combinación donde empeora es BERT con longitud fija de 40 palabras\n   (0,30 → 0,20). Muchas secciones no nombran su tema (\"La unidad tiene dos franjas de visita…\"): el tema está en el encabezado.\n3. **Chunking.** Se probaron las tres estrategias de la clase:\n   - *Longitud fija con solapamiento*: ventanas de 40 palabras (solapamiento 10) y de 80 (solapamiento 20), sin cruzar\n     secciones. Se mide en palabras y no en tokens para que cada fragmento siga siendo texto literal del corpus.\n   - *Semántico*: un fragmento por párrafo y, como variante más fina, uno por oración.\n   - *Estructural*: un fragmento por sección `##` del Markdown (la introducción del documento es una sección más).\n\n   La estructural y la de longitud fija de 80 palabras empatan arriba. La semántica por oración es la peor para todos\n   los encoders: corta el contexto que el encoder necesita para reconocer el tema. Los tamaños de referencia de la\n   clase (800–1000 caracteres) no se probaron porque las secciones de este corpus miden 223 caracteres en promedio\n   (mediana 193): una ventana así juntaría cuatro o cinco temas distintos en cada fragmento. Se eligió la estructural porque respeta la jerarquía\n   del documento y da fragmentos completos (útil para el agente de la parte 2, p. ej. la preparación de la colonoscopía\n   entera).\n4. **Selección (top-k, umbral, margen):** con e5-base + chunking estructural + metadatos, k = 1 da 1,000 en dev. Pero en dos preguntas\n   el primer y el segundo fragmento están casi empatados (R01: diferencia de 0,001 en el coseno; R15: 0,003). En el\n   conjunto de test un empate así es casi una moneda al aire: con k = 1 un error vale 0, y devolver los dos vale 0,667.\n   Por eso se entrega **top-2 con margen 0,005**: el segundo fragmento se agrega solo si está a menos de 0,005 del\n   primero (k medio 1,10). Cuesta 0,033 en dev y protege los casos dudosos. Un umbral absoluto de 0,88 saca más en dev\n   (0,983), pero no cubre esos casos: agrega el segundo fragmento cuando los dos puntajes son altos, no cuando están\n   empatados, y en R01 (0,862) y R15 (0,816) el mejor ni siquiera llega a 0,88. Como los cosenos de e5 viven en una franja\n   estrecha (el mejor va de 0,82 a 0,91 según la pregunta), un umbral absoluto depende demasiado del conjunto dev; el\n   margen es relativo a cada pregunta.",
+   "que_hace": "Es la sección del INFORME que justifica, con números, el encoder, los metadatos, la estrategia de chunking y la selección top-2 con margen.",
+   "como_funciona": "1. Grilla de 80 corridas: con k = 3 ningún encoder pasa 0,515 porque hay una evidencia por pregunta.\n2. Metadatos: anteponer «título > sección» mejora a los cuatro encoders (e5-base 0,85 → 1,00 con k = 1).\n3. Chunking: estructural y ventana 80 empatan; por oración es la peor; 800–1000 caracteres no se probó (secciones de 223 de media).\n4. Selección: top-2 con margen 0,005 en vez de k = 1 o umbral 0,88, por los empates de R01 y R15.",
+   "proposito": "Deja por escrito las alternativas descartadas y por qué, que es lo que se defiende en el coloquio.",
+   "interaccion": "Resume los resultados de `experimentos/recuperacion/*.eval.json` (generados por `correr_recuperacion.py`) y explica los valores de `hospital/rag/config.json`.",
+   "teoria": "Tamaño de fragmento, solapamiento, metadatos y top-k como decisiones que ponen el techo de calidad del RAG.",
+   "key": "tp3-informe-seleccion",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 32,
+     "title": "Ajustes de producción",
+     "url": "/clases/06/#d=rag-y-mcp&s=32"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 35,
+     "title": "El corte decide qué se recupera junto",
+     "url": "/clases/06/#d=rag-y-mcp&s=35"
+    }
+   ],
+   "nusos": 2
+  },
+  {
+   "id": "chunking-estrategias",
+   "titulo": "Las cuatro estrategias de chunking comparadas",
+   "archivo": "hospital/rag/chunking.py",
+   "desde": 56,
+   "hasta": 93,
+   "lenguaje": "python",
+   "codigo": "def _parrafos(texto):\n    return [p.strip() for p in re.split(r\"\\n\\s*\\n\", texto) if p.strip()]\n\n\ndef _oraciones(parrafo):\n    partes = []\n    for linea in parrafo.splitlines():  # los items de una lista son oraciones sueltas\n        partes += re.split(r\"(?<=[.!?])\\s+(?=[^\\sa-z])\", linea.strip())\n    return [p for p in partes if p]\n\n\ndef _ventanas(texto, palabras, solapamiento):\n    spans = [m.span() for m in re.finditer(r\"\\S+\", texto)]\n    paso = palabras - solapamiento\n    for i in range(0, len(spans), paso):\n        grupo = spans[i:i + palabras]\n        yield texto[grupo[0][0]:grupo[-1][1]]\n        if i + palabras >= len(spans):\n            break\n\n\ndef fragmentar(docs, estrategia, palabras=60, solapamiento=15):\n    \"\"\"estrategia: 'seccion' | 'parrafo' | 'oracion' | 'ventana' (usa palabras y solapamiento).\"\"\"\n    frags = []\n    for doc in docs:\n        for seccion, texto in _secciones(doc):\n            if estrategia == \"seccion\":\n                piezas = [texto]\n            elif estrategia == \"parrafo\":\n                piezas = _parrafos(texto)\n            elif estrategia == \"oracion\":\n                piezas = [o for p in _parrafos(texto) for o in _oraciones(p)]\n            elif estrategia == \"ventana\":\n                piezas = list(_ventanas(texto, palabras, solapamiento))\n            else:\n                raise ValueError(f\"estrategia desconocida: {estrategia}\")\n            frags += [Fragmento(p, doc.nombre, doc.titulo, seccion) for p in piezas]\n    return frags",
+   "que_hace": "Implementa las estrategias que se compararon en la grilla: sección entera, párrafo, oración y ventana de N palabras con solapamiento.",
+   "como_funciona": "- `_parrafos` corta por líneas en blanco; `_oraciones` corta tras `.`, `!` o `?` seguidos de mayúscula (cada ítem de lista es una oración).\n- `_ventanas` toma los `spans` de cada palabra y avanza de a `paso = palabras - solapamiento`, recortando el texto original entre el primer y el último span (así sigue siendo literal).\n- `fragmentar(docs, estrategia, palabras, solapamiento)` aplica la estrategia dentro de cada sección y crea un `Fragmento` por pieza.",
+   "proposito": "Medir en palabras (no tokens) y recortar con spans mantiene cada fragmento como substring exacto del corpus. Se probaron ventanas de 40/10 y 80/20; tamaños de 800–1000 caracteres se descartaron porque mezclarían 4 o 5 secciones.",
+   "interaccion": "Lo usan `Recuperador.__init__` y `experimentos/correr_recuperacion.py` (diccionario `CHUNKINGS`). La configuración entregada fija `\"estrategia\": \"seccion\"` en `hospital/rag/config.json`.",
+   "teoria": "Las tres familias de chunking de la clase: longitud fija con solapamiento, semántico (párrafo/oración) y estructural.",
+   "key": "tp3-chunking-estrategias",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 36,
+     "title": "Tamaño del fragmento y solapamiento",
+     "url": "/clases/06/#d=rag-y-mcp&s=36"
+    }
+   ],
+   "nusos": 1
+  },
+  {
+   "id": "fragmento-con-metadatos",
+   "titulo": "Fragmento literal y texto con metadatos para embeber",
+   "archivo": "hospital/rag/chunking.py",
+   "desde": 23,
+   "hasta": 34,
+   "lenguaje": "python",
+   "codigo": "@dataclass(frozen=True)\nclass Fragmento:\n    texto: str\n    doc: str\n    titulo: str\n    seccion: str\n\n    def para_embedding(self, metadatos=False):\n        if not metadatos:\n            return self.texto\n        encabezado = f\"{self.titulo} > {self.seccion}\" if self.seccion else self.titulo\n        return f\"{encabezado}: {self.texto}\"",
+   "que_hace": "Define la unidad que maneja todo el RAG: un fragmento con su texto literal, el documento, el título y la sección. Sabe armar el texto que se va a embeber, con o sin «Título > Sección» adelante.",
+   "como_funciona": "- `Fragmento` es un dataclass inmutable con `texto`, `doc`, `titulo` y `seccion`.\n- `para_embedding(metadatos=False)` devuelve el `texto` tal cual.\n- Con `metadatos=True` arma `encabezado = \"{titulo} > {seccion}\"` (o solo el título si es la intro) y devuelve `\"{encabezado}: {texto}\"`.\n- Lo que se devuelve al evaluador sigue siendo `f.texto`; el encabezado solo cambia el vector.",
+   "proposito": "El evaluador busca la evidencia como substring, así que el fragmento no se puede reescribir. Separar «texto devuelto» de «texto embebido» permite sumar el tema de la sección al vector sin romper esa regla: subió e5-base de 0,85 a 1,00 con k = 1.",
+   "interaccion": "Lo construye `fragmentar()` en el mismo archivo; `Recuperador.__init__` llama a `para_embedding(metadatos)` para cada fragmento y `documentos.buscar_documentos` usa `titulo` y `seccion` para escribir la fuente `[Documento > Sección]`.",
+   "teoria": "Metadatos en RAG: acá no se usan para filtrar antes de buscar sino como texto buscable que enriquece el embedding del fragmento.",
+   "key": "tp3-fragmento-con-metadatos",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 37,
+     "title": "Los metadatos filtran antes de buscar",
+     "url": "/clases/06/#d=rag-y-mcp&s=37"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 10,
+     "title": "Metadatos: filtrar antes de buscar",
+     "url": "/clases/07/#d=rag-mcp-rapida&s=10"
+    }
+   ],
+   "nusos": 2
+  },
+  {
+   "id": "evaluar-juez",
+   "titulo": "El juez LLM: CR, Faithfulness y Answer Relevance",
+   "archivo": "evaluar/evaluar.py",
+   "desde": 73,
+   "hasta": 98,
+   "lenguaje": "python",
+   "codigo": "INSTRUCCIONES = \"\"\"Sos un evaluador de un sistema de preguntas y respuestas de un hospital. Recibís una pregunta, los contextos que el sistema recuperó con sus herramientas, la respuesta del sistema y una respuesta de referencia escrita por la cátedra.\n\nPuntuá de 1 a 5 cada criterio, con estas anclas:\n\ncontext_relevance: ¿los contextos contienen la información necesaria para responder, sin ruido de más? 5 = está todo lo necesario y casi nada irrelevante. 3 = está lo necesario pero mezclado con mucho contenido ajeno, o falta una parte. 1 = los contextos no sirven para responder.\n\nfaithfulness: ¿cada afirmación de la respuesta está respaldada por los contextos? Juzgá SOLO contra los contextos, no contra la referencia ni contra tu conocimiento. 5 = todo está respaldado. 3 = hay alguna afirmación sin respaldo que no cambia el sentido. 1 = la respuesta inventa datos centrales.\n\nanswer_relevance: ¿la respuesta contesta lo que se preguntó, completa y sin desviarse? Usá la referencia para saber qué se esperaba. 5 = contesta todo lo pedido. 3 = contesta una parte. 1 = no contesta la pregunta.\n\nDevolvé solo el JSON pedido. La justificación, en una o dos oraciones.\"\"\"\n\n\ndef juzgar(key, p, r):\n    ctx = \"\\n\\n---\\n\\n\".join(r.get(\"contextos\", [])) or \"(sin contextos)\"\n    usuario = (f\"PREGUNTA:\\n{p['pregunta']}\\n\\nCONTEXTOS RECUPERADOS:\\n{ctx}\\n\\n\"\n               f\"RESPUESTA DEL SISTEMA:\\n{r.get('respuesta', '')}\\n\\nRESPUESTA DE REFERENCIA:\\n{p['respuesta_referencia']}\")\n    body = {\"model\": JUEZ, \"temperature\": 0,\n            \"messages\": [{\"role\": \"system\", \"content\": INSTRUCCIONES}, {\"role\": \"user\", \"content\": usuario}],\n            \"response_format\": {\"type\": \"json_schema\", \"json_schema\": {\"name\": \"evaluacion\", \"strict\": True, \"schema\": ESQUEMA}}}\n    req = urllib.request.Request(URL, data=json.dumps(body).encode(), headers={\"Authorization\": f\"Bearer {key}\", \"Content-Type\": \"application/json\"})\n    for intento in range(3):\n        try:\n            with urllib.request.urlopen(req, timeout=120) as resp:\n                d = json.loads(resp.read())\n            return json.loads(d[\"choices\"][0][\"message\"][\"content\"]), d.get(\"usage\", {})",
+   "que_hace": "Script de la cátedra: instrucciones y llamada al modelo juez (`google/gemini-3.7-flash`) que puntúa de 1 a 5 cada respuesta del agente en tres criterios.",
+   "como_funciona": "- `INSTRUCCIONES` define anclas 1/3/5 para `context_relevance` (contextos), `faithfulness` (respuesta vs. contextos) y `answer_relevance` (respuesta vs. pregunta, usando la referencia).\n- `juzgar` arma el mensaje con pregunta, contextos, respuesta y referencia.\n- Pide salida estructurada con `response_format` y el `ESQUEMA` JSON, a temperatura 0.\n- Aparte, `agente()` calcula el ruteo comparando herramientas esperadas y usadas.",
+   "proposito": "Separa la calidad de la recuperación (CR) de la de la generación (F, AR): por eso A11 se diagnosticó como problema de contexto con F 5. La corrida 4 sacó 5/5/5.",
+   "interaccion": "Lo corre el equipo con `python3 evaluar/evaluar.py agente --respuestas respuestas.jsonl`, que lee los `contextos` y `herramientas` que escribe `correr()`.",
+   "teoria": "LLM-as-a-judge y la tríada de evaluación de RAG: Context Relevance, Faithfulness, Answer Relevance.",
+   "key": "tp3-evaluar-juez",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 39,
+     "title": "Evaluar las dos etapas por separado",
+     "url": "/clases/06/#d=rag-y-mcp&s=39"
+    }
+   ],
+   "nusos": 1
+  },
+  {
+   "id": "informe-agente-buscador",
+   "titulo": "Mejor buscador aislado ≠ mejor agente",
+   "archivo": "INFORME.md",
+   "desde": 288,
+   "hasta": 320,
+   "lenguaje": "markdown",
+   "codigo": "| Métrica | `baseline` | `prefijos` |\n|---|---:|---:|\n| Casos resueltos | **10/50** | 6/50 |\n| Parcial medio | **0,831** | 0,796 |\n| registro / box / circuito / plazo | 0,76 / 0,72 / 0,98 / 0,92 | 0,62 / 0,68 / 0,94 / 0,84 |\n| cobertura / entidad / aviso / verificación | 0,80 / 0,82 / 0,72 / 0,76 | 0,78 / 0,82 / 0,72 / 0,76 |\n| Llamadas / búsquedas por caso | 4,9 / 1,34 | 5,0 / 1,40 |\n| Caracteres de contexto por caso | 19.954 | 20.689 |\n| Segundos por caso (T4, lote 4) | 15,2 | 15,7 |\n\n`baseline` reproduce exactamente la corrida anterior del modelo sin entrenar (10/50, 0,831; commit `a89f5b9`).\nPor caso, `prefijos` gana 3 (pev-005, 019, 037) y pierde 7 (pev-010, 012, 017, 021, 024, 049, 050); con 10\ncasos discordantes la prueba de signos da p≈0,34, así que la diferencia **no es concluyente**, pero tampoco\nhay señal de mejora.\n\n**Por qué el mejor recall no ayudó.** `baseline` devuelve siempre 2 secciones; `prefijos` devolvió 1 en 30\nbúsquedas, 3 en 26 y 2 en 14. Con 3 suele sumar secciones parecidas de otras áreas (por ejemplo NOR-DER-01 o\nNOR-GUA-02), justamente las que no deciden la ficha. Por eso el contexto por caso subió 3,7 % en vez de bajar\ncomo en la evaluación separada, y cambió el recorrido del agente (en pev-021 nunca buscó el circuito). Es lo\nque muestran las trazas, no una causa probada.\n\n**Costo de contexto.** Con las dos variantes el agente hace pocas búsquedas (1,3–1,4 por caso) y cada caso usa\nunos 20.000 caracteres de contexto (~5.000 tokens a 4 caracteres por token). `prefijos` trae menos tokens por\nconsulta en `evaluar_rag` (549 contra 618) pero más contexto por caso con el agente. El costo de GPU de la\ncomparación fue 2.968 s de sesión T4 (≈ 49,5 min, ~20 min de instalación de dependencias); tiempos T4 **no\ncomparables** con la A100-40GB de la entrega.\n\n### Decisión\n\nEl default de la entrega sigue siendo `baseline` (`entrega.py` no cambia): es el que mejor resolvió con el\nagente y el que se usó para generar las conversaciones de entrenamiento. `prefijos` queda documentado y\nseleccionable como resultado negativo: mejora la evaluación separada pero no al agente sin entrenar. Si\nalcanzan tiempo y cuota, se repetirá la comparación con el modelo entrenado.",
+   "que_hace": "Compara `baseline` y `prefijos` jugando los 50 casos de práctica con Gemma sin entrenar: `baseline` resuelve 10/50 y `prefijos` 6/50.",
+   "como_funciona": "- Tabla por control, llamadas, contexto y segundos por caso.\n- Por caso: `prefijos` gana 3 y pierde 7 (prueba de signos p≈0,34, no concluyente).\n- Explica por qué: `prefijos` trae 1 o 3 secciones y con 3 suma secciones parecidas que no deciden la ficha; el contexto por caso sube 3,7 %.\n- Decisión: el default sigue siendo `baseline`.",
+   "proposito": "Materializa la regla de que el buscador vale por lo que rinde el agente con él, no por su métrica aislada; `prefijos` queda como resultado negativo documentado.",
+   "interaccion": "Los datos vienen de `infra/kaggle_baseline.py` con `BUSCADOR_VARIANTE` y se puntúan con `admision.correr puntuar`; la decisión deja `entrega.construir_buscador` en `baseline`.",
+   "teoria": "Evaluar las dos etapas de un RAG por separado y juntas: mejor recuperación aislada no garantiza mejor respuesta final.",
+   "key": "tp4-informe-agente-buscador",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 39,
+     "title": "Evaluar las dos etapas por separado",
+     "url": "/clases/06/#d=rag-y-mcp&s=39"
+    },
+    {
+     "clase": 13,
+     "cnn": "13",
+     "slug": "cierre-magnifica-humanitas",
+     "i": 44,
+     "title": "Evaluar es el nuevo cuello de botella",
+     "url": "/clases/13/#d=cierre-magnifica-humanitas&s=44"
+    }
+   ],
+   "nusos": 2
+  },
+  {
+   "id": "readme-deploy",
+   "titulo": "README: configuración y deploy en Railway",
+   "archivo": "README.md",
+   "desde": 30,
+   "hasta": 48,
+   "lenguaje": "markdown",
+   "codigo": "## Configuración\n\n- `DATABASE_URL` (obligatoria): URL de conexión a PostgreSQL. Nunca se versiona su valor real.\n- `PORT` (opcional): puerto HTTP; por defecto `3000`. Railway lo define automáticamente.\n\nAl arrancar, la app crea la tabla `links` si no existe e importa los registros heredados de\n`data/links.json` con `ON CONFLICT DO NOTHING`. A partir de ahí, PostgreSQL es la única fuente de\nverdad. `GET /health` comprueba también que la base esté accesible.\n\n## Deploy en Railway\n\nEl repo incluye `railway.json` con Railpack y healthcheck en `/health`. El servicio web necesita\nuna base PostgreSQL en el mismo proyecto y una variable de referencia:\n\n```text\nDATABASE_URL=${{Postgres.DATABASE_URL}}\n```\n\nLuego se despliega con `railway up` y se genera el dominio público con `railway domain`.",
+   "que_hace": "Documenta las variables de entorno y cómo quedó armado el deploy en Railway.",
+   "como_funciona": "- `DATABASE_URL` obligatoria y nunca versionada; `PORT` lo define Railway.\n- Al arrancar se crea la tabla `links` y se importan los datos heredados con `ON CONFLICT DO NOTHING`.\n- El servicio web referencia la base del mismo proyecto con `DATABASE_URL=${{Postgres.DATABASE_URL}}`.",
+   "proposito": "Deja por escrito el resultado de lo que el agente hizo contra Railway vía MCP (provisionar Postgres, setear la variable de referencia, deployar y generar el dominio). La configuración de los servidores MCP en sí no está versionada en el repo: lo que queda es este resultado y `railway.json`.",
+   "interaccion": "Describe cómo se conectan `railway.json`, `src/server.js` (`iniciar()` lee `DATABASE_URL` y `PORT`) y `src/postgres.js`.",
+   "teoria": "MCP: el servidor expone acciones de un servicio (crear base, variables, deploy) como tools que el agente llama dentro de su loop.",
+   "key": "tp1-readme-deploy",
+   "tp": 1,
+   "tp_titulo": "Corta, del caos a producción",
+   "usos": [
+    {
+     "clase": 2,
+     "cnn": "02",
+     "slug": "cowork-intro",
+     "i": 24,
+     "title": "Qué es MCP",
+     "url": "/clases/02/#d=cowork-intro&s=24"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 46,
+     "title": "MCP conecta modelos con herramientas",
+     "url": "/clases/06/#d=rag-y-mcp&s=46"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 16,
+     "title": "MCP conecta modelos con herramientas",
+     "url": "/clases/07/#d=rag-mcp-rapida&s=16"
+    }
+   ],
+   "nusos": 3
+  },
+  {
+   "id": "plan-mcp-pendiente",
+   "titulo": "Diseño del servidor y cliente MCP (pendiente)",
+   "archivo": "PLAN.md",
+   "desde": 155,
+   "hasta": 171,
+   "lenguaje": "markdown",
+   "codigo": "## Step 3 — Part 3: MCP server + LangChain MCP client (15 pts)\nDepends on Step 2.\n\n**3.1 `servidor_mcp.py`** — `mcp.server.fastmcp.FastMCP(\"hospital\")`, 6 `@mcp.tool(name=..., description=DESCRIPCIONES[...])`\nwrapping `hospital.api_cliente` and `Recuperador`; `mcp.run()` (stdio). Nothing on stdout except the protocol (logs → stderr);\nwarm up the retriever at startup so the first call doesn’t time out.\n\n**3.2 `agente_mcp.py`** — **no API/retriever code of its own**: `MultiServerMCPClient({\"hospital\": {\"command\": sys.executable, \"args\": [\"servidor_mcp.py\"], \"transport\": \"stdio\"}})`,\n`tools = await client.get_tools()` (tools/list; log the discovered names), then reuse `responder` + `correr(..., etiqueta=\"mcp\")`\nwith the same LLM and prompt.\n\n**3.3 Inspector** (manual, user) — `npx @modelcontextprotocol/inspector python3 servidor_mcp.py`, call all 6 tools, save screenshots to `experimentos/inspector/`.\n\n**3.4 Compare** — run benchmark → `respuestas_mcp.jsonl` + log + eval. `experimentos/comparar_agentes.py` prints a table\n(ruteo, CR, F, AR, agent cost from log totals, judge cost) for Part 2 vs 3. INFORME §3: table + explanation of any difference from the logs (e.g. tool-result formatting, nondeterminism).\n\n**Done when:** `python3 agente_mcp.py --preguntas datos/preguntas_agente_dev.jsonl --salida respuestas_mcp.jsonl` works with the API running, `grep -E \"urllib|Recuperador|localhost\" agente_mcp.py` is empty, 6 inspector screenshots exist.",
+   "que_hace": "Es el diseño, no código: la parte 3 quedó pendiente y no existen `servidor_mcp.py` ni `agente_mcp.py`. El PLAN describe un servidor FastMCP por stdio con las 6 tools y un cliente LangChain con `MultiServerMCPClient`.",
+   "como_funciona": "- 3.1: `FastMCP(\"hospital\")` con 6 `@mcp.tool(name=..., description=DESCRIPCIONES[...])` que envuelven `api_cliente` y el recuperador; `mcp.run()` por stdio; logs a stderr porque stdout es el canal del protocolo.\n- 3.2: `agente_mcp.py` sin código propio de API: `MultiServerMCPClient` lanza el servidor, `get_tools()` descubre las tools (tools/list) y se reusa `responder` y `correr`.\n- 3.3: probar con MCP Inspector.\n- 3.4: comparar parte 2 vs. parte 3.",
+   "proposito": "Separa herramienta y agente: el mismo set de tools podría usarlo cualquier host MCP. Reusar `descripciones.py` y el bucle agnóstico haría justa la comparación. Quedó pendiente en la entrega.",
+   "interaccion": "Se apoyaría en `hospital/descripciones.py`, `hospital/api_cliente.py`, `hospital/documentos.py`, `hospital/agente/bucle.py` y `corrida.py` (que ya normaliza bloques de contenido MCP en `texto()`).",
+   "teoria": "Arquitectura MCP: host, cliente y servidor; descubrimiento con tools/list y ejecución con tools/call sobre JSON-RPC 2.0 por stdio.",
+   "key": "tp3-plan-mcp-pendiente",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "claude-desktop-chat",
+     "i": 21,
+     "title": "Agregar un external connector",
+     "url": "/clases/01/#d=claude-desktop-chat&s=21"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 53,
+     "title": "El servidor separa herramienta y agente",
+     "url": "/clases/06/#d=rag-y-mcp&s=53"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 54,
+     "title": "El ciclo de vida de una herramienta MCP",
+     "url": "/clases/06/#d=rag-y-mcp&s=54"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 16,
+     "title": "MCP conecta modelos con herramientas",
+     "url": "/clases/07/#d=rag-mcp-rapida&s=16"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 18,
+     "title": "JSON-RPC 2.0: la capa de mensajes",
+     "url": "/clases/07/#d=rag-mcp-rapida&s=18"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 47,
+     "title": "MCP: host, cliente y servidor",
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=47"
+    },
+    {
+     "clase": 13,
+     "cnn": "13",
+     "slug": "cierre-magnifica-humanitas",
+     "i": 45,
+     "title": "Hacia un Internet de Agentes",
+     "url": "/clases/13/#d=cierre-magnifica-humanitas&s=45"
+    }
+   ],
+   "nusos": 7
+  },
+  {
+   "id": "claude-md-reglas",
+   "titulo": "CLAUDE.md: reglas no negociables (spec-first, test-first, secretos, MCP)",
+   "archivo": "CLAUDE.md",
+   "desde": 28,
+   "hasta": 51,
+   "lenguaje": "markdown",
+   "codigo": "## Prácticas de trabajo\n\n1. **Documentar el comportamiento esperado antes de tocarlo.** Mantené `docs/SPEC.md` con el\n   comportamiento de cada endpoint y los casos borde relevantes (entradas inválidas, duplicados,\n   recursos inexistentes). Se actualiza cada vez que el entendimiento del sistema cambia — no es\n   un documento que se escribe una vez y se abandona.\n\n2. **Test-first.** Para cada fix o feature: primero el test, después la implementación que lo\n   hace pasar. Commits separados para uno y otro, así queda trazable en `git log`.\n   - Framework: `node:test` (nativo, sin dependencias nuevas). Correr con `npm test`.\n   - Los tests viven en `tests/` (no `test/` — un directorio llamado `test` hace que Node trate\n     cualquier `.js` adentro como archivo de test, incluidos los helpers). Los archivos de test\n     siguen el patrón `*.test.js`.\n   - `manual-check.js` en la raíz es el script manual heredado (requiere el server ya levantado\n     con `npm start`, se corre aparte con `node manual-check.js`); no es parte de la suite de\n     `npm test` — se renombró desde `test.js` porque ese nombre matcheaba el descubrimiento\n     automático de `node --test` y terminaba pegándole a un server real si había uno corriendo.\n\n3. **Nada de secretos versionados.** Ni hardcodeados en código, ni en archivos de texto o JSON\n   commiteados. Credenciales van en variables de entorno (del proveedor de hosting en\n   producción, `.env` gitignoreado en local).\n\n4. **Usar las herramientas de infraestructura disponibles**, no comandos manuales sueltos,\n   cuando el flujo lo soporta (gestión de repo/colaboradores, servicios, bases de datos, deploy).",
+   "que_hace": "Fija las cuatro prácticas de trabajo que el agente tiene que respetar en cualquier tarea dentro del repo.",
+   "como_funciona": "1. **Spec-first**: mantener `docs/SPEC.md` con endpoints y casos borde.\n2. **Test-first**: primero el test, después la implementación, en commits separados; framework `node:test`, tests en `tests/*.test.js` y la explicación de por qué `test.js` pasó a `manual-check.js`.\n3. **Nada de secretos versionados**: credenciales solo en variables de entorno.\n4. **Usar las herramientas de infraestructura disponibles** (los servidores MCP de GitHub y Railway) antes que comandos manuales sueltos.",
+   "proposito": "Convierte decisiones del equipo en reglas que el agente hereda en cada sesión, en vez de repetirlas en cada prompt. La regla 4 es la que empuja al agente a crear repo, base y deploy vía tools MCP; la regla 3 es una capa más de defensa contra filtrar la credencial que venía en `notas.txt`.",
+   "interaccion": "Lo lee el agente al arrancar. Gobierna cómo se escribieron `tests/*.test.js`, `src/server.js` y `src/postgres.js`, y cómo se configuró Railway (`railway.json`, `DATABASE_URL`).",
+   "teoria": "CLAUDE.md como contrato/memoria del repo: reglas duras, cómo testear y convenciones, en un .md versionado que el agente lee siempre.",
+   "key": "tp1-claude-md-reglas",
+   "tp": 1,
+   "tp_titulo": "Corta, del caos a producción",
+   "usos": [
+    {
+     "clase": 2,
+     "cnn": "02",
+     "slug": "cowork-intro",
+     "i": 6,
+     "title": "Dónde se empieza: pararse en una carpeta",
+     "url": "/clases/02/#d=cowork-intro&s=6"
+    },
+    {
+     "clase": 2,
+     "cnn": "02",
+     "slug": "cowork-intro",
+     "i": 15,
+     "title": "CLAUDE.md / AGENTS.md: la memoria del repo",
+     "url": "/clases/02/#d=cowork-intro&s=15"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 55,
+     "title": "Conectar un servidor MCP: tres caminos",
+     "url": "/clases/06/#d=rag-y-mcp&s=55"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 21,
+     "title": "Conectar un servidor: los caminos y la configuración",
+     "url": "/clases/07/#d=rag-mcp-rapida&s=21"
+    }
+   ],
+   "nusos": 4
+  },
+  {
+   "id": "bucle-tool-calling",
+   "titulo": "El bucle de tool calling escrito a mano",
+   "archivo": "hospital/agente/bucle.py",
+   "desde": 25,
+   "hasta": 48,
+   "lenguaje": "python",
+   "codigo": "async def _ejecutar(por_nombre, llamada):\n    tool = por_nombre.get(llamada[\"name\"])\n    if tool is None:\n        return ToolMessage(f\"Error: la herramienta '{llamada['name']}' no existe. Herramientas disponibles: \"\n                           f\"{', '.join(sorted(por_nombre))}.\", tool_call_id=llamada[\"id\"], name=llamada[\"name\"])\n    try:\n        return await tool.ainvoke({**llamada, \"type\": \"tool_call\"})\n    except Exception as e:  # el error vuelve al modelo como texto para que pueda corregirse\n        return ToolMessage(f\"Error al ejecutar {llamada['name']}: {e}\", tool_call_id=llamada[\"id\"], name=llamada[\"name\"])\n\n\nasync def responder(llm, tools, pregunta):\n    \"\"\"Devuelve todos los mensajes de la conversación: sistema, pregunta, AIMessage y ToolMessage.\"\"\"\n    llm_con_tools = llm.bind_tools(tools)\n    por_nombre = {t.name: t for t in tools}\n    mensajes = [SystemMessage(PROMPT), HumanMessage(pregunta)]\n    for _ in range(MAX_PASOS):\n        ai = await llm_con_tools.ainvoke(mensajes)\n        mensajes.append(ai)\n        if not ai.tool_calls:\n            break\n        for llamada in ai.tool_calls:\n            mensajes.append(await _ejecutar(por_nombre, llamada))\n    return mensajes",
+   "que_hace": "Implementa el agente: el modelo pide herramientas, se ejecutan, sus resultados vuelven como `ToolMessage` y se repite hasta que responde sin pedir nada o se llega a 6 pasos.",
+   "como_funciona": "- `responder` enlaza las tools con `llm.bind_tools(tools)` y arma `por_nombre`.\n- Arranca con `[SystemMessage(PROMPT), HumanMessage(pregunta)]`.\n- En cada paso: `ai = await llm_con_tools.ainvoke(mensajes)`; si `ai.tool_calls` está vacío, termina.\n- Si no, ejecuta cada llamada con `_ejecutar` y agrega el `ToolMessage` (puede haber varias en paralelo en el mismo paso).\n- `_ejecutar` devuelve un `ToolMessage` de error si la tool no existe o lanza una excepción.",
+   "proposito": "Se escribió a mano, sin LangGraph ni AgentExecutor, para tener todos los mensajes y poder loguearlos. Es agnóstico del origen de las tools: el docstring lo prepara para las de `langchain-mcp-adapters` (parte 3, pendiente).",
+   "interaccion": "Lo llama `correr()` en `hospital/agente/corrida.py` por cada pregunta; devuelve la lista completa de mensajes, que `resumir()` convierte en respuesta, contextos, herramientas y costo. `tests/test_agente.py` lo prueba con un modelo falso.",
+   "teoria": "Agente ReAct / ciclo de vida de una tool: AIMessage con tool_calls → ejecución → ToolMessage → nueva llamada al modelo.",
+   "key": "tp3-bucle-tool-calling",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "introduccion",
+     "i": 62,
+     "title": "El futuro: agentes autónomos e IA multimodal",
+     "url": "/clases/01/#d=introduccion&s=62"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 57,
+     "title": "Demo: un servidor MCP mínimo",
+     "url": "/clases/06/#d=rag-y-mcp&s=57"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 20,
+     "title": "El ciclo de vida de una herramienta",
+     "url": "/clases/07/#d=rag-mcp-rapida&s=20"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 36,
+     "title": "El circuito con un agente",
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=36"
+    },
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 14,
+     "title": "Workflow o agente",
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=14"
+    },
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 26,
+     "title": "ReAct en LangGraph",
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=26"
+    }
+   ],
+   "nusos": 6
+  },
+  {
+   "id": "railway-json",
+   "titulo": "railway.json: build y healthcheck versionados",
+   "archivo": "railway.json",
+   "desde": 1,
+   "hasta": 12,
+   "lenguaje": "json",
+   "codigo": "{\n  \"$schema\": \"https://railway.com/railway.schema.json\",\n  \"build\": {\n    \"builder\": \"RAILPACK\"\n  },\n  \"deploy\": {\n    \"healthcheckPath\": \"/health\",\n    \"healthcheckTimeout\": 120,\n    \"restartPolicyType\": \"ON_FAILURE\",\n    \"restartPolicyMaxRetries\": 3\n  }\n}",
+   "que_hace": "Configura en el repo cómo Railway construye y despliega Corta.",
+   "como_funciona": "- `builder: RAILPACK` detecta y construye la app Node.\n- `healthcheckPath: /health` con 120 s de timeout: Railway solo activa el deploy si la app responde.\n- `restartPolicyType: ON_FAILURE` con 3 reintentos.",
+   "proposito": "Versionar la configuración de infraestructura evita que dependa de clics en un panel o de lo que el agente haya hecho en una sesión: queda revisable en un diff. Combinado con el MCP de Railway, el agente deploya y la config queda en GitHub.",
+   "interaccion": "Railway lo lee en cada deploy; el healthcheck pega a `GET /health` de `src/server.js`, que llama a `verificarConexion()` de `src/postgres.js`.",
+   "teoria": "Un agente con varios servidores MCP (GitHub para versionar, Railway para infraestructura) y la infraestructura como archivos revisables.",
+   "key": "tp1-railway-json",
+   "tp": 1,
+   "tp_titulo": "Corta, del caos a producción",
+   "usos": [
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 59,
+     "title": "Un agente, varios servidores",
+     "url": "/clases/06/#d=rag-y-mcp&s=59"
+    }
+   ],
+   "nusos": 1
+  },
+  {
+   "id": "descripciones-api-y-registro",
+   "titulo": "Descripciones de farmacia y espera, y el registro de las seis",
+   "archivo": "hospital/descripciones.py",
+   "desde": 40,
+   "hasta": 61,
+   "lenguaje": "python",
+   "codigo": "CONSULTAR_FARMACIA = (\n    \"Stock de HOY de un medicamento en la farmacia del hospital y, si no hay, la fecha de reposición. Usala para \"\n    \"saber si un medicamento está disponible. No dice cómo retirarlo ni qué papeles hacen falta: eso está en los \"\n    \"documentos. \"\n    \"medicamento: uno de 'amoxicilina 500 mg', 'enalapril 10 mg', 'metformina 850 mg', 'salbutamol aerosol', \"\n    \"'insulina NPH', 'paracetamol 500 mg', 'levotiroxina 50 mcg'.\"\n)\n\nCONSULTAR_ESPERA = (\n    \"Minutos de espera ACTUALES en la guardia para cada nivel de triage (rojo, naranja, amarillo, verde, azul). \"\n    \"Usala para saber cuánto se está esperando hoy en la guardia. No recibe parámetros. Los tiempos máximos \"\n    \"que fija la norma de triage están en los documentos, no acá.\"\n)\n\nDESCRIPCIONES = {\n    \"buscar_documentos\": BUSCAR_DOCUMENTOS,\n    \"consultar_camas\": CONSULTAR_CAMAS,\n    \"consultar_guardia\": CONSULTAR_GUARDIA,\n    \"consultar_turnos\": CONSULTAR_TURNOS,\n    \"consultar_farmacia\": CONSULTAR_FARMACIA,\n    \"consultar_espera\": CONSULTAR_ESPERA,\n}",
+   "que_hace": "Completa las descripciones de las dos tools de la API que faltan y arma el diccionario nombre → descripción con las seis herramientas.",
+   "como_funciona": "- `CONSULTAR_FARMACIA` aclara que no dice cómo retirar el medicamento («eso está en los documentos») y lista los siete medicamentos válidos.\n- `CONSULTAR_ESPERA` no recibe parámetros y aclara que los tiempos máximos de la norma de triage están en los documentos.\n- `DESCRIPCIONES` mapea los seis nombres exactos que exige el evaluador.",
+   "proposito": "Mantiene en un único lugar el contrato de las tools, sin depender de LangChain, para reusarlo en la parte 2 y en la parte 3 (MCP). Con solo 6 tools bien descritas no hizo falta routing jerárquico.",
+   "interaccion": "`hospital/herramientas.py` toma `DESCRIPCIONES[nombre]` para cada `@tool`; `tests/test_agente.py` verifica que las descripciones de las tools coincidan con este diccionario.",
+   "teoria": "Pocas herramientas bien elegidas y con descripciones que marcan límites entre fuentes reducen errores de selección.",
+   "key": "tp3-descripciones-api-y-registro",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 64,
+     "title": "Más herramientas, peor elección",
+     "url": "/clases/06/#d=rag-y-mcp&s=64"
+    }
+   ],
+   "nusos": 1
+  },
+  {
+   "id": "corrida-log-md",
+   "titulo": "El log .md de cada corrida",
+   "archivo": "hospital/agente/corrida.py",
+   "desde": 70,
+   "hasta": 95,
+   "lenguaje": "python",
+   "codigo": "def _log_pregunta(p, mensajes, r, segundos, error):\n    out = [f\"## {p['id']}: {p['pregunta']}\", \"\"]\n    if error:\n        out += [f\"**Error:** `{error}`\", \"\"]\n    resultados = {m.tool_call_id: m for m in mensajes if isinstance(m, ToolMessage)}\n    paso = 0\n    for m in mensajes:\n        if not isinstance(m, AIMessage):\n            continue\n        u = r[\"llamadas_modelo\"][paso]\n        paso += 1\n        costo = f\"USD {u['costo']:.6f}\" + (\" (estimado)\" if u[\"costo_estimado\"] else \"\")\n        out += [f\"### Llamada al modelo {paso}\", \"\",\n                f\"- Tokens: entrada {u['tokens_entrada']} (cache {u['tokens_cache']}), \"\n                f\"salida {u['tokens_salida']} (razonamiento {u['tokens_razonamiento']})\",\n                f\"- Costo: {costo}\", f\"- Generación: `{u['id']}`\", \"\"]\n        if texto(m.content).strip():\n            out += [\"Texto del modelo:\", \"\", \"> \" + texto(m.content).strip().replace(\"\\n\", \"\\n> \"), \"\"]\n        for c in m.tool_calls:\n            res = resultados.get(c[\"id\"])\n            out += [f\"**Herramienta** `{c['name']}` con argumentos `{json.dumps(c['args'], ensure_ascii=False)}`\", \"\",\n                    \"```\", texto(res.content) if res else \"(sin resultado)\", \"```\", \"\"]\n    out += [\"**Respuesta final:**\", \"\", r[\"respuesta\"] or \"(vacía)\", \"\",\n            f\"_Herramientas: {', '.join(r['herramientas']) or 'ninguna'} · llamadas al modelo: {len(r['llamadas_modelo'])} · \"\n            f\"tokens {r['tokens_entrada']} / {r['tokens_salida']} · USD {r['costo']:.6f} · {segundos:.1f} s_\", \"\"]\n    return out",
+   "que_hace": "Escribe, por pregunta, cada llamada al modelo con tokens, costo e id de generación, cada herramienta con sus argumentos y su resultado completo, y la respuesta final.",
+   "como_funciona": "- Indexa los `ToolMessage` por `tool_call_id` para emparejar cada llamada con su resultado.\n- Por cada `AIMessage` agrega «Llamada al modelo N» con tokens (cache y razonamiento), costo y `Generación`.\n- Si el modelo escribió texto, lo cita; por cada `tool_call` escribe nombre, argumentos JSON y el resultado en un bloque de código.\n- Cierra con la respuesta final y una línea de totales (tools, llamadas, tokens, USD, segundos).",
+   "proposito": "Es la analítica de la corrida: gracias a este log se diagnosticó A11 (la consulta que redactó el modelo no traía la sección correcta) sin adivinar.",
+   "interaccion": "Lo llama `correr()`, que junta las secciones con una cabecera de totales y lo guarda en `experimentos/corridas/agente_<fecha>.md`.",
+   "teoria": "Observabilidad en producción: registrar llamadas, argumentos, resultados, tokens y costo para depurar y controlar gasto.",
+   "key": "tp3-corrida-log-md",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 69,
+     "title": "Analítica en producción",
+     "url": "/clases/06/#d=rag-y-mcp&s=69"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 29,
+     "title": "Analítica en producción",
+     "url": "/clases/07/#d=rag-mcp-rapida&s=29"
+    }
+   ],
+   "nusos": 2
+  }
+ ]
+}

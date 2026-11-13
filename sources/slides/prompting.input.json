@@ -1,0 +1,875 @@
+[
+ {
+  "i": 0,
+  "section": "",
+  "title": "Inteligencia Artificial Generativa (AI Gen)",
+  "lead": "",
+  "visible_text": "Inteligencia Artificial Generativa (AI Gen) Trabajar con LLMs: prompts, costos y producción Autor: Paulo Veiga, Claudio Righetti, Marco Sorondo (Universidad Austral) Última modificación: 2026-09-02",
+  "details": [],
+  "speaker_notes": ""
+ },
+ {
+  "i": 1,
+  "section": "Fundamentos",
+  "title": "Fundamentos",
+  "lead": "",
+  "visible_text": "01 Fundamentos 02 Modelos y costos 03 Prompts estructurados 04 In-context learning 05 Prompting avanzado 06 Effort y thinking 07 LLMs en ingeniería 08 Resumen y práctica 01 Fundamentos Portada. Presentate y presentá a los otros dos docentes. Encuadre de una frase antes de arrancar: esta clase no es un catálogo de trucos de prompting, es la clase donde se entiende qué hace el modelo por dentro cuando lo promptean, y por qué cada mejora de calidad tiene un precio en tokens y en latencia. Avisá acá",
+  "details": [],
+  "speaker_notes": "Portada. Presentate y presentá a los otros dos docentes. Encuadre de una frase antes de arrancar: esta clase no es un catálogo de trucos de prompting, es la clase donde se entiende qué hace el modelo por dentro cuando lo promptean, y por qué cada mejora de calidad tiene un precio en tokens y en latencia. Avisá acá que la clase dura dos horas y media y que los módulos de práctica de aitutorial.dev quedan como trabajo domiciliario.\n\nEl mapa de la clase. Vale la pena decir en voz alta el arco, porque las siete secciones no son siete temas sueltos: las dos primeras explican la máquina y su precio, las tres del medio son el oficio de escribir prompts, y las dos últimas bajan todo a un equipo de software real. Anunciá también que esta misma agenda reaparece entre secciones marcando dónde estamos, para que nadie se pierda en dos horas y media.\n\nAbre el bloque conceptual: qué es un prompt, qué entra en la ventana, cómo se cuentan los tokens y por qué el modelo alucina."
+ },
+ {
+  "i": 2,
+  "section": "Fundamentos",
+  "title": "¿Qué es un prompt?",
+  "lead": "Un prompt es la instrucción, pregunta o entrada textual que se le da a un modelo de lenguaje grande (LLM) para que genere una respuesta.",
+  "visible_text": "Fundamentos ¿Qué es un prompt? Un prompt es la instrucción, pregunta o entrada textual que se le da a un modelo de lenguaje grande (LLM) para que genere una respuesta. Medio de comunicación La interfaz principal entre la persona y el modelo. Define tarea y contexto Establece qué hacer y bajo qué condiciones. Calidad = resultado Un prompt mejor produce respuestas más útiles y precisas. Un prompt se parece a un ticket bien escrito: cuanto más claro el enunciado y las condiciones de aceptación, men",
+  "details": [
+   "Medio de comunicación: La interfaz principal entre la persona y el modelo.",
+   "Define tarea y contexto: Establece qué hacer y bajo qué condiciones.",
+   "Calidad = resultado: Un prompt mejor produce respuestas más útiles y precisas.",
+   "Un prompt se parece a un ticket bien escrito: cuanto más claro el enunciado y las condiciones de aceptación, menos vueltas da quien lo resuelve."
+  ],
+  "speaker_notes": "Arranque suave, pero conviene no darlo por sabido. El punto que sí hay que dejar clavado es el tercero: la calidad del prompt no es cortesía, es la única palanca de control que queda una vez elegido el modelo. La analogía del ticket funciona mejor que la de la receta para esta audiencia: todos escribieron alguna vez un issue de dos líneas y recibieron una implementación que no era la que querían. El prompt tiene el mismo problema y la misma solución."
+ },
+ {
+  "i": 3,
+  "section": "Fundamentos",
+  "title": "¿Qué se guarda en un prompt?",
+  "lead": "Todo lo que el modelo ve en un turno vive en la ventana de contexto, y todo compite por su atención al mismo tiempo.",
+  "visible_text": "Fundamentos ¿Qué se guarda en un prompt? Todo lo que el modelo ve en un turno vive en la ventana de contexto, y todo compite por su atención al mismo tiempo. Más contexto no es mejor contexto: el modelo no elige qué leer, procesa todo junto y lo importante se diluye. Recorré el contenedor banda por banda, porque las definiciones ya no están en la lámina. System prompt : las instrucciones base que fijan el comportamiento general del modelo, fijas entre turnos. Historial : toda la conversación pre",
+  "details": [
+   "Más contexto no es mejor contexto: el modelo no elige qué leer, procesa todo junto y lo importante se diluye."
+  ],
+  "speaker_notes": "Recorré el contenedor banda por banda, porque las definiciones ya no están en la lámina. **System prompt**: las instrucciones base que fijan el comportamiento general del modelo, fijas entre turnos. **Historial**: toda la conversación previa; cada mensaje nuevo se concatena y ocupa lugar de forma acumulativa. **Datos inyectados**: archivos, resultados de búsqueda, respuestas de APIs externas. **Respuestas del modelo**: sus propias salidas previas, que también ocupan lugar. Cuatro cosas entran en la ventana y solo una la escribe el usuario en ese momento. Es la slide donde conviene romper la ilusión de que \"el chat se acuerda\": no se acuerda, la aplicación le reenvía todo el historial en cada turno. De ahí salen dos consecuencias que se cobran más adelante en la clase. La primera es de plata: el historial se paga entero, otra vez, en cada mensaje (la slide de la fórmula del costo lo cuantifica). La segunda es de calidad: el modelo reparte atención sobre todo lo que entra, así que meter más contexto puede empeorar la respuesta en lugar de mejorarla. Si el grupo pregunta por qué, adelantá el sesgo de recencia de la slide de limitaciones: el modelo mira más el principio y el final del prompt que el medio."
+ },
+ {
+  "i": 4,
+  "section": "Fundamentos",
+  "title": "Ventana de contexto",
+  "lead": "La ventana de contexto es la memoria de trabajo activa del modelo. Contiene todo lo que puede ver en un momento dado para generar la respuesta: system prompt, historial, datos inyectados y sus propias respuestas.",
+  "visible_text": "Fundamentos Ventana de contexto La ventana de contexto es la memoria de trabajo activa del modelo. Contiene todo lo que puede ver en un momento dado para generar la respuesta: system prompt, historial, datos inyectados y sus propias respuestas. Es finita. Cuando se llena, el modelo pierde acceso a lo más viejo. Tamaños en 2026 : La carrera por ventanas más largas es la frontera competitiva del momento. La definición primero y la tabla después: la ventana es memoria de trabajo, no memoria a largo",
+  "details": [
+   "Es finita. Cuando se llena, el modelo pierde acceso a lo más viejo.",
+   "Tamaños en 2026: La carrera por ventanas más largas es la frontera competitiva del momento."
+  ],
+  "speaker_notes": "La definición primero y la tabla después: la ventana es memoria de trabajo, no memoria a largo plazo. La analogía útil acá es la RAM contra el disco. Nada de lo que está en la ventana persiste entre sesiones, y nada de lo que quedó afuera existe para el modelo. Sobre la tabla: la fila de Anthropic está verificada contra el catálogo vigente de la API; las tres filas de otros proveedores vienen del deck original y no las pude verificar, así que decilas como orden de magnitud y no como dato preciso. El punto pedagógico está en otro lado: un millón de tokens ya dejó de ser una restricción práctica para casi todo trabajo de software, y que el cuello de botella se mudó del tamaño de la ventana al costo de llenarla."
+ },
+ {
+  "i": 5,
+  "section": "Fundamentos",
+  "title": "¿Cuánto es 1 millón de Tolkien tokens?",
+  "lead": "",
+  "visible_text": "Fundamentos ¿Cuánto es 1 millón de Tolkien tokens? \"Claude Code tiene ahora una ventana de contexto de 1 millón de tokens por defecto. Un millón de tokens es mucho: la trilogía de El Señor de los Anillos más El Hobbit tienen unas 576.000 palabras, lo que equivale a ~750.000 tokens. Las cuatro obras caben en un único prompt... y aún sobra espacio.\" ~750K tokens Toda la obra de Tolkien: El Hobbit más la trilogía de El Señor de los Anillos. ¿Y un repositorio con código? El código, los tests y la do",
+  "details": [
+   "~750K tokens: Toda la obra de Tolkien: El Hobbit más la trilogía de El Señor de los Anillos.",
+   "¿Y un repositorio con código?: El código, los tests y la documentación de un servicio de tamaño medio entran cómodos. La cuenta exacta depende del repo.",
+   "\"Claude Code tiene ahora una ventana de contexto de 1 millón de tokens por defecto. Un millón de tokens es mucho: la trilogía de El Señor de los Anillos más El Hobbit tienen unas 576.000 palabras, lo que equivale a ~750.000 tokens. Las cuatro obras caben en un único prompt... y aún sobra espacio.\""
+  ],
+  "speaker_notes": "Esta es la slide del \"ah, mirá\". Sirve para que la cifra deje de ser abstracta: 576.000 palabras de Tolkien son unos 750.000 tokens, y todavía sobran 250.000. La segunda columna es la traducción al mundo de ellos, y conviene decirla con honestidad: no tengo una medición del repo, tengo un orden de magnitud. Si querés hacerlo vivo, pediles que estimen cuántos tokens tiene el repositorio del trabajo práctico y después lo miden con el tokenizador en la slide siguiente. Aviso de derechos, por si el material se republica: el fotograma de Gandalf es de la película y el deck original no lo acredita."
+ },
+ {
+  "i": 6,
+  "section": "Fundamentos",
+  "title": "Cómo se tokeniza",
+  "lead": "**Antes de llegar al modelo, todo texto se parte en piezas de un vocabulario fijo. Ese vocabulario es lo que decide cuántos tokens cuesta una frase, y cada familia de modelos tiene el suyo.**",
+  "visible_text": "Fundamentos Cómo se tokeniza Antes de llegar al modelo, todo texto se parte en piezas de un vocabulario fijo. Ese vocabulario es lo que decide cuántos tokens cuesta una frase, y cada familia de modelos tiene el suyo. BPE — byte pair encoding Arranca de caracteres sueltos y fusiona los pares más frecuentes hasta llenar el vocabulario. Por eso lo común es un token y lo raro se parte en pedazos. Vocabulario creciente De cincuenta mil entradas a doscientas mil. Uno más grande corta menos: el mismo t",
+  "details": [
+   "BPE — *byte pair encoding*: Arranca de caracteres sueltos y fusiona los pares más frecuentes hasta llenar el vocabulario. Por eso lo común es un token y lo raro se parte en pedazos.",
+   "Vocabulario creciente: De cincuenta mil entradas a doscientas mil. Uno más grande corta menos: el mismo texto rinde menos tokens."
+  ],
+  "speaker_notes": ""
+ },
+ {
+  "i": 7,
+  "section": "Fundamentos",
+  "title": "Economía de tokens",
+  "lead": "Los tokens son subpalabras, no palabras completas. El modelo procesa y factura en tokens, tanto los de entrada como los de salida.",
+  "visible_text": "Fundamentos Economía de tokens Los tokens son subpalabras, no palabras completas. El modelo procesa y factura en tokens, tanto los de entrada como los de salida. 1 \"Ingeniería de Software\" no cuenta como dos palabras: el tokenizador la parte en varios trozos, y la cuenta exacta cambia según el modelo. 2 Un prompt de 2.000 tokens de entrada más una respuesta de 500 de salida cuesta unos $0,014 con Claude Sonnet 4.6. 3 Probarlo en tiempo real: gpt-tokenizer.dev Momento de abrir gpt-tokenizer.dev e",
+  "details": [
+   "\"Ingeniería de Software\" no cuenta como dos palabras: el tokenizador la parte en varios trozos, y la cuenta exacta cambia según el modelo.",
+   "Un prompt de 2.000 tokens de entrada más una respuesta de 500 de salida cuesta unos **$0,014** con Claude Sonnet 4.6.",
+   "[Probarlo en tiempo real: gpt-tokenizer.dev](https://gpt-tokenizer.dev)"
+  ],
+  "speaker_notes": "Momento de abrir gpt-tokenizer.dev en vivo y pegar una línea de código. El efecto es inmediato: un identificador en camelCase se parte en cuatro o cinco tokens, y un bloque de JSON con indentación se come muchísimos más de los que cualquiera estimaría a ojo. Ese es el punto: la intuición de \"una palabra, un token\" está mal, y está mal justo en la dirección que más importa, porque el código y el JSON tokenizan peor que la prosa. El costo de $0,014 parece nada, y lo es hasta que se multiplica por diez mil llamadas diarias. Guardá esa multiplicación para la slide siguiente, que es donde el número empieza a doler."
+ },
+ {
+  "i": 8,
+  "section": "Fundamentos",
+  "title": "La fórmula del costo",
+  "lead": "**Costo total = (tokens de entrada × precio de entrada) + (tokens de salida × precio de salida)**",
+  "visible_text": "Fundamentos La fórmula del costo Costo total = (tokens de entrada × precio de entrada) + (tokens de salida × precio de salida) ¿Por qué no explota el consumo? : El modelo no recuerda nada entre llamadas: cada turno reenvía todo y lo vuelve a leer desde cero. Debería costar una fortuna. No la cuesta. Esta es la slide que explica por qué la factura de un chatbot crece sin que crezca el uso. La fórmula tiene dos términos y el interesante es el primero: los tokens de entrada de un turno incluyen tod",
+  "details": [
+   "¿Por qué no explota el consumo?: El modelo no recuerda nada entre llamadas: cada turno reenvía todo y lo vuelve a leer desde cero. Debería costar una fortuna. No la cuesta."
+  ],
+  "speaker_notes": "Esta es la slide que explica por qué la factura de un chatbot crece sin que crezca el uso. La fórmula tiene dos términos y el interesante es el primero: los tokens de entrada de un turno incluyen todo lo anterior. Un chat de veinte turnos paga el turno uno veinte veces. Señalá la tabla de izquierda a derecha una fila por vez y dejá que la tercera columna hable sola. Acá conviene sembrar dos cosas que se cobran después en la clase: prompt caching existe justo para atacar este crecimiento, y las técnicas avanzadas de la sección cinco compran calidad gastando tokens de salida, que son los caros. Si alguien pregunta por qué la salida cuesta cinco veces más que la entrada, la respuesta corta es que se genera token por token y no se paraleliza como la lectura del prompt."
+ },
+ {
+  "i": 9,
+  "section": "Fundamentos",
+  "title": "Cómo funciona el caching",
+  "lead": "**El proveedor no guarda respuestas: guarda el estado ya calculado de un prefijo de tokens. De ahí sale la regla única que gobierna todo — coincidencia por prefijo — y también la facilidad con la que se rompe.**",
+  "visible_text": "Fundamentos Cómo funciona el caching El proveedor no guarda respuestas: guarda el estado ya calculado de un prefijo de tokens. De ahí sale la regla única que gobierna todo — coincidencia por prefijo — y también la facilidad con la que se rompe. Coincide por prefijo, no por contenido No es \"¿ya vi este texto antes?\". El proveedor guarda el cómputo de los primeros N tokens del pedido; si esos N coinciden byte a byte con los de la llamada anterior, se reutilizan en vez de recalcularse. Un byte dist",
+  "details": [
+   "Coincide por prefijo, no por contenido: No es \"¿ya vi este texto antes?\". El proveedor guarda el cómputo de los primeros N tokens del pedido; si esos N coinciden byte a byte con los de la llamada anterior, se reutilizan en vez de recalcularse.",
+   "Un byte distinto invalida todo lo que sigue: Y el orden del pedido es fijo: primero las herramientas, después el system prompt, después los mensajes. Por eso lo estable va adelante y lo que cambia en cada llamada va al final.",
+   "Hay un mínimo, y falla en silencio: Un prefijo por debajo del mínimo del modelo no se cachea: sin error, sin aviso. Un prompt corto puede estar marcado para cachear y no cachear nunca.",
+   "Se verifica en la respuesta: El contador de tokens leídos del caché dice si funcionó. Si da cero en llamadas repetidas, hay un invalidador escondido: una fecha en el system prompt, un JSON sin ordenar, una lista de herramientas que cambia de orden.",
+   "Por qué encaja acá: La bola de nieve de la lámina anterior es un prefijo que crece: cada turno agrega al final y deja intacto lo de antes. El caso ideal para el caching."
+  ],
+  "speaker_notes": "Esta lámina existe para que el caching no se lea como magia cuando lleguen a la sección de costos. La idea que tienen que llevarse es una sola: no se cachean respuestas, se cachea el cómputo de un prefijo. Y de ahí sale todo lo demás por deducción, así que en vez de enumerar reglas, deducilas en voz alta con ellos. Si lo que se guarda es el prefijo, entonces lo estable tiene que ir adelante — obvio. Si un byte cambia, todo lo que viene después se recalcula — también obvio. Los dos puntos que más les van a servir en la práctica son los dos últimos, porque fallan en silencio. Un prompt corto marcado para cachear puede no cachear nunca, y nadie te avisa. Y el invalidador clásico es meter la fecha y hora en el system prompt: cambia en cada llamada, está al principio, y tira abajo el caché entero. Por eso se verifica mirando el contador de tokens leídos del caché en la respuesta: si da cero en llamadas repetidas, hay un invalidador escondido. Cerrá conectando con la lámina anterior: la conversación que crece es un prefijo que crece, y por eso es el caso ideal."
+ },
+ {
+  "i": 10,
+  "section": "Fundamentos",
+  "title": "Del chat al caché programático",
+  "lead": "**En un chat el prefijo crece solo: cada turno agrega al final y deja intacto todo lo anterior. En una aplicación no hay esa suerte — el pedido lo armás vos, y sos vos quien decide dónde corta la frontera entre lo que se reutiliza y lo que cambia.**",
+  "visible_text": "Fundamentos Del chat al caché programático En un chat el prefijo crece solo: cada turno agrega al final y deja intacto todo lo anterior. En una aplicación no hay esa suerte — el pedido lo armás vos, y sos vos quien decide dónde corta la frontera entre lo que se reutiliza y lo que cambia. El caso típico de un equipo de software : la guía de estilo, las decisiones de arquitectura ya documentadas —los ADR — y el fragmento de base de código que el asistente necesita son idénticos en cada consulta; e",
+  "details": [
+   "El caso típico de un equipo de software: la guía de estilo, las decisiones de arquitectura ya documentadas —los *ADR*— y el fragmento de base de código que el asistente necesita son idénticos en cada consulta; el pedido del usuario son doscientos tokens. Ese reparto es el que el caching premia, y `cache_control` es la marca que dice dónde termina uno y empieza el otro.",
+   "Monitorear el hit rate: Si `cache_read_input_tokens` da cero, algo está invalidando el prefijo en silencio."
+  ],
+  "speaker_notes": "Esta es la lámina que cierra el puente, y conviene abrirla con una pregunta: cuando chatean con un asistente, ¿quién marca el corte? Nadie: el prefijo crece solo porque cada turno se agrega al final, y el proveedor lo aprovecha sin que ellos hagan nada. En una aplicación propia eso no pasa, porque el pedido lo arman ellos en cada llamada, y por eso hay que marcar el corte a mano. Ahí entra `cache_control`. Caminá el diagrama señalando las tres decisiones que se deducen del match por prefijo: cachear lo estático — base de conocimiento, system prompt, documentación de arquitectura, guía de estilo—, no cachear el input del usuario porque rompe el prefijo, y poner primero lo cacheable. La advertencia del pie es la que más les va a servir: si el system prompt lleva un `datetime.now()` adentro, el prefijo cambia en cada llamada y el hit rate es cero sin que nadie se entere, porque no hay error, solo una factura más alta. El caso del equipo de software es el ideal y vale decirlo: cincuenta mil tokens idénticos contra doscientos que cambian. Los números del ahorro los ven en la sección de costos; acá el foco es el mecanismo y quién marca el corte."
+ },
+ {
+  "i": 11,
+  "section": "Fundamentos",
+  "title": "Prompt caching: implementación",
+  "lead": "**El caching se activa marcando las partes estáticas del prompt con un bloque `cache_control`.**",
+  "visible_text": "Fundamentos Prompt caching: implementación El caching se activa marcando las partes estáticas del prompt con un bloque cache_control . Parte estática (cacheable) System prompt, guía de estilo, decisiones de arquitectura, base de conocimiento. Se marca con cache_control . Parte dinámica (no cacheable) El diff, el ticket, la consulta puntual. Cambia en cada request, así que va después del corte. Hit de caché Si el prefijo ya fue procesado, el proveedor lo reutiliza en vez de recalcularlo. Python i",
+  "details": [
+   "Parte estática (cacheable): System prompt, guía de estilo, decisiones de arquitectura, base de conocimiento. Se marca con `cache_control`.",
+   "Parte dinámica (no cacheable): El diff, el ticket, la consulta puntual. Cambia en cada request, así que va después del corte.",
+   "Hit de caché: Si el prefijo ya fue procesado, el proveedor lo reutiliza en vez de recalcularlo."
+  ],
+  "speaker_notes": "Veinte líneas de código y una sola idea: la frontera entre lo que se cachea y lo que no la dibuja el programador, poniendo `cache_control` en el bloque correcto. Señalá el orden. Lo estático arriba, lo dinámico abajo, siempre, porque el match es por prefijo. Si alguien pone el diff arriba del system prompt, el caché no sirve para nada y no hay ningún error que lo avise. El ejemplo pasó de un system prompt de guías clínicas a la guía de estilo y los ADRs del repo, que es el caso real de un asistente de revisión de código: cincuenta mil tokens de convenciones que no cambian, cien tokens de diff que cambian siempre."
+ },
+ {
+  "i": 12,
+  "section": "Fundamentos",
+  "title": "La economía de los tokens",
+  "lead": "**La economía del consumo de tokens de IA: cuánto cuesta correr modelos de lenguaje —tokens de entrada contra salida, cacheados contra no cacheados, precio por proveedor— y cómo medir el retorno real que eso genera para el negocio.**",
+  "visible_text": "Fundamentos La economía de los tokens La economía del consumo de tokens de IA: cuánto cuesta correr modelos de lenguaje —tokens de entrada contra salida, cacheados contra no cacheados, precio por proveedor— y cómo medir el retorno real que eso genera para el negocio. Lo que ya vimos Entrada contra salida, la bola de nieve del historial, el prefijo que se cachea y el que no, y el precio distinto de cada proveedor. Todo eso es el lado del costo. Lo que falta La otra mitad de la ecuación: cuánto va",
+  "details": [
+   "Lo que ya vimos: Entrada contra salida, la bola de nieve del historial, el prefijo que se cachea y el que no, y el precio distinto de cada proveedor. Todo eso es el lado del costo.",
+   "Lo que falta: La otra mitad de la ecuación: cuánto valor devuelve ese gasto. Es la pregunta que ninguna factura responde."
+  ],
+  "speaker_notes": "Lámina de transición, corta. Sirve para nombrar lo que venimos haciendo sin darle nombre: todo lo anterior —entrada contra salida, la bola de nieve, el prefijo cacheado, el precio por proveedor— es economía de tokens. Decilo y hacé la pausa, porque lo que sigue es que esto tiene nombre propio, tiene una fundación detrás y tiene treinta empresas grandes tratando de estandarizarlo. El giro que importa es el de la segunda viñeta: hasta acá midieron el costo, y la pregunta abierta es el valor. Ninguna factura te dice si valió la pena."
+ },
+ {
+  "i": 13,
+  "section": "Fundamentos",
+  "title": "La Tokenomics Foundation",
+  "lead": "**La Linux Foundation anunció el lanzamiento de la [Tokenomics Foundation](https://www.tokeneconomics.com/), enfocada en establecer estándares abiertos, benchmarks y mejores prácticas para la economía de la infraestructura de IA. Se lanzó el 4 de agosto de 2026 con 30 empresas fundadoras, entre ellas Accenture, IBM, JPMorganChase, Oracle, SAP, ServiceNow, Broadcom y Lenovo.**",
+  "visible_text": "Fundamentos La Tokenomics Foundation La Linux Foundation anunció el lanzamiento de la Tokenomics Foundation , enfocada en establecer estándares abiertos, benchmarks y mejores prácticas para la economía de la infraestructura de IA. Se lanzó el 4 de agosto de 2026 con 30 empresas fundadoras, entre ellas Accenture, IBM, JPMorganChase, Oracle, SAP, ServiceNow, Broadcom y Lenovo. El token es la unidad, no el total Buena parte del costo no está en los tokens: cómputo, almacenamiento, base de datos, ca",
+  "details": [
+   "El token es la unidad, no el total: Buena parte del costo no está en los tokens: cómputo, almacenamiento, base de datos, caché y el trabajo de los ingenieros. Pero el token los atraviesa a todos, y por eso sirve para contarlos.",
+   "Falta un lenguaje común: No hay forma compartida de conectar gasto con valor, y cada proveedor cobra distinto. Esa fragmentación vuelve incomparable el costo total entre organizaciones.",
+   "Costo por llamada, no por token: Uno de sus entregables es un método estándar de *costo de servir*: la cuenta completa expresada por llamada, que es la unidad con la que uno diseña un sistema.",
+   "Medición de valor: Un marco que relacione el gasto con resultados, empezando por la proporción de trabajo que se completa sin intervención humana, medida contra lo que ese proceso cuesta hoy.",
+   "Lo más cercano a esta clase: Su proyecto *Big-T* clasifica la complejidad de costo de una carga de trabajo **antes** de decidir a qué modelo enrutarla: es el árbol de decisión que vimos, convertido en método. Y el número que explica la urgencia: Goldman Sachs proyecta que el consumo de tokens se multiplique por **24 hacia 2030**."
+  ],
+  "speaker_notes": "Esta lámina existe para que lo anterior no se lea como una preocupación nuestra: hay una fundación de la Linux Foundation, con treinta empresas grandes adentro, tratando de estandarizarlo. Y es material fresco, de hace tres semanas. Cuatro cosas y ninguna es la lista de miembros. La primera es la buena noticia: aunque el token no sea todo el costo, es la unidad que atraviesa a todos los demás y por eso sirve para contar. La segunda es la incómoda: hoy no hay forma estándar de comparar el costo total entre proveedores, y por eso el ejercicio de la tabla de tarifas que vieron antes es necesariamente parcial. La tercera es la que más les sirve como ingenieros: pasar de costo por token a costo por llamada, porque el token es una unidad interna del proveedor y la llamada es la unidad con la que uno diseña. La cuarta tiene una definición operativa linda: empiezan por la proporción de trabajo que se completa sin que intervenga una persona. Es medible, no es retórica. Cerrá con Big-T, que es el puente directo al árbol de decisión de la sección de costos, y con el 24x, que es el número que explica por qué esto se volvió urgente ahora."
+ },
+ {
+  "i": 14,
+  "section": "Fundamentos",
+  "title": "Limitaciones de los LLM",
+  "lead": "",
+  "visible_text": "Fundamentos Limitaciones de los LLM Alucinaciones El modelo predice texto plausible y no verifica hechos. Mitigación Restringirlo al contexto dado más revisión humana. No-determinismo El mismo prompt puede dar respuestas distintas. En producción En producción se compensa corriendo varias veces y comparando, no con un parámetro. Sesgo de recencia El modelo presta más atención al principio y al final del prompt que al medio. Estrategia Instrucciones críticas al inicio, la consulta concreta al fina",
+  "details": [],
+  "speaker_notes": "Tres fallas de familia, no tres bugs. Ninguna se arregla con un modelo mejor, todas se administran con diseño del sistema alrededor del modelo. La de no-determinismo suele ser la que más molesta a esta audiencia, porque rompe la intuición de función pura: mismo input, distinto output. Y si alguien propone el atajo de bajar la aleatoriedad con un parámetro, aclarale que en la generación actual de modelos esas perillas ya no existen: en producción la variabilidad se compensa corriendo varias veces y comparando. El sesgo de recencia es el que menos se conoce y el más accionable: si el prompt tiene cincuenta mil tokens de contexto y la pregunta está en el medio, la respuesta empeora. Instrucción arriba, pregunta abajo. Las tres se retoman en la sección de técnicas avanzadas, así que dejalas planteadas y seguí."
+ },
+ {
+  "i": 15,
+  "section": "Fundamentos",
+  "title": "¿Por qué alucina un modelo?",
+  "lead": "El modelo genera el token más probable dado el contexto. Cuando no tiene el dato, igual genera algo: la fluidez del texto no depende de que sea cierto.",
+  "visible_text": "Fundamentos ¿Por qué alucina un modelo? El modelo genera el token más probable dado el contexto. Cuando no tiene el dato, igual genera algo: la fluidez del texto no depende de que sea cierto. Sin acceso a hechos verificados El modelo no consulta una base de verdad. Produce texto plausible a partir de patrones, y plausible no es lo mismo que correcto. Entrenamiento incompleto o viejo Con datos parciales o desactualizados, el modelo extrapola más allá de lo que sabe. Confianza sin verificación No ",
+  "details": [
+   "Sin acceso a hechos verificados: El modelo no consulta una base de verdad. Produce texto plausible a partir de patrones, y plausible no es lo mismo que correcto.",
+   "Entrenamiento incompleto o viejo: Con datos parciales o desactualizados, el modelo extrapola más allá de lo que sabe.",
+   "Confianza sin verificación: No distingue entre lo que sabe y lo que inventa. Responde con la misma seguridad en los dos casos.",
+   "Presión de completado: Siempre intenta terminar el texto, incluso sin información suficiente. Un espacio en blanco no es una salida válida para él."
+  ],
+  "speaker_notes": "Cuatro causas y ninguna es un defecto de implementación: son consecuencias directas de cómo funciona un motor de completado. La tercera es la que hay que subrayar, porque es la que hace peligrosa a la alucinación en un equipo de software: el modelo no tiene un canal separado para decir \"no sé\". La probabilidad del token siguiente es alta tanto cuando recita algo que vio mil veces como cuando arma algo verosímil de la nada, y el texto sale con el mismo tono en ambos casos. La cuarta explica por qué la alucinación aparece justo en el peor momento: cuanto más raro el pedido, menos patrón hay y más inventa. Sembrá acá el vínculo con la tesis: si el modelo es un completador, el trabajo del ingeniero es acorralarlo con contexto y con verificación."
+ },
+ {
+  "i": 16,
+  "section": "Fundamentos",
+  "title": "Alucinaciones: casos reales",
+  "lead": "",
+  "visible_text": "Fundamentos Alucinaciones: casos reales Air Canada (2024) El chatbot inventó una política de tarifas de duelo que no existía. La aerolínea se defendió diciendo que el chatbot era una entidad legal separada , responsable de sus propios actos; el tribunal calificó el argumento de notable y lo rechazó: quien despliega el modelo responde por lo que el modelo dice. Moffatt v. Air Canada, 2024 BCCRT Abogados: ya no es anecdótico Hay más de 1.148 casos documentados de alucinaciones en tribunales de EE.",
+  "details": [
+   "Air Canada (2024): El chatbot inventó una política de tarifas de duelo que no existía. La aerolínea se defendió diciendo que el chatbot era **una entidad legal separada**, responsable de sus propios actos; el tribunal calificó el argumento de notable y lo rechazó: quien despliega el modelo responde por lo que el modelo dice. [Moffatt v. Air Canada, 2024 BCCRT](https://www.canlii.org/en/bc/bccrt/doc/2024/2024bccrt149/2024bccrt149.html)",
+   "Abogados: ya no es anecdótico: Hay **más de 1.148 casos documentados** de alucinaciones en tribunales de EE.UU., y las sanciones escalaron: en el Sexto Circuito, honorarios, costas dobles, **15.000 dólares de sanción punitiva a cada abogado** y derivación disciplinaria. [Norton Rose Fulbright, 2026](https://www.nortonrosefulbright.com/en/knowledge/publications/792d8bf3/ai-in-litigation-update-on-gen-ai-sanctions-in-2026)",
+   "El 19,7% de los paquetes no existe: Sobre 576.000 muestras de código de 16 modelos, **uno de cada cinco paquetes recomendados no existe en ningún registro**: 205.000 nombres únicos inventados. Los modelos abiertos alucinan 21,7% contra 5,2% de los propietarios. [Socket, análisis del paper](https://socket.dev/blog/slopsquatting-how-ai-hallucinations-are-fueling-a-new-class-of-supply-chain-attacks)",
+   "Slopsquatting: El ataque que se monta sobre lo anterior: el atacante **registra el nombre que el modelo alucina** en npm o PyPI y espera. No hay typo humano que explotar; la puerta la abre el asistente de código. El término se acuñó en abril de 2025. [Slopsquatting](https://en.wikipedia.org/wiki/Slopsquatting)"
+  ],
+  "speaker_notes": "Cuatro casos y un orden deliberado: primero el costo legal de desplegar, después el costo legal de usar, y al final los dos que les tocan como ingenieros. El de Air Canada es el más útil de los dos primeros por la defensa que intentó la empresa: sostuvo que el chatbot era una entidad legal separada, responsable de sus propios actos. El tribunal lo rechazó, y esa es la línea que hay que subrayar: el que despliega el modelo responde por lo que el modelo dice. El segundo instala escala: más de mil cien casos documentados y sanciones que ya incluyen dinero punitivo y derivación disciplinaria, no un tirón de orejas. El tercero es el número que quiero que se lleven: uno de cada cinco paquetes que recomienda un modelo no existe. Preguntales si les pasó; la respuesta suele ser que sí. Y marcá la diferencia entre modelos abiertos y propietarios, que es de cuatro veces, porque es un criterio de selección concreto. El cuarto cierra el arco y es el que engancha con la sección de seguridad del final: el código alucinado compila mal y se detecta rápido, pero un nombre de dependencia alucinado que alguien registró antes que vos es un vector de ataque real, y ahí no hay compilador que te salve."
+ },
+ {
+  "i": 17,
+  "section": "Fundamentos",
+  "title": "Mitigar alucinaciones: el prompt",
+  "lead": "Lo que se puede hacer dentro de la llamada al modelo, sin cambiar el sistema alrededor.",
+  "visible_text": "Fundamentos Mitigar alucinaciones: el prompt Lo que se puede hacer dentro de la llamada al modelo, sin cambiar el sistema alrededor. Grounding en contexto Instruir al modelo a responder solo con el contexto provisto, y a decir que no sabe cuando ese contexto no alcanza. RAG (retrieval-augmented generation) Recuperar e inyectar solo la información verificada y relevante para esa consulta, en vez de confiar en la memoria del modelo. Self-consistency Generar varias respuestas independientes y queda",
+  "details": [
+   "Grounding en contexto: Instruir al modelo a responder solo con el contexto provisto, y a decir que no sabe cuando ese contexto no alcanza.",
+   "RAG (retrieval-augmented generation): Recuperar e inyectar solo la información verificada y relevante para esa consulta, en vez de confiar en la memoria del modelo.",
+   "Self-consistency: Generar varias respuestas independientes y quedarse con la más frecuente.",
+   "Revisión humana en el loop: El output es siempre un borrador. Alguien del equipo lo valida antes de que llegue a producción."
+  ],
+  "speaker_notes": "Cuatro palancas ordenadas de la más barata a la más cara. Grounding es una línea de texto en el system prompt y ya cambia el comportamiento. RAG es infraestructura: alguien tiene que indexar, recuperar y decidir qué entra. Self-consistency se ve en detalle en la sección cinco, acá solo nombrala. Y la quinta es la que ningún equipo puede saltear: mientras la tasa de alucinación del sistema no esté medida, la revisión humana no es una etapa opcional del proceso, es la única garantía que hay."
+ },
+ {
+  "i": 18,
+  "section": "Fundamentos",
+  "title": "Mitigar alucinaciones: el proceso",
+  "lead": "El testing formal es la ventaja competitiva de un equipo de software acá: es la disciplina que ya se tiene y que la mayoría de los equipos de producto no aplica a los prompts.",
+  "visible_text": "Fundamentos Mitigar alucinaciones: el proceso El testing formal es la ventaja competitiva de un equipo de software acá: es la disciplina que ya se tiene y que la mayoría de los equipos de producto no aplica a los prompts. Dataset de evaluación Mínimo 50 a 100 casos con ground truth del dominio, anotados por quien sabe. Métricas de alucinación Faithfulness score, hallucination rate, ROUGE-L. Sin métrica no hay umbral de aceptación. Regression testing Correr el eval set completo en cada cambio de ",
+  "details": [
+   "Dataset de evaluación: Mínimo 50 a 100 casos con ground truth del dominio, anotados por quien sabe.",
+   "Métricas de alucinación: Faithfulness score, hallucination rate, ROUGE-L. Sin métrica no hay umbral de aceptación.",
+   "Regression testing: Correr el eval set completo en cada cambio de prompt, igual que la suite de tests en cada commit.",
+   "Red teaming: Probar con casos ambiguos y contradictorios antes de salir a producción.",
+   "Regla de oro: Un sistema cuya tasa de alucinación no se puede medir no se despliega."
+  ],
+  "speaker_notes": "Acá la clase les habla en su idioma y conviene decirlo de frente: las cuatro prácticas de esta slide son CI/CD aplicado a un artefacto que casi nadie versiona ni testea. El dataset de evaluación es el fixture, las métricas son los asserts, el regression testing es el pipeline y el red teaming es el fuzzing. La pregunta que suele aparecer es de dónde salen los 50 a 100 casos. Respuesta honesta: de producción, mirando lo que el sistema ya respondió mal, y anotando a mano. No hay atajo. La regla de oro del cierre es la frase para llevarse, y se retoma en la sección cinco con la slide de prompts sin verificación."
+ },
+ {
+  "i": 19,
+  "section": "Fundamentos",
+  "title": "Modelo mental: motores de completado",
+  "lead": "",
+  "visible_text": "Fundamentos Modelo mental: motores de completado Cómo es el modelo Los LLM completan patrones vistos en el entrenamiento y no entienden la intención. Fortaleza Muy bueno reconociendo patrones que vio muchas veces. Debilidad Alucina cuando el patrón no estaba en el entrenamiento. Sin razonamiento interno Predice el siguiente token más probable, y nada más. Qué hacer con eso Pensarlos como un autocompletado muy sofisticado cambia cómo se escribe el prompt. Prompt vago \"Extraé nombre y email\" puede",
+  "details": [],
+  "speaker_notes": "Esta slide es el ensayo de la tesis, y por eso vale la pena bajar la velocidad. Si el modelo completa patrones, entonces un prompt bien escrito es un patrón fácil de completar, y uno mal escrito es un patrón ambiguo. El ejemplo de la derecha lo muestra en cuatro líneas: el mismo pedido, escrito como plantilla, deja de tener grados de libertad. Es el mismo mecanismo que explica por qué funcionan las etiquetas XML de la sección tres y los ejemplos few-shot de la sección cuatro. Anticipá que en la sección cinco esto mismo va a explicar por qué chain of thought mejora la precisión: escribir los pasos es generar el patrón que hace más probable el token correcto al final."
+ },
+ {
+  "i": 20,
+  "section": "Modelos y costos",
+  "title": "Modelos y costos",
+  "lead": "",
+  "visible_text": "01 Fundamentos 02 Modelos y costos 03 Prompts estructurados 04 In-context learning 05 Prompting avanzado 06 Effort y thinking 07 LLMs en ingeniería 08 Resumen y práctica 02 Modelos y costos Corte y respiro. Recapitulá en dos frases: la ventana es finita y se factura por token, y el modelo completa en vez de razonar, por eso alucina. Lo que sigue le pone precio a esas dos cosas. Le pone precio a lo anterior: tarifas por familia, cuándo conviene cada modelo, caching y cascading.",
+  "details": [],
+  "speaker_notes": "Corte y respiro. Recapitulá en dos frases: la ventana es finita y se factura por token, y el modelo completa en vez de razonar, por eso alucina. Lo que sigue le pone precio a esas dos cosas.\n\nLe pone precio a lo anterior: tarifas por familia, cuándo conviene cada modelo, caching y cascading."
+ },
+ {
+  "i": 21,
+  "section": "Modelos y costos",
+  "title": "Tarifas: familia Claude",
+  "lead": "",
+  "visible_text": "Modelos y costos Tarifas: familia Claude Modelo Generación Ventana Entrada ($/MTok) Salida ($/MTok) Fable 5 2026 1M $10,00 $50,00 Opus 5 2026 1M $5,00 $25,00 Opus 4.8 2026 1M $5,00 $25,00 Sonnet 5 2026 1M $2,00 $10,00 Sonnet 4.6 2026 1M $3,00 $15,00 Haiku 4.5 2025 200K $1,00 $5,00 Modificadores de tarifa : Cache hit: 10% del precio de entrada · Batch: 50% de la tarifa · Fast Mode (Opus 5 y Opus 4.8): $10 / $50 · Búsqueda web: $10 por cada 1.000 búsquedas · Ejecución de código: 50 h gratis por dí",
+  "details": [
+   "Modificadores de tarifa: Cache hit: 10% del precio de entrada · Batch: 50% de la tarifa · Fast Mode (Opus 5 y Opus 4.8): $10 / $50 · Búsqueda web: $10 por cada 1.000 búsquedas · Ejecución de código: 50 h gratis por día, después $0,05/hora."
+  ],
+  "speaker_notes": "Dos cosas y ninguna es la tabla. La primera: la salida cuesta cinco veces la entrada en toda la familia, así que la variable que hay que vigilar es cuánto habla el modelo, no cuánto se le manda. La segunda: entre Haiku 4.5 y Fable 5 hay un factor diez de precio, y esa distancia es la que hace que valga la pena la cascada que viene después. Mostrales la captura: el selector de modelo y de esfuerzo está a la vista en la interfaz, no escondido en la API — el esfuerzo lo trabajamos en detalle en la sección de técnicas avanzadas. Si preguntan por Fable 5, aclará que la captura lo muestra como no disponible en ese momento y que la tabla sí le pone precio: son dos estados del mismo producto en fechas distintas."
+ },
+ {
+  "i": 22,
+  "section": "Modelos y costos",
+  "title": "Elegir modelo: la primera pregunta que dé \"sí\" decide",
+  "lead": "",
+  "visible_text": "Modelos y costos Elegir modelo: la primera pregunta que dé \"sí\" decide El árbol vale más por el orden de las preguntas que por los nombres que devuelve. Primero la dificultad de la tarea, porque es la que más plata mueve: si clasificar tickets se puede hacer con un modelo chico, cualquier discusión sobre caching es secundaria. Segundo el contexto, que es una restricción dura y no negociable. Y tercero el costo, porque optimizar costo antes de saber si la calidad alcanza es optimizar lo que no im",
+  "details": [],
+  "speaker_notes": "El árbol vale más por el orden de las preguntas que por los nombres que devuelve. Primero la dificultad de la tarea, porque es la que más plata mueve: si clasificar tickets se puede hacer con un modelo chico, cualquier discusión sobre caching es secundaria. Segundo el contexto, que es una restricción dura y no negociable. Y tercero el costo, porque optimizar costo antes de saber si la calidad alcanza es optimizar lo que no importa. Decí también por qué el árbol nombra familias y no versiones: los nombres cambian cada seis meses, las preguntas no. El árbol no pregunta por el formato de salida a propósito: structured outputs es GA en toda la generación actual, incluido Haiku 4.5, así que pedir JSON garantizado ya no descarta a nadie ni obliga a subir de modelo."
+ },
+ {
+  "i": 23,
+  "section": "Modelos y costos",
+  "title": "Model cascading",
+  "lead": "**Intentar primero con el modelo barato. Si la confianza es baja, escalar al caro. El ahorro depende de que el gating de confianza sea confiable.**",
+  "visible_text": "Modelos y costos Model cascading Intentar primero con el modelo barato. Si la confianza es baja, escalar al caro. El ahorro depende de que el gating de confianza sea confiable. La idea es de una línea y la trampa está en el rombo del medio. Todo el ahorro del cascading depende de que el sistema sepa cuándo la respuesta barata no alcanza, y esa señal casi nunca viene servida. Algunos proveedores devuelven log-probabilities y sirven; con otros hay que armar el gate a mano, por ejemplo pidiéndole a",
+  "details": [],
+  "speaker_notes": "La idea es de una línea y la trampa está en el rombo del medio. Todo el ahorro del cascading depende de que el sistema sepa cuándo la respuesta barata no alcanza, y esa señal casi nunca viene servida. Algunos proveedores devuelven log-probabilities y sirven; con otros hay que armar el gate a mano, por ejemplo pidiéndole al modelo chico que declare su confianza, con el problema obvio de que un modelo mal calibrado declara alta confianza sobre cosas que inventó. Preguntales cómo lo resolverían. Suele salir la idea de una segunda llamada de verificación, y ahí conviene señalar que esa llamada también cuesta y puede comerse el ahorro. La slide siguiente da los criterios para decidir si vale la pena."
+ },
+ {
+  "i": 24,
+  "section": "Modelos y costos",
+  "title": "Cascading: el gate en código",
+  "lead": "",
+  "visible_text": "Modelos y costos Cascading: el gate en código Python # el gate del cascading es UN CAMPO del esquema de salida: # structured outputs garantiza que llegue, y con el tipo correcto from typing import Literal from anthropic import Anthropic from pydantic import BaseModel, Field client = Anthropic() BARATO, CARO = \"claude-haiku-4-5-20251001\", \"claude-opus-5\" class Triage(BaseModel): categoria: Literal[\"facturacion\", \"acceso\", \"bug\", \"feature\"] confianza: float = Field(ge=0, le=1, description=( \"Proba",
+  "details": [],
+  "speaker_notes": "Veinte líneas, y la que importa es la del `if`. La lámina anterior deja el rombo dibujado sin decir cómo se implementa, y acá se ve: el gate es un campo más del esquema de salida, y structured outputs garantiza que ese campo llegue. Señalá que sin eso el gate se vuelve frágil, porque hay que leer texto libre y manejar el caso en que el modelo no declare nada. Después pegales el número del final, que suele sorprender: aun escalando ocho de cada diez veces la cascada empata con llamar directo al modelo caro, y cualquier tasa menor es ahorro. Eso invierte la intuición de que el cascading sirve solo si el modelo chico acierta casi siempre. La trampa real no es la tasa de escalamiento sino la calibración: un Haiku que se declara seguro sobre lo que inventó no escala nunca, y el ahorro se paga en errores que nadie mide. Si preguntan por la segunda llamada de verificación que suele salir en la discusión de la lámina anterior, mostrales que ahí ya hay dos llamadas y que el cálculo del final es el que dice si conviene. Aprovechá para mostrar dónde se define \"confianza\": no en la frase del prompt sino en la `description` del campo, que viaja dentro del esquema y el modelo la lee. Ahí está el ancla que hace que el número signifique algo, porque fija contra qué se compara: la probabilidad de que un revisor humano experto elija la misma categoría. Sin ese ancla, \"confianza\" es lo que el modelo quiera que sea. El detalle de `ge`/`le` vale un minuto: no son soportados por structured outputs, pero el SDK no los descarta, los pasa al texto de la description y valida la respuesta contra el esquema original, así que el rango se sigue cumpliendo del lado de tu código."
+ },
+ {
+  "i": 25,
+  "section": "Modelos y costos",
+  "title": "Cascading: cuándo sí y cuándo no",
+  "lead": "",
+  "visible_text": "Modelos y costos Cascading: cuándo sí y cuándo no Cuándo conviene Alto volumen de tareas parecidas Muchas consultas con una distribución de dificultad predecible. Señal de confianza clara El sistema puede saber cuándo la respuesta barata no alcanza. Presión de costo con piso de calidad Hay que ahorrar sin bajar la precisión. Cuándo evitarlo Latencia baja requerida Cada escalón agrega una llamada más. Confianza difícil de medir Sin señal confiable, el routing falla en silencio. Bajo volumen La co",
+  "details": [],
+  "speaker_notes": "La fila que decide es la última de la tabla. El cascading no es una configuración, es un componente más del sistema: hay que rutear, monitorear el porcentaje de escalados y detectar cuándo el gate se desalinea. Un equipo chico que procesa cien consultas por día está pagando esa complejidad para ahorrar unos dólares. Un equipo que procesa cien mil, no. Si querés cerrar con una regla práctica: medí primero cuánto cuesta hacer todo con el modelo bueno a effort bajo. Muchas veces eso alcanza y no hace falta cascada, porque un modelo nuevo a effort bajo suele rendir como el anterior a effort alto, y un solo modelo mantiene un solo namespace de caché."
+ },
+ {
+  "i": 26,
+  "section": "Prompts estructurados",
+  "title": "Prompts estructurados",
+  "lead": "",
+  "visible_text": "01 Fundamentos 02 Modelos y costos 03 Prompts estructurados 04 In-context learning 05 Prompting avanzado 06 Effort y thinking 07 LLMs en ingeniería 08 Resumen y práctica 03 Prompts estructurados Cierre de la parte cara de la clase. Resumen en una frase: el modelo se elige por tarea y no por prestigio, el caching es ahorro sin costo de calidad y la cascada es ahorro con costo de complejidad. A partir de acá el tema deja de ser el precio y pasa a ser el oficio. De escribir un prompt a componerlo: ",
+  "details": [],
+  "speaker_notes": "Cierre de la parte cara de la clase. Resumen en una frase: el modelo se elige por tarea y no por prestigio, el caching es ahorro sin costo de calidad y la cascada es ahorro con costo de complejidad. A partir de acá el tema deja de ser el precio y pasa a ser el oficio.\n\nDe escribir un prompt a componerlo: seis partes, etiquetas XML y salidas JSON que se validan solas."
+ },
+ {
+  "i": 27,
+  "section": "Prompts estructurados",
+  "title": "Los 6 componentes",
+  "lead": "**La diferencia entre un prototipo que a veces anda y un sistema de producción suele estar en la estructura del prompt, no en la redacción.**",
+  "visible_text": "Prompts estructurados Los 6 componentes La diferencia entre un prototipo que a veces anda y un sistema de producción suele estar en la estructura del prompt, no en la redacción. Seis componentes y el orden importa. Las definiciones ya no están en la lámina, así que van habladas mientras señalás cada banda. Rol : fija el nivel de expertise y los patrones de comportamiento. Contexto : la información de fondo que la tarea necesita, el servicio, las convenciones del equipo. Instrucciones : qué hacer",
+  "details": [],
+  "speaker_notes": "Seis componentes y el orden importa. Las definiciones ya no están en la lámina, así que van habladas mientras señalás cada banda. **Rol**: fija el nivel de expertise y los patrones de comportamiento. **Contexto**: la información de fondo que la tarea necesita, el servicio, las convenciones del equipo. **Instrucciones**: qué hacer, paso a paso, y cuanto más específicas mejor. **Restricciones**: los límites y el formato de salida. **Ejemplos**: casos resueltos que demuestran el comportamiento esperado. **Input**: los datos concretos de esta llamada. Rol y contexto van arriba porque condicionan todo lo que sigue, y porque el modelo presta más atención al principio del prompt. El input va último por la misma razón invertida: es lo que tiene que estar fresco cuando empieza a generar. La discusión que suele aparecer es si hace falta todo esto para pedir un resumen. No, y conviene decirlo: los seis componentes son la anatomía de un prompt de producción, el que corre diez mil veces por día y tiene que dar el mismo formato siempre. Para una consulta única en el chat, alcanza con instrucciones e input. El ejemplo de la slide siguiente muestra los seis armados."
+ },
+ {
+  "i": 28,
+  "section": "Prompts estructurados",
+  "title": "Un prompt completo",
+  "lead": "**Los seis componentes armados, sobre una tarea real: revisar un pull request.**",
+  "visible_text": "Prompts estructurados Un prompt completo Los seis componentes armados, sobre una tarea real: revisar un pull request. Markdown # [1] ROL / PERSONA Sos un revisor de codigo senior, con experiencia en sistemas de alta disponibilidad. # [2] CONTEXTO Estas revisando un pull request sobre el servicio de facturacion. Las convenciones del equipo estan en CONTRIBUTING.md y en la guia de estilo del lenguaje. # [3] INSTRUCCIONES 1. Lee el diff completo antes de comentar. 2. Lista los problemas mas graves ",
+  "details": [],
+  "speaker_notes": "Leé el prompt en voz alta, bloque por bloque, y hacé notar dos cosas. La primera: el bloque de restricciones es el que más trabajo hace, y es el que la gente saltea. \"Comentá solo lo que aparece en el diff\" es lo que impide que el modelo se ponga a opinar sobre archivos que no se tocaron. La segunda: el ejemplo few-shot no muestra solo la respuesta, muestra el formato exacto, y por eso el modelo lo copia. Buen momento para una pregunta al grupo: qué pasa si sacamos el bloque 5. Respuesta: el JSON sale, pero con claves distintas cada vez, y el código que lo parsea empieza a romperse. Aclará que este prompt es propio: la fuente que lo promete lo perdió en la extracción."
+ },
+ {
+  "i": 29,
+  "section": "Prompts estructurados",
+  "title": "Salidas estructuradas: JSON Schema",
+  "lead": "**Imponer un esquema de salida reduce los errores de parseo y los reintentos, y vuelve la salida verificable por código.**",
+  "visible_text": "Prompts estructurados Salidas estructuradas: JSON Schema Imponer un esquema de salida reduce los errores de parseo y los reintentos, y vuelve la salida verificable por código. Esquema en el prompt : Incluir el formato JSON en las instrucciones. Más flexible, sin garantías. Modo JSON de la API : Usar response_format: json_object . Más confiable: garantiza estructura válida. Validación automática : La salida se verifica con el esquema, sin leerla a mano. Menos errores de parseo : Menos fallos en e",
+  "details": [
+   "Esquema en el prompt: Incluir el formato JSON en las instrucciones. Más flexible, sin garantías.",
+   "Modo JSON de la API: Usar `response_format: json_object`. Más confiable: garantiza estructura válida.",
+   "Validación automática: La salida se verifica con el esquema, sin leerla a mano.",
+   "Menos errores de parseo: Menos fallos en el pipeline y menos reintentos.",
+   "Integración directa: El JSON entra al issue tracker o al bot de review sin traducción intermedia.",
+   "[Ver ejemplo interactivo en aitutorial.dev →](https://aitutorial.dev/prompting/structured-prompt-engineering)"
+  ],
+  "speaker_notes": "La distinción entre los dos enfoques es la que hay que dejar clara, porque se confunde todo el tiempo. Pedir el formato en el prompt es una sugerencia: el modelo casi siempre obedece y ese casi es el problema, porque el uno por ciento que falla aparece en producción a las tres de la mañana. La funcionalidad de salidas estructuradas de la API es una garantía a nivel de decodificación, no una instrucción. Si el output alimenta código, se usa la segunda. El esquema de la slide es el del revisor de código de la slide anterior, así que se ve el circuito completo: el prompt pide, el esquema define, el código valida. Y una advertencia útil: un esquema muy estricto sobre una tarea ambigua no arregla la ambigüedad, la esconde en un campo con un valor plausible."
+ },
+ {
+  "i": 30,
+  "section": "Prompts estructurados",
+  "title": "XML: estructura semántica",
+  "lead": "**Las etiquetas marcan dónde empieza y termina cada parte del prompt. El modelo no tiene que inferir la estructura: se la das dibujada.**",
+  "visible_text": "Prompts estructurados XML: estructura semántica Las etiquetas marcan dónde empieza y termina cada parte del prompt. El modelo no tiene que inferir la estructura: se la das dibujada. Fronteras explícitas : Tarea, instrucciones, ejemplos y entrada quedan separados sin ambigüedad. Nada se confunde con nada. Formato que ya conocen : Los LLM se entrenaron con enormes cantidades de HTML y XML de la web, así que la notación les resulta familiar. La salida también se delimita : Pedir la respuesta dentro",
+  "details": [
+   "Fronteras explícitas: Tarea, instrucciones, ejemplos y entrada quedan separados sin ambigüedad. Nada se confunde con nada.",
+   "Formato que ya conocen: Los LLM se entrenaron con enormes cantidades de HTML y XML de la web, así que la notación les resulta familiar.",
+   "La salida también se delimita: Pedir la respuesta dentro de una etiqueta vuelve trivial el parseo y evita que el modelo mezcle explicación con resultado.",
+   "El overhead se paga solo: Las etiquetas suman tokens, pero se compensan con menos reintentos y menos errores de parseo. Si el prompt es estable, el caching lo absorbe."
+  ],
+  "speaker_notes": "El argumento de por qué funcionan las etiquetas es el mismo de la slide del motor de completado: el modelo vio millones de documentos con esta forma, así que una etiqueta de apertura es un patrón fortísimo. La segunda razón es más práctica: sin delimitadores, el modelo no sabe dónde termina la instrucción y dónde empieza el dato, y ese es el agujero por donde entra una inyección de prompt. Sobre las dos donas: el deck original les ponía 40% y 60% de reducción de alucinaciones, y esa cifra no tiene respaldo. La fuente la atribuye a \"lo que reportan los equipos\", sin estudio. Así que la afirmación queda cualitativa y las donas están marcadas para rehacer o retirar en el polish."
+ },
+ {
+  "i": 31,
+  "section": "In-context learning",
+  "title": "In-context learning",
+  "lead": "",
+  "visible_text": "01 Fundamentos 02 Modelos y costos 03 Prompts estructurados 04 In-context learning 05 Prompting avanzado 06 Effort y thinking 07 LLMs en ingeniería 08 Resumen y práctica 04 In-context learning Cierre de la anatomía del prompt. Lo que sigue agrega la pieza que faltaba: los ejemplos. Anunciá el puente: hasta acá se le dijo al modelo qué hacer; ahora se le va a mostrar. Enseñar con ejemplos dentro del prompt: zero, few y many-shot sobre tareas de software.",
+  "details": [],
+  "speaker_notes": "Cierre de la anatomía del prompt. Lo que sigue agrega la pieza que faltaba: los ejemplos. Anunciá el puente: hasta acá se le dijo al modelo qué hacer; ahora se le va a mostrar.\n\nEnseñar con ejemplos dentro del prompt: zero, few y many-shot sobre tareas de software."
+ },
+ {
+  "i": 32,
+  "section": "In-context learning",
+  "title": "In-context learning (ICL)",
+  "lead": "**Aprender el patrón desde el prompt, sin tocar los pesos.**",
+  "visible_text": "In-context learning In-context learning (ICL) Aprender el patrón desde el prompt, sin tocar los pesos. El patrón viaja en el pedido : Los ejemplos van dentro del prompt, no en un entrenamiento previo sobre esa tarea. No se re-entrena : Los pesos del modelo quedan exactamente iguales antes y después de la llamada. Reconoce y extiende : Infiere la regla que comparten los ejemplos y la aplica al caso nuevo, en la misma llamada. No persiste : El aprendizaje muere con la respuesta. El request siguien",
+  "details": [
+   "El patrón viaja en el pedido: Los ejemplos van dentro del prompt, no en un entrenamiento previo sobre esa tarea.",
+   "No se re-entrena: Los pesos del modelo quedan exactamente iguales antes y después de la llamada.",
+   "Reconoce y extiende: Infiere la regla que comparten los ejemplos y la aplica al caso nuevo, en la misma llamada.",
+   "No persiste: El aprendizaje muere con la respuesta. El request siguiente vuelve a mandar los ejemplos, y a pagarlos."
+  ],
+  "speaker_notes": "La frase que hay que dejar clavada es \"sin modificar los pesos\", y el diagrama la sostiene: las tres columnas son el mismo prompt, con más o menos ejemplos metidos entre la instrucción y el caso. Las definiciones van habladas. **Zero-shot**: solo la instrucción, sin ejemplos, todo depende del conocimiento preentrenado. **Few-shot**: entre 2 y 10 casos resueltos antes del caso a resolver, y es el régimen más usado en producción. **Many-shot**: decenas o cientos de ejemplos, para tareas complejas o con mucha variabilidad. Señalá los tres ejes del pie, porque ahí está la decisión: la precisión satura y el costo no. Para esta audiencia el contraste natural es con fine-tuning: fine-tuning cambia el artefacto y cuesta una corrida de entrenamiento, in-context learning cambia el prompt y cuesta tokens. Eso reordena la intuición de cuándo conviene cada cosa. El dato histórico ayuda: la capacidad se documentó en el paper de GPT-3 en 2020, y lo llamativo entonces fue que nadie la había programado, apareció al escalar. Un matiz de honestidad, por si alguien va a la fuente: el término \"in-context learning\" y la taxonomía de zero, one y few-shot están en el cuerpo del paper, no en el abstract."
+ },
+ {
+  "i": 33,
+  "section": "In-context learning",
+  "title": "Zero-shot vs. few-shot",
+  "lead": "",
+  "visible_text": "In-context learning Zero-shot vs. few-shot Python # ---- ZERO-SHOT ---- # sin ejemplos: el modelo # elige formato y escala PROMPT = \"\"\" Clasifica la severidad de este issue. Issue: el export a CSV corta en la fila 8.192. \"\"\" r = client.messages.create( model=M, max_tokens=256, messages=[ {\"role\": \"user\", \"content\": PROMPT}]) # >>> \"Parece un problema de # tamano de buffer. # Severidad media-alta, # segun el uso.\" # # formato libre e # impredecible: no se # puede parsear Python # ---- FEW-SHOT --",
+  "details": [],
+  "speaker_notes": "Slide nueva, y llena un agujero real del deck original: definía zero-shot y nunca lo mostraba. El contraste sobre el mismo input es lo que hace el trabajo. En zero-shot el modelo responde bien en el sentido humano y mal en el sentido operativo: la respuesta es correcta y no se puede parsear, porque inventó su propia escala. Con dos ejemplos, la escala deja de ser suya. Ese es el punto de la línea de cierre y conviene decirlo despacio, porque contradice la intuición de que los ejemplos \"enseñan el concepto\". No enseñan el concepto: fijan el formato y ubican las fronteras entre categorías. Si el grupo pregunta cuántos ejemplos, la respuesta viene en la slide siguiente."
+ },
+ {
+  "i": 34,
+  "section": "In-context learning",
+  "title": "Many-shot learning",
+  "lead": "",
+  "visible_text": "In-context learning Many-shot learning 1 Decenas o cientos de ejemplos, aprovechando las ventanas de contexto grandes. 2 Cuando few-shot no captura la variabilidad del problema. 3 Cuando hay muchas categorías, o categorías con fronteras finas. 4 En producción: agregar ejemplos al prompt a medida que aparecen los errores. Es mejorar el sistema sin re-entrenar nada. Python # many-shot: los ejemplos crecen, la llamada no cambia EJEMPLOS = [ (\"en produccion, todos los checkouts fallan con 500 \" \"des",
+  "details": [
+   "Decenas o cientos de ejemplos, aprovechando las ventanas de contexto grandes.",
+   "Cuando few-shot no captura la variabilidad del problema.",
+   "Cuando hay muchas categorías, o categorías con fronteras finas.",
+   "En producción: agregar ejemplos al prompt a medida que aparecen los errores. Es mejorar el sistema sin re-entrenar nada."
+  ],
+  "speaker_notes": "El punto fuerte de esta slide es la cuarta línea, porque describe un bucle de mejora que ningún equipo asocia con machine learning: cada vez que el sistema clasifica mal, ese caso se agrega al prompt como ejemplo, y el sistema mejora sin tocar el modelo. Es la forma más barata de aprendizaje continuo que existe, y el costo es lineal en tokens. El caso resuelto del final es el que el deck original dejaba abierto con signos de pregunta: fijate que la respuesta correcta no sale del texto del issue sino de la consecuencia, que es un contrato de API roto propagándose a tres clientes. Si querés hacerlo participativo, tapá la respuesta y pediles que voten CRITICO, ALTO o BAJO antes de mostrarla. Suele haber desacuerdo, y ese desacuerdo es el argumento de por qué hacen falta ejemplos con la frontera explicitada."
+ },
+ {
+  "i": 35,
+  "section": "Prompting avanzado",
+  "title": "Prompting avanzado",
+  "lead": "",
+  "visible_text": "01 Fundamentos 02 Modelos y costos 03 Prompts estructurados 04 In-context learning 05 Prompting avanzado 06 Effort y thinking 07 LLMs en ingeniería 08 Resumen y práctica 05 Prompting avanzado Punto de quiebre de la clase. Hasta acá se trabajó sobre lo que entra al prompt. Lo que sigue trabaja sobre lo que el modelo escribe antes de contestar, que es la sección más larga y la que contiene la tesis. Si hay que hacer un corte de descanso, este es el lugar. La sección más larga y donde vive la tesis",
+  "details": [],
+  "speaker_notes": "Punto de quiebre de la clase. Hasta acá se trabajó sobre lo que entra al prompt. Lo que sigue trabaja sobre lo que el modelo escribe antes de contestar, que es la sección más larga y la que contiene la tesis. Si hay que hacer un corte de descanso, este es el lugar.\n\nLa sección más larga y donde vive la tesis: todo lo que hace el modelo antes de contestar."
+ },
+ {
+  "i": 36,
+  "section": "Prompting avanzado",
+  "title": "Cuatro técnicas, una sola idea",
+  "lead": "**Cuatro técnicas distintas y una sola idea de fondo: todas hacen que el modelo escriba más antes de responder.**",
+  "visible_text": "Prompting avanzado Cuatro técnicas, una sola idea Cuatro técnicas distintas y una sola idea de fondo: todas hacen que el modelo escriba más antes de responder. Chain of Thought (CoT) Razonamiento paso a paso antes de la respuesta. Self-consistency Varias respuestas independientes y voto por mayoría. Tree of Thought (ToT) Ramas exploradas en paralelo, con poda de las peores. Prompt chaining Una secuencia de prompts simples encadenados. Mapa de la sección. Cuatro técnicas y una sola idea de fondo,",
+  "details": [
+   "Chain of Thought (CoT): Razonamiento paso a paso antes de la respuesta.",
+   "Self-consistency: Varias respuestas independientes y voto por mayoría.",
+   "Tree of Thought (ToT): Ramas exploradas en paralelo, con poda de las peores.",
+   "Prompt chaining: Una secuencia de prompts simples encadenados."
+  ],
+  "speaker_notes": "Mapa de la sección. Cuatro técnicas y una sola idea de fondo, que se explica recién al final: todas hacen que el modelo escriba más antes de responder. Conviene anticipar ese cierre acá, porque le da sentido al recorrido y evita que se lea como una lista de recetas sueltas. Dos precisiones que no están en la lámina y vale decir en voz alta. Una: lo que CoT fuerza son tokens intermedios que condicionan la predicción final, y por eso funciona. La otra: self-consistency se queda con la respuesta más frecuente y con eso reduce el error por no-determinismo, que es un problema distinto del de razonar mal. El recuadro de cierre es el que ordena la sección entera: cada técnica compra calidad con un recurso distinto, y ninguna la compra gratis."
+ },
+ {
+  "i": 37,
+  "section": "Prompting avanzado",
+  "title": "Chain of Thought (CoT)",
+  "lead": "**Mostrarle al modelo el razonamiento paso a paso, no solo el resultado. Es pensar en voz alta.**",
+  "visible_text": "Prompting avanzado Chain of Thought (CoT) Mostrarle al modelo el razonamiento paso a paso, no solo el resultado. Es pensar en voz alta. Instrucción directa Pedirle que razone antes de responder, en el propio prompt. Ejemplos con razonamiento explícito Dar ejemplos donde se ve el proceso de resolución, no solo la respuesta final. CoT e in-context learning son la misma familia: few-shot CoT es ICL donde los ejemplos incluyen el razonamiento. ICL enseña qué responder; CoT enseña cómo razonar. Esta ",
+  "details": [
+   "Instrucción directa: Pedirle que razone antes de responder, en el propio prompt.",
+   "Ejemplos con razonamiento explícito: Dar ejemplos donde se ve el proceso de resolución, no solo la respuesta final.",
+   "CoT e in-context learning son la misma familia: few-shot CoT es ICL donde los ejemplos incluyen el razonamiento. ICL enseña qué responder; CoT enseña cómo razonar."
+  ],
+  "speaker_notes": "Esta slide cambió respecto del deck original y conviene contar por qué, porque enseña método. El deck afirmaba 70% de mejora en precisión y 35% menos errores en código, y esas dos cifras no salen de ninguna fuente: son plausibles, suenan bien y no existen. Las que están ahora sí tienen paper. Al leerlas, marcá la trampa: son mejoras **sobre CoT**, no accuracy absoluta. Decir \"self-consistency alcanza 17,9% en GSM8K\" es leer mal el abstract, y es el error más común con esas cifras. El salto de 4% a 74% del Game of 24 es el número más impresionante de toda la clase y vale detenerse: mismo modelo, mismo problema, solo cambia la estrategia de inferencia. La última línea conecta con la sección anterior y sirve de puente."
+ },
+ {
+  "i": 38,
+  "section": "Prompting avanzado",
+  "title": "Chain of Thought: ejemplo",
+  "lead": "**El mismo cálculo con y sin pasos escritos. Las dos respuestas coinciden y solo una se puede auditar.**",
+  "visible_text": "Prompting avanzado Chain of Thought: ejemplo El mismo cálculo con y sin pasos escritos. Las dos respuestas coinciden y solo una se puede auditar. Sin CoT : Llega el número y hay que creerle. Con CoT : Cada paso queda escrito y el error se ve donde ocurre. En revisión de código y análisis de incidentes, CoT produce un rastro que otra persona puede seguir. Cuesta más latencia, porque la salida es más larga. Ejemplo interactivo en aitutorial.dev → Markdown ### Sin CoT Prompt: ¿Cuánto es el 15% de p",
+  "details": [
+   "Sin CoT: Llega el número y hay que creerle.",
+   "Con CoT: Cada paso queda escrito y el error se ve donde ocurre.",
+   "En revisión de código y análisis de incidentes, CoT produce un rastro que otra persona puede seguir. Cuesta más latencia, porque la salida es más larga.",
+   "[Ejemplo interactivo en aitutorial.dev →](https://aitutorial.dev/prompting/advanced-techniques)"
+  ],
+  "speaker_notes": "El ejemplo es trivial a propósito y hay que decirlo, porque la pregunta obvia es por qué molestarse con una cuenta de una línea. La respuesta está en la fila de abajo: las dos respuestas son iguales, lo que cambia es que una se puede auditar. Sin los pasos escritos, el razonamiento tampoco se puede depurar: cuando el modelo se equivoca queda un número mal y ninguna pista. Con CoT, el error está en el paso 2 y se ve. Trasladalo al terreno de ellos con un ejemplo hablado: un modelo que dice \"este diff no introduce bugs\" es inútil; uno que enumera lo que revisó y por qué descartó cada riesgo es revisable. La contra que hay que nombrar es la latencia, y se cuantifica dos slides más adelante."
+ },
+ {
+  "i": 39,
+  "section": "Prompting avanzado",
+  "title": "Self-consistency: votación",
+  "lead": "",
+  "visible_text": "Prompting avanzado Self-consistency: votación Alto riesgo Un deploy, una migración de datos, un cambio en facturación. Razonamiento complejo Varias cadenas de pensamiento pueden divergir. Clasificación con confianza Importa cuán seguro está el modelo. Validación previa Medirlo siempre en el eval set propio. Antes del diagrama, el número que sostiene la decisión y que ya no está en la lámina: cinco llamadas cuestan cinco veces, la precisión mejora de forma medible, y CoT más self-consistency comb",
+  "details": [
+   "Alto riesgo: Un deploy, una migración de datos, un cambio en facturación.",
+   "Razonamiento complejo: Varias cadenas de pensamiento pueden divergir.",
+   "Clasificación con confianza: Importa cuán seguro está el modelo.",
+   "Validación previa: Medirlo siempre en el eval set propio."
+  ],
+  "speaker_notes": "Antes del diagrama, el número que sostiene la decisión y que ya no está en la lámina: cinco llamadas cuestan cinco veces, la precisión mejora de forma medible, y CoT más self-consistency combinados dan ganancias adicionales (Wang et al., 2022). Precisión terminológica que vale la pena hacer, porque ordena la cabeza: self-consistency no es un prompt distinto, es una forma distinta de muestrear y agregar las salidas del mismo prompt. El paper habla de marginalizar sobre los caminos de razonamiento; \"votación por mayoría\" es cómo lo explicamos, y funciona como explicación. La intuición que lo sostiene es elegante: un problema difícil admite varios caminos correctos que convergen a la misma respuesta, y los caminos equivocados divergen entre sí. Si tres de cinco muestras coinciden, esa coincidencia es señal. De la tercera viñeta vale sacar el matiz que la lámina ya no dice: lo que se gana es saber cuán seguro está el modelo, y no solamente qué respondió. La cuarta es la más importante para producción y suele saltearse: las ganancias no son universales, hay tareas donde cinco muestras dan cinco respuestas distintas, y ahí la votación no agrega nada más que costo."
+ },
+ {
+  "i": 40,
+  "section": "Prompting avanzado",
+  "title": "Self-consistency: ejemplo",
+  "lead": "**Cinco corridas independientes del mismo prompt sobre el mismo diff, y una votación.**",
+  "visible_text": "Prompting avanzado Self-consistency: ejemplo Cinco corridas independientes del mismo prompt sobre el mismo diff, y una votación. Cuándo usarlo : Cambios donde el error sale caro y el razonamiento admite más de un camino. Costo : Cinco llamadas al modelo: cinco veces el precio, y la latencia de la más lenta si se lanzan en paralelo. # CASO Diff en orders/pagination.py - return items[offset : offset + limit] + return items[offset : offset + limit + 1] Pregunta: con limit=20, ¿se solapan dos pagina",
+  "details": [
+   "Cuándo usarlo: Cambios donde el error sale caro y el razonamiento admite más de un camino.",
+   "Costo: Cinco llamadas al modelo: cinco veces el precio, y la latencia de la más lenta si se lanzan en paralelo."
+  ],
+  "speaker_notes": "Lo interesante del ejemplo es la corrida 3, y conviene señalarla. No es una alucinación: es una lectura distinta y coherente del mismo diff, bajo un supuesto distinto sobre qué representa `tax`. Eso es lo que self-consistency detecta y lo que una sola llamada esconde. La confianza del 67% no es una probabilidad calibrada, es la proporción de votos, y conviene decirlo para que nadie la reporte como si fuera otra cosa. El uso práctico en un equipo: cuando la votación no es unánime, el sistema no decide, escala a una persona. Ese es el valor real, más que el voto en sí."
+ },
+ {
+  "i": 41,
+  "section": "Prompting avanzado",
+  "title": "Tree of Thought (ToT)",
+  "lead": "**Limitaciones**",
+  "visible_text": "Prompting avanzado Tree of Thought (ToT) Limitaciones ToT extiende CoT explorando varios caminos de razonamiento en paralelo, como las ramas de un árbol de decisión. El modelo evalúa cada rama y elige la más prometedora. Costo Cuesta bastante más que un CoT lineal. Implementación Hay que generar ramas, puntuarlas y podar. Cuándo rinde Sirve si el problema admite varias soluciones posibles. Cuándo no En tareas simples el overhead no se justifica. El árbol de la lámina es el punto entero de la téc",
+  "details": [
+   "Costo: Cuesta bastante más que un CoT lineal.",
+   "Implementación: Hay que generar ramas, puntuarlas y podar.",
+   "Cuándo rinde: Sirve si el problema admite varias soluciones posibles.",
+   "Cuándo no: En tareas simples el overhead no se justifica.",
+   "**ToT extiende CoT explorando varios caminos de razonamiento en paralelo, como las ramas de un árbol de decisión. El modelo evalúa cada rama y elige la más prometedora.**"
+  ],
+  "speaker_notes": "El árbol de la lámina es el punto entero de la técnica, así que caminalo: se generan varias ramas, cada una recibe un score, las malas se podan y solo la mejor se expande. Marcá que CoT es este mismo árbol con una sola rama y sin vuelta atrás. El aporte teórico del paper vale la pena decirlo porque reordena todo lo anterior: la generación autoregresiva decide token por token y de izquierda a derecha, sin manera de volver atrás, y si el primer paso fue malo el resto está condenado. ToT cambia la unidad de decisión: en vez de tokens, pensamientos completos, y con eso aparecen dos operaciones que CoT no tiene, mirar hacia adelante y retroceder. Recordá el número de la slide de CoT: 4% a 74% en Game of 24, mismo modelo. La analogía médica del deck original se reemplazó por el ejemplo de refactor de la slide siguiente."
+ },
+ {
+  "i": 42,
+  "section": "Prompting avanzado",
+  "title": "Tree of Thought: ejemplo",
+  "lead": "**Razonamiento del modelo**",
+  "visible_text": "Prompting avanzado Tree of Thought: ejemplo Razonamiento del modelo Tres estrategias de refactor generadas por el modelo, evaluadas una por una y podadas hasta quedarse con la mejor. Rama A: módulo de impuestos aparte : Aísla el cambio y el riesgo queda acotado. Seleccionada. Rama B: reescribir el módulo con tests : Lo más limpio a largo plazo, y sin tests previos no hay red. Rama C: condicionales in situ : Lo más rápido, y suma complejidad a un módulo que ya no la tolera. Markdown # CASO El mod",
+  "details": [
+   "Rama A: módulo de impuestos aparte: Aísla el cambio y el riesgo queda acotado. **Seleccionada.**",
+   "Rama B: reescribir el módulo con tests: Lo más limpio a largo plazo, y sin tests previos no hay red.",
+   "Rama C: condicionales in situ: Lo más rápido, y suma complejidad a un módulo que ya no la tolera.",
+   "**Tres estrategias de refactor generadas por el modelo, evaluadas una por una y podadas hasta quedarse con la mejor.**"
+  ],
+  "speaker_notes": "Este ejemplo funciona porque las tres ramas son defendibles, y eso es justo el tipo de problema donde ToT rinde. Un problema con una sola respuesta correcta no necesita ramas. Lo que hace ganar a la rama A es que permite testear la parte nueva sin tocar lo viejo, así que el riesgo queda acotado; el criterio no es la elegancia. La rama B es la trampa útil: es la respuesta que da un modelo sin evaluación de ramas porque es la más limpia en abstracto, y es la peor decisión concreta porque rompe la mayor superficie de una sola vez y no hay tests que sostengan la reescritura. La rama C queda descartada por complejidad ciclomática sobre un módulo que ya no la tolera. Si querés hacerlo participativo, mostrá las tres ramas sin la selección y pediles que elijan. La discusión que se arma es el trabajo que hace ToT."
+ },
+ {
+  "i": 43,
+  "section": "Prompting avanzado",
+  "title": "Prompt chaining",
+  "lead": "**Dividir una tarea compleja en una secuencia de prompts simples, donde el output de cada paso alimenta al siguiente. Cada paso es más preciso porque se enfoca en una sola sub-tarea.**",
+  "visible_text": "Prompting avanzado Prompt chaining Dividir una tarea compleja en una secuencia de prompts simples, donde el output de cada paso alimenta al siguiente. Cada paso es más preciso porque se enfoca en una sola sub-tarea. Prompt chaining convierte tareas imposibles en secuencias manejables. Es la base de los agentes de IA modernos. El texto de esta slide venía cortado a mitad de palabra en el deck original y no se pudo reponer verbatim, porque el material fuente está igual de cortado. Lo que decía la ",
+  "details": [
+   "**Prompt chaining convierte tareas imposibles en secuencias manejables. Es la base de los agentes de IA modernos.**"
+  ],
+  "speaker_notes": "El texto de esta slide venía cortado a mitad de palabra en el deck original y no se pudo reponer verbatim, porque el material fuente está igual de cortado. Lo que decía la frase se deduce de la propia slide de ejemplo: varias llamadas en vez de una incrementan latencia y costo total de orquestación, a cambio de que cada paso sea simple y evaluable por separado. Decilo así. El otro punto es el de la línea de cierre y es el más importante de la slide: un pipeline de cinco pasos con lógica de control escrita por el programador ya es, en lo esencial, un agente con el bucle fijo. La diferencia con un agente de verdad es quién decide el próximo paso: en un pipeline lo decide el código, y en un agente lo decide el modelo en cada vuelta."
+ },
+ {
+  "i": 44,
+  "section": "Prompting avanzado",
+  "title": "Prompt chaining: ejemplo",
+  "lead": "**Ventajas** y **Trade-offs**",
+  "visible_text": "Prompting avanzado Prompt chaining: ejemplo Ventajas y Trade-offs Debugging : Se identifica en qué paso falló, no solo que falló. Resiliencia : Los pasos que fallan se reintentan por separado. Optimización : Cada prompt se ajusta a su tarea, y los pasos caros se llaman solo cuando hacen falta. Escalabilidad : Cada paso se evalúa y se mejora por separado. Más latencia : Las llamadas son secuenciales. El código de orquestación es más complejo. Varias llamadas al modelo, aunque el total suele salir",
+  "details": [
+   "Debugging: Se identifica en qué paso falló, no solo que falló.",
+   "Resiliencia: Los pasos que fallan se reintentan por separado.",
+   "Optimización: Cada prompt se ajusta a su tarea, y los pasos caros se llaman solo cuando hacen falta.",
+   "Escalabilidad: Cada paso se evalúa y se mejora por separado.",
+   "Más latencia: Las llamadas son secuenciales.",
+   "El código de orquestación es más complejo.",
+   "Varias llamadas al modelo, aunque el total suele salir más barato."
+  ],
+  "speaker_notes": "La tercera ventaja es la que suele sorprender, y merece medio minuto: encadenar es más barato aunque haya más llamadas. La razón es que el paso 1 corre con un modelo chico sobre doscientos tokens, y el modelo caro solo se invoca en el paso 4 y con el contexto ya filtrado. Un prompt monolítico manda todo al modelo caro siempre. Es el mismo argumento del cascading, aplicado a las etapas en vez de a los modelos. La contra real es la de la primera fila de la derecha: cuatro llamadas secuenciales son cuatro latencias sumadas, y en un flujo interactivo eso se nota. Si el sistema es asincrónico, no importa."
+ },
+ {
+  "i": 45,
+  "section": "Prompting avanzado",
+  "title": "Las cuatro técnicas: pros y contras",
+  "lead": "",
+  "visible_text": "Prompting avanzado Las cuatro técnicas: pros y contras Técnica Pros Contras Chain of Thought (CoT) Razonamiento auditable, mejora la precisión, los errores se detectan. Más latencia y más costo; poco útil en tareas simples; no garantiza corrección. Self-consistency Reduce el error por no-determinismo; da una señal de confianza. Multiplica el costo por 3 a 5 llamadas; más latencia. Tree of Thought (ToT) Explora varios caminos; mejor que CoT en planificación. Muy costoso; complejo de implementar; ",
+  "details": [],
+  "speaker_notes": "Tabla de referencia, para consultar más que para leer. Si hay que decir una sola cosa, que sea el patrón de la columna de la derecha: todas las contras son la misma contra escrita de cuatro maneras, que es más tokens o más llamadas. Ninguna técnica de esta sección compra calidad gratis. Y una lectura transversal útil: las dos primeras filas mejoran cómo piensa el modelo, las dos últimas cambian la arquitectura del sistema alrededor. Las primeras son un cambio de prompt, las segundas son un cambio de diseño, con todo lo que eso implica para el equipo que lo mantiene."
+ },
+ {
+  "i": 46,
+  "section": "Prompting avanzado",
+  "title": "¿Por qué tardan más?",
+  "lead": "**Más calidad cuesta tiempo de cómputo: más tokens generados, más segundos. No es magia, es aritmética.**",
+  "visible_text": "Prompting avanzado ¿Por qué tardan más? Más calidad cuesta tiempo de cómputo: más tokens generados, más segundos. No es magia, es aritmética. Técnica Efecto en latencia Chain of Thought (CoT) Genera 100 a 500 tokens de razonamiento antes de la respuesta. Latencia 2 a 5 veces mayor. Self-consistency Corre el mismo prompt N veces (5 a 10). Latencia y costo: N veces una sola llamada. Tree of Thought (ToT) Proporcional a la cantidad de ramas evaluadas: 3 a 5 veces CoT en los casos habituales. Prompt",
+  "details": [
+   "**Usar estas técnicas solo cuando la precisión justifica el costo. Para tareas simples, un prompt directo es más eficiente.**"
+  ],
+  "speaker_notes": "Esta slide es el contrapeso de las anteriores y por eso va acá, justo después de la que explica por qué funcionan. La regla del cierre es la que se llevan escrita. Un detalle que conviene marcar porque cambia decisiones de producto: la latencia de self-consistency es N veces solo si las llamadas van en serie, y no tienen por qué. Cinco muestras en paralelo cuestan cinco veces en plata y una vez en tiempo. Es de las pocas veces en que se puede comprar calidad sin pagar latencia. La advertencia nueva es la que cierra la sección con honestidad y evita que se vayan pensando que más razonamiento siempre es mejor. Tres modelos, uno gastando seis veces más tokens que el otro, y la precisión queda en el mismo rango. Si alguien te pregunta cuál elegir, esa comparación es la respuesta: mide en tu tarea, porque el gasto de tokens no predice la calidad."
+ },
+ {
+  "i": 47,
+  "section": "Prompting avanzado",
+  "title": "¿Por qué funcionan?",
+  "lead": "**El LLM no piensa: predice tokens de izquierda a derecha, y cada uno depende solo de los anteriores. No hay motor de razonamiento oculto, así que lo escrito en la respuesta es el razonamiento.**",
+  "visible_text": "Prompting avanzado ¿Por qué funcionan? El LLM no piensa: predice tokens de izquierda a derecha, y cada uno depende solo de los anteriores. No hay motor de razonamiento oculto, así que lo escrito en la respuesta es el razonamiento. Los tokens intermedios son cálculo Cada paso escrito condiciona la predicción del siguiente. Más contexto, mejor predicción Un razonamiento de 200 tokens guía mejor que un prompt de 10. Se achica el espacio de error Cada paso recorta la incertidumbre antes de la conclu",
+  "details": [
+   "Los tokens intermedios son cálculo: Cada paso escrito condiciona la predicción del siguiente.",
+   "Más contexto, mejor predicción: Un razonamiento de 200 tokens guía mejor que un prompt de 10.",
+   "Se achica el espacio de error: Cada paso recorta la incertidumbre antes de la conclusión.",
+   "Es la diferencia entre resolver un problema de cabeza y resolverlo escribiéndolo en papel. El papel no vuelve más inteligente a nadie, y hace la cuenta más precisa."
+  ],
+  "speaker_notes": "Esta es la slide de la tesis y merece el tiempo que haga falta. Todo lo que vieron en la sección se explica desde acá: si el modelo genera token por token y cada token se condiciona solo con lo anterior, entonces escribir los pasos no es documentar el razonamiento, es hacerlo. Los tokens intermedios son cómputo en sentido estricto: son estados que el modelo puede leer para producir el siguiente, y funcionan como memoria de trabajo explícita. Por eso pedirle que piense paso a paso funciona, y por eso pedirle que \"sea más cuidadoso\" no funciona. El tercer argumento se entiende mejor por contraste: sin CoT el modelo tiene que saltar directo a la respuesta, y cada paso intermedio que escribe le baja la incertidumbre acumulada antes de la conclusión. La analogía del papel es la que engancha, y tiene un matiz que conviene decir: el papel no agrega inteligencia, agrega memoria de trabajo. Ahora tienes además un argumento empírico que antes no estaba, y es el más fuerte de la sección: en el paper de DeepSeek el modelo alarga sus respuestas solo, sin que nadie se lo pida, a medida que aprende a acertar. Si escribir más pasos no fuera cómputo, alargar no le daría ninguna ventaja. Si te queda tiempo, cierra volviendo a la slide del motor de completado del principio, porque es la misma idea vista dos horas antes."
+ },
+ {
+  "i": 48,
+  "section": "Effort y thinking",
+  "title": "Effort y thinking",
+  "lead": "",
+  "visible_text": "01 Fundamentos 02 Modelos y costos 03 Prompts estructurados 04 In-context learning 05 Prompting avanzado 06 Effort y thinking 07 LLMs en ingeniería 08 Resumen y práctica 06 Effort y thinking Cambio de perilla. Hasta acá el control estuvo en lo que se escribe en el prompt; lo que sigue es el control sobre cuánto razona el modelo antes de contestar, que se configura por parámetro y no por texto. Cierra recapitulando las cinco técnicas con su costo en latencia.",
+  "details": [],
+  "speaker_notes": "Cambio de perilla. Hasta acá el control estuvo en lo que se escribe en el prompt; lo que sigue es el control sobre cuánto razona el modelo antes de contestar, que se configura por parámetro y no por texto. Cierra recapitulando las cinco técnicas con su costo en latencia."
+ },
+ {
+  "i": 49,
+  "section": "Effort y thinking",
+  "title": "Thinking: el mecanismo",
+  "lead": "**El modelo produce un bloque de razonamiento antes de la respuesta. En los modelos actuales el thinking es adaptativo, así que el modelo evalúa cada petición y decide solo si piensa y cuánto.**",
+  "visible_text": "Effort y thinking Thinking: el mecanismo El modelo produce un bloque de razonamiento antes de la respuesta. En los modelos actuales el thinking es adaptativo, así que el modelo evalúa cada petición y decide solo si piensa y cuánto. La decisión es por petición Una pregunta factual simple vuelve sin bloque; un problema de varios pasos lo dispara. El código no puede asumir el bloque Una misma conversación mezcla turnos con y sin thinking. El bloque viaja aparte de la respuesta Llega con tipo propio",
+  "details": [
+   "La decisión es por petición: Una pregunta factual simple vuelve sin bloque; un problema de varios pasos lo dispara.",
+   "El código no puede asumir el bloque: Una misma conversación mezcla turnos con y sin thinking.",
+   "El bloque viaja aparte de la respuesta: Llega con tipo propio, distinto del texto, y `display` decide si vuelve resumido o vacío.",
+   "También piensa entre herramientas: Razona entre llamadas y evalúa cada resultado antes de decidir el paso siguiente."
+  ],
+  "speaker_notes": "Esta es la lámina del mecanismo, y la palabra que hay que fijar es \"adaptativo\". El modelo decide, petición por petición, si le conviene pensar. La consecuencia práctica que más les va a servir en un trabajo real son los dos primeros bullets juntos: si escribes código que asume que todo turno del asistente empieza con un bloque de thinking, se te rompe el día que el modelo decide que la pregunta era fácil. La documentación es explícita en que eso es válido y esperable. Del tercero, el detalle útil es que el bloque llega con un tipo propio, así que se lo trata aparte del texto en el parseo. Del cuarto, que el razonamiento entre herramientas no necesita ninguna configuración extra en los modelos adaptativos. Cierra con `max_tokens`, que es el techo duro y cubre las dos salidas juntas; vuelves sobre eso en la lámina de costo."
+ },
+ {
+  "i": 50,
+  "section": "Effort y thinking",
+  "title": "Thinking: cómo queda en código",
+  "lead": "",
+  "visible_text": "Effort y thinking Thinking: cómo queda en código Python import anthropic client = anthropic.Anthropic() # En Opus 5 y Sonnet 5 el thinking ya viene encendido, con # display \"omitted\": el bloque llega vacio salvo que lo pidas. r = client.messages.create( model=\"claude-opus-5\", max_tokens=16000, # techo de thinking + texto thinking={\"type\": \"adaptive\", # el modelo decide si piensa \"display\": \"summarized\"}, # y si te lo deja ver messages=[{\"role\": \"user\", \"content\": \"¿Este diff introduce un bug?\"}]",
+  "details": [],
+  "speaker_notes": "Veinticuatro líneas para la lámina anterior entera. Tres cosas y todas se ven en el código. La primera es que `display` va adentro del objeto `thinking`, no al lado: es una propiedad del razonamiento, no de la petición. La segunda es el bucle, y es la que más les va a doler en producción: la respuesta es una lista de bloques y el de thinking puede no estar, así que cualquier código que haga `r.content[0].text` se rompe el día que el modelo decide pensar. Mostrales que el patrón correcto es recorrer y preguntar por el tipo. La tercera es la firma: es una copia cifrada del razonamiento completo y se reenvía sin tocar en el turno siguiente, porque el modelo la necesita para seguir el hilo. Si alguien pregunta por qué el bloque viene vacío con `display: \"omitted\"`, la respuesta honesta es que se paga igual; omitirlo mejora la latencia del primer token de texto, no la factura."
+ },
+ {
+  "i": 51,
+  "section": "Effort y thinking",
+  "title": "Una sola pasada, o una zona de trabajo aparte",
+  "lead": "**\"Un modelo que responde en una sola pasada tiene que acertar todo a la primera: sin borrador, sin verificación, sin poder cambiar de rumbo a mitad de camino.\"**",
+  "visible_text": "Effort y thinking Una sola pasada, o una zona de trabajo aparte \"Un modelo que responde en una sola pasada tiene que acertar todo a la primera: sin borrador, sin verificación, sin poder cambiar de rumbo a mitad de camino.\" Markdown ## SIN THINKING una sola secuencia de tokens \"El\" \"MCD\" \"de\" \"1071\" \"y\" \"462\" \"es\" \"21.\" \"Esto\" \"se\" \"calcula\" \"con\" \"el\" \"algoritmo\" \"de\" \"Euclides.\" ^ token 8: ya se comprometio con el numero, sin haber hecho la cuenta todavia > Cada token escrito queda > fijo: no h",
+  "details": [],
+  "speaker_notes": "Esta es la lámina que explica por qué el bloque separado no es cosmético. Caminá primero el caso de arriba y deteneté en el token 8: ahí el modelo ya escribió \"21\" y todavía no hizo ninguna división. Preguntales de dónde salió ese número. La respuesta incómoda es que salió de la predicción, no del cálculo, y que en un problema más difícil eso es exactamente donde aparece el error. Después señalá lo que hace irreversible el problema: cada token que el modelo escribió queda fijo y condiciona los que siguen, así que una resta mal hecha no se corrige, se arrastra. El caso de abajo cambia la estructura, no el esfuerzo: el bloque de razonamiento se genera entero, se completa, y recién entonces el modelo usa un resultado ya resuelto para escribir la respuesta visible. Cuando llega al texto, el 21 ya está verificado. Conectá con la lámina de cadena de pensamiento: es la misma idea, con la diferencia de que allá el plan lo escribías vos en el prompt y acá lo hace el modelo solo, en un bloque con tipo propio."
+ },
+ {
+  "i": 52,
+  "section": "Effort y thinking",
+  "title": "Qué cambia el bloque separado",
+  "lead": "**El modelo genera token por token, y cada token nuevo se apoya en todo lo que ya escribió. Si el razonamiento es parte de la respuesta, queda atado a lo que dijo.**",
+  "visible_text": "Effort y thinking Qué cambia el bloque separado El modelo genera token por token, y cada token nuevo se apoya en todo lo que ya escribió. Si el razonamiento es parte de la respuesta, queda atado a lo que dijo. Sin thinking Con thinking Dónde razona Dentro de la misma respuesta que ves, si es que razona. En un bloque separado, antes de la respuesta. Compromiso Cada token escrito queda fijo. No puede volver atrás y rehacerlo en limpio. Puede desarrollar, probar y corregirse, y recién después conde",
+  "details": [],
+  "speaker_notes": "La tabla existe para cerrar una confusión que aparece siempre: que el thinking es una función de la interfaz. No lo es, y la fila que lo demuestra es la primera. Sin thinking el modelo también puede razonar, pero no tiene dónde, así que el razonamiento se le mezcla en la respuesta: ese \"vamos a ver, el tren A recorre 45 kilómetros, entonces...\" que todos vieron alguna vez es exactamente eso, un modelo pensando en voz alta porque no tiene un cuaderno aparte. La segunda fila es la razón técnica y conviene decirla despacio: el modelo genera de izquierda a derecha y cada token se apoya en los anteriores, así que un paso de cálculo equivocado no se borra, se arrastra. El bloque de thinking es un lugar donde iterar antes de que esos tokens se conviertan en la respuesta comprometida que llega al usuario. La última fila es la que conecta con la lámina de código: lo que ves no es lo que se factura, porque el resumen se puede omitir y el costo es el mismo."
+ },
+ {
+  "i": 53,
+  "section": "Effort y thinking",
+  "title": "De dónde salió el thinking",
+  "lead": "**DeepSeek-R1, publicado en Nature en 2025, mostró que el razonamiento se puede incentivar con refuerzo puro: sin trayectorias de razonamiento anotadas por humanos.**",
+  "visible_text": "Effort y thinking De dónde salió el thinking DeepSeek-R1, publicado en Nature en 2025, mostró que el razonamiento se puede incentivar con refuerzo puro: sin trayectorias de razonamiento anotadas por humanos. Nadie le enseñó a razonar Refuerzo puro, sin una sola trayectoria de razonamiento anotada por humanos. El método saltea el ajuste supervisado previo. Solo se premia acertar La recompensa compara la respuesta final contra la verdadera y no mira el proceso. Por eso tiene que ser verificable a ",
+  "details": [
+   "Nadie le enseñó a razonar: Refuerzo puro, sin una sola trayectoria de razonamiento anotada por humanos. El método saltea el ajuste supervisado previo.",
+   "Solo se premia acertar: La recompensa compara la respuesta final contra la verdadera y no mira el proceso. Por eso tiene que ser verificable a máquina: una caja en matemática, el compilador contra tests en código.",
+   "El razonamiento emergió solo: Autorreflexión, verificación y cambio de estrategia aparecieron sin que nadie los enseñara. Y la respuesta se alargó sola: al modelo le conviene escribir más.",
+   "En AIME 2024 el pass@1 promedio va de 15,6% a 77,9%, y llega a 86,7% con self-consistency**, la misma técnica de la sección anterior, usada acá para evaluar."
+  ],
+  "speaker_notes": "Esta es la lámina que contesta la pregunta que la sección nunca contestaba: cómo se logró que un modelo razone. La fuente es fuerte y conviene decirlo, porque cambia cómo la escuchan: está publicada en Nature, no es un post de blog. Y DeepSeek ya les apareció en la tabla de modelos de la sección de costos, así que no es un nombre nuevo. El hallazgo central en una frase: nadie le enseñó al modelo a razonar mostrándole razonamientos humanos. Se lo premió por acertar y los patrones aparecieron solos. El argumento del primer punto es el que más discusión genera: los autores sostienen que entrenar con trayectorias humanas le pone un techo al modelo, porque lo obliga a copiar la forma en que pensamos nosotros y le limita la exploración.\n\nEl tercer punto es el que funciona mejor con este grupo, porque es ingeniería pura. La pregunta que contesta es cómo se le pone una nota a un razonamiento sin leerlo, y la respuesta del paper es elegante: no lo leas, verificá el resultado. En matemática se exige la respuesta dentro de una caja y se compara; en código se compila y se corre contra tests. Detenete en por qué descartan un modelo de recompensa aprendido: preguntales qué haría un agente optimizador contra un evaluador aprendido, y van a llegar solos a que aprende a agradarle al evaluador en vez de a resolver el problema. Es el mismo problema que ya conocen de las métricas de proxy en producción. Un compilador con tests no se hackea.\n\nEl punto de la etiqueta es el que le cierra el círculo a la sección, y conviene decirlo despacio: esa etiqueta que hoy escriben en un prompt como técnica no salió de un manual de estilo, salió de la función de recompensa con la que se entrenó el modelo. El último punto es la honestidad del paper y marca el borde del método: donde no hay verificador confiable, esto no escala. Los números están para el orden de magnitud, no para memorizar; el 86,7% queda por encima del promedio de los participantes humanos de la competencia, y ese es el que impresiona. El remate del gráfico es lo mejor que tiene el paper para esta clase: la longitud de la respuesta crece sola durante el entrenamiento. El modelo descubre que escribir más lo hace acertar más. Eso es la tesis de la clase, medida experimentalmente por otra gente.\n\nCuatro cosas quedaron fuera de la lámina y valen si hay preguntas. La primera es por qué saltean el ajuste supervisado: los autores sostienen que entrenar con trayectorias humanas le pone un techo al modelo, porque lo obliga a copiar la forma en que pensamos nosotros y le limita la exploración. La segunda es por qué descartan un modelo de recompensa aprendido: preguntales qué haría un agente optimizador contra un evaluador aprendido, y van a llegar solos a que aprende a agradarle al evaluador en vez de a resolver el problema; un compilador con tests no se hackea. La tercera es el borde del método, y es la honestidad del paper: donde no hay verificador confiable, como al escribir, el refuerzo puro sigue siendo un problema abierto y vuelve la anotación humana. La cuarta es el mejor dato suelto que tiene el trabajo para esta clase: la etiqueta `<think>` que hoy escriben en un prompt como técnica no salió de un manual de estilo, salió de la función de recompensa con la que se entrenó el modelo."
+ },
+ {
+  "i": 54,
+  "section": "Effort y thinking",
+  "title": "¿CoT todavía sirve?",
+  "lead": "**Lo que Chain of Thought conseguía pidiéndolo en el prompt, los modelos de razonamiento lo traen del entrenamiento. El mecanismo es el mismo y cambió quién pide los pasos.**",
+  "visible_text": "Effort y thinking ¿CoT todavía sirve? Lo que Chain of Thought conseguía pidiéndolo en el prompt, los modelos de razonamiento lo traen del entrenamiento. El mecanismo es el mismo y cambió quién pide los pasos. El mecanismo no cambió Wei et al. mostraron que escribir pasos intermedios mejora el desempeño en tareas complejas. Antes lo pedía el prompt \"Pensemos paso a paso\" producía la cadena; hoy el modelo la produce por su cuenta. Ahora lo pide el entrenamiento El refuerzo con recompensa verificab",
+  "details": [
+   "El mecanismo no cambió: Wei et al. mostraron que escribir pasos intermedios mejora el desempeño en tareas complejas.",
+   "Antes lo pedía el prompt: \"Pensemos paso a paso\" producía la cadena; hoy el modelo la produce por su cuenta.",
+   "Ahora lo pide el entrenamiento: El refuerzo con recompensa verificable instala el comportamiento.",
+   "Y también la plataforma: Con el thinking activo, la API incluye un system prompt especializado para soportarlo.",
+   "Por eso algunas técnicas pierden filo: Pedir el paso a paso agrega poco contra un modelo que ya lo hace.",
+   "El costo es invisible: Los tokens de pensamiento se facturan como salida y no vuelven en la respuesta.",
+   "**Es la tesis de la clase otra vez: los pasos escritos son el cómputo.** Lo que se movió es la autoría del pedido, del prompt del usuario al entrenamiento del modelo y al system prompt del proveedor."
+  ],
+  "speaker_notes": "Esta es la lámina conceptual que le da sentido al bloque y ahora tiene la fuente que le faltaba. Vuelve a la tesis: el modelo no tiene un motor de razonamiento aparte, completa tokens de izquierda a derecha, y lo que llamamos razonar es que escriba los pasos intermedios antes de la respuesta. Chain of Thought descubrió eso y lo explotó desde el prompt. Lo que cambió después es dónde se pide. El tercer y el cuarto bullet son dos momentos distintos y conviene separarlos al decirlos. Uno es el entrenamiento, que es lo que acaban de ver en la lámina de DeepSeek. El otro es tiempo de ejecución, y es el dato que sorprende: la documentación dice que cuando el thinking está activo la API inyecta sola un system prompt especializado. O sea que abajo de todo sigue habiendo un prompt pidiéndole al modelo que razone. Solo que no lo escribes tú. La consecuencia práctica es incómoda y vale decirla: parte de lo que enseñamos en la sección anterior pierde filo contra un modelo de razonamiento, porque ya lo hace solo y encima se lo están pidiendo. El cierre es el costo, y ahí el matiz es que la factura sube sin que aparezca una línea de texto en pantalla; lo retomas en detalle al final de la sección. Del recuadro sale además la consecuencia para el trabajo de ellos: escribir mejores instrucciones importa menos que elegir cuánto conviene que el modelo piense."
+ },
+ {
+  "i": 55,
+  "section": "Effort y thinking",
+  "title": "Effort: un parámetro de la petición",
+  "lead": "**`effort` es un parámetro de la petición. Gradúa cuántos tokens gasta el modelo al responder e intercambia exhaustividad por eficiencia dentro de un mismo modelo.**",
+  "visible_text": "Effort y thinking Effort: un parámetro de la petición effort es un parámetro de la petición. Gradúa cuántos tokens gasta el modelo al responder e intercambia exhaustividad por eficiencia dentro de un mismo modelo. effort va en output_config : Nunca adentro del objeto thinking . high es el default : Pasarlo produce exactamente el mismo comportamiento que omitirlo. Son los tres errores más frecuentes al configurarlo por primera vez. Python response = client.messages.create( model=\"claude-opus-5\", ",
+  "details": [
+   "`effort` va en `output_config`: Nunca adentro del objeto `thinking`.",
+   "`high` es el default: Pasarlo produce exactamente el mismo comportamiento que omitirlo.",
+   "**Son los tres errores más frecuentes al configurarlo por primera vez.**"
+  ],
+  "speaker_notes": "Esta es la lámina que desarma el malentendido más común, así que la primera línea va despacio: el effort no es una propiedad del modelo ni algo que se decidió en el entrenamiento. Es un parámetro que viaja en la petición y que cambia cuánto gasta el mismo modelo. Del código, marca dónde va: adentro de `output_config`. Es el error que todos cometen la primera vez, y es el primero de los tres que conviene que se lleven anotados. El tercero tiene una consecuencia práctica que suele sorprender: si alguien está pasando `high` creyendo que sube algo, no está subiendo nada, porque es el default. Sobre cómo elegir el nivel, la documentación recomienda arrancar en `high` en Opus 5 y en Fable 5.1 y bajar a `medium` o `low` cuando los evals muestren que la calidad aguanta; en Opus 4.7 y 4.8 el punto de partida recomendado para código y tareas agénticas es `xhigh`. Al cambiar de modelo conviene volver a barrer los niveles en vez de reusar el que traían."
+ },
+ {
+  "i": 56,
+  "section": "Effort y thinking",
+  "title": "Los cinco niveles de effort",
+  "lead": "**Cinco niveles, del más rápido al más exhaustivo.**",
+  "visible_text": "Effort y thinking Los cinco niveles de effort Cinco niveles, del más rápido al más exhaustivo. Alcanza a toda la salida : Texto, llamadas a herramientas y thinking, con el thinking activo o sin él. Con effort bajo el modelo también usa menos herramientas : Hace menos llamadas y más escuetas. Es una señal de comportamiento, no un presupuesto de tokens.** Con effort bajo el modelo sigue pensando en los problemas difíciles, y piensa menos que con effort alto para el mismo problema. Nivel Comportami",
+  "details": [
+   "Alcanza a toda la salida: Texto, llamadas a herramientas y thinking, con el thinking activo o sin él.",
+   "Con effort bajo el modelo también usa menos herramientas: Hace menos llamadas y más escuetas.",
+   "Es una señal de comportamiento, no un presupuesto de tokens.** Con effort bajo el modelo sigue pensando en los problemas difíciles, y piensa menos que con effort alto para el mismo problema."
+  ],
+  "speaker_notes": "Esta es la lámina de referencia del bloque y la que más plata les puede ahorrar. De la tabla no leas las filas, que están para consultar; lee la columna de la derecha y di lo importante, que la disponibilidad no es uniforme y que hay modelos que soportan `max` sin soportar `xhigh`. Si el que pregunta necesita el detalle, la tabla de la documentación es la autoridad. El remate tiene un matiz que se pierde si vas rápido: el effort no es un presupuesto de tokens, es una señal. Con effort bajo el modelo sigue pensando cuando el problema es difícil de verdad. Piensa menos que con effort alto, y no deja de pensar. El segundo bullet es el que se le escapa a todo el mundo y vale marcarlo: bajar el effort no solo acorta el razonamiento, también hace que el modelo llame menos herramientas y de forma más escueta, lo cual cambia el comportamiento de un agente entero."
+ },
+ {
+  "i": 57,
+  "section": "Effort y thinking",
+  "title": "Effort por dentro: una señal, no un flag",
+  "lead": "**`effort` no es una bandera: son tokens que el modelo lee.**",
+  "visible_text": "Effort y thinking Effort por dentro: una señal, no un flag effort no es una bandera: son tokens que el modelo lee. Viaja con el prompt : El valor resuelto se renderiza adentro, al lado de tu pedido. Aprendido, no programado : El modelo fue entrenado para comportarse distinto en cada nivel, y eso quedó grabado en los pesos congelados. Es señal, no tope : Con low igual piensa en los problemas difíciles: se pesa contra la dificultad real, no la reemplaza. Toca tres cosas a la vez : Si razona, cuánt",
+  "details": [
+   "Viaja con el prompt: El valor resuelto se renderiza adentro, al lado de tu pedido.",
+   "Aprendido, no programado: El modelo fue entrenado para comportarse distinto en cada nivel, y eso quedó grabado en los pesos congelados.",
+   "Es señal, no tope: Con `low` igual piensa en los problemas difíciles: se pesa contra la dificultad real, no la reemplaza.",
+   "Toca tres cosas a la vez: Si razona, cuántas herramientas llama y qué tan larga es la respuesta."
+  ],
+  "speaker_notes": "Esta lámina contesta la pregunta que siempre aparece cuando alguien ve el parámetro: qué hace por dentro. La respuesta sorprende y conviene decirla directo: el valor no queda del lado del servidor decidiendo por afuera, se escribe adentro del prompt. El modelo lo lee como contexto, igual que lee el system prompt especializado que la plataforma inyecta cuando el razonamiento está activo. La regla operativa que se desprende es elegir un nivel por conversación y no moverlo. Si algunos turnos necesitan más o menos razonamiento, se guía con lenguaje natural en el último mensaje en vez de cambiar el parámetro.\n\nEl segundo punto es el que más expectativas rompe. La gente espera que bajar el nivel baje la factura, y no es un tope. En un problema genuinamente difícil el modelo va a pensar igual, porque la señal se pesa contra la dificultad real de la tarea en vez de reemplazarla. Si necesitan un límite duro, el único es el techo de tokens de la respuesta.\n\nEl último punto es el que cierra la sección entera: los dos parámetros son hermanos, no está uno adentro del otro. El modo de razonamiento define si existe un bloque separado, con su propio tipo de contenido en la respuesta. El nivel de esfuerzo es la calibración de cuánto usar ese carril, y también cuánto gastar en todo lo demás, texto y llamadas a herramientas incluidas. El punto que más cambia el modelo mental del grupo es el segundo, y conviene decirlo con la cita: el nivel no ejecuta código distinto en el servidor. El comportamiento de cada nivel se le enseñó al modelo en el post-entrenamiento y quedó grabado en los pesos congelados. Cuando la petición llega, el nivel es una entrada más a la que el modelo responde, igual que responde al texto del prompt, y lo que fija es cuán exhaustivo y cuán seguro necesita estar antes de dar la tarea por terminada. De ahí sale que un mismo nivel produzca a la vez más pasos de razonamiento, más llamadas a herramientas y una respuesta más larga: no son tres controles, es una sola disposición aprendida."
+ },
+ {
+  "i": 58,
+  "section": "Effort y thinking",
+  "title": "Pedirle al modelo que piense",
+  "lead": "**Que el modelo piense en un turno dado es promptable. El effort fija la postura general y el lenguaje natural corrige el disparo caso por caso.**",
+  "visible_text": "Effort y thinking Pedirle al modelo que piense Que el modelo piense en un turno dado es promptable. El effort fija la postura general y el lenguaje natural corrige el disparo caso por caso. Primero el effort Fijar el nivel que corresponde al balance de calidad y latencia de la carga de trabajo. Después el prompt Agregar guía en lenguaje natural solo si el disparo del thinking todavía no coincide con lo que hace falta. En el system prompt Cambia el umbral para todas las peticiones de la conversac",
+  "details": [
+   "Primero el effort: Fijar el nivel que corresponde al balance de calidad y latencia de la carga de trabajo.",
+   "Después el prompt: Agregar guía en lenguaje natural solo si el disparo del thinking todavía no coincide con lo que hace falta.",
+   "En el system prompt: Cambia el umbral para todas las peticiones de la conversación.",
+   "Por mensaje: Empuja o suprime el thinking en ese turno, sin tocar el system prompt ni cambiar un parámetro.",
+   "**Bajar el effort es la primera palanca, porque es un control calibrado.** La guía por prompt depende de las palabras exactas, y empujar al modelo a pensar menos puede bajar la calidad en las tareas que se benefician del razonamiento."
+  ],
+  "speaker_notes": "Esta lámina es la que ata la sección con el resto de la clase y por eso vale la pena marcarla como tal. Durante dos horas les enseñaste a escribir prompts. Acá el círculo se cierra: la profundidad del razonamiento, que parecía una perilla de infraestructura, también se controla con lenguaje natural. El orden de los dos primeros bullets es una recomendación explícita de la documentación y conviene decirlo con esas palabras: primero el effort, después el prompt. La razón está en la advertencia final. El effort es un control calibrado; una frase en el system prompt es una instrucción y su efecto depende de cómo la escribiste. Antes de mandar cualquiera de las dos a producción, hay que medir sobre una muestra representativa del tráfico, y la documentación dice qué mirar: cuántas veces se dispara el thinking, cuántos tokens de salida, latencia y calidad. Si te queda tiempo, pregúntales qué medirían ellos. La primera de las cuatro es la que nadie dice: contar cuántas respuestas traen bloque de thinking."
+ },
+ {
+  "i": 59,
+  "section": "Effort y thinking",
+  "title": "Frases que suben o bajan el thinking",
+  "lead": "**Las tres redacciones que la documentación da textuales. Están en inglés porque en la práctica los system prompts se escriben en inglés.**",
+  "visible_text": "Effort y thinking Frases que suben o bajan el thinking Las tres redacciones que la documentación da textuales. Están en inglés porque en la práctica los system prompts se escriben en inglés. Para que piense menos, en el system prompt \"Extended thinking adds latency and should only be used when it will meaningfully improve answer quality, typically for problems that require multistep reasoning. When in doubt, respond directly.\" Para que piense en este turno \"Please think hard before responding.\" ",
+  "details": [
+   "Para que piense menos, en el system prompt: *\"Extended thinking adds latency and should only be used when it will meaningfully improve answer quality, typically for problems that require multistep reasoning. When in doubt, respond directly.\"*",
+   "Para que piense en este turno: *\"Please think hard before responding.\"*",
+   "Para que responda directo en este turno: *\"Answer directly without deliberating.\"*",
+   "**La redacción exacta importa.** Si una frase no produce el comportamiento buscado, la documentación sugiere probar una variante más directa."
+  ],
+  "speaker_notes": "Las tres frases están en inglés a propósito, porque son las que la documentación da textuales y porque cambiarles una palabra cambia el efecto. La primera va en el system prompt y mueve el umbral de toda la conversación. Las otras dos van en el turno del usuario y valen solo para ese turno. El ejemplo que mejor aterriza esto para un ingeniero es el del harness agéntico: la misma aplicación pone *\"Please think hard before responding.\"* en los pasos de planificación y *\"Answer directly without deliberating.\"* en las confirmaciones de rutina, sin tocar el system prompt ni cambiar un parámetro entre turnos. Es steering en tiempo de ejecución, decidido por el código. La advertencia final no es un detalle: la documentación misma admite que la efectividad depende de la formulación, y la receta cuando algo no funciona es probar una variante más directa, no insistir con la misma frase."
+ },
+ {
+  "i": 60,
+  "section": "LLMs en ingeniería",
+  "title": "LLMs en ingeniería",
+  "lead": "",
+  "visible_text": "01 Fundamentos 02 Modelos y costos 03 Prompts estructurados 04 In-context learning 05 Prompting avanzado 06 Effort y thinking 07 LLMs en ingeniería 08 Resumen y práctica 07 LLMs en ingeniería Dónde entra esto en el ciclo de vida real, con qué riesgos y qué mitigaciones.",
+  "details": [],
+  "speaker_notes": "Dónde entra esto en el ciclo de vida real, con qué riesgos y qué mitigaciones."
+ },
+ {
+  "i": 61,
+  "section": "LLMs en ingeniería",
+  "title": "Ciclo de vida: dónde entra el LLM",
+  "lead": "**El mismo recorrido que hace un cambio desde que alguien lo pide hasta que llega a producción, con lo que un LLM aporta en cada estadio.**",
+  "visible_text": "LLMs en ingeniería Ciclo de vida: dónde entra el LLM El mismo recorrido que hace un cambio desde que alguien lo pide hasta que llega a producción, con lo que un LLM aporta en cada estadio. Etapa Qué hace hoy Issue y triage Clasifica, deduplica y enruta al equipo correcto. Diseño Redacta ADRs, contrasta alternativas, encuentra precedentes en el propio repo. Implementación Completa código, genera tests, traduce entre lenguajes y frameworks. Review Detecta bugs, marca desvíos de la guía de estilo, ",
+  "details": [],
+  "speaker_notes": "Esta slide reordena toda la clase en el eje que a ellos les resulta natural: el flujo de trabajo. La columna \"hacia dónde va\" salió de la lámina y va hablada, estadio por estadio: en **issue**, priorización con el contexto del roadmap y de la deuda técnica; en **diseño**, exploración de alternativas con costo y riesgo estimados; en **implementación**, agentes que abren un pull request completo a partir del issue; en **review**, revisión con el contexto histórico del módulo y de sus incidentes; en **deploy**, estimación de riesgo del despliegue a partir del diff; y en **incidente**, diagnóstico asistido mientras el incidente sigue abierto. Marcalas como especulación, que es lo que son. Vale la pena decir de entrada que las seis etapas no son igual de maduras, y que la columna del medio es lo que ya se usa hoy en equipos reales, no una promesa. La fila de review es la que más pega, porque es donde el LLM aporta y donde más rápido se ve el límite: encuentra el bug obvio y no entiende por qué ese módulo está escrito así. La fila de incidente es la que más entusiasma y la más peligrosa, porque un post-mortem con una causa raíz inventada es peor que no tener post-mortem. Aviso de honestidad: la versión original de esta slide traía cifras del dominio médico, y no las traduje a números de software porque no tengo fuente. Lo que queda es cualitativo a propósito."
+ },
+ {
+  "i": 62,
+  "section": "LLMs en ingeniería",
+  "title": "Explorar y entender código",
+  "lead": "**El otro uso grande no es escribir código: es entender el que ya existe.**",
+  "visible_text": "LLMs en ingeniería Explorar y entender código El otro uso grande no es escribir código: es entender el que ya existe. Búsqueda semántica en repos grandes Preguntar \"dónde se decide si un pedido se factura en dos cuotas\" y recibir los tres archivos que importan, en vez de 400 coincidencias de grep . Comprensión de sistemas legados Reconstruir el modelo mental de un módulo sin autor vivo: qué hace, qué invariantes asume y qué rompe si se toca. Síntesis de documentación Generar el README que nunca ",
+  "details": [
+   "Búsqueda semántica en repos grandes: Preguntar \"dónde se decide si un pedido se factura en dos cuotas\" y recibir los tres archivos que importan, en vez de 400 coincidencias de `grep`.",
+   "Comprensión de sistemas legados: Reconstruir el modelo mental de un módulo sin autor vivo: qué hace, qué invariantes asume y qué rompe si se toca.",
+   "Síntesis de documentación: Generar el README que nunca se escribió, a partir del código, los tests y los nombres de las cosas.",
+   "Arqueología de decisiones: Recorrer historial de Git, ADRs y tickets viejos para responder por qué se eligió esto y no aquello.",
+   "Las cuatro tareas comparten el mismo riesgo: el modelo produce una explicación coherente aunque el código haga otra cosa. La respuesta se verifica contra el código, siempre."
+  ],
+  "speaker_notes": "Esta es la slide donde más gente se sorprende, porque el uso famoso de los LLM es generar código y el uso que más tiempo ahorra en un equipo real es leerlo. La primera fila tiene el mejor argumento: la diferencia entre buscar por texto y buscar por intención. `grep` encuentra el nombre; el modelo encuentra el lugar donde se toma la decisión, aunque la variable se llame distinto. La cuarta es la que menos se piensa y la que más valor tiene en un equipo con rotación: la respuesta a \"por qué está hecho así\" vive repartida entre commits, tickets y una conversación de Slack de 2023. La advertencia del cierre no es retórica: una explicación fluida de un código que hace otra cosa es la alucinación más difícil de detectar, porque suena a documentación."
+ },
+ {
+  "i": 63,
+  "section": "LLMs en ingeniería",
+  "title": "Casos de uso hoy",
+  "lead": "**Lo que ya está desplegado en equipos de software, no lo que se promete.**",
+  "visible_text": "LLMs en ingeniería Casos de uso hoy Lo que ya está desplegado en equipos de software, no lo que se promete. Asistentes de código Completado en el editor y agentes que resuelven un issue completo. Es el uso más adoptado y el más medido. Generación de tests Tests unitarios a partir del código existente, y casos borde que el autor no había pensado. Triage automático Clasificación, deduplicación y ruteo de issues y tickets entrantes. Revisión y documentación Comentarios de review sobre el diff, resú",
+  "details": [
+   "Asistentes de código: Completado en el editor y agentes que resuelven un issue completo. Es el uso más adoptado y el más medido.",
+   "Generación de tests: Tests unitarios a partir del código existente, y casos borde que el autor no había pensado.",
+   "Triage automático: Clasificación, deduplicación y ruteo de issues y tickets entrantes.",
+   "Revisión y documentación: Comentarios de review sobre el diff, resúmenes de pull request y documentación generada del código.",
+   "Ninguno reemplaza al revisor humano. Los cuatro producen borradores que alguien del equipo aprueba antes de que el cambio entre."
+  ],
+  "speaker_notes": "Slide corta y a propósito. Lo que hay que sostener es la advertencia del final, porque es la bisagra con las dos slides de riesgos que siguen. La columna de generación de tests merece una aclaración que suele hacer ruido: un test generado por el modelo a partir del código verifica que el código hace lo que hace, no que hace lo correcto. Es útil como red contra regresiones y no sirve como especificación. Si alguien pregunta por números de adopción o de productividad, decí la verdad: la versión original de esta slide tenía cifras de estudios clínicos y no las reemplacé por cifras de software inventadas. Quedó marcado como pendiente buscar evidencia citable."
+ },
+ {
+  "i": 64,
+  "section": "LLMs en ingeniería",
+  "title": "Seguridad: el caso Glasswing",
+  "lead": "**En abril de 2026 un modelo de frontera sin publicar encontró miles de vulnerabilidades críticas —de forma autónoma, sin dirección humana— en todos los sistemas operativos y navegadores importantes. Doce empresas formaron Project Glasswing para poner esa capacidad del lado de la defensa.**",
+  "visible_text": "LLMs en ingeniería Seguridad: el caso Glasswing En abril de 2026 un modelo de frontera sin publicar encontró miles de vulnerabilidades críticas —de forma autónoma, sin dirección humana— en todos los sistemas operativos y navegadores importantes. Doce empresas formaron Project Glasswing para poner esa capacidad del lado de la defensa. OpenBSD: veintisiete años escondida En uno de los sistemas más endurecidos que existen, el que se usa para correr firewalls e infraestructura crítica. La falla perm",
+  "details": [
+   "OpenBSD: veintisiete años escondida: En uno de los sistemas más endurecidos que existen, el que se usa para correr firewalls e infraestructura crítica. La falla permitía tirar abajo cualquier máquina de forma remota con solo conectarse a ella.",
+   "FFmpeg: el test que no alcanzó: Vulnerabilidad de dieciséis años, en una línea de código que las herramientas de testing automático habían recorrido **cinco millones de veces** sin detectar nunca el problema.",
+   "Linux: encadenar para escalar: El modelo encontró varias vulnerabilidades del kernel y las combinó solo, hasta pasar de usuario común a control total de la máquina.",
+   "Por qué el pipeline se vuelve urgente: Si un modelo encuentra en semanas lo que sobrevivió décadas de revisión humana y millones de tests, entonces la revisión y los tests que tenés hoy dejaron de ser suficientes. Y la capacidad no es exclusiva de los defensores: el mismo modelo que encuentra la falla para parcharla sabe escribir el exploit."
+  ],
+  "speaker_notes": "Esta lámina es la cara incómoda de todo lo que vimos hoy, y va acá a propósito: recién les mostré los casos de uso lindos, y esto es el reverso. El dato que más impacta no es el número de vulnerabilidades, es la antigüedad: veintisiete años en OpenBSD, que es el sistema que la industria pone de ejemplo cuando habla de código endurecido. Y el de FFmpeg es el que les va a doler como ingenieros: la línea estaba cubierta, los tests la recorrieron cinco millones de veces, y el problema no se veía. No es que faltaba cobertura; es que el tipo de error no era detectable con esas herramientas. De ahí sale la conclusión práctica, y conviene decirla sin dramatismo: el pipeline de revisión y testing que hoy consideran suficiente fue construido contra un atacante humano. La simetría es lo último y lo más importante: la misma capacidad que encuentra la falla para parcharla sirve para escribir el exploit. Por eso el proyecto existe y por eso hay doce empresas grandes adentro. Si alguien pregunta si esto es marketing, señalá el detalle verificable: las tres fallas están parcheadas y reportadas a los mantenedores."
+ },
+ {
+  "i": 65,
+  "section": "LLMs en ingeniería",
+  "title": "Oportunidades vs. riesgos",
+  "lead": "",
+  "visible_text": "LLMs en ingeniería Oportunidades vs. riesgos Oportunidades Bajar el piso de entrada Tareas que antes exigían un especialista quedan al alcance de más gente del equipo. Liberar tiempo Menos horas en documentación, boilerplate y tickets repetidos, más horas en diseño. Acelerar la exploración Evaluar tres alternativas de diseño en el tiempo que antes llevaba evaluar una. Mejorar el onboarding Alguien que entra puede preguntarle al repositorio en vez de interrumpir a un colega. Riesgos Alucinación d",
+  "details": [],
+  "speaker_notes": "Ocho ítems, y conviene ordenar el énfasis en lugar de leerlos todos. De las oportunidades, la cuarta es la que más rápido se nota en un equipo real y la que menos se nombra en las presentaciones. De los riesgos, los dos primeros son técnicos y se atacan con herramientas, y los dos últimos son organizacionales y no. La dependencia excesiva es el que hay que dejar instalado porque es lento y silencioso: no rompe nada el primer mes, y a los seis meses hay un equipo que aprueba pull requests sin leerlos. El de licencias suele generar debate y no tiene respuesta cerrada todavía; si sale, decí que está sin resolver en vez de improvisar una."
+ },
+ {
+  "i": 66,
+  "section": "LLMs en ingeniería",
+  "title": "Mitigaciones que funcionan",
+  "lead": "**Ninguna es nueva. Son las prácticas de ingeniería de siempre, aplicadas a un artefacto que casi nadie trata como código.**",
+  "visible_text": "LLMs en ingeniería Mitigaciones que funcionan Ninguna es nueva. Son las prácticas de ingeniería de siempre, aplicadas a un artefacto que casi nadie trata como código. Revisión humana obligatoria Sin excepción. El output del modelo entra como borrador y una persona lo aprueba. Es la única mitigación que aparece en todas las implementaciones documentadas que funcionan. Tests como red La suite de tests es lo que hace seguro aceptar código que nadie escribió a mano. Sin tests, el código generado es ",
+  "details": [
+   "Revisión humana obligatoria: Sin excepción. El output del modelo entra como borrador y una persona lo aprueba. Es la única mitigación que aparece en todas las implementaciones documentadas que funcionan.",
+   "Tests como red: La suite de tests es lo que hace seguro aceptar código que nadie escribió a mano. Sin tests, el código generado es deuda que todavía no se declaró.",
+   "Linters y SAST en el pipeline: El análisis estático agarra la concatenación en SQL y el secreto hardcodeado antes del merge, sin depender de que el revisor esté atento ese día.",
+   "RAG sobre el propio repositorio: Darle al modelo la guía de estilo, los ADRs y el código real del equipo, en vez de confiar en lo que recuerde del entrenamiento.",
+   "Monitoreo continuo: Medir antes y después: tasa de aceptación de sugerencias, defectos que llegan a producción, tiempo de review. Sin medición no hay decisión."
+  ],
+  "speaker_notes": "La primera es la única no negociable y conviene decirlo con esas palabras. Todo lo demás es gradiente; la revisión humana es un piso. La segunda tiene un matiz que a ellos les va a sonar: aceptar código generado sin tests no es más rápido, es tomar deuda a una tasa que no está declarada, porque el costo aparece cuando alguien tiene que modificar código que nadie entiende y nadie escribió. La tercera es la de mejor relación entre esfuerzo y resultado, y suele estar ya instalada en el pipeline: no hay que comprar nada, hay que dejar de saltearla. La cuarta cierra el círculo con toda la clase, porque es prompt caching más grounding aplicado al caso de ellos."
+ },
+ {
+  "i": 67,
+  "section": "LLMs en ingeniería",
+  "title": "Para pensar",
+  "lead": "",
+  "visible_text": "LLMs en ingeniería Para pensar La evidencia todavía es floja La mayor parte de lo que se publica sobre productividad con LLMs es observacional o en entornos controlados. Los estudios rigurosos sobre implementaciones reales se cuentan con los dedos. La brecha de uso es real Un modelo capaz usado sin criterio rinde mucho menos que el mismo modelo usado con criterio. El contexto de uso pesa tanto como la tecnología, y esa parte no la resuelve la próxima versión. ¿Quién responde cuando falla? Si el ",
+  "details": [
+   "La evidencia todavía es floja: La mayor parte de lo que se publica sobre productividad con LLMs es observacional o en entornos controlados. Los estudios rigurosos sobre implementaciones reales se cuentan con los dedos.",
+   "La brecha de uso es real: Un modelo capaz usado sin criterio rinde mucho menos que el mismo modelo usado con criterio. El contexto de uso pesa tanto como la tecnología, y esa parte no la resuelve la próxima versión.",
+   "¿Quién responde cuando falla?: Si el código generado introduce una vulnerabilidad que llega a producción, la responsabilidad no es del modelo. Falta acordar de quién es dentro del equipo, y esa conversación conviene tenerla antes.",
+   "Marco ético de referencia: El deck original apoyaba esta sección en los seis principios de la OMS para grandes modelos multimodales: autonomía, bienestar, transparencia, responsabilidad, equidad y sostenibilidad. Fuera de salud siguen sirviendo como checklist de gobernanza."
+  ],
+  "speaker_notes": "Slide de discusión, no de contenido. Si hay tiempo, la tercera viñeta es la mejor pregunta para abrir al grupo, y suele generar debate real: quién firma. La respuesta correcta es la misma de siempre en software, quien mergea, y hacerles llegar solos a esa conclusión vale más que decirla. La primera viñeta es un ejercicio de honestidad intelectual que esta clase se debe: la mayoría de las cifras de productividad que circulan no resistirían una revisión metodológica, incluidas varias que estaban en la versión original de estas slides. La segunda es la que más les va a servir en la práctica, porque explica por qué dos personas con la misma herramienta obtienen resultados tan distintos, y por qué esta clase existe."
+ },
+ {
+  "i": 68,
+  "section": "LLMs en ingeniería",
+  "title": "Benchmarks: qué miden",
+  "lead": "**Un benchmark mide una tarea acotada en condiciones de laboratorio. Sirve para comparar modelos entre sí y dice poco sobre cómo va a rendir en el repositorio de cada equipo.**",
+  "visible_text": "LLMs en ingeniería Benchmarks: qué miden Un benchmark mide una tarea acotada en condiciones de laboratorio. Sirve para comparar modelos entre sí y dice poco sobre cómo va a rendir en el repositorio de cada equipo. Qué mide bien Capacidad relativa entre modelos sobre una misma tarea cerrada: resolver un problema de programación con tests, responder una pregunta con respuesta única, completar una función. Qué no mide Trabajar sobre una base de código de años, con convenciones propias, deuda técnic",
+  "details": [
+   "Qué mide bien: Capacidad relativa entre modelos sobre una misma tarea cerrada: resolver un problema de programación con tests, responder una pregunta con respuesta única, completar una función.",
+   "Qué no mide: Trabajar sobre una base de código de años, con convenciones propias, deuda técnica y contexto que no está escrito en ninguna parte.",
+   "Contaminación: Un benchmark público lleva años circulando en la web cuando el modelo se entrena. Parte del puntaje puede ser memoria y no capacidad.",
+   "La medición que importa: El eval set propio, con casos reales del dominio. Es la misma conclusión de la sección de testing sistemático."
+  ],
+  "speaker_notes": "Esta slide estaba al final de la sección de fundamentos, cortando el hilo entre ventana de contexto y economía de tokens con una tanda de benchmarks médicos. Acá funciona mejor, porque cierra la sección de aplicación con la pregunta correcta: qué significa de verdad que un modelo saque un puntaje. Las cifras médicas del original se retiraron y no las reemplacé por equivalentes de software inventadas. La tercera viñeta es la que más le sirve a esta audiencia y la que menos se dice: los benchmarks públicos llevan años indexados en la web, así que parte del puntaje puede ser recuerdo. La cuarta cierra el círculo con la sección cinco y es el mensaje que se llevan: el único benchmark que decide algo es el eval set propio."
+ },
+ {
+  "i": 69,
+  "section": "Resumen y práctica",
+  "title": "Resumen y práctica",
+  "lead": "",
+  "visible_text": "01 Fundamentos 02 Modelos y costos 03 Prompts estructurados 04 In-context learning 05 Prompting avanzado 06 Effort y thinking 07 LLMs en ingeniería 08 Resumen y práctica 08 Resumen y práctica Última transición. Queda el cierre y la consigna de práctica. Si vas corto de tiempo, este es el punto donde conviene saltar directo a las conclusiones y dejar la slide de práctica para el final, que se explica en dos minutos. Cierre y trabajo domiciliario.",
+  "details": [],
+  "speaker_notes": "Última transición. Queda el cierre y la consigna de práctica. Si vas corto de tiempo, este es el punto donde conviene saltar directo a las conclusiones y dejar la slide de práctica para el final, que se explica en dos minutos.\n\nCierre y trabajo domiciliario."
+ },
+ {
+  "i": 70,
+  "section": "Resumen y práctica",
+  "title": "¡A practicar!",
+  "lead": "",
+  "visible_text": "Resumen y práctica ¡A practicar! Trabajo domiciliario : Los cuatro módulos son para hacer fuera de clase: 45 a 60 minutos en total. No entran en las dos horas y media de cursada. Foundational Models Fundamentals aitutorial.dev/prompting/llm-foundamentals — Ventana de contexto, tokens, limitaciones y modelo mental del completado. Técnicas Avanzadas de Prompting aitutorial.dev/prompting/advanced-techniques — CoT, self-consistency, extended thinking y prompt chaining aplicados. Structured Prompt En",
+  "details": [
+   "Trabajo domiciliario: Los cuatro módulos son para hacer fuera de clase: 45 a 60 minutos en total. No entran en las dos horas y media de cursada.",
+   "Foundational Models Fundamentals: [aitutorial.dev/prompting/llm-foundamentals](https://aitutorial.dev/prompting/llm-foundamentals) — Ventana de contexto, tokens, limitaciones y modelo mental del completado.",
+   "Técnicas Avanzadas de Prompting: [aitutorial.dev/prompting/advanced-techniques](https://aitutorial.dev/prompting/advanced-techniques) — CoT, self-consistency, extended thinking y prompt chaining aplicados.",
+   "Structured Prompt Engineering: [aitutorial.dev/prompting/structured-prompt-engineering](https://aitutorial.dev/prompting/structured-prompt-engineering) — Los 6 componentes, etiquetas XML y salidas JSON en la práctica.",
+   "Prompt Optimization & Testing: [aitutorial.dev/prompting/prompt-optimization-and-testing](https://aitutorial.dev/prompting/prompt-optimization-and-testing) — Evaluar, iterar y llevar prompts a producción con rigor."
+  ],
+  "speaker_notes": "Dejá claro el encuadre antes que nada: esto es tarea, no actividad de clase. Sumados al deck no entran en las dos horas y media. Recomendá el orden: primero fundamentos, último el de optimización y testing, que es el que más se apoya en los otros tres. Si vas a evaluar algo de esto, decilo acá. Y un aviso de honestidad: la agenda del deck original prometía además un \"sistema de triage con LLM\" como práctica, que nunca existió. La promesa se sacó de las siete agendas. Si querés reponerlo como trabajo práctico, el ejemplo de triage de issues de la sección cuatro y el pipeline de tickets de la sección cinco ya dejan la consigna casi armada."
+ },
+ {
+  "i": 71,
+  "section": "Conclusions",
+  "title": "Key takeaways",
+  "lead": "",
+  "visible_text": "Conclusions Key takeaways El modelo completa, no razona. Genera token a token, de izquierda a derecha, sin un motor de razonamiento aparte. Escribir los pasos intermedios es el cómputo, y por eso CoT, self-consistency, ToT y prompt chaining tienen todas la misma forma: hacen que el modelo escriba más antes de responder. Cada punto de calidad se paga. En tokens, en latencia y en dinero. La habilidad central no es conocer las técnicas, es emparejar la técnica y el modelo con la dificultad real de ",
+  "details": [
+   "El modelo completa, no razona.: Genera token a token, de izquierda a derecha, sin un motor de razonamiento aparte. Escribir los pasos intermedios es el cómputo, y por eso CoT, self-consistency, ToT y prompt chaining tienen todas la misma forma: hacen que el modelo escriba más antes de responder.",
+   "Cada punto de calidad se paga.: En tokens, en latencia y en dinero. La habilidad central no es conocer las técnicas, es emparejar la técnica y el modelo con la dificultad real de la tarea. Pensar de más en una tarea fácil cuesta plata y a veces empeora la respuesta.",
+   "Un prompt es código.: Se versiona, se testea contra un eval set y se mide antes y después de cada cambio. Sin medición, cualquier mejora es una opinión, y eso vale igual para un chatbot que para un asistente de revisión de código."
+  ],
+  "speaker_notes": "Tres frases y ninguna es un resumen de la agenda. Son la tesis desplegada. La primera es el mecanismo y explica todo lo demás: si el modelo completa, entonces el trabajo del ingeniero es darle un patrón fácil de completar y hacerlo escribir antes de concluir. La segunda es la economía: no hay técnica gratis, y elegir de más es tan error como elegir de menos. La tercera es la disciplina, y es la que más rápido pueden aplicar el lunes. Cerrá con una pregunta abierta si te queda tiempo: cuál de las seis técnicas de la sección cinco usarían para el trabajo práctico que están cursando, y por qué. La respuesta correcta casi siempre es la más barata que alcanza."
+ }
+]

@@ -1,0 +1,881 @@
+{
+ "num": 5,
+ "fecha": "2026-09-02",
+ "titulo": "LLMs: prompting, costos y producción",
+ "talks": [
+  "prompting"
+ ],
+ "bloque": "LLMs",
+ "tesis": "El LLM completa tokens de izquierda a derecha y no tiene un motor de razonamiento aparte, así que toda técnica de prompting que funciona lo hace por la misma razón: obliga al modelo a escribir los pasos intermedios, y esos pasos escritos son el cómputo. Como cada punto de calidad se paga en tokens, latencia y dinero, la habilidad central es emparejar técnica y modelo con la dificultad real de la tarea.",
+ "resumen": "La clase abre por la máquina: qué entra en la ventana de contexto (system prompt, historial, datos inyectados, respuestas), cómo se tokeniza el texto y qué cuesta cada token. La fórmula del costo y la «bola de nieve» del historial explican por qué un chat se encarece solo, y el prompt caching (coincidencia por prefijo, hit al 10%) por qué no explota. Después aparecen las limitaciones —alucinaciones, no-determinismo, sesgo de recencia— con casos reales (Air Canada, abogados sancionados, slopsquatting) y el modelo mental del LLM como motor de completado. Siguen las decisiones con precio: tarifas, árbol de elección de modelo y model cascading con su punto de equilibrio. Luego el oficio: los seis componentes del prompt, salidas estructuradas, XML e in-context learning. El bloque avanzado (CoT, self-consistency, ToT, prompt chaining) culmina en la tesis: los pasos escritos son el cómputo. La sección de effort y thinking muestra que hoy esos pasos los pide el entrenamiento (DeepSeek-R1) y se gradúan con un parámetro. Cierra bajando todo al ciclo de vida del software y a la misión «el prompt mínimo».",
+ "secciones": [
+  {
+   "titulo": "Qué entra en el prompt: ventana de contexto y tokens",
+   "contenido": "Un **prompt** es la instrucción, pregunta o entrada textual que se le da a un LLM para que genere una respuesta. La clase lo compara con un **ticket bien escrito**: cuanto más claro el enunciado y las condiciones de aceptación, menos vueltas da quien lo resuelve. Una vez elegido el modelo, el prompt es la única palanca de control que queda.\n\n**La ventana de contexto** es la *memoria de trabajo activa* del modelo (la analogía es RAM contra disco): todo lo que puede ver en un turno. Adentro conviven cuatro cosas, y solo una la escribe el usuario en ese momento:\n\n- **System prompt**: instrucciones base, fijas entre turnos.\n- **Historial**: todos los turnos previos; crece en cada mensaje.\n- **Datos inyectados**: archivos, resultados de búsqueda, respuestas de APIs.\n- **Respuestas del modelo**: sus propias salidas previas.\n\nTodo compite por la atención **al mismo tiempo**. Es finita: cuando se llena, se pierde el acceso a lo más viejo. ⚠️ **Más contexto no es mejor contexto**: el modelo no elige qué leer, procesa todo junto y lo importante se diluye. Y «el chat se acuerda» es una ilusión: la aplicación **reenvía todo el historial en cada turno**.\n\n**Tamaños en 2026**: Haiku 4.5 200K; Opus 5/4.8, Sonnet 5/4.6 y GPT-5.4 1M; Gemini 3 Pro 2M; Llama 4 10M (solo lo de Anthropic está verificado). 1M ya es la meseta común: el cuello de botella se mudó del tamaño de la ventana **al costo de llenarla**.\n\n**Tokens.** Antes de llegar al modelo, el texto se parte en piezas de un vocabulario fijo con **BPE (byte pair encoding)**: arranca de caracteres sueltos y fusiona los pares más frecuentes hasta llenar el vocabulario; por eso lo común es un token y lo raro se parte en pedazos. Cada familia tiene su tokenizador: en `tiktoken`, `r50k_base` (GPT-2, 50.257), `cl100k_base` (GPT-3.5/4, 100.257), `o200k_base` (GPT-4o y serie o, 199.999). Un vocabulario más grande corta menos. Para Claude se cuenta con el endpoint `count_tokens`.\n\nLa intuición «una palabra, un token» está mal justo en la dirección que importa: **el código y el JSON tokenizan peor que la prosa** (un identificador camelCase se parte en 4 o 5 tokens).",
+   "conceptos": [
+    "prompt-engineering",
+    "ventana-de-contexto",
+    "token",
+    "tokenizacion",
+    "system-prompt"
+   ],
+   "ejemplo": "**¿Cuánto es 1 millón de ~~Tolkien~~ tokens?** El Hobbit + la trilogía de El Señor de los Anillos suman unas **576.000 palabras ≈ 750.000 tokens**. Las cuatro obras entran en un único prompt de 1M y todavía sobran ~250.000 tokens. El código, los tests y la documentación de un servicio mediano también entran cómodos."
+  },
+  {
+   "titulo": "La economía de los tokens: la fórmula del costo y la bola de nieve",
+   "contenido": "El modelo **procesa y factura en tokens**, de entrada y de salida, a precios distintos:\n\n$$\\text{Costo} = T_{in}\\cdot p_{in} + T_{out}\\cdot p_{out}$$\n\nEn toda la familia Claude **la salida cuesta 5 veces la entrada** (se genera token por token y no se paraleliza como la lectura del prompt). Por eso la variable a vigilar es **cuánto habla el modelo**, no cuánto se le manda.\n\n**La bola de nieve del historial.** Lo que el usuario escribe no crece; lo que la app le manda al modelo sí, porque cada llamada **reenvía toda la conversación anterior**:\n\n| Turno | Lo que se envía | Bloques |\n|---|---|---|\n| 1 | M1 | 1 |\n| 2 | M1 R1 M2 | 3 |\n| 3 | M1 R1 M2 R2 M3 | 5 |\n| 4 | M1 R1 M2 R2 M3 R3 M4 | 7 |\n\nEn el turno $n$ se mandan $(2n-1)$ bloques. **Un chat de veinte turnos paga el turno uno veinte veces.** ¿Por qué no explota la factura? Por el **prompt caching** (sección siguiente).\n\n**Tokenomics Foundation.** La Linux Foundation la lanzó el **4 de agosto de 2026** con **30 empresas fundadoras** (Accenture, IBM, JPMorganChase, Oracle, SAP…). Ideas clave: el token es *la unidad, no el total* (el costo real incluye cómputo, almacenamiento, caché y trabajo de ingenieros, pero el token los atraviesa); falta un lenguaje común para comparar proveedores; proponen medir **costo por llamada** (*costo de servir*), que es la unidad con la que uno diseña; y un marco de **valor** que arranca por la proporción de trabajo completado sin intervención humana. Su proyecto **Big-T** clasifica la complejidad de costo de una carga **antes** de decidir a qué modelo enrutarla. Goldman Sachs proyecta que el consumo de tokens se multiplique **×24 hacia 2030**.\n\nLa pregunta que ninguna factura responde: **cuánto valor devuelve ese gasto**.",
+   "conceptos": [
+    "costo-por-token",
+    "token",
+    "ventana-de-contexto"
+   ],
+   "ejemplo": "**Cuenta de la clase** (Claude Sonnet 4.6, USD 3 / USD 15 por millón de tokens):\n\nPrompt de 2.000 tokens de entrada + 500 de salida:\n- Entrada: 2.000 / 1.000.000 × 3 = USD 0,006\n- Salida: 500 / 1.000.000 × 15 = USD 0,0075\n- **Total: USD 0,0135 ≈ USD 0,014**\n\nParece nada, hasta que se multiplica: a 10.000 llamadas diarias son ≈ **USD 135 por día**. Y si es un chat, cada turno vuelve a pagar todo el historial."
+  },
+  {
+   "titulo": "Prompt caching: se cachea el cómputo de un prefijo",
+   "contenido": "**El proveedor no guarda respuestas: guarda el estado ya calculado de un prefijo de tokens.** De ahí sale la única regla que gobierna todo, la **coincidencia por prefijo**, y la facilidad con que se rompe:\n\n- **Coincide por prefijo, no por contenido.** No es «¿ya vi este texto?». Si los primeros N tokens coinciden **byte a byte** con la llamada anterior, se reutilizan.\n- **Un byte distinto invalida todo lo que sigue.** El orden del pedido es fijo: **herramientas → system prompt → mensajes**. Por eso lo estable va adelante y lo variable al final.\n- **Hay un mínimo, y falla en silencio.** Un prefijo debajo del mínimo del modelo no se cachea, sin error ni aviso.\n- **Se verifica en la respuesta**: el contador `cache_read_input_tokens` (en OpenRouter `cached_tokens`). Si da cero en llamadas repetidas hay un **invalidador escondido**: una fecha (`datetime.now()`) en el system prompt, un JSON sin ordenar, herramientas que cambian de orden. Resultado: hit rate 0, **sin error, solo una factura más alta**.\n\n**Chat vs. aplicación.** En un chat el prefijo crece solo (cada turno agrega al final): es el caso ideal. En una app propia el pedido lo armás vos, así que **vos marcás el corte** con `cache_control: {type: 'ephemeral'}` sobre el bloque estático (en Anthropic y Qwen es explícito; en OpenAI, Gemini y DeepSeek es automático por prefijo repetido).\n\nLas tres decisiones que se deducen: **cachear lo estático** (system prompt, guía de estilo, ADRs, base de conocimiento), **no cachear el input del usuario**, y **poner primero lo cacheable**.\n\n**Precio**: el cache hit cuesta **10% del precio de entrada** (ej.: Opus 4.8, USD 5 → USD 0,50). Request 1 = MISS (se procesa entero y se guarda); Request 2+ = HIT.\n\nMientras más grande y estable el prefijo respecto del sufijo variable, más rinde: el caso típico de un equipo de software son **50.000 tokens** de guía de estilo + ADRs + código idénticos, contra **100-200 tokens** de diff que cambian.",
+   "conceptos": [
+    "prompt-caching",
+    "costo-por-token",
+    "system-prompt"
+   ],
+   "ejemplo": "**Revisor de código con caché** (Sonnet, USD 3/MTok de entrada):\n\n- Prefijo estático: 50.000 tokens → sin caché: 50.000 / 1.000.000 × 3 = **USD 0,15** por llamada.\n- Con hit (10%): **USD 0,015** por llamada. Ahorro ≈ USD 0,135 por llamada sobre el prefijo (90%).\n- El diff de 100 tokens se paga a precio lleno siempre (≈ USD 0,0003).\n\n```python\nsystem=[{'type': 'text', 'text': system_prompt,   # 50K estáticos\n         'cache_control': {'type': 'ephemeral'}}],\nmessages=[{'role': 'user', 'content': 'Revisa este diff: ...'}]  # dinámico\n```"
+  },
+  {
+   "titulo": "Limitaciones, alucinaciones y el modelo mental del completado",
+   "contenido": "**Tres fallas de familia** (no bugs: se administran con diseño del sistema):\n\n| Alucinaciones | No-determinismo | Sesgo de recencia |\n|---|---|---|\n| Predice texto plausible y no verifica hechos. Mitigación: restringir al contexto + revisión humana. | El mismo prompt da respuestas distintas. Se compensa corriendo varias veces y comparando, **no con un parámetro** (en la generación actual las perillas de sampling ya no existen). | Atiende más al **principio y al final** que al medio. Instrucciones críticas arriba, consulta concreta abajo. |\n\n**¿Por qué alucina?** Genera el token más probable dado el contexto; cuando no tiene el dato, **igual genera algo**. Cuatro causas: sin acceso a hechos verificados; entrenamiento incompleto o viejo; **confianza sin verificación** (no tiene un canal separado para decir «no sé»: responde con el mismo tono lo que sabe y lo que inventa); y **presión de completado** (un espacio en blanco no es una salida válida).\n\n**Casos reales**: *Moffatt v. Air Canada* (2024): el chatbot inventó una política de tarifas de duelo; la aerolínea alegó que el chatbot era **una entidad legal separada** y el tribunal lo rechazó: **quien despliega el modelo responde por lo que dice**. Abogados: **más de 1.148 casos** documentados en EE.UU.; en el Sexto Circuito, **USD 15.000 de sanción a cada abogado**. Paquetes: sobre 576.000 muestras de código de 16 modelos, **19,7% de los paquetes recomendados no existe** (205.000 nombres inventados; abiertos 21,7% vs propietarios 5,2%). De ahí el **slopsquatting** (abril 2025): el atacante registra en npm/PyPI el nombre que el modelo alucina.\n\n**Mitigar desde el prompt** (de más barato a más caro): grounding en contexto («respondé solo con esto, decí que no sabés si no alcanza»), **RAG**, self-consistency, revisión humana. **Desde el proceso**: dataset de evaluación de **50 a 100 casos** con ground truth, métricas (faithfulness, hallucination rate, ROUGE-L), regression testing en cada cambio de prompt, red teaming. Es CI/CD aplicado al prompt. 🎯 **Regla de oro: un sistema cuya tasa de alucinación no se puede medir no se despliega.**\n\n**Modelo mental: motores de completado.** Los LLM completan patrones vistos en el entrenamiento y no entienden la intención; son un **autocompletado muy sofisticado**. «Extraé nombre y email» puede fallar; darle la plantilla `Nombre: [campo] / Email: [campo]` le sirve el patrón. Esta idea es el ensayo de la tesis de la clase.",
+   "conceptos": [
+    "alucinacion",
+    "evals",
+    "llm"
+   ]
+  },
+  {
+   "titulo": "Elegir modelo: tarifas, árbol de decisión y model cascading",
+   "contenido": "**Tarifas familia Claude** (USD por millón de tokens): Fable 5 USD 10/USD 50 · Opus 5 y 4.8 USD 5/USD 25 · Sonnet 5 USD 2/USD 10 · Sonnet 4.6 USD 3/USD 15 · Haiku 4.5 USD 1/USD 5 (ventana 200K; los demás 1M). Modificadores: **cache hit 10%** de la entrada, **Batch 50%**, Fast Mode (Opus) USD 10/USD 50, búsqueda web USD 10 cada 1.000. Entre Haiku y Fable hay un **factor 10**.\n\n**Árbol de elección: la primera pregunta que dé «sí» decide.**\n1. ¿La tarea es simple (clasificar, extraer, rotular)? → modelo chico y barato (Haiku 4.5, GPT-4o Mini, Gemini Flash).\n2. ¿Necesita más de 1M de contexto? → el de ventana más grande (hoy Gemini Pro, 2M).\n3. ¿El costo es crítico por volumen? → **model cascading**.\n4. Si no → el mejor modelo para la calidad que se necesita.\n\nEl orden **es** el contenido: primero dificultad (la que más plata mueve), después contexto (restricción dura), y el costo al final (optimizar costo antes de saber si la calidad alcanza es optimizar lo que no importa). Ya no se pregunta por el formato: structured outputs es GA en toda la generación actual, hasta Haiku.\n\n**Model cascading**: intentar primero con el modelo barato; si la **confianza** es baja, escalar al caro. La rama corta (una llamada) tiene que ser la mayoritaria. **Todo el ahorro depende del gate**: en código, el gate es **un campo del esquema de salida** (`confianza: float`) garantizado por structured outputs, con un **ancla** en la `description` («probabilidad de que un revisor humano experto elija la misma categoría»). El prompt pide no inflarla: «un 0,4 honesto vale más que un 0,9 optimista». Umbral del ejemplo: `>= 0.85`.\n\nLa trampa real no es la tasa de escalamiento sino la **calibración**: un Haiku que se declara seguro sobre lo que inventó no escala nunca, y el ahorro se paga en errores que nadie mide.\n\n**Cuándo sí**: alto volumen de tareas parecidas, señal de confianza clara, presión de costo con piso de calidad. **Cuándo no**: latencia baja requerida, confianza difícil de medir, bajo volumen (100 consultas/día no pagan la complejidad; 100.000 sí). Regla práctica: medí primero el modelo bueno a **effort bajo**; un modelo nuevo a effort bajo suele rendir como el anterior a effort alto, y un solo modelo mantiene un solo namespace de caché.",
+   "conceptos": [
+    "costo-por-token",
+    "llm",
+    "structured-output"
+   ],
+   "ejemplo": "**Punto de equilibrio del cascading** (Haiku 4.5 USD 1/USD 5 vs Opus 5 USD 5/USD 25: factor 5 en entrada y salida).\n\nMidiendo el costo en «unidades Haiku»: la cascada siempre paga el barato (1) y, con probabilidad $p$ de escalar, además el caro (5): $c = 1 + 5p$. Ir directo al caro cuesta 5.\n\n$$c = 1 + 5p = 5 \\Rightarrow p = 0{,}8$$\n\n**Aun escalando 8 de cada 10 veces la cascada empata** con llamar directo al caro; cualquier tasa menor es ahorro. Ej.: con $p = 0{,}3$, costo $= 2{,}5$ contra 5 → **la mitad**."
+  },
+  {
+   "titulo": "Prompts estructurados e in-context learning",
+   "contenido": "**Los 6 componentes** de un prompt de producción, en este orden (el orden explota el **sesgo de recencia**: atención ALTA arriba y abajo, BAJA en el medio):\n\n1. **Rol / persona** — quién es el modelo (nivel de expertise).\n2. **Contexto** — qué necesita saber (servicio, convenciones).\n3. **Instrucciones** — qué hacer, paso a paso.\n4. **Restricciones** — qué NO hacer y en qué formato responder (el bloque que más trabaja y el que más se saltea: «comentá solo lo que aparece en el diff»).\n5. **Ejemplos (few-shot)** — cómo se ve una respuesta correcta; 3 a 5 alcanzan.\n6. **Input** — el dato de ESTA llamada (va último para estar «fresco»).\n\nPara una consulta única alcanza con instrucciones + input; los seis son para el prompt que corre diez mil veces por día.\n\n**Salidas estructuradas.** Dos enfoques: **esquema en el prompt** (flexible, sin garantías: el 1% que falla aparece en producción a las 3 AM) vs **funcionalidad de la API** (`response_format`/structured outputs: garantía a nivel de **decodificación**). Si la salida alimenta código, se usa la segunda. La `description` de cada campo viaja en el esquema y el modelo la lee; `ge`/`le` no son soportados pero el SDK los pasa a la descripción y valida contra el esquema original. ⚠️ Un esquema estricto sobre una tarea ambigua **esconde** la ambigüedad en un valor plausible.\n\n**XML.** Las etiquetas marcan fronteras explícitas (tarea, instrucciones, ejemplos, entrada); los LLM vieron enormes cantidades de HTML/XML; pedir la salida en una etiqueta vuelve trivial el parseo; el overhead de tokens se paga con menos reintentos y el caching lo absorbe. Sin delimitadores, además, entra la **inyección de prompt**.\n\n**In-context learning (ICL)** — Brown et al. 2020 (GPT-3): aprender el patrón **desde el prompt, sin tocar los pesos**. No re-entrena, infiere la regla y la extiende, y **no persiste**: el request siguiente vuelve a mandar (y pagar) los ejemplos. Regímenes: **zero-shot** (sin ejemplos), **few-shot** (2 a 10, el más usado en producción), **many-shot** (decenas o cientos). Tokens y costo **suben siempre**; la precisión **satura**: el salto grande está entre zero y few. Los ejemplos **no enseñan el concepto: fijan el formato y ubican las fronteras entre categorías**. Many-shot permite un bucle de mejora sin re-entrenar: cada error se agrega como ejemplo (costo lineal en tokens). Contraste: fine-tuning cambia el artefacto y cuesta un entrenamiento; ICL cambia el prompt y cuesta tokens.",
+   "conceptos": [
+    "prompt-engineering",
+    "few-shot",
+    "structured-output",
+    "system-prompt"
+   ],
+   "ejemplo": "**Zero-shot vs few-shot sobre el mismo issue** («el export a CSV corta en la fila 8.192»):\n\n- Zero-shot: «Parece un problema de tamaño de buffer. Severidad media-alta, según el uso.» → correcto para un humano, **imparseable**: inventó su escala.\n- Few-shot con dos ejemplos (`caen los checkouts → CRITICO`, `tooltip en inglés → BAJO`): → **«ALTO»**, una etiqueta del conjunto que el código consume directo.\n\nMany-shot: `/v2/orders devuelve 200 con body vacío cuando el token expiró en lugar de 401` → **ALTO**: la respuesta sale de la **consecuencia** (contrato de API roto propagándose a tres clientes), no del texto."
+  },
+  {
+   "titulo": "Prompting avanzado: cuatro técnicas, una sola idea",
+   "contenido": "Las cuatro técnicas hacen lo mismo: **que el modelo escriba más antes de responder**.\n\n**Chain of Thought (CoT)** — Wei et al. 2022. Razonar paso a paso antes de la respuesta, por instrucción directa («Pensá paso a paso») o con ejemplos que muestran el razonamiento (few-shot CoT = ICL donde los ejemplos incluyen el razonamiento: *ICL enseña qué responder; CoT enseña cómo razonar*). Además vuelve la respuesta **auditable**: el error se ve donde ocurre.\n\n**Self-consistency** — Wang et al. 2022. Muestrear varios caminos independientes del **mismo** prompt y quedarse con la respuesta más frecuente. El paper la presenta como **estrategia de decodificación** (muestreo diverso + marginalización), «votación» es glosa didáctica. Intuición: los caminos correctos convergen; los equivocados divergen entre sí. Mejoras **relativas a CoT**: +17,9% en GSM8K y +11,0% en SVAMP (no son accuracies absolutas: error típico). La proporción de votos **no es una probabilidad calibrada**. Uso real: si la votación no es unánime, se escala a una persona.\n\n**Tree of Thought (ToT)** — Yao et al. 2023 (NeurIPS). Generar ramas, **evaluarlas** (score), **podar** las malas, **expandir** la mejor y seleccionar. La unidad de decisión pasa del token al *thought*, y aparecen *lookahead* y **backtracking**. CoT es este árbol con una sola rama y sin vuelta atrás. **Game of 24 con GPT-4: CoT 4% → ToT 74%**, mismo modelo.\n\n**Prompt chaining**: dividir en una secuencia de prompts simples donde la salida de cada paso alimenta al siguiente. Ventajas: debugging por paso, reintentos parciales, optimización (modelo chico en pasos simples, el caro solo al final), evaluación separada. Contra: latencias sumadas, orquestación más compleja. Es **la base de los agentes**: en un pipeline el próximo paso lo decide el código; en un agente lo decide el modelo.\n\n**¿Por qué funcionan?** El LLM predice tokens de izquierda a derecha y cada uno depende solo de los anteriores; **no hay motor de razonamiento oculto, así que lo escrito es el razonamiento**. Los tokens intermedios son **cómputo** (memoria de trabajo explícita), más contexto da mejor predicción, y cada paso achica el espacio de error. Analogía: resolver de cabeza vs en papel: *el papel no vuelve más inteligente a nadie, y hace la cuenta más precisa*. Por eso «pensá paso a paso» funciona y «sé más cuidadoso» no.\n\n**Ninguna técnica compra calidad gratis.** Y más tokens no garantiza más precisión: en GPQA Diamond, Claude 3.7 Sonnet gasta 3× más tokens que o3-mini y este 2× más que o1 (6× en total) con precisión en el mismo rango (Balachandran et al., MSR 2025).",
+   "conceptos": [
+    "chain-of-thought",
+    "prompt-engineering",
+    "few-shot"
+   ],
+   "ejemplo": "**CoT, la propina del 15% sobre USD 47,83**: sin CoT → «USD 7,17» (hay que creerle). Con CoT → 10% = 4,78; 5% = 2,39; 15% = 4,78 + 2,39 = **7,17**. Mismo resultado, pero solo uno se puede auditar.\n\n**Self-consistency, diff de paginación** (`items[offset : offset + limit + 1]`, limit=20: ¿se solapan páginas?): runs 1, 2, 4, 5 → SÍ; run 3 → NO («el slice no cambia el largo», error de razonamiento). Votación: **SÍ, 4 de 5, 80%**. Costo: 5 llamadas = 5× el precio; en paralelo, la latencia de la más lenta.\n\n**ToT, refactor de `billing/invoice.py`** (1.400 líneas, 38 métodos, sin tests; hay que agregar IVA por jurisdicción): A) módulo de impuestos aparte → **seleccionada** (riesgo acotado, testeable); B) reescribir con tests → la «limpia», pero sin red; C) condicionales in situ → complejidad que el módulo no tolera.\n\n**Chaining de tickets**: 1 clasificar urgencia (modelo chico) → 2 extraer detalles (chico) → 3 buscar runbooks con RAG (sin modelo) → 4 redactar respuesta (**caro, solo acá**)."
+  },
+  {
+   "titulo": "Effort y thinking: el razonamiento como mecanismo",
+   "contenido": "**Thinking**: el modelo produce un **bloque de razonamiento separado** antes de la respuesta. En los modelos actuales es **adaptativo**: decide **por petición** si piensa y cuánto. Consecuencias: el código **no puede asumir** que el bloque está (recorrer `r.content` y preguntar por `b.type`, nunca `r.content[0].text`); el bloque tiene **tipo propio** (`thinking`) con su `signature`, que se reenvía sin tocar; `display` (`summarized` u `omitted`, va **dentro** del objeto `thinking`) decide si vuelve resumido o vacío, **pero se factura igual** (omitir baja latencia, no costo); también piensa **entre llamadas a herramientas**; y `max_tokens` es el **techo duro de thinking + texto**. En Opus 5 / Sonnet 5 ya viene encendido y oculto por defecto.\n\n**Por qué el bloque separado cambia el resultado.** Sin thinking el modelo tiene que acertar todo a la primera: cada token escrito queda **fijo** y un error se arrastra. Con thinking puede desarrollar, probar y corregirse en un **borrador** y recién después comprometer la respuesta.\n\n**De dónde salió**: **DeepSeek-R1** (Nature, 2025) mostró que el razonamiento se incentiva con **refuerzo puro**, sin trayectorias humanas y salteando el SFT previo. La recompensa solo mira si la respuesta final es correcta y debe ser **verificable a máquina** (respuesta en una caja en matemática; compilador + tests en código). Descartan modelos de recompensa neuronales por **reward hacking**. Emergieron autorreflexión, verificación y cambio de estrategia, y **la respuesta se alargó sola**. AIME 2024 pass@1: **15,6% → 77,9%**, y **86,7%** con self-consistency (cons@16). La etiqueta `<think>` salió de la función de recompensa. Límite: donde no hay verificador confiable, no escala.\n\n**¿CoT todavía sirve?** El mecanismo es el mismo; cambió **quién pide los pasos**: antes el prompt, ahora el entrenamiento y la plataforma (con thinking activo la API inyecta un **system prompt especializado**). Pedir paso a paso agrega poco a un modelo que ya razona. **Los tokens de pensamiento se facturan como salida** y no se ven.\n\n**Effort**: parámetro **de la petición** en `output_config` (**nunca** dentro de `thinking`). Niveles: `low` | `medium` | `high` (**default**: pasarlo = omitirlo) | `xhigh` | `max`. Afecta **toda** la salida: thinking, texto y **llamadas a herramientas** (con effort bajo usa menos y más escuetas). Es una **señal de comportamiento, no un presupuesto**: con `low` igual piensa en problemas difíciles. El valor se **renderiza dentro del prompt** como tokens; el comportamiento por nivel se aprendió en el post-entrenamiento y está **grabado en los pesos congelados**. El único límite duro es `max_tokens`.\n\n**Steering**: primero fijar el effort (control calibrado), después ajustar con lenguaje natural en el system prompt (umbral global) o por mensaje: *«Please think hard before responding.»* / *«Answer directly without deliberating.»*. La redacción exacta importa; medir frecuencia de thinking, tokens de salida, latencia y calidad.",
+   "conceptos": [
+    "chain-of-thought",
+    "rl-con-verificador",
+    "costo-por-token"
+   ],
+   "ejemplo": "**MCD de 1071 y 462** (ejemplo de la documentación). Sin thinking: «El MCD de 1071 y 462 es 21…» → en el token 8 ya se comprometió con el número **sin haber hecho la cuenta**. Con thinking, el bloque `thinking` hace Euclides: 1071 = 2·462 + 147; 462 = 3·147 + 21; 147 = 7·21 + 0 → MCD = 21, y recién después el bloque `text` responde con el número ya verificado.\n\n**Effort por dentro**: `low` + «¿Cuánto es 12*34?» → `[text] 408`. `max` → `[thinking] 12*30 + 12*4 = 408` + `[text] 408`."
+  },
+  {
+   "titulo": "LLMs en ingeniería y la práctica: el prompt mínimo",
+   "contenido": "**Ciclo de vida de un cambio** (lazo cerrado de seis estadios, el LLM aporta en todos): **Issue** (clasifica, deduplica, enruta) → **Diseño** (contrasta alternativas, redacta ADRs) → **Implementación** (código, tests antes que la implementación) → **Review** (resume el diff, marca desvíos) → **Deploy** (release notes) → **Incidente** (correlaciona logs, propone hipótesis, post-mortem) → vuelve a Issue. Otro uso grande es **entender código**: búsqueda semántica en repos («dónde se decide si un pedido se factura en dos cuotas» vs 400 coincidencias de `grep`), sistemas legados, síntesis de docs, arqueología de decisiones. Riesgo común: una explicación coherente de un código que hace otra cosa. Un test generado desde el código verifica que el código hace **lo que hace**, no lo correcto.\n\n**Glasswing** (abril 2026): un modelo de frontera sin publicar encontró **miles de vulnerabilidades críticas** de forma autónoma: OpenBSD (27 años), FFmpeg (16 años, línea recorrida **5 millones de veces** por tests), cadena de escalada en Linux. 12 empresas formaron Project Glasswing. La misma capacidad que encuentra la falla escribe el exploit.\n\n**Riesgos**: alucinación de APIs y dependencias, código inseguro, **dependencia excesiva** (sesgo de automatización), licencias. **Mitigaciones**: revisión humana **obligatoria** (la única no negociable), tests como red, linters y SAST, **RAG sobre el propio repo**, monitoreo continuo. **Benchmarks**: comparan modelos en tareas cerradas, sufren **contaminación**; el único que decide es **el eval set propio**.\n\n**La misión «el prompt mínimo»** (vía **OpenRouter**, API unificada compatible con OpenAI):\n- **Ej. 1**: chat con 4 modelos, uno por proveedor: `openai/gpt-5.6-luna` (effort configurable), `anthropic/claude-haiku-4.5` (caching explícito con `cache_control`), `google/gemini-3.7-flash` (JSON Schema), `deepseek/deepseek-v4-flash-0731` (el escalón barato, **15× más barato** que el slot 2). Muestra tras cada respuesta: tokens de entrada, salida, razonamiento, cacheados y costo; cambiar de modelo abre conversación nueva; guarda un log `.md` por conversación (**sin log no cuenta**).\n- **Ej. 2**: Conway (`vida.py`, stdlib, mundo finito sin wrap-around, `#`/`.`) con DeepSeek razonando, correcto **en 1 prompt o a lo sumo 2**; si no, la corrida queda **quemada** (se mejora el prompt, no el código). Pasan los **9 tests**. **Caching obligatorio**: parte estática al principio e idéntica; `cached_tokens > 0` desde el 2.º intento.\n- **Ej. 3**: la cuenta final, contrastada contra el dashboard, con una conclusión que nombre **una decisión concreta**.\n- Rúbrica: E1 30, E2 40, E3 20, repo 10 (CLAUDE.md, SPEC.md, commits). Un prompt = 12 pts en 2.2; dos = 9; tres o más = 0. Señal de alarma: `cached_tokens > 0` en el **primer** intento (imposible con prefijo nuevo).\n\n**Takeaways**: el modelo completa, no razona; cada punto de calidad se paga; **un prompt es código** (se versiona, se testea, se mide).",
+   "conceptos": [
+    "evals",
+    "prompt-caching",
+    "structured-output",
+    "alucinacion"
+   ]
+  }
+ ],
+ "conceptos": [
+  {
+   "id": "prompt-engineering",
+   "termino": "Prompt / prompt engineering",
+   "definicion": "El prompt es la instrucción, pregunta o entrada textual que se le da a un LLM. Prompt engineering es diseñarlo con estructura (rol, contexto, instrucciones, restricciones, ejemplos, input) para que el resultado sea útil, predecible y verificable.",
+   "por_que_importa": "Una vez elegido el modelo, es la única palanca de control que queda; la diferencia entre prototipo y producción suele estar en la estructura del prompt.",
+   "trampa": "Creer que es redacción o cortesía. Es especificación: «sé más cuidadoso» no cambia nada; dar el patrón o pedir pasos sí."
+  },
+  {
+   "id": "ventana-de-contexto",
+   "termino": "Ventana de contexto",
+   "definicion": "La memoria de trabajo activa del modelo: todo lo que ve en un turno (system prompt, historial, datos inyectados y sus propias respuestas). Es finita y todo compite por la atención a la vez.",
+   "por_que_importa": "Define qué puede usar el modelo y cuánto se paga por llamada; el cuello de botella hoy es el costo de llenarla, no su tamaño.",
+   "trampa": "Más contexto no es mejor contexto: lo importante se diluye. Y el chat no «se acuerda»: la app reenvía todo el historial en cada turno."
+  },
+  {
+   "id": "token",
+   "termino": "Token",
+   "definicion": "Subpalabra de un vocabulario fijo con la que el modelo procesa y factura el texto, tanto de entrada como de salida.",
+   "por_que_importa": "Es la unidad de costo, de límite de contexto y de latencia.",
+   "trampa": "«Una palabra = un token» es falso; código y JSON tokenizan peor que la prosa (un camelCase se parte en 4-5 tokens)."
+  },
+  {
+   "id": "tokenizacion",
+   "termino": "Tokenización (BPE)",
+   "definicion": "Byte pair encoding: arranca de caracteres sueltos y fusiona los pares más frecuentes hasta llenar el vocabulario (de ~50K en GPT-2 a ~200K en o200k_base). Cada familia de modelos tiene su tokenizador.",
+   "por_que_importa": "El vocabulario decide cuántos tokens cuesta una frase; uno más grande corta menos.",
+   "trampa": "Contar tokens de Claude con tiktoken: hay que usar el endpoint count_tokens del proveedor."
+  },
+  {
+   "id": "costo-por-token",
+   "termino": "Costo por token / fórmula del costo",
+   "definicion": "Costo = tokens de entrada × precio de entrada + tokens de salida × precio de salida, con precios por millón de tokens (MTok). En Claude la salida cuesta 5× la entrada.",
+   "por_que_importa": "Permite estimar y comparar decisiones (modelo, caching, cascading, técnicas) con números.",
+   "trampa": "Mirar solo el mensaje del usuario: en un chat la entrada de cada turno incluye todo el historial (bola de nieve). Y los tokens de thinking se facturan como salida aunque no se vean."
+  },
+  {
+   "id": "prompt-caching",
+   "termino": "Prompt caching",
+   "definicion": "El proveedor guarda el cómputo ya hecho de un prefijo de tokens y lo reutiliza si la llamada siguiente coincide byte a byte; el hit cuesta 10% del precio de entrada. En Anthropic se marca con cache_control.",
+   "por_que_importa": "Ataca el costo del contexto estático grande y de la bola de nieve del historial.",
+   "trampa": "Pensar que cachea respuestas o contenido. Es por prefijo: un datetime.now() en el system prompt o un JSON sin ordenar deja el hit rate en 0 sin ningún error."
+  },
+  {
+   "id": "system-prompt",
+   "termino": "System prompt",
+   "definicion": "Instrucciones base que fijan el comportamiento general del modelo y se mantienen fijas entre turnos; va antes de los mensajes en el orden del pedido (herramientas → system → mensajes).",
+   "por_que_importa": "Es el lugar natural del prefijo cacheable y del steering global (por ejemplo, el umbral de thinking).",
+   "trampa": "Meterle datos variables (fecha, hora) rompe el caché en cada llamada."
+  },
+  {
+   "id": "alucinacion",
+   "termino": "Alucinación",
+   "definicion": "Texto fluido y plausible pero falso: el modelo genera el token más probable aunque no tenga el dato, con el mismo tono de confianza.",
+   "por_que_importa": "Tiene costos legales (Air Canada, abogados sancionados) y de seguridad (slopsquatting: 19,7% de paquetes recomendados no existen).",
+   "trampa": "Creer que un modelo mejor lo elimina. Es consecuencia de ser un motor de completado: se administra con grounding, RAG, verificación y medición."
+  },
+  {
+   "id": "llm",
+   "termino": "LLM como motor de completado",
+   "definicion": "Un LLM predice el siguiente token más probable de izquierda a derecha, completando patrones vistos en el entrenamiento; no tiene un motor de razonamiento aparte.",
+   "por_que_importa": "Es la tesis de la clase y explica por qué funcionan las técnicas: darle un patrón fácil de completar y hacerlo escribir pasos.",
+   "trampa": "Pensarlo como un sistema que «entiende la intención»."
+  },
+  {
+   "id": "structured-output",
+   "termino": "Salidas estructuradas (JSON Schema)",
+   "definicion": "Funcionalidad de la API que garantiza a nivel de decodificación que la salida cumple un esquema; la description de cada campo viaja en el esquema y el modelo la lee.",
+   "por_que_importa": "Elimina errores de parseo y reintentos, y permite implementar el gate del cascading como un campo tipado.",
+   "trampa": "Confundirla con pedir JSON en el prompt (sugerencia sin garantía). Y un esquema estricto sobre una tarea ambigua esconde la ambigüedad en un valor plausible."
+  },
+  {
+   "id": "few-shot",
+   "termino": "In-context learning: zero / few / many-shot",
+   "definicion": "Aprender el patrón desde ejemplos dentro del prompt sin tocar los pesos (Brown et al. 2020). Zero-shot: sin ejemplos; few-shot: 2 a 10; many-shot: decenas o cientos.",
+   "por_que_importa": "Fija el formato y las fronteras entre categorías; many-shot permite mejorar agregando cada error como ejemplo, sin re-entrenar.",
+   "trampa": "Creer que persiste (cada request vuelve a pagar los ejemplos) o que la precisión sigue subiendo: satura después de few-shot mientras el costo sube siempre."
+  },
+  {
+   "id": "chain-of-thought",
+   "termino": "Chain of Thought (CoT)",
+   "definicion": "Hacer que el modelo escriba el razonamiento paso a paso antes de la respuesta, pidiéndolo o con ejemplos que muestran el proceso (Wei et al. 2022).",
+   "por_que_importa": "Los tokens intermedios son cómputo: mejora tareas de varios pasos y deja un rastro auditable.",
+   "trampa": "Pensar que es «explicar al final»: los pasos van en el medio y condicionan la respuesta. Tampoco garantiza corrección, y cuesta 2-5× de latencia."
+  },
+  {
+   "id": "self-consistency",
+   "termino": "Self-consistency",
+   "definicion": "Muestrear varios caminos de razonamiento independientes del mismo prompt y quedarse con la respuesta más frecuente (Wang et al. 2022, estrategia de decodificación).",
+   "por_que_importa": "Reduce el error por no-determinismo y da una señal de acuerdo (ej. 4 de 5).",
+   "trampa": "Leer +17,9% en GSM8K como accuracy absoluta (es mejora relativa a CoT) o la proporción de votos como probabilidad calibrada. Cuesta N veces."
+  },
+  {
+   "id": "tree-of-thought",
+   "termino": "Tree of Thought (ToT)",
+   "definicion": "Búsqueda sobre «pensamientos»: generar ramas, evaluarlas, podar, expandir la mejor y seleccionar, con lookahead y backtracking (Yao et al. 2023).",
+   "por_que_importa": "Rinde en problemas con varias soluciones defendibles: Game of 24 pasó de 4% (CoT) a 74% con el mismo GPT-4.",
+   "trampa": "Usarlo en tareas simples o de respuesta única: es muy costoso (3-5× CoT) y complejo de implementar."
+  },
+  {
+   "id": "prompt-chaining",
+   "termino": "Prompt chaining",
+   "definicion": "Dividir una tarea en una secuencia de prompts simples donde la salida de uno es la entrada del siguiente.",
+   "por_que_importa": "Debugging y reintentos por paso, y permite usar el modelo caro solo donde hace falta; es la base de los agentes.",
+   "trampa": "Creer que siempre es más caro por tener más llamadas: suele salir más barato. Su contra real es la latencia sumada."
+  },
+  {
+   "id": "model-cascading",
+   "termino": "Model cascading",
+   "definicion": "Intentar primero con un modelo barato y escalar al caro solo si la confianza no supera un umbral.",
+   "por_que_importa": "Con factor de precio 5, empata con el caro recién al escalar 80% de las veces.",
+   "trampa": "El ahorro depende del gate: un modelo mal calibrado que se declara seguro sobre lo que inventó nunca escala y el error no se mide."
+  },
+  {
+   "id": "thinking-adaptativo",
+   "termino": "Thinking (razonamiento extendido adaptativo)",
+   "definicion": "Bloque de razonamiento con tipo propio que el modelo genera antes del texto; en los modelos actuales decide por petición si pensar y cuánto.",
+   "por_que_importa": "Le da un borrador donde corregirse antes de comprometer tokens de la respuesta.",
+   "trampa": "Asumir que siempre está (r.content[0].text se rompe) o creer que display: omitted abarata: se factura igual."
+  },
+  {
+   "id": "effort",
+   "termino": "Effort",
+   "definicion": "Parámetro de la petición (output_config.effort: low, medium, high por defecto, xhigh, max) que gradúa cuántos tokens gasta el modelo en thinking, texto y herramientas. Se renderiza como tokens dentro del prompt y el comportamiento está en los pesos.",
+   "por_que_importa": "Es la primera palanca, calibrada, para balancear calidad, latencia y costo.",
+   "trampa": "Ponerlo dentro de thinking, creer que pasar high sube algo (es el default) o tratarlo como tope de tokens: es una señal; el límite duro es max_tokens."
+  },
+  {
+   "id": "rl-con-verificador",
+   "termino": "Refuerzo con recompensa verificable (DeepSeek-R1)",
+   "definicion": "Entrenar con refuerzo puro premiando solo que la respuesta final sea correcta según un verificador automático (caja en matemática, compilador + tests en código).",
+   "por_que_importa": "Así emergió el razonamiento: AIME 2024 de 15,6% a 77,9% (86,7% con self-consistency) y respuestas que se alargan solas.",
+   "trampa": "Pensar que alguien le enseñó a razonar con trayectorias humanas, o que escala donde no hay verificador confiable."
+  },
+  {
+   "id": "evals",
+   "termino": "Evals (eval set propio)",
+   "definicion": "Dataset de 50 a 100 casos con ground truth del dominio, métricas (faithfulness, hallucination rate, ROUGE-L) y regression testing en cada cambio de prompt.",
+   "por_que_importa": "Sin medición no hay umbral de aceptación; los benchmarks públicos no predicen el rendimiento en el repo propio y sufren contaminación.",
+   "trampa": "Confiar en benchmarks o en la intuición: un sistema cuya tasa de alucinación no se puede medir no se despliega."
+  }
+ ],
+ "formulas": [
+  {
+   "nombre": "Costo de una llamada",
+   "tex": "C = T_{in}\\cdot p_{in} + T_{out}\\cdot p_{out}",
+   "explicacion": "$T_{in}$, $T_{out}$: tokens de entrada y salida; $p_{in}$, $p_{out}$: precio por token (precio por MTok / 10^6). Ej.: 2.000 × 3/10^6 + 500 × 15/10^6 = USD 0,0135."
+  },
+  {
+   "nombre": "Bola de nieve del historial",
+   "tex": "\\text{bloques enviados en el turno } n = 2n-1",
+   "explicacion": "Cada turno reenvía todos los mensajes (M) y respuestas (R) anteriores más el nuevo mensaje; el turno 1 se paga en todos los turnos siguientes."
+  },
+  {
+   "nombre": "Costo con prompt caching",
+   "tex": "C_{in} = T_{pref}\\cdot 0{,}1\\,p_{in} + T_{suf}\\cdot p_{in}",
+   "explicacion": "En un cache hit el prefijo estático $T_{pref}$ se cobra al 10% y el sufijo dinámico $T_{suf}$ a precio lleno. 50.000 tokens a USD 3/MTok: USD 0,15 → USD 0,015."
+  },
+  {
+   "nombre": "Punto de equilibrio del cascading",
+   "tex": "c_b + p\\,c_c = c_c \\;\\Rightarrow\\; p^* = 1 - \\frac{c_b}{c_c} = 1 - \\frac{1}{5} = 0{,}8",
+   "explicacion": "$c_b$, $c_c$: costo por llamada del modelo barato y del caro (factor 5 entre Haiku 4.5 y Opus 5); $p$: tasa de escalamiento. Debajo de $p^*=0,8$ la cascada ahorra."
+  },
+  {
+   "nombre": "Costo de self-consistency",
+   "tex": "C_{SC} = N \\cdot C_{1},\\quad L_{SC} \\approx \\max_i L_i \\text{ (en paralelo)}",
+   "explicacion": "N muestras cuestan N veces una llamada; si se lanzan en paralelo la latencia es la de la más lenta (N veces si van en serie)."
+  }
+ ],
+ "comparaciones": [
+  {
+   "titulo": "Tarifas familia Claude (USD por millón de tokens)",
+   "columnas": [
+    "Modelo",
+    "Ventana",
+    "Entrada",
+    "Salida",
+    "Cache hit (10%)"
+   ],
+   "filas": [
+    [
+     "Fable 5",
+     "1M",
+     "USD 10,00",
+     "USD 50,00",
+     "USD 1,00"
+    ],
+    [
+     "Opus 5 / Opus 4.8",
+     "1M",
+     "USD 5,00",
+     "USD 25,00",
+     "USD 0,50"
+    ],
+    [
+     "Sonnet 5",
+     "1M",
+     "USD 2,00",
+     "USD 10,00",
+     "USD 0,20"
+    ],
+    [
+     "Sonnet 4.6",
+     "1M",
+     "USD 3,00",
+     "USD 15,00",
+     "USD 0,30"
+    ],
+    [
+     "Haiku 4.5",
+     "200K",
+     "USD 1,00",
+     "USD 5,00",
+     "USD 0,10"
+    ]
+   ]
+  },
+  {
+   "titulo": "Regímenes de in-context learning",
+   "columnas": [
+    "Aspecto",
+    "Zero-shot",
+    "Few-shot",
+    "Many-shot"
+   ],
+   "filas": [
+    [
+     "Ejemplos",
+     "Ninguno",
+     "2 a 10",
+     "Decenas o cientos"
+    ],
+    [
+     "Tokens y costo",
+     "Bajo",
+     "Medio",
+     "Alto (sube siempre)"
+    ],
+    [
+     "Precisión",
+     "Baja / formato libre",
+     "Alta",
+     "Alta (satura)"
+    ],
+    [
+     "Cuándo",
+     "Tareas triviales, consulta única",
+     "El más usado en producción",
+     "Muchas categorías o fronteras finas; bucle de mejora con errores"
+    ]
+   ]
+  },
+  {
+   "titulo": "Las cuatro técnicas avanzadas",
+   "columnas": [
+    "Técnica",
+    "Pros",
+    "Contras",
+    "Latencia / costo"
+   ],
+   "filas": [
+    [
+     "Chain of Thought",
+     "Auditable, mejora precisión, errores visibles",
+     "Poco útil en tareas simples; no garantiza corrección",
+     "100-500 tokens extra; 2-5× latencia"
+    ],
+    [
+     "Self-consistency",
+     "Reduce error por no-determinismo; señal de confianza",
+     "Multiplica el costo",
+     "N = 5-10 llamadas; N× costo"
+    ],
+    [
+     "Tree of Thought",
+     "Explora caminos, backtracking; mejor en planificación",
+     "Muy costoso, complejo, difícil de controlar",
+     "3-5× CoT"
+    ],
+    [
+     "Prompt chaining",
+     "Pasos simples, reintentables, evaluables",
+     "Más latencia total; orquestación compleja",
+     "Suma de latencias; suele ser más barato"
+    ]
+   ]
+  },
+  {
+   "titulo": "Esquema en el prompt vs salidas estructuradas de la API",
+   "columnas": [
+    "Aspecto",
+    "Esquema en el prompt",
+    "Structured outputs (API)"
+   ],
+   "filas": [
+    [
+     "Naturaleza",
+     "Sugerencia/instrucción",
+     "Garantía a nivel de decodificación"
+    ],
+    [
+     "Fiabilidad",
+     "Casi siempre (el 1% falla en producción)",
+     "Siempre válido contra el esquema"
+    ],
+    [
+     "Flexibilidad",
+     "Mayor",
+     "Restricciones numéricas no soportadas (el SDK las valida)"
+    ],
+    [
+     "Cuándo",
+     "Prototipos, salida para humanos",
+     "Cuando la salida alimenta código"
+    ]
+   ]
+  },
+  {
+   "titulo": "Sin thinking vs con thinking",
+   "columnas": [
+    "Aspecto",
+    "Sin thinking",
+    "Con thinking"
+   ],
+   "filas": [
+    [
+     "Dónde razona",
+     "Dentro de la respuesta, si razona",
+     "En un bloque separado, antes"
+    ],
+    [
+     "Compromiso",
+     "Cada token queda fijo",
+     "Puede probar y corregirse antes de condensar"
+    ],
+    [
+     "Riesgo",
+     "Un mal arranque se arrastra",
+     "El error se filtra en el borrador"
+    ],
+    [
+     "Lo que ves",
+     "Todo mezclado",
+     "Solo la respuesta; el razonamiento aparte (resumido u omitido, se factura igual)"
+    ]
+   ]
+  },
+  {
+   "titulo": "Niveles de effort",
+   "columnas": [
+    "Nivel",
+    "Comportamiento del thinking"
+   ],
+   "filas": [
+    [
+     "max",
+     "Piensa siempre, sin restricción de profundidad"
+    ],
+    [
+     "xhigh",
+     "Piensa siempre y en profundidad"
+    ],
+    [
+     "high (default)",
+     "Piensa casi siempre; profundo en tareas complejas"
+    ],
+    [
+     "medium",
+     "Moderado; puede saltearlo en consultas simples"
+    ],
+    [
+     "low",
+     "Minimiza; lo saltea en tareas simples"
+    ]
+   ]
+  },
+  {
+   "titulo": "Model cascading: cuándo sí y cuándo no",
+   "columnas": [
+    "Conviene",
+    "Evitarlo"
+   ],
+   "filas": [
+    [
+     "Alto volumen de tareas parecidas",
+     "Se requiere latencia baja (cada escalón suma una llamada)"
+    ],
+    [
+     "Señal de confianza clara",
+     "La confianza es difícil de medir (falla en silencio)"
+    ],
+    [
+     "Presión de costo con piso de calidad",
+     "Bajo volumen (la complejidad no se paga)"
+    ]
+   ]
+  },
+  {
+   "titulo": "Limitaciones de los LLM",
+   "columnas": [
+    "Limitación",
+    "Qué es",
+    "Cómo se administra"
+   ],
+   "filas": [
+    [
+     "Alucinaciones",
+     "Texto plausible no verificado",
+     "Grounding, RAG, revisión humana, evals"
+    ],
+    [
+     "No-determinismo",
+     "Mismo prompt, distinta respuesta",
+     "Correr varias veces y comparar (no un parámetro)"
+    ],
+    [
+     "Sesgo de recencia",
+     "Más atención al inicio y al final",
+     "Instrucciones arriba, consulta abajo"
+    ]
+   ]
+  }
+ ],
+ "flashcards": [
+  {
+   "q": "¿Cuál es la tesis de la clase 5?",
+   "a": "El LLM completa tokens de izquierda a derecha sin motor de razonamiento aparte; toda técnica que funciona obliga a escribir pasos intermedios, y esos pasos escritos son el cómputo. Cada punto de calidad se paga en tokens, latencia y dinero."
+  },
+  {
+   "q": "¿Qué cuatro cosas viven en la ventana de contexto?",
+   "a": "System prompt, historial, datos inyectados y las respuestas previas del modelo."
+  },
+  {
+   "q": "¿Cuánto cuesta 2.000 tokens de entrada + 500 de salida en Sonnet 4.6 (USD 3/USD 15)?",
+   "a": "USD 0,006 + USD 0,0075 = USD 0,0135 ≈ USD 0,014."
+  },
+  {
+   "q": "¿Cuántas veces más cara es la salida que la entrada en Claude?",
+   "a": "5 veces, en toda la familia."
+  },
+  {
+   "q": "¿Por qué crece la factura de un chat si el usuario escribe lo mismo?",
+   "a": "Porque cada turno reenvía todo el historial: en el turno n se mandan 2n−1 bloques; el turno 1 se paga en cada turno."
+  },
+  {
+   "q": "¿Qué guarda el prompt caching?",
+   "a": "El cómputo ya hecho de un prefijo de tokens (no respuestas); coincide por prefijo byte a byte."
+  },
+  {
+   "q": "¿Cuánto cuesta un cache hit en Claude?",
+   "a": "10% del precio de entrada (ej. Opus 4.8: USD 0,50 por MTok)."
+  },
+  {
+   "q": "Invalidador clásico del caché",
+   "a": "Una fecha/hora (datetime.now()) en el system prompt: cambia el prefijo en cada llamada y el hit rate queda en 0 sin error."
+  },
+  {
+   "q": "¿Cuál es el orden fijo del pedido para el caché?",
+   "a": "Herramientas → system prompt → mensajes."
+  },
+  {
+   "q": "Punto de equilibrio del cascading Haiku→Opus 5",
+   "a": "1 + 5p = 5 → p = 0,8: escalando 8 de cada 10 veces empata con ir directo al caro."
+  },
+  {
+   "q": "Los 6 componentes de un prompt de producción",
+   "a": "Rol, contexto, instrucciones, restricciones, ejemplos (few-shot) e input, en ese orden."
+  },
+  {
+   "q": "¿Qué hacen realmente los ejemplos few-shot?",
+   "a": "Fijan el formato y ubican las fronteras entre categorías; no enseñan el concepto ni cambian los pesos."
+  },
+  {
+   "q": "Cifra clave de Tree of Thought",
+   "a": "Game of 24 con GPT-4: CoT 4% → ToT 74%."
+  },
+  {
+   "q": "¿+17,9% en GSM8K de self-consistency es accuracy absoluta?",
+   "a": "No: es mejora relativa al baseline de CoT (Wang et al. 2022)."
+  },
+  {
+   "q": "DeepSeek-R1 en AIME 2024",
+   "a": "pass@1 de 15,6% a 77,9% con RL puro; 86,7% con self-consistency (cons@16)."
+  },
+  {
+   "q": "¿Dónde va effort y cuál es su default?",
+   "a": "En output_config (nunca dentro de thinking); el default es high, que equivale a omitirlo."
+  },
+  {
+   "q": "¿display: omitted abarata el thinking?",
+   "a": "No: baja la latencia del primer token de texto pero se factura igual."
+  },
+  {
+   "q": "¿Qué es slopsquatting?",
+   "a": "Registrar en npm/PyPI el nombre de un paquete que los modelos alucinan (19,7% de los recomendados no existen) para que el asistente lo instale."
+  },
+  {
+   "q": "Regla de oro de las alucinaciones",
+   "a": "Un sistema cuya tasa de alucinación no se puede medir no se despliega."
+  },
+  {
+   "q": "¿Qué se mejora entre intentos en la misión del prompt mínimo?",
+   "a": "El prompt, nunca el código: más de 2 prompts quema la corrida y se empieza de cero."
+  }
+ ],
+ "quiz": [
+  {
+   "q": "Un chatbot de 20 turnos cuesta mucho más de lo esperado aunque los usuarios escriben mensajes cortos. ¿Cuál es la causa principal?",
+   "opciones": [
+    "La salida cuesta 5× la entrada",
+    "Cada llamada reenvía todo el historial, así que la entrada crece en cada turno",
+    "El tokenizador parte el español en más tokens",
+    "El modelo recuerda la conversación en sus pesos y cobra por eso"
+   ],
+   "correcta": 1,
+   "explicacion": "El modelo no recuerda nada entre llamadas: la app reenvía la conversación entera (2n−1 bloques en el turno n). La salida cara y la tokenización influyen, pero no explican el crecimiento; nada se guarda en los pesos."
+  },
+  {
+   "q": "Con Sonnet 4.6 (USD 3 entrada / USD 15 salida por MTok), ¿cuánto cuesta una llamada de 2.000 tokens de entrada y 500 de salida?",
+   "opciones": [
+    "USD 0,0135",
+    "USD 0,036",
+    "USD 0,0075",
+    "USD 0,135"
+   ],
+   "correcta": 0,
+   "explicacion": "2.000×3/10^6 = 0,006 y 500×15/10^6 = 0,0075; suma 0,0135. USD 0,0075 es solo la salida; las otras multiplican mal."
+  },
+  {
+   "q": "Marcaron el system prompt con cache_control, pero cache_read_input_tokens da 0 en todas las llamadas. ¿Cuál es la explicación más probable?",
+   "opciones": [
+    "El caché solo funciona con modelos Opus",
+    "El system prompt incluye la fecha y hora actual",
+    "El input del usuario es demasiado largo",
+    "El caché guarda respuestas y cada pregunta es distinta"
+   ],
+   "correcta": 1,
+   "explicacion": "El caching es por prefijo byte a byte; un timestamp al principio cambia el prefijo en cada llamada y falla en silencio. El sufijo largo no rompe el prefijo, y no se cachean respuestas."
+  },
+  {
+   "q": "Un prefijo estático de 50.000 tokens a USD 3/MTok, con cache hit. ¿Cuánto se paga por ese prefijo en cada llamada después de la primera?",
+   "opciones": [
+    "USD 0,15",
+    "USD 0,075",
+    "USD 0,015",
+    "USD 0"
+   ],
+   "correcta": 2,
+   "explicacion": "Sin caché cuesta 50.000×3/10^6 = USD 0,15; con hit se cobra el 10%: USD 0,015. No es gratis ni 50% (eso es Batch)."
+  },
+  {
+   "q": "Cascada Haiku 4.5 → Opus 5 (factor de precio 5). ¿A partir de qué tasa de escalamiento la cascada deja de ahorrar?",
+   "opciones": [
+    "20%",
+    "50%",
+    "80%",
+    "95%"
+   ],
+   "correcta": 2,
+   "explicacion": "Costo de cascada 1 + 5p contra 5 directo: 1 + 5p = 5 → p = 0,8. La intuición de que el chico debe acertar casi siempre es falsa."
+  },
+  {
+   "q": "En el árbol de elección de modelo de la clase, ¿qué pregunta se hace primero?",
+   "opciones": [
+    "¿El costo es crítico por volumen?",
+    "¿La tarea es simple (clasificar, extraer, rotular)?",
+    "¿Necesita salida en JSON?",
+    "¿Necesita más de 1M de contexto?"
+   ],
+   "correcta": 1,
+   "explicacion": "Primero la dificultad (la que más plata mueve), después el contexto y el costo al final. El formato ya no se pregunta porque structured outputs es GA hasta en Haiku."
+  },
+  {
+   "q": "En zero-shot el modelo responde «Severidad media-alta, según el uso». Con dos ejemplos responde «ALTO». ¿Qué hicieron los ejemplos?",
+   "opciones": [
+    "Re-entrenaron el modelo para la tarea",
+    "Fijaron el formato y las fronteras entre categorías",
+    "Le enseñaron qué es la severidad",
+    "Activaron el thinking"
+   ],
+   "correcta": 1,
+   "explicacion": "ICL no toca pesos ni enseña el concepto: fija la escala y el formato que el código puede consumir."
+  },
+  {
+   "q": "Según la clase, ¿por qué funcionan CoT, self-consistency, ToT y prompt chaining?",
+   "opciones": [
+    "Porque activan un módulo de razonamiento interno",
+    "Porque hacen que el modelo escriba más tokens intermedios, que son cómputo que condiciona lo siguiente",
+    "Porque bajan la temperatura del muestreo",
+    "Porque usan más parámetros del modelo"
+   ],
+   "correcta": 1,
+   "explicacion": "No hay motor de razonamiento oculto: lo escrito es el razonamiento. No tiene que ver con temperatura (ya no existe como perilla) ni con usar más parámetros."
+  },
+  {
+   "q": "Wang et al. reportan +17,9% en GSM8K para self-consistency. ¿Cómo se lee correctamente?",
+   "opciones": [
+    "El modelo alcanza 17,9% de accuracy",
+    "Mejora 17,9 puntos relativos al baseline de CoT",
+    "Reduce 17,9% las alucinaciones",
+    "Cuesta 17,9% más que CoT"
+   ],
+   "correcta": 1,
+   "explicacion": "Es mejora sobre CoT, no accuracy absoluta; leerlo como 17,9% de accuracy es el error más común con esas cifras."
+  },
+  {
+   "q": "¿Qué cambia Tree of Thought respecto de Chain of Thought?",
+   "opciones": [
+    "Usa un modelo más grande",
+    "La unidad de decisión pasa del token al pensamiento, con evaluación, poda y backtracking",
+    "Vota entre respuestas finales",
+    "Encadena prompts con modelos distintos"
+   ],
+   "correcta": 1,
+   "explicacion": "ToT explora ramas y puede volver atrás; CoT es el árbol con una sola rama. Votar es self-consistency; encadenar es chaining."
+  },
+  {
+   "q": "Un dev pasa output_config={'effort':'high'} creyendo que mejora la calidad respecto de no pasar nada. ¿Qué ocurre?",
+   "opciones": [
+    "Sube al máximo el razonamiento",
+    "Nada distinto: high es el default",
+    "Da error porque effort va dentro de thinking",
+    "Fija un presupuesto de tokens alto"
+   ],
+   "correcta": 1,
+   "explicacion": "high equivale a omitir el parámetro. effort va en output_config (no en thinking) y no es un presupuesto sino una señal."
+  },
+  {
+   "q": "¿Qué afirmación sobre el thinking adaptativo es correcta?",
+   "opciones": [
+    "Todo turno del asistente empieza con un bloque thinking",
+    "Con display omitted el thinking no se factura",
+    "El modelo decide por petición si piensa, y max_tokens limita thinking + texto",
+    "effort=low impide que piense"
+   ],
+   "correcta": 2,
+   "explicacion": "El bloque puede no estar; omitirlo se factura igual; low es señal, no prohibición: en problemas difíciles igual piensa."
+  },
+  {
+   "q": "¿Por qué DeepSeek-R1 descarta modelos de recompensa neuronales en tareas de razonamiento?",
+   "opciones": [
+    "Son demasiado lentos",
+    "Son susceptibles a reward hacking: el modelo aprende a agradar al evaluador",
+    "No existen para matemática",
+    "Requieren trayectorias humanas"
+   ],
+   "correcta": 1,
+   "explicacion": "Un optimizador contra un evaluador aprendido lo explota; un verificador (caja en matemática, compilador + tests) no se hackea."
+  },
+  {
+   "q": "En la misión del prompt mínimo, el primer intento ya muestra cached_tokens > 0. ¿Qué indica según la rúbrica?",
+   "opciones": [
+    "Que el prompt está bien diseñado",
+    "Que DeepSeek cachea siempre",
+    "Una señal de alarma: con prefijo nuevo es imposible, sugiere corridas previas no entregadas",
+    "Que se usó cache_control correctamente"
+   ],
+   "correcta": 2,
+   "explicacion": "El caché necesita un prefijo ya visto; un hit en el primer intento implica intentos escondidos."
+  },
+  {
+   "q": "¿Cuál es la única mitigación no negociable para el código generado por LLM según la clase?",
+   "opciones": [
+    "Usar el modelo más caro",
+    "Revisión humana obligatoria",
+    "Bajar la temperatura",
+    "Benchmarks públicos"
+   ],
+   "correcta": 1,
+   "explicacion": "Todo lo demás (tests, SAST, RAG, monitoreo) es gradiente; la revisión humana es el piso."
+  }
+ ],
+ "desarrollo": [
+  {
+   "pregunta": "Explicá la tesis de la clase («los pasos escritos son el cómputo») y usala para justificar por qué funcionan CoT y el thinking nativo. Incluí evidencia empírica.",
+   "respuesta_modelo": "Un LLM genera token a token, de izquierda a derecha, y cada token se condiciona solo con los anteriores; no hay un motor de razonamiento oculto. Por lo tanto, escribir los pasos no documenta el razonamiento: **es** el razonamiento. Los tokens intermedios funcionan como memoria de trabajo explícita, dan más contexto a la predicción y achican el espacio de error antes de la conclusión (la analogía del papel: no agrega inteligencia, agrega memoria). **CoT** (Wei et al. 2022) lo explota desde el prompt; self-consistency, ToT y chaining comparten la forma: hacen escribir más antes de responder. El **thinking** nativo es el mismo mecanismo con un bloque separado: un borrador donde corregirse antes de comprometer tokens de la respuesta (ej. MCD de 1071 y 462: sin thinking se compromete con «21» antes de calcular). Cambió quién pide los pasos: el entrenamiento y el system prompt del proveedor. Evidencia: en **DeepSeek-R1** (Nature 2025), entrenado con RL puro premiando solo la respuesta correcta, la longitud de las respuestas crece sola mientras AIME 2024 sube de 15,6% a 77,9%: si escribir más no fuera cómputo, alargar no daría ventaja. Matiz: más tokens no garantiza más precisión (Balachandran et al.).",
+   "puntos_clave": [
+    "Generación autoregresiva sin motor de razonamiento aparte",
+    "Tokens intermedios = cómputo / memoria de trabajo",
+    "CoT, SC, ToT y chaining comparten la idea",
+    "Thinking = bloque separado, borrador antes de comprometer",
+    "DeepSeek-R1: longitud crece sola con la precisión",
+    "Costo: se paga en tokens de salida"
+   ]
+  },
+  {
+   "pregunta": "Un equipo arma un asistente de revisión de código con 50.000 tokens de guía de estilo + ADRs y diffs de ~100 tokens, miles de veces por día. Diseñá la estrategia de costos (caching, elección de modelo, cascading) con números.",
+   "respuesta_modelo": "**Caching**: el reparto 50.000 estáticos vs 100 dinámicos es el caso ideal. Orden: herramientas → system (guía, ADRs, marcado con `cache_control`) → mensaje con el diff al final. Sin caché, a USD 3/MTok, el prefijo cuesta USD 0,15 por llamada; con hit, 10%: USD 0,015 (ahorro de ~90%). Hay que **verificar** `cache_read_input_tokens` > 0 y evitar invalidadores (fecha en el system, JSON desordenado), y superar el mínimo cacheable. **Modelo**: árbol de la clase. Revisar un diff no es trivial, el contexto entra en 1M, y el costo es crítico por volumen → **cascading**. Gate como campo `confianza` de structured outputs con ancla en la description. Con Haiku (USD 1/USD 5) y Opus 5 (USD 5/USD 25), factor 5: 1 + 5p = 5 → empata en p = 0,8; con p = 0,3 cuesta la mitad. El riesgo es la calibración: medir escalados y errores. Alternativa a evaluar primero: un solo modelo bueno a effort bajo (un solo namespace de caché). Además, la salida cuesta 5×: limitar la respuesta (máximo 3 problemas en JSON) baja la factura.",
+   "puntos_clave": [
+    "Prefijo estático primero, cache_control, dinámico al final",
+    "Cuenta USD 0,15 → USD 0,015",
+    "Verificar el contador de caché; invalidadores silenciosos",
+    "Árbol de decisión: dificultad, contexto, costo",
+    "Break-even p = 0,8",
+    "Calibración del gate",
+    "Controlar tokens de salida / effort"
+   ]
+  },
+  {
+   "pregunta": "Compará zero-shot, few-shot y many-shot (in-context learning) y contrastalo con fine-tuning. ¿Cuándo usarías cada uno?",
+   "respuesta_modelo": "ICL (Brown et al. 2020, GPT-3) es aprender el patrón desde ejemplos en el prompt **sin modificar los pesos**; el aprendizaje no persiste y cada request vuelve a pagar los ejemplos. **Zero-shot**: solo la instrucción; depende del preentrenamiento; el modelo elige formato y escala (ej. «media-alta, según el uso», imparseable). **Few-shot** (2-10): fija formato y fronteras («ALTO»); es el régimen de producción y donde está el salto grande de precisión. **Many-shot** (decenas a cientos): para muchas categorías o fronteras finas; permite un bucle de mejora agregando cada error como ejemplo, con costo lineal en tokens; la precisión satura mientras el costo sigue subiendo. **Fine-tuning** cambia el artefacto y cuesta una corrida de entrenamiento; conviene cuando lo que falta es formato o estilo estable a gran escala y el costo de reenviar ejemplos supera al de entrenar. ICL se elige cuando la tarea cambia, se quiere iterar rápido o no hay datos/infra para entrenar; el caching absorbe parte del costo de ejemplos estables.",
+   "puntos_clave": [
+    "Sin tocar pesos, no persiste",
+    "Definición y rango de cada régimen",
+    "Precisión satura, costo sube",
+    "Ejemplos fijan formato/fronteras",
+    "Many-shot como bucle de mejora",
+    "Fine-tuning cambia el artefacto"
+   ]
+  },
+  {
+   "pregunta": "¿Por qué alucinan los LLM y cómo se mitiga en un sistema de producción? Usá los casos de la clase.",
+   "respuesta_modelo": "El LLM genera el token más probable dado el contexto; cuando no tiene el dato igual genera algo, y la fluidez no depende de la verdad. Causas: no consulta una base de verdad, datos incompletos o viejos, **confianza sin verificación** (no tiene canal para decir «no sé») y **presión de completado**. Casos: Air Canada (2024) inventó una política de duelo y el tribunal estableció que quien despliega responde; más de 1.148 casos de abogados con sanciones de USD 15.000; 19,7% de paquetes recomendados inexistentes, base del **slopsquatting**. Mitigación en la llamada: grounding («solo con este contexto, decí si no sabés»), RAG, self-consistency, revisión humana. En el proceso: eval set de 50-100 casos con ground truth, métricas de faithfulness/hallucination rate/ROUGE-L, regression testing en cada cambio de prompt y red teaming. Regla de oro: si la tasa de alucinación no se puede medir, no se despliega.",
+   "puntos_clave": [
+    "Motor de completado, plausible ≠ correcto",
+    "Cuatro causas",
+    "Casos Air Canada, abogados, paquetes/slopsquatting",
+    "Mitigaciones en prompt ordenadas por costo",
+    "Evals, métricas y regression testing",
+    "Regla de oro"
+   ]
+  },
+  {
+   "pregunta": "Explicá qué es el parámetro effort, dónde vive, qué controla y cómo se relaciona con el thinking y con max_tokens.",
+   "respuesta_modelo": "**effort** es un parámetro de la **petición** (`output_config.effort`) que gradúa cuántos tokens gasta el modelo: `low`, `medium`, `high` (default, igual a omitirlo), `xhigh`, `max`. No va dentro de `thinking` (error frecuente). Afecta **toda** la salida: si piensa y cuánto, cuántas herramientas llama y el largo del texto. No es una bandera del servidor: el valor se **renderiza como tokens dentro del prompt** y el modelo aprendió en el post-entrenamiento a comportarse distinto en cada nivel (grabado en los pesos congelados). Es **señal, no presupuesto**: con `low` igual piensa ante problemas difíciles. El **thinking** define si existe un bloque separado (adaptativo, por petición) y effort calibra cuánto usarlo: son hermanos. El único límite duro es **max_tokens**, que abarca thinking + texto. Recomendación: fijar el effort primero (control calibrado) y recién después afinar con frases en el system prompt o por mensaje, midiendo frecuencia de thinking, tokens, latencia y calidad.",
+   "puntos_clave": [
+    "output_config, no thinking",
+    "Cinco niveles, high default",
+    "Afecta thinking, texto y herramientas",
+    "Tokens en el prompt, comportamiento en los pesos",
+    "Señal, no presupuesto; max_tokens es el tope duro",
+    "Primero effort, después steering en lenguaje natural"
+   ]
+  }
+ ],
+ "conexiones": [
+  {
+   "clase": 3,
+   "relacion": "La fórmula de costo y la tesis del completado se apoyan en que el LLM es una red que predice el siguiente token; el thinking por RL retoma la idea de optimizar una función objetivo."
+  },
+  {
+   "clase": 6,
+   "relacion": "RAG aparece acá como mitigación de alucinaciones y paso 3 del prompt chaining; la clase 6 responde la objeción «con 1M de tokens, ¿para qué recuperar?»."
+  },
+  {
+   "clase": 7,
+   "relacion": "Tokens, tokenización y embeddings se profundizan en «De la palabra al transformer»; el sesgo de recencia se explica con atención."
+  },
+  {
+   "clase": 9,
+   "relacion": "DeepSeek-R1 y el refuerzo con recompensa verificable, SFT y post-entrenamiento (de donde sale el comportamiento por nivel de effort) son el tema de cómo se entrena un LLM."
+  },
+  {
+   "clase": 10,
+   "relacion": "Prompt chaining es la base de los agentes: en un pipeline el próximo paso lo decide el código, en un agente lo decide el modelo; effort también cambia cuántas herramientas llama un agente."
+  },
+  {
+   "clase": 13,
+   "relacion": "Slopsquatting, Glasswing, delimitadores XML contra inyección de prompt y la responsabilidad de quien despliega (Air Canada) se retoman en seguridad y ética."
+  }
+ ],
+ "lecturas": [
+  "Brown et al. 2020, Language Models are Few-Shot Learners (GPT-3; in-context learning)",
+  "Wei et al. 2022, Chain-of-Thought Prompting Elicits Reasoning in Large Language Models",
+  "Wang et al. 2022, Self-Consistency Improves Chain of Thought Reasoning in Language Models",
+  "Yao et al. 2023, Tree of Thoughts: Deliberate Problem Solving with Large Language Models (NeurIPS 2023)",
+  "DeepSeek-AI et al. 2025, DeepSeek-R1 incentivizes reasoning in LLMs through reinforcement learning (Nature 645)",
+  "Balachandran et al. 2025 (Microsoft Research), Inference-Time Scaling for Complex Tasks: Where We Stand and What Lies Ahead",
+  "Moffatt v. Air Canada, 2024 BCCRT 149",
+  "Norton Rose Fulbright 2026, AI in litigation: update on gen AI sanctions",
+  "We Have a Package for You! (análisis de Socket sobre package hallucinations / slopsquatting)",
+  "Linux Foundation 2026, Tokenomics Foundation",
+  "Anthropic 2026, Project Glasswing",
+  "Documentación de Claude: prompt caching, structured outputs, adaptive thinking, effort",
+  "aitutorial.dev: módulos de prompting (fundamentals, structured prompt engineering, advanced techniques, optimization & testing)"
+ ]
+}

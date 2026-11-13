@@ -1,0 +1,715 @@
+{
+  "num": 3,
+  "fecha": "2026-08-19",
+  "titulo": "Introducción a las redes neuronales",
+  "talks": [
+    "intro-redes-neuronales"
+  ],
+  "bloque": "Fundamentos de redes",
+  "tesis": "Una red neuronal es un circuito que aprende ajustando cuánta señal deja pasar cada conexión. Todo lo demás son variaciones sobre tres piezas: la capa (combinación lineal seguida de una no linealidad), la matriz donde viven los pesos, y backpropagation, que reparte la culpa del error entre todos ellos.",
+  "resumen": "La clase construye la red desde la intuición hasta el entrenamiento, sin saltos. Arranca con la metáfora del auto con sensores, compuertas y actuadores (Mark Riedl): entrenar es ajustar qué caminos conducen, sin que nadie programe reglas. Después fija la pieza mínima: la neurona como combinación lineal más sesgo, la sigmoide como no linealidad clásica y la capa como el bloque que se repite. Al apilar capas aparecen las capas ocultas, las dos dimensiones de toda arquitectura (ancho y profundidad) y la distinción entre parámetros e hiperparámetros. Un caso concreto —ocho variables del clima, nueve unidades ocultas— da 72 conexiones, 81 parámetros, una matriz 8×9 y un producto matricial cuyas dimensiones se anticipan de memoria. Luego muestra por qué la no linealidad es obligatoria (sin ella la red colapsa en $W^*$), cataloga sigmoide, tanh, ReLU y softmax, y advierte dónde va softmax. Cierra abriendo el entrenamiento: forward y backward, la pérdida L2, la regla de la cadena, el delta que se propaga hacia atrás y el paso $w \\leftarrow w-\\eta\\,\\partial L/\\partial w$.",
+  "secciones": [
+    {
+      "titulo": "De la intuición a la red: un circuito que se ajusta solo",
+      "contenido": "La clase arranca sin una sola fórmula, con una metáfora (atribuida a **Mark Riedl**, *A Very Gentle Introduction to Large Language Models without the Hype*): un **auto con sensores** (\"viene algo por la izquierda\", \"estoy cerca de la pared\") conectados por cables a dos **actuadores**, el acelerador y el freno. Entre medio hay **nodos** que reparten la electricidad. *Eso es, literalmente, una red neuronal.*\n\nLos tres roles:\n\n- **Sensor** → la entrada: un número que describe algo del mundo (una distancia, una temperatura, un píxel).\n- **Compuerta** → el nodo intermedio: deja pasar más o menos energía según el parámetro que aprendió. Ese *\"cuánto deja pasar\"* es todo el secreto.\n- **Actuador** → la salida: frenar o acelerar; en una red real, una clase o un número.\n\n**Aprender es ajustar qué caminos conducen.** Al principio los parámetros son azarosos y el auto choca. Probamos, medimos el error, retocamos apenas las compuertas y volvemos a probar. Después de muchísimas repeticiones ciertos caminos quedan reforzados: los que llevan del sensor correcto al actuador correcto. **Esto es el entrenamiento: nadie programa reglas**, hay un procedimiento incremental que ajusta números hasta que el comportamiento se parece al que queríamos. El ciclo *adivinar → medir → corregir un poco → repetir* es exactamente backpropagation (capítulo 6).\n\n**El punto de partida conocido: el modelo lineal.** Tres piezas que reaparecen en toda la clase:\n\n1. **La entrada:** un vector de números $x$, las variables que describen el caso.\n2. **El modelo:** una combinación lineal de esas variables, con un peso por cada una.\n3. **El error:** la suma de las diferencias al cuadrado entre lo predicho y lo esperado.\n\nLa entrada es el vector $x$ del ejemplo del clima, el modelo es la parte lineal de la neurona y el error es la función de coste de backpropagation.\n\n**Deep Learning** es reconocer que se pueden poner otras cosas en el circuito además de compuertas (un cálculo que suma y multiplica antes de dejar pasar la señal), con la misma técnica de fondo. **\"Deep\" no se refiere a profundidad conceptual, sino a la cantidad de capas apiladas.**",
+      "conceptos": [
+        "neurona",
+        "funcion-de-perdida"
+      ]
+    },
+    {
+      "titulo": "La neurona, la sigmoide y la capa",
+      "contenido": "**El mundo real no es lineal.** La temperatura a lo largo del año sube y baja (periódica); la distribución del ingreso cae de forma abrupta y después se aplana (caída con cola). Una recta aproxima el promedio pero pierde **la forma**. \"Mejor modelo\" significa: capaz de representar **curvas, saturaciones y quiebres**.\n\n**La neurona, primero, una combinación lineal.** Recibe varias entradas, las multiplica por sus pesos, las suma y agrega un sesgo:\n\n$$a = x \\cdot w + b$$\n\n$x$ es el vector de entradas, $w$ los pesos aprendidos y $b$ el **sesgo**: *un desplazamiento que le permite activarse antes o después* (mueve el umbral de decisión sin cambiar la pendiente). Ese único número $a$ es todo lo que produce la parte lineal.\n\n**La sigmoide: la no linealidad clásica.** Aplasta cualquier número al intervalo $(0,1)$:\n\n$$\\sigma(a) = \\frac{1}{1+e^{-a}}$$\n\nCuatro propiedades: **rango acotado** (se lee como probabilidad), **diferenciable** (sin eso no habría backpropagation — la más importante), **monótona creciente** (conserva el orden) y **punto medio en 0**: $\\sigma(0)=0.5$, umbral natural de decisión. Su derivada sale \"casi gratis\" porque se escribe con la propia sigmoide: $\\sigma'(a)=\\sigma(a)(1-\\sigma(a))$. Ojo: fue el default histórico, pero **hoy el estándar en capas ocultas es ReLU** (se ve en el capítulo 5).\n\n**La capa: el bloque que se repite.** *Combinación lineal seguida de una no linealidad.* Ese par es la unidad con la que se construye cualquier red: **no hay una pieza más grande que aprender, solo esta repetida**. Una capa toma un vector y devuelve otro vector; encadenarlas es pasarle a la siguiente lo que produjo la anterior.\n\n**Analogía del termostato:** la temperatura baja de forma continua, pero la decisión (ponerse el abrigo o no) es binaria. La activación convierte una magnitud continua en una respuesta de otra naturaleza: una probabilidad, una activación o un cero.",
+      "conceptos": [
+        "neurona",
+        "sesgo",
+        "sigmoide",
+        "capa",
+        "funcion-de-activacion"
+      ]
+    },
+    {
+      "titulo": "Redes profundas: ancho, profundidad, parámetros e hiperparámetros",
+      "contenido": "**Apilar capas.** Entre la entrada y la salida se meten capas intermedias, llamadas **ocultas** porque no se observan directamente: no son ni el dato que entra ni la respuesta que sale. Lo que representa cada unidad nadie se lo indicó: la red descubre sola qué combinaciones le sirven para reducir el error. Construye **representaciones intermedias**: en visión, las primeras capas detectan bordes, las siguientes texturas, las últimas objetos.\n\n**Las dos dimensiones** que describen cualquier arquitectura (y cambian capacidad *y costo*):\n\n- **Ancho:** cantidad de unidades dentro de una capa. El ancho de la red es el de su **capa más grande**.\n- **Profundidad:** cantidad de **capas ocultas**. **No cuentan ni la entrada ni la salida.** Los papers no son consistentes: \"red de tres capas\" suele significar tres ocultas.\n\n**Parámetros contra hiperparámetros** — la distinción que más confusión genera:\n\n| Aspecto | Hiperparámetros | Parámetros |\n|---|---|---|\n| ¿Quién los fija? | Nosotros, a mano, antes de entrenar | La red, durante el entrenamiento |\n| Ejemplos | Ancho, profundidad, tasa de aprendizaje $\\eta$, tamaño de lote | Pesos $w$ y sesgos $b$ |\n| ¿Cuándo cambian? | Solo si se relanza el entrenamiento | En cada iteración, con cada lote |\n| ¿Cuántos hay? | Decenas como mucho | Millones o miles de millones |\n| ¿Cómo se eligen? | Búsqueda, experiencia, validación | Descenso por gradiente sobre el error |\n\nAjustar hiperparámetros es el **ciclo externo**; entrenar es el **ciclo interno** que corre dentro de cada configuración. El ciclo de ajuste: elegir configuración (ancho, profundidad, $\\eta$) → entrenar → medir el **error de validación** → cambiar la configuración y volver a probar, hasta que el error deja de mejorar. Trampa típica: **la tasa de aprendizaje no se aprende, se elige.**\n\n**Cómo leer un diagrama de red:** los círculos son unidades, las flechas son transformaciones con pesos asociados, y cada columna es una capa.",
+      "conceptos": [
+        "capa-oculta",
+        "profundidad-y-ancho",
+        "parametros-vs-hiperparametros"
+      ]
+    },
+    {
+      "titulo": "El recorrido completo: predecir el clima",
+      "contenido": "El capítulo más denso recorre una red concreta con números verificables a mano. Tres preguntas: ¿cómo se ve un caso real?, ¿dónde viven los pesos?, ¿cómo se calcula una capa? (un producto matricial y una activación, **nada más**).\n\n**El caso.** **Ocho variables de entrada**: temperatura media, máxima, mínima, humedad, precipitación, presión, nubosidad y visibilidad. Una primera capa oculta de **nueve unidades** (el 9 es un **hiperparámetro**, lo elegimos nosotros).\n\n- **8 entradas × 9 unidades = 72 conexiones**, cada una con su propio peso, que arranca al azar y el entrenamiento corrige.\n- Más **un sesgo por unidad oculta** (9 más; el sesgo desplaza la unidad entera, no cada entrada): **81 parámetros solo en la primera capa**.\n\n**Todos los pesos, en una matriz** de **8 filas × 9 columnas**: cada fila es una variable de entrada, cada columna una unidad oculta, cada celda el peso de esa conexión. Notación: $w_{36}$ es el peso que va de la **tercera entrada** a la **sexta unidad oculta** (primer subíndice = entrada, segundo = unidad oculta). Pensar en matrices permite **calcular la capa entera con una sola operación y aprovechar la GPU**: las nueve unidades se calculan en paralelo, todas ven las mismas ocho variables y lo único que las diferencia es **su columna de pesos**.\n\n**El cálculo de la capa es un producto matricial:**\n\n$$\\underbrace{x}_{1\\times 8}\\cdot \\underbrace{W^{(1)}}_{8\\times 9} = \\underbrace{h}_{1\\times 9}\\quad(\\text{antes de la activación})$$\n\n**Resumen de dimensiones:**\n\n| Etapa | Dimensión | Qué representa |\n|---|---|---|\n| Entrada $x$ | 1 × 8 | Las ocho variables de una observación |\n| Pesos $W^{(1)}$ | 8 × 9 | Conexiones entrada → 1ª capa oculta |\n| Capa oculta $h^{(1)}$ | 1 × 9 | El producto, ya pasado por la activación |\n| Pesos $W^{(n)}$ | 100 × 4 | Última capa oculta (100 unidades) → salida: 400 pesos |\n| Salida $y$ | 1 × 4 | Los cuatro valores que predice la red |\n\n(Entre la primera oculta y la salida hay otras capas no dibujadas; la última tiene 100 unidades.)\n\n**Regla práctica:** el número de **columnas de la izquierda tiene que coincidir con el de filas de la derecha**. Si no coincide, la arquitectura está mal planteada.",
+      "conceptos": [
+        "capa",
+        "matriz-de-pesos",
+        "profundidad-y-ancho",
+        "parametros-vs-hiperparametros"
+      ],
+      "ejemplo": "**Contar parámetros (fórmula general):** una capa densa de $m$ neuronas sobre $n$ entradas tiene $m\\cdot n + m$ parámetros.\n\n- Clima, primera capa: $9\\cdot 8 + 9 = 81$.\n- Capa de salida del ejemplo: $100\\cdot 4 + 4 = 404$ (400 pesos + 4 sesgos).\n- Verificación de dimensiones: $(1\\times 8)\\cdot(8\\times 9) = (1\\times 9)$ ✔; $(1\\times 9)\\cdot(8\\times 9)$ ✘ — los \"9\" y \"8\" no coinciden."
+    },
+    {
+      "titulo": "Funciones de activación: por qué la no linealidad es obligatoria",
+      "contenido": "> *Necesitamos las no linealidades para poder romper la linealidad y representar relaciones más complicadas.*\n\n**Sin no linealidad, la red colapsa.** Dos transformaciones lineales encadenadas equivalen a una sola:\n\n$$W_2(W_1x) = (W_2W_1)x = W^{*}x$$\n\nCon el ejemplo: $W_1$ (8×9) y $W_2$ (9×4) se multiplican en una única $W^{*}$ (8×4); la capa oculta $h$ desaparece y $x$ llega directo a $y$. **Diez capas lineales tienen exactamente el mismo poder expresivo que una**: sacarle la activación a una red de diez capas te deja *una regresión lineal disfrazada*.\n\n**Con no linealidad**, cada capa \"dobla el espacio\" a su manera y al encadenarlas se puede aproximar prácticamente cualquier función continua: el **teorema de aproximación universal**. Matiz clave: garantiza que *existe* una red que aproxima la función; **no dice cuántas unidades hacen falta ni cómo encontrarla**. *La no linealidad no es un detalle de implementación: es lo único que justifica apilar capas.*\n\n**Las cuatro más comunes.** Todas son **monótonas, continuas y diferenciables**; difieren en el rango y en sus derivadas:\n\n| Función | Definición | Rango | Cuándo usarla |\n|---|---|---|---|\n| Sigmoide | $1/(1+e^{-a})$ | (0, 1) | Salida binaria; probabilidad |\n| Tanh | $(e^{a}-e^{-a})/(e^{a}+e^{-a})$ | (−1, 1) | Ocultas; centrada en 0, converge más rápido que la sigmoide |\n| ReLU | $\\max(0,a)$ | [0, ∞) | **El estándar en capas ocultas**: barata y evita el gradiente que se desvanece |\n| Softmax | $e^{a_i}/\\sum_j e^{a_j}$ | (0, 1), suman 1 | Capa de salida multiclase |\n\n**La derivada importa tanto como la función**: es la que viaja hacia atrás durante el entrenamiento. **Una derivada que se aplana frena el aprendizaje.** Ese es el problema de la sigmoide: en los extremos se aplana, su derivada tiende a 0 (su máximo es 0.25 en $a=0$) y el gradiente **se desvanece**. Por eso ReLU la reemplazó en capas ocultas, aunque la sigmoide haya sido el default histórico gracias a que su derivada sale \"casi gratis\".",
+      "conceptos": [
+        "no-linealidad",
+        "funcion-de-activacion",
+        "relu",
+        "sigmoide",
+        "aproximacion-universal",
+        "gradiente-que-se-desvanece"
+      ]
+    },
+    {
+      "titulo": "Softmax: de puntajes a probabilidades",
+      "contenido": "En la capa de salida de un clasificador multiclase no queremos números sueltos sino **una distribución**. Softmax toma valores arbitrariamente grandes o chicos (puntajes, *logits*) y devuelve probabilidades **positivas que suman exactamente 1**:\n\n$$y_i = \\frac{e^{a_i}}{\\sum_j e^{a_j}}$$\n\nDos pasos: la exponencial vuelve todo positivo (y agranda las diferencias), y la división por el total normaliza.\n\n**Ojo con dónde se aplica.** Softmax va en la **activación de la capa final**. Si se la aplica en una **capa oculta** se pierde información sobre la **magnitud** de los valores y solo sobrevive su proporción (variabilidad). Es un error que aparece en trabajos de alumnos.\n\n**Softmax es la única de las cuatro que mira todas las unidades a la vez**: sigmoide, tanh y ReLU se aplican número por número; softmax necesita el vector entero porque cada salida depende de la suma de todas. Por eso, además, las clases **compiten**: subir una baja las otras (lo que la hace correcta solo para clases excluyentes, tema de la clase 4).",
+      "conceptos": [
+        "softmax",
+        "funcion-de-activacion"
+      ],
+      "ejemplo": "**Gato, perro y caballo** (el ejemplo de la clase). Puntajes de la capa de salida: $a = [-0{,}21;\\ 0{,}47;\\ 1{,}72]$.\n\n| Clase | $a$ | $e^{a}$ | $e^{a}/\\Sigma$ |\n|---|---|---|---|\n| gato | −0,21 | 0,81 | 0,81 / 8 = **0,1** |\n| perro | 0,47 | 1,60 | 1,60 / 8 = **0,2** |\n| caballo | 1,72 | 5,58 | 5,58 / 8 = **0,7** |\n| | | $\\Sigma \\approx 8$ (7,99) | suman **1** |\n\n\"Caballo\" es la clase más probable. Notá que un puntaje negativo (−0,21) igual termina en una probabilidad positiva."
+    },
+    {
+      "titulo": "Backpropagation I: forward, backward, función de coste y regla de la cadena",
+      "contenido": "Tres preguntas ordenan el capítulo: ¿cómo sabe la red que se equivocó? (**función de coste**), ¿cómo reparte la culpa entre pesos? (**regla de la cadena**, capa por capa hacia atrás), ¿cómo se corrige cada peso? (**un paso en dirección opuesta al gradiente, del tamaño de $\\eta$**).\n\n**Ida y vuelta.** El entrenamiento es un ciclo de dos movimientos (sobre una red 2-3-2 en la clase):\n\n- **Propagación hacia adelante (forward):** empujar la entrada a través de la red, comparar las salidas $y$ con los objetivos $t$ y formar el error.\n- **Propagación hacia atrás (backward):** propagar ese error hacia atrás y actualizar los parámetros (pesos y sesgos). La vuelta termina en los pesos $w_{ij}$ de la primera capa: **las entradas no tienen parámetros**.\n\nEs el auto del capítulo 1: forward es dejar que el auto ande, backward es retocar las compuertas después de ver dónde chocó. Una **época** es una pasada completa por todos los datos de entrenamiento.\n\n**El error: la función de coste L2.**\n\n$$L = \\frac{1}{2}\\sum_j (y_j - t_j)^2$$\n\n$y$ es lo predicho, $t$ el objetivo; la suma recorre **las unidades de salida**. Tres decisiones de diseño: **al cuadrado** (exceso y defecto no se cancelan, los errores grandes pesan más), **el ½** (no cambia dónde está el mínimo; está para que la derivada quede limpia, porque el 2 del exponente baja y se cancela) y **diferenciable** (permite calcular el gradiente).\n\n**La regla de la cadena.** ¿Cuánto cambia el error si movemos un peso? El peso **no toca el error directamente**: lo hace a través de la suma ponderada $a_j$, y esta a través de la activación $y_j$. Tres efectos encadenados:\n\n$$\\frac{\\partial L}{\\partial w_{ij}} = \\underbrace{\\frac{\\partial L}{\\partial y_j}}_{①\\ y_j - t_j}\\cdot\\underbrace{\\frac{\\partial y_j}{\\partial a_j}}_{②\\ f'(a_j)}\\cdot\\underbrace{\\frac{\\partial a_j}{\\partial w_{ij}}}_{③\\ x_i}$$\n\n① cuánto cambia el error si cambia la salida (sale directo del coste: predicción menos objetivo); ② cuánto cambia la salida si cambia la suma (la derivada de la activación en ese punto); ③ cuánto cambia la suma si cambia el peso: **simplemente la entrada que multiplicaba a ese peso**.",
+      "conceptos": [
+        "backpropagation",
+        "funcion-de-perdida",
+        "mse",
+        "regla-de-la-cadena",
+        "epoca"
+      ]
+    },
+    {
+      "titulo": "Backpropagation II: el delta, la propagación hacia atrás y el paso de actualización",
+      "contenido": "**El delta en la capa de salida.** Se agrupan los dos primeros factores en un solo término $\\delta$, *la sensibilidad del error respecto de la suma ponderada de esa unidad*:\n\n$$\\delta_j = \\frac{\\partial L}{\\partial a_j} = (y_j - t_j)\\, f'(a_j) \\qquad\\Rightarrow\\qquad \\frac{\\partial L}{\\partial w_{ij}} = \\delta_j\\, x_i$$\n\nDelta **es una abreviatura, no un concepto nuevo**. La ganancia: con $\\delta$ calculado, el gradiente de **cualquier** peso que llega a la unidad es **una multiplicación**, sin rehacer la cadena. Esa economía hace viable entrenar millones de parámetros.\n\n**Capa oculta: propagar el delta hacia atrás.** ¿Contra qué se compara una unidad oculta? **Contra nada**: no tiene objetivo propio. Su \"culpa\" se calcula **sumando los deltas de las unidades de la capa siguiente a las que alimenta, ponderados por los pesos que las conectan**, por la derivada de su activación (con sigmoide, $y_j(1-y_j)$):\n\n$$\\delta_j = \\Big(\\sum_k \\delta_k\\, w_{jk}\\Big)\\, y_j(1-y_j) \\qquad\\Rightarrow\\qquad \\frac{\\partial L}{\\partial w_{ij}} = \\delta_j\\, x_i$$\n\n- **Salida:** $\\delta$ se calcula directo (hay objetivo).\n- **Ocultas:** $\\delta$ se **hereda** de la capa siguiente, ponderado por los pesos.\n- **Recursión:** se repite hacia atrás hasta la primera capa.\n\n*Acá está el corazón del algoritmo*: cada unidad recibe la parte de culpa que le corresponde según cuánto influyó en las que venían después. De ahí el nombre.\n\n**El paso de actualización.** Corregir un peso es restarle una fracción de su gradiente:\n\n$$w \\leftarrow w - \\eta\\,\\frac{\\partial L}{\\partial w}$$\n\n- **El signo menos:** el gradiente apunta hacia donde el error **crece**; nos movemos en la dirección opuesta.\n- **$\\eta$ muy chico:** avanza tan despacio que puede volverse impracticable.\n- **$\\eta$ muy grande:** los pasos se pasan del mínimo y el error oscila o diverge.\n\nImagen: una pelota bajando por un valle, con $\\eta$ como tamaño del paso — pasos chicos tardan una eternidad, pasos grandes saltan de una ladera a la otra. Y $\\eta$ es un **hiperparámetro**: se elige, no se aprende.\n\n**Glosario de símbolos:** $x$ entrada · $w$ peso · $a$ suma ponderada ($xw+b$) · $y$ salida (activación aplicada) · $t$ objetivo · $L$ pérdida · $\\delta$ delta · $\\eta$ tasa de aprendizaje.",
+      "conceptos": [
+        "delta",
+        "backpropagation",
+        "learning-rate"
+      ],
+      "ejemplo": "**Ejercicio de práctica (cuenta propia con la notación de la clase, no está en el mazo).** Una neurona sigmoide: $x=1$, $w=0{,}5$, $b=0$, objetivo $t=1$, $\\eta=0{,}5$.\n\n1. Forward: $a = 1\\cdot 0{,}5 + 0 = 0{,}5$; $y=\\sigma(0{,}5)=0{,}6225$.\n2. Coste: $L=\\tfrac12(0{,}6225-1)^2 = 0{,}0713$.\n3. Delta: $\\delta=(y-t)\\,y(1-y) = (-0{,}3775)(0{,}2350) = -0{,}0887$.\n4. Gradiente: $\\partial L/\\partial w = \\delta\\,x = -0{,}0887$.\n5. Update: $w \\leftarrow 0{,}5 - 0{,}5\\cdot(-0{,}0887) = 0{,}5444$.\n\nEl gradiente es negativo (subir $w$ baja el error), así que el signo menos hace **subir** el peso: la próxima predicción queda más cerca de 1."
+    }
+  ],
+  "conceptos": [
+    {
+      "id": "neurona",
+      "termino": "Neurona (unidad)",
+      "definicion": "Unidad que calcula una combinación lineal de sus entradas más un sesgo, $a = x\\cdot w + b$, y le aplica una función de activación $y=f(a)$.",
+      "por_que_importa": "Es la pieza mínima; toda la red son neuronas organizadas en capas.",
+      "trampa": "La parte lineal sola no es una neurona completa: sin la no linealidad no aporta nada que una regresión no haga."
+    },
+    {
+      "id": "sesgo",
+      "termino": "Sesgo (bias)",
+      "definicion": "Término $b$ que se suma a la combinación lineal: un desplazamiento que permite a la unidad activarse antes o después. Hay uno por unidad, no por conexión.",
+      "por_que_importa": "Mueve el umbral de decisión sin cambiar la pendiente; también es un parámetro que se aprende (los 9 del ejemplo del clima).",
+      "trampa": "Olvidarlo al contar parámetros: 8×9 = 72 pesos, pero la capa tiene 81 parámetros."
+    },
+    {
+      "id": "capa",
+      "termino": "Capa",
+      "definicion": "Combinación lineal seguida de una no linealidad, aplicada a un vector y que devuelve otro vector. Es el bloque que se repite en cualquier red.",
+      "por_que_importa": "\"No hay una pieza más grande que aprender, solo esta repetida\": cualquier arquitectura es una variación de este bloque.",
+      "trampa": "Pensar que una capa tiene una 'tercera cosa' escondida: es un producto matricial y una función, nada más."
+    },
+    {
+      "id": "capa-oculta",
+      "termino": "Capa oculta",
+      "definicion": "Capa intermedia entre entrada y salida; se llama oculta porque no se observa directamente (no es ni el dato que entra ni la respuesta que sale).",
+      "por_que_importa": "Construye representaciones intermedias que nadie le indicó (bordes → texturas → objetos en visión).",
+      "trampa": "'Oculta' no significa misteriosa: solo que no tiene un valor objetivo observable."
+    },
+    {
+      "id": "profundidad-y-ancho",
+      "termino": "Ancho y profundidad",
+      "definicion": "Ancho: cantidad de unidades de una capa (el de la red es el de su capa más grande). Profundidad: cantidad de capas ocultas, sin contar entrada ni salida.",
+      "por_que_importa": "Son los dos números que describen cualquier arquitectura y determinan su capacidad y su costo.",
+      "trampa": "Contar la capa de entrada o la de salida en la profundidad. 'Deep' alude a la cantidad de capas, no a profundidad conceptual."
+    },
+    {
+      "id": "parametros-vs-hiperparametros",
+      "termino": "Parámetros vs. hiperparámetros",
+      "definicion": "Parámetros: pesos y sesgos, los aprende la red por descenso por gradiente (millones). Hiperparámetros: ancho, profundidad, $\\eta$, tamaño de lote; los fija quien diseña antes de entrenar (decenas).",
+      "por_que_importa": "Ordena el trabajo en dos ciclos: el externo (buscar configuración mirando validación) y el interno (entrenar).",
+      "trampa": "Creer que la tasa de aprendizaje se aprende: se elige."
+    },
+    {
+      "id": "matriz-de-pesos",
+      "termino": "Matriz de pesos",
+      "definicion": "Los pesos de una capa ordenados en una matriz de (entradas × unidades): filas = variables de entrada, columnas = unidades. $w_{36}$ va de la entrada 3 a la unidad oculta 6.",
+      "por_que_importa": "Permite calcular la capa entera con un solo producto $x\\cdot W$ y aprovechar la GPU.",
+      "trampa": "Equivocar el orden de dimensiones: las columnas de la izquierda deben coincidir con las filas de la derecha."
+    },
+    {
+      "id": "funcion-de-activacion",
+      "termino": "Función de activación",
+      "definicion": "Función no lineal $f$ que se aplica a la suma ponderada; transforma un número real cualquiera en algo de otra naturaleza (probabilidad, activación, cero). Debe ser monótona, continua y diferenciable.",
+      "por_que_importa": "Sin ella la red colapsa en una sola transformación lineal; su derivada viaja hacia atrás en backpropagation.",
+      "trampa": "Pensar que es un detalle de implementación: es lo único que justifica apilar capas."
+    },
+    {
+      "id": "no-linealidad",
+      "termino": "No linealidad / colapso lineal",
+      "definicion": "Sin activaciones, $W_2(W_1x)=(W_2W_1)x=W^*x$: cualquier cantidad de capas lineales equivale a una sola.",
+      "por_que_importa": "Diez capas lineales tienen el mismo poder expresivo que una; sin no linealidad la profundidad desaparece.",
+      "trampa": "Creer que agregar capas lineales agrega capacidad: queda una regresión lineal disfrazada."
+    },
+    {
+      "id": "sigmoide",
+      "termino": "Sigmoide",
+      "definicion": "$\\sigma(a)=1/(1+e^{-a})$, rango (0,1), $\\sigma(0)=0.5$. Su derivada es $\\sigma(1-\\sigma)$.",
+      "por_que_importa": "Fue el default histórico (derivada casi gratis) y es la activación de salida para sí/no.",
+      "trampa": "Usarla en capas ocultas: se aplana en los extremos y el gradiente se desvanece."
+    },
+    {
+      "id": "relu",
+      "termino": "ReLU",
+      "definicion": "$\\max(0,a)$, rango [0, ∞).",
+      "por_que_importa": "Es el estándar en capas ocultas: barata y no se aplana del lado positivo, así evita el gradiente que se desvanece.",
+      "trampa": "Quedarse con la sigmoide como 'la' activación porque fue la primera que se presentó."
+    },
+    {
+      "id": "softmax",
+      "termino": "Softmax",
+      "definicion": "$y_i=e^{a_i}/\\sum_j e^{a_j}$: convierte puntajes arbitrarios en probabilidades positivas que suman 1. Mira todas las unidades a la vez.",
+      "por_que_importa": "Es la activación de la capa de salida en clasificación multiclase.",
+      "trampa": "Aplicarla en una capa oculta: normaliza y se pierde la magnitud; solo sobrevive la proporción."
+    },
+    {
+      "id": "aproximacion-universal",
+      "termino": "Teorema de aproximación universal",
+      "definicion": "Con no linealidades, encadenar capas permite aproximar prácticamente cualquier función continua.",
+      "por_que_importa": "Justifica teóricamente las redes con activaciones.",
+      "trampa": "Garantiza que la red existe, no cuántas unidades hacen falta ni cómo encontrarla."
+    },
+    {
+      "id": "funcion-de-perdida",
+      "termino": "Función de coste (pérdida L2)",
+      "definicion": "Número único que resume cuánto se equivocó la red: $L=\\tfrac12\\sum_j(y_j-t_j)^2$, sumando sobre las unidades de salida.",
+      "por_que_importa": "Es lo que la red minimiza; tiene que ser diferenciable para poder calcular el gradiente.",
+      "trampa": "Creer que el ½ cambia el mínimo: solo limpia la derivada."
+    },
+    {
+      "id": "backpropagation",
+      "termino": "Backpropagation",
+      "definicion": "Algoritmo que propaga el error desde la salida hacia atrás aplicando la regla de la cadena capa por capa, para obtener el gradiente de cada peso, que luego se usa para actualizarlo.",
+      "por_que_importa": "Reparte la culpa del error entre todos los pesos con un costo razonable; sin él no se entrena ninguna red.",
+      "trampa": "Verlo como una fórmula mágica: es la regla de la cadena aplicada capa por capa, seguible con lápiz y papel."
+    },
+    {
+      "id": "regla-de-la-cadena",
+      "termino": "Regla de la cadena",
+      "definicion": "$\\partial L/\\partial w_{ij} = (\\partial L/\\partial y_j)(\\partial y_j/\\partial a_j)(\\partial a_j/\\partial w_{ij})$ = (error de salida) × (derivada de la activación) × (entrada $x_i$).",
+      "por_que_importa": "Responde cuánto cambia el error si movemos un peso que no lo toca directamente.",
+      "trampa": "Olvidar que el tercer factor es simplemente la entrada que multiplicaba al peso."
+    },
+    {
+      "id": "delta",
+      "termino": "Delta (δ)",
+      "definicion": "Sensibilidad del error respecto de la suma ponderada de una unidad: agrupa los dos primeros factores de la cadena. En la salida $\\delta_j=(y_j-t_j)f'(a_j)$; en una oculta $\\delta_j=(\\sum_k\\delta_k w_{jk})f'(a_j)$.",
+      "por_que_importa": "Con δ, el gradiente de cualquier peso entrante es $\\delta_j x_i$: una multiplicación, sin rehacer la cadena.",
+      "trampa": "Buscar un 'objetivo' para una unidad oculta: no lo tiene, hereda la culpa de la capa siguiente."
+    },
+    {
+      "id": "learning-rate",
+      "termino": "Tasa de aprendizaje η",
+      "definicion": "Hiperparámetro que fija el tamaño del paso en $w \\leftarrow w - \\eta\\,\\partial L/\\partial w$.",
+      "por_que_importa": "Es uno de los hiperparámetros más sensibles: muy chico, entrenamiento impracticable; muy grande, oscila o diverge.",
+      "trampa": "Olvidar el signo menos: el gradiente apunta hacia donde el error crece."
+    },
+    {
+      "id": "epoca",
+      "termino": "Época",
+      "definicion": "Una pasada completa por todos los datos de entrenamiento.",
+      "por_que_importa": "Es la unidad con la que se cuenta el entrenamiento y se mide el error de validación.",
+      "trampa": "Confundirla con un ajuste de pesos (eso es por batch; se ve en la clase 4)."
+    },
+    {
+      "id": "gradiente-que-se-desvanece",
+      "termino": "Gradiente que se desvanece",
+      "definicion": "Cuando la derivada de la activación es casi cero (sigmoide en los extremos), el factor ② de la cadena anula el producto y el gradiente que llega a las primeras capas se apaga.",
+      "por_que_importa": "Explica por qué ReLU reemplazó a la sigmoide en capas ocultas.",
+      "trampa": "Atribuirlo a un learning rate chico: es un problema de la derivada de la activación."
+    }
+  ],
+  "formulas": [
+    {
+      "nombre": "Neurona: combinación lineal",
+      "tex": "a = x\\cdot w + b = \\sum_i x_i w_i + b",
+      "explicacion": "$x$ entradas, $w$ pesos aprendidos, $b$ sesgo; $a$ es la suma ponderada antes de la activación."
+    },
+    {
+      "nombre": "Salida de una neurona",
+      "tex": "y = f(a)",
+      "explicacion": "$f$ es la función de activación aplicada a la suma ponderada."
+    },
+    {
+      "nombre": "Capa como producto matricial",
+      "tex": "h = f(x\\,W + b),\\quad (1\\times 8)(8\\times 9) = (1\\times 9)",
+      "explicacion": "Ejemplo del clima: 8 variables por una matriz 8×9 dan 9 unidades ocultas; columnas de la izquierda = filas de la derecha."
+    },
+    {
+      "nombre": "Parámetros de una capa densa",
+      "tex": "\\#\\text{params} = m\\cdot n + m",
+      "explicacion": "$n$ entradas, $m$ unidades: $m\\cdot n$ pesos + $m$ sesgos. Clima: $9\\cdot 8+9=81$."
+    },
+    {
+      "nombre": "Sigmoide",
+      "tex": "\\sigma(a) = \\frac{1}{1+e^{-a}}",
+      "explicacion": "Rango (0,1); $\\sigma(0)=0.5$."
+    },
+    {
+      "nombre": "Derivada de la sigmoide",
+      "tex": "\\sigma'(a) = \\sigma(a)\\,\\big(1-\\sigma(a)\\big)",
+      "explicacion": "Se escribe con la propia sigmoide (sale 'casi gratis'); su máximo es 0.25 y tiende a 0 en los extremos (gradiente que se desvanece)."
+    },
+    {
+      "nombre": "Tanh",
+      "tex": "\\tanh(a) = \\frac{e^{a}-e^{-a}}{e^{a}+e^{-a}}",
+      "explicacion": "Rango (−1,1), centrada en 0."
+    },
+    {
+      "nombre": "ReLU",
+      "tex": "\\mathrm{ReLU}(a) = \\max(0, a)",
+      "explicacion": "Rango [0,∞); estándar en capas ocultas."
+    },
+    {
+      "nombre": "Softmax",
+      "tex": "y_i = \\frac{e^{a_i}}{\\sum_j e^{a_j}}",
+      "explicacion": "Convierte puntajes en probabilidades que suman 1; solo en la capa de salida."
+    },
+    {
+      "nombre": "Colapso sin activación",
+      "tex": "W_2(W_1x) = (W_2W_1)x = W^{*}x",
+      "explicacion": "Dos capas lineales equivalen a una sola matriz $W^*$ (8×9 · 9×4 → 8×4)."
+    },
+    {
+      "nombre": "Función de coste L2",
+      "tex": "L = \\frac{1}{2}\\sum_j (y_j - t_j)^2",
+      "explicacion": "$y$ predicción, $t$ objetivo; suma sobre unidades de salida. El ½ cancela el 2 al derivar."
+    },
+    {
+      "nombre": "Regla de la cadena",
+      "tex": "\\frac{\\partial L}{\\partial w_{ij}} = \\frac{\\partial L}{\\partial y_j}\\cdot\\frac{\\partial y_j}{\\partial a_j}\\cdot\\frac{\\partial a_j}{\\partial w_{ij}} = (y_j-t_j)\\cdot f'(a_j)\\cdot x_i",
+      "explicacion": "① error si cambia la salida, ② derivada de la activación, ③ la entrada que multiplicaba al peso."
+    },
+    {
+      "nombre": "Delta de la capa de salida",
+      "tex": "\\delta_j = \\frac{\\partial L}{\\partial a_j} = (y_j - t_j)\\,f'(a_j)",
+      "explicacion": "Agrupa los dos primeros factores: sensibilidad del error respecto de la suma ponderada."
+    },
+    {
+      "nombre": "Gradiente en términos de delta",
+      "tex": "\\frac{\\partial L}{\\partial w_{ij}} = \\delta_j\\,x_i",
+      "explicacion": "Con δ calculado, el gradiente de cada peso entrante es una multiplicación."
+    },
+    {
+      "nombre": "Delta de una capa oculta",
+      "tex": "\\delta_j = \\Big(\\sum_k \\delta_k\\,w_{jk}\\Big)\\,y_j(1-y_j)",
+      "explicacion": "Suma de los deltas de las unidades $k$ que alimenta, ponderados por $w_{jk}$, por la derivada de su activación (sigmoide)."
+    },
+    {
+      "nombre": "Paso de actualización",
+      "tex": "w \\leftarrow w - \\eta\\,\\frac{\\partial L}{\\partial w}",
+      "explicacion": "$\\eta$ tasa de aprendizaje; el signo menos va contra el gradiente (hacia donde el error baja)."
+    }
+  ],
+  "comparaciones": [
+    {
+      "titulo": "Parámetros vs. hiperparámetros",
+      "columnas": [
+        "Aspecto",
+        "Hiperparámetros",
+        "Parámetros"
+      ],
+      "filas": [
+        [
+          "¿Quién los fija?",
+          "Quien diseña, antes de entrenar",
+          "La red, durante el entrenamiento"
+        ],
+        [
+          "Ejemplos",
+          "Ancho, profundidad, η, tamaño de lote",
+          "Pesos w y sesgos b"
+        ],
+        [
+          "¿Cuándo cambian?",
+          "Solo al relanzar el entrenamiento",
+          "En cada iteración, con cada lote"
+        ],
+        [
+          "¿Cuántos hay?",
+          "Decenas como mucho",
+          "Millones o miles de millones"
+        ],
+        [
+          "¿Cómo se eligen?",
+          "Búsqueda, experiencia, validación (ciclo externo)",
+          "Descenso por gradiente (ciclo interno)"
+        ]
+      ]
+    },
+    {
+      "titulo": "Las cuatro funciones de activación",
+      "columnas": [
+        "Función",
+        "Definición",
+        "Rango",
+        "Cuándo usarla"
+      ],
+      "filas": [
+        [
+          "Sigmoide",
+          "1/(1+e^{-a})",
+          "(0, 1)",
+          "Salida binaria; probabilidad"
+        ],
+        [
+          "Tanh",
+          "(e^a − e^{-a})/(e^a + e^{-a})",
+          "(−1, 1)",
+          "Ocultas; centrada en 0, converge más rápido que la sigmoide"
+        ],
+        [
+          "ReLU",
+          "max(0, a)",
+          "[0, ∞)",
+          "Estándar en capas ocultas; barata y evita el gradiente que se desvanece"
+        ],
+        [
+          "Softmax",
+          "e^{a_i}/Σ e^{a_j}",
+          "(0, 1), suman 1",
+          "Capa de salida multiclase; mira todas las unidades a la vez"
+        ]
+      ]
+    },
+    {
+      "titulo": "Delta: capa de salida vs. capa oculta",
+      "columnas": [
+        "Aspecto",
+        "Capa de salida",
+        "Capa oculta"
+      ],
+      "filas": [
+        [
+          "¿Tiene objetivo t?",
+          "Sí",
+          "No"
+        ],
+        [
+          "Cálculo de δ",
+          "(y − t)·f'(a), directo",
+          "(Σ δ_k w_jk)·f'(a), heredado de la capa siguiente"
+        ],
+        [
+          "Gradiente de un peso entrante",
+          "δ_j · x_i",
+          "δ_j · x_i"
+        ]
+      ]
+    }
+  ],
+  "flashcards": [
+    {
+      "q": "¿Qué es una capa?",
+      "a": "Una combinación lineal seguida de una no linealidad; toma un vector y devuelve otro. Es el bloque que se repite."
+    },
+    {
+      "q": "¿Cuántos parámetros tiene la primera capa del ejemplo del clima (8 entradas, 9 ocultas)?",
+      "a": "81: 72 pesos (8×9) + 9 sesgos."
+    },
+    {
+      "q": "¿Qué dimensión tiene la matriz de pesos del ejemplo del clima?",
+      "a": "8 × 9: filas = variables de entrada, columnas = unidades ocultas."
+    },
+    {
+      "q": "¿Qué significa $w_{36}$?",
+      "a": "El peso que va de la tercera entrada a la sexta unidad oculta."
+    },
+    {
+      "q": "¿Qué cuenta la profundidad de una red?",
+      "a": "Solo las capas ocultas; no se cuentan la entrada ni la salida."
+    },
+    {
+      "q": "¿Qué pasa si sacás todas las activaciones de una red de 10 capas?",
+      "a": "Colapsa en una sola transformación lineal: $W_2(W_1x)=W^*x$. Queda una regresión lineal disfrazada."
+    },
+    {
+      "q": "¿Qué garantiza (y qué no) el teorema de aproximación universal?",
+      "a": "Que existe una red con no linealidades que aproxima cualquier función continua; no dice cuántas unidades ni cómo encontrarla."
+    },
+    {
+      "q": "¿Cuál es la activación estándar en capas ocultas y por qué?",
+      "a": "ReLU: es barata y no se aplana del lado positivo, evitando el gradiente que se desvanece."
+    },
+    {
+      "q": "¿Por qué no se usa softmax en una capa oculta?",
+      "a": "Normaliza: se pierde la magnitud de los valores y solo sobrevive su proporción."
+    },
+    {
+      "q": "Softmax de [−0,21; 0,47; 1,72] (gato, perro, caballo)",
+      "a": "≈ [0,1; 0,2; 0,7]: exponenciales 0,81/1,60/5,58 divididas por Σ≈8."
+    },
+    {
+      "q": "¿Para qué está el ½ en $L=\\frac12\\sum(y-t)^2$?",
+      "a": "Para que la derivada quede limpia (cancela el 2 del exponente). No cambia dónde está el mínimo."
+    },
+    {
+      "q": "¿Cuáles son los tres factores de la regla de la cadena para un peso?",
+      "a": "(y−t) error de salida × f'(a) derivada de la activación × x_i la entrada que multiplicaba al peso."
+    },
+    {
+      "q": "¿Qué es δ?",
+      "a": "La sensibilidad del error respecto de la suma ponderada de una unidad; agrupa los dos primeros factores de la cadena."
+    },
+    {
+      "q": "¿Cómo se calcula δ de una unidad oculta?",
+      "a": "Sumando los δ de las unidades de la capa siguiente que alimenta, ponderados por los pesos que las conectan, por la derivada de su activación."
+    },
+    {
+      "q": "Regla de actualización de un peso",
+      "a": "$w \\leftarrow w - \\eta\\,\\partial L/\\partial w$."
+    },
+    {
+      "q": "¿Qué pasa con η muy grande? ¿Y muy chico?",
+      "a": "Grande: se pasa del mínimo, oscila o diverge. Chico: avanza tan lento que es impracticable."
+    },
+    {
+      "q": "¿Qué es una época?",
+      "a": "Una pasada completa por todos los datos de entrenamiento."
+    },
+    {
+      "q": "¿Cuál es la derivada de la sigmoide?",
+      "a": "$\\sigma(a)(1-\\sigma(a))$; máximo 0,25 y tiende a 0 en los extremos."
+    }
+  ],
+  "quiz": [
+    {
+      "q": "Una red tiene 8 entradas y una primera capa oculta de 9 unidades. ¿Cuántos parámetros tiene esa capa?",
+      "opciones": [
+        "72",
+        "81",
+        "17",
+        "90"
+      ],
+      "correcta": 1,
+      "explicacion": "8×9 = 72 pesos más un sesgo por unidad oculta (9) = 81. 72 olvida los sesgos; 17 suma en vez de multiplicar; 90 cuenta un sesgo por entrada además de 9 extras."
+    },
+    {
+      "q": "¿Por qué apilar diez capas sin funciones de activación no aumenta el poder expresivo?",
+      "opciones": [
+        "Porque el gradiente se desvanece",
+        "Porque la composición de transformaciones lineales es otra transformación lineal",
+        "Porque la red tiene demasiados parámetros",
+        "Porque los sesgos se cancelan entre capas"
+      ],
+      "correcta": 1,
+      "explicacion": "$W_2(W_1x)=(W_2W_1)x$: todo colapsa en una sola matriz. El gradiente que se desvanece es otro problema (de la derivada de la activación), y la cantidad de parámetros o los sesgos no son la causa."
+    },
+    {
+      "q": "Si $x$ es 1×8 y la siguiente capa tiene 9 unidades, ¿qué forma debe tener $W$ para calcular $x\\cdot W$?",
+      "opciones": [
+        "9 × 8",
+        "1 × 9",
+        "8 × 9",
+        "8 × 8"
+      ],
+      "correcta": 2,
+      "explicacion": "Las columnas de la izquierda (8) deben coincidir con las filas de la derecha, y el resultado debe tener 9 columnas: 8×9. 9×8 no encaja con 1×8."
+    },
+    {
+      "q": "¿Cuál de estos es un hiperparámetro?",
+      "opciones": [
+        "El peso $w_{36}$",
+        "El sesgo de la unidad 4",
+        "La tasa de aprendizaje η",
+        "El δ de la capa de salida"
+      ],
+      "correcta": 2,
+      "explicacion": "η la elige quien diseña antes de entrenar. Pesos y sesgos son parámetros aprendidos; δ es un valor intermedio del cálculo del gradiente."
+    },
+    {
+      "q": "Una red con capa de entrada, tres capas ocultas y capa de salida, ¿qué profundidad tiene según la convención de la clase?",
+      "opciones": [
+        "5",
+        "4",
+        "3",
+        "1"
+      ],
+      "correcta": 2,
+      "explicacion": "La profundidad cuenta solo las capas ocultas, sin entrada ni salida."
+    },
+    {
+      "q": "¿Dónde se aplica softmax correctamente?",
+      "opciones": [
+        "En todas las capas ocultas para normalizar",
+        "En la capa de salida de un clasificador multiclase",
+        "En la capa de entrada para escalar los datos",
+        "En la salida de una regresión de precio"
+      ],
+      "correcta": 1,
+      "explicacion": "Softmax convierte puntajes en una distribución que suma 1 y va en la capa final de clasificación multiclase. En una oculta pierde la magnitud; en la entrada no hay activación; un precio no es una distribución."
+    },
+    {
+      "q": "Puntajes de salida [−0,21; 0,47; 1,72]. Tras softmax, ¿qué se obtiene aproximadamente?",
+      "opciones": [
+        "[0; 0,27; 0,73]",
+        "[0,1; 0,2; 0,7]",
+        "[−0,1; 0,2; 0,9]",
+        "[0,33; 0,33; 0,33]"
+      ],
+      "correcta": 1,
+      "explicacion": "e^a = 0,81; 1,60; 5,58, suma ≈ 8 → 0,1; 0,2; 0,7. Softmax nunca da 0 ni negativos, y no reparte en partes iguales si los puntajes difieren."
+    },
+    {
+      "q": "En la regla de la cadena, ¿a qué es igual $\\partial a_j / \\partial w_{ij}$?",
+      "opciones": [
+        "A la derivada de la activación",
+        "A $y_j - t_j$",
+        "A la entrada $x_i$ que multiplicaba al peso",
+        "Al peso $w_{ij}$"
+      ],
+      "correcta": 2,
+      "explicacion": "Como $a_j=\\sum_i x_i w_{ij}+b$, derivar respecto de $w_{ij}$ deja $x_i$. La derivada de la activación es el factor ②; $y-t$ es el ①."
+    },
+    {
+      "q": "¿Por qué una unidad oculta necesita heredar su δ de la capa siguiente?",
+      "opciones": [
+        "Porque su derivada es siempre cero",
+        "Porque no tiene un objetivo propio con el cual compararse",
+        "Porque sus pesos no se actualizan",
+        "Porque usa ReLU"
+      ],
+      "correcta": 1,
+      "explicacion": "Nadie le dice cuál era su valor correcto; su culpa es la suma de los δ de las unidades que alimenta ponderados por los pesos. Sus pesos sí se actualizan y la activación no cambia esta lógica."
+    },
+    {
+      "q": "El gradiente de la pérdida respecto de un peso es positivo. ¿Qué hace el paso de actualización?",
+      "opciones": [
+        "Aumenta el peso",
+        "Disminuye el peso",
+        "Lo deja igual",
+        "Lo pone en cero"
+      ],
+      "correcta": 1,
+      "explicacion": "$w \\leftarrow w-\\eta\\cdot(+)$: el peso baja, porque el gradiente positivo indica que subirlo aumenta el error."
+    },
+    {
+      "q": "Durante el entrenamiento el error oscila de un lado a otro y no baja. ¿Causa más probable?",
+      "opciones": [
+        "η demasiado chico",
+        "η demasiado grande",
+        "Falta de sesgos",
+        "Demasiadas épocas"
+      ],
+      "correcta": 1,
+      "explicacion": "Con η grande los pasos se pasan del mínimo y saltan de una ladera a la otra. η chico produce avance lento, no oscilación."
+    },
+    {
+      "q": "¿Por qué la sigmoide dejó de ser la activación estándar en capas ocultas?",
+      "opciones": [
+        "Porque no es diferenciable",
+        "Porque su rango no es acotado",
+        "Porque su derivada se aplana en los extremos y el gradiente se desvanece",
+        "Porque es más cara que softmax"
+      ],
+      "correcta": 2,
+      "explicacion": "Es diferenciable y acotada; el problema es que su derivada (máx. 0,25) tiende a cero en los extremos, apagando el gradiente. ReLU no satura del lado positivo."
+    },
+    {
+      "q": "¿Qué representa el sesgo $b$ de una neurona?",
+      "opciones": [
+        "Un error sistemático del modelo",
+        "Un desplazamiento que permite activarse antes o después",
+        "El peso de la conexión más importante",
+        "La tasa de aprendizaje de esa unidad"
+      ],
+      "correcta": 1,
+      "explicacion": "El sesgo desplaza la suma ponderada (mueve el umbral sin cambiar la pendiente). No es 'sesgo' estadístico ni un hiperparámetro."
+    }
+  ],
+  "desarrollo": [
+    {
+      "pregunta": "Explicá por qué la no linealidad es obligatoria en una red neuronal profunda. Incluí la demostración del colapso y el rol del teorema de aproximación universal.",
+      "respuesta_modelo": "Una capa es una combinación lineal seguida de una no linealidad. Si se quita la no linealidad, cada capa es solo una multiplicación por una matriz, y la composición de transformaciones lineales es lineal: $W_2(W_1x)=(W_2W_1)x=W^*x$. Con el ejemplo de la clase, $W_1$ (8×9) y $W_2$ (9×4) colapsan en una única $W^*$ (8×4) y la capa oculta desaparece. Por eso **diez capas lineales tienen el mismo poder expresivo que una**: queda una regresión lineal disfrazada, incapaz de representar curvas, saturaciones y quiebres como la temperatura anual o la distribución del ingreso.\n\nCon una activación no lineal (ReLU, tanh, sigmoide) cada capa 'dobla el espacio' a su manera y al encadenarlas se puede aproximar prácticamente cualquier función continua: es el **teorema de aproximación universal**. Matiz: garantiza que la red existe, pero no dice cuántas unidades hacen falta ni cómo encontrarla (eso es trabajo del entrenamiento). Además, las activaciones deben ser diferenciables porque su derivada viaja hacia atrás en backpropagation. Conclusión: la no linealidad no es un detalle de implementación, es lo único que justifica apilar capas.",
+      "puntos_clave": [
+        "Demostración W2(W1x)=(W2W1)x=W*x",
+        "Diez capas lineales = una",
+        "Mundo real no lineal (curvas, quiebres)",
+        "Teorema de aproximación universal y su límite",
+        "Diferenciabilidad necesaria para backprop"
+      ]
+    },
+    {
+      "pregunta": "Recorré el ejemplo del clima: dimensiones de entrada, pesos y capa oculta, cantidad de parámetros, y por qué se piensa en matrices.",
+      "respuesta_modelo": "La red recibe **8 variables meteorológicas** (temperatura media, máxima y mínima, humedad, precipitación, presión, nubosidad, visibilidad): un vector fila $x$ de 1×8. La primera capa oculta tiene **9 unidades**, un hiperparámetro elegido por quien diseña. Cada entrada se conecta con cada unidad: **8×9 = 72 conexiones**, cada una con su peso, más **9 sesgos** (uno por unidad): **81 parámetros**.\n\nLos 72 pesos se ordenan en una matriz $W^{(1)}$ de **8×9**: filas = entradas, columnas = unidades ($w_{36}$ va de la entrada 3 a la unidad 6). El cálculo de la capa es un producto matricial: $(1\\times 8)(8\\times 9)=(1\\times 9)$, el vector $h$ antes de la activación; luego se aplica $f$ elemento a elemento. La regla práctica: las columnas de la izquierda deben coincidir con las filas de la derecha. Más adelante, una última capa oculta de 100 unidades conectada a 4 salidas usa una matriz 100×4 (400 pesos).\n\nPensar en matrices no es capricho de notación: permite calcular las nueve unidades **a la vez**, con una sola operación, y aprovechar la GPU. Todas ven las mismas 8 variables; lo único que las diferencia es su columna de pesos.",
+      "puntos_clave": [
+        "x 1×8, W 8×9, h 1×9",
+        "72 pesos + 9 sesgos = 81",
+        "Filas=entradas, columnas=unidades; notación w_ij",
+        "Columnas izquierda = filas derecha",
+        "Paralelismo / GPU",
+        "9 es hiperparámetro"
+      ]
+    },
+    {
+      "pregunta": "Explicá backpropagation paso a paso: función de coste, regla de la cadena, delta en la salida y en capas ocultas, y paso de actualización.",
+      "respuesta_modelo": "El entrenamiento alterna **forward** (la entrada atraviesa la red y se obtiene $y$) y **backward** (el error se propaga hacia atrás para ajustar pesos y sesgos).\n\n1. **Coste:** $L=\\tfrac12\\sum_j(y_j-t_j)^2$. El cuadrado evita que errores por exceso y defecto se cancelen y castiga más los grandes; el ½ limpia la derivada; es diferenciable.\n2. **Regla de la cadena:** el peso no toca el error directamente, sino a través de la suma $a_j$ y la activación $y_j$: $\\partial L/\\partial w_{ij}=(y_j-t_j)\\cdot f'(a_j)\\cdot x_i$.\n3. **Delta en la salida:** $\\delta_j=(y_j-t_j)f'(a_j)$, la sensibilidad del error respecto de la suma ponderada. Entonces $\\partial L/\\partial w_{ij}=\\delta_j x_i$: una multiplicación.\n4. **Delta en una oculta:** no tiene objetivo, así que hereda la culpa: $\\delta_j=(\\sum_k\\delta_k w_{jk})\\,y_j(1-y_j)$ con sigmoide. Se repite recursivamente hasta la primera capa — de ahí 'propagación hacia atrás'.\n5. **Actualización:** $w\\leftarrow w-\\eta\\,\\partial L/\\partial w$. El signo menos va contra el gradiente; $\\eta$ chico hace todo lento y grande hace oscilar o divergir.\n\nLa eficiencia viene de reusar los δ: no hay que rehacer la cadena por cada peso.",
+      "puntos_clave": [
+        "Forward / backward",
+        "Coste L2 y el ½",
+        "Tres factores de la cadena",
+        "δ salida = (y−t)f'(a)",
+        "δ oculta = (Σ δ_k w_jk) f'(a)",
+        "Gradiente = δ·x",
+        "Update con −η y efecto de η"
+      ]
+    },
+    {
+      "pregunta": "Compará sigmoide, tanh, ReLU y softmax: rango, uso y por qué la derivada importa tanto como la función.",
+      "respuesta_modelo": "Las cuatro son monótonas, continuas y diferenciables. **Sigmoide** $1/(1+e^{-a})$, rango (0,1), se lee como probabilidad: salida binaria. Su derivada $\\sigma(1-\\sigma)$ sale casi gratis (por eso fue el default histórico) pero vale como máximo 0,25 y se aplana en los extremos. **Tanh**, rango (−1,1), centrada en 0, converge más rápido que la sigmoide en capas ocultas. **ReLU** $\\max(0,a)$, rango [0,∞), es **el estándar en capas ocultas**: barata y no se aplana del lado positivo. **Softmax** $e^{a_i}/\\sum_j e^{a_j}$ convierte puntajes en probabilidades que suman 1 (gato/perro/caballo: −0,21; 0,47; 1,72 → 0,1; 0,2; 0,7); va **solo en la capa de salida** multiclase, y es la única que mira todas las unidades a la vez. En una oculta perdería la magnitud.\n\nLa derivada importa porque es el factor ② de la regla de la cadena y viaja hacia atrás en cada paso: si se aplana, el producto se va a cero, el gradiente **se desvanece** y las primeras capas dejan de aprender. Por eso ReLU desplazó a la sigmoide en las ocultas.",
+      "puntos_clave": [
+        "Rangos de cada una",
+        "Sigmoide para salida binaria, softmax para multiclase",
+        "ReLU estándar en ocultas",
+        "Softmax solo en salida",
+        "Derivada = factor de la cadena; gradiente que se desvanece"
+      ]
+    }
+  ],
+  "conexiones": [
+    {
+      "clase": 4,
+      "relacion": "La clase 4 toma esta red como dada y pasa al diseño: cómo codificar la entrada, partir el dataset, elegir salida y loss, y vuelve a backpropagation para agregar batches, épocas y regularización."
+    },
+    {
+      "clase": 7,
+      "relacion": "Las tablas de embeddings (word2vec, tokens) son pesos de la red entrenados con este mismo backpropagation; un embedding equivale a un one-hot por una capa lineal."
+    },
+    {
+      "clase": 8,
+      "relacion": "El transformer usa softmax en la atención y capas feed-forward (combinación lineal + activación GELU/ReLU): el mismo bloque de esta clase repetido."
+    },
+    {
+      "clase": 9,
+      "relacion": "El pre-entrenamiento de un LLM es descenso por gradiente con backpropagation sobre una cross-entropy de predicción del próximo token."
+    },
+    {
+      "clase": 11,
+      "relacion": "Las GANs son dos de estas redes compitiendo, entrenadas con el mismo mecanismo de backpropagation."
+    },
+    {
+      "clase": 12,
+      "relacion": "Las redes convolucionales son el mismo esqueleto adaptado a imágenes, con pesos compartidos y detección de patrones locales."
+    }
+  ],
+  "lecturas": [
+    "Mark Riedl, A Very Gentle Introduction to Large Language Models without the Hype (metáfora del circuito de sensores y actuadores)",
+    "Mazo de clase Intro-Redes-Neuronales-105min (Paulo Veiga, Marcos Sanchez Sorondo, Universidad Austral)",
+    "Teorema de aproximación universal (mencionado en clase)",
+    "Knowledge library del curso: arquitectura-de-una-red, activaciones-y-capa-de-salida, backpropagation"
+  ]
+}

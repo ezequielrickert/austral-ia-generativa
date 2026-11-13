@@ -1,0 +1,929 @@
+{
+ "num": 6,
+ "fecha": "2026-09-09",
+ "titulo": "RAG, bases vectoriales, inverted index",
+ "talks": [
+  "rag-y-mcp"
+ ],
+ "bloque": "RAG, MCP y herramientas",
+ "tesis": "RAG y MCP le dan al modelo dos cosas que le faltan: el contexto que no está en sus pesos y las acciones que no puede ejecutar. Las dos funcionan por la misma vía, recortar lo que el modelo ve hasta dejarle solo lo que necesita para el turno: recuperar de más envenena la respuesta y exponer demasiadas herramientas hace que el agente elija mal, así que la habilidad es diseñar ese recorte y medirlo.",
+ "resumen": "La clase abre por el problema de conocimiento: el modelo sabe lo que estaba en su entrenamiento y nada más. RAG suma una memoria no paramétrica en tres pasos —recuperar, aumentar, generar— sobre un índice que se construye offline (load, split, embed, store). Después recorre las dos familias de índice: la léxica (índice invertido, TF-IDF con un ejemplo de tres documentos, BM25 con saturación y normalización por longitud) y la semántica (embeddings, similitud coseno, HNSW), mostrando que fallan en casos distintos y por eso producción usa búsqueda híbrida fusionada con RRF. Sigue el reranking con cross-encoders en un embudo de dos etapas (recall arriba, precisión abajo), el chunking y los metadatos, y la evaluación por etapa (context relevance, faithfulness, answer relevance) junto a los riesgos: permisos en la recuperación e inyección indirecta. La segunda mitad cambia de carencia: MCP, sobre JSON-RPC, le presta acciones al modelo y convierte M×N conectores en M+N. Cierra con el diseño de herramientas: más herramientas, peor elección, y la descripción es la interfaz.",
+ "secciones": [
+  {
+   "titulo": "Qué resuelve RAG: recuperar, aumentar, generar",
+   "contenido": "Un modelo preentrenado guarda conocimiento en sus parámetros, pero **no puede acceder a lo que nunca vio**: tu documentación, tus tickets, tu código. **Lewis et al. (2020)** lo plantean como combinar dos memorias: la **paramétrica** (en los pesos) y la **no paramétrica** (en un índice, actualizable sin reentrenar).\n\nTres componentes: el **recuperador** (busca fragmentos relevantes; devuelve texto, no respuestas), la **base de conocimiento** (docs, ADRs, tickets, changelogs, código) y el **LLM** (el único que genera; no busca nada por su cuenta).\n\n**Los tres pasos** — *todo lo demás de la clase existe para hacer mejor uno de estos*:\n1. **Recuperar**: buscar en el índice los top-k fragmentos que se parecen a la consulta.\n2. **Aumentar**: pegarlos en el prompt → `prompt = instrucción + fragmentos + consulta` (es concatenación de texto, no magia).\n3. **Generar**: responder usando **solo** esos fragmentos y **citar** de cuál salió cada afirmación.\n\n**Los pesos del modelo no cambian en ningún paso.**\n\n**Antes de consultar hay que indexar.** La indexación es trabajo **offline** (una vez y cada vez que cambia el corpus): **LOAD → SPLIT → EMBED → STORE**. La consulta, **online**: **EMBED → RETRIEVE → GENERATE**. Las dos fases se tocan en un solo punto, el índice. ⚠️ **El modelo de embeddings tiene que ser el mismo en las dos fases.** En producción el índice se persiste y es un *job* con disparador, costo y versión.\n\n**Cinco razones para no reentrenar**: datos actualizados, datos propietarios, precisión y **citas**, **auditabilidad** (poder contestar «de dónde salió esto») y **costo** (se actualiza el repositorio, no el modelo). Fine-tuning conviene cuando falta **formato o estilo**, no conocimiento.\n\n**«Con 1M de tokens, ¿para qué recuperar?»** Tres respuestas que no dependen del largo de la ventana: (1) **no entra**: el corpus crece más rápido que la ventana; (2) **si entra, encuentra peor**: el modelo rinde peor buscando dentro de entradas muy largas; (3) **se paga todo**: cada consulta reenvía el corpus y se cobra por token. Seleccionar los pasajes relevantes es un problema en sí mismo.\n\n**Del prototipo a producción** faltan cuatro cosas: procesamiento de documentos (chunking, metadatos), recuperación en dos etapas (reranking), ingeniería de contexto y evaluación continua; la observabilidad (calidad, latencia y costo por consulta) las atraviesa.",
+   "conceptos": [
+    "rag",
+    "embedding",
+    "base-vectorial"
+   ],
+   "ejemplo": "Consulta: «¿por qué falla el deploy de staging?» → **Recuperar** los top-k fragmentos del índice (runbooks, post-mortems) → **Aumentar**: instrucción («respondé solo con estos fragmentos y citá») + fragmentos + consulta → **Generar** una respuesta con citas. Si mañana cambia el runbook, se reindexan sus fragmentos (por eso se guarda el id de fuente en los metadatos) y el modelo no se toca."
+  },
+  {
+   "titulo": "Búsqueda léxica: índice invertido, TF-IDF y BM25",
+   "contenido": "Hay dos familias de índice: el **índice invertido** (término → documentos; sirve para identificadores y jerga cerrada) y la **base vectorial** (vectores, búsqueda por cercanía; sirve para lenguaje natural). La **búsqueda híbrida** corre las dos y funde los rankings: es el estándar de producción. ⚠️ **Las calidades de la fuente ponen el techo**: garbage in, garbage out; un fragmento malo se recupera igual que uno bueno.\n\n**Índice invertido.** Se llama *invertido* porque da vuelta la relación natural: en vez de guardar qué términos tiene cada documento, guarda **en qué documentos está cada término** (su *posting list*). Pasos: **ingesta** → **tokenización** (minúsculas, stopwords fuera, raíz) → **construcción** → **consulta** (se tokeniza igual y se **intersectan** las listas). Buscar deja de ser leer cada documento y pasa a ser cruzar listas cortas. El orden lo decide un score.\n\n**TF-IDF: frecuente acá, raro afuera.**\n- $TF(t,d)$ = apariciones de $t$ en $d$ / total de tokens de $d$ (ej. «timeout» 3 veces en 100 tokens → 0,03).\n- $IDF(t) = \\ln(N/df(t))$: penaliza lo que está en todas partes («el», «de» → ≈ 0; «deadlock» → alto). Ojo: **logaritmo natural**; con base 10 dan otros números.\n- Score = TF × IDF, sumado sobre los términos de la consulta.\n\nResultado elegante: **una stopword que está en todos los documentos tiene IDF = 0 por construcción**. Problema: TF-IDF **no satura** (100 apariciones pesan 100 veces más que una).\n\n**BM25** — la línea de base léxica de todo RAG en producción (Robertson & Zaragoza 2009, *Probabilistic Relevance Framework*). Arregla dos cosas:\n- **Saturación de la frecuencia** (derivada del modelo 2-Poisson y la noción de *eliteness*): el peso crece con tf pero se acerca a un techo; `k1` decide qué tan rápido. La 2.ª aparición agrega mucho; la 100.ª, casi nada (un README que dice «docker» 80 veces no es 80 veces más sobre Docker).\n- **Normalización suave por longitud**: un documento largo puede serlo por verboso o por tener más para decir; `b` interpola entre las dos hipótesis en lugar de dividir por la longitud a secas.\n\nValores usuales: **k1 = 1,2 y b = 0,75 son defaults de Lucene**, no del paper (que da rangos 1,2 < k1 < 2 y 0,5 < b < 0,8 y dice que el modelo no los deriva).\n\n**El límite de lo léxico**: los documentos que no comparten ninguna palabra con la consulta puntúan **cero**, aunque hablen de lo mismo («el servicio no responde» vs «timeout del upstream»). Motores: Elasticsearch, OpenSearch, Solr, Typesense.",
+   "conceptos": [
+    "indice-invertido",
+    "bm25",
+    "busqueda-hibrida"
+   ],
+   "ejemplo": "**Corpus**: Doc1 «el servicio devuelve timeout intermitente» (5 tokens) · Doc2 «el cliente devuelve error de conexion» (6) · Doc3 «el servicio y el cliente reintentan solos» (7).\n\nÍndice: servicio → [Doc1, Doc3]; cliente → [Doc2, Doc3]; timeout → [Doc1]… Consulta «servicio cliente» → intersección = **Doc3**.\n\nTF-IDF en Doc1 (N = 3): «el» → IDF = ln(3/3) = 0 → 0; «servicio» → 0,20 × ln(3/2) = 0,20 × 0,41 = 0,08; «timeout» → 0,20 × ln(3) = 0,20 × 1,10 = **0,22**; «intermitente» → **0,22**.\n\nConsulta «¿qué documentos hablan de timeout intermitente?» → `[timeout, intermitente]` → Doc1 = 0,22 + 0,22 = **0,44** (top-1, va al LLM); Doc2 = 0; Doc3 = 0."
+  },
+  {
+   "titulo": "Búsqueda por significado: embeddings, coseno y HNSW",
+   "contenido": "El cambio clave: el texto deja de compararse como **cadena de caracteres** y pasa a compararse como **punto en un espacio**. Tres pasos: **convertir a vectores** con un modelo de embeddings, **calcular similitud** con la consulta, **recuperar** los más cercanos, *aunque no compartan ni una palabra*.\n\n**Embeddings.** Textos con significado parecido caen cerca (timeout, latencia, reintento forman un vecindario; factura y pago, otro). Se aprenden por **entrenamiento contrastivo** con millones de pares (pregunta, respuesta relevante). **Dimensionalidad: 384 a 3072**; más dimensiones, más capacidad y más costo por consulta. Son **multilingües**: «deployment» y «despliegue» caen cerca. ⚠️ Los ejes **no significan nada por separado**: la única lectura válida es la distancia. El embedding captura significado, no sintaxis. (La aritmética rey − hombre + mujer es de word2vec; con embeddings de oración modernos no funciona de forma confiable.) Modelos: text-embedding-3-small, all-MiniLM-L6-v2, embed-multilingual-v3.\n\n**Similitud coseno: importa el ángulo.**\n$$\\cos\\theta = \\frac{A\\cdot B}{\\lVert A\\rVert\\,\\lVert B\\rVert}$$\n1 = misma dirección, 0 = sin relación, −1 = opuestos. Es **invariante al largo** del vector (y del texto): sin esa propiedad, los fragmentos largos ganarían siempre; así se compara un fragmento de tres palabras con uno de trescientas. Alternativas: la euclidiana es sensible a la magnitud; el **producto punto** es más rápido y se usa a escala (con vectores normalizados equivale al coseno). Valores ilustrativos: timeout–latencia ≈ 0,91, timeout–reintento ≈ 0,76, timeout–factura ≈ 0,12 (dependen del modelo).\n\n**HNSW (Hierarchical Navigable Small World)** — Malkov & Yashunin 2016. Comparar contra cada vector es **O(n)**; con 10 millones de fragmentos no entra en la latencia de una consulta. HNSW arma **capas**: arriba pocos nodos y saltos largos, abajo (capa 0) todos los vectores y saltos cortos. Se entra por arriba y se baja cuando no hay un vecino más cercano en la capa actual → escala **logarítmica**. La capa de cada elemento **se sortea** con distribución exponencial decreciente, **como en una skip list**. Es **aproximado** (ANN): el vecino real más cercano puede quedar afuera; el intercambio exactitud/velocidad se regula con parámetros.\n\nMotores vectoriales: Pinecone, Weaviate, Qdrant, Chroma, pgvector.",
+   "conceptos": [
+    "embedding",
+    "similitud-coseno",
+    "base-vectorial"
+   ],
+   "ejemplo": "**«olvidé mi contraseña»** vs **«no puedo iniciar sesión»**: léxico → 0 términos en común → **sin coincidencia**; vectorial → vectores casi paralelos → **muy parecidos**.\n\nConsulta «¿por qué se cuelga la API a veces?» sobre el mismo corpus de tres documentos:\n\n| Documento | Coseno | Al LLM |\n|---|---|---|\n| Doc1 «el servicio devuelve timeout intermitente» | **0,91** | ✅ |\n| Doc3 «el servicio y el cliente reintentan solos» | 0,43 | ❌ nombra el servicio, no la falla |\n| Doc2 «el cliente devuelve error de conexion» | 0,21 | ❌ otra falla |\n\nDoc1 gana **sin compartir ni una palabra** con la consulta: un índice léxico le habría dado 0."
+  },
+  {
+   "titulo": "Búsqueda híbrida, RRF y reranking",
+   "contenido": "**Cuándo conviene cada estrategia.** **Léxica (BM25)**: rápida, exacta, sin GPU; no reconoce sinónimos; ideal para **identificadores** (código de error `ERR_CONN_1042`, SKU, nombre de función, versión). **Semántica**: sinónimos, paráfrasis, idiomas; más lenta y con costo de inferencia; ideal para preguntas en lenguaje natural («cómo configuro el retry del cliente HTTP»). **Híbrida**: mejor cobertura, más piezas y pesos que ajustar; estándar de producción. *Los dos fallan, y fallan en casos distintos.* Las cifras de relevancia/latencia/costo que circulan se miden sobre el corpus propio.\n\n**El flujo de producción**: consulta → **BM25 top-50** y **vectorial (ANN) top-50** *en paralelo* → **fusión RRF** → **rerank cross-encoder (50 → 5)** → `prompt = instrucción + top-5 + consulta` → LLM → respuesta con citas. **Lo barato filtra, lo caro ordena**: BM25 y vectorial procesan 100.000 docs en milisegundos; el cross-encoder maneja ~100.\n\n**RRF (Reciprocal Rank Fusion)** — Cormack et al. 2009. BM25 puntúa de 0 a ∞ y el coseno de −1 a 1: **los scores no son comparables, las posiciones sí**.\n$$RRF(d) = \\sum_{r} \\frac{1}{k + rank_r(d)},\\quad k = 60$$\nPremia el **acuerdo** entre rankings por encima del entusiasmo de uno solo. `k = 60` es empírico, «near-optimal, but not critical» (10 a 100 rinde casi igual). Nació como **línea de base** y le ganó a learning-to-rank; ventaja medida de 4-5% sobre Condorcet y CombMNZ. ⚠️ El paper **nunca evaluó** léxico + vectorial: usarlo así es una extrapolación razonable.\n\n**Reranking: recuperar y ordenar son dos trabajos.** Embudo: 100.000+ → **etapa 1** (× 1/2000) → 50 candidatos → **etapa 2** (× 1/10) → 5 docs. **Etapa 1 busca recall** (no dejar afuera nada relevante, se aceptan falsos positivos); **etapa 2 busca precisión** (solo los mejores, se aceptan falsos negativos).\n\n**Bi-encoder vs cross-encoder.** El **bi-encoder** (búsqueda vectorial) codifica consulta y documento **por separado** y compara vectores: el vector del doc se precalcula, escala a millones. El **cross-encoder** concatena `consulta + [SEP] + documento` y deja que la **atención cruce cada token con cada token**: distingue negaciones, ambigüedad y contexto, pero exige una inferencia **por par** → solo sobre los top-50. Ejemplo «banco»: en el bi-encoder tiene un único vector (¿dinero o río?); en el cross-encoder se lee pegado a la consulta. Modelos: Cohere Rerank, BGE-Reranker, ms-marco-MiniLM. Un LLM puede hacer de reranker, con el mismo costo: una llamada por candidato.\n\n**Síntomas de que falta una etapa**: respuestas inconsistentes; el documento correcto existe y no aparece arriba; ya conviven léxica y semántica sin regla de fusión. La calidad es una **cadena**: un reranking impecable sobre candidatos malos devuelve documentos malos.\n\n**Ajustes**: pool de **20 a 100** candidatos; top-k final de **3 a 5**; las dos búsquedas **en paralelo**; loguear **latencia** (sube por el reranking) y **costo** (sube por el tamaño del contexto) por consulta.",
+   "conceptos": [
+    "busqueda-hibrida",
+    "reranking",
+    "bm25",
+    "recall-at-k"
+   ],
+   "ejemplo": "**RRF con k = 60.** Ranking BM25: 1 A, 2 C, 3 F, 4 D, 5 B. Ranking vectorial: 1 B, 2 E, 3 A, 4 G, …, 8 C.\n\n- Doc A: 1/61 + 1/63 = 0,01639 + 0,01587 = **0,03227**\n- Doc B: 1/65 + 1/61 = 0,01538 + 0,01639 = **0,03178**\n- Doc C: 1/62 + 1/68 = 0,01613 + 0,01471 = **0,03083**\n\nRanking fusionado: **A, B, C**. A gana por estar arriba **en los dos** (B fue 1.º en uno solo y 5.º en el otro)."
+  },
+  {
+   "titulo": "Chunking y metadatos",
+   "contenido": "**El fragmento es la unidad de recuperación.** Un argumento partido al medio se recupera sin la mitad que lo explica.\n\n**Tres estrategias de corte** (misma cantidad de texto, distinto lugar donde caen los límites):\n- **Largo fijo**: corta por cantidad de tokens. Simple y predecible; **parte frases por la mitad**.\n- **Semántico**: respeta límites de párrafo y sección. Mejor coherencia, largo variable.\n- **Por estructura**: usa la jerarquía del documento (encabezados, secciones, funciones). **La que mejor funciona con documentación técnica, specs de API y código**: la estructura ya viene dada (ej.: una referencia de API cortada por encabezado da **un fragmento por endpoint**).\n\n**Tamaño y solapamiento.** Fragmentos **chicos** recuperan con precisión y **pierden contexto**; **grandes** conservan contexto y **diluyen** lo que había que encontrar. El **solapamiento** (ej. 50 tokens) hace que una idea que cruza el corte aparezca entera en alguna copia («la zona repetida cose el corte»), a cambio de almacenamiento y recuperaciones duplicadas. Los rangos que circulan (800-1000 caracteres para prosa, 600-800 para docs técnicos) son **orientativos**: el tamaño correcto se mide con el eval set propio y las consultas reales.\n\n**Metadatos: filtrar antes de buscar.** Un fragmento en el índice es un **sobre** con metadatos + texto + vector. Con metadatos se puede **filtrar primero** (barato y preciso) y buscar por vector solo en el subconjunto.\n- **Siempre**: **identificador de fuente** (sin él no hay cita ni reindexación), **timestamp** (saber si quedó viejo) y **posición** en el documento (reconstruir el orden).\n- **Según el caso**: autor/equipo, tipo y versión, jerarquía de sección, idioma, score de calidad.\n\nUna consulta sobre la versión 3 de un servicio no tiene por qué mirar los fragmentos de la versión 1.",
+   "conceptos": [
+    "chunking",
+    "base-vectorial"
+   ],
+   "ejemplo": "Fragmento indexado:\n```text\nfuente   docs/api/pagos.md\nversion  v3\nseccion  Autenticacion > Tokens\nfecha    2026-07-14\nTEXTO    El token expira a los 3600 segundos. Para renovarlo se usa /refresh ...\nvector   [0.41 -0.18 0.62 ...]\n```\nConsulta «cómo renuevo el token en v3» → 1) filtrar `version = v3` (todo el índice → subconjunto) → 2) búsqueda vectorial solo ahí → top-5. Sin metadatos, el paso 1 no existe y el paso 2 mira todo."
+  },
+  {
+   "titulo": "Evaluación y seguridad de un sistema RAG",
+   "contenido": "**Un sistema RAG tiene dos formas de fallar y una sola respuesta visible.** Medirlas juntas no dice cuál se rompió, así que se mide **por etapa**:\n\n- **Context Relevance** — ¿el recuperador trajo los documentos correctos? Mide la **etapa de recuperación**, independiente del modelo.\n- **Answer Faithfulness** — ¿la respuesta está sostenida por el contexto recuperado, o el modelo agregó cosas de sus pesos?\n- **Answer Relevance** — ¿la respuesta contesta lo que se preguntó? Un texto fiel al contexto y ajeno a la pregunta falla igual.\n\nSi Context Relevance es bajo, **tocar el prompt de generación no mueve el resultado**. Recuperador y generador se ajustan por separado, y mejorar uno no siempre mejora el final. En la etapa 1 importa el **recall** (¿están los relevantes entre los k recuperados? → recall@k) y en la etapa 2 la **precisión** de los pocos que entran al prompt. Herramientas: RAGAS, TruLens. (La cifra «70% de los fallos vienen de la recuperación» se retiró del deck por no tener fuente: el argumento es la cadena.)\n\n**Riesgos propios de RAG**: dos superficies de ataque nuevas, un índice con datos internos y un canal por donde entra texto de terceros al prompt.\n- **Acceso no autorizado**: el recuperador ve todo el índice. **Los permisos se aplican en la recuperación, no en la presentación**: filtrar la respuesta después llega tarde, porque el fragmento ya estuvo en el prompt e influyó en la salida aunque no aparezca citado.\n- **Inyección indirecta de prompts**: **el atacante nunca le habla al modelo**. Escribe instrucciones en un documento (wiki, ticket, issue) que el sistema va a indexar: 1) envenenar → 2) indexar → 3) un usuario inocente hace una consulta legítima → 4) el fragmento envenenado entra al prompt **al mismo nivel que la instrucción del sistema** y el LLM hace lo que dice. Entre 1 y 3 pueden pasar meses. ⚠️ **Ninguna estrategia de prompt ni de delimitadores la previene de forma confiable** (documentación de LangChain). Lo que reduce el riesgo: restringir qué fuentes entran al índice, permisos en la recuperación, y tratar todo fragmento recuperado como **entrada no confiable** al decidir qué acciones puede disparar la respuesta.\n- **Falta de controles**: sin política de acceso, auditoría y validación, no se detecta nada.\n\n**Buenas prácticas**: control de acceso granular (documento y usuario, en la recuperación), encriptación y anonimización antes de indexar, monitoreo continuo y pentests, **validación de salidas** (sobre todo si disparan acciones). Ninguna previene la inyección sola: **acotan el daño**.\n\n**Resumen de RAG**: qué resuelve (lo que no está en los pesos, sin reentrenar); cómo (léxico + vectorial, fusión, reranking: pocos documentos y buenos); dónde se rompe (en el **corpus** y en el **corte**, casi nunca en el modelo); cómo se sabe si anda (medir recuperación y generación por separado).",
+   "conceptos": [
+    "evals",
+    "recall-at-k",
+    "prompt-injection",
+    "rag"
+   ],
+   "ejemplo": "**Escenario hipotético de filtración**: un chatbot interno con RAG aplica permisos en la capa de presentación. Un documento marcado como restringido entra igual al contexto de un usuario sin acceso → información sensible expuesta. Solución: filtrar en la recuperación. Pregunta de diseño: con cinco niveles de permiso, ¿un índice con filtro en la consulta o cinco índices? Depende de cuántos niveles haya y de cuánto cambien."
+  },
+  {
+   "titulo": "MCP: el protocolo que le presta acciones al modelo",
+   "contenido": "RAG le da al modelo el **contexto** que no tiene; **MCP (Model Context Protocol)** le da las **acciones** que no puede ejecutar. Define cómo una aplicación de IA le pide datos y acciones a un sistema externo con **un único formato de mensajes** en lugar de un conector por integración.\n\n- **Servidor MCP**: proceso que expone **herramientas, recursos y prompts**; lo escribe quien tiene los datos.\n- **Cliente MCP**: la app de IA (Claude Desktop, Claude Code, Cursor, un agente propio) que se conecta a servidores y **descubre en tiempo de ejecución** qué pueden hacer.\n- **Herramienta**: nombre + **descripción en lenguaje natural** + esquema de parámetros. **El modelo elige cuál llamar leyendo la descripción.**\n- Cliente y servidor son **roles**, no procesos.\n\n**El problema: M×N.** Antes, cada par (aplicación, fuente) necesitaba su conector: con 3 apps y 3 fuentes, **9 conectores** (sumar una fuente = +3). Con un protocolo: **M + N = 6 implementaciones** (sumar una fuente = +1 servidor). El costo está en el **mantenimiento**: 9 superficies de autenticación, 9 manejos de error. (El argumento es de la clase; el anuncio solo dice que no escalaba.) Diagnóstico del anuncio: los modelos están *«trapped behind information silos»*: no son tontos, están desconectados.\n\n**Lanzamiento: noviembre de 2024** (Anthropic): especificación + SDKs, servidores locales en Claude Desktop y repo de servidores (Google Drive, Slack, GitHub, Git, Postgres, Puppeteer). Primeros adoptantes: Block, Apollo, Zed, Replit, Codeium, Sourcegraph. La analogía «USB-C para IA» es de la comunidad, no de Anthropic.\n\n**¿Por qué no HTTP o GraphQL?** HTTP resuelve el **transporte**, no la interfaz (no hay negociación de capacidades ni «¿qué sabés hacer?»). GraphQL resuelve **consulta de datos**, no ejecución de acciones. MCP agrega **descubrimiento** (`tools/list`), **sesión con estado** y un formato común para que un modelo elija herramientas. ⚠️ MCP tiene sesión con estado; su capa de mensajes, **JSON-RPC 2.0, es sin estado**: son dos niveles.\n\n**JSON-RPC 2.0**: cada mensaje lleva `\"jsonrpc\": \"2.0\"`; el **`id`** aparea pedido y respuesta; una respuesta lleva `result` **o** `error` (mutuamente excluyentes); un mensaje **sin `id`** es una **notificación** y no se responde (permite que el servidor hable sin que le pregunten). Es agnóstico del transporte.\n\n**Transportes**: lo decide **quién arranca el proceso**. **stdio**: el cliente lanza el servidor como **subproceso** (config con `command` + `args`, ej. `npx -y @modelcontextprotocol/server-filesystem`): **no hay puerto**. **HTTP en streaming / SSE**: el servidor ya corre en una URL (`http://localhost:8002/mcp`).\n\n**Ciclo de vida de una herramienta**: 1) arranque (declara nombre + descripción + esquema) → 2) **descubrimiento** con `tools/list` → 3) **consulta**: el LLM lee las **descripciones** y elige → 4) `tools/call {name, arguments}` → 5) ejecución → 6) el LLM usa el resultado. *El modelo elige por la descripción: la descripción es la interfaz.*\n\n⚠️ Un servidor MCP **ejecuta código, lee archivos y hace pedidos de red con tus permisos** (más parecido a instalar una extensión de navegador que una dependencia). Los que traen contenido externo abren la **misma puerta de inyección indirecta** de RAG.",
+   "conceptos": [
+    "mcp",
+    "tool-calling",
+    "routing-de-herramientas"
+   ],
+   "ejemplo": "```json\n{ \"mcpServers\": {\n    \"filesystem\": { \"command\": \"npx\",\n      \"args\": [\"-y\", \"@modelcontextprotocol/server-filesystem\", \"/ruta/al/proyecto\"] },\n    \"mi-servidor-local\": { \"type\": \"http\", \"url\": \"http://localhost:8002/mcp\" } } }\n```\nEl primero es **stdio** (sin URL: el cliente lanza el proceso); el segundo es **HTTP** (sin comando: el proceso ya corre). Intercambio típico: `{jsonrpc: 2.0, method: tools/list, id: 1}` → `{jsonrpc: 2.0, result: {tools: [...]}, id: 1}`."
+  },
+  {
+   "titulo": "Diseño de herramientas: menos y distinguibles",
+   "contenido": "**Herramienta hardcodeada vs servidor MCP**: la lógica deja de vivir en el agente y corre como proceso aparte; el agente la descubre en ejecución; cualquier cliente MCP la reutiliza; cambiarla obliga a reiniciar el servidor, no a redesplegar el agente.\n\n**Cuatro principios**:\n1. **Nombres explícitos** `[verbo]_[sustantivo]_[contexto]`: `get_customer_by_email`, `calculate_shipping_cost_for_order` (no `process`, `fetch`, `do_thing`).\n2. **Descripciones exhaustivas** — el campo que más pesa: qué hace, **cuándo usarla, cuándo NO usarla**, forma de entrada y salida.\n3. **Esquemas simples**: pocos parámetros, poco anidamiento.\n4. **Respuesta consistente** `{ success, data, error, message }`. Respaldo: Microsoft Research encontró que de 5.983 resultados **sin flag de error**, 3.536 describían un error en el texto (≈6 de 10); ejemplos reales: «error: job», «Please retry with 0 or fewer IDs.».\n\n**Lo medido (Microsoft Research, 2025, 1.470 servidores, 12.643 herramientas)**: profundidad de esquema media **2,24**, mediana 2, máximo **20**; aplanar parámetros mejoró el tool-calling **47%** (composio). Herramientas por servidor: mediana **4**, media 8,6, máximo 256; GitHub MCP expone **91**. **775 colisiones de nombre exacto** (`search` en 32 servidores) y **23 nombres distintos** para la búsqueda web. **MCP no tiene namespaces**: el OpenAI Agents SDK da error ante duplicados; Claude Code prefija los nombres. ⚠️ El gráfico «1-3 parámetros → 90%, 4-6 → 80%, 7+ → 65%» atribuido a ese estudio **no existe** en él: es una encuesta de catálogos, no mide acierto de agentes.\n\n**Más herramientas, peor elección.** «LLMs pattern-match descriptions. Large option spaces overwhelm them.» Lo accionable: OpenAI recomienda **menos de 20 funciones a la vez** (aunque su API tolera **128**). La escala 1-5 → 92%, 6-10 → 84%, 11-20 → 71%, 20+ → 58% circula **sin estudio** (aitutorial.dev); el «42% de elecciones incorrectas» es solo el complemento de 58. Un servidor no sabe con qué modelo habla, así que expone el mismo catálogo a todos.\n\n**Patrones**:\n- **Routing jerárquico**: en vez de 20 herramientas planas, una `route_to_domain(domain, action)` con dos enums cerrados (4 dominios × 5 acciones). Las 20 opciones **se mudan del nombre al esquema**. Costo: un salto extra y errores de ruteo sin definir. MSR pide lo mismo a nivel de protocolo (*hierarchical tool-calling*).\n- **Catálogo por fase**: saludo/autenticación → diagnóstico → resolución, con 2-3 herramientas visibles por fase (filtrado dinámico; VS Code *tool grouping*, GitHub *dynamic tool discovery*). Pregunta abierta: **¿quién decide la fase?** Si es el mismo LLM, el problema de selección sube un nivel.\n- **Decir cuándo NO usarla**: con tres herramientas superpuestas el modelo elige al azar o llama a las tres; el problema es de **distinguibilidad**, no de cantidad.\n\n**Analítica en producción**: `call_count`, `success_rate`, `avg_latency_ms`, `last_used`. Sin uso → eliminar/consolidar; alta tasa de error → revisar manejo de errores o la descripción; lentas → cachear. Que el agente no use o use mal una herramienta es **señal de diseño, no de capacidad del modelo**.\n\n**Takeaways**: las dos mitades resuelven lo mismo (acercar poco y bien elegido: 5 docs buenos > 50; 3 herramientas distinguibles > 20); el cuello de botella está **aguas arriba del modelo**; sin medición todo es opinión; **verificá las cifras antes de repetirlas**.",
+   "conceptos": [
+    "tool-calling",
+    "mcp",
+    "routing-de-herramientas"
+   ],
+   "ejemplo": "Tres herramientas que sonaban igual, diferenciadas por la descripción:\n- `search_products_by_text(query)` — ✅ «mouse inalámbrico»; ❌ si ya hay SKU.\n- `get_product_by_sku(sku)` — ✅ «PROD-001»; ❌ texto libre.\n- `filter_products_by_attributes(category?, priceMax?)` — ✅ «mouses de menos de 20 dólares»; ❌ texto.\n\nAnalítica que debería producir recomendaciones como: «Remove unused tool: legacy_search», «flaky_tool fails 40% — review error handling», «slow_api averages 3000ms — consider caching»."
+  }
+ ],
+ "conceptos": [
+  {
+   "id": "rag",
+   "termino": "RAG (Retrieval-Augmented Generation)",
+   "definicion": "Patrón que recupera fragmentos relevantes de una base de conocimiento externa, los pega en el prompt junto a la consulta y hace que el modelo genere usando solo esos fragmentos, con citas. Combina memoria paramétrica (pesos) y no paramétrica (índice) (Lewis et al. 2020).",
+   "por_que_importa": "Da acceso a datos actualizados y propietarios, citas y auditabilidad sin reentrenar.",
+   "trampa": "Pensar que «el modelo busca en Google»: el recuperador trae texto y el LLM solo genera. Y que con ventanas de 1M sobra: el corpus no entra, el modelo encuentra peor en entradas largas y se paga todo."
+  },
+  {
+   "id": "indice-invertido",
+   "termino": "Índice invertido",
+   "definicion": "Estructura que mapea cada término a la lista de documentos que lo contienen (posting list); una consulta se resuelve tokenizando igual e intersectando listas.",
+   "por_que_importa": "Búsqueda léxica en milisegundos y sin GPU; imbatible para identificadores exactos (códigos de error, SKUs).",
+   "trampa": "Creer que entiende sinónimos: un documento sin palabras en común con la consulta puntúa cero aunque hable de lo mismo."
+  },
+  {
+   "id": "tf-idf",
+   "termino": "TF-IDF",
+   "definicion": "Score = TF (frecuencia del término en el documento, normalizada por su largo) × IDF = ln(N/df) (rareza en el corpus), sumado sobre los términos de la consulta.",
+   "por_que_importa": "Premia lo frecuente acá y raro afuera; una stopword presente en todos los documentos tiene IDF = 0 por construcción.",
+   "trampa": "Mezclar bases de logaritmo (la clase usa ln) y olvidar que no satura: 100 apariciones pesan 100 veces más."
+  },
+  {
+   "id": "bm25",
+   "termino": "BM25",
+   "definicion": "Función de ranking léxico del Probabilistic Relevance Framework (Robertson & Zaragoza 2009) que satura la frecuencia del término (k1) y normaliza suavemente por longitud del documento (b).",
+   "por_que_importa": "Es la línea de base léxica de todo sistema RAG en producción.",
+   "trampa": "Atribuir k1 = 1,2 y b = 0,75 al paper: son defaults de Lucene; el paper da rangos y dice que el modelo no los deriva."
+  },
+  {
+   "id": "embedding",
+   "termino": "Embedding",
+   "definicion": "Vector denso (384 a 3072 dimensiones) que un modelo entrenado contrastivamente asigna a un texto, de modo que textos con significado parecido quedan cerca.",
+   "por_que_importa": "Permite buscar por significado, cruzar paráfrasis e idiomas.",
+   "trampa": "Interpretar ejes individuales (solo vale la distancia) o indexar y consultar con modelos de embeddings distintos."
+  },
+  {
+   "id": "similitud-coseno",
+   "termino": "Similitud coseno",
+   "definicion": "cos θ = A·B / (‖A‖‖B‖): mide el ángulo entre vectores; 1 misma dirección, 0 sin relación, −1 opuestos.",
+   "por_que_importa": "Es invariante al largo, así que compara un fragmento de 3 palabras con uno de 300 sin favorecer a los largos.",
+   "trampa": "Tomar valores como 0,91 o 0,12 como absolutos: dependen por completo del modelo de embeddings."
+  },
+  {
+   "id": "base-vectorial",
+   "termino": "Base vectorial y HNSW",
+   "definicion": "Almacén de fragmentos como vectores con búsqueda de vecinos más cercanos; HNSW es un índice de grafos jerárquicos por capas (como una skip list) que lleva la búsqueda de O(n) a escala logarítmica (Malkov 2016).",
+   "por_que_importa": "Hace viable la búsqueda semántica sobre millones de fragmentos dentro del presupuesto de latencia.",
+   "trampa": "Olvidar que es aproximada (ANN): el vecino real más cercano puede quedar afuera."
+  },
+  {
+   "id": "busqueda-hibrida",
+   "termino": "Búsqueda híbrida",
+   "definicion": "Correr en paralelo búsqueda léxica (BM25) y vectorial y fusionar los rankings (típicamente con RRF).",
+   "por_que_importa": "Los dos mecanismos fallan en casos distintos (identificadores vs paráfrasis); juntos dan mejor cobertura. Es el estándar de producción.",
+   "trampa": "Correrlas en serie (duplica latencia) o fusionar por scores crudos, que no son comparables."
+  },
+  {
+   "id": "rrf",
+   "termino": "Reciprocal Rank Fusion (RRF)",
+   "definicion": "Fusión de rankings por posición: RRF(d) = Σ 1/(k + rank), con k = 60 (Cormack et al. 2009).",
+   "por_que_importa": "Fusiona escalas incompatibles (BM25 0..∞, coseno −1..1) y premia el acuerdo entre rankings.",
+   "trampa": "Creer que k = 60 es crítico (10 a 100 rinde casi igual) o que el paper validó la fusión léxica + vectorial (no lo hizo)."
+  },
+  {
+   "id": "reranking",
+   "termino": "Reranking con cross-encoder",
+   "definicion": "Segunda etapa que reordena los candidatos (20-100) con un modelo que lee consulta y documento juntos, dejando que la atención cruce todos los tokens, para quedarse con 3-5.",
+   "por_que_importa": "Resuelve negaciones, ambigüedad («banco») y contexto que el coseno entre vectores separados no ve.",
+   "trampa": "Usarlo sobre todo el corpus: requiere una inferencia por par, inviable con 100.000 documentos."
+  },
+  {
+   "id": "bi-encoder",
+   "termino": "Bi-encoder",
+   "definicion": "Arquitectura que codifica consulta y documento por separado en vectores y los compara (cos), con el vector del documento precalculado.",
+   "por_que_importa": "Escala a millones de documentos: es la búsqueda vectorial de la etapa 1.",
+   "trampa": "Cada texto tiene un único vector independiente de la consulta, así que no desambigua según el contexto de la pregunta."
+  },
+  {
+   "id": "chunking",
+   "termino": "Chunking",
+   "definicion": "Cortar documentos en fragmentos, la unidad de recuperación: por largo fijo, semántico (párrafos) o por estructura (encabezados, funciones), con solapamiento opcional.",
+   "por_que_importa": "Decide qué se recupera junto; un argumento partido se recupera sin la mitad que lo explica.",
+   "trampa": "Buscar «el» tamaño correcto: chico = preciso sin contexto, grande = contexto diluido; se mide sobre el corpus propio."
+  },
+  {
+   "id": "metadatos",
+   "termino": "Metadatos del fragmento",
+   "definicion": "Campos guardados junto al texto y el vector: siempre id de fuente, timestamp y posición; según el caso versión, autor, sección, idioma, calidad.",
+   "por_que_importa": "Permiten filtrar antes de buscar (más barato y preciso), citar, reindexar y detectar fragmentos viejos.",
+   "trampa": "No guardar el id de fuente: sin él no hay cita ni reindexación cuando cambia un documento."
+  },
+  {
+   "id": "recall-at-k",
+   "termino": "Recall (recall@k) y precisión por etapa",
+   "definicion": "Recall@k: proporción de documentos relevantes que aparecen entre los k recuperados; la etapa 1 optimiza recall (no perder relevantes) y la etapa 2 precisión (solo buenos en el prompt).",
+   "por_que_importa": "Ordena el diseño del embudo y la evaluación: si el relevante no está en el pool, ningún reranker lo salva.",
+   "trampa": "Medir solo la respuesta final: no dice si falló la recuperación o la generación."
+  },
+  {
+   "id": "evals",
+   "termino": "Métricas de RAG: Context Relevance, Faithfulness, Answer Relevance",
+   "definicion": "Context Relevance mide si se trajeron los documentos correctos; Answer Faithfulness, si la respuesta está sostenida por ellos; Answer Relevance, si contesta la pregunta.",
+   "por_que_importa": "Hay dos etapas que fallan solas y una sola respuesta visible; medir por separado dice dónde intervenir.",
+   "trampa": "Ajustar el prompt de generación cuando lo bajo es Context Relevance: no mueve el resultado."
+  },
+  {
+   "id": "prompt-injection",
+   "termino": "Inyección indirecta de prompts",
+   "definicion": "Ataque en el que se escriben instrucciones en un documento que el sistema indexará; al recuperarse entra al prompt al mismo nivel que la instrucción del sistema y el modelo la obedece.",
+   "por_que_importa": "El atacante nunca habla con el modelo y el daño se dispara en consultas legítimas, quizás meses después; aplica igual a servidores MCP que traen contenido externo.",
+   "trampa": "Creer que delimitadores o instrucciones lo previenen: ninguna estrategia de prompt lo hace de forma confiable; se acota el daño restringiendo fuentes, permisos y acciones."
+  },
+  {
+   "id": "mcp",
+   "termino": "MCP (Model Context Protocol)",
+   "definicion": "Protocolo abierto (Anthropic, noviembre 2024) sobre JSON-RPC 2.0 con el que un cliente de IA descubre (tools/list) e invoca (tools/call) herramientas, recursos y prompts expuestos por servidores.",
+   "por_que_importa": "Convierte M×N conectores a medida en M+N implementaciones y separa las herramientas de los agentes.",
+   "trampa": "Decir que es «JSON-RPC sobre HTTP en localhost»: el caso más común es stdio sin puerto. Y confundir la sesión con estado de MCP con JSON-RPC, que es sin estado."
+  },
+  {
+   "id": "json-rpc",
+   "termino": "JSON-RPC 2.0",
+   "definicion": "Formato de mensajes RPC liviano, sin estado y agnóstico del transporte: jsonrpc = 2.0, method, params, id; la respuesta lleva result o error (excluyentes); sin id es una notificación que no se responde.",
+   "por_que_importa": "Es la capa de mensajes de MCP; el id correlaciona pedidos y respuestas y las notificaciones hacen el canal bidireccional.",
+   "trampa": "Responder una notificación o devolver result y error a la vez."
+  },
+  {
+   "id": "tool-calling",
+   "termino": "Tool calling / selección de herramientas",
+   "definicion": "El modelo elige qué herramienta llamar y con qué argumentos leyendo nombre, descripción y esquema en lenguaje natural.",
+   "por_que_importa": "La descripción es la interfaz: ahí se gana o se pierde la precisión del sistema; OpenAI recomienda menos de 20 funciones a la vez.",
+   "trampa": "Culpar al modelo cuando elige mal: suele ser diseño (descripciones ambiguas, catálogos grandes, nombres colisionados)."
+  },
+  {
+   "id": "routing-de-herramientas",
+   "termino": "Patrones de catálogo: routing jerárquico y catálogo por fase",
+   "definicion": "Routing jerárquico: una herramienta route_to_domain(domain, action) con enums cerrados; catálogo por fase: exponer solo las 2-3 herramientas de la fase actual de la conversación.",
+   "por_que_importa": "Reducen el espacio de decisión del modelo cuando el sistema tiene muchas herramientas.",
+   "trampa": "Venderlos como magia: el routing agrega un salto y errores de ruteo, y si el LLM clasifica la fase, el problema de selección sube un nivel."
+  }
+ ],
+ "formulas": [
+  {
+   "nombre": "Term Frequency",
+   "tex": "TF(t,d) = \\frac{\\text{apariciones de } t \\text{ en } d}{\\text{tokens de } d}",
+   "explicacion": "Frecuencia relativa del término en el documento. «timeout» 1 vez en Doc1 (5 tokens) → 0,20."
+  },
+  {
+   "nombre": "Inverse Document Frequency",
+   "tex": "IDF(t) = \\ln\\frac{N}{df(t)}",
+   "explicacion": "$N$: total de documentos; $df(t)$: en cuántos aparece $t$. Logaritmo natural. Con N = 3: «el» → ln 1 = 0; «servicio» → ln 1,5 = 0,41; «timeout» → ln 3 = 1,10."
+  },
+  {
+   "nombre": "TF-IDF de un documento para una consulta",
+   "tex": "score(q,d) = \\sum_{t \\in q} TF(t,d)\\cdot IDF(t)",
+   "explicacion": "Se suma sobre los términos de la consulta. Doc1 para [timeout, intermitente]: 0,22 + 0,22 = 0,44."
+  },
+  {
+   "nombre": "BM25 (forma estándar)",
+   "tex": "BM25(q,d) = \\sum_{t\\in q} IDF(t)\\,\\frac{tf\\,(k_1+1)}{tf + k_1\\left(1 - b + b\\,\\frac{|d|}{avgdl}\\right)}",
+   "explicacion": "La fracción satura con $tf$ (techo $k_1+1$); $k_1$ regula qué tan rápido; $b$ interpola la normalización por longitud ($|d|$ largo del documento, $avgdl$ largo promedio). Defaults de Lucene: $k_1=1{,}2$, $b=0{,}75$. La clase lo explica cualitativamente."
+  },
+  {
+   "nombre": "Similitud coseno",
+   "tex": "\\cos\\theta = \\frac{A\\cdot B}{\\lVert A\\rVert\\,\\lVert B\\rVert}",
+   "explicacion": "Producto punto dividido por el producto de las normas: depende solo del ángulo, no del largo. 1 idénticos, 0 sin relación, −1 opuestos."
+  },
+  {
+   "nombre": "Reciprocal Rank Fusion",
+   "tex": "RRF(d) = \\sum_{r \\in R} \\frac{1}{k + rank_r(d)},\\quad k=60",
+   "explicacion": "$R$: rankings a fusionar; $rank_r(d)$: posición de $d$ en el ranking $r$. Doc A (1.º y 3.º): 1/61 + 1/63 = 0,03227."
+  },
+  {
+   "nombre": "Recall@k",
+   "tex": "Recall@k = \\frac{|\\text{relevantes} \\cap \\text{top-}k|}{|\\text{relevantes}|}",
+   "explicacion": "Métrica estándar de la etapa 1: qué fracción de los documentos relevantes quedó dentro de los k recuperados (el pool de 20-100 candidatos)."
+  },
+  {
+   "nombre": "Integraciones sin y con protocolo",
+   "tex": "\\text{sin protocolo: } M\\times N \\qquad \\text{con MCP: } M+N",
+   "explicacion": "$M$ aplicaciones y $N$ fuentes. Con 3 y 3: 9 conectores contra 6 implementaciones; sumar una fuente cuesta +3 contra +1."
+  }
+ ],
+ "comparaciones": [
+  {
+   "titulo": "Búsqueda léxica vs semántica vs híbrida",
+   "columnas": [
+    "Aspecto",
+    "Léxica (BM25)",
+    "Semántica (embeddings)",
+    "Híbrida (RRF)"
+   ],
+   "filas": [
+    [
+     "Compara",
+     "Cadenas / términos",
+     "Posiciones en un espacio vectorial",
+     "Las dos, fusionando rankings"
+    ],
+    [
+     "Estructura",
+     "Índice invertido",
+     "Base vectorial + ANN (HNSW)",
+     "Ambas"
+    ],
+    [
+     "Fortaleza",
+     "Identificadores exactos, sin GPU, milisegundos",
+     "Sinónimos, paráfrasis, multilingüe",
+     "Mejor cobertura"
+    ],
+    [
+     "Falla cuando",
+     "El usuario no usa las palabras del documento",
+     "Hay que encontrar un identificador exacto",
+     "Más piezas y pesos que mantener"
+    ],
+    [
+     "Ejemplo",
+     "ERR_CONN_1042, SKU, nombre de función",
+     "«no puedo iniciar sesión» ≈ «olvidé mi contraseña»",
+     "Buscador interno con ambos tipos de consulta"
+    ]
+   ]
+  },
+  {
+   "titulo": "TF-IDF vs BM25",
+   "columnas": [
+    "Aspecto",
+    "TF-IDF",
+    "BM25"
+   ],
+   "filas": [
+    [
+     "Frecuencia",
+     "Crece lineal, sin techo",
+     "Satura (parámetro k1)"
+    ],
+    [
+     "Longitud del documento",
+     "Normaliza dividiendo por el largo",
+     "Normalización suave (parámetro b)"
+    ],
+    [
+     "Fundamento",
+     "Heurística tf × idf",
+     "Probabilistic Relevance Framework, modelo 2-Poisson"
+    ],
+    [
+     "Uso",
+     "Didáctico / base",
+     "Línea de base léxica de producción"
+    ]
+   ]
+  },
+  {
+   "titulo": "Bi-encoder vs cross-encoder",
+   "columnas": [
+    "Aspecto",
+    "Bi-encoder (búsqueda vectorial)",
+    "Cross-encoder (reranker)"
+   ],
+   "filas": [
+    [
+     "Entrada",
+     "Consulta y documento por separado",
+     "Consulta + [SEP] + documento juntos"
+    ],
+    [
+     "Interacción",
+     "Ninguna: cos(A, B)",
+     "La atención cruza cada token con cada token"
+    ],
+    [
+     "Costo en consulta",
+     "Vector del doc precalculado; escala a millones",
+     "Una inferencia por par; solo top-50"
+    ],
+    [
+     "Precisión",
+     "Menor; no desambigua («banco»)",
+     "Alta: negaciones, ambigüedad, contexto"
+    ],
+    [
+     "Etapa",
+     "1 (recall)",
+     "2 (precisión)"
+    ]
+   ]
+  },
+  {
+   "titulo": "Estrategias de chunking",
+   "columnas": [
+    "Estrategia",
+    "Dónde corta",
+    "Ventaja",
+    "Desventaja"
+   ],
+   "filas": [
+    [
+     "Largo fijo",
+     "Donde toca la cuenta de tokens",
+     "Simple, predecible",
+     "Parte frases por la mitad"
+    ],
+    [
+     "Semántico",
+     "Límites de párrafo/sección",
+     "Coherencia",
+     "Largo variable"
+    ],
+    [
+     "Por estructura",
+     "Encabezados, secciones, funciones",
+     "Mejor para docs técnicos, APIs y código",
+     "Requiere documentos estructurados"
+    ]
+   ]
+  },
+  {
+   "titulo": "Métricas de evaluación de RAG",
+   "columnas": [
+    "Métrica",
+    "Pregunta",
+    "Qué etapa mide"
+   ],
+   "filas": [
+    [
+     "Context Relevance",
+     "¿Trajo los documentos correctos?",
+     "Recuperación"
+    ],
+    [
+     "Answer Faithfulness",
+     "¿Lo dicho está sostenido por los fragmentos?",
+     "Generación (fidelidad al contexto)"
+    ],
+    [
+     "Answer Relevance",
+     "¿Contesta lo que se preguntó?",
+     "Generación (pertinencia)"
+    ],
+    [
+     "Recall@k",
+     "¿Están los relevantes entre los k recuperados?",
+     "Etapa 1 del embudo"
+    ]
+   ]
+  },
+  {
+   "titulo": "RAG vs fine-tuning",
+   "columnas": [
+    "Aspecto",
+    "RAG",
+    "Fine-tuning"
+   ],
+   "filas": [
+    [
+     "Qué agrega",
+     "Conocimiento (contexto en el prompt)",
+     "Formato, estilo, comportamiento"
+    ],
+    [
+     "Actualización",
+     "Se reindexa el documento el día que cambia",
+     "Nueva corrida de entrenamiento"
+    ],
+    [
+     "Pesos",
+     "No cambian",
+     "Cambian"
+    ],
+    [
+     "Citas / auditabilidad",
+     "Sí, cada afirmación apunta a su fuente",
+     "No deja rastro"
+    ],
+    [
+     "Costo",
+     "Infraestructura de índice + tokens de contexto",
+     "Caro y lento de actualizar"
+    ]
+   ]
+  },
+  {
+   "titulo": "Herramienta hardcodeada vs servidor MCP",
+   "columnas": [
+    "Aspecto",
+    "Hardcodeada",
+    "Servidor MCP"
+   ],
+   "filas": [
+    [
+     "Dónde vive",
+     "Dentro del código del agente",
+     "Proceso aparte"
+    ],
+    [
+     "Descubrimiento",
+     "En compilación",
+     "En ejecución con tools/list"
+    ],
+    [
+     "Reutilización",
+     "Copiar el código",
+     "Cualquier cliente MCP se conecta"
+    ],
+    [
+     "Cambiarla",
+     "Redesplegar el agente",
+     "Reiniciar el servidor"
+    ],
+    [
+     "Formato",
+     "El del framework",
+     "JSON-RPC común"
+    ]
+   ]
+  },
+  {
+   "titulo": "Transportes MCP",
+   "columnas": [
+    "Transporte",
+    "Quién arranca el proceso",
+    "Config",
+    "Uso típico"
+   ],
+   "filas": [
+    [
+     "stdio",
+     "El cliente, como subproceso",
+     "command + args (npx …); sin puerto",
+     "Herramientas locales (el más común)"
+    ],
+    [
+     "HTTP en streaming",
+     "El servidor ya corre",
+     "type: http + url",
+     "Servidores remotos o propios en desarrollo"
+    ],
+    [
+     "SSE",
+     "El servidor ya corre",
+     "url",
+     "Si el servidor no soporta streaming HTTP"
+    ]
+   ]
+  },
+  {
+   "titulo": "Por qué MCP y no HTTP/GraphQL",
+   "columnas": [
+    "Protocolo",
+    "Qué resuelve",
+    "Qué no resuelve"
+   ],
+   "filas": [
+    [
+     "HTTP",
+     "Transporte",
+     "Interfaz común y negociación de capacidades"
+    ],
+    [
+     "GraphQL",
+     "Consulta de datos con la forma pedida",
+     "Ejecutar acciones y orquestar fuentes"
+    ],
+    [
+     "MCP",
+     "Descubrimiento, sesión con estado, formato para que el modelo elija herramientas",
+     "Namespaces (no los tiene)"
+    ]
+   ]
+  }
+ ],
+ "flashcards": [
+  {
+   "q": "¿Cuáles son los tres pasos de RAG?",
+   "a": "Recuperar (top-k fragmentos), aumentar (instrucción + fragmentos + consulta en el prompt) y generar (respuesta con citas usando solo esos fragmentos). Los pesos no cambian."
+  },
+  {
+   "q": "Pasos de la indexación offline",
+   "a": "LOAD → SPLIT → EMBED → STORE; la consulta online es EMBED → RETRIEVE → GENERATE, con el mismo modelo de embeddings."
+  },
+  {
+   "q": "Memoria paramétrica vs no paramétrica (Lewis 2020)",
+   "a": "Paramétrica: en los pesos. No paramétrica: en un índice actualizable sin reentrenar."
+  },
+  {
+   "q": "Tres respuestas a «con 1M de tokens, ¿para qué RAG?»",
+   "a": "No entra; si entra, el modelo encuentra peor en entradas largas; se paga todo el corpus en cada consulta."
+  },
+  {
+   "q": "¿Por qué el índice invertido se llama así?",
+   "a": "Porque guarda en qué documentos está cada término en lugar de qué términos tiene cada documento."
+  },
+  {
+   "q": "IDF de una palabra que está en los 3 documentos",
+   "a": "ln(3/3) = 0: las stopwords se eliminan solas."
+  },
+  {
+   "q": "TF-IDF de «timeout» en Doc1 (5 tokens, N=3, df=1)",
+   "a": "0,20 × ln 3 = 0,20 × 1,10 = 0,22."
+  },
+  {
+   "q": "Las dos mejoras de BM25 sobre TF-IDF",
+   "a": "Saturación de la frecuencia (k1) y normalización suave por longitud (b)."
+  },
+  {
+   "q": "k1 = 1,2 y b = 0,75, ¿de dónde salen?",
+   "a": "Son defaults de Lucene, no del paper de Robertson & Zaragoza (que da rangos)."
+  },
+  {
+   "q": "¿Por qué coseno y no distancia euclidiana?",
+   "a": "Porque es invariante al largo del vector/texto; la euclidiana es sensible a la magnitud."
+  },
+  {
+   "q": "¿Qué hace HNSW?",
+   "a": "Búsqueda aproximada de vecinos con capas jerárquicas (como una skip list): de O(n) a escala logarítmica, a cambio de exactitud."
+  },
+  {
+   "q": "Fórmula de RRF y valor de k",
+   "a": "RRF(d) = Σ 1/(k + rank), k = 60 (no crítico: 10 a 100 rinde casi igual)."
+  },
+  {
+   "q": "¿Por qué RRF usa posiciones y no scores?",
+   "a": "BM25 puntúa 0..∞ y el coseno −1..1: los scores no son comparables, las posiciones sí."
+  },
+  {
+   "q": "Embudo de producción",
+   "a": "100.000+ docs → etapa 1 (BM25 + vectorial, recall) → 50 candidatos → etapa 2 (cross-encoder, precisión) → 5 docs al prompt."
+  },
+  {
+   "q": "Diferencia bi-encoder / cross-encoder",
+   "a": "El bi-encoder codifica por separado y compara vectores (escala); el cross-encoder lee consulta y documento juntos con atención cruzada (preciso, una inferencia por par)."
+  },
+  {
+   "q": "Metadatos que van siempre",
+   "a": "Identificador de fuente, timestamp y posición en el documento."
+  },
+  {
+   "q": "Tres métricas de RAG",
+   "a": "Context Relevance (recuperación), Answer Faithfulness y Answer Relevance (generación)."
+  },
+  {
+   "q": "¿Dónde se aplican los permisos en RAG?",
+   "a": "En la recuperación, no en la presentación: un fragmento que llegó al prompt ya influyó."
+  },
+  {
+   "q": "M×N vs M+N",
+   "a": "Sin protocolo, M apps × N fuentes conectores (3×3 = 9); con MCP, M + N implementaciones (6)."
+  },
+  {
+   "q": "En JSON-RPC, ¿qué es un mensaje sin id?",
+   "a": "Una notificación: no se responde."
+  },
+  {
+   "q": "Recomendación de OpenAI sobre cantidad de herramientas",
+   "a": "Menos de 20 funciones a la vez (la API tolera 128)."
+  },
+  {
+   "q": "¿Cuál es la interfaz real de una herramienta MCP para el modelo?",
+   "a": "Su descripción en lenguaje natural: el modelo elige leyéndola (qué hace, cuándo usarla y cuándo NO)."
+  }
+ ],
+ "quiz": [
+  {
+   "q": "Un usuario busca «ERR_CONN_1042» en el buscador interno y la búsqueda vectorial devuelve documentos de errores de conexión parecidos pero no el exacto. ¿Qué conviene?",
+   "opciones": [
+    "Subir la dimensionalidad de los embeddings",
+    "Agregar búsqueda léxica (BM25) y fusionar con RRF",
+    "Usar un chunk más grande",
+    "Bajar k en RRF"
+   ],
+   "correcta": 1,
+   "explicacion": "Los identificadores exactos son el caso donde lo vectorial falla y lo léxico brilla; la híbrida cubre ambos. Más dimensiones o chunks no resuelven coincidencias literales."
+  },
+  {
+   "q": "Con el corpus de la clase (N = 3), ¿cuál es el IDF de «servicio», que aparece en Doc1 y Doc3?",
+   "opciones": [
+    "ln(3) = 1,10",
+    "ln(3/2) = 0,41",
+    "ln(2/3) = −0,41",
+    "0"
+   ],
+   "correcta": 1,
+   "explicacion": "IDF = ln(N/df) = ln(3/2) ≈ 0,41. ln 3 corresponde a df = 1; 0 a df = 3."
+  },
+  {
+   "q": "¿Qué problema de TF-IDF corrige principalmente el parámetro k1 de BM25?",
+   "opciones": [
+    "Que las stopwords pesen",
+    "Que el peso crezca lineal sin techo con la frecuencia",
+    "Que los documentos cortos se penalicen",
+    "Que no entienda sinónimos"
+   ],
+   "correcta": 1,
+   "explicacion": "k1 controla la saturación de tf. La longitud la maneja b; las stopwords ya las anula el IDF; ningún método léxico entiende sinónimos."
+  },
+  {
+   "q": "¿Por qué se usa similitud coseno para comparar embeddings de fragmentos?",
+   "opciones": [
+    "Porque es la única métrica que funciona en alta dimensión",
+    "Porque es invariante al largo del vector, así los fragmentos largos no ganan siempre",
+    "Porque es más rápida que el producto punto",
+    "Porque devuelve probabilidades calibradas"
+   ],
+   "correcta": 1,
+   "explicacion": "Depende solo del ángulo. El producto punto es más rápido; los valores dependen del modelo y no son probabilidades."
+  },
+  {
+   "q": "Ranking BM25: A 1.º, C 2.º. Ranking vectorial: A 3.º, C 8.º. Con RRF (k = 60), ¿cuánto vale C?",
+   "opciones": [
+    "1/2 + 1/8",
+    "1/62 + 1/68 ≈ 0,0308",
+    "1/60 + 1/60",
+    "0,028"
+   ],
+   "correcta": 1,
+   "explicacion": "RRF suma 1/(k + rank): 1/62 + 1/68 = 0,01613 + 0,01471 = 0,0308. El 0,028 era el error de cuenta del deck original."
+  },
+  {
+   "q": "¿Cuál es la razón por la que el cross-encoder no se usa en la primera etapa?",
+   "opciones": [
+    "Es menos preciso que el bi-encoder",
+    "Requiere una inferencia completa por cada par (consulta, documento), inviable con 100.000 documentos",
+    "No soporta texto en español",
+    "Solo funciona con BM25"
+   ],
+   "correcta": 1,
+   "explicacion": "Su precisión viene de leer los dos textos juntos, y eso mismo hace imposible precalcular: costo O(n) por consulta."
+  },
+  {
+   "q": "En el embudo de dos etapas, ¿qué optimiza cada una?",
+   "opciones": [
+    "Etapa 1 precisión, etapa 2 recall",
+    "Etapa 1 recall, etapa 2 precisión",
+    "Las dos recall",
+    "Las dos latencia"
+   ],
+   "correcta": 1,
+   "explicacion": "Arriba no hay que perder relevantes (se aceptan falsos positivos); abajo solo debe entrar lo bueno al prompt (se aceptan falsos negativos)."
+  },
+  {
+   "q": "Un sistema RAG responde mal. Las métricas muestran Context Relevance bajo y Faithfulness alto. ¿Qué conviene hacer?",
+   "opciones": [
+    "Reescribir el prompt de generación",
+    "Cambiar a un LLM más grande",
+    "Mejorar la recuperación: chunking, híbrida, reranking o metadatos",
+    "Subir la temperatura"
+   ],
+   "correcta": 2,
+   "explicacion": "El modelo es fiel a lo que recibe, pero recibe documentos equivocados; tocar la generación no mueve el resultado."
+  },
+  {
+   "q": "Para documentación de una API donde cada endpoint es una sección con encabezado, ¿qué chunking recomienda la clase?",
+   "opciones": [
+    "Largo fijo de 512 tokens",
+    "Por estructura (encabezados)",
+    "Un solo chunk por archivo",
+    "Por oraciones"
+   ],
+   "correcta": 1,
+   "explicacion": "La documentación técnica ya trae estructura; cortar por encabezado da un fragmento por endpoint y no parte ideas."
+  },
+  {
+   "q": "Un chatbot interno con RAG filtra por permisos la respuesta final antes de mostrarla. ¿Cuál es el problema?",
+   "opciones": [
+    "Ninguno, es la práctica recomendada",
+    "El fragmento restringido ya estuvo en el prompt e influyó en la salida aunque no se cite",
+    "Aumenta la latencia",
+    "Rompe el caché"
+   ],
+   "correcta": 1,
+   "explicacion": "Los permisos deben aplicarse en la recuperación; filtrar después llega tarde."
+  },
+  {
+   "q": "¿Qué afirmación sobre la inyección indirecta de prompts es correcta según la clase?",
+   "opciones": [
+    "Se previene con delimitadores XML",
+    "El atacante escribe en un documento que se indexará y el ataque se dispara en una consulta legítima",
+    "Requiere que el atacante tenga acceso al chat",
+    "Solo afecta a modelos open source"
+   ],
+   "correcta": 1,
+   "explicacion": "El atacante nunca le habla al modelo; ninguna estrategia de prompt o delimitadores la previene de forma confiable."
+  },
+  {
+   "q": "Con 4 aplicaciones y 5 fuentes de datos, ¿cuántas integraciones hacen falta sin protocolo y con MCP?",
+   "opciones": [
+    "9 y 20",
+    "20 y 9",
+    "20 y 20",
+    "9 y 9"
+   ],
+   "correcta": 1,
+   "explicacion": "Sin protocolo M×N = 20 conectores; con MCP M+N = 9 implementaciones."
+  },
+  {
+   "q": "Configuraste un servidor MCP con command: npx y args. Buscás en qué puerto quedó escuchando. ¿Qué pasa?",
+   "opciones": [
+    "Escucha en el 3000",
+    "Escucha en el 8080",
+    "En ninguno: es transporte stdio, el cliente lo lanza como subproceso",
+    "Depende del SDK"
+   ],
+   "correcta": 2,
+   "explicacion": "command + args es stdio: entrada y salida estándar, sin red. HTTP/SSE es cuando el servidor ya corre en una URL."
+  },
+  {
+   "q": "En JSON-RPC 2.0, ¿cuál de estas respuestas es válida?",
+   "opciones": [
+    "{jsonrpc: 2.0, result: {...}, error: {...}, id: 1}",
+    "{jsonrpc: 2.0, result: {...}, id: 1}",
+    "{temperature: 22, condition: soleado}",
+    "{result: {...}}"
+   ],
+   "correcta": 1,
+   "explicacion": "Debe llevar jsonrpc 2.0, id y exactamente uno de result o error. La tercera era el ejemplo inválido del deck original."
+  },
+  {
+   "q": "Un agente de soporte tiene 3 herramientas: search_products, find_products y product_lookup, y elige mal. ¿Qué recomienda la clase primero?",
+   "opciones": [
+    "Cambiar a un modelo más grande",
+    "Diferenciar nombres y descripciones diciendo cuándo usar y cuándo NO usar cada una",
+    "Agregar más herramientas",
+    "Bajar el effort"
+   ],
+   "correcta": 1,
+   "explicacion": "El problema es de distinguibilidad: con tres superpuestas el modelo elige al azar o llama a las tres. Es señal de diseño, no de capacidad."
+  }
+ ],
+ "desarrollo": [
+  {
+   "pregunta": "Describí el pipeline completo de un sistema RAG en producción, desde la indexación hasta la respuesta, justificando el orden de cada etapa.",
+   "respuesta_modelo": "**Indexación (offline)**: LOAD de las fuentes (docs, ADRs, tickets, código; garbage in, garbage out) → SPLIT en fragmentos (preferentemente por estructura, con solapamiento) guardando metadatos (fuente, timestamp, posición, versión) → EMBED con un modelo de embeddings → STORE en un índice invertido (para BM25) y en una base vectorial con HNSW. Se repite cuando cambia el corpus. **Consulta (online)**: se aplica primero el **filtro por metadatos y permisos** (barato y en la recuperación). Luego, **en paralelo**, BM25 (top-50 por coincidencia exacta) y búsqueda vectorial ANN con el mismo modelo de embeddings (top-50 por cercanía). **RRF** (k = 60) fusiona por posiciones porque los scores no son comparables y premia el acuerdo. Un **cross-encoder** reordena los ~50-100 candidatos y deja 3-5. Se **aumenta** el prompt (instrucción + top-5 + consulta) y el LLM **genera** con citas. El orden sigue «lo barato filtra, lo caro ordena»: la etapa 1 maximiza recall sobre 100.000 documentos en milisegundos; la 2 maximiza precisión sobre pocos. Se loguea latencia y costo por consulta y se evalúa por etapa (Context Relevance, Faithfulness, Answer Relevance).",
+   "puntos_clave": [
+    "Indexación offline LOAD/SPLIT/EMBED/STORE",
+    "Mismo modelo de embeddings en ambas fases",
+    "Filtro de metadatos y permisos en la recuperación",
+    "BM25 y vectorial en paralelo",
+    "RRF por posiciones, k = 60",
+    "Cross-encoder 50 → 5",
+    "Recall arriba, precisión abajo",
+    "Generación con citas y evaluación por etapa"
+   ]
+  },
+  {
+   "pregunta": "Compará búsqueda léxica y semántica: mecanismo, cuándo falla cada una y por qué producción usa la híbrida. Usá el ejemplo de los tres documentos.",
+   "respuesta_modelo": "La **léxica** usa un índice invertido (término → documentos) y puntúa con TF-IDF o BM25. Con «timeout intermitente», Doc1 obtiene 0,20 × 1,10 + 0,20 × 1,10 = 0,44 y los otros 0. Es rápida, exacta y sin GPU, ideal para identificadores, pero **falla cuando el usuario no usa las palabras del documento**: un documento sin términos en común puntúa cero. La **semántica** convierte cada fragmento en un embedding (384-3072 dimensiones) y busca vecinos por coseno con HNSW. Con «¿por qué se cuelga la API a veces?», Doc1 gana con coseno 0,91 sin compartir una sola palabra; también resuelve «olvidé mi contraseña» ≈ «no puedo iniciar sesión». **Falla con identificadores exactos** que ningún embedding distingue de otros parecidos, y cuesta inferencia por consulta. Como fallan en casos distintos, la **híbrida** corre las dos en paralelo y funde con RRF, que opera sobre posiciones porque BM25 (0..∞) y coseno (−1..1) no son comparables. Da mejor cobertura a cambio de más piezas que mantener; es el estándar de producción.",
+   "puntos_clave": [
+    "Índice invertido + TF-IDF/BM25",
+    "Cuenta 0,44 del ejemplo",
+    "Falla léxica: sin palabras en común",
+    "Embeddings + coseno + HNSW",
+    "Doc1 0,91 sin palabras en común",
+    "Falla semántica: identificadores",
+    "Híbrida + RRF por posiciones"
+   ]
+  },
+  {
+   "pregunta": "¿Cómo se evalúa un sistema RAG y qué riesgos de seguridad introduce? Proponé mitigaciones.",
+   "respuesta_modelo": "Un RAG tiene dos etapas que fallan solas y una sola respuesta visible, así que se mide por separado: **Context Relevance** (¿se trajeron los documentos correctos?), **Answer Faithfulness** (¿la respuesta está sostenida por ellos?) y **Answer Relevance** (¿contesta la pregunta?). En la recuperación importa el recall (por ejemplo recall@k del pool) y al final la precisión. Si Context Relevance es bajo, tocar el prompt de generación no sirve. Riesgos: **acceso no autorizado** (el recuperador ve todo el índice; si los permisos se aplican en la presentación el fragmento ya influyó) e **inyección indirecta**: un atacante escribe instrucciones en una wiki o ticket, se indexa y, meses después, una consulta legítima lo mete en el prompt al mismo nivel que la instrucción del sistema. Ninguna estrategia de prompt ni delimitadores lo previene. Mitigaciones: restringir qué fuentes se indexan, control de acceso granular aplicado en la recuperación, encriptación y anonimización antes de indexar, auditoría y monitoreo, validación de salidas y tratar los fragmentos como entrada no confiable antes de disparar acciones. Acotan el daño, no lo eliminan.",
+   "puntos_clave": [
+    "Tres métricas y qué etapa mide cada una",
+    "Recall en etapa 1, precisión en etapa 2",
+    "No tocar generación si falla recuperación",
+    "Permisos en la recuperación",
+    "Mecanismo de inyección indirecta en 4 pasos",
+    "No hay defensa de prompt confiable",
+    "Mitigaciones que acotan el daño"
+   ]
+  },
+  {
+   "pregunta": "Explicá qué es MCP, qué problema resuelve y cómo funciona el ciclo de vida de una herramienta. ¿Por qué la clase dice que «la descripción es la interfaz»?",
+   "respuesta_modelo": "MCP (Anthropic, noviembre 2024) es un protocolo para que aplicaciones de IA (clientes) pidan datos y acciones a sistemas externos (servidores) con un formato común. Resuelve el problema **M×N**: sin protocolo, cada par app-fuente necesita su conector (3×3 = 9, cada uno con su autenticación y errores); con MCP, **M+N** (6). A diferencia de HTTP (transporte) o GraphQL (consulta de datos), agrega descubrimiento de capacidades, sesión con estado y un formato para describir herramientas. Usa **JSON-RPC 2.0** (sin estado; id para correlacionar; result o error; notificaciones sin id) sobre stdio (subproceso, sin puerto) o HTTP/SSE. Ciclo: el servidor arranca y declara nombre + descripción + esquema; el cliente hace `tools/list`; ante una consulta el **LLM lee las descripciones y elige**; llama `tools/call`; el servidor ejecuta y devuelve un resultado; el LLM lo usa. Como el paso de elección ocurre dentro del modelo leyendo texto, la descripción es la interfaz: debe decir qué hace, cuándo usarla y cuándo NO, con esquemas simples y nombres explícitos. Además el agente ve un catálogo plano sin namespaces, así que la calidad del sistema depende de diseñar pocas herramientas distinguibles (menos de 20).",
+   "puntos_clave": [
+    "Cliente, servidor, herramienta",
+    "M×N vs M+N",
+    "Diferencia con HTTP/GraphQL",
+    "JSON-RPC: id, result/error, notificación",
+    "stdio vs HTTP",
+    "Seis pasos con tools/list y tools/call",
+    "El modelo elige leyendo la descripción",
+    "Sin namespaces, catálogo plano"
+   ]
+  },
+  {
+   "pregunta": "Más herramientas, peor elección: ¿qué evidencia hay, qué cifras no deben repetirse y qué patrones de diseño propone la clase?",
+   "respuesta_modelo": "El modelo hace coincidencia de patrones sobre descripciones y un espacio de opciones grande lo desborda. Evidencia con fuente: OpenAI recomienda **menos de 20 funciones a la vez** (aunque su API acepta 128). Microsoft Research inspeccionó **1.470 servidores** (12.643 herramientas): mediana 4 herramientas por servidor pero extremos de 256 (GitHub MCP 91), **775 colisiones de nombre exacto** (`search` en 32 servidores), 23 nombres para búsqueda web, profundidad de esquema mediana 2 con máximo 20, y aplanar parámetros mejoró el tool-calling 47%. MCP no tiene namespaces. **No repetir**: el gráfico 90/80/65% por cantidad de parámetros atribuido a MSR (no existe: el estudio no mide acierto de agentes) ni presentar la escala 92/84/71/58% como medición (es de un tutorial sin fuente; el «42%» es su complemento). **Patrones**: nombres `verbo_sustantivo_contexto`, descripciones con «cuándo NO usarla», respuestas `{success, data, error, message}`, **routing jerárquico** (`route_to_domain(domain, action)` con enums cerrados; costo: un salto extra), **catálogo por fase** (2-3 herramientas visibles; ojo con quién decide la fase) y **analítica** (call_count, success_rate, avg_latency_ms, last_used) para eliminar, corregir o cachear. Que el agente elija mal es señal de diseño, no de capacidad.",
+   "puntos_clave": [
+    "Menos de 20 (OpenAI) vs límite 128",
+    "Datos MSR: colisiones, extremos, sin namespaces",
+    "Cifras a no repetir y por qué",
+    "Routing jerárquico y su costo",
+    "Catálogo por fase y quién decide la fase",
+    "Descripciones con cuándo NO",
+    "Analítica en producción"
+   ]
+  }
+ ],
+ "conexiones": [
+  {
+   "clase": 5,
+   "relacion": "RAG apareció como mitigación de alucinaciones y como paso 3 del prompt chaining; la objeción «con ventanas de 1M, ¿para qué recuperar?» viene de la sección de ventana de contexto y costo por token."
+  },
+  {
+   "clase": 7,
+   "relacion": "La clase 7 repasa RAG y profundiza MCP y herramientas; también explica de dónde salen los embeddings (word2vec) y la atención que usa el cross-encoder."
+  },
+  {
+   "clase": 8,
+   "relacion": "El cross-encoder es un transformer encoder donde la atención cruza tokens de consulta y documento; el bi-encoder usa el mismo bloque por separado."
+  },
+  {
+   "clase": 10,
+   "relacion": "MCP y el diseño del catálogo de herramientas son la base de los agentes: el agente elige herramientas leyendo descripciones y el catálogo por fase anticipa el manejo de contexto de agente."
+  },
+  {
+   "clase": 13,
+   "relacion": "La inyección indirecta por el corpus o por servidores MCP con contenido externo es un caso de la tríada letal y de la defensa en profundidad."
+  }
+ ],
+ "lecturas": [
+  "Lewis et al. 2020, Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
+  "Robertson & Zaragoza 2009, The Probabilistic Relevance Framework: BM25 and Beyond",
+  "Cormack, Clarke & Büttcher 2009, Reciprocal Rank Fusion outperforms Condorcet and individual Rank Learning Methods",
+  "Malkov & Yashunin 2016, Efficient and robust approximate nearest neighbor search using Hierarchical Navigable Small World graphs",
+  "Microsoft Research 2025, Tool-space interference in the MCP era (1.470 servidores MCP)",
+  "Anthropic, noviembre 2024, Introducing the Model Context Protocol",
+  "JSON-RPC 2.0 Specification",
+  "LangChain, RAG tutorial (indexación y advertencia sobre inyección indirecta)",
+  "aitutorial.dev: RAG fundamentals, reranking y agents/tool selection",
+  "modelcontextprotocol.io y registry.modelcontextprotocol.io"
+ ]
+}

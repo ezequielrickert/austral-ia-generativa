@@ -1,0 +1,432 @@
+{
+  "num": 2,
+  "titulo": "¿Cuánto vale esta casa?",
+  "repo": "house-prices",
+  "consigna": "**Misión `missions/mlp`** (sobre las clases 3 y 4). Se entrega **un único notebook** ejecutado, que corra entero con *Restart & Run All*, con las explicaciones en celdas de markdown.\n\n**El cambio respecto de la clase:** en clase la red respondía *¿está por encima de la mediana?* (sigmoide, sí/no). Ahora la pregunta es **¿cuánto sale esta casa, en dólares?**: cambia la última capa, la loss y las métricas. Y cambia la entrada: `house-prices-extended.csv` tiene **1460 casas, 19 columnas** — las 10 numéricas de clase más `State`, `District`, `HouseStyle`, `MonthSold`, `ListingId`, `LotFrontage` (con faltantes), etc. Nada de eso entra a un `Dense` tal como viene.\n\n**Milestones:**\n1. **Tabla de decisiones:** cada columna por el checklist de la clase (qué es, **qué significa la resta**, cardinalidad, puede faltar, la tengo al predecir). El dataset esconde **al menos tres trampas** de codificación.\n2. **Baseline numérico** con salida de regresión (par activación-loss correcto; saber por qué `accuracy` no significa nada) y MAE/RMSE en test.\n3. **Categóricas:** `State` (12) pide one-hot y `District` (72) pide embedding; el MAE tiene que bajar claro y mostrar cuánto aporta cada bloque.\n4. **Que no memorice:** overfitear a propósito y arreglar con L2 / dropout, con curvas train vs val.\n5. **Tasar una casa** escrita como la escribiría una persona: **el preprocesamiento es parte del modelo**.\n\n**Extra:** P10/P50/P90 con *pinball loss* (≈80% de las casas entre P10 y P90).\n\n**Las cinco preguntas (lo que se corrige):** (1) MAE vs RMSE vs MAPE y la casa que más los separa; (2) `District` como entero 0–71; (3) qué pasa con `ListingId` adentro; (4) con qué se imputa `LotFrontage`, 0 vs mediana, y si el faltante informa; (5) sobre qué datos se ajustó el escalador y qué número miente si se hace sobre todo el dataset.",
+  "que_hicimos": "Entregamos `calveyra-desivo-giordanelli-rickert.ipynb` (grupo Calveyra, Desivo, Giordanelli, Rickert), versionado en git con un commit por milestone (M1 a M4). El repo trae además el notebook de clase (`house-prices.ipynb`, el clasificador de `AboveMedianPrice`) y la consigna.\n\n**M1 — Tabla de decisiones.** Primero inspeccionamos el dataset (`dtype`, valores únicos, faltantes): `(1460, 20)`, `LotFrontage` falta en **103 filas (7,05%)**, `State` tiene 12 valores, `District` 72, `HouseStyle` 6, `SaleCondition` 5, `CentralAir` 2. La tabla tiene una fila por columna con la pregunta clave de la clase 4: **¿qué significa la resta entre dos valores?** Identificamos las tres trampas:\n- **`ListingId`** — identificador único (1460 valores distintos): se **descarta**.\n- **`MonthSold`** — cíclica: diciembre y enero están a un mes, no a once → **seno/coseno**.\n- **`District`** — 72 categorías nominales: como entero 0–71 la red asume orden y distancia → **embedding**.\nEl resto: numéricas con z-score, `State`/`HouseStyle`/`SaleCondition` one-hot, `CentralAir` 0/1, `LotFrontage` **mediana de train + flag de faltante**.\n\n**Particiones.** `train_test_split` en dos pasos, **70/20/10** con `random_state=42`: train 1022, val 292, test 146. Partimos **antes** de calcular cualquier estadística; `StandardScaler`, mediana, encoders one-hot y el diccionario distrito→índice se ajustan **solo con train**. También escalamos el **target** (`SalePrice` va de ~50 mil a ~1,6 millones) con un `StandardScaler` de train y desescalamos las predicciones para reportar en dólares.\n\n**M2 — Baseline numérico.** MLP `Sequential`: `Dense(32, relu) → Dense(32, relu) → Dense(1, linear)`, `optimizer='adam'`, `loss='mse'`, `metrics=['mae']`, `batch_size=32`, 100 épocas. Comparamos tres imputaciones de `LotFrontage` (Pregunta 4), medimos si el faltante informa por sí solo, analizamos la casa con mayor error (Pregunta 1) y entrenamos una vez con `ListingId` adentro (Pregunta 3).\n\n**M3 — Categóricas.** Pasamos a la **API funcional** de Keras: dos entradas, `dense_features` (numéricas + flag + one-hots + mes sin/cos + `CentralAir`) y `district_idx` (entero), que pasa por `Embedding(73, 8)` → `Flatten` → `Concatenate` con el resto → `Dense(32)` → `Dense(32)` → `Dense(1, linear)`. El vocabulario es 72 + 1 índice reservado para distritos desconocidos (OOV). Entrenamos **de forma incremental** para medir el aporte de cada bloque, y la versión trampa con `District` como entero (Pregunta 2).\n\n**M4 — Que no memorice.** Mismo feature set con una red sobredimensionada `512-512-512` (**550.985 parámetros** para 1022 casas), 150 épocas, sin freno. Después la misma red con **L2 = 0,001** (`kernel_regularizer`), **Dropout 0,3** entre capas y **`EarlyStopping(patience=15, restore_best_weights=True)`** sobre `val_loss`.\n\n**Lo que quedó pendiente:** el notebook termina en el Milestone 4. **No están** el Milestone 5 (tasar una casa con el preprocesamiento dentro del modelo), la respuesta escrita de la Pregunta 5 (aunque el código aplica la regla correcta y lo comenta) ni el extra de pinball loss.",
+  "arquitectura": "flowchart LR\n  CSV[house-prices-extended.csv 1460 filas] --> SPLIT[Split 70/20/10 seed 42]\n  SPLIT --> TR[train 1022]\n  SPLIT --> VA[val 292]\n  SPLIT --> TE[test 146]\n  TR -- fit solo en train --> PRE[StandardScaler, mediana LotFrontage, OneHotEncoders, mapa District a indice]\n  PRE --> NUM[Numericas z-score + flag faltante]\n  PRE --> CYC[MonthSold sin y cos]\n  PRE --> OH[One-hot State, HouseStyle, SaleCondition + CentralAir 0 o 1]\n  PRE --> IDX[District indice 0 a 72]\n  IDX --> EMB[Embedding 73 x 8 + Flatten]\n  NUM --> CAT[Concatenate]\n  CYC --> CAT\n  OH --> CAT\n  EMB --> CAT\n  CAT --> D1[Dense 32 ReLU]\n  D1 --> D2[Dense 32 ReLU]\n  D2 --> OUT[Dense 1 lineal]\n  OUT --> LOSS[Loss MSE sobre target escalado, Adam]\n  OUT --> INV[inverse_transform a dolares]\n  INV --> MET[MAE, RMSE, MAPE en test]",
+  "resultados": "Todas las métricas son sobre **test (146 casas)**, en dólares, con `seed=42`.\n\n**Milestone 2 — imputación de `LotFrontage` (baseline numérico 32-32):**\n\n| Variante | MAE | RMSE | MAPE |\n|---|---|---|---|\n| Mediana + indicador (baseline oficial) | 51.411 | 69.919 | 27,66% |\n| Mediana sin indicador | 50.940 | 68.271 | 27,20% |\n| Cero sin indicador | 47.462 | 65.108 | 25,01% |\n\nMediana de `LotFrontage` en train: **70,0**. ¿El faltante informa? Correlación faltante↔precio **−0,064**; precio medio con dato **\\$210.880** vs sin dato **\\$185.522** (**−12,0%**). En el baseline, `val_loss` toca su mínimo cerca de la **época 3** y después sube mientras `train_loss` sigue bajando: ya hay overfitting.\n\n**Pregunta 1 — la casa que más separa MAE y RMSE:** `ListingId 781978` (NC, Wheatfield, `OverallQual=9`, 11 ambientes): real **\\$357.100**, predicho **\\$583.271**, error **\\$226.171**. Sacarla baja el RMSE **3,3%** y el MAE solo **2,3%**.\n\n**Pregunta 3 — `ListingId` adentro:** MAE \\$51.131 (vs \\$51.411, ruido), pero la brecha val−train de loss (promedio de las últimas 10 épocas, target escalado) crece de **0,2657** a **0,3470** (train 0,1268 / val 0,4738).\n\n**Milestone 3 — aporte incremental de cada bloque:**\n\n| Modelo | MAE | RMSE | MAPE |\n|---|---|---|---|\n| Solo numérico (M2) | 51.411 | 69.919 | 27,66% |\n| + `State` one-hot | 30.956 | 41.203 | 16,92% |\n| + `District` embedding | 25.380 | 31.678 | 14,85% |\n| + resto categóricas + mes cíclico | **20.844** | **26.202** | **11,60%** |\n\n**Pregunta 2 — `District` como entero 0–71:** MAE **\\$25.856** (+24%), RMSE **\\$35.284** (+35%), MAPE 14,83%.\n\n**Milestone 4 — overfitting y regularización (512-512-512):**\n\n| Modelo | MAE | RMSE | train_loss final | val_loss final |\n|---|---|---|---|---|\n| Sobredimensionado (150 épocas) | 18.464 | 27.159 | 0,0121 | 0,1273 |\n| L2 0,001 + Dropout 0,3 + early stopping | **16.538** | **21.199** | 0,1302 | 0,1622 |\n\nEl sobredimensionado tiene su mejor `val_loss` (0,0727) en la **época 7** y termina en 0,1273; el regularizado cortó a las **76 de 150 épocas**. Mejor modelo: **MAE \\$16.538**, un **68% menos** que el baseline numérico.\n\n**Conclusiones:** (1) el salto grande no vino de la arquitectura sino de **la codificación**: sumar ubicación bien codificada bajó el MAE de 51 mil a 21 mil; (2) un error de codificación **no da error** (con `District` como entero el modelo entrena igual, solo peor); (3) restringir la capacidad mejoró la generalización.\n\n**Observaciones críticas para la defensa:**\n- La celda de markdown del M4 dice \"casi 300 mil parámetros\" pero la salida real es **550.985**.\n- \"Cero sin indicador\" dio *mejor* MAE en esta corrida; el notebook lo atribuye al ruido de una sola semilla y defiende la mediana por razones conceptuales (0 = \"lote sin frente\", un valor fuera de la distribución). Para afirmarlo con números habría que promediar varias semillas.\n- Todas las variantes se comparan sobre **test**; en rigor, elegir entre variantes es trabajo de **validación**, y el test se abre una vez.\n- Faltan el M5, la Pregunta 5 escrita y el extra de pinball.",
+  "decisiones": [
+    {
+      "decision": "Descartar `ListingId` como feature.",
+      "por_que": "Es un identificador único (1460 valores distintos): la resta entre dos IDs no significa nada y no hay nada que generalizar. Si el modelo 'aprende' de él, memoriza. Con el ID adentro el MAE de test casi no cambió (51.131 vs 51.411) pero la brecha val−train creció de 0,2657 a 0,3470.",
+      "alternativas": "Dejarlo como número escalado (trampa 1 del dataset). No hay alternativa válida: en la tabla de la clase 4, 'Identificador único → se descarta, 0 floats'.",
+      "clases": [
+        4
+      ],
+      "conceptos": [
+        "identificador-como-feature",
+        "overfitting"
+      ]
+    },
+    {
+      "decision": "`MonthSold` codificado como `sin(2πt/12)` y `cos(2πt/12)`.",
+      "por_que": "Es cíclica: diciembre (12) y enero (1) están a un mes, pero como número plano están a 11. Con dos floats los extremos del ciclo quedan juntos. Se necesitan los dos porque con solo el seno dos meses distintos darían el mismo valor.",
+      "alternativas": "Entero plano (trampa 2, usado a propósito en el baseline del M2) u one-hot de 12 (no ve que meses vecinos se parecen).",
+      "clases": [
+        4
+      ],
+      "conceptos": [
+        "codificacion-ciclica"
+      ]
+    },
+    {
+      "decision": "`State` (12 valores) con one-hot y `District` (72 valores) con embedding de dimensión 8.",
+      "por_que": "Regla de cardinalidad de la clase 4: hasta 15 valores one-hot, 50 o más embedding. One-hot deja todas las categorías a igual distancia (la verdad del dato) y no se aprende; el embedding aporta d=8 floats en vez de 72 y aprende de los datos qué distritos se parecen. Resultado: + State bajó el MAE de 51.411 a 30.956; + District a 25.380.",
+      "alternativas": "One-hot de 72 para `District` (viable pero disperso: 72 columnas casi todas en cero) o entero 0–71 (trampa 3: MAE 25.856 y RMSE 35.284 contra 20.844 / 26.202 del embedding).",
+      "clases": [
+        4
+      ],
+      "conceptos": [
+        "one-hot-encoding",
+        "embeddings-categoricos"
+      ]
+    },
+    {
+      "decision": "Imputar `LotFrontage` con la **mediana de train** (70,0) más un flag binario `LotFrontage_missing`.",
+      "por_que": "Receta de la clase: imputar más flag, porque faltar puede significar algo. Lo comprobaron: las casas sin el dato valen en promedio 12% menos (\\$185.522 vs \\$210.880). Rellenar con 0 le dice a la red 'esta casa tiene un lote sin frente', un valor que no existe en la distribución real.",
+      "alternativas": "Rellenar con 0 (en una corrida dio MAE 47.462, menor, que atribuyeron al ruido de una sola semilla), con la media, o descartar las filas (se pierde 7% del dataset).",
+      "clases": [
+        4
+      ],
+      "conceptos": [
+        "imputacion-de-faltantes",
+        "data-leakage"
+      ]
+    },
+    {
+      "decision": "Partición 70/20/10 con `random_state=42`, hecha **antes** de calcular cualquier estadística; scaler, mediana, encoders y mapa de distritos ajustados solo sobre train.",
+      "por_que": "Todo lo que se aprende de los datos se aprende solo del train. Ajustar μ y σ (o la mediana) sobre el dataset completo filtra información de test al entrenamiento y deja optimista el MAE/RMSE de test, sin ningún error visible.",
+      "alternativas": "Split de dos vías (sin validación se termina tuneando contra test) o `scaler.fit` sobre todo el dataset (data leakage silencioso).",
+      "clases": [
+        4
+      ],
+      "conceptos": [
+        "particion-train-val-test",
+        "data-leakage",
+        "normalizacion"
+      ]
+    },
+    {
+      "decision": "Salida `Dense(1, activation='linear')` con loss MSE; reportar MAE, RMSE y MAPE en dólares; no usar `accuracy`.",
+      "por_que": "La última capa la decide la tarea: un real → 1 neurona lineal + MSE/MAE/Huber. Una sigmoide acotaría la salida a (0,1). `accuracy` necesita clases que acertar; acá hay una distancia en dólares que minimizar.",
+      "alternativas": "Entrenar con MAE (más robusto a outliers, aprende la mediana) o Huber; MSE aprende el promedio y castiga más los errores grandes.",
+      "clases": [
+        3,
+        4
+      ],
+      "conceptos": [
+        "funcion-de-perdida",
+        "mse",
+        "accuracy"
+      ]
+    },
+    {
+      "decision": "Escalar también el target `SalePrice` con un `StandardScaler` ajustado en train, y desescalar las predicciones.",
+      "por_que": "El precio va de ~50 mil a ~1,6 millones: sin escalar, la loss y los gradientes son enormes y la red no converge en 100 épocas con el learning rate por defecto de Adam (0,001). Las métricas se reportan después de `inverse_transform`, en dólares.",
+      "alternativas": "`log(SalePrice)` (comprime la cola larga de precios altos y hace que el error sea relativo), o dejar el target crudo y subir mucho el learning rate (inestable).",
+      "clases": [
+        4
+      ],
+      "conceptos": [
+        "normalizacion",
+        "learning-rate"
+      ]
+    },
+    {
+      "decision": "Pasar de `Sequential` a la API funcional de Keras con dos entradas (`dense_features` y `district_idx`).",
+      "por_que": "El embedding necesita una rama propia: el entero no entra a la red, entra al lookup de la tabla `Embedding`, y su fila se concatena con el resto de las features antes de las capas densas.",
+      "alternativas": "Preprocessing layers de Keras (`StringLookup`, `Normalization`) dentro del modelo, que además habría resuelto el Milestone 5 (el preprocesamiento viajando con el modelo).",
+      "clases": [
+        4
+      ],
+      "conceptos": [
+        "embeddings-categoricos",
+        "capa"
+      ]
+    },
+    {
+      "decision": "Overfitear a propósito con 512-512-512 (550.985 parámetros) y corregir con L2 0,001 + Dropout 0,3 + EarlyStopping(patience=15, restore_best_weights=True).",
+      "por_que": "Con 1022 casas, ~540 parámetros por ejemplo: memoriza (train 0,0121 vs val 0,1273). La guía de la clase: tabular → L2 + early stopping; red profunda → dropout + L2. Se combinaron las tres. Cortó a las 76 épocas y el MAE bajó a 16.538.",
+      "alternativas": "Reducir capacidad (volver a 32-32), solo early stopping (el más barato), o más datos (ataca la causa). L1 en vez de L2 llevaría pesos a cero y seleccionaría features.",
+      "clases": [
+        4
+      ],
+      "conceptos": [
+        "overfitting",
+        "regularizacion",
+        "dropout",
+        "early-stopping",
+        "profundidad-y-ancho"
+      ]
+    },
+    {
+      "decision": "Medir el aporte de cada bloque de columnas con entrenamientos incrementales (numérico → + State → + District → + resto).",
+      "por_que": "La consigna pide mostrar cuánto aporta cada bloque. Con la misma semilla y la misma arquitectura, la diferencia se atribuye a la información agregada: State −40%, District −18%, resto + mes cíclico −18%.",
+      "alternativas": "Ablación inversa (sacar un bloque por vez del modelo completo) o promediar varias semillas para separar señal de ruido.",
+      "clases": [
+        4
+      ],
+      "conceptos": [
+        "one-hot-encoding",
+        "embeddings-categoricos"
+      ]
+    }
+  ],
+  "evidencia": [
+    {
+      "archivo": "calveyra-desivo-giordanelli-rickert.ipynb (celda 7)",
+      "lenguaje": "python",
+      "fragmento": "# Partimos el dataset ANTES de calcular cualquier estadística (mediana, media, desvío).\n# 70% train / 20% validation / 10% test.\ndf_train, df_val_test = train_test_split(df, test_size=0.3, random_state=SEED)\ndf_val, df_test = train_test_split(df_val_test, test_size=1/3, random_state=SEED)\n\nprint(f\"train: {df_train.shape}, val: {df_val.shape}, test: {df_test.shape}\")\n# train: (1022, 20), val: (292, 20), test: (146, 20)",
+      "explicacion": "La partición 70/20/10 en dos pasos con semilla fija, idéntica al patrón de la clase 4 (`test_size=0.30` y después `1/3`). Partir antes de explorar o calcular estadísticas es lo que evita el data leakage; la semilla permite comparar modelos sobre exactamente los mismos datos.",
+      "clases": [
+        4
+      ],
+      "conceptos": [
+        "particion-train-val-test",
+        "data-leakage"
+      ]
+    },
+    {
+      "archivo": "calveyra-desivo-giordanelli-rickert.ipynb (celda 9)",
+      "lenguaje": "python",
+      "fragmento": "def prepare_numeric_split(frame, fill_value, add_indicator, scaler=None, fit_scaler=False):\n    \"\"\"Imputa LotFrontage, arma el indicador de faltante y escala con un scaler\n    que se AJUSTA una sola vez (sobre train) y se reutiliza para las demás partes.\"\"\"\n    frame = frame.copy()\n    missing_flag = frame['LotFrontage'].isna().to_numpy(dtype=float)\n    frame['LotFrontage'] = frame['LotFrontage'].fillna(fill_value)\n    X_num = frame[NUMERIC_COLS].to_numpy(dtype=float)\n    if fit_scaler:\n        scaler = StandardScaler().fit(X_num)\n    X_num_scaled = scaler.transform(X_num)\n    X = np.column_stack([X_num_scaled, missing_flag]) if add_indicator else X_num_scaled\n    y = frame[TARGET].to_numpy(dtype=float)\n    return X, y, scaler",
+      "explicacion": "Materializa tres ideas de la clase 4: z-score `(x − μ)/σ` con μ y σ **solo de train** (`fit_scaler=True` solo para `df_train`), imputación con un valor de train (`lotfrontage_median`), y el **flag de faltante** que viaja como feature aparte. Es la respuesta implícita a la Pregunta 5.",
+      "clases": [
+        4
+      ],
+      "conceptos": [
+        "normalizacion",
+        "imputacion-de-faltantes",
+        "data-leakage"
+      ]
+    },
+    {
+      "archivo": "calveyra-desivo-giordanelli-rickert.ipynb (celda 9)",
+      "lenguaje": "python",
+      "fragmento": "def build_baseline_model(n_features):\n    model = Sequential([\n        Input(shape=(n_features,)),\n        Dense(32, activation='relu'),\n        Dense(32, activation='relu'),\n        Dense(1, activation='linear'),\n    ])\n    # Salida real -> activación lineal + loss de regresión (mse). 'accuracy' no aplica acá:\n    # no hay clases que acertar, hay una distancia en dólares que minimizar.\n    model.compile(optimizer='adam', loss='mse', metrics=['mae'])\n    return model",
+      "explicacion": "El par activación-loss de regresión: una neurona lineal + MSE. Respecto del notebook de clase (sigmoide + BCE para `AboveMedianPrice`) cambia solo la última capa y la loss: 'la última capa la decide el problema, no el gusto'. Capas ocultas ReLU, optimizador Adam.",
+      "clases": [
+        3,
+        4
+      ],
+      "conceptos": [
+        "funcion-de-perdida",
+        "mse",
+        "relu",
+        "perceptron-multicapa"
+      ]
+    },
+    {
+      "archivo": "calveyra-desivo-giordanelli-rickert.ipynb (celdas 24-25)",
+      "lenguaje": "python",
+      "fragmento": "def month_cyclical(month_series):\n    \"\"\"MonthSold (1-12) -> (seno, coseno): la codificación cíclica correcta.\"\"\"\n    radians = 2 * np.pi * month_series.to_numpy(dtype=float) / 12\n    return np.column_stack([np.sin(radians), np.cos(radians)])\n\ndef build_model_categorical(n_dense, use_district, district_vocab_size=None, embed_dim=8):\n    dense_input = Input(shape=(n_dense,), name='dense_features')\n    if use_district:\n        district_input = Input(shape=(1,), name='district_idx')\n        embed = Embedding(input_dim=district_vocab_size, output_dim=embed_dim,\n                          name='district_embedding')(district_input)\n        embed = Flatten()(embed)\n        x = Concatenate()([dense_input, embed])\n        inputs = [dense_input, district_input]",
+      "explicacion": "La codificación cíclica `sin(2πt/T)`, `cos(2πt/T)` con T=12 y la rama de embedding: el índice del distrito busca una fila de una tabla entrenable `73 × 8` (72 distritos + 1 OOV) que se concatena con el resto. 'El entero no entra a la red, entra al lookup'.",
+      "clases": [
+        4
+      ],
+      "conceptos": [
+        "codificacion-ciclica",
+        "embeddings-categoricos"
+      ]
+    },
+    {
+      "archivo": "calveyra-desivo-giordanelli-rickert.ipynb (celda 26, salida)",
+      "lenguaje": "text",
+      "fragmento": "Modelo                                            MAE         RMSE   MAPE %\n----------------------------------------------------------------------------\nSolo numérico (Milestone 2)                    51,411       69,919    27.66\n+ State (one-hot)                              30,956       41,203    16.92\n+ District (embedding)                         25,380       31,678    14.85\n+ resto categóricas + mes cíclico              20,844       26,202    11.60",
+      "explicacion": "La evidencia del aprendizaje 'la red no ve casas, ve un tensor de floats': con la misma arquitectura 32-32, el MAE baja 60% solo por cómo se arma la entrada. La ubicación (State + District) es la información que le faltaba al baseline.",
+      "clases": [
+        4
+      ],
+      "conceptos": [
+        "one-hot-encoding",
+        "embeddings-categoricos"
+      ]
+    },
+    {
+      "archivo": "calveyra-desivo-giordanelli-rickert.ipynb (celdas 33 y 36)",
+      "lenguaje": "python",
+      "fragmento": "reg = regularizers.l2(l2) if l2 > 0 else None\nfor units_in_layer in units:                       # units=(512, 512, 512)\n    x = Dense(units_in_layer, activation='relu', kernel_regularizer=reg)(x)\n    if dropout > 0:\n        x = Dropout(dropout)(x)\noutput = Dense(1, activation='linear')(x)\n\nmodel_regularized = build_big_model(X4_train.shape[1], DISTRICT_VOCAB_SIZE, l2=0.001, dropout=0.3)\nearly_stopping = EarlyStopping(monitor='val_loss', patience=15, restore_best_weights=True)\nhist_regularized = model_regularized.fit(\n    [X4_train, d4_train], y4_train, batch_size=32, epochs=150,\n    validation_data=([X4_val, d4_val], y4_val), callbacks=[early_stopping], verbose=0)\n# Entrenó 76 épocas (de las 150 posibles) antes de que early stopping cortara.",
+      "explicacion": "Las tres herramientas de regularización de la clase 4: L2 por capa (`J = cost + λ·Σw²`, λ=0,001, el bias no se penaliza), Dropout 0,3 (apaga neuronas al azar solo en `fit`) y early stopping sobre la validación, restaurando los pesos del mejor punto.",
+      "clases": [
+        4
+      ],
+      "conceptos": [
+        "regularizacion",
+        "dropout",
+        "early-stopping",
+        "overfitting"
+      ]
+    },
+    {
+      "archivo": "calveyra-desivo-giordanelli-rickert.ipynb (celda 11)",
+      "lenguaje": "python",
+      "fragmento": "missing_flag_full = df['LotFrontage'].isna()\ncorr_missing_price = missing_flag_full.astype(int).corr(df['SalePrice'])\nmedia_con_dato = df.loc[~missing_flag_full, 'SalePrice'].mean()\nmedia_sin_dato = df.loc[missing_flag_full, 'SalePrice'].mean()\n# Correlación entre 'falta LotFrontage' y SalePrice: -0.064\n# Precio promedio cuando SÍ está el dato: $210,880\n# Precio promedio cuando FALTA el dato:   $185,522\n# Diferencia: -12.0%",
+      "explicacion": "La prueba de que el faltante no es aleatorio respecto del precio (Pregunta 4): justifica que el flag binario viaje como feature. Ojo: es un análisis exploratorio sobre el dataset **completo**, no entra al modelo, así que no contamina el entrenamiento.",
+      "clases": [
+        4
+      ],
+      "conceptos": [
+        "imputacion-de-faltantes"
+      ]
+    }
+  ],
+  "relaciones": [
+    {
+      "clase": 3,
+      "conceptos": [
+        "neurona",
+        "capa",
+        "relu",
+        "funcion-de-perdida",
+        "backpropagation",
+        "descenso-por-gradiente"
+      ],
+      "como_se_aplico": "La red del TP es exactamente el bloque de la clase 3 repetido: cada `Dense` es una combinación lineal `W·x + b` seguida de una no linealidad (ReLU), y `fit` corre el ciclo forward → loss → backpropagation (regla de la cadena) → actualización de pesos. Sin la ReLU, las tres capas colapsarían en una sola transformación lineal."
+    },
+    {
+      "clase": 4,
+      "conceptos": [
+        "one-hot-encoding",
+        "embeddings-categoricos",
+        "codificacion-ciclica",
+        "imputacion-de-faltantes",
+        "identificador-como-feature",
+        "normalizacion"
+      ],
+      "como_se_aplico": "La tabla de decisiones del M1 es la tabla de la clase 4 aplicada columna por columna con la pregunta '¿qué significa la resta entre dos valores?'. Las tres trampas son tres de los 'errores de codificación caros' de la clase: identificador único como feature, variable cíclica aplastada y código como número; y `LotFrontage` es el cuarto (faltante rellenado con 0)."
+    },
+    {
+      "clase": 4,
+      "conceptos": [
+        "particion-train-val-test",
+        "data-leakage"
+      ],
+      "como_se_aplico": "Split 70/20/10 en dos pasos con semilla fija y todo el preprocesamiento aprendido solo del train (μ, σ, mediana, encoders, mapa de distritos). La clase insiste en que el modelo desplegado no son solo `W` y `b`: también esos parámetros; el M5 pendiente era justamente hacerlos viajar con el modelo."
+    },
+    {
+      "clase": 4,
+      "conceptos": [
+        "funcion-de-perdida",
+        "mse",
+        "accuracy"
+      ],
+      "como_se_aplico": "Catálogo de salidas de la clase: 'un real (precio) → 1 neurona, lineal, MSE/MAE/Huber'. MSE castiga el error al cuadrado (aprende el promedio); por eso el RMSE se dispara con la casa de Wheatfield y el MAE apenas se mueve. 'Medir es elegir qué error duele'."
+    },
+    {
+      "clase": 4,
+      "conceptos": [
+        "overfitting",
+        "regularizacion",
+        "dropout",
+        "early-stopping",
+        "profundidad-y-ancho"
+      ],
+      "como_se_aplico": "Diagnóstico en dos números: train bajo (0,0121) y val alto (0,1273) = overfitting → regularizar. Se aplicaron L2 (pesos chicos, función suave), Dropout (ensamble implícito) y early stopping (el que más rinde). Regularizar empeora a propósito el train (0,1302) a cambio de generalizar mejor (MAE 16.538)."
+    },
+    {
+      "clase": 4,
+      "conceptos": [
+        "batch",
+        "epoca"
+      ],
+      "como_se_aplico": "Con 1022 casas y `batch_size=32`, cada época son 32 ajustes de pesos (un ajuste por batch). Las curvas de loss se leen por época, y early stopping decide en qué época quedarse."
+    }
+  ],
+  "preguntas_defensa": [
+    {
+      "q": "¿Por qué la última capa es `Dense(1, linear)` con MSE y no una sigmoide? ¿Por qué `accuracy` no significa nada acá?",
+      "a": "Porque predecimos un real en dólares: la tabla de la clase dice 1 neurona, activación lineal, loss MSE/MAE/Huber. La sigmoide acota la salida a (0,1) y va con BCE para un sí/no (el modelo de clase con `AboveMedianPrice`). Activación y loss se eligen juntas. `accuracy` cuenta aciertos de clase; en regresión una predicción de \\$240.001 contra \\$240.000 nunca 'acierta', así que mide nada. Se reportan MAE, RMSE y MAPE."
+    },
+    {
+      "q": "MAE, RMSE y MAPE no coinciden. ¿Cuál le reportan a una inmobiliaria y qué casa los separa más?",
+      "a": "El MAE (\\$51.411 en el baseline): es el error promedio en dólares, fácil de explicar. El RMSE (\\$69.919) eleva al cuadrado y castiga desproporcionadamente los errores grandes; sirve puertas adentro para detectarlos. El MAPE (27,7%) relativiza al precio de cada casa. La casa que más los separa es `ListingId 781978` (NC, Wheatfield, `OverallQual=9`): real \\$357.100, predicho \\$583.271. Sacarla baja el RMSE 3,3% y el MAE 2,3%. El baseline no veía la ubicación; con State y District ese tipo de error se achica."
+    },
+    {
+      "q": "¿Qué asume la red si meten `District` como un entero de 0 a 71?",
+      "a": "Que hay orden y distancia: que el distrito 40 está más cerca del 41 que del 2, y que 'ser Wheatfield' es una cantidad que se multiplica por un peso. El índice es arbitrario (orden alfabético). Poner un número real en el vector es afirmar algo, y acá es falso. Resultado: MAE \\$25.856 y RMSE \\$35.284 contra \\$20.844 / \\$26.202 con embedding. Y no da ningún error: entrena igual."
+    },
+    {
+      "q": "¿Por qué `State` va con one-hot y `District` con embedding?",
+      "a": "Por cardinalidad. Regla de la clase 4: hasta 15 valores one-hot, 15 a 50 cualquiera, 50 o más embedding. `State` tiene 12: one-hot deja todos a la misma distancia, es interpretable y necesita pocos datos. `District` tiene 72: el embedding aporta d=8 floats en vez de 72, y la red aprende desde los datos qué distritos se parecen. Un embedding es matemáticamente un one-hot seguido de una capa lineal sin sesgo: la tabla es un peso de la red, no una entrada."
+    },
+    {
+      "q": "¿Qué 'aprende' el modelo cuando dejan `ListingId` adentro, y por qué eso no es aprender?",
+      "a": "Con 1460 valores casi todos distintos, la red puede asociar cada número puntual con el ruido del precio de esa fila: una tabla de consulta, memorización. Baja el loss de train (0,1268) y sube el de validación (0,4738); la brecha pasa de 0,2657 a 0,3470. El MAE de test casi no cambia (51.131), lo que muestra que mirar una sola métrica esconde el problema. Ante un ID nunca visto no hay nada que generalizar: un identificador único se descarta."
+    },
+    {
+      "q": "¿Con qué completaron `LotFrontage` y qué significa rellenar con 0? ¿El faltante dice algo?",
+      "a": "Con la mediana de train (70,0) más un flag `LotFrontage_missing`. El 0 le dice a la red 'este lote no tiene frente', un valor real fuera de la distribución que no se distingue de un dato. En una corrida el 0 dio menor MAE (47.462 vs 51.411); lo tratamos como ruido de una sola semilla, aunque para afirmarlo habría que promediar varias semillas. El faltante sí informa: las casas sin el dato valen 12% menos en promedio (\\$185.522 vs \\$210.880), así que el flag aporta señal."
+    },
+    {
+      "q": "(Pregunta 5) ¿Sobre qué datos calcularon μ y σ? Si los calculan sobre todo el dataset, ¿qué número miente?",
+      "a": "Solo sobre train (`StandardScaler().fit` con `df_train`), y lo mismo para la mediana de imputación, los encoders y el mapa de distritos. Si se ajustan sobre todo el dataset, el modelo entrena igual y sin error, pero la **métrica de test** (MAE/RMSE) sale optimista: información del test se filtró al preprocesamiento, así que el test deja de simular datos nunca vistos. Es data leakage. En producción nunca vas a tener las casas futuras para calcular μ y σ."
+    },
+    {
+      "q": "Muestren el overfitting en sus curvas y expliquen qué hace cada herramienta que usaron para frenarlo.",
+      "a": "La red 512-512-512 (550.985 parámetros para 1022 casas) termina con train 0,0121 y val 0,1273; su mejor val (0,0727) fue en la época 7. Es el patrón de libro: train sigue bajando y val sube. L2 (λ=0,001) suma λΣw² y empuja los pesos a cero: función más suave. Dropout 0,3 apaga neuronas al azar en `fit`: nada depende de una neurona (ensamble implícito). Early stopping corta cuando val deja de mejorar y restaura el mejor punto: cortó a las 76 épocas. Resultado: train 0,1302 y val 0,1622 juntos, y MAE 16.538 vs 18.464."
+    },
+    {
+      "q": "¿Por qué escalaron también el target `SalePrice`?",
+      "a": "Porque va de ~50 mil a ~1,6 millones: con MSE sobre dólares crudos la loss y los gradientes son gigantes para el learning rate de Adam (0,001) y la red no converge en 100 épocas. Se ajusta un `StandardScaler` con el target de train, se entrena en esa escala y se hace `inverse_transform` sobre las predicciones para reportar en dólares. Una alternativa era `log(SalePrice)`, que además comprime la cola de casas caras."
+    },
+    {
+      "q": "El Milestone 5 pide que 'el preprocesamiento sea parte del modelo'. ¿Lo cumplieron? ¿Cómo lo harían?",
+      "a": "No, quedó pendiente: el scaler, la mediana, los encoders y el diccionario distrito→índice viven sueltos en celdas del notebook, así que el modelo no se puede usar en ningún lado sin ellos. 'El modelo no son solo los pesos'. La solución es meter el preprocesamiento en el grafo: capas `Normalization` (adaptadas en train), `StringLookup` + `Embedding` para `District`, `StringLookup` con salida one-hot para `State`, y la imputación + flag + sin/cos como capas; o guardar un pipeline que serialice todo junto. Así se predice con `{'OverallQual': 7, 'State': 'CA', 'District': 'Greenfield', ...}`, y cambiar solo el estado debería mover el precio."
+    },
+    {
+      "q": "Compararon muchas variantes mirando el MAE de test. ¿Hay algún problema metodológico?",
+      "a": "Sí: elegir entre variantes (imputación, codificación, arquitectura) es trabajo de **validación**. El test se abre una vez, con el modelo terminado. Si se toman decisiones mirando el test, se 'tunea contra el test' y su número deja de ser insesgado. Lo correcto era comparar con `val_loss`/MAE de validación y reportar test solo del modelo final. Además, una sola semilla hace que diferencias chicas (como la del 0 contra la mediana) sean ruido."
+    }
+  ],
+  "quiz": [
+    {
+      "q": "Para predecir el precio de una casa en dólares, ¿qué par salida-loss corresponde?",
+      "opciones": [
+        "1 neurona sigmoide + BCE",
+        "1 neurona lineal + MSE",
+        "N neuronas softmax + cross-entropy",
+        "1 neurona ReLU + accuracy"
+      ],
+      "correcta": 1,
+      "explicacion": "Un real → 1 neurona lineal con MSE/MAE/Huber. Sigmoide + BCE es para sí/no, softmax + CE para una de N clases, y accuracy no es una loss (no tiene derivada) ni aplica a regresión."
+    },
+    {
+      "q": "`MonthSold` vale de 1 a 12. ¿Cuál es la codificación correcta según la clase 4?",
+      "opciones": [
+        "Un float normalizado con z-score",
+        "Un embedding de dimensión 12",
+        "`sin(2πt/12)` y `cos(2πt/12)`",
+        "Se descarta por ser una fecha"
+      ],
+      "correcta": 2,
+      "explicacion": "Es cíclica: diciembre y enero están a un mes. Como número plano están a 11. Con seno y coseno (2 floats) los extremos del ciclo quedan juntos; hacen falta los dos porque el seno solo repite valores."
+    },
+    {
+      "q": "Una variable nominal tiene 72 valores distintos. Según la regla de cardinalidad de la clase, ¿qué conviene?",
+      "opciones": [
+        "Entero de 0 a 71 normalizado",
+        "Embedding",
+        "Descartarla",
+        "Un solo float con la frecuencia de cada valor"
+      ],
+      "correcta": 1,
+      "explicacion": "Hasta 15 valores one-hot; de 15 a 50, cualquiera; 50 o más, embedding. El entero 0–71 le inventa orden y distancia a algo nominal (en el TP subió el MAE 24%)."
+    },
+    {
+      "q": "Se calcula la media y el desvío del `StandardScaler` sobre el dataset completo antes de partir. ¿Qué pasa?",
+      "opciones": [
+        "El entrenamiento falla con un error de dimensiones",
+        "Nada: el escalado no afecta las métricas",
+        "Data leakage: la métrica de test sale optimista sin dar ningún error",
+        "La red no converge"
+      ],
+      "correcta": 2,
+      "explicacion": "Información del test se filtra al preprocesamiento; el modelo entrena igual y el número de test queda mentido. Por eso μ, σ, la mediana y los diccionarios se aprenden solo del train."
+    },
+    {
+      "q": "En el TP, train_loss final 0,0121 y val_loss final 0,1273 (red 512-512-512). ¿Diagnóstico y remedio?",
+      "opciones": [
+        "Underfitting: agregar capacidad",
+        "Overfitting: regularizar (L2, dropout, early stopping)",
+        "Todo bien: no hacer nada",
+        "Learning rate muy chico: subirlo"
+      ],
+      "correcta": 1,
+      "explicacion": "Train bajo y val alto = overfitting (la brecha). Alto/alto sería underfitting; bajo/bajo, bien. El remedio es regularizar o reducir capacidad, no agregarla."
+    },
+    {
+      "q": "¿Por qué en el TP sacar una única casa con error de \\$226.171 bajó el RMSE 3,3% pero el MAE solo 2,3%?",
+      "opciones": [
+        "Porque el RMSE eleva el error al cuadrado y pondera más los errores grandes",
+        "Porque el MAE no usa valores absolutos",
+        "Porque el RMSE se calcula solo sobre train",
+        "Por redondeo"
+      ],
+      "correcta": 0,
+      "explicacion": "MSE/RMSE castigan el cuadrado del error: un ejemplo muy lejos pesa desproporcionadamente. El MAE es proporcional al error: un outlier pesa como un ejemplo más."
+    },
+    {
+      "q": "Con `ListingId` adentro, el MAE de test casi no cambió pero la brecha val−train creció. ¿Qué indica?",
+      "opciones": [
+        "Que `ListingId` es una buena feature",
+        "Que el modelo memoriza filas de train (identificador único) sin generalizar",
+        "Que hay que normalizar mejor el ID",
+        "Que falta un embedding para el ID"
+      ],
+      "correcta": 1,
+      "explicacion": "Un identificador único no tiene nada que generalizar; si el modelo 'aprende' de él, memoriza. Normalizarlo o pasarlo por un embedding no cambia eso: se descarta (0 floats en la tabla de la clase)."
+    },
+    {
+      "q": "¿Qué hace `EarlyStopping(monitor='val_loss', patience=15, restore_best_weights=True)`?",
+      "opciones": [
+        "Corta cuando train_loss llega a 0",
+        "Corta si val_loss no mejora en 15 épocas y vuelve a los pesos de la mejor época",
+        "Reduce el learning rate cada 15 épocas",
+        "Apaga 15% de las neuronas"
+      ],
+      "correcta": 1,
+      "explicacion": "Monitorea la validación, espera 15 épocas sin mejora, corta y restaura el mejor punto (en el TP: 76 de 150 épocas). Bajar el learning rate es otro callback y apagar neuronas es dropout."
+    }
+  ]
+}

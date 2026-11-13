@@ -1,0 +1,429 @@
+{
+ "num": 4,
+ "titulo": "El agente de admisión de guardia (TP final)",
+ "repo": "tp_final_ia_gen",
+ "consigna": "El Hospital General de Prueba (ficticio) quiere un agente que complete la **ficha de admisión** de cada paciente que entra por la guardia. No decide nada clínico: lee la nota de triage, pregunta lo que falta, verifica la cobertura, consulta las normas y registra. La ficha tiene **8 campos** (tipo de registro, documento, box antes del registro, circuito tiempo-dependiente —ECG, código ACV, sepsis—, su plazo, cobertura, entidad a notificar, aviso al voluntariado) más un control de que se verificó la afiliación con la entidad correcta: **9 controles, un caso está resuelto solo si los 9 están bien**. Herramientas fijas: `leer_triage`, `preguntar`, `verificar_afiliacion`, `buscar_normativa`, `registrar_decision`.\n\nTres trampas: las normas **contradicen lo habitual** (y en el test secreto **cambian sus números**), hay **costumbres no escritas** que solo se ven en los datos, y el **historial está sucio**.\n\nPartes: (1) **curado**: clasificar las 2.000 filas del historial en correcta / error (viola una norma) / ruido (se aparta de una costumbre), describir las costumbres y armar conversaciones de entrenamiento (reales y sintéticas); (2) **RAG propio** sobre las normas, evaluado aparte con `admision.evaluar_rag` contra la referencia BM25 de la cátedra (recall 0,875, precisión 0,492, 580 tokens, 51/60); (3) **optimización de prompt antes de entrenar** (sugieren DSPy/GEPA), valorando también el largo; (4) **post-entrenamiento** (SFT, DPO o RL) de un modelo libre ≤ 8B (Gemma 4 E4B), con tabla sin entrenar / solo prompt / solo entrenamiento / ambos en normas original, b y c contra la referencia (12/15/12 sin entrenar; 25/24/25 con SFT); (5) **recursos y producción** en una A100 de 40 GB. El agente **no llama servicios externos** en operación.\n\nSe corrige, en orden: el modelo final en el test secreto (casos resueltos, costo y tiempo por caso), documentación y **auditabilidad** total (cada número reproducible con su comando, checkpoint y prompt), curado de datos y optimización de recursos. Entrega: 20 de noviembre de 2026.",
+ "que_hicimos": "Equipo de cuatro, con issues y ramas por tema, `AGENTS.md` como estándar común y una bitácora (`docs/progreso.md`) que distingue siempre **implementado / probado con dobles / validado con dependencia real / validado en GPU**. Modal se descartó: todo el desarrollo GPU corrió en **Kaggle 2× T4** (fp16), con la deuda explícita de validar en A100-40GB (KI-A100-001).\n\n**Parte 1 — curado (`scripts/clasificar_historial.py`).** Clasificador determinista que recalcula cada fila contra las normas originales (registro, documento, box, circuito, plazo, cobertura, verificación, entidad) con precedencia **error > ruido**. Las costumbres se **infieren de los datos**, no se fijan en código: sobre las filas limpias se prueban todas las reglas `edad ≥ umbral`, solas o combinadas con un dato del triage, y se elige la que más filas explica. Resultado: **1.600 correctas, 240 errores, 160 ruido**. Dos costumbres confirmadas: (1) **avisar al voluntariado solo a pacientes de 75+ sin acompañante** (explica 1.609/1.760 limpias contra 1.507 de la mejor regla solo por edad) y (2) **con obra social y prepaga, verificar solo la prepaga** (163/172; si está inactiva, `sin_cobertura`). Todo el ruido viene de tres operadores (OP-04, OP-11, OP-17). Dataset de entrenamiento v2: **2.900 conversaciones** (1.600 del historial correcto, 800 de referencia de la cátedra, 500 sintéticas con `admision.generador`, semilla 12012, balanceadas por circuito y dificultad y con **valores de normas variados** para que el modelo aprenda a leer números, no a memorizarlos). Las búsquedas se re-ejecutan con el buscador real y se quitan `fundamentos` que citan secciones no recuperadas.\n\n**Parte 2 — buscador (`admision_tp/buscador.py`).** BM25 propio (k1 = 1,5, b = 0,75), **una sección entera por fragmento**, sobre texto normalizado (minúsculas, sin tildes), indexando la carpeta de normas recibida con su `parametros.yaml`: así los números de b/c/test llegan por búsqueda. Tres variantes seleccionables (`baseline`, `sin_comunes`, `prefijos`) y 68 configuraciones exploradas (párrafos, stemmers, RRF con n-gramas, umbrales). Sin embeddings ni rerankers (dependencias/descargas no autorizadas).\n\n**Parte 3 — prompt.** `PromptSpec`: los textos del agente (sistema, mensaje inicial, formato de observación, corrección de JSON) salen de un JSON versionado con sha256, sin tocar `admision/`. El baseline reproduce byte a byte al agente de la cátedra (50/50 conversaciones idénticas). Se diseñó `procedimiento-v1` (buscar cada tema por separado, verificar cobertura antes de decidir, ART con lesión laboral) y se eligió en un conjunto **prompt-dev** propio, nunca en práctica.\n\n**Parte 4 — entrenamiento.** SFT con **LoRA** (r = 8, α = 16, solo `q_proj`/`v_proj` de la atención del modelo de lenguaje), bf16, gradient checkpointing, **pérdida solo sobre los tokens del asistente** (`labels = −100` en el resto), checkpoints reanudables publicados en HF con revisión y corridas en W&B. Validado con **humo** en T4 (incluida reanudación desde un checkpoint de HF); **el entrenamiento con los datos reales curados todavía no se corrió** en el estado del repo.\n\n**Parte 5 — recursos.** Mediciones T4: lote 1 → 4 baja de 33,3 a 15,6 s/caso sin cambiar resultados; lotes 8/16 caen con un error CUDA. Borrador de proyección a producción en `docs/informe-parte5.md`.",
+ "arquitectura": "flowchart LR\n  T[Caso de guardia] --> E[Entorno del kit admision]\n  E --> AG[AgentePrompt con PromptSpec]\n  AG --> M[Gemma 4 E4B local mas adapter LoRA]\n  M -->|accion JSON| AG\n  AG -->|leer_triage| E\n  AG -->|preguntar| E\n  AG -->|verificar_afiliacion| E\n  AG -->|buscar_normativa| B[BuscadorBM25 seccion entera k 2]\n  B --> N[Normas recibidas mas parametros.yaml]\n  AG -->|registrar_decision| F[Ficha 8 campos]\n  F --> C[9 controles]\n  H[Historial 2000 filas] --> CL[Clasificador correcta error ruido]\n  CL --> DS[2900 conversaciones]\n  DS --> SFT[SFT LoRA labels solo assistant]\n  SFT --> M",
+ "resultados": "**Parte 1.** 2.000 filas → 1.600 correcta / 240 error / 160 ruido (corrección del 2026-11-10; antes 1.631/279/90). Costumbres: voluntariado (75+ sin acompañante, 185/185 en los 17 operadores sin desvíos) y credencial (prepaga, 163/172; inactiva → `sin_cobertura` 45/45). Dataset v2: 2.900 conversaciones válidas, tres generaciones idénticas byte a byte.\n\n**Parte 2 — `evaluar_rag` (60 consultas dev, normas originales).**\n\n| Buscador | Secciones | Completas | Recall | Precisión | Tokens/consulta |\n|---|---|---:|---:|---:|---:|\n| Referencia BM25 cátedra | 2 | 51/60 | 0,875 | 0,492 | 580 |\n| `baseline` (entrega) | 2 | 48/60 | 0,817 | 0,467 | 618 |\n| `sin_comunes` | 2 | 50/60 | 0,850 | 0,483 | 591 |\n| `prefijos` | 1–3 (umbral 0,6) | **55/60** | **0,933** | **0,686** | **549** |\n\n**Con el agente** (Gemma sin entrenar, 50 casos, T4): `baseline` **10/50** contra `prefijos` 6/50 (gana 3, pierde 7; signos p≈0,34). `prefijos` traía 3 secciones de áreas parecidas y el contexto por caso **subió** (19.954 → 20.689 caracteres). Se quedó `baseline`: **mejor en la evaluación aislada no implica mejor para el agente**.\n\n**Partes 3 y 4 — casos resueltos sobre 50 de práctica (Kaggle T4, solo para reportar).**\n\n| Configuración | original | b | c | Contexto/caso | s/caso |\n|---|---|---|---|---|---|\n| sin entrenar (prompt baseline, 615 tokens de sistema) | 10 | 10 | 7 | ~19.900 car. | ~16 |\n| solo prompt (`procedimiento-v1`) | **14** | **16** | **12** | ~52.000 car. | ~25 |\n| solo entrenamiento / ambos | — | — | — | — | — |\n| Ref. cátedra sin entrenar | 12 | 15 | 12 | | |\n| Ref. cátedra SFT simple | 25 | 24 | 25 | | |\n\nEl prompt nuevo lleva a **0 las fallas atribuibles al buscador** en registro, box y plazo (box gana 11–12 casos por versión) porque busca cada tema por separado, pero **rompe verificación (7–11) y entidad a notificar (5–8)**: el modelo base decide mal *con la evidencia delante*, y el aviso al voluntariado sigue en 14 fallas porque es costumbre. Cuesta ~2,6× más contexto y 3,5 búsquedas por caso. Conclusión del grupo: lo que queda es **comportamiento**, y eso es lo que tiene que enseñar el SFT.\n\n**Parte 5 (T4, no comparable con A100).** Lote 1: 33,3 s/caso, 16,7 GB; lote 4: 15,6 s/caso, 19,1 GB (suma de 2 GPU), mismos 10/50 y conversaciones idénticas en 49/50; lotes 8 y 16 cayeron con `CUDA error: unspecified launch failure`. Humo de entrenamiento: 15,7 GB pico. Reparto del contexto: sistema 55 %, búsquedas 25 %. A100, adapter final y costos de producción: pendientes.",
+ "decisiones": [
+  {
+   "decision": "Inferir las costumbres buscando la regla `edad ≥ umbral` (+ condición del triage) que más filas limpias explica, en vez de fijar 75 en el código.",
+   "por_que": "El enunciado dice que las costumbres 'se descubren mirando los datos'. Buscar el umbral y la condición evita sesgo propio; la regla completa (75+ y sin acompañante) explica 1.609 filas contra 1.507 de la mejor regla solo por edad.",
+   "alternativas": "Un árbol de decisión o reglas a mano. El árbol daría lo mismo con menos interpretabilidad; a mano arriesga confirmar lo que uno ya esperaba (la primera versión solo veía 'no avisar a menores de 75').",
+   "clases": [
+    3,
+    4
+   ],
+   "conceptos": [
+    "overfitting",
+    "evals"
+   ]
+  },
+  {
+   "decision": "Precedencia error > ruido y excluir errores y ruido del entrenamiento.",
+   "por_que": "SFT es behavior cloning: el modelo copia lo que ve. Entrenar con filas que violan normas o con operadores que se apartan de la costumbre le enseñaría esos desvíos.",
+   "alternativas": "Entrenar con todo y confiar en que la mayoría domina; o usar errores como negativos en DPO (pares buena/mala), que la consigna sugiere y quedó como opción.",
+   "clases": [
+    9
+   ],
+   "conceptos": [
+    "sft",
+    "dpo"
+   ]
+  },
+  {
+   "decision": "Conversaciones sintéticas con valores de normas variados (500, semilla 12012), balanceadas por circuito y dificultad.",
+   "por_que": "En el test los números cambian: si todas las conversaciones usan los valores originales, el modelo los memoriza en los pesos. Variarlos lo obliga a leerlos de la búsqueda. El balance cubre los casos que más cuestan (ART, dos credenciales, sin nadie).",
+   "alternativas": "Solo historial (1.600, todos con valores originales) o generar con un LLM pago, permitido para datos pero menos controlable que el generador del kit.",
+   "clases": [
+    9,
+    4
+   ],
+   "conceptos": [
+    "sft",
+    "overfitting",
+    "fine-tuning"
+   ]
+  },
+  {
+   "decision": "Buscador BM25 propio con una sección entera por fragmento, indexando la carpeta de normas que llega en cada corrida.",
+   "por_que": "Lo que cambia (los números) va al buscador, no a los pesos. Las normas son cortas y estructuradas por sección; BM25 corre local, sin descargas ni servicios externos, y es determinista.",
+   "alternativas": "Embeddings o búsqueda híbrida con reranker: mejor con sinónimos (d030 'pecho' ↔ 'dolor torácico') pero requerían descargas/dependencias no autorizadas y más VRAM.",
+   "clases": [
+    6,
+    7
+   ],
+   "conceptos": [
+    "bm25",
+    "indice-invertido",
+    "rag",
+    "chunking"
+   ]
+  },
+  {
+   "decision": "Mantener `baseline` (2 secciones) como default aunque `prefijos` gane en `evaluar_rag` (55/60 vs 48/60).",
+   "por_que": "Con el agente, `prefijos` resolvió 6/50 contra 10/50: devolvía hasta 3 secciones de áreas parecidas, el contexto por caso subió y cambió el recorrido del agente. Lo que cuenta es cuánto le sirve al agente.",
+   "alternativas": "Adoptar `prefijos` por la métrica aislada, o repetir la comparación con el modelo entrenado (pendiente). La diferencia no es significativa (p≈0,34).",
+   "clases": [
+    7
+   ],
+   "conceptos": [
+    "evals",
+    "recall-at-k",
+    "precision-recall"
+   ]
+  },
+  {
+   "decision": "Externalizar los textos del agente en un `PromptSpec` versionado con sha256 y elegir candidatos en un prompt-dev propio, nunca en práctica.",
+   "por_que": "Permite optimizar sin modificar `admision/`, garantiza que cada número diga qué prompt lo produjo, y evita optimizar sobre el conjunto que se usa para reportar.",
+   "alternativas": "DSPy/GEPA (sugerido por la cátedra), que automatiza la búsqueda de instrucciones; quedó pendiente. Elegir en práctica sería fuga de evaluación.",
+   "clases": [
+    5,
+    4
+   ],
+   "conceptos": [
+    "prompt-engineering",
+    "system-prompt",
+    "data-leakage"
+   ]
+  },
+  {
+   "decision": "Prompt `procedimiento-v1`: buscar cada tema por separado (registro, circuito, cobertura) y verificar antes de decidir.",
+   "por_que": "El análisis de errores atribuía muchas fallas al buscador por consultas mixtas. Con búsquedas separadas las fallas del buscador en registro, box y plazo pasan a 0: 10/10/7 → 14/16/12.",
+   "alternativas": "Prompt más corto: la consigna valora el largo porque se repite en cada llamada. Este prompt casi triplica el contexto por caso (~52 mil caracteres).",
+   "clases": [
+    5,
+    10
+   ],
+   "conceptos": [
+    "prompt-engineering",
+    "costo-por-token",
+    "contexto-de-agente"
+   ]
+  },
+  {
+   "decision": "SFT con LoRA (r=8, α=16) sobre q_proj/v_proj del modelo de lenguaje, pérdida solo en tokens del asistente.",
+   "por_que": "LoRA congela los pesos y entrena dos matrices chicas por capa: entra en una GPU y el adapter pesa poco. La máscara (`labels = −100` en sistema, usuario y observaciones) hace que el modelo aprenda a actuar, no a predecir las respuestas del entorno. Se excluyen las torres de visión y audio de Gemma 4 (PEFT no las soporta).",
+   "alternativas": "Ajuste completo (no entra en 40 GB con optimizador), QLoRA (4 bits, menos VRAM, algo de calidad), DPO o RL con los 9 controles como recompensa.",
+   "clases": [
+    9
+   ],
+   "conceptos": [
+    "lora",
+    "sft",
+    "fine-tuning",
+    "entropia-cruzada"
+   ]
+  },
+  {
+   "decision": "Evaluar en lotes de 4 casos en vez de 1 (y no 8/16).",
+   "por_que": "2,1× más rápido (33,3 → 15,6 s/caso) con +2,4 GB de VRAM y los mismos resultados (49/50 conversaciones idénticas). Lotes 8 y 16 fallaron con un error CUDA no diagnosticado.",
+   "alternativas": "vLLM con batching continuo para más throughput (trabajo futuro); lote 1 para la entrega hasta medir en A100.",
+   "clases": [
+    3,
+    5
+   ],
+   "conceptos": [
+    "batch",
+    "costo-por-token"
+   ]
+  },
+  {
+   "decision": "Auditabilidad estricta: cada corrida guarda commit, sha256 de prompt/datos/plan, checkpoint con revisión inmutable y trazas completas; la bitácora separa 'probado con dobles' de 'validado en GPU'.",
+   "por_que": "La consigna no acepta números no reproducibles. Por ejemplo, detectaron que `runner.json` decía `lote: 1` cuando el agente usó 4, y que lotes caídos devolvían returncode 0.",
+   "alternativas": "Documentar solo la corrida final, prohibido por la consigna, que pide cada pasada incluidas las fallidas.",
+   "clases": [
+    5
+   ],
+   "conceptos": [
+    "evals"
+   ]
+  }
+ ],
+ "evidencia": [
+  {
+   "archivo": "admision_tp/buscador.py",
+   "lenguaje": "python",
+   "fragmento": "def recuperar(self, consulta: str, k: int) -> list[Seccion]:\n    \"\"\"Devuelve hasta k secciones por relevancia BM25 (k1=1.5, b=0.75).\"\"\"\n    if k <= 0 or not self._promedio:\n        return []\n    terminos = sorted(set(self._terminos(consulta)))\n    puntuados = []\n    for i, frecuencias in enumerate(self._frecuencias):\n        normalizador = 1.5 * (0.25 + 0.75 * self._longitudes[i] / self._promedio)\n        puntaje = sum(\n            self._idf[t] * frecuencias[t] * 2.5 / (frecuencias[t] + normalizador)\n            for t in terminos if t in frecuencias\n        )\n        if puntaje > 0:\n            puntuados.append((i, puntaje))\n    puntuados.sort(key=lambda x: (-x[1], x[0]))\n    if puntuados:\n        minimo = self.config.umbral_relativo * puntuados[0][1]\n        puntuados = [(i, p) for i, p in puntuados if p >= minimo]\n    return [self._secciones[i] for i, _ in puntuados[:k]]",
+   "explicacion": "BM25 a mano: IDF por término, frecuencia saturada (tf·(k1+1)/(tf + k1·(1−b+b·L/L̄)), con k1=1,5 y b=0,75 → el 2,5 y el 0,25+0,75) y normalización por largo de la sección. Más un umbral relativo al mejor puntaje (variante `prefijos`). Es la fórmula de la clase 6: 'BM25 satura la frecuencia'.",
+   "clases": [
+    6
+   ],
+   "conceptos": [
+    "bm25",
+    "indice-invertido"
+   ]
+  },
+  {
+   "archivo": "admision_tp/buscador.py",
+   "lenguaje": "python",
+   "fragmento": "VARIANTES = {\n    \"baseline\": ConfigBM25(),\n    \"sin_comunes\": ConfigBM25(sin_comunes=True),\n    \"prefijos\": ConfigBM25(sin_comunes=True, prefijo=4, umbral_relativo=0.6, k_entorno=3),\n}\n\ndef _tokens(texto: str) -> list[str]:\n    normalizado = unicodedata.normalize(\"NFD\", texto.casefold())\n    sin_tildes = \"\".join(c for c in normalizado if unicodedata.category(c) != \"Mn\")\n    return re.findall(r\"[a-z0-9]+\", sin_tildes)",
+   "explicacion": "Las variantes: quitar palabras comunes (stopwords), stemming por prefijo de 4 letras (une 'registro', 'registrarlo', 'registra') y top-k con umbral relativo. La normalización sin tildes es para el índice; el texto devuelto no se modifica.",
+   "clases": [
+    6,
+    7
+   ],
+   "conceptos": [
+    "bm25",
+    "tokenizacion",
+    "recall-at-k"
+   ]
+  },
+  {
+   "archivo": "entrega.py",
+   "lenguaje": "python",
+   "fragmento": "def construir_buscador(ruta_normas: Path) -> BuscadorBM25:\n    return BuscadorBM25(ruta_normas, variante=os.getenv(\"BUSCADOR_VARIANTE\", \"baseline\"))\n\n\ndef cargar_prompt() -> PromptSpec:\n    \"\"\"PromptSpec de `PROMPT_SPEC` (relativa a la raíz del repo) o el baseline; valida su sha256.\"\"\"\n    ruta = Path(os.getenv(\"PROMPT_SPEC\") or RUTA_BASELINE)\n    return PromptSpec.cargar(ruta if ruta.is_absolute() else RAIZ / ruta)\n\n\ndef construir_agente():\n    ...\n    prompt = cargar_prompt()  # antes de cargar el modelo: un prompt inválido falla sin usar la GPU\n    return AgentePrompt(ModeloLocal.cargar(Configuracion.desde_entorno()), prompt)",
+   "explicacion": "El contrato con la cátedra: el buscador se construye con la carpeta de normas que llega (original, b, c o test), así el conocimiento que cambia entra por RAG. El agente es modelo local + prompt versionado; nada llama a servicios externos.",
+   "clases": [
+    6,
+    10
+   ],
+   "conceptos": [
+    "rag",
+    "agente",
+    "system-prompt"
+   ]
+  },
+  {
+   "archivo": "admision_tp/tokenizacion.py",
+   "lenguaje": "python",
+   "fragmento": "ids = tokens(mensajes)\nif len(ids) > max_seq_length:\n    raise ValueError(\"conversación excede max_seq_length; no se recorta\")\nlabels = [-100] * len(ids)\nfor i, mensaje in enumerate(mensajes):\n    if mensaje[\"role\"] != \"assistant\":\n        continue\n    inicio = tokens(mensajes[:i], True)\n    fin = tokens(mensajes[:i + 1])\n    if ids[:len(inicio)] != inicio or ids[:len(fin)] != fin or len(fin) <= len(inicio):\n        raise ValueError(\"plantilla/tokenizador no preserva prefijos; máscara insegura\")\n    labels[len(inicio):len(fin)] = ids[len(inicio):len(fin)]\nif all(x == -100 for x in labels):\n    raise ValueError(\"conversación sin tokens supervisados\")",
+   "explicacion": "La máscara de pérdida del SFT: la entropía cruzada solo cuenta los tokens que escribe el asistente (las acciones JSON); sistema, triage y resultados de herramientas llevan −100 y no suman. Es la lámina de la clase 9: 'pérdida = 0 en el prompt; cross-entropy en la respuesta'. Además, nunca recorta en silencio.",
+   "clases": [
+    9
+   ],
+   "conceptos": [
+    "sft",
+    "entropia-cruzada",
+    "token"
+   ]
+  },
+  {
+   "archivo": "admision_tp/entrenamiento.py",
+   "lenguaje": "python",
+   "fragmento": "# Solo la atención del modelo de lenguaje. Gemma 4 es multimodal: sus torres de visión y audio también\n# tienen q_proj/v_proj, pero son Gemma4ClippableLinear y PEFT no los soporta (falló en Kaggle).\nLORA_OBJETIVO = r\"(.*\\.)?language_model\\.layers\\.\\d+\\.self_attn\\.(q_proj|v_proj)\"\nLORA = {\"r\": 8, \"lora_alpha\": 16, \"lora_dropout\": 0.0,\n        \"target_modules\": LORA_OBJETIVO, \"task_type\": \"CAUSAL_LM\"}\nPOLITICA = {\"save_steps\": 50, \"bf16\": True, \"gradient_checkpointing\": True,\n            \"gradient_checkpointing_kwargs\": {\"use_reentrant\": False}, \"save_only_model\": False}",
+   "explicacion": "LoRA: W₀ congelado + B·A de rango 8 en las proyecciones Q y V de la autoatención (las mismas W_q y W_v de la clase 8). bf16 y gradient checkpointing para entrar en 40 GB; checkpoints completos (con optimizador) cada 50 pasos para poder reanudar.",
+   "clases": [
+    9,
+    8
+   ],
+   "conceptos": [
+    "lora",
+    "query-key-value",
+    "fine-tuning"
+   ]
+  },
+  {
+   "archivo": "scripts/clasificar_historial.py",
+   "lenguaje": "python",
+   "fragmento": "def inferir_costumbre_aviso(rows, limpias):\n    \"\"\"Busca la regla `edad >= umbral y condición` que mejor explica el aviso en filas limpias.\"\"\"\n    edades = [int(row[\"edad\"]) for row in limpias]\n    ...\n        for umbral in sorted(set(edades)):\n            prediccion = [edad >= umbral and ok for edad, ok in zip(edades, cumple)]\n            ...\n            # Empates: menos condiciones primero; entre umbrales igual de buenos, el mayor,\n            # para no afirmar avisos en edades sin evidencia.\n            candidatos.append((-aciertos, orden, -umbral, clave, umbral))\n    _, _, _, clave, umbral = candidatos[0]",
+   "explicacion": "Descubrimiento de costumbres guiado por datos: búsqueda exhaustiva de reglas simples sobre filas sin violaciones normativas, con desempate hacia la regla más simple (navaja de Occam). Así salió '75+ sin acompañante' sin fijar 75 en el código.",
+   "clases": [
+    3,
+    4
+   ],
+   "conceptos": [
+    "umbral-de-decision",
+    "overfitting"
+   ]
+  }
+ ],
+ "relaciones": [
+  {
+   "clase": 4,
+   "conceptos": [
+    "particion-train-val-test",
+    "data-leakage",
+    "overfitting"
+   ],
+   "como_se_aplico": "Práctica se usa solo para reportar, los prompts se eligen en un prompt-dev propio, y se verificó que ninguna conversación de entrenamiento comparta triage, documento ni CUIL con práctica. Las normas b/c y valores variados en sintéticos evitan que el modelo sobreajuste a los números de práctica."
+  },
+  {
+   "clase": 5,
+   "conceptos": [
+    "system-prompt",
+    "prompt-engineering",
+    "costo-por-token",
+    "structured-output"
+   ],
+   "como_se_aplico": "El prompt de sistema es el 55 % del contexto por caso y se repite en cada llamada, por eso la consigna valora su largo (615 tokens en el baseline). El agente responde con acciones JSON (salida estructurada) y tiene un mensaje de corrección cuando el JSON es inválido."
+  },
+  {
+   "clase": 6,
+   "conceptos": [
+    "bm25",
+    "indice-invertido",
+    "rag",
+    "chunking"
+   ],
+   "como_se_aplico": "El buscador es un índice invertido con BM25 a mano, una sección por fragmento (chunking estructural). RAG trae el conocimiento que cambia (los números de las normas) para que no quede en los pesos."
+  },
+  {
+   "clase": 7,
+   "conceptos": [
+    "recall-at-k",
+    "evals",
+    "precision-recall"
+   ],
+   "como_se_aplico": "`evaluar_rag` mide la etapa de recuperación por separado (recall de evidencia, precisión, tokens), y la variante `prefijos` juega con top-k y umbral relativo. La lección: una mejora en la métrica aislada (55/60) no se tradujo en el agente (6/50 vs 10/50)."
+  },
+  {
+   "clase": 9,
+   "conceptos": [
+    "sft",
+    "lora",
+    "fine-tuning",
+    "dpo",
+    "rl-con-verificador"
+   ],
+   "como_se_aplico": "SFT con LoRA y máscara de pérdida sobre el asistente: 'RAG corrige fallas de información, fine-tuning corrige fallas de comportamiento'. El análisis de errores lo confirma: tras el prompt quedan fallas de decisión con la evidencia delante (verificación, entidad) y de costumbre (voluntariado), que son comportamiento. DPO y RL con los 9 controles como verificador eran alternativas."
+  },
+  {
+   "clase": 10,
+   "conceptos": [
+    "agente",
+    "tool-calling",
+    "contexto-de-agente",
+    "peas"
+   ],
+   "como_se_aplico": "Es un agente basado en LLM con cinco tools y un tope de 40 llamadas, sobre un entorno simulado con medida de desempeño explícita (9 controles). Se cuidó el contexto del agente: guarda que corta un caso si no entra en la ventana en vez de recortar en silencio, y medición del reparto (sistema 55 %, búsquedas 25 %)."
+  }
+ ],
+ "preguntas_defensa": [
+  {
+   "q": "¿Qué va en el buscador y qué va en los pesos? ¿Por qué?",
+   "a": "Lo que cambia va en el buscador: los números de las normas, que en el test secreto son otros. Lo estable va en los pesos: el oficio (cómo completar la ficha, qué preguntar, las costumbres). Es la regla de la clase 9: RAG corrige fallas de información, fine-tuning corrige fallas de comportamiento. Un modelo que memoriza los números de práctica falla en el test."
+  },
+  {
+   "q": "¿Cómo distinguieron un 'error' de un 'ruido' en el historial?",
+   "a": "Error: la fila viola una norma escrita, recalculando cada campo contra las normas originales. Ruido: no viola normas pero se aparta de una costumbre (lo que hace casi todo el mundo en esa situación). Con precedencia error > ruido. Primero se excluyen las filas con violaciones, sobre las limpias se infieren las costumbres, y toda fila limpia que se aparta de una costumbre confirmada es ruido. Quedó 1.600/240/160."
+  },
+  {
+   "q": "¿Cómo encontraron la costumbre del voluntariado sin sesgarse?",
+   "a": "Probando todas las reglas 'edad ≥ umbral', solas o combinadas con un dato observable del triage (acompañante, si puede responder, forma de llegada), y eligiendo la que explica más filas limpias. Ganó '75+ sin acompañante' (1.609/1.760) contra '75+' solo (1.507). Los 17 operadores sin desvíos la cumplen 100 %; los desvíos son de OP-04, OP-11 y OP-17."
+  },
+  {
+   "q": "`prefijos` sacó 55/60 en `evaluar_rag` y `baseline` 48/60. ¿Por qué entregaron `baseline`?",
+   "a": "Porque lo que cuenta es el agente: con Gemma sin entrenar `baseline` resolvió 10/50 y `prefijos` 6/50. `prefijos` devolvía hasta 3 secciones, a menudo de otras áreas parecidas, y el contexto por caso subió en vez de bajar. Evaluar las etapas por separado sirve para diagnosticar, pero la decisión se toma con la métrica de punta a punta. La diferencia no es significativa (p≈0,34) y queda repetirla con el modelo entrenado."
+  },
+  {
+   "q": "¿Por qué el SFT calcula la pérdida solo sobre los tokens del asistente?",
+   "a": "Porque queremos que el modelo aprenda a actuar (qué tool llamar, con qué argumentos, qué ficha registrar), no a predecir el mensaje de sistema, el triage o lo que devuelven las herramientas. Los demás tokens llevan label −100 y no suman a la entropía cruzada. Es la misma pérdida de preentrenamiento con otra máscara y otros datos."
+  },
+  {
+   "q": "¿Qué es LoRA y por qué lo aplicaron solo a q_proj y v_proj?",
+   "a": "LoRA congela W₀ y aprende una corrección de bajo rango B·A (r=8, α=16), así se entrenan muy pocos parámetros y entra en una GPU de 40 GB. Se aplicó a las proyecciones de query y value de la autoatención del modelo de lenguaje, la elección clásica del paper; las torres de visión y audio de Gemma 4 se excluyeron porque PEFT no soporta sus capas."
+  },
+  {
+   "q": "El prompt `procedimiento-v1` mejoró de 10/10/7 a 14/16/12. ¿Qué costó y qué no arregló?",
+   "a": "Costó ~2,6× más contexto por caso (~52 mil caracteres), 3,5 búsquedas y ~25 s por caso en T4. Llevó a 0 las fallas del buscador en registro, box y plazo, pero rompió verificación y entidad: el modelo base decide mal aunque tenga la evidencia. El aviso al voluntariado no se movió (14 fallas) porque es una costumbre no escrita. Eso le toca al entrenamiento."
+  },
+  {
+   "q": "¿Por qué generar conversaciones sintéticas con valores de normas variados?",
+   "a": "Si todas las conversaciones usan los números originales, el modelo puede aprender 'plazo de ECG = X' en los pesos en vez de leerlo de la búsqueda, y fallar con las normas b, c o el test. Variar los valores rompe esa correlación espuria (un caso de data leakage/sobreajuste) y obliga a usar el RAG. Además balancean los casos difíciles: ART, dos credenciales, sin acompañante."
+  },
+  {
+   "q": "¿Qué ganaron al evaluar con lote 4 en vez de 1, y qué riesgos tiene?",
+   "a": "2,1× de velocidad (33,3 → 15,6 s/caso) con +2,4 GB de VRAM y sin cambiar resultados (mismos 10 casos, 49/50 conversaciones idénticas). El riesgo es el padding y la memoria: los lotes 8 y 16 fallaron con un error CUDA. Para producción, el throughput se escalaría con batching continuo (vLLM) y más réplicas."
+  },
+  {
+   "q": "¿Por qué la cátedra valora el largo del prompt?",
+   "a": "El prompt de sistema se repite en cada llamada (en el baseline es el 55 % del contexto por caso): cuesta cómputo, ocupa VRAM (caché KV), limita cuántos casos entran a la vez y alarga el entrenamiento. Es la economía de tokens de la clase 5 llevada a un modelo propio: entre dos modelos que resuelven lo mismo, gana el más barato."
+  },
+  {
+   "q": "¿Cómo garantizan que cada número del informe sea reproducible?",
+   "a": "Cada corrida guarda commit (y si estaba sucio), sha256 de prompt, datos, plan y trazas, el checkpoint con revisión inmutable de HF, la configuración y la semilla. El comando de puntuación se reconstruye del `runner.json`. Tres generaciones del dataset dieron archivos idénticos byte a byte. Y la bitácora separa lo probado con dobles de lo validado en GPU."
+  }
+ ],
+ "quiz": [
+  {
+   "q": "Según la clase 9, ¿qué tipo de falla corrige mejor el fine-tuning que el RAG?",
+   "opciones": [
+    "El modelo no conoce los números de una norma nueva",
+    "El modelo no actúa en la forma o el formato pedidos",
+    "El corpus es demasiado grande para la ventana de contexto",
+    "Las normas cambian todos los meses"
+   ],
+   "correcta": 1,
+   "explicacion": "RAG corrige fallas de información; fine-tuning, fallas de comportamiento. Las normas que cambian son información: van al buscador."
+  },
+  {
+   "q": "En SFT, ¿qué significa poner label −100 en los tokens del sistema y de las observaciones?",
+   "opciones": [
+    "Que esos tokens se borran del input",
+    "Que no contribuyen a la pérdida, aunque el modelo los lea como contexto",
+    "Que se penalizan con más peso",
+    "Que se usan como negativos para DPO"
+   ],
+   "correcta": 1,
+   "explicacion": "El modelo sigue viéndolos (attention), pero la entropía cruzada solo se calcula sobre lo que escribe el asistente."
+  },
+  {
+   "q": "En BM25, el parámetro b controla…",
+   "opciones": [
+    "La saturación de la frecuencia del término",
+    "Cuánto se normaliza el puntaje por el largo del documento",
+    "El número de documentos devueltos",
+    "El peso del IDF"
+   ],
+   "correcta": 1,
+   "explicacion": "b = 0 ignora el largo; b = 1 normaliza del todo. k1 controla la saturación de la frecuencia. El grupo usó k1=1,5 y b=0,75."
+  },
+  {
+   "q": "LoRA con r = 8 sobre una matriz de 4096×4096 entrena, por capa adaptada…",
+   "opciones": [
+    "4096×4096 parámetros",
+    "8×8 parámetros",
+    "2×4096×8 parámetros",
+    "4096 parámetros"
+   ],
+   "correcta": 2,
+   "explicacion": "Dos matrices: A (8×4096) y B (4096×8). W₀ queda congelada; la actualización es B·A, de rango ≤ 8."
+  },
+  {
+   "q": "Una variante del buscador mejora recall y precisión en la evaluación aislada pero el agente resuelve menos casos. ¿Qué conclusión es la correcta?",
+   "opciones": [
+    "La evaluación aislada está mal implementada",
+    "Hay que adoptarla igual porque la métrica de recuperación es la que importa",
+    "La métrica de punta a punta manda: más secciones parecidas pueden confundir al agente y subir el contexto",
+    "El agente tiene un bug"
+   ],
+   "correcta": 2,
+   "explicacion": "La consigna lo dice: el buscador cuenta por lo que rinde el agente con él. `prefijos` traía hasta 3 secciones de otras áreas y el contexto por caso subió."
+  },
+  {
+   "q": "¿Por qué no se pueden usar los casos de práctica para elegir el prompt?",
+   "opciones": [
+    "Porque son pocos",
+    "Porque se usan para reportar: elegir con ellos infla el resultado (fuga de evaluación)",
+    "Porque no tienen fichas esperadas",
+    "Porque están en otro formato"
+   ],
+   "correcta": 1,
+   "explicacion": "Seleccionar sobre el conjunto con el que se reporta es sobreajustar la decisión a ese conjunto; el grupo usó un prompt-dev propio."
+  },
+  {
+   "q": "Una fila del historial avisa al voluntariado a un paciente de 40 años y cumple todas las normas escritas. ¿Cómo se clasifica?",
+   "opciones": [
+    "correcta",
+    "error",
+    "ruido",
+    "Se descarta del historial"
+   ],
+   "correcta": 2,
+   "explicacion": "No viola ninguna norma (no es error), pero se aparta de la costumbre '75+ sin acompañante': es ruido."
+  },
+  {
+   "q": "¿Por qué la consigna premia que el prompt de sistema sea corto?",
+   "opciones": [
+    "Porque los modelos chicos no leen prompts largos",
+    "Porque se repite en cada llamada: cuesta cómputo, VRAM y tiempo al usar y al entrenar el modelo",
+    "Porque los prompts largos siempre alucinan más",
+    "Porque DSPy no acepta prompts largos"
+   ],
+   "correcta": 1,
+   "explicacion": "En la referencia de la cátedra el sistema es un quinto de cada conversación; en el baseline del grupo, el 55 % del contexto por caso."
+  }
+ ]
+}

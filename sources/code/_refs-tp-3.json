@@ -1,0 +1,554 @@
+[
+ {
+  "slug": "introduccion",
+  "i": 36,
+  "clase": 1,
+  "slide_title": "Ejemplos de problemas de representación",
+  "slide_resumen": "Embeddings de texto y código, búsqueda semántica aunque no coincidan las palabras, recomendación y detección de anomalías.",
+  "tp_texto": "En el TP3 la búsqueda semántica con e5-base y chunking por sección llegó a Context Recall 0,967, contra 0,350 de BERT promediado."
+ },
+ {
+  "slug": "introduccion",
+  "i": 62,
+  "clase": 1,
+  "slide_title": "El futuro: agentes autónomos e IA multimodal",
+  "slide_resumen": "Los LLMs pasan de responder preguntas a ser **agentes** que planifican, usan APIs y ejecutan código, y a ser multimodales nativos.",
+  "tp_texto": "En el TP3 armaste un agente con bucle explícito de tool calling (máx. 6 llamadas) en LangChain, sin LangGraph."
+ },
+ {
+  "slug": "claude-desktop-chat",
+  "i": 21,
+  "clase": 1,
+  "slide_title": "Agregar un external connector",
+  "slide_resumen": "Se agrega desde la biblioteca con la URL del servidor MCP y sus credenciales. El equipo técnico monta el servidor; cualquiera lo agrega.",
+  "tp_texto": "En el TP3 tu servidor MCP propio (FastMCP, `servidor_mcp.py`) quedó pendiente: solo está diseñado en `PLAN.md`."
+ },
+ {
+  "slug": "cowork-intro",
+  "i": 25,
+  "clase": 2,
+  "slide_title": "Cómo el agente descubre y usa una herramienta",
+  "slide_resumen": "Al conectar un server, el agente recibe el catálogo (nombre, descripción, parámetros) y elige por descripción. Cuándo conviene cada tool lo dice la documentación.",
+  "tp_texto": "En el TP3 las descripciones de tus tools dicen qué fuente consultan, qué NO tienen y los valores válidos del parámetro."
+ },
+ {
+  "slug": "prompting",
+  "i": 8,
+  "clase": 5,
+  "slide_title": "La fórmula del costo",
+  "slide_resumen": "**Costo = tokens entrada × precio + tokens salida × precio.** Cada turno reenvía todo el historial: un chat de 20 turnos paga el primero 20 veces.",
+  "tp_texto": "Tus logs del TP3 registraban tokens y costo por llamada: ~USD 0,0015 por corrida del agente contra ~0,017 del juez (más de 10×)."
+ },
+ {
+  "slug": "prompting",
+  "i": 14,
+  "clase": 5,
+  "slide_title": "Limitaciones de los LLM",
+  "slide_resumen": "Tres fallas de familia: **alucinaciones**, **no-determinismo** y **sesgo de recencia** (importa más el principio y el final). Se administran con diseño, no con mejor modelo.",
+  "tp_texto": "En el TP3 usaste temperatura 0 y aun así concluiste que, con 12 preguntas y una corrida, una pregunta de diferencia era ruido."
+ },
+ {
+  "slug": "prompting",
+  "i": 17,
+  "clase": 5,
+  "slide_title": "Mitigar alucinaciones: el prompt",
+  "slide_resumen": "Palancas dentro de la llamada, de barata a cara: **grounding** (responder solo con el contexto y admitir «no sé»), RAG, self-consistency y revisión humana.",
+  "tp_texto": "El prompt del TP3 obligaba a usar solo datos de las herramientas y decir cuando faltaban: Faithfulness 5,00 en las 4 corridas."
+ },
+ {
+  "slug": "prompting",
+  "i": 33,
+  "clase": 5,
+  "slide_title": "Zero-shot vs. few-shot",
+  "slide_resumen": "Mismo issue: en zero-shot el modelo inventa su escala y no se puede parsear; con dos ejemplos la escala deja de ser suya.",
+  "tp_texto": "En el TP3 sacaste del ejemplo de la descripción la pregunta A01 de dev, para no filtrar el conjunto de evaluación al sistema."
+ },
+ {
+  "slug": "rag-y-mcp",
+  "i": 2,
+  "clase": 6,
+  "slide_title": "RAG suma lo que no está en los pesos",
+  "slide_resumen": "El modelo no tiene en sus pesos tu documentación ni tus datos. **RAG** recupera fragmentos y los pone en el prompt: el recuperador trae texto y el modelo genera.",
+  "tp_texto": "El hospital del TP3 era ficticio a propósito: el modelo solo contestaba bien si recuperaba de los 20 Markdown o de la API."
+ },
+ {
+  "slug": "rag-y-mcp",
+  "i": 3,
+  "clase": 6,
+  "slide_title": "Recuperar, aumentar, generar",
+  "slide_resumen": "**Recuperar, aumentar, generar.** Aumentar es solo concatenar texto al prompt. Todo lo demás de la clase mejora alguno de estos tres pasos.",
+  "tp_texto": "Tu agente del TP3: buscar_documentos recupera con e5-base, los fragmentos vuelven como ToolMessage y deepseek genera la respuesta."
+ },
+ {
+  "slug": "rag-y-mcp",
+  "i": 10,
+  "clase": 6,
+  "slide_title": "Las fuentes ponen el techo de calidad",
+  "slide_resumen": "La calidad de las fuentes pone el techo: documentos no estructurados, bases de datos, APIs. Filtrar en el corpus es más barato que corregir después.",
+  "tp_texto": "El TP3 combinaba dos fuentes: normas que casi no cambian (Markdown) y una API con el estado del día; las descripciones de tools las separaban."
+ },
+ {
+  "slug": "rag-y-mcp",
+  "i": 20,
+  "clase": 6,
+  "slide_title": "Embeddings: cada texto es un punto",
+  "slide_resumen": "Un **embedding** ubica textos parecidos cerca. Se aprende con **entrenamiento contrastivo** (pares pregunta–respuesta relevante); 384 a 3072 dimensiones.",
+  "tp_texto": "En el TP3, BERT sin ajustar sacó CR 0,350 y e5-base (contrastivo, con prefijos query/passage) 1,000 con k = 1."
+ },
+ {
+  "slug": "rag-y-mcp",
+  "i": 21,
+  "clase": 6,
+  "slide_title": "Coseno: importa el ángulo",
+  "slide_resumen": "La **similitud coseno** mide el ángulo, no el largo: $\\cos\\theta = \\frac{a \\cdot b}{\\|a\\|\\|b\\|}$. Así un fragmento corto compite con uno largo.",
+  "tp_texto": "En el TP3 normalizaste los vectores con L2, así `matriz @ q` es directamente el coseno contra todos los fragmentos."
+ },
+ {
+  "slug": "rag-y-mcp",
+  "i": 22,
+  "clase": 6,
+  "slide_title": "HNSW: no comparar contra todos",
+  "slide_resumen": "**HNSW**: índice por capas (como una skip list) para buscar vecinos aproximados sin comparar contra los n vectores.",
+  "tp_texto": "Con 56 secciones, el TP3 hizo búsqueda exacta contra todos; HNSW no hacía falta."
+ },
+ {
+  "slug": "rag-y-mcp",
+  "i": 29,
+  "clase": 6,
+  "slide_title": "Tres síntomas de que falta una etapa",
+  "slide_resumen": "Señales de que falta una etapa: respuestas inconsistentes, el documento correcto existe pero queda fuera del top-k, o tenés dos buscadores sin fusionar.",
+  "tp_texto": "Fue tu A11 del TP3: la sección correcta quedaba tercera. Lo arreglaste reescribiendo la descripción de la tool, sin rerankear."
+ },
+ {
+  "slug": "rag-y-mcp",
+  "i": 31,
+  "clase": 6,
+  "slide_title": "El cross-encoder lee los dos juntos",
+  "slide_resumen": "Un **bi-encoder** codifica consulta y documento por separado; un **cross-encoder** los lee juntos con atención cruzada. Más preciso, pero una inferencia por documento.",
+  "tp_texto": "El recuperador del TP3 soporta un cross-encoder opcional, pero la entrega no lo usó (reranker: null)."
+ },
+ {
+  "slug": "rag-y-mcp",
+  "i": 32,
+  "clase": 6,
+  "slide_title": "Ajustes de producción",
+  "slide_resumen": "Ajustes típicos: de 20 a 100 candidatos para rerankear, de 3 a 5 en el prompt, búsquedas en paralelo y medir todo.",
+  "tp_texto": "En el TP3, con top-3 ningún encoder pasó de 0,515 porque había una sola evidencia por pregunta; elegiste top-2 con margen 0,005."
+ },
+ {
+  "slug": "rag-y-mcp",
+  "i": 35,
+  "clase": 6,
+  "slide_title": "El corte decide qué se recupera junto",
+  "slide_resumen": "El fragmento es la unidad de recuperación. **Chunking** de largo fijo, semántico (párrafos) o **estructural** (secciones). En documentación técnica, la estructura sale gratis.",
+  "tp_texto": "En el TP3 probaste las tres; ganó el estructural (una sección ## por fragmento) y por oración fue el peor para todos los encoders."
+ },
+ {
+  "slug": "rag-y-mcp",
+  "i": 36,
+  "clase": 6,
+  "slide_title": "Tamaño del fragmento y solapamiento",
+  "slide_resumen": "Fragmentos chicos son precisos pero sin contexto; grandes conservan contexto pero diluyen. El **solapamiento** compensa. Los tamaños se miden en tu corpus.",
+  "tp_texto": "Tus secciones medían 223 caracteres de media: ventanas de 800–1000 habrían mezclado 4 o 5 temas. Probaste ventanas de 40/10 y 80/20 palabras."
+ },
+ {
+  "slug": "rag-y-mcp",
+  "i": 37,
+  "clase": 6,
+  "slide_title": "Los metadatos filtran antes de buscar",
+  "slide_resumen": "Los **metadatos** (fuente, fecha, posición, tipo) permiten citar, reindexar y **filtrar antes de buscar**, que es más barato y preciso.",
+  "tp_texto": "En el TP3 los usaste como texto buscable: anteponer «Título > Sección» al embeber subió e5-base de 0,85 a 1,00 con k = 1."
+ },
+ {
+  "slug": "rag-y-mcp",
+  "i": 39,
+  "clase": 6,
+  "slide_title": "Evaluar las dos etapas por separado",
+  "slide_resumen": "Hay que **evaluar las dos etapas por separado**: Context Relevance (recuperación), Answer Faithfulness y Answer Relevance (generación). Juntas no dicen qué se rompió.",
+  "tp_texto": "El juez del TP3 puntuaba CR, Faithfulness y AR por separado; la corrida 4 dio 5/5/5."
+ },
+ {
+  "slug": "rag-y-mcp",
+  "i": 53,
+  "clase": 6,
+  "slide_title": "El servidor separa herramienta y agente",
+  "slide_resumen": "El servidor separa la herramienta del agente. Con **stdio** el cliente lanza el proceso (sin puerto); con HTTP el servidor ya está corriendo.",
+  "tp_texto": "Quedó pendiente en el TP3: el PLAN.md diseña FastMCP por stdio, con logs a stderr porque stdout es el canal del protocolo."
+ },
+ {
+  "slug": "rag-y-mcp",
+  "i": 54,
+  "clase": 6,
+  "slide_title": "El ciclo de vida de una herramienta MCP",
+  "slide_resumen": "Ciclo: arranque, descubrimiento (`tools/list`), el modelo elige leyendo descripciones, `tools/call`, resultado y respuesta. Agregar una tool no obliga a tocar el agente.",
+  "tp_texto": "Pendiente en el TP3: el cliente con MultiServerMCPClient que descubre con tools/list y llama con tools/call no se implementó."
+ },
+ {
+  "slug": "rag-y-mcp",
+  "i": 57,
+  "clase": 6,
+  "slide_title": "Demo: un servidor MCP mínimo",
+  "slide_resumen": "Demo: pasar de una herramienta hardcodeada en el agente al mismo código expuesto como servidor MCP.",
+  "tp_texto": "El bucle del TP3 quedó agnóstico del origen de las tools para reusarlo con MCP, pero la parte 3 quedó pendiente."
+ },
+ {
+  "slug": "rag-y-mcp",
+  "i": 63,
+  "clase": 6,
+  "slide_title": "Cuatro principios de diseño",
+  "slide_resumen": "Cuatro principios: nombres `verbo_sustantivo_contexto`, **descripciones exhaustivas** (el campo que más pesa), parámetros simples y errores informativos.",
+  "tp_texto": "Cada tool del TP3 declaraba su fuente, para qué sirve, qué NO tiene y los valores válidos del parámetro: ruteo 1,00 en las 4 corridas."
+ },
+ {
+  "slug": "rag-y-mcp",
+  "i": 64,
+  "clase": 6,
+  "slide_title": "Más herramientas, peor elección",
+  "slide_resumen": "El modelo elige tools por **coincidencia de patrones** con las descripciones: cuantas más hay, peor elige, y un modelo mejor no lo arregla.",
+  "tp_texto": "Con 6 tools en el TP3 no hizo falta routing jerárquico."
+ },
+ {
+  "slug": "rag-y-mcp",
+  "i": 68,
+  "clase": 6,
+  "slide_title": "La descripción dice cuándo NO usarla",
+  "slide_resumen": "Con tres tools que suenan igual alcanza para confundir al modelo. La descripción debe decir **cuándo usarla y cuándo NO**.",
+  "tp_texto": "Tu consultar_turnos del TP3 aclaraba: «No dice qué hay que llevar al turno: eso está en los documentos»."
+ },
+ {
+  "slug": "rag-y-mcp",
+  "i": 69,
+  "clase": 6,
+  "slide_title": "Analítica en producción",
+  "slide_resumen": "Instrumentar cada llamada (cantidad, tasa de éxito, latencia, último uso) vuelve medible el diseño del catálogo. Una tool que nunca se usa es un problema de diseño.",
+  "tp_texto": "Cada corrida del TP3 dejaba un log .md con tokens, costo, id de generación y cada tool con sus argumentos y su resultado."
+ },
+ {
+  "slug": "rag-mcp-rapida",
+  "i": 2,
+  "clase": 7,
+  "slide_title": "RAG en tres pasos",
+  "slide_resumen": "**RAG** indexa offline y en cada consulta recupera fragmentos y los concatena al prompt, sin tocar pesos. Una ventana enorme no lo reemplaza: el modelo se pierde en entradas largas.",
+  "tp_texto": "Tu pipeline: 56 secciones embebidas con e5-base, coseno contra la consulta y fragmentos entregados al agente vía `buscar_documentos`."
+ },
+ {
+  "slug": "rag-mcp-rapida",
+  "i": 3,
+  "clase": 7,
+  "slide_title": "Por palabras: el índice invertido",
+  "slide_resumen": "El **índice invertido** guarda en qué documentos aparece cada término; TF-IDF/BM25 ordenan. Falla con sinónimos: 'timeout del upstream' no matchea 'el servicio no responde'.",
+  "tp_texto": "El recuperador léxico ingenuo de la consigna sacaba 0,35 de Context Relevance, igual que BERT crudo."
+ },
+ {
+  "slug": "rag-mcp-rapida",
+  "i": 4,
+  "clase": 7,
+  "slide_title": "Por significado: embeddings y similitud",
+  "slide_resumen": "Consulta y fragmentos se vuelven vectores y gana el más cercano por **similitud coseno**, aunque no compartan palabras. HNSW evita comparar contra todos.",
+  "tp_texto": "Normalizaste L2 para que `matriz @ q` sea el coseno; búsqueda exacta, sin HNSW, porque eran solo 56 secciones."
+ },
+ {
+  "slug": "rag-mcp-rapida",
+  "i": 5,
+  "clase": 7,
+  "slide_title": "Como herramienta: el agente decide cuándo buscar",
+  "slide_resumen": "Con la **recuperación como herramienta**, el modelo decide si busca, qué y cuántas veces. Gana flexibilidad y paga una llamada extra por ronda.",
+  "tp_texto": "Tu agente llama `buscar_documentos` solo cuando hace falta; en las mixtas (A10–A12) pidió documentos y API en paralelo."
+ },
+ {
+  "slug": "rag-mcp-rapida",
+  "i": 8,
+  "clase": 7,
+  "slide_title": "Top-k y similitud mínima",
+  "slide_resumen": "Dos perillas: **top-k** (cuántos fragmentos) y **umbral** de similitud (cuán parecidos). El umbral permite decir 'no sé', pero su valor depende del modelo: hay que calibrarlo.",
+  "tp_texto": "Elegiste top-2 con margen 0,005: con k=3 ningún encoder pasaba 0,515 de CR y el umbral absoluto 0,88 no cubría empates."
+ },
+ {
+  "slug": "rag-mcp-rapida",
+  "i": 9,
+  "clase": 7,
+  "slide_title": "Chunking: dónde cortar y cuánto solapar",
+  "slide_resumen": "El **chunking** decide qué se recupera junto: chico es preciso pero sin contexto; grande diluye. Importa más dónde caen los cortes respecto de la estructura que el tamaño.",
+  "tp_texto": "Comparaste ventanas, párrafo, oración y sección `##`; ganó la sección y la oración fue la peor para los cuatro encoders."
+ },
+ {
+  "slug": "rag-mcp-rapida",
+  "i": 10,
+  "clase": 7,
+  "slide_title": "Metadatos: filtrar antes de buscar",
+  "slide_resumen": "Los **metadatos** filtran antes de buscar y también se buscan: pegar 'título > sección' adelante del fragmento antes de embeber ubica su vector.",
+  "tp_texto": "Anteponer 'Título > Sección' solo al texto embebido subió e5-base de 0,85 a 1,00 con k=1; el fragmento devuelto siguió literal."
+ },
+ {
+  "slug": "rag-mcp-rapida",
+  "i": 11,
+  "clase": 7,
+  "slide_title": "Reranking: la segunda etapa",
+  "slide_resumen": "**Reranking** en serie: un recuperador rápido busca recall en un pool grande y un **cross-encoder**, lento pero preciso, reordena los mejores.",
+  "tp_texto": "`recuperador.py` soporta cross-encoder, pero la entrega no lo usa (`reranker: null`)."
+ },
+ {
+  "slug": "rag-mcp-rapida",
+  "i": 13,
+  "clase": 7,
+  "slide_title": "Evaluar las dos etapas por separado",
+  "slide_resumen": "Medir por etapa: **Context Relevance** para la recuperación; **Faithfulness** y **Answer Relevance** para la generación. Medirlas juntas no dice cuál se rompió.",
+  "tp_texto": "Tu juez gemini puntuó CR/F/AR más ruteo; la corrida 4 dio 5/5/5. A11 fallaba por la consulta, no por la generación."
+ },
+ {
+  "slug": "rag-mcp-rapida",
+  "i": 16,
+  "clase": 7,
+  "slide_title": "MCP conecta modelos con herramientas",
+  "slide_resumen": "**MCP** estandariza cómo una app de IA pide datos y acciones: el servidor expone tools, recursos y prompts; el cliente los consume; el modelo elige leyendo descripciones.",
+  "tp_texto": "En el TP3 esta parte quedó pendiente: no existe `servidor_mcp.py`; el diseño en PLAN.md usa FastMCP reusando `descripciones.py`."
+ },
+ {
+  "slug": "rag-mcp-rapida",
+  "i": 18,
+  "clase": 7,
+  "slide_title": "JSON-RPC 2.0: la capa de mensajes",
+  "slide_resumen": "MCP usa **JSON-RPC 2.0**: `tools/list` y `tools/call`, un `id` que aparea pedido y respuesta, `result` o `error`. La sesión MCP tiene estado; JSON-RPC no.",
+  "tp_texto": "Pendiente: el cliente con `langchain-mcp-adapters` iba a descubrir con `tools/list` y llamar con `tools/call` sobre stdio."
+ },
+ {
+  "slug": "rag-mcp-rapida",
+  "i": 19,
+  "clase": 7,
+  "slide_title": "Herramienta hardcodeada o servidor aparte",
+  "slide_resumen": "Tool hardcodeada: se conoce al compilar y se copia entre agentes. **Servidor MCP**: proceso aparte, descubierto en ejecución. Con stdio el cliente lanza el subproceso: no hay puerto.",
+  "tp_texto": "Tus 6 tools son `@tool` de LangChain (hardcodeadas); el bucle `responder` ya es agnóstico para enchufarlas por MCP."
+ },
+ {
+  "slug": "rag-mcp-rapida",
+  "i": 20,
+  "clase": 7,
+  "slide_title": "El ciclo de vida de una herramienta",
+  "slide_resumen": "Ciclo: registrar, descubrir con `tools/list`, elegir, llamar. El modelo elige leyendo la **descripción**: escribirla es diseño, no documentación.",
+  "tp_texto": "Tu bucle: AIMessage con `tool_calls` → ejecutar → ToolMessage, máximo 6 pasos; los errores de tool vuelven como texto."
+ },
+ {
+  "slug": "rag-mcp-rapida",
+  "i": 25,
+  "clase": 7,
+  "slide_title": "Cuatro principios de diseño",
+  "slide_resumen": "Cuatro principios: nombres `verbo_sustantivo_contexto`, descripciones exhaustivas (qué, cuándo, cuándo NO, formato), esquemas simples y errores accionables.",
+  "tp_texto": "Tus descripciones dicen fuente, uso, qué NO tienen y valores válidos; los errores de tool vuelven al modelo para que se corrija."
+ },
+ {
+  "slug": "rag-mcp-rapida",
+  "i": 26,
+  "clase": 7,
+  "slide_title": "Más herramientas, peor elección",
+  "slide_resumen": "El modelo elige por coincidencia de patrones sobre descripciones: más tools, peor elección, y un modelo mejor no lo arregla. OpenAI recomienda menos de 20.",
+  "tp_texto": "Con 6 tools no hizo falta routing jerárquico: ruteo 1,00 en las 4 corridas."
+ },
+ {
+  "slug": "rag-mcp-rapida",
+  "i": 28,
+  "clase": 7,
+  "slide_title": "La descripción dice cuándo NO usarla",
+  "slide_resumen": "Con tres tools parecidas ya falla la elección. La descripción tiene que decir cuándo usar cada una y, sobre todo, cuándo **NO** usarla.",
+  "tp_texto": "`CONSULTAR_TURNOS` aclara que no dice qué llevar ('eso está en los documentos'): separar norma de estado dio ruteo 1,00."
+ },
+ {
+  "slug": "rag-mcp-rapida",
+  "i": 29,
+  "clase": 7,
+  "slide_title": "Analítica en producción",
+  "slide_resumen": "Medir cada tool (llamadas, éxito, latencia, último uso) para eliminar las que sobran y arreglar las que fallan. Sin medición, ajustar el catálogo es opinión.",
+  "tp_texto": "Tu log `.md` por corrida guarda cada tool con argumentos, resultado, tokens y costo (~USD 0,0015 el agente vs 0,017 el juez)."
+ },
+ {
+  "slug": "rag-mcp-rapida",
+  "i": 31,
+  "clase": 7,
+  "slide_title": "Poco y bien elegido",
+  "slide_resumen": "Misma lección en RAG y MCP: darle al modelo **poco y bien elegido**. El cuello de botella está antes del modelo: corpus, cortes y descripciones.",
+  "tp_texto": "Lo viste en A11: top-3 la arreglaba pero el ruido bajó CR a 4,417; la solución fue mejorar la consulta."
+ },
+ {
+  "slug": "palabra-al-transformer",
+  "i": 21,
+  "clase": 7,
+  "slide_title": "Promediar una frase pierde el orden",
+  "slide_resumen": "Promediar los vectores de una frase da tamaño fijo pero pierde el orden: 'perro muerde hombre' queda igual que 'hombre muerde perro'.",
+  "tp_texto": "Tu línea base BERT con promedio de tokens sacó 0,35 de Context Relevance: promediar sin ajuste no captura el significado."
+ },
+ {
+  "slug": "palabra-al-transformer",
+  "i": 27,
+  "clase": 7,
+  "slide_title": "Cada token mira a todos",
+  "slide_resumen": "La **atención** da a cada token una fila de pesos que suma 1 sobre todos los demás, y con ella arma su representación contextual.",
+  "tp_texto": "La parte 4 del TP3 (atención en NumPy) quedó pendiente: el plan era `softmax`, `atencion` y `autoatencion` guiados por 14 tests."
+ },
+ {
+  "slug": "palabra-al-transformer",
+  "i": 32,
+  "clase": 7,
+  "slide_title": "El ciclo de un LLM, token a token",
+  "slide_resumen": "Cada token generado es una vuelta: tokenizar, embeber, transformer, distribución, elegir y volver a leer todo. La **temperatura** regula cuánto azar hay al elegir.",
+  "tp_texto": "Tu agente corre deepseek-v4-flash con temperatura 0: siempre elige el token más probable."
+ },
+ {
+  "slug": "transformers-a-fondo",
+  "i": 11,
+  "clase": 8,
+  "slide_title": "El ciclo de generación con el transformer abierto",
+  "slide_resumen": "El transformer es un **bloque repetido N veces**: entra y sale una matriz n×d, y por eso se puede apilar. Ejemplo de toda la clase: 'the cat sat' con d=4.",
+  "tp_texto": "Es el ejemplo de los 14 tests de la parte 4 del TP3 ('the cat sat', d=4), que quedó pendiente."
+ },
+ {
+  "slug": "transformers-a-fondo",
+  "i": 18,
+  "clase": 8,
+  "slide_title": "Escalar y repartir: el softmax",
+  "slide_resumen": "Se divide por $\\sqrt{d_k}$ para que la varianza no crezca con la dimensión (sin escala el softmax se satura), y cada fila pasa por **softmax**.",
+  "tp_texto": "Pendiente en el TP3; el plan era `S = QKᵀ/√d_k` y softmax restando el máximo para estabilidad numérica."
+ },
+ {
+  "slug": "transformers-a-fondo",
+  "i": 20,
+  "clase": 8,
+  "slide_title": "La máscara causal",
+  "slide_resumen": "Para generar, los scores futuros se ponen en $-\\infty$ antes del softmax ($e^{-\\infty}=0$). Un 0 no alcanza: daría peso $e^0=1$. Así n tokens dan n ejemplos.",
+  "tp_texto": "Quedó pendiente (plan: `np.triu(…,1) → −∞`). La parte 5 lo pide: con máscara, 'banco' queda igual en las dos frases."
+ },
+ {
+  "slug": "transformers-a-fondo",
+  "i": 26,
+  "clase": 8,
+  "slide_title": "Layer norm: mantener los números en rango",
+  "slide_resumen": "**Layer norm** normaliza cada vector por separado (media 0, desvío 1) y lo reescala con γ y β. Es por token, no por batch: sirve con cualquier largo.",
+  "tp_texto": "Pendiente en el TP3; el plan era `layer_norm` sin γ/β, verificada por los tests."
+ },
+ {
+  "slug": "transformers-a-fondo",
+  "i": 34,
+  "clase": 8,
+  "slide_title": "Del encoder al embedding de oración",
+  "slide_resumen": "BERT crudo promediado es un mal embedding de oración (STS 54,8, menos que GloVe 61,3). **Sentence-BERT** lo arregla con pooling y ajuste siamés.",
+  "tp_texto": "Tu BERT promediado sacó CR 0,35 (z=1,56); e5-base, ajustado con pares consulta–pasaje, llegó a 1,00 con k=1 (z=3,94)."
+ },
+ {
+  "slug": "transformers-a-fondo",
+  "i": 36,
+  "clase": 8,
+  "slide_title": "El mapa de la familia",
+  "slide_resumen": "Tres formas de apilar: encoder-only (MLM, embeddings), decoder-only (siguiente token, generar) y encoder-decoder (traducir). Para embeddings, encoder; para generar, decoder.",
+  "tp_texto": "En el TP3 combinaste las dos: el encoder e5-base recupera y el decoder deepseek responde como agente."
+ },
+ {
+  "slug": "transformers-a-fondo",
+  "i": 42,
+  "clase": 8,
+  "slide_title": "Un bloque repetido",
+  "slide_resumen": "Un transformer es un bloque repetido: la atención mezcla entre tokens y la FFN procesa cada uno. $\\text{softmax}(QK^\\top/\\sqrt{d_k})V$ resume la clase.",
+  "tp_texto": "El ejercicio a mano es la parte 5 del TP3 ('El banco aguanta/presta'), pendiente en tu repo."
+ },
+ {
+  "slug": "como-se-entrena-un-llm",
+  "i": 36,
+  "clase": 9,
+  "slide_title": "El circuito con un agente",
+  "slide_resumen": "El chat es el agente: llama al LLM, ejecuta las tools pedidas, agrega el resultado con rol *tool* y repite hasta que el LLM responde. Pone un tope de vueltas.",
+  "tp_texto": "`bucle.py`: el mismo loop a mano con `ToolMessage` y tope de 6 llamadas."
+ },
+ {
+  "slug": "como-se-entrena-un-llm",
+  "i": 47,
+  "clase": 9,
+  "slide_title": "MCP: host, cliente y servidor",
+  "slide_resumen": "**MCP**: el host crea un cliente por servidor; `tools/list` descubre y `tools/call` ejecuta. El modelo queda fuera del protocolo.",
+  "tp_texto": "El servidor MCP del TP3 (FastMCP, 6 tools) quedó pendiente: solo está diseñado en `PLAN.md`."
+ },
+ {
+  "slug": "como-se-entrena-un-llm",
+  "i": 48,
+  "clase": 9,
+  "slide_title": "MCP: una herramienta es una definición",
+  "slide_resumen": "No hay que entrenar para cada servidor MCP: cada tool entra al contexto como **definición** (nombre, descripción, esquema). La descripción dice cuándo usarla.",
+  "tp_texto": "`descripciones.py`: cada tool dice su fuente, qué NO tiene y los valores válidos; ruteo 1,00 en las 4 corridas."
+ },
+ {
+  "slug": "como-se-entrena-un-llm",
+  "i": 49,
+  "clase": 9,
+  "slide_title": "MCP: lo que aprende el modelo",
+  "slide_resumen": "El modelo aprende **function calling genérico** con SFT: funciones en el system prompt, el pedido y la llamada esperada, incluso varias en paralelo.",
+  "tp_texto": "En las preguntas mixtas (A10–A12), el modelo pidió las dos tools en paralelo en el mismo paso."
+ },
+ {
+  "slug": "agentes-y-multiagentes",
+  "i": 14,
+  "clase": 10,
+  "slide_title": "Workflow o agente",
+  "slide_resumen": "Anthropic: **workflow** si el código fija el camino; **agente** si el LLM usa tools en un loop según lo que observa. Los sistemas reales mezclan las dos.",
+  "tp_texto": "Hiciste un agente: el modelo elige tools y cuándo terminar."
+ },
+ {
+  "slug": "agentes-y-multiagentes",
+  "i": 19,
+  "clase": 10,
+  "slide_title": "Una tool en código",
+  "slide_resumen": "En código: `@tool` + docstring. El modelo ve el nombre, los tipos y el docstring, **nunca el cuerpo**. Ojo: `eval()` sobre texto del modelo es inaceptable en producción.",
+  "tp_texto": "Usaste `@tool` y `bind_tools` en LangChain, con `ChatOpenAI` apuntando a OpenRouter."
+ },
+ {
+  "slug": "agentes-y-multiagentes",
+  "i": 20,
+  "clase": 10,
+  "slide_title": "Principios para diseñar tools",
+  "slide_resumen": "Diseño de tools: **pocas y consolidadas**, nombres con prefijo, devolver contexto con significado y respuestas cortas. El contexto es caro y la memoria, barata.",
+  "tp_texto": "Arreglaste A11 cambiando la descripción de `buscar_documentos` («con las palabras del paciente, una búsqueda por tema»): CR 5,000."
+ },
+ {
+  "slug": "agentes-y-multiagentes",
+  "i": 26,
+  "clase": 10,
+  "slide_title": "ReAct en LangGraph",
+  "slide_resumen": "ReAct en LangGraph: un `agent_node` con tools enlazadas y un `ToolNode`; la arista tools → agent es el loop, y el modelo decide cuándo salir.",
+  "tp_texto": "Escribiste ese mismo loop a mano, sin LangGraph ni AgentExecutor, para registrar cada mensaje en el log."
+ },
+ {
+  "slug": "segmentacion-y-stable-diffusion",
+  "i": 22,
+  "clase": 12,
+  "slide_title": "Embeddings más allá del texto",
+  "slide_resumen": "El encoder de una CNN termina en un vector fijo: un **embedding** donde vectores cercanos son contenidos parecidos. Vale para imagen, texto o audio.",
+  "tp_texto": "En el TP3 usaste embeddings de texto: e5-base con chunking por sección logró Context Recall 0,967 contra 0,350 de BERT promediado."
+ },
+ {
+  "slug": "segmentacion-y-stable-diffusion",
+  "i": 51,
+  "clase": 12,
+  "slide_title": "CLIP: el puente texto ↔ imagen",
+  "slide_resumen": "**CLIP** (2021): un encoder de imagen y otro de texto entrenados contrastivamente con 400M pares, para que los pares reales queden cerca en el mismo espacio.",
+  "tp_texto": "e5-base, el encoder que elegiste en el TP3, también es contrastivo (consulta–pasaje): por eso el fragmento correcto queda a 3,94 desvíos y con BERT crudo a 1,56."
+ },
+ {
+  "slug": "segmentacion-y-stable-diffusion",
+  "i": 52,
+  "clase": 12,
+  "slide_title": "Cómo se entrena CLIP",
+  "slide_resumen": "Entrenar CLIP: matriz S de cosenos del batch, cross-entropy simétrica con objetivo en la diagonal y temperatura $\\tau$. El gradiente llega a ambos encoders; no hay decoder.",
+  "tp_texto": "En el TP3 normalizaste los embeddings con L2, así el producto punto es el coseno, igual que en la matriz S de CLIP."
+ },
+ {
+  "slug": "cierre-magnifica-humanitas",
+  "i": 25,
+  "clase": 13,
+  "slide_title": "De la alucinación al engaño funcional",
+  "slide_resumen": "De la alucinación (error involuntario) a la **sycophancy**: los modelos entrenados con preferencias humanas dan la razón al usuario contra la evidencia, porque eso se premia.",
+  "tp_texto": "En el TP3 el system prompt prohibía agregar datos que no vinieran de las tools y pedía decir cuándo faltaba algo: Faithfulness 5,00 en las 4 corridas."
+ },
+ {
+  "slug": "cierre-magnifica-humanitas",
+  "i": 45,
+  "clase": 13,
+  "slide_title": "Hacia un Internet de Agentes",
+  "slide_resumen": "Internet de agentes: MCP ya es el estándar agente–herramienta; A2A entre agentes sigue emergente. Faltan identidad, descubrimiento y reputación, o la tríada letal escala.",
+  "tp_texto": "En el TP3 el servidor MCP (FastMCP con 6 tools) quedó diseñado en `PLAN.md` pero pendiente: no existe `servidor_mcp.py`."
+ }
+]

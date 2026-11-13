@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}Glosario · IA Generativa{% endblock title %}
+{% block content %}
+{% set g = load_data(path="data/glosario.json") %}
+<header class="page-header">
+  <div class="ph-main">
+    <nav class="crumbs"><span>Estudiar</span><span class="sep">/</span><span>Glosario</span></nav>
+    <h1>Glosario</h1>
+    <div class="ph-meta"><span>{{ g | length }} conceptos</span><span class="sep"></span><span>Cada uno enlaza a las diapositivas donde aparece</span></div>
+  </div>
+</header>
+
+<div class="grid side-main">
+  <section class="card sticky glos-list" style="max-height:calc(100vh - 48px)">
+    <div class="card-header">
+      <div class="input-icon" style="flex:1">
+        <svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input class="input" id="filter" type="search" placeholder="Filtrar conceptos" aria-label="Filtrar conceptos">
+      </div>
+    </div>
+    <div class="card-body flush scroll" id="glos-list">
+      {% for k in g %}
+      <button class="glos-row" data-id="{{ k.id }}" data-k="{{ k.termino }} {{ k.id }}"><span class="t">{{ k.termino }}</span><span class="pill">{{ k.cnn }}</span></button>
+      {% endfor %}
+      <div class="empty" id="glos-empty" hidden>Ningún concepto coincide.</div>
+    </div>
+  </section>
+
+  <div id="glos-detail">
+    {% for k in g %}
+    <section class="card glos-detail" data-id="{{ k.id }}" hidden>
+      <div class="card-header">
+        <div class="card-title">{{ k.termino }}</div>
+        <a class="btn sm" href="{{ config.base_url }}/clases/{{ k.cnn }}/">Clase {{ k.cnn }}</a>
+      </div>
+      <div class="card-section">
+        <span class="section-label">Definición</span>
+        <div class="def">{{ k.definicion | markdown(inline=true) | safe }}</div>
+      </div>
+      {% if k.trampa %}
+      <div class="card-section">
+        <span class="section-label">Error frecuente</span>
+        <div class="callout">{{ k.trampa | markdown(inline=true) | safe }}</div>
+      </div>
+      {% endif %}
+      <div class="card-section" style="padding:0">
+        <div class="row-group" style="position:static"><span>Diapositivas donde aparece</span><span class="mono">{{ k.nrefs }}</span></div>
+        {% if k.refs %}
+        <div class="rows">
+          {% for r in k.refs %}<a class="row-item" href="{{ config.base_url }}{{ r.url }}"><span class="ref">{{ r.cnn }}·{{ r.i }}</span><span class="t">{{ r.title }}</span></a>{% endfor %}
+        </div>
+        {% if k.more %}<div class="empty" style="padding:12px">y {{ k.more }} más (usá el buscador)</div>{% endif %}
+        {% else %}<div class="empty">No aparece como palabra clave en ninguna diapositiva.</div>{% endif %}
+      </div>
+    </section>
+    {% endfor %}
+  </div>
+</div>
+{% endblock content %}
+{% block scripts %}
+<script>
+(function () {
+  var rows = [].slice.call(document.querySelectorAll('.glos-row'));
+  var panels = {};
+  document.querySelectorAll('.glos-detail').forEach(function (p) { panels[p.dataset.id] = p; });
+  function select(id, scroll) {
+    if (!panels[id]) id = rows[0].dataset.id;
+    rows.forEach(function (r) { r.classList.toggle('active', r.dataset.id === id); });
+    Object.keys(panels).forEach(function (k) { panels[k].hidden = k !== id; });
+    Study.renderMath(panels[id]);
+    history.replaceState(null, '', '#' + id);
+    if (scroll) { var r = document.querySelector('.glos-row.active'), box = document.getElementById('glos-list'); if (r) box.scrollTop = r.offsetTop - box.offsetTop - box.clientHeight / 2 + r.offsetHeight / 2; }
+  }
+  document.getElementById('glos-list').addEventListener('click', function (e) { var b = e.target.closest('.glos-row'); if (b) select(b.dataset.id); });
+  document.getElementById('filter').addEventListener('input', function (e) {
+    var q = Study.norm(e.target.value), n = 0;
+    rows.forEach(function (r) { var hit = !q || Study.norm(r.dataset.k).indexOf(q) >= 0; r.hidden = !hit; if (hit) n++; });
+    document.getElementById('glos-empty').hidden = n > 0;
+  });
+  window.addEventListener('hashchange', function () { select(location.hash.slice(1), true); });
+  select(location.hash.slice(1), true);
+})();
+</script>
+{% endblock scripts %}

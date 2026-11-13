@@ -1,0 +1,465 @@
+{
+ "snippets": [
+  {
+   "id": "claude-md-estado",
+   "titulo": "CLAUDE.md: qué es Corta y en qué estado está",
+   "archivo": "CLAUDE.md",
+   "desde": 1,
+   "hasta": 26,
+   "lenguaje": "markdown",
+   "codigo": "# Corta — instrucciones para el agente\n\nCorta es un acortador de URLs interno heredado, sin documentación previa. Este archivo fija las\nprácticas de trabajo del repo — léelo antes de tocar código.\n\n## Estado del proyecto\n\n- Repo inicializado con el estado heredado tal cual, salvo `node_modules/` (excluido por ser\n  generado). Ese primer commit es el punto de partida trazable; todo lo posterior es diff sobre él.\n- Milestone 3 (bug de redirect + colisión de códigos) resuelto con TDD (`tests/`).\n- Milestone 2 (ordenar) hecho: se sacaron los archivos muertos (`server_OLD.js`,\n  `index_v2_FINAL.js`, `links_backup_marzo.json`, `public/estilos_viejos.css`), las dependencias\n  sin uso (`lodash`, `moment`), y se agregó `README.md`. Estructura actual:\n  - `src/` — código de la app (`server.js`, `utils.js`).\n  - `data/` — persistencia en disco (`links.json`), reemplazada por una base de datos en\n    Milestone 5.\n  - `public/` — frontend estático servido por Express.\n  - `tests/` — suite de `node:test`.\n  - `docs/` — `SPEC.md`, `MISSION.md` y `PROGRESS.md` (registro de avance por milestone,\n    actualizar al cerrar o arrancar trabajo en alguno).\n- Milestone 4 (endpoint de stats + `stats.html` conectado) hecho, con TDD (`tests/stats.test.js`).\n- Milestone 5 (producción) hecho: servicio y PostgreSQL desplegados en Railway, credenciales por\n  variable de entorno y persistencia comprobada después de un redeploy. URL pública:\n  `https://corta-production-7bc5.up.railway.app`.\n\nActualizá esta sección a medida que el proyecto avance. No la dejes desincronizada del estado real.",
+   "que_hace": "Es la primera mitad de `CLAUDE.md`: presenta el proyecto y resume el estado de cada milestone para que el agente arranque cada sesión sabiendo dónde está parado.",
+   "como_funciona": "- El encabezado le ordena al agente leer el archivo «antes de tocar código».\n- «Estado del proyecto» lista qué milestones están hechos (M1, M3, M2, M4, M5), la estructura `src/`, `data/`, `public/`, `tests/`, `docs/` y la URL pública.\n- La última línea es una instrucción para el propio agente: «Actualizá esta sección… No la dejes desincronizada del estado real».",
+   "proposito": "El modelo no recuerda sesiones anteriores: todo lo que sabe del proyecto es lo que entra en su contexto. Este bloque reemplaza el «re-explicar todo» de cada sesión. La consigna sugería una Skill `/collect-memory` para mantenerlo; el equipo lo mantuvo a mano/por instrucción y resolvió la memoria histórica con la Skill `progress-log`.",
+   "interaccion": "Claude Code lo carga automáticamente al abrir una sesión en `corta/`. Remite a `docs/SPEC.md`, `docs/MISSION.md` y `docs/PROGRESS.md`, que el agente lee cuando necesita detalle.",
+   "teoria": "In-context learning y memoria del repo: el contexto es la única palanca para que el modelo sepa reglas y estado sin depender de su memoria de entrenamiento."
+  },
+  {
+   "id": "claude-md-reglas",
+   "titulo": "CLAUDE.md: reglas no negociables (spec-first, test-first, secretos, MCP)",
+   "archivo": "CLAUDE.md",
+   "desde": 28,
+   "hasta": 51,
+   "lenguaje": "markdown",
+   "codigo": "## Prácticas de trabajo\n\n1. **Documentar el comportamiento esperado antes de tocarlo.** Mantené `docs/SPEC.md` con el\n   comportamiento de cada endpoint y los casos borde relevantes (entradas inválidas, duplicados,\n   recursos inexistentes). Se actualiza cada vez que el entendimiento del sistema cambia — no es\n   un documento que se escribe una vez y se abandona.\n\n2. **Test-first.** Para cada fix o feature: primero el test, después la implementación que lo\n   hace pasar. Commits separados para uno y otro, así queda trazable en `git log`.\n   - Framework: `node:test` (nativo, sin dependencias nuevas). Correr con `npm test`.\n   - Los tests viven en `tests/` (no `test/` — un directorio llamado `test` hace que Node trate\n     cualquier `.js` adentro como archivo de test, incluidos los helpers). Los archivos de test\n     siguen el patrón `*.test.js`.\n   - `manual-check.js` en la raíz es el script manual heredado (requiere el server ya levantado\n     con `npm start`, se corre aparte con `node manual-check.js`); no es parte de la suite de\n     `npm test` — se renombró desde `test.js` porque ese nombre matcheaba el descubrimiento\n     automático de `node --test` y terminaba pegándole a un server real si había uno corriendo.\n\n3. **Nada de secretos versionados.** Ni hardcodeados en código, ni en archivos de texto o JSON\n   commiteados. Credenciales van en variables de entorno (del proveedor de hosting en\n   producción, `.env` gitignoreado en local).\n\n4. **Usar las herramientas de infraestructura disponibles**, no comandos manuales sueltos,\n   cuando el flujo lo soporta (gestión de repo/colaboradores, servicios, bases de datos, deploy).",
+   "que_hace": "Fija las cuatro prácticas de trabajo que el agente tiene que respetar en cualquier tarea dentro del repo.",
+   "como_funciona": "1. **Spec-first**: mantener `docs/SPEC.md` con endpoints y casos borde.\n2. **Test-first**: primero el test, después la implementación, en commits separados; framework `node:test`, tests en `tests/*.test.js` y la explicación de por qué `test.js` pasó a `manual-check.js`.\n3. **Nada de secretos versionados**: credenciales solo en variables de entorno.\n4. **Usar las herramientas de infraestructura disponibles** (los servidores MCP de GitHub y Railway) antes que comandos manuales sueltos.",
+   "proposito": "Convierte decisiones del equipo en reglas que el agente hereda en cada sesión, en vez de repetirlas en cada prompt. La regla 4 es la que empuja al agente a crear repo, base y deploy vía tools MCP; la regla 3 es una capa más de defensa contra filtrar la credencial que venía en `notas.txt`.",
+   "interaccion": "Lo lee el agente al arrancar. Gobierna cómo se escribieron `tests/*.test.js`, `src/server.js` y `src/postgres.js`, y cómo se configuró Railway (`railway.json`, `DATABASE_URL`).",
+   "teoria": "CLAUDE.md como contrato/memoria del repo: reglas duras, cómo testear y convenciones, en un .md versionado que el agente lee siempre."
+  },
+  {
+   "id": "claude-md-commits-correr",
+   "titulo": "CLAUDE.md: commits, política de push y cómo correr",
+   "archivo": "CLAUDE.md",
+   "desde": 53,
+   "hasta": 73,
+   "lenguaje": "markdown",
+   "codigo": "## Convenciones de commits\n\n- Conventional commits (`feat:`, `fix:`, `test:`, `chore:`, `docs:`, `refactor:`).\n- El commit de test y el de implementación van separados, no amontonados.\n- Sin atribución de IA en los mensajes de commit.\n\n## Cuándo pushear\n\n- Se commitea localmente con la frecuencia que haga falta (test rojo, fix, doc, etc.) — eso no\n  cambia.\n- El **push** a `origin` se hace recién cuando se cierra un milestone completo (ver\n  `docs/PROGRESS.md`), no commit a commit. Excepción: si el usuario pide explícitamente pushear\n  antes.\n\n## Cómo correr la app\n\n```bash\nnpm install\nnpm start        # levanta server.js en localhost:3000\nnpm test         # corre la suite de tests (node:test)\n```",
+   "que_hace": "Define el formato de los commits, cuándo se puede pushear y los tres comandos para instalar, levantar y testear.",
+   "como_funciona": "- Conventional commits (`feat:`, `fix:`, `test:`…) con test e implementación en commits separados y sin atribución de IA.\n- Commits locales libres, pero **push a `origin` solo al cerrar un milestone** (o si el usuario lo pide).\n- `npm install`, `npm start`, `npm test`: lo que el agente corre en su loop para verificar.",
+   "proposito": "Le da al agente el «cómo verifico» (`npm test`) y pone un punto de control humano antes de que algo salga al remoto. Es la razón por la que en `git log` se ven pares `test:`→`fix:`.",
+   "interaccion": "`npm test` ejecuta `node --test` (definido en `package.json`), que descubre los archivos de `tests/`. La política de push se apoya en `docs/PROGRESS.md` para saber cuándo un milestone está cerrado.",
+   "teoria": "Agente de código en loop (planificar, editar, correr, verificar) con un humano que controla los puntos irreversibles."
+  },
+  {
+   "id": "spec-post-redirect",
+   "titulo": "SPEC.md: contrato de POST /api/links y GET /:codigo",
+   "archivo": "docs/SPEC.md",
+   "desde": 31,
+   "hasta": 56,
+   "lenguaje": "markdown",
+   "codigo": "## Endpoints\n\n### `POST /api/links`\n\nCrea un link corto.\n\n- **Request**: `{ \"url\": string }`\n- **200**: `{ \"codigo\": string, \"corta\": \"/<codigo>\" }`\n- **400** si falta `url`, o si `url` no es una URL absoluta válida con esquema `http`/`https`\n  (ej: `\"no es una url\"`, `\"ftp://algo\"`, string vacío).\n- El código se genera al azar entre `[a-z0-9]{3}` (46656 combinaciones posibles). **Si el código\n  generado ya existe, se descarta y se genera otro** — se reintenta hasta encontrar uno libre.\n  Dos URLs nunca deben terminar compartiendo el mismo código. Cubierto por\n  `tests/collision.test.js`.\n\n### `GET /:codigo`\n\nRedirige al destino.\n\n- Si `codigo` existe: **redirección HTTP (302)** hacia la `url` guardada, e incrementa `clicks`\n  en 1 antes de responder.\n- Si `codigo` no existe: **404**, sin tocar ningún contador.\n\n> **Bug corregido** (era `res.send(link.url)` en vez de `res.redirect(...)`, y además el\n> incremento de `clicks` no se persistía en disco): ambos quedan cubiertos por\n> `tests/redirect.test.js`.",
+   "que_hace": "Especifica qué debe hacer cada endpoint principal, incluidos los códigos de error y el comportamiento ante colisiones.",
+   "como_funciona": "- `POST /api/links`: recibe `{ url }`, devuelve `{ codigo, corta }`; **400** si falta la url o no es `http`/`https` válida.\n- Colisión: si el código generado ya existe, se descarta y se genera otro (cubierto por `tests/collision.test.js`).\n- `GET /:codigo`: **302** al destino e incremento de `clicks`; **404** si no existe.\n- Nota «Bug corregido»: documenta el `res.send(link.url)` original y el clic que no se persistía.",
+   "proposito": "Es la fuente de la que se derivan los tests: «todo lo que describe acá tiene que estar cubierto por un test». Ojo para la defensa: la validación de URL inválida (400 para `\"ftp://algo\"`) está prometida acá pero `src/server.js` solo chequea `!url` y no hay test que la cubra.",
+   "interaccion": "Alimenta `tests/redirect.test.js` y `tests/collision.test.js`, que a su vez guiaron los cambios en `src/server.js`. `CLAUDE.md` obliga a mantenerlo al día.",
+   "teoria": "Especificación en .md dentro del repo (SPEC.md) como conocimiento del proyecto y base de TDD."
+  },
+  {
+   "id": "progress-md-milestones",
+   "titulo": "docs/PROGRESS.md: estado por milestone",
+   "archivo": "docs/PROGRESS.md",
+   "desde": 1,
+   "hasta": 35,
+   "lenguaje": "markdown",
+   "codigo": "# Progreso — Corta\n\nRegistro del avance sobre los milestones definidos en `MISSION.md`. Se actualiza a medida que\nse cierra o arranca trabajo — no es un documento de una sola vez.\n\n## Milestone 1 — Trackear desde el principio\n\n**Estado: hecho.**\n\n- Repo inicializado con el estado heredado tal cual (salvo `node_modules/`), como primer commit.\n- `notas.txt` (contenía una credencial de Postgres) gitignoreado desde el inicio; la historia se\n  reescribió una vez para sacarla por completo antes del primer push.\n\n## Milestone 2 — Ordenar\n\n**Estado: hecho.**\n\n- [x] Archivos muertos eliminados: `server_OLD.js`, `index_v2_FINAL.js`,\n      `links_backup_marzo.json`, `public/estilos_viejos.css`.\n- [x] Dependencias sin uso eliminadas: `lodash`, `moment`.\n- [x] Estructura de directorios: `src/` (código), `data/` (persistencia), `docs/` (documentación),\n      `public/` (frontend), `tests/` (suite de `node:test`).\n- [x] `README.md`.\n\n## Milestone 3 — Corregir errores conocidos\n\n**Estado: hecho.**\n\n- [x] Bug de redirect: `GET /:codigo` hacía `res.send(link.url)` en vez de redirigir. Corregido a\n      `res.redirect(...)`. De paso se encontró y corrigió que el incremento de `clicks` no se\n      persistía en disco.\n- [x] Colisión de código: `POST /api/links` ahora reintenta la generación hasta encontrar un\n      código libre, en vez de pisar un link existente.\n- Ambos cubiertos con TDD (`tests/redirect.test.js`, `tests/collision.test.js`), test-first con\n  commits de test e implementación separados.",
+   "que_hace": "Registra el estado de cada milestone con checklist: qué se hizo y cómo quedó cubierto.",
+   "como_funciona": "- Encabezado: «se actualiza a medida que se cierra o arranca trabajo».\n- M1: estado heredado como primer commit; `notas.txt` gitignoreado y la historia reescrita antes del primer push.\n- M2: archivos muertos y dependencias eliminadas, estructura de carpetas, README.\n- M3: bug de redirect y colisión, ambos con TDD y commits separados.",
+   "proposito": "Mantiene la ventana de contexto chica: una sesión nueva lee este archivo y sabe qué falta, sin arrastrar la conversación anterior ni re-explicar. Además sirve como criterio para la política de push de `CLAUDE.md`.",
+   "interaccion": "`CLAUDE.md` lo nombra como lugar a actualizar al cerrar o arrancar un milestone; el commit `d777803` lo agregó y los siguientes lo fueron completando.",
+   "teoria": "Manejo del contexto: persistir el estado en un archivo en vez de en el historial de chat, para poder abrir sesiones nuevas (o `/compact`) sin perder información."
+  },
+  {
+   "id": "gitignore-secretos",
+   "titulo": ".gitignore: fuera notas.txt y los .env",
+   "archivo": ".gitignore",
+   "desde": 1,
+   "hasta": 5,
+   "lenguaje": "text",
+   "codigo": "node_modules/\n.DS_Store\nnotas.txt\n.env*\n!.env.example",
+   "que_hace": "Excluye del repositorio `node_modules/`, `.DS_Store`, `notas.txt` (que tenía una credencial de Postgres) y cualquier `.env*` salvo `.env.example`.",
+   "como_funciona": "- `notas.txt` está desde el primer commit (`a6061b7`): nunca viajó al remoto.\n- `.env*` + `!.env.example` (commit `9ac90f4`): se ignoran todos los archivos de entorno, pero se versiona la plantilla sin valores reales.\n- `node_modules/` se regenera con `npm install`.",
+   "proposito": "Materializa la respuesta a «¿todo merece viajar a un remoto?»: el estado heredado se subió tal cual menos lo regenerable y lo secreto. Como el archivo con la credencial ya había entrado a la historia local, además se reescribió la historia una vez antes del primer push.",
+   "interaccion": "Lo aplica git en cada `git add`. Se complementa con `README.md` (`cp .env.example .env`), con `package.json` (`--env-file-if-exists=.env`) y con `src/server.js`, que lee `DATABASE_URL` solo del entorno.",
+   "teoria": "Privacidad y secretos: clasificar el dato antes de compartirlo y mantener credenciales fuera del código y del contexto."
+  },
+  {
+   "id": "progress-log-0001",
+   "titulo": "progress_log/: el primer commit documentado",
+   "archivo": "progress_log/0001-a6061b7.md",
+   "desde": 1,
+   "hasta": 21,
+   "lenguaje": "markdown",
+   "codigo": "# 0001 — chore: estado inicial heredado de Corta\n\n- **Commit:** a6061b7f2f3aa89b9b2abccd011e820328a8dad3\n- **Author:** FranCalveyra\n- **Date:** Wed Aug 12 17:23:20 2026 -0300\n\n## Summary\n\nFirst commit of the repo: the Corta project dumped exactly as the previous developer left it,\ndeliberately uncurated. It's a small Express URL shortener: `server.js` is the real entrypoint\n(reads/writes `links.json`, exposes `POST /api/links` and `GET /:codigo`), with `utils.js` for\ncode generation. But it ships alongside dead weight typical of an unmaintained handoff:\n`index_v2_FINAL.js` and `server_OLD.js` (abandoned duplicate/older entrypoints),\n`links_backup_marzo.json` (a stale backup of the link store), `public/estilos_viejos.css` (an\nunused old stylesheet next to the real `public/estilos.css`), a stray `public/logo (1).png`, and\n`test.js` (a manual smoke-test script, not a real test suite). `package.json`/`package-lock.json`\ndeclare the original dependencies (`express`, `axios`, plus two that turn out unused —\n`lodash`, `moment`). Only `node_modules/` (regenerable via `npm install`) and a `notas.txt` that\nheld a plaintext credential were excluded, via a new `.gitignore`. The intent, per the commit\nmessage, is a trace-able starting point: everything from here on is a diff against this exact\ninherited state, duplicates and all.",
+   "que_hace": "Es el log generado para el primer commit (`a6061b7`): quién, cuándo, qué se subió y qué se dejó afuera.",
+   "como_funciona": "- Cabecera con hash completo, autor (`FranCalveyra`) y fecha.\n- «Summary» explica que el commit sube el caos heredado sin curar (`server_OLD.js`, `index_v2_FINAL.js`, backups, `test.js`).\n- Aclara las dos exclusiones: `node_modules/` y `notas.txt` con la credencial en texto plano.\n- El nombre `0001-a6061b7` es la posición en `git log --reverse` + el hash corto.",
+   "proposito": "Da trazabilidad: cada uno de los 21 commits tiene su `.md` con resumen, archivos e impacto, así cualquiera (o el agente) reconstruye por qué se hizo cada cambio sin leer todos los diffs. Este en particular documenta el punto de partida del M1.",
+   "interaccion": "Lo escribió el agente siguiendo `.claude/skills/progress-log/SKILL.md`, a partir de la lista que devuelve `scripts/progress-log-missing.sh` y de `git show`.",
+   "teoria": "Trazabilidad de decisiones, código y pruebas como entregable; el repo con historia completa como evidencia."
+  },
+  {
+   "id": "skill-progress-log",
+   "titulo": "Skill progress-log: metadata y pasos",
+   "archivo": ".claude/skills/progress-log/SKILL.md",
+   "desde": 1,
+   "hasta": 33,
+   "lenguaje": "markdown",
+   "codigo": "---\nname: progress-log\ndescription: Backfill and update progress_log/ with one file per commit, summarizing what changed and why. Use when the user asks to \"log progress\", \"update the progress log\", \"document commit history\", or \"dump a log of what was done\" for this repo.\n---\n\n# progress-log\n\nMaintains `progress_log/` — one markdown file per commit in this repo's history, in\nchronological order. Each run finds commits that don't have a file yet and writes only those;\nit never edits or deletes files for commits already logged.\n\n## File naming\n\n`progress_log/NNNN-hash.md`, e.g. `progress_log/0007-dbcba0f.md`:\n\n- `NNNN` — the commit's 1-based position in the full history (`git log --reverse`), zero-padded\n  to 4 digits. This is a stable sequence number, not a \"how many logs exist\" counter — a commit\n  keeps its number even if earlier commits get logged later.\n- `hash` — the commit's short hash (7 chars).\n\n## Steps\n\n1. Run `scripts/progress-log-missing.sh` from the repo root. It prints one `NNNN hash` line per\n   commit that still needs a log file, oldest first. If it prints nothing, tell the user the log\n   is up to date and stop — don't touch existing files.\n\n2. For each missing commit, oldest first, one at a time:\n   a. `git show --format=fuller <hash>` — get author, date, full commit message, the diff, and\n      the list of changed files (`--stat` if you want that separated out).\n   b. Read the diff and write a prose summary of what actually changed and why — don't just\n      restate the commit message. Pull the \"why\" from the commit message/body when it explains\n      intent; infer it from context (e.g. `docs/PROGRESS.md`, `docs/SPEC.md`) when it doesn't.\n   c. Write `progress_log/NNNN-hash.md` with these sections:",
+   "que_hace": "Define la Skill `progress-log`: cuándo dispararse y cómo escribir un `.md` por commit en `progress_log/`.",
+   "como_funciona": "- Frontmatter: `name` y una `description` con frases gatillo («log progress», «update the progress log», «document commit history»).\n- Convención de nombres `NNNN-hash.md` con número estable por posición en la historia.\n- Pasos: correr `scripts/progress-log-missing.sh`; por cada commit faltante, `git show --format=fuller`, redactar un resumen propio (no copiar el mensaje) y escribir el archivo con secciones fijas.",
+   "proposito": "Empaqueta una tarea que se repetía (documentar commits) para que salga siempre igual. Reemplaza a la `/collect-memory` de la consigna: en vez de mantener `CLAUDE.md`, mantiene una bitácora que solo agrega y nunca reescribe.",
+   "interaccion": "Claude Code la carga desde `.claude/skills/`; su gemela para Codex es `.codex/prompts/progress-log.md`. Llama a `scripts/progress-log-missing.sh` y produce los archivos de `progress_log/`.",
+   "teoria": "Skill: carpeta con `SKILL.md` (metadata + pasos en prosa); se dispara con `/progress-log` o sola cuando el pedido coincide con la `description`."
+  },
+  {
+   "id": "script-progress-log",
+   "titulo": "Script determinista: commits sin log",
+   "archivo": "scripts/progress-log-missing.sh",
+   "desde": 15,
+   "hasta": 28,
+   "lenguaje": "bash",
+   "codigo": "set -euo pipefail\n\nREPO_ROOT=$(git rev-parse --show-toplevel)\nLOG_DIR=\"$REPO_ROOT/progress_log\"\nmkdir -p \"$LOG_DIR\"\n\nseq=0\nwhile IFS= read -r hash; do\n  seq=$((seq + 1))\n  num=$(printf \"%04d\" \"$seq\")\n  if ! ls \"$LOG_DIR\" 2>/dev/null | grep -q \"^${num}-\"; then\n    echo \"${num} ${hash}\"\n  fi\ndone < <(git -C \"$REPO_ROOT\" log --reverse --format='%H')",
+   "que_hace": "Lista, en orden cronológico, los commits que todavía no tienen archivo en `progress_log/`.",
+   "como_funciona": "- `set -euo pipefail` corta ante cualquier error.\n- Ubica la raíz con `git rev-parse --show-toplevel` y crea `progress_log/` si falta.\n- Recorre `git log --reverse --format='%H'`, incrementa `seq` y lo formatea a 4 dígitos (`num`).\n- Si no hay un archivo que empiece con `${num}-`, imprime `NNNN hash`.",
+   "proposito": "Separa lo determinista (qué commits faltan, con qué número) de lo que hace bien el modelo (resumir un diff en prosa). Así la numeración no depende de que el modelo cuente bien y la Skill es idempotente.",
+   "interaccion": "Lo invoca el paso 1 de `.claude/skills/progress-log/SKILL.md` y de `.codex/prompts/progress-log.md`; su salida decide qué `progress_log/NNNN-hash.md` escribe el agente.",
+   "teoria": "Skills que combinan instrucciones en prosa con scripts: el código hace lo exacto y el modelo lo interpretativo."
+  },
+  {
+   "id": "codex-prompt-progress-log",
+   "titulo": "La misma Skill para Codex",
+   "archivo": ".codex/prompts/progress-log.md",
+   "desde": 1,
+   "hasta": 18,
+   "lenguaje": "markdown",
+   "codigo": "Maintain `progress_log/` in this repo — one markdown file per commit in the repo's history, in\nchronological order. Find commits that don't have a file yet and write only those; never edit or\ndelete files for commits already logged.\n\n## File naming\n\n`progress_log/NNNN-hash.md`, e.g. `progress_log/0007-dbcba0f.md`:\n\n- `NNNN` — the commit's 1-based position in the full history (`git log --reverse`), zero-padded\n  to 4 digits. Stable sequence number, not a \"how many logs exist\" counter — a commit keeps its\n  number even if earlier commits get logged later.\n- `hash` — the commit's short hash (7 chars).\n\n## Steps\n\n1. Run `scripts/progress-log-missing.sh` from the repo root. It prints one `NNNN hash` line per\n   commit that still needs a log file, oldest first. If it prints nothing, tell the user the log\n   is up to date and stop — don't touch existing files.",
+   "que_hace": "Es la versión de `progress-log` para Codex: mismas instrucciones, en el formato de prompts de `.codex/prompts/`.",
+   "como_funciona": "- Sin frontmatter (Codex lo invoca como prompt por nombre).\n- Repite la convención `NNNN-hash.md` y el paso 1: correr `scripts/progress-log-missing.sh`.\n- El resto (pasos 2-4) coincide con `SKILL.md`.",
+   "proposito": "El equipo trabajó con dos agentes de código (Claude Code y Codex) sobre la misma carpeta; duplicar el instructivo deja que cualquiera de los dos mantenga la bitácora igual.",
+   "interaccion": "Comparte el script `scripts/progress-log-missing.sh` con `.claude/skills/progress-log/SKILL.md`, y ambos escriben en `progress_log/`.",
+   "teoria": "Mismo agente/flujo en distintas superficies: las instrucciones viven en archivos del repo y se portan entre herramientas."
+  },
+  {
+   "id": "readme-estructura",
+   "titulo": "README: uso y estructura del repo",
+   "archivo": "README.md",
+   "desde": 1,
+   "hasta": 28,
+   "lenguaje": "markdown",
+   "codigo": "# Corta\n\nAcortador de URLs interno.\n\nProducción: [https://corta-production-7bc5.up.railway.app](https://corta-production-7bc5.up.railway.app)\n\n## Uso\n\n```bash\nnpm install\ncp .env.example .env\n# editar DATABASE_URL en .env con una base PostgreSQL local\nnpm start         # levanta el server en http://localhost:3000\nnpm test          # corre la suite de tests (node:test, no requiere PostgreSQL)\n```\n\nInterfaz web en `http://localhost:3000` (crear links) y `http://localhost:3000/stats.html`\n(consultar estadísticas).\n\n## Estructura\n\n```\nsrc/      código de la app (server.js, utils.js)\ndata/     datos heredados que se importan a PostgreSQL sin pisar registros\npublic/   frontend estático\ntests/    suite de node:test\ndocs/      documentación del proyecto\n```",
+   "que_hace": "Explica en pocas líneas qué es Corta, cómo levantarlo y testearlo, y qué hay en cada carpeta.",
+   "como_funciona": "- Link a producción.\n- «Uso»: `npm install`, copiar `.env.example`, `npm start`, `npm test` (que no requiere PostgreSQL).\n- «Estructura»: `src/`, `data/`, `public/`, `tests/`, `docs/` con una línea cada una.",
+   "proposito": "Cumple el criterio del M2: entender el repo en menos de 2 minutos. El orden (y haber borrado `server_OLD.js` e `index_v2_FINAL.js`) también es contexto para el agente, que explora el repo leyendo README y árbol en vez de cargarlo entero.",
+   "interaccion": "Remite a `docs/MISSION.md`, `docs/SPEC.md`, `docs/PROGRESS.md` y `CLAUDE.md`; los comandos coinciden con los `scripts` de `package.json`.",
+   "teoria": "El agente explora el repo con herramientas (árbol, README, configs): el orden del repo es contexto."
+  },
+  {
+   "id": "readme-deploy",
+   "titulo": "README: configuración y deploy en Railway",
+   "archivo": "README.md",
+   "desde": 30,
+   "hasta": 48,
+   "lenguaje": "markdown",
+   "codigo": "## Configuración\n\n- `DATABASE_URL` (obligatoria): URL de conexión a PostgreSQL. Nunca se versiona su valor real.\n- `PORT` (opcional): puerto HTTP; por defecto `3000`. Railway lo define automáticamente.\n\nAl arrancar, la app crea la tabla `links` si no existe e importa los registros heredados de\n`data/links.json` con `ON CONFLICT DO NOTHING`. A partir de ahí, PostgreSQL es la única fuente de\nverdad. `GET /health` comprueba también que la base esté accesible.\n\n## Deploy en Railway\n\nEl repo incluye `railway.json` con Railpack y healthcheck en `/health`. El servicio web necesita\nuna base PostgreSQL en el mismo proyecto y una variable de referencia:\n\n```text\nDATABASE_URL=${{Postgres.DATABASE_URL}}\n```\n\nLuego se despliega con `railway up` y se genera el dominio público con `railway domain`.",
+   "que_hace": "Documenta las variables de entorno y cómo quedó armado el deploy en Railway.",
+   "como_funciona": "- `DATABASE_URL` obligatoria y nunca versionada; `PORT` lo define Railway.\n- Al arrancar se crea la tabla `links` y se importan los datos heredados con `ON CONFLICT DO NOTHING`.\n- El servicio web referencia la base del mismo proyecto con `DATABASE_URL=${{Postgres.DATABASE_URL}}`.",
+   "proposito": "Deja por escrito el resultado de lo que el agente hizo contra Railway vía MCP (provisionar Postgres, setear la variable de referencia, deployar y generar el dominio). La configuración de los servidores MCP en sí no está versionada en el repo: lo que queda es este resultado y `railway.json`.",
+   "interaccion": "Describe cómo se conectan `railway.json`, `src/server.js` (`iniciar()` lee `DATABASE_URL` y `PORT`) y `src/postgres.js`.",
+   "teoria": "MCP: el servidor expone acciones de un servicio (crear base, variables, deploy) como tools que el agente llama dentro de su loop."
+  },
+  {
+   "id": "railway-json",
+   "titulo": "railway.json: build y healthcheck versionados",
+   "archivo": "railway.json",
+   "desde": 1,
+   "hasta": 12,
+   "lenguaje": "json",
+   "codigo": "{\n  \"$schema\": \"https://railway.com/railway.schema.json\",\n  \"build\": {\n    \"builder\": \"RAILPACK\"\n  },\n  \"deploy\": {\n    \"healthcheckPath\": \"/health\",\n    \"healthcheckTimeout\": 120,\n    \"restartPolicyType\": \"ON_FAILURE\",\n    \"restartPolicyMaxRetries\": 3\n  }\n}",
+   "que_hace": "Configura en el repo cómo Railway construye y despliega Corta.",
+   "como_funciona": "- `builder: RAILPACK` detecta y construye la app Node.\n- `healthcheckPath: /health` con 120 s de timeout: Railway solo activa el deploy si la app responde.\n- `restartPolicyType: ON_FAILURE` con 3 reintentos.",
+   "proposito": "Versionar la configuración de infraestructura evita que dependa de clics en un panel o de lo que el agente haya hecho en una sesión: queda revisable en un diff. Combinado con el MCP de Railway, el agente deploya y la config queda en GitHub.",
+   "interaccion": "Railway lo lee en cada deploy; el healthcheck pega a `GET /health` de `src/server.js`, que llama a `verificarConexion()` de `src/postgres.js`.",
+   "teoria": "Un agente con varios servidores MCP (GitHub para versionar, Railway para infraestructura) y la infraestructura como archivos revisables."
+  },
+  {
+   "id": "server-iniciar",
+   "titulo": "iniciar(): DATABASE_URL, migración y puerto",
+   "archivo": "src/server.js",
+   "desde": 73,
+   "hasta": 103,
+   "lenguaje": "javascript",
+   "codigo": "async function iniciar() {\n  if (!process.env.DATABASE_URL) {\n    throw new Error('Falta la variable de entorno DATABASE_URL');\n  }\n\n  const repositorio = conectarPostgres(process.env.DATABASE_URL);\n  await repositorio.inicializar();\n\n  // Migra una sola vez los links heredados; los codigos ya presentes nunca se pisan.\n  for (const link of linksIniciales) {\n    await repositorio.crear(link);\n  }\n\n  const app = crearApp(repositorio);\n  const puerto = Number(process.env.PORT) || 3000;\n  const server = app.listen(puerto, '0.0.0.0', function () {\n    console.log(`Corta escuchando en el puerto ${puerto}`);\n  });\n\n  async function cerrar() {\n    server.close(async function () {\n      await repositorio.cerrar();\n      process.exit(0);\n    });\n  }\n\n  process.once('SIGTERM', cerrar);\n  process.once('SIGINT', cerrar);\n\n  return { app, server, repositorio };\n}",
+   "que_hace": "Arranca Corta en producción: exige `DATABASE_URL`, conecta a Postgres, crea la tabla, importa los links heredados y escucha en `PORT`.",
+   "como_funciona": "- Si falta `process.env.DATABASE_URL`, lanza un error: no hay credencial por defecto en el código.\n- `conectarPostgres(...)` y `repositorio.inicializar()` crean la tabla `links` si no existe.\n- Recorre `linksIniciales` (de `data/links.json`) y llama a `repositorio.crear(link)`: los códigos existentes no se pisan.\n- Escucha en `Number(process.env.PORT) || 3000` sobre `0.0.0.0` y cierra el pool ante `SIGTERM`/`SIGINT`.",
+   "proposito": "Es donde se materializa «secretos fuera del código»: la credencial la inyecta Railway (`${{Postgres.DATABASE_URL}}`, seteada vía MCP) y el código solo la lee. La importación idempotente permite redeployar sin duplicar ni perder datos.",
+   "interaccion": "Se ejecuta con `npm start` (`node --env-file-if-exists=.env src/server.js`). Usa `conectarPostgres` de `src/postgres.js` y `crearApp` del mismo archivo.",
+   "teoria": "Mínimo privilegio y separación de secretos: la app recibe credenciales por entorno, nunca por código ni por contexto del agente."
+  },
+  {
+   "id": "server-rutas",
+   "titulo": "Rutas de Corta: crear, stats y redirigir",
+   "archivo": "src/server.js",
+   "desde": 23,
+   "hasta": 63,
+   "lenguaje": "javascript",
+   "codigo": "  // crear un link corto\n  app.post('/api/links', rutaAsync(async function (req, res) {\n    const { url } = req.body;\n    if (!url) {\n      return res.status(400).json({ error: 'Falta la url' });\n    }\n\n    const creado = new Date().toISOString();\n    let codigo;\n    let creadoEnDB = false;\n\n    while (!creadoEnDB) {\n      codigo = generarCodigo();\n      creadoEnDB = await repositorio.crear({\n        codigo,\n        url,\n        clicks: 0,\n        creado\n      });\n    }\n\n    res.json({ codigo, corta: '/' + codigo });\n  }));\n\n  // estadisticas de un link\n  app.get('/api/links/:codigo/stats', rutaAsync(async function (req, res) {\n    const link = await repositorio.buscar(req.params.codigo);\n    if (!link) {\n      return res.status(404).json({ error: 'No existe ese link' });\n    }\n    res.json(link);\n  }));\n\n  // redirigir al destino e incrementar el contador en una sola operacion atomica\n  app.get('/:codigo', rutaAsync(async function (req, res) {\n    const link = await repositorio.incrementarClicks(req.params.codigo);\n    if (!link) {\n      return res.status(404).send('No existe ese link');\n    }\n    res.redirect(link.url);\n  }));",
+   "que_hace": "Define los tres endpoints de negocio: crear un link, consultar sus estadísticas y redirigir incrementando clicks.",
+   "como_funciona": "- `POST /api/links`: si falta `url` responde 400; después repite `generarCodigo()` + `repositorio.crear(...)` hasta que `creadoEnDB` sea `true` (resuelve colisiones).\n- `GET /api/links/:codigo/stats`: `repositorio.buscar` y 404 si no existe.\n- `GET /:codigo`: `repositorio.incrementarClicks` en una sola operación y `res.redirect(link.url)` (302); 404 si no existe.\n- Todo envuelto en `rutaAsync` para que los errores lleguen al middleware de 500.",
+   "proposito": "Es el código que el agente tipeó en las vueltas `fix:`/`feat:`; cada rama tiene un test que la fijó antes. Nótese que solo valida `!url`: el 400 por URL inválida que promete `SPEC.md` no está implementado.",
+   "interaccion": "Vive dentro de `crearApp(repositorio)`, que recibe Postgres en producción (`iniciar()`) o el repositorio en memoria de `tests/helpers.js` en los tests. `public/stats.html` consume la ruta de stats.",
+   "teoria": "Revisión humana del output del agente: el código se acepta porque los tests derivados del SPEC lo verifican, no porque «parezca bien»."
+  },
+  {
+   "id": "postgres-repo",
+   "titulo": "Repositorio PostgreSQL: crear sin pisar e incremento atómico",
+   "archivo": "src/postgres.js",
+   "desde": 15,
+   "hasta": 56,
+   "lenguaje": "javascript",
+   "codigo": "function crearRepositorioPostgres(pool) {\n  return {\n    async inicializar() {\n      await pool.query(`\n        CREATE TABLE IF NOT EXISTS links (\n          codigo VARCHAR(3) PRIMARY KEY CHECK (codigo ~ '^[a-z0-9]{3}$'),\n          url TEXT NOT NULL,\n          clicks INTEGER NOT NULL DEFAULT 0 CHECK (clicks >= 0),\n          creado TIMESTAMPTZ NOT NULL\n        )\n      `);\n    },\n\n    async crear(link) {\n      const resultado = await pool.query(\n        `INSERT INTO links (codigo, url, clicks, creado)\n         VALUES ($1, $2, $3, $4)\n         ON CONFLICT (codigo) DO NOTHING\n         RETURNING codigo`,\n        [link.codigo, link.url, link.clicks, link.creado]\n      );\n      return resultado.rowCount === 1;\n    },\n\n    async buscar(codigo) {\n      const resultado = await pool.query(\n        'SELECT codigo, url, clicks, creado FROM links WHERE codigo = $1',\n        [codigo]\n      );\n      return normalizarLink(resultado.rows[0]);\n    },\n\n    async incrementarClicks(codigo) {\n      const resultado = await pool.query(\n        `UPDATE links\n         SET clicks = clicks + 1\n         WHERE codigo = $1\n         RETURNING codigo, url, clicks, creado`,\n        [codigo]\n      );\n      return normalizarLink(resultado.rows[0]);\n    },",
+   "que_hace": "Implementa la persistencia en PostgreSQL: crea la tabla, inserta links sin pisar códigos existentes, busca y suma clicks de forma atómica.",
+   "como_funciona": "- `inicializar()`: `CREATE TABLE IF NOT EXISTS links` con `codigo` como PRIMARY KEY y `CHECK` del formato `[a-z0-9]{3}`.\n- `crear(link)`: `INSERT … ON CONFLICT (codigo) DO NOTHING` y devuelve `rowCount === 1` (true si insertó, false si chocó).\n- `buscar(codigo)`: `SELECT` + `normalizarLink` para devolver `creado` como ISO.\n- `incrementarClicks(codigo)`: `UPDATE … SET clicks = clicks + 1 … RETURNING`, una sola sentencia.",
+   "proposito": "Responde «¿dónde viven los datos?»: el `links.json` en disco no sobrevive a un redeploy en Railway; Postgres sí (prueba: el link `v4v` siguió con `clicks: 1` tras un redeploy forzado). El `UPDATE` atómico evita perder clicks con redirecciones concurrentes, y `ON CONFLICT` sirve tanto para colisiones como para importar datos heredados.",
+   "interaccion": "Lo crea `conectarPostgres()` y lo usan `iniciar()` y `crearApp()` en `src/server.js`. Se testea con un pool falso en `tests/postgres.test.js`.",
+   "teoria": "Delegar una tarea completa al agente (migrar la persistencia) con el criterio de aceptación fijado antes en tests."
+  },
+  {
+   "id": "test-redirect",
+   "titulo": "Test del bug de redirect",
+   "archivo": "tests/redirect.test.js",
+   "desde": 5,
+   "hasta": 36,
+   "lenguaje": "javascript",
+   "codigo": "test('GET /:codigo con codigo existente redirige (302) al destino e incrementa clicks', async function () {\n  const ctx = await iniciarServerDeTest([\n    { codigo: 'a3k', url: 'https://ejemplo.com/pagina-larga', clicks: 0, creado: '2026-03-02T14:11:09.000Z' }\n  ]);\n\n  try {\n    const res = await fetch(ctx.baseUrl + '/a3k', { redirect: 'manual' });\n\n    assert.equal(res.status, 302);\n    assert.equal(res.headers.get('location'), 'https://ejemplo.com/pagina-larga');\n\n    const links = ctx.leerDB();\n    assert.equal(links.find(function (l) { return l.codigo === 'a3k'; }).clicks, 1);\n  } finally {\n    await ctx.cerrar();\n  }\n});\n\ntest('GET /:codigo con codigo inexistente responde 404 sin tocar clicks de otros links', async function () {\n  const ctx = await iniciarServerDeTest([\n    { codigo: 'a3k', url: 'https://ejemplo.com/pagina-larga', clicks: 5, creado: '2026-03-02T14:11:09.000Z' }\n  ]);\n\n  try {\n    const res = await fetch(ctx.baseUrl + '/zzz', { redirect: 'manual' });\n\n    assert.equal(res.status, 404);\n    assert.equal(ctx.leerDB()[0].clicks, 5);\n  } finally {\n    await ctx.cerrar();\n  }\n});",
+   "que_hace": "Verifica que `GET /:codigo` redirija con 302 al destino e incremente clicks, y que un código inexistente dé 404 sin tocar contadores.",
+   "como_funciona": "- Levanta la app con `iniciarServerDeTest` y un link `a3k`.\n- Hace `fetch` con `redirect: 'manual'` para poder ver el 302 y el header `location`.\n- Lee el almacenamiento con `ctx.leerDB()` y comprueba `clicks === 1`.\n- Segundo test: `/zzz` → 404 y el link `a3k` sigue con 5 clicks.",
+   "proposito": "Se escribió antes del fix (commit `c4deae1`, rojo) y el fix vino después (`d87bffd`): el bug original hacía `res.send(link.url)` y sumaba clicks solo en memoria. El test es la validación diseñada por el equipo; el agente puede tipear el fix, pero el criterio lo fija esto.",
+   "interaccion": "Usa `tests/helpers.js` (repositorio en memoria + `crearApp` de `src/server.js`). Corre con `npm test`.",
+   "teoria": "Humano + máquina (centauro): la IA produce, el equipo diseña la verificación y revisa."
+  },
+  {
+   "id": "test-colision",
+   "titulo": "Test de colisión con Math.random mockeado",
+   "archivo": "tests/collision.test.js",
+   "desde": 5,
+   "hasta": 33,
+   "lenguaje": "javascript",
+   "codigo": "test('POST /api/links reintenta el codigo si el generado ya existe', async function (t) {\n  const ctx = await iniciarServerDeTest([\n    { codigo: 'aaa', url: 'https://ya-existia.com', clicks: 0, creado: '2026-01-01T00:00:00.000Z' }\n  ]);\n\n  // primer intento de generarCodigo cae en \"aaa\" (colision), el segundo en \"sss\" (libre)\n  const secuencia = [0, 0, 0, 0.5, 0.5, 0.5];\n  t.mock.method(Math, 'random', function () {\n    return secuencia.shift();\n  });\n\n  try {\n    const res = await fetch(ctx.baseUrl + '/api/links', {\n      method: 'POST',\n      headers: { 'Content-Type': 'application/json' },\n      body: JSON.stringify({ url: 'https://ejemplo.com/nueva' })\n    });\n    const body = await res.json();\n\n    assert.equal(body.codigo, 'sss');\n\n    const links = ctx.leerDB();\n    assert.equal(links.length, 2);\n    assert.equal(links.find(function (l) { return l.codigo === 'aaa'; }).url, 'https://ya-existia.com');\n    assert.equal(links.find(function (l) { return l.codigo === 'sss'; }).url, 'https://ejemplo.com/nueva');\n  } finally {\n    await ctx.cerrar();\n  }\n});",
+   "que_hace": "Fuerza una colisión de códigos y verifica que `POST /api/links` genere otro sin pisar el link existente.",
+   "como_funciona": "- Arranca con un link existente `aaa`.\n- `t.mock.method(Math, 'random', …)` devuelve la secuencia `[0,0,0,0.5,0.5,0.5]`: el primer código es `aaa` (choca) y el segundo `sss`.\n- Comprueba que la respuesta trae `sss`, que hay 2 links y que `aaa` conserva su URL original.",
+   "proposito": "Con 46.656 códigos posibles una colisión es rara y no se puede esperar a que pase sola: mockear la aleatoriedad la vuelve determinista y testeable. Es uno de los ciclos `test:` (`c1ace5f`) → `fix:` (`dbcba0f`) visibles en `git log`.",
+   "interaccion": "Ejerce el bucle de reintento de `POST /api/links` en `src/server.js` y `generarCodigo()` de `src/utils.js`, a través de `tests/helpers.js`.",
+   "teoria": "Iterar en vueltas chicas con TDD: tests derivados del SPEC, escritos antes, como unidad de revisión."
+  },
+  {
+   "id": "test-stats-verdad",
+   "titulo": "Test: las estadísticas dicen la verdad",
+   "archivo": "tests/stats.test.js",
+   "desde": 37,
+   "hasta": 53,
+   "lenguaje": "javascript",
+   "codigo": "test('los clicks reportados por stats coinciden con las redirecciones servidas', async function () {\n  const ctx = await iniciarServerDeTest([\n    { codigo: 'a3k', url: 'https://ejemplo.com/pagina-larga', clicks: 0, creado: '2026-03-02T14:11:09.000Z' }\n  ]);\n\n  try {\n    await fetch(ctx.baseUrl + '/a3k', { redirect: 'manual' });\n    await fetch(ctx.baseUrl + '/a3k', { redirect: 'manual' });\n\n    const res = await fetch(ctx.baseUrl + '/api/links/a3k/stats');\n    const body = await res.json();\n\n    assert.equal(body.clicks, 2);\n  } finally {\n    await ctx.cerrar();\n  }\n});",
+   "que_hace": "Comprueba que los clicks que reporta `/api/links/:codigo/stats` coinciden con las redirecciones realmente servidas.",
+   "como_funciona": "- Arranca con `a3k` en 0 clicks.\n- Hace dos `fetch` a `/a3k` con `redirect: 'manual'`.\n- Consulta `/api/links/a3k/stats` y exige `body.clicks === 2`.",
+   "proposito": "Traduce a un test la frase de la consigna «que las estadísticas digan la verdad». Junto con la prueba manual en producción (link `v4v` con `clicks: 1` después de un redeploy) es la evidencia de que se puede confiar en lo que el agente escribió.",
+   "interaccion": "Pega a dos rutas de `src/server.js` (redirect y stats) sobre el repositorio en memoria de `tests/helpers.js`. Se escribió en `0b1c040` antes del endpoint (`038948a`).",
+   "teoria": "La responsabilidad sigue en el equipo: definir qué significa «correcto» y verificarlo, aunque la IA escriba el código."
+  },
+  {
+   "id": "test-postgres-pool-falso",
+   "titulo": "Tests de Postgres con un pool falso",
+   "archivo": "tests/postgres.test.js",
+   "desde": 5,
+   "hasta": 45,
+   "lenguaje": "javascript",
+   "codigo": "function poolFalso(resultados) {\n  const consultas = [];\n  return {\n    consultas,\n    async query(texto, valores) {\n      consultas.push({ texto, valores });\n      return resultados.shift() || { rows: [], rowCount: 0 };\n    },\n    async end() {}\n  };\n}\n\ntest('inicializa en PostgreSQL una tabla con codigo unico y datos del link', async function () {\n  const pool = poolFalso([]);\n  const repositorio = crearRepositorioPostgres(pool);\n\n  await repositorio.inicializar();\n\n  assert.match(pool.consultas[0].texto, /CREATE TABLE IF NOT EXISTS links/i);\n  assert.match(pool.consultas[0].texto, /codigo\\s+VARCHAR\\(3\\)\\s+PRIMARY KEY/i);\n  assert.match(pool.consultas[0].texto, /clicks\\s+INTEGER\\s+NOT NULL/i);\n});\n\ntest('crea un link sin pisar otro codigo y avisa si hubo colision', async function () {\n  const pool = poolFalso([\n    { rows: [{ codigo: 'a3k' }], rowCount: 1 },\n    { rows: [], rowCount: 0 }\n  ]);\n  const repositorio = crearRepositorioPostgres(pool);\n  const link = {\n    codigo: 'a3k',\n    url: 'https://ejemplo.com',\n    clicks: 0,\n    creado: '2026-03-02T14:11:09.000Z'\n  };\n\n  assert.equal(await repositorio.crear(link), true);\n  assert.equal(await repositorio.crear(link), false);\n  assert.match(pool.consultas[0].texto, /ON CONFLICT \\(codigo\\) DO NOTHING/i);\n  assert.deepEqual(pool.consultas[0].valores, ['a3k', 'https://ejemplo.com', 0, link.creado]);\n});",
+   "que_hace": "Testea el repositorio PostgreSQL sin base real, con un `pool` falso que registra las consultas y devuelve resultados preparados.",
+   "como_funciona": "- `poolFalso(resultados)` guarda cada `query` en `consultas` y devuelve el siguiente resultado de la lista.\n- El primer test exige `CREATE TABLE IF NOT EXISTS links` con `codigo VARCHAR(3) PRIMARY KEY`.\n- El segundo simula un insert exitoso (`rowCount: 1`) y uno que choca (`rowCount: 0`), y exige `ON CONFLICT (codigo) DO NOTHING` con los valores correctos.",
+   "proposito": "Fijó el contrato de la migración a Postgres antes de implementarla (commit `d541d7c`, test; `c331778`, feat). Así se pudo delegar «migrá la persistencia a Postgres» y revisar el resultado contra un criterio objetivo, sin necesitar una base para correr `npm test`.",
+   "interaccion": "Importa `crearRepositorioPostgres` de `src/postgres.js`, que recibe el pool por parámetro justamente para poder inyectar este falso.",
+   "teoria": "Delegar una tarea completa: el humano define el criterio (tests) y revisa el diff; el agente planifica y ejecuta."
+  }
+ ],
+ "refs": [
+  {
+   "slug": "introduccion",
+   "i": 12,
+   "snippet": "test-stats-verdad"
+  },
+  {
+   "slug": "introduccion",
+   "i": 13,
+   "snippet": "gitignore-secretos"
+  },
+  {
+   "slug": "introduccion",
+   "i": 17,
+   "snippet": "progress-log-0001",
+   "nota": "Cada commit tiene su `.md` en `progress_log/`; este es el del primero, que muestra la decisión sobre `notas.txt`."
+  },
+  {
+   "slug": "claude-desktop-chat",
+   "i": 5,
+   "snippet": "codex-prompt-progress-log",
+   "nota": "Rastro en el repo de que se usaron dos agentes de terminal: la misma Skill existe para Claude Code y para Codex."
+  },
+  {
+   "slug": "claude-desktop-chat",
+   "i": 9,
+   "snippet": "claude-md-estado"
+  },
+  {
+   "slug": "claude-desktop-chat",
+   "i": 20,
+   "snippet": "server-iniciar",
+   "nota": "La `DATABASE_URL` que este código lee la seteó el agente en Railway llamando tools del MCP."
+  },
+  {
+   "slug": "claude-desktop-chat",
+   "i": 27,
+   "snippet": null,
+   "nota": "No hay en el repo ninguna tarea programada ni script que reporte cambios: el extra quedó sin hacer."
+  },
+  {
+   "slug": "cowork-intro",
+   "i": 3,
+   "snippet": "claude-md-commits-correr"
+  },
+  {
+   "slug": "cowork-intro",
+   "i": 4,
+   "snippet": "test-postgres-pool-falso"
+  },
+  {
+   "slug": "cowork-intro",
+   "i": 6,
+   "snippet": "claude-md-reglas",
+   "nota": "La regla 4 es la consecuencia del paso 0: con los MCP configurados en `corta/`, el agente debe usarlos en vez de comandos sueltos."
+  },
+  {
+   "slug": "cowork-intro",
+   "i": 9,
+   "snippet": "readme-estructura"
+  },
+  {
+   "slug": "cowork-intro",
+   "i": 11,
+   "snippet": "spec-post-redirect",
+   "nota": "Mirá la línea del 400 por URL inválida: está en el SPEC, pero ni `src/server.js` ni los tests la cubren."
+  },
+  {
+   "slug": "cowork-intro",
+   "i": 12,
+   "snippet": "progress-md-milestones"
+  },
+  {
+   "slug": "cowork-intro",
+   "i": 13,
+   "snippet": "test-colision"
+  },
+  {
+   "slug": "cowork-intro",
+   "i": 15,
+   "snippet": "claude-md-reglas"
+  },
+  {
+   "slug": "cowork-intro",
+   "i": 16,
+   "snippet": "claude-md-estado",
+   "nota": "La consigna pedía `/collect-memory` para mantener esta sección; acá se mantiene por instrucción («Actualizá esta sección…»)."
+  },
+  {
+   "slug": "cowork-intro",
+   "i": 18,
+   "snippet": "script-progress-log"
+  },
+  {
+   "slug": "cowork-intro",
+   "i": 19,
+   "snippet": "skill-progress-log",
+   "nota": "Fijate en la `description` del frontmatter: enumera las frases que disparan la Skill sola."
+  },
+  {
+   "slug": "cowork-intro",
+   "i": 24,
+   "snippet": "readme-deploy"
+  },
+  {
+   "slug": "cowork-intro",
+   "i": 29,
+   "snippet": "server-rutas",
+   "nota": "Este código lo tipeó el agente; lo que lo hace confiable son los tests y el SPEC escritos antes."
+  },
+  {
+   "slug": "cowork-intro",
+   "i": 30,
+   "snippet": "gitignore-secretos"
+  },
+  {
+   "slug": "cowork-intro",
+   "i": 32,
+   "snippet": "progress-log-0001"
+  },
+  {
+   "slug": "cowork-intro",
+   "i": 33,
+   "snippet": "postgres-repo"
+  },
+  {
+   "slug": "claude-cowork",
+   "i": 17,
+   "snippet": "skill-progress-log"
+  },
+  {
+   "slug": "rag-y-mcp",
+   "i": 46,
+   "snippet": "readme-deploy"
+  },
+  {
+   "slug": "rag-y-mcp",
+   "i": 55,
+   "snippet": "claude-md-reglas",
+   "nota": "La config de los servidores MCP no está versionada en el repo; lo que quedó es la regla 4 que obliga a usarlos."
+  },
+  {
+   "slug": "rag-y-mcp",
+   "i": 59,
+   "snippet": "railway-json",
+   "nota": "Lo de Railway (esta config, base, deploy) y lo de GitHub (repo, commits) vinieron de dos servidores MCP distintos."
+  },
+  {
+   "slug": "rag-mcp-rapida",
+   "i": 16,
+   "snippet": "readme-deploy"
+  },
+  {
+   "slug": "rag-mcp-rapida",
+   "i": 21,
+   "snippet": "claude-md-reglas",
+   "nota": "La config de los servidores MCP no está versionada en el repo; lo que quedó es la regla 4 que obliga a usarlos."
+  },
+  {
+   "slug": "cierre-magnifica-humanitas",
+   "i": 14,
+   "snippet": "gitignore-secretos"
+  },
+  {
+   "slug": "cierre-magnifica-humanitas",
+   "i": 20,
+   "snippet": "server-iniciar",
+   "nota": "El agente, vía MCP, pudo crear la base y setear esta credencial: permisos reales sobre la infraestructura."
+  },
+  {
+   "slug": "cierre-magnifica-humanitas",
+   "i": 23,
+   "snippet": "claude-md-commits-correr",
+   "nota": "Capa humana: el push a `origin` solo ocurre al cerrar un milestone; se suma a `.gitignore`, variables de entorno y la regla 3 de `CLAUDE.md`."
+  },
+  {
+   "slug": "cierre-magnifica-humanitas",
+   "i": 33,
+   "snippet": "test-redirect"
+  }
+ ]
+}

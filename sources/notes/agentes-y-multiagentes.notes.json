@@ -1,0 +1,705 @@
+[
+ {
+  "i": 0,
+  "resumen": "Portada de la clase 10: agentes y sistemas multiagente.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 1,
+  "resumen": "Agenda: qué es un agente, el agente con LLM, tools, ReAct, otros tipos, multiagente y cuándo repartir.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 2,
+  "resumen": "Quiz: un LLM **por sí solo no es un agente**. Recibe texto y devuelve texto; se vuelve agente cuando percibe y actúa en un loop.",
+  "claves": [
+   "agente",
+   "llm"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 3,
+  "resumen": "Russell & Norvig: un **agente** es cualquier cosa que percibe su entorno con **sensores** y actúa sobre él con **actuadores**. Es la definición canónica.",
+  "claves": [
+   "agente",
+   "sensores",
+   "actuadores"
+  ],
+  "ver": [
+   {
+    "ref": "introduccion#63",
+    "por": "tipos de agentes en IA"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 4,
+  "resumen": "La definición es amplia a propósito: no exige LLM, ni robot, ni inteligencia. Antes de diseñar, preguntá qué percibe, qué hace y en qué ambiente.",
+  "claves": [
+   "agente",
+   "peas"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 5,
+  "resumen": "**Agente racional**: elige la acción que maximiza la **medida de performance** esperada con lo que percibió. Si la medida está mal especificada, hace algo indeseable.",
+  "claves": [
+   "agente-racional",
+   "medida de performance"
+  ],
+  "tp": [
+   {
+    "tp": 4,
+    "texto": "Tu medida de performance eran 9 controles: un caso cuenta como resuelto solo si los 9 están bien."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "cierre-magnifica-humanitas#28",
+    "por": "objetivos instrumentales"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 6,
+  "resumen": "Lo racional depende de cuatro factores: la medida, el conocimiento previo, las acciones posibles y lo percibido. Este último después se llama **contexto**.",
+  "claves": [
+   "agente-racional",
+   "contexto-de-agente"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 7,
+  "resumen": "La **función** de agente mapea historias de percepciones a acciones (tabla casi infinita); el **programa** es el código que corre y solo ve la percepción actual.",
+  "claves": [
+   "funcion de agente",
+   "programa de agente"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 8,
+  "resumen": "Arquitecturas clásicas: reflejo simple, con modelo, basado en objetivos, en utilidad y que aprende. Cada una agrega una pieza a la anterior.",
+  "claves": [
+   "arquitecturas-clasicas-de-agente"
+  ],
+  "ver": [
+   {
+    "ref": "introduccion#63",
+    "por": "tipos de agentes en IA"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 9,
+  "resumen": "El auto autónomo en cada arquitectura: el modelo recuerda lo que no ve, el objetivo da destino, la utilidad elige la ruta y el aprendizaje corrige al diseñador.",
+  "claves": [
+   "arquitecturas-clasicas-de-agente"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 10,
+  "resumen": "**PEAS**: medida de **P**erformance, **E**ntorno, **A**ctuadores y **S**ensores. Al LLM, sus tools le dan los actuadores y sus resultados, los sensores.",
+  "claves": [
+   "peas",
+   "agente"
+  ],
+  "tp": [
+   {
+    "tp": 4,
+    "texto": "P: 9 controles. E: entorno de admisión. A: `preguntar`, `registrar_decision`. S: `leer_triage` y lo que devuelven las tools."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "introduccion#64",
+    "por": "dimensiones del entorno"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 11,
+  "resumen": "Sección 2: el agente basado en LLM.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 12,
+  "resumen": "Lilian Weng: **agente = LLM + planificación + tools** (+ memoria). El LLM es el cerebro; tools y planificación organizan la clase.",
+  "claves": [
+   "agente",
+   "llm",
+   "planificacion"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 13,
+  "resumen": "Mismo LLM y mismas tools, dos formas: el **código** decide el próximo paso (pasos fijos) o lo decide el **modelo** en un loop.",
+  "claves": [
+   "workflow-vs-agente"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 14,
+  "resumen": "Anthropic: **workflow** si el código fija el camino; **agente** si el LLM usa tools en un loop según lo que observa. Los sistemas reales mezclan las dos.",
+  "claves": [
+   "workflow-vs-agente",
+   "agente"
+  ],
+  "tp": [
+   {
+    "tp": 3,
+    "texto": "Hiciste un agente: el modelo elige tools y cuándo terminar."
+   },
+   {
+    "tp": 4,
+    "texto": "El de admisión también: 5 tools, el modelo decide el recorrido."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "prompting#43",
+    "por": "prompt chaining, un workflow"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 15,
+  "resumen": "Empezá por **lo más simple posible**: a veces no hace falta un agente. Cuesta latencia y plata, y los errores se acumulan.",
+  "claves": [
+   "workflow-vs-agente",
+   "costo"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 16,
+  "resumen": "Sección 3: los agentes tienen tools.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 17,
+  "resumen": "Una **tool** es una función que el agente pide: nombre, descripción y parámetros van al contexto. El LLM solo genera el pedido; **el programa ejecuta**.",
+  "claves": [
+   "tool-calling",
+   "descripcion-como-disparador"
+  ],
+  "tp": [
+   {
+    "tp": 4,
+    "texto": "Cinco tools fijas: `leer_triage`, `preguntar`, `verificar_afiliacion`, `buscar_normativa` y `registrar_decision`."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "como-se-entrena-un-llm#48",
+    "por": "una tool es una definición"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 18,
+  "resumen": "Una tool es un contrato con un sistema **no determinístico**: puede llamarla de más, de menos o con argumentos raros. Se diseña pensando en quien la llama.",
+  "claves": [
+   "tool-calling",
+   "no determinismo"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 19,
+  "resumen": "En código: `@tool` + docstring. El modelo ve el nombre, los tipos y el docstring, **nunca el cuerpo**. Ojo: `eval()` sobre texto del modelo es inaceptable en producción.",
+  "claves": [
+   "tool-calling",
+   "langchain"
+  ],
+  "tp": [
+   {
+    "tp": 3,
+    "texto": "Usaste `@tool` y `bind_tools` en LangChain, con `ChatOpenAI` apuntando a OpenRouter."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "como-se-entrena-un-llm#42",
+    "por": "la llamada vista desde la API"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 20,
+  "resumen": "Diseño de tools: **pocas y consolidadas**, nombres con prefijo, devolver contexto con significado y respuestas cortas. El contexto es caro y la memoria, barata.",
+  "claves": [
+   "tool-calling",
+   "routing-de-herramientas"
+  ],
+  "tp": [
+   {
+    "tp": 3,
+    "texto": "Arreglaste A11 cambiando la descripción de `buscar_documentos` («con las palabras del paciente, una búsqueda por tema»): CR 5,000."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "rag-y-mcp#63",
+    "por": "cuatro principios de diseño"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 21,
+  "resumen": "Sección 4: ReAct.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 22,
+  "resumen": "**ReAct** suma el lenguaje a las acciones ($\\hat A = A \\cup L$): intercala **pensamientos** y **acciones** hasta poder responder. Razonar para actuar y actuar para razonar.",
+  "claves": [
+   "react",
+   "chain-of-thought"
+  ],
+  "ver": [
+   {
+    "ref": "prompting#37",
+    "por": "chain of thought"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 23,
+  "resumen": "Una trayectoria de HotpotQA: los pensamientos descomponen la pregunta, extraen lo importante, reformulan cuando falla la búsqueda y sintetizan la respuesta.",
+  "claves": [
+   "react",
+   "trayectoria"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 24,
+  "resumen": "En 2022, ReAct corría sobre modelos de **completado** (PaLM, davinci), sin roles; las tools eran tres líneas de texto en la instrucción.",
+  "claves": [
+   "react",
+   "few-shot"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 25,
+  "resumen": "Cada paso es una llamada de completado cortada antes de `Observation`; el código ejecuta la acción, pega el resultado y repite hasta `Finish` o 7 pasos.",
+  "claves": [
+   "react",
+   "stop sequence"
+  ],
+  "ver": [
+   {
+    "ref": "como-se-entrena-un-llm#40",
+    "por": "el modelo se detiene para la tool"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 26,
+  "resumen": "ReAct en LangGraph: un `agent_node` con tools enlazadas y un `ToolNode`; la arista tools → agent es el loop, y el modelo decide cuándo salir.",
+  "claves": [
+   "react",
+   "langgraph"
+  ],
+  "tp": [
+   {
+    "tp": 3,
+    "texto": "Escribiste ese mismo loop a mano, sin LangGraph ni AgentExecutor, para registrar cada mensaje en el log."
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 27,
+  "resumen": "«Agente ReAct» hoy tiene dos sentidos: el formato de prompt de 2022 o cualquier loop de tools con llamadas estructuradas (`bind_tools`).",
+  "claves": [
+   "react",
+   "tool-calling"
+  ],
+  "ver": [
+   {
+    "ref": "como-se-entrena-un-llm#49",
+    "por": "function calling genérico"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 28,
+  "resumen": "Sección 5: otros tres tipos de agente.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 29,
+  "resumen": "Dos preguntas para comparar los tipos: **¿cuándo se planifica?** y **¿cuántas veces vuelve a razonar el LLM?** ReAct: nunca antes, y en cada paso.",
+  "claves": [
+   "react",
+   "planificacion"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 30,
+  "resumen": "**Plan-and-Execute**: un planner escribe el plan completo, los executors (pequeños ReAct) resuelven cada paso y un re-planner decide si sigue o replanifica.",
+  "claves": [
+   "plan-and-execute"
+  ],
+  "ver": [
+   {
+    "ref": "prompting#43",
+    "por": "prompt chaining"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 31,
+  "resumen": "La misma pregunta del Apple Remote, con un plan de dos pasos armado por la cátedra. La búsqueda fallida la resuelve el executor sin volver al planner.",
+  "claves": [
+   "plan-and-execute"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 32,
+  "resumen": "Planificar ahorra llamadas al modelo grande y fuerza a pensar la tarea entera, pero las ventajas no están medidas y el plan no conecta datos entre pasos.",
+  "claves": [
+   "plan-and-execute",
+   "costo"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 33,
+  "resumen": "**Reflexion**: el Actor intenta, el Evaluator juzga y, si falla, se escribe una **crítica en lenguaje natural** como memoria para el próximo intento. No toca los pesos.",
+  "claves": [
+   "reflexion",
+   "memoria"
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 34,
+  "resumen": "Ejemplo: una solución que solo cuenta paréntesis falla los tests que generó el propio agente; la reflexión dice «importa el orden» y guía el siguiente intento.",
+  "claves": [
+   "reflexion",
+   "tests"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 35,
+  "resumen": "Reflexion llegó a 91 % en HumanEval (vs 80,1 % de GPT-4), pero necesita una **señal clara de éxito** y cuesta varios intentos.",
+  "claves": [
+   "reflexion",
+   "evals"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 36,
+  "resumen": "**ReWOO**: el plan se escribe completo con **variables** (`#E1`) y todas las tools se ejecutan sin volver a razonar. El LLM piensa solo al planificar y al resolver.",
+  "claves": [
+   "rewoo",
+   "planificacion"
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 37,
+  "resumen": "En el plan ReWOO, E4 usa el resultado de E2 sin conocerlo todavía. Un LLM puede ser una tool (`LLM[...]`): una llamada al planner, cinco ejecuciones y un solver.",
+  "claves": [
+   "rewoo"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 38,
+  "resumen": "ReWOO ataca el **costo**: en ReAct cada paso reenvía el prompt acumulado. A cambio, si una tool devuelve algo inesperado, nadie replanifica.",
+  "claves": [
+   "rewoo",
+   "costo-por-token"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 39,
+  "resumen": "Comparación: **ReAct** para tareas exploratorias, **Plan-and-Execute** para largas y predecibles, **ReWOO** para ahorrar tokens y **Reflexion** cuando hay un evaluador claro.",
+  "claves": [
+   "react",
+   "plan-and-execute",
+   "reflexion",
+   "rewoo"
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 40,
+  "resumen": "Sección 6: sistemas multiagente.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 41,
+  "resumen": "**Context rot**: el contexto crece en cada vuelta y, cuanto más largo, peor recuerda el modelo. Hay que buscar el conjunto **más chico** de tokens útiles.",
+  "claves": [
+   "context-rot",
+   "contexto-de-agente"
+  ],
+  "tp": [
+   {
+    "tp": 4,
+    "texto": "El sistema ocupa el 55 % del contexto. `prefijos` subió el contexto por caso y bajó de 10/50 a 6/50 casos resueltos."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "cowork-intro#12",
+    "por": "el manejo del contexto"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 42,
+  "resumen": "**Multiagente**: varios agentes que interactúan para un problema que excede a uno. Repartir mueve tres palancas: paralelismo, especialización y **aislamiento de contexto**.",
+  "claves": [
+   "sistema-multiagente",
+   "aislamiento-de-contexto"
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 43,
+  "resumen": "Forma básica: un **orquestador** parte la tarea en el momento y cada **worker** resuelve su parte con su propio loop.",
+  "claves": [
+   "orquestador-workers",
+   "subagente"
+  ],
+  "ver": [
+   {
+    "ref": "cowork-intro#21",
+    "por": "subagentes en paralelo"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 44,
+  "resumen": "Dónde aparece: edición de código en varios archivos, búsqueda en muchas fuentes y el sistema de investigación de Anthropic. Leer en paralelo no choca; escribir, sí.",
+  "claves": [
+   "orquestador-workers"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 45,
+  "resumen": "**Estrella**: cada subagente habla solo con el orquestador, con **su propia ventana**; lee mucho y devuelve poco. «La esencia de buscar es comprimir».",
+  "claves": [
+   "topologias-multiagente",
+   "subagente"
+  ],
+  "ver": [
+   {
+    "ref": "claude-cowork#24",
+    "por": "subagentes trabajando a la vez"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 46,
+  "resumen": "**Router**: clasifica el pedido una vez y lo despacha al especialista; no vuelve a razonar sobre lo que devuelve.",
+  "claves": [
+   "topologias-multiagente",
+   "routing-jerarquico"
+  ],
+  "ver": [
+   {
+    "ref": "rag-mcp-rapida#27",
+    "por": "routing jerárquico"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 47,
+  "resumen": "**Red**: sin coordinador, el control pasa de agente en agente con el contexto armado (bienvenida → IT → finanzas).",
+  "claves": [
+   "topologias-multiagente",
+   "handoff"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 48,
+  "resumen": "**Pizarra**: cada agente publica en un espacio compartido y lee de ahí. No se mandan mensajes (MetaGPT).",
+  "claves": [
+   "topologias-multiagente",
+   "pizarra"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 49,
+  "resumen": "**Pipeline**: cadena fija, un workflow con un agente por paso (ChatDev). **Jerarquía**: un árbol de orquestadores (Contract Net).",
+  "claves": [
+   "topologias-multiagente",
+   "prompt-chaining"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 50,
+  "resumen": "Tabla de topologías: quién tiene el control, por dónde pasa el contexto, la latencia y los tokens. El orquestador central da trazabilidad a cambio de tiempo.",
+  "claves": [
+   "topologias-multiagente"
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 51,
+  "resumen": "LangChain: **empezá con un agente** y buenas tools; repartí solo si el contexto o la especialización se vuelven un límite.",
+  "claves": [
+   "sistema-multiagente",
+   "agente"
+  ],
+  "tp": [
+   {
+    "tp": 4,
+    "texto": "Tu agente es uno solo, con 5 tools: el trabajo es secuencial y nunca hizo falta repartir."
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 52,
+  "resumen": "Sección 7: cuándo repartir.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 53,
+  "resumen": "Un agente gasta ~4× los tokens de un chat; un multiagente, ~15×. El 80 % del desempeño en BrowseComp se explica por tokens: solo paga si la tarea vale.",
+  "claves": [
+   "costo-por-token",
+   "sistema-multiagente"
+  ],
+  "ver": [
+   {
+    "ref": "prompting#8",
+    "por": "la fórmula del costo"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 54,
+  "resumen": "**MAST**: 1.642 trazas de 7 sistemas, entre 41 % y 86,7 % de fallas. Tres categorías: especificación, desalineación entre agentes y verificación.",
+  "claves": [
+   "mast",
+   "evals"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 55,
+  "resumen": "Al pasar el control, el que recibe suele **heredar toda la conversación**. El aislamiento no viene solo: hay que configurarlo y verificarlo en los logs.",
+  "claves": [
+   "aislamiento-de-contexto",
+   "handoff"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 56,
+  "resumen": "Aun con todo el contexto compartido, cada subagente no ve las **decisiones de su hermano**, y chocan al combinar (el Flappy Bird de Cognition).",
+  "claves": [
+   "aislamiento-de-contexto",
+   "decisiones implicitas"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 57,
+  "resumen": "Cognition («no construyas multiagentes»: un solo hilo) vs. Anthropic (a favor para investigación), con un día de diferencia. Discuten si los agentes necesitan verse.",
+  "claves": [
+   "sistema-multiagente",
+   "debate"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 58,
+  "resumen": "La regla: si el trabajo **lee**, repartir paga; si **escribe** sobre algo compartido, conviene un solo hilo o límites explícitos.",
+  "claves": [
+   "lee-o-escribe",
+   "sistema-multiagente"
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 59,
+  "resumen": "Caso Kore.ai: «pagá el crédito con la caja de ahorro». Dos lecturas en paralelo y una única escritura, la transferencia, al final y después de validar.",
+  "claves": [
+   "lee-o-escribe",
+   "orquestador-workers"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 60,
+  "resumen": "Conclusiones.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 61,
+  "resumen": "Resumen: agente, tools, tipos de agente, multiagente y la regla que los ordena: **empezar por lo más simple que alcance**.",
+  "claves": [
+   "agente",
+   "tool-calling",
+   "sistema-multiagente"
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 62,
+  "resumen": "Árbol para elegir la arquitectura: workflow o agente, uno o varios, y qué topología. La mayoría de los casos se resuelve en la segunda o tercera pregunta.",
+  "claves": [
+   "workflow-vs-agente",
+   "topologias-multiagente"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 63,
+  "resumen": "Lecturas: ReAct, Reflexion, *Building effective agents* de Anthropic y el debate Cognition vs. Anthropic.",
+  "claves": [],
+  "clave_examen": false
+ }
+]

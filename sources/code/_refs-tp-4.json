@@ -1,0 +1,394 @@
+[
+ {
+  "slug": "introduccion",
+  "i": 18,
+  "clase": 1,
+  "slide_title": "Trabajo final",
+  "slide_resumen": "Trabajo final: proyecto propio sobre un problema de Ingeniería de Software, mismo equipo, con video de demo y código desplegado o ejecutable.",
+  "tp_texto": "Tu trabajo final fue el agente de admisión de guardia: BM25 propio, RAG sobre normas y prompt optimizado."
+ },
+ {
+  "slug": "introduccion",
+  "i": 42,
+  "clase": 1,
+  "slide_title": "Ejemplos de problemas de razonamiento simbólico",
+  "slide_resumen": "Sistemas expertos, validación normativa, reglas de negocio, grafos de conocimiento y verificación formal. Deep Blue no aprendía nada de los datos.",
+  "tp_texto": "El curado del TP4 fue simbólico: `clasificar_historial.py` recalcula cada fila contra las normas (error > ruido): 1.600 correctas, 240 errores, 160 ruido."
+ },
+ {
+  "slug": "introduccion",
+  "i": 44,
+  "clase": 1,
+  "slide_title": "Ejemplos de problemas de generación",
+  "slide_resumen": "Texto, código, imágenes, audio, video y **datos sintéticos** para pruebas o entrenamiento.",
+  "tp_texto": "En el TP4 generaste 500 conversaciones sintéticas con `admision.generador` (semilla 12012) dentro del dataset de 2.900."
+ },
+ {
+  "slug": "cowork-intro",
+  "i": 15,
+  "clase": 2,
+  "slide_title": "CLAUDE.md / AGENTS.md: la memoria del repo",
+  "slide_resumen": "**CLAUDE.md / AGENTS.md**: archivo en la raíz que el agente lee al arrancar cada sesión. Lleva cómo correr y testear, convenciones y reglas duras.",
+  "tp_texto": "En el TP4 el estándar común del equipo fue `AGENTS.md`."
+ },
+ {
+  "slug": "modelado-redes-neuronales",
+  "i": 17,
+  "clase": 4,
+  "slide_title": "Los tres, lado a lado",
+  "slide_resumen": "La validación no actualiza pesos: la usás vos para elegir. El test se abre **una vez**, al final; si lo usás para elegir, deja de medir.",
+  "tp_texto": "Lo hiciste bien: prompts elegidos en un prompt-dev propio y el set de práctica solo para reportar."
+ },
+ {
+  "slug": "prompting",
+  "i": 3,
+  "clase": 5,
+  "slide_title": "¿Qué se guarda en un prompt?",
+  "slide_resumen": "En la ventana entran system prompt, historial, datos inyectados y respuestas previas; todo compite por atención. **Más contexto no es mejor contexto.**",
+  "tp_texto": "En el TP4 mediste el reparto del contexto por caso: el prompt de sistema era el 55 % y las búsquedas el 25 %."
+ },
+ {
+  "slug": "prompting",
+  "i": 4,
+  "clase": 5,
+  "slide_title": "Ventana de contexto",
+  "slide_resumen": "La **ventana de contexto** es memoria de trabajo (RAM, no disco): finita, no persiste entre sesiones, y lo que queda afuera no existe para el modelo.",
+  "tp_texto": "El agente del TP4 corta un caso si no entra en la ventana, en vez de recortar en silencio."
+ },
+ {
+  "slug": "prompting",
+  "i": 18,
+  "clase": 5,
+  "slide_title": "Mitigar alucinaciones: el proceso",
+  "slide_resumen": "Testear prompts como código: eval set de 50–100 casos con ground truth, métricas (faithfulness), regresión en cada cambio y red teaming.",
+  "tp_texto": "En el TP4 elegiste prompts en un prompt-dev propio y dejaste práctica solo para reportar, para no sobreajustar al conjunto de evaluación."
+ },
+ {
+  "slug": "prompting",
+  "i": 27,
+  "clase": 5,
+  "slide_title": "Los 6 componentes",
+  "slide_resumen": "Seis componentes en orden: **rol, contexto, instrucciones, restricciones, ejemplos e input**. La estructura separa un prototipo de un sistema de producción.",
+  "tp_texto": "Tu prompt procedimiento-v1 del TP4 agregó instrucciones paso a paso (buscar cada tema por separado): de 10/10/7 a 14/16/12 casos resueltos."
+ },
+ {
+  "slug": "prompting",
+  "i": 29,
+  "clase": 5,
+  "slide_title": "Salidas estructuradas: JSON Schema",
+  "slide_resumen": "Pedir JSON en el prompt es una sugerencia; las **salidas estructuradas** de la API lo garantizan al decodificar. Si la salida alimenta código, se usa la garantía.",
+  "tp_texto": "El agente del TP4 responde con acciones JSON y tiene un mensaje de corrección cuando el JSON llega inválido."
+ },
+ {
+  "slug": "prompting",
+  "i": 46,
+  "clase": 5,
+  "slide_title": "¿Por qué tardan más?",
+  "slide_resumen": "Más calidad es más tokens generados y más segundos: CoT 2–5× de latencia, self-consistency N× (en paralelo cuesta N en plata y 1 en tiempo).",
+  "tp_texto": "procedimiento-v1 del TP4 mejoró los casos resueltos, pero subió el contexto ~2,6× (~52 mil caracteres por caso) y de ~16 a ~25 s por caso."
+ },
+ {
+  "slug": "prompting",
+  "i": 66,
+  "clase": 5,
+  "slide_title": "Mitigaciones que funcionan",
+  "slide_resumen": "Mitigaciones de siempre aplicadas al prompt: **revisión humana obligatoria**, tests y versionado. La revisión humana es el piso no negociable.",
+  "tp_texto": "En el TP4 versionaste los prompts en un PromptSpec con sha256: cada número reportado dice qué prompt lo produjo."
+ },
+ {
+  "slug": "rag-y-mcp",
+  "i": 4,
+  "clase": 6,
+  "slide_title": "Antes de consultar hay que indexar",
+  "slide_resumen": "La **indexación** es trabajo offline: se corre una vez y se repite cuando cambia el corpus. Indexar y consultar exigen el mismo modelo de embeddings.",
+  "tp_texto": "En el TP4 el buscador indexa la carpeta de normas que llega en cada corrida (con parametros.yaml), así los números del test entran por búsqueda."
+ },
+ {
+  "slug": "rag-y-mcp",
+  "i": 5,
+  "clase": 6,
+  "slide_title": "Cinco razones para no reentrenar",
+  "slide_resumen": "Por qué RAG y no reentrenar: datos actualizados, datos propietarios, citas auditables, menos alucinación y menor costo.",
+  "tp_texto": "En el TP4: lo que cambia (los números de las normas) va al buscador, no a los pesos; el SFT queda para el comportamiento."
+ },
+ {
+  "slug": "rag-y-mcp",
+  "i": 12,
+  "clase": 6,
+  "slide_title": "Cómo funciona un índice invertido",
+  "slide_resumen": "El **índice invertido** guarda en qué documentos aparece cada término. Pipeline: tokenizar (minúsculas, sin stopwords, raíces), indexar y luego intersectar listas.",
+  "tp_texto": "Tu BM25 del TP4 normaliza a minúsculas y sin tildes; la variante prefijos hace stemming con los primeros 4 caracteres."
+ },
+ {
+  "slug": "rag-y-mcp",
+  "i": 15,
+  "clase": 6,
+  "slide_title": "BM25 satura la frecuencia",
+  "slide_resumen": "**BM25** mejora TF-IDF: **satura** la frecuencia ($k_1$) y **normaliza por largo** ($b$). Es la línea de base léxica de todo RAG.",
+  "tp_texto": "En el TP4 implementaste BM25 a mano con k1 = 1,5 y b = 0,75, una sección por fragmento: 48/60 completas contra 51/60 de la cátedra."
+ },
+ {
+  "slug": "rag-y-mcp",
+  "i": 25,
+  "clase": 6,
+  "slide_title": "Cuándo conviene cada estrategia",
+  "slide_resumen": "**BM25** es rápido, exacto en identificadores y sin GPU, pero no ve sinónimos. Los **embeddings** ven paráfrasis, pero cuestan más. Las cifras se miden en tu corpus.",
+  "tp_texto": "En el TP4 elegiste BM25 (local, sin descargas) y aceptaste que no une sinónimos como «pecho» y «dolor torácico»."
+ },
+ {
+  "slug": "rag-y-mcp",
+  "i": 30,
+  "clase": 6,
+  "slide_title": "RRF fusiona sumando posiciones",
+  "slide_resumen": "**RRF** fusiona por posiciones, no por puntajes (no comparables): $\\sum 1/(k + rank)$, con $k = 60$ empírico y poco crítico.",
+  "tp_texto": "En el TP4 probaste RRF con n-gramas entre 68 configuraciones; no quedó en la entrega."
+ },
+ {
+  "slug": "rag-y-mcp",
+  "i": 39,
+  "clase": 6,
+  "slide_title": "Evaluar las dos etapas por separado",
+  "slide_resumen": "Hay que **evaluar las dos etapas por separado**: Context Relevance (recuperación), Answer Faithfulness y Answer Relevance (generación). Juntas no dicen qué se rompió.",
+  "tp_texto": "En el TP4, «prefijos» ganó en evaluar_rag (55/60) y perdió con el agente (6/50 contra 10/50)."
+ },
+ {
+  "slug": "rag-mcp-rapida",
+  "i": 3,
+  "clase": 7,
+  "slide_title": "Por palabras: el índice invertido",
+  "slide_resumen": "El **índice invertido** guarda en qué documentos aparece cada término; TF-IDF/BM25 ordenan. Falla con sinónimos: 'timeout del upstream' no matchea 'el servicio no responde'.",
+  "tp_texto": "En el TP4 escribiste BM25 propio (k1=1,5, b=0,75) por sección, sin tildes; la variante `prefijos` llegó a recall 0,933."
+ },
+ {
+  "slug": "rag-mcp-rapida",
+  "i": 5,
+  "clase": 7,
+  "slide_title": "Como herramienta: el agente decide cuándo buscar",
+  "slide_resumen": "Con la **recuperación como herramienta**, el modelo decide si busca, qué y cuántas veces. Gana flexibilidad y paga una llamada extra por ronda.",
+  "tp_texto": "En el TP4, `procedimiento-v1` obliga a buscar cada tema por separado: de 10 a 14 casos resueltos."
+ },
+ {
+  "slug": "rag-mcp-rapida",
+  "i": 6,
+  "clase": 7,
+  "slide_title": "En producción se usan las dos",
+  "slide_resumen": "**Búsqueda híbrida**: léxico y vectorial en paralelo, fusionados por posición con **RRF** ($\\sum 1/(k+\\text{pos})$), porque los scores de BM25 y coseno no se comparan.",
+  "tp_texto": "Probaste RRF con n-gramas entre 68 configuraciones, pero entregaste BM25 solo: embeddings no estaban permitidos."
+ },
+ {
+  "slug": "rag-mcp-rapida",
+  "i": 9,
+  "clase": 7,
+  "slide_title": "Chunking: dónde cortar y cuánto solapar",
+  "slide_resumen": "El **chunking** decide qué se recupera junto: chico es preciso pero sin contexto; grande diluye. Importa más dónde caen los cortes respecto de la estructura que el tamaño.",
+  "tp_texto": "En el TP4 repetiste la idea: una sección entera de norma por fragmento para BM25."
+ },
+ {
+  "slug": "transformers-a-fondo",
+  "i": 15,
+  "clase": 8,
+  "slide_title": "Tres proyecciones del mismo vector",
+  "slide_resumen": "Cada token se proyecta con tres matrices entrenables: **Q** (qué busca), **K** (qué ofrece) y **V** (qué aporta). Son tres por la asimetría entre buscar y ser encontrado.",
+  "tp_texto": "En el TP4, LoRA (r=8) se aplicó solo a `q_proj`/`v_proj`, las $W_Q$ y $W_V$ de esta lámina; corrió solo en humo."
+ },
+ {
+  "slug": "transformers-a-fondo",
+  "i": 40,
+  "clase": 8,
+  "slide_title": "Qué se minimiza",
+  "slide_resumen": "Se minimiza la **cross-entropy**, $-\\log p(\\text{token correcto})$, en cada posición. El mínimo no es cero: después de un contexto hay varios tokens razonables.",
+  "tp_texto": "En el SFT del TP4 esa pérdida solo cuenta los tokens del asistente (`labels = −100` en el resto)."
+ },
+ {
+  "slug": "como-se-entrena-un-llm",
+  "i": 2,
+  "clase": 9,
+  "slide_title": "Un modelo 100 veces más chico gana",
+  "slide_resumen": "Gancho: un GPT-3 **100× más chico**, con un poco de entrenamiento extra con personas, le ganó al original. Ese extra costó menos del 2 % del cómputo.",
+  "tp_texto": "Lo mismo en la consigna: Gemma de referencia pasa de 12/15/12 a 25/24/25 casos con un SFT simple."
+ },
+ {
+  "slug": "como-se-entrena-un-llm",
+  "i": 7,
+  "clase": 9,
+  "slide_title": "C4: cómo Google depuró Common Crawl",
+  "slide_resumen": "**C4**: Google filtró Common Crawl con reglas a mano, y el mismo modelo rinde mejor en todas las tareas. Filtrar datos funciona, aunque tiene costos.",
+  "tp_texto": "Curaste el historial: 2.000 filas → 1.600 correctas, 240 errores y 160 de ruido. Solo las correctas entran al entrenamiento."
+ },
+ {
+  "slug": "como-se-entrena-un-llm",
+  "i": 19,
+  "clase": 9,
+  "slide_title": "Datos de demostración",
+  "slide_resumen": "SFT usa la misma **cross-entropy** del siguiente token, pero sobre demostraciones y con la **pérdida solo en los tokens de la respuesta**. Es *behavior cloning*: copia el comportamiento.",
+  "tp_texto": "`tokenizacion.py`: labels = −100 en sistema, triage y observaciones; la pérdida cuenta solo las acciones JSON del asistente."
+ },
+ {
+  "slug": "como-se-entrena-un-llm",
+  "i": 20,
+  "clase": 9,
+  "slide_title": "Un dataset de SFT",
+  "slide_resumen": "Un dataset de SFT es un JSON con dos campos, prompt y respuesta. Hay públicos: Dolly-15k, OpenAssistant, Alpaca (generado con ChatGPT).",
+  "tp_texto": "Armaste 2.900 conversaciones: 1.600 del historial correcto, 800 de la cátedra y 500 sintéticas."
+ },
+ {
+  "slug": "como-se-entrena-un-llm",
+  "i": 22,
+  "clase": 9,
+  "slide_title": "Quiz: ¿qué aprende el SFT?",
+  "slide_resumen": "El SFT ve una sola respuesta por prompt y la imita: no aprende **cuál es mejor**. Para eso hacen falta comparaciones (RLHF).",
+  "tp_texto": "Por eso excluiste errores y ruido del entrenamiento: el SFT copiaría esos desvíos."
+ },
+ {
+  "slug": "como-se-entrena-un-llm",
+  "i": 29,
+  "clase": 9,
+  "slide_title": "Paso 2: optimizar con PPO",
+  "slide_resumen": "**PPO**: el LLM genera, el RM puntúa y se ajusta con un freno **KL** que lo ata al SFT. Es caro e inestable; **DPO** llega a lo mismo sin RM.",
+  "tp_texto": "DPO con los errores del historial como respuestas malas quedó como opción; no se hizo."
+ },
+ {
+  "slug": "como-se-entrena-un-llm",
+  "i": 31,
+  "clase": 9,
+  "slide_title": "RL con verificador: el proceso",
+  "slide_resumen": "**RL con verificador**: una regla (no una persona) chequea la respuesta. **GRPO** genera 16 respuestas por problema y refuerza las que superan el promedio del grupo.",
+  "tp_texto": "Quedó como alternativa no hecha: RL usando los 9 controles de la ficha como recompensa."
+ },
+ {
+  "slug": "como-se-entrena-un-llm",
+  "i": 36,
+  "clase": 9,
+  "slide_title": "El circuito con un agente",
+  "slide_resumen": "El chat es el agente: llama al LLM, ejecuta las tools pedidas, agrega el resultado con rol *tool* y repite hasta que el LLM responde. Pone un tope de vueltas.",
+  "tp_texto": "El agente de admisión tiene tope de 40 llamadas."
+ },
+ {
+  "slug": "como-se-entrena-un-llm",
+  "i": 42,
+  "clase": 9,
+  "slide_title": "Calcular: la misma cuenta por la API",
+  "slide_resumen": "Con Ollama, la API esconde los tokens especiales: llegan `tool_calls` en JSON, tu código calcula y devuelve un mensaje con rol *tool*.",
+  "tp_texto": "Gemma corre local y responde acciones JSON; si el JSON es inválido, el `PromptSpec` trae un mensaje de corrección."
+ },
+ {
+  "slug": "como-se-entrena-un-llm",
+  "i": 51,
+  "clase": 9,
+  "slide_title": "Dónde entra el fine-tuning",
+  "slide_resumen": "El fine-tuning repite el post-training a escala chica con datos propios. **LoRA** congela los pesos y entrena dos matrices chicas; **QLoRA** además guarda el modelo en 4 bits.",
+  "tp_texto": "LoRA r=8, α=16 sobre `q_proj`/`v_proj` de Gemma 4 E4B. QLoRA quedó como alternativa."
+ },
+ {
+  "slug": "como-se-entrena-un-llm",
+  "i": 52,
+  "clase": 9,
+  "slide_title": "Prompt, RAG o fine-tuning",
+  "slide_resumen": "**RAG** corrige fallas de **información**; el **fine-tuning**, fallas de **comportamiento** (forma, formato, estilo). Orden: prompt → ejemplos → RAG → fine-tuning.",
+  "tp_texto": "La idea central del TP: los números de las normas van al BM25 y el oficio y las costumbres, a los pesos con SFT."
+ },
+ {
+  "slug": "como-se-entrena-un-llm",
+  "i": 53,
+  "clase": 9,
+  "slide_title": "Cuándo vale la pena el fine-tuning",
+  "slide_resumen": "El fine-tuning paga cuando el prompt ya no alcanza: un formato fijo (JSON), un estilo, una tarea poco vista o **destilar** en un modelo chico.",
+  "tp_texto": "Con `procedimiento-v1` siguieron las fallas de verificación, entidad y voluntariado: son de comportamiento, y eso le tocaba al SFT."
+ },
+ {
+  "slug": "como-se-entrena-un-llm",
+  "i": 55,
+  "clase": 9,
+  "slide_title": "Fine-tuning local: el recorrido",
+  "slide_resumen": "Fine-tuning local con pesos abiertos: TRL/PEFT o Unsloth en una GPU propia o en Colab. Sale un **adaptador** aparte, con la máscara −100 antes de la respuesta.",
+  "tp_texto": "TRL/PEFT en Kaggle 2× T4 con checkpoints en HF. Solo corrió el humo (15,7 GB pico); faltó el entrenamiento con los datos curados."
+ },
+ {
+  "slug": "como-se-entrena-un-llm",
+  "i": 56,
+  "clase": 9,
+  "slide_title": "Qué pedirle a los datos",
+  "slide_resumen": "Los datos son lo difícil: un dataset **chico y parecido a la tarea** le gana a uno grande y genérico. Formato JSONL con `messages`.",
+  "tp_texto": "500 conversaciones sintéticas (semilla 12012) con valores de normas variados, para que el modelo los lea y no los memorice."
+ },
+ {
+  "slug": "agentes-y-multiagentes",
+  "i": 5,
+  "clase": 10,
+  "slide_title": "El agente racional",
+  "slide_resumen": "**Agente racional**: elige la acción que maximiza la **medida de performance** esperada con lo que percibió. Si la medida está mal especificada, hace algo indeseable.",
+  "tp_texto": "Tu medida de performance eran 9 controles: un caso cuenta como resuelto solo si los 9 están bien."
+ },
+ {
+  "slug": "agentes-y-multiagentes",
+  "i": 10,
+  "clase": 10,
+  "slide_title": "Dos agentes, una descripción PEAS",
+  "slide_resumen": "**PEAS**: medida de **P**erformance, **E**ntorno, **A**ctuadores y **S**ensores. Al LLM, sus tools le dan los actuadores y sus resultados, los sensores.",
+  "tp_texto": "P: 9 controles. E: entorno de admisión. A: `preguntar`, `registrar_decision`. S: `leer_triage` y lo que devuelven las tools."
+ },
+ {
+  "slug": "agentes-y-multiagentes",
+  "i": 14,
+  "clase": 10,
+  "slide_title": "Workflow o agente",
+  "slide_resumen": "Anthropic: **workflow** si el código fija el camino; **agente** si el LLM usa tools en un loop según lo que observa. Los sistemas reales mezclan las dos.",
+  "tp_texto": "El de admisión también: 5 tools, el modelo decide el recorrido."
+ },
+ {
+  "slug": "agentes-y-multiagentes",
+  "i": 17,
+  "clase": 10,
+  "slide_title": "Qué es una tool",
+  "slide_resumen": "Una **tool** es una función que el agente pide: nombre, descripción y parámetros van al contexto. El LLM solo genera el pedido; **el programa ejecuta**.",
+  "tp_texto": "Cinco tools fijas: `leer_triage`, `preguntar`, `verificar_afiliacion`, `buscar_normativa` y `registrar_decision`."
+ },
+ {
+  "slug": "agentes-y-multiagentes",
+  "i": 41,
+  "clase": 10,
+  "slide_title": "El contexto se degrada",
+  "slide_resumen": "**Context rot**: el contexto crece en cada vuelta y, cuanto más largo, peor recuerda el modelo. Hay que buscar el conjunto **más chico** de tokens útiles.",
+  "tp_texto": "El sistema ocupa el 55 % del contexto. `prefijos` subió el contexto por caso y bajó de 10/50 a 6/50 casos resueltos."
+ },
+ {
+  "slug": "agentes-y-multiagentes",
+  "i": 51,
+  "clase": 10,
+  "slide_title": "Primero, un solo agente",
+  "slide_resumen": "LangChain: **empezá con un agente** y buenas tools; repartí solo si el contexto o la especialización se vuelven un límite.",
+  "tp_texto": "Tu agente es uno solo, con 5 tools: el trabajo es secuencial y nunca hizo falta repartir."
+ },
+ {
+  "slug": "redes-generativas-antagonicas",
+  "i": 48,
+  "clase": 11,
+  "slide_title": "El dataset importa: lo que le das es lo que obtenés",
+  "slide_resumen": "Una GAN solo genera lo que aprendió: clases mezcladas sin etiqueta dan híbridos. Hay que validar el dataset (limpio, etiquetado, homogéneo) o usar cGAN.",
+  "tp_texto": "En el TP4 sacaron del SFT las 240 filas con error y las 160 de ruido: el modelo copia lo que ve, igual que una GAN."
+ },
+ {
+  "slug": "segmentacion-y-stable-diffusion",
+  "i": 75,
+  "clase": 12,
+  "slide_title": "Lo que el equipo va a encontrar",
+  "slide_resumen": "Lo que falta: LAION no tiene caras inclinadas, así que hay que hacer fine-tuning con **DreamBooth** o **LoRA**; además auditar sesgos y usar ControlNet o inpainting.",
+  "tp_texto": "En el TP4 aplicaste LoRA (r=8, α=16, solo `q_proj`/`v_proj`) sobre el LLM, pero solo en corridas de humo: el entrenamiento real quedó pendiente."
+ },
+ {
+  "slug": "cierre-magnifica-humanitas",
+  "i": 24,
+  "clase": 13,
+  "slide_title": "Repaso: cómo aprende a «portarse bien»",
+  "slide_resumen": "Repaso: preentrenamiento, SFT y **RLHF**. Optimizar la aprobación no es decir la verdad: el modelo aprende qué recibe buena nota, y eso se puede hackear.",
+  "tp_texto": "En el TP4 planteaste SFT con LoRA y pérdida solo en tokens del asistente para enseñar comportamiento, pero solo se validó en corridas de humo."
+ },
+ {
+  "slug": "cierre-magnifica-humanitas",
+  "i": 44,
+  "clase": 13,
+  "slide_title": "Evaluar es el nuevo cuello de botella",
+  "slide_resumen": "Evaluar es el cuello de botella: saturación, techo del instrumento y **validez externa** (buen puntaje ≠ buen desempeño real). AlphaFold avanzó porque había una métrica acordada.",
+  "tp_texto": "En el TP4, `prefijos` ganaba aislado (55/60 vs 48/60) pero con el agente resolvió 6/50 contra 10/50: mejor métrica aislada no fue mejor agente."
+ }
+]

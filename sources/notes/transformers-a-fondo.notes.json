@@ -1,0 +1,461 @@
+[
+ {
+  "i": 0,
+  "resumen": "Clase 8: el transformer por dentro, con las cuentas a mano.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 1,
+  "resumen": "Agenda: repaso, atención con números, bloque completo, familia, cambios desde 2017, entrenamiento.",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 2,
+  "resumen": "Quiz: un modelo de lenguaje devuelve una **distribución** sobre |V| (softmax final), no una palabra.",
+  "claves": [
+   "softmax"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 3,
+  "resumen": "Quiz: una frase de 6 tokens da 5 ejemplos gratis; la máscara causal los calcula todos a la vez.",
+  "claves": [
+   "self-supervised",
+   "mascara-causal"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 4,
+  "resumen": "Quiz: una RNN no se paraleliza porque cada estado depende del anterior; la atención no tiene ese bucle.",
+  "claves": [
+   "rnn"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 5,
+  "resumen": "Quiz: 'it' arma su representación con peso alto en 'animal' y bajo en el resto.",
+  "claves": [
+   "atencion"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 6,
+  "resumen": "Quiz: cada fila de pesos de atención suma **1**, así que la salida es un promedio ponderado.",
+  "claves": [
+   "atencion",
+   "softmax"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 7,
+  "resumen": "Quiz: una cabeza calcula **n²** pesos por capa; de ahí sale el costo cuadrático.",
+  "claves": [
+   "costo-cuadratico"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 8,
+  "resumen": "Quiz: la matriz de atención **no** es simétrica, porque lo que un token busca (Q) no es lo que ofrece (K).",
+  "claves": [
+   "query-key-value"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 9,
+  "resumen": "Quiz: chatear es inferencia; los parámetros están congelados.",
+  "claves": [
+   "inferencia"
+  ],
+  "ver": [
+   {
+    "ref": "palabra-al-transformer#35",
+    "por": "entrenamiento vs inferencia"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 10,
+  "resumen": "Separador: empieza la sección «Dónde quedamos».",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 11,
+  "resumen": "El transformer es un **bloque repetido N veces**: entra y sale una matriz n×d, y por eso se puede apilar. Ejemplo de toda la clase: 'the cat sat' con d=4.",
+  "claves": [
+   "transformer"
+  ],
+  "tp": [
+   {
+    "tp": 3,
+    "texto": "Es el ejemplo de los 14 tests de la parte 4 del TP3 ('the cat sat', d=4), que quedó pendiente."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "palabra-al-transformer#32",
+    "por": "el ciclo token a token"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 12,
+  "resumen": "La frase es una matriz **X** de n tokens × d dimensiones (aquí 3×4; en modelos reales d=512 o 768). La atención opera sobre esa matriz.",
+  "claves": [
+   "embedding",
+   "transformer"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 13,
+  "resumen": "La atención no ve el orden: es invariante a permutar filas. Por eso se **suma** un vector de posición a cada embedding antes de todo.",
+  "claves": [
+   "codificacion-posicional"
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 14,
+  "resumen": "Separador: empieza la sección «La atención con números».",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 15,
+  "resumen": "Cada token se proyecta con tres matrices entrenables: **Q** (qué busca), **K** (qué ofrece) y **V** (qué aporta). Son tres por la asimetría entre buscar y ser encontrado.",
+  "claves": [
+   "query-key-value",
+   "self-attention"
+  ],
+  "tp": [
+   {
+    "tp": 4,
+    "texto": "En el TP4, LoRA (r=8) se aplicó solo a `q_proj`/`v_proj`, las $W_Q$ y $W_V$ de esta lámina; corrió solo en humo."
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 16,
+  "resumen": "Cálculo: Q = X, K = X con columnas intercambiadas de a pares, V baja a dimensión 2. $d_k$ tiene que coincidir entre Q y K; $d_v$ es libre.",
+  "claves": [
+   "query-key-value"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 17,
+  "resumen": "$QK^\\top$ es una matriz n×n de afinidades: cada consulta contra cada clave (cat·the = 3). Esa matriz es el costo cuadrático que atacan las variantes modernas.",
+  "claves": [
+   "self-attention",
+   "costo-cuadratico"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 18,
+  "resumen": "Se divide por $\\sqrt{d_k}$ para que la varianza no crezca con la dimensión (sin escala el softmax se satura), y cada fila pasa por **softmax**.",
+  "claves": [
+   "escala-raiz-dk",
+   "softmax"
+  ],
+  "tp": [
+   {
+    "tp": 3,
+    "texto": "Pendiente en el TP3; el plan era `S = QKᵀ/√d_k` y softmax restando el máximo para estabilidad numérica."
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 19,
+  "resumen": "Salida = **A·V**: cada token es un promedio ponderado de los V ('cat' = 0,45·the + 0,10·cat + 0,45·sat). Esa es la representación contextual.",
+  "claves": [
+   "self-attention",
+   "atencion"
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 20,
+  "resumen": "Para generar, los scores futuros se ponen en $-\\infty$ antes del softmax ($e^{-\\infty}=0$). Un 0 no alcanza: daría peso $e^0=1$. Así n tokens dan n ejemplos.",
+  "claves": [
+   "mascara-causal"
+  ],
+  "tp": [
+   {
+    "tp": 3,
+    "texto": "Quedó pendiente (plan: `np.triu(…,1) → −∞`). La parte 5 lo pide: con máscara, 'banco' queda igual en las dos frases."
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 21,
+  "resumen": "Separador: empieza la sección «El bloque completo».",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 22,
+  "resumen": "**Multi-head**: h atenciones en paralelo de dimensión d/h (8×64=512), concatenadas y mezcladas por $W_O$. Una sola cabeza promediaría motivos distintos.",
+  "claves": [
+   "multi-head-attention"
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 23,
+  "resumen": "Tras la atención, cada token pasa solo por una **FFN** (d→4d, ReLU, →d). Es la única no linealidad del bloque y concentra 2/3 de sus parámetros.",
+  "claves": [
+   "feed-forward",
+   "relu"
+  ],
+  "tp": [
+   {
+    "tp": 2,
+    "texto": "Es el mismo Dense + ReLU de tu MLP del TP2, pero aplicado token por token con los mismos pesos."
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 24,
+  "resumen": "Apilar N bloques vuelve el gradiente un producto de N derivadas: $0{,}9^{48}\\approx 0{,}006$. El gradiente se desvanece.",
+  "claves": [
+   "gradiente-que-se-desvanece",
+   "regla-de-la-cadena"
+  ],
+  "ver": [
+   {
+    "ref": "modelado-redes-neuronales#38",
+    "por": "la regla de la cadena"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 25,
+  "resumen": "**Residual**: $x + \\text{subcapa}(x)$. El atajo identidad deja pasar el gradiente y las capas aprenden solo la corrección (residual stream).",
+  "claves": [
+   "conexion-residual"
+  ],
+  "ver": [
+   {
+    "ref": "segmentacion-y-stable-diffusion#33",
+    "por": "skip connections en U-Net"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 26,
+  "resumen": "**Layer norm** normaliza cada vector por separado (media 0, desvío 1) y lo reescala con γ y β. Es por token, no por batch: sirve con cualquier largo.",
+  "claves": [
+   "layer-norm",
+   "normalizacion"
+  ],
+  "tp": [
+   {
+    "tp": 3,
+    "texto": "Pendiente en el TP3; el plan era `layer_norm` sin γ/β, verificada por los tests."
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 27,
+  "resumen": "Posición fija del paper: $PE(pos,2i)=\\sin(pos/10000^{2i/d})$ y coseno en las impares; cada par de dimensiones a distinta frecuencia.",
+  "claves": [
+   "codificacion-posicional"
+  ],
+  "tp": [
+   {
+    "tp": 2,
+    "texto": "Misma idea que `MonthSold` en el TP2: seno y coseno para que la posición en el ciclo quede bien codificada."
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 28,
+  "resumen": "Un bloque tiene unos **12d²** parámetros: 4d² en la atención ($W_Q,W_K,W_V,W_O$) y 8d² en la FFN. El decoder suma 4d² por la cross-attention.",
+  "claves": [
+   "parametros-vs-hiperparametros"
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 29,
+  "resumen": "Sin embeddings, el total es $\\approx 12Nd^2$ (Kaplan). GPT-3, con d=12.288 y N=96, da ~174 mil millones; la tabla de embeddings pesa poco en modelos grandes.",
+  "claves": [
+   "leyes-de-escala"
+  ],
+  "ver": [
+   {
+    "ref": "como-se-entrena-un-llm#8",
+    "por": "tres perillas y una cuenta"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 30,
+  "resumen": "Separador: empieza la sección «Encoder, decoder y la familia».",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 31,
+  "resumen": "El paper apila 6 bloques de encoder y 6 de decoder. La **cross-attention** del decoder toma sus Q y las K, V del encoder.",
+  "claves": [
+   "encoder-decoder",
+   "cross-attention"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 32,
+  "resumen": "**Decoder-only** (GPT): self-attention causal + FFN y softmax final. Si entrada y salida son el mismo texto, el encoder sobra. Es la arquitectura de casi todos los LLM.",
+  "claves": [
+   "decoder-only"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 33,
+  "resumen": "**Encoder-only** (BERT): sin máscara, entrenado con MLM (tapar tokens y predecirlos). No genera; da un vector contextual por token.",
+  "claves": [
+   "bert"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 34,
+  "resumen": "BERT crudo promediado es un mal embedding de oración (STS 54,8, menos que GloVe 61,3). **Sentence-BERT** lo arregla con pooling y ajuste siamés.",
+  "claves": [
+   "embedding-de-oracion",
+   "bert",
+   "similitud-coseno"
+  ],
+  "tp": [
+   {
+    "tp": 3,
+    "texto": "Tu BERT promediado sacó CR 0,35 (z=1,56); e5-base, ajustado con pares consulta–pasaje, llegó a 1,00 con k=1 (z=3,94)."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "rag-mcp-rapida#4",
+    "por": "recuperar por similitud"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 35,
+  "resumen": "El bloque no sabe que procesa texto: una imagen en 196 parches de 16×16 proyectados es **ViT**. Necesita más datos que una CNN por tener menos sesgo inductivo.",
+  "claves": [
+   "transformer",
+   "sesgo-inductivo"
+  ],
+  "ver": [
+   {
+    "ref": "segmentacion-y-stable-diffusion#7",
+    "por": "sesgo inductivo"
+   }
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 36,
+  "resumen": "Tres formas de apilar: encoder-only (MLM, embeddings), decoder-only (siguiente token, generar) y encoder-decoder (traducir). Para embeddings, encoder; para generar, decoder.",
+  "claves": [
+   "encoder-decoder",
+   "bert",
+   "decoder-only"
+  ],
+  "tp": [
+   {
+    "tp": 3,
+    "texto": "En el TP3 combinaste las dos: el encoder e5-base recupera y el decoder deepseek responde como agente."
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 37,
+  "resumen": "Separador: empieza la sección «Lo que cambió desde 2017».",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 38,
+  "resumen": "Los cambios desde 2017 atacan dos costos: atención cuadrática en n y guardar K y V al generar (**KV cache** y variantes). Se ve en la clase 9.",
+  "claves": [
+   "kv-cache",
+   "costo-cuadratico"
+  ],
+  "clave_examen": false
+ },
+ {
+  "i": 39,
+  "resumen": "Separador: empieza la sección «Cómo se entrena».",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 40,
+  "resumen": "Se minimiza la **cross-entropy**, $-\\log p(\\text{token correcto})$, en cada posición. El mínimo no es cero: después de un contexto hay varios tokens razonables.",
+  "claves": [
+   "entropia-cruzada",
+   "pretraining"
+  ],
+  "tp": [
+   {
+    "tp": 4,
+    "texto": "En el SFT del TP4 esa pérdida solo cuenta los tokens del asistente (`labels = −100` en el resto)."
+   }
+  ],
+  "ver": [
+   {
+    "ref": "modelado-redes-neuronales#30",
+    "por": "cross-entropy multiclase"
+   }
+  ],
+  "clave_examen": true
+ },
+ {
+  "i": 41,
+  "resumen": "Separador: empieza la sección «Conclusiones».",
+  "claves": [],
+  "clave_examen": false
+ },
+ {
+  "i": 42,
+  "resumen": "Un transformer es un bloque repetido: la atención mezcla entre tokens y la FFN procesa cada uno. $\\text{softmax}(QK^\\top/\\sqrt{d_k})V$ resume la clase.",
+  "claves": [
+   "transformer",
+   "atencion"
+  ],
+  "tp": [
+   {
+    "tp": 3,
+    "texto": "El ejercicio a mano es la parte 5 del TP3 ('El banco aguanta/presta'), pendiente en tu repo."
+   }
+  ],
+  "clave_examen": false
+ }
+]

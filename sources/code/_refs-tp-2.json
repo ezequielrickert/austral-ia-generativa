@@ -1,0 +1,362 @@
+[
+ {
+  "slug": "introduccion",
+  "i": 26,
+  "clase": 1,
+  "slide_title": "Redes Neuronales — Estructura y Celda Básica",
+  "slide_resumen": "Neurona artificial: entradas por pesos, suma más bias $z=\\sum w_i x_i + b$ y una activación. Aprender es ajustar los pesos.",
+  "tp_texto": "En el TP2 apilaste estas neuronas en un MLP `Dense(32, relu) → Dense(32, relu) → Dense(1, linear)` para predecir `SalePrice`."
+ },
+ {
+  "slug": "introduccion",
+  "i": 32,
+  "clase": 1,
+  "slide_title": "Ejemplos de problemas predictivos",
+  "slide_resumen": "Clasificación binaria y multiclase, regresión y series temporales, medidas con accuracy, F1 o AUC-ROC.",
+  "tp_texto": "El TP2 fue regresión de precios de casas: el modelo final bajó el MAE en test de 51.411 a 20.844 dólares."
+ },
+ {
+  "slug": "introduccion",
+  "i": 50,
+  "clase": 1,
+  "slide_title": "Paradigmas de Aprendizaje",
+  "slide_resumen": "Supervisado (pares X,Y), no supervisado (solo X) y **self-supervised**: el texto genera sus propias etiquetas (próxima palabra) y eso habilita escala masiva.",
+  "tp_texto": "El TP2 fue supervisado: 1.460 casas con precio, partidas 70/20/10 antes de calcular cualquier estadística."
+ },
+ {
+  "slug": "intro-redes-neuronales",
+  "i": 8,
+  "clase": 3,
+  "slide_title": "La sigmoide: la no linealidad clásica",
+  "slide_resumen": "La **sigmoide** aplasta cualquier número a $(0,1)$ y es diferenciable. Fue el default histórico; hoy en capas ocultas se usa ReLU.",
+  "tp_texto": "El notebook de clase usaba sigmoide para `AboveMedianPrice`; en el TP2 la salida pasó a `Dense(1, linear)` porque predecías dólares."
+ },
+ {
+  "slug": "intro-redes-neuronales",
+  "i": 9,
+  "clase": 3,
+  "slide_title": "La capa: el bloque que se repite",
+  "slide_resumen": "Una **capa** = combinación lineal + no linealidad. Es la única pieza: toda red, incluso las modernas, es este bloque repetido.",
+  "tp_texto": "Cada `Dense(32, relu)` del TP2 es este bloque: $W\\cdot x+b$ seguido de ReLU, apilado dos veces antes de la salida."
+ },
+ {
+  "slug": "intro-redes-neuronales",
+  "i": 12,
+  "clase": 3,
+  "slide_title": "Las dos dimensiones: ancho y profundidad",
+  "slide_resumen": "Toda arquitectura se describe con **ancho** (unidades por capa) y **profundidad** (capas ocultas, sin contar entrada ni salida).",
+  "tp_texto": "Usaste 32-32 como baseline y 512-512-512 para overfitear a propósito: misma profundidad casi, ancho ×16."
+ },
+ {
+  "slug": "intro-redes-neuronales",
+  "i": 13,
+  "clase": 3,
+  "slide_title": "Parámetros contra hiperparámetros",
+  "slide_resumen": "**Hiperparámetros** los fijás vos antes de entrenar (ancho, η); **parámetros** los aprende la red. η no se aprende, se elige.",
+  "tp_texto": "La red 512-512-512 tenía 550.985 parámetros aprendidos; L2 0,001, dropout 0,3 y patience 15 fueron hiperparámetros elegidos."
+ },
+ {
+  "slug": "intro-redes-neuronales",
+  "i": 24,
+  "clase": 3,
+  "slide_title": "Sin activación, la red colapsa",
+  "slide_resumen": "Sin activación, $W_2(W_1x) = W^*x$: diez capas lineales valen lo mismo que una. La no linealidad evita ese **colapso**.",
+  "tp_texto": "Por eso tus capas ocultas llevan ReLU: sin ella, `Dense(32)→Dense(32)→Dense(1)` sería una sola regresión lineal."
+ },
+ {
+  "slug": "intro-redes-neuronales",
+  "i": 25,
+  "clase": 3,
+  "slide_title": "Las funciones de activación más comunes",
+  "slide_resumen": "Sigmoide, tanh, ReLU y softmax: monótonas, continuas, diferenciables. **ReLU** es el estándar en ocultas; la sigmoide sufre el **gradiente que se desvanece**.",
+  "tp_texto": "Ocultas con ReLU y salida lineal en todas las variantes del TP2, del baseline 32-32 a la 512-512-512."
+ },
+ {
+  "slug": "intro-redes-neuronales",
+  "i": 29,
+  "clase": 3,
+  "slide_title": "Ida y vuelta: forward y backward",
+  "slide_resumen": "Entrenar es **forward** (predecir) y **backward** (propagar el error y ajustar pesos). Una **época** es una pasada completa por el train.",
+  "tp_texto": "Tu `fit` corre este ciclo: 100 épocas en el baseline y 150 en la red grande (cortó en 76 por early stopping)."
+ },
+ {
+  "slug": "intro-redes-neuronales",
+  "i": 30,
+  "clase": 3,
+  "slide_title": "El error: la función de coste",
+  "slide_resumen": "La pérdida **L2**: $E=\\tfrac12\\sum(y-t)^2$. Al cuadrado para que los errores no se cancelen y los grandes pesen más; el ½ simplifica la derivada.",
+  "tp_texto": "Entrenaste con `loss='mse'`; por eso una sola casa (Wheatfield, error \\$226.171) movió más el RMSE (3,3%) que el MAE (2,3%)."
+ },
+ {
+  "slug": "intro-redes-neuronales",
+  "i": 34,
+  "clase": 3,
+  "slide_title": "El paso de actualización",
+  "slide_resumen": "Actualización: $w \\leftarrow w - \\eta\\,\\partial E/\\partial w$. El signo menos baja por el gradiente; η chico tarda, η grande oscila.",
+  "tp_texto": "Escalaste `SalePrice` con `StandardScaler` porque con dólares crudos los gradientes eran enormes para el η=0,001 de Adam y no convergía."
+ },
+ {
+  "slug": "modelado-redes-neuronales",
+  "i": 2,
+  "clase": 4,
+  "slide_title": "La red ve una fila de números",
+  "slide_resumen": "La red solo ve una **fila de floats** de largo fijo. Convertir el dato en esa fila es una traducción con pérdida.",
+  "tp_texto": "La lección central del TP2: con la misma red 32-32, solo cambiar cómo armaste la entrada bajó el MAE 60%."
+ },
+ {
+  "slug": "modelado-redes-neuronales",
+  "i": 10,
+  "clase": 4,
+  "slide_title": "La pregunta que decide la codificación",
+  "slide_resumen": "La pregunta que decide la codificación: **¿qué significa la resta entre dos valores?** Cantidad real, solo orden, o nada.",
+  "tp_texto": "Tu tabla de decisiones del M1 aplicó esta pregunta columna por columna y detectó las tres trampas: `ListingId`, `MonthSold` y `District`."
+ },
+ {
+  "slug": "modelado-redes-neuronales",
+  "i": 11,
+  "clase": 4,
+  "slide_title": "Numéricas: normalizar no es opcional",
+  "slide_resumen": "**Normalizar** ($z$-score $(x-\\mu)/\\sigma$) pone las variables en escala comparable: el gradiente apunta mejor y no satura neuronas.",
+  "tp_texto": "Numéricas con `StandardScaler` ajustado solo en train; también escalaste el target `SalePrice` y desescalaste para reportar dólares."
+ },
+ {
+  "slug": "modelado-redes-neuronales",
+  "i": 12,
+  "clase": 4,
+  "slide_title": "Categóricas: one-hot contra embedding",
+  "slide_resumen": "Categórica sin orden: **one-hot** si hay pocos valores, **embedding** si hay muchos. La tabla $k\\times d$ es un parámetro, no una entrada.",
+  "tp_texto": "`State` (12) con one-hot y `District` (72) con `Embedding(73, 8)`: el MAE bajó de 51.411 a 30.956 y luego a 25.380."
+ },
+ {
+  "slug": "modelado-redes-neuronales",
+  "i": 13,
+  "clase": 4,
+  "slide_title": "Errores de codificación caros",
+  "slide_resumen": "Cuatro errores silenciosos: código como número, ID único como feature, variable cíclica plana y faltante rellenado con 0.",
+  "tp_texto": "Las tres trampas del dataset más `LotFrontage`. `District` como entero entrenó sin error pero dio MAE 25.856 vs 20.844 con embedding."
+ },
+ {
+  "slug": "modelado-redes-neuronales",
+  "i": 14,
+  "clase": 4,
+  "slide_title": "La tabla de decisiones",
+  "slide_resumen": "La tabla de referencia: tipo de variable → codificación → cuántos floats. Ordinal, código e ID único son las filas que más fallan.",
+  "tp_texto": "`ListingId` descartado (0 floats), `MonthSold` como seno y coseno (2 floats), `CentralAir` 0/1, `LotFrontage` mediana 70,0 + flag."
+ },
+ {
+  "slug": "modelado-redes-neuronales",
+  "i": 16,
+  "clase": 4,
+  "slide_title": "Un dataset, tres trabajos distintos",
+  "slide_resumen": "Tres porciones con tres trabajos: **train** ajusta, **validación** decide, **test** mide. Medir con datos de entrenamiento hace mentir la métrica.",
+  "tp_texto": "Partición 70/20/10 en dos pasos con `random_state=42`: 1022 casas de train, 292 de validación y 146 de test."
+ },
+ {
+  "slug": "modelado-redes-neuronales",
+  "i": 17,
+  "clase": 4,
+  "slide_title": "Los tres, lado a lado",
+  "slide_resumen": "La validación no actualiza pesos: la usás vos para elegir. El test se abre **una vez**, al final; si lo usás para elegir, deja de medir.",
+  "tp_texto": "Ojo: comparaste todas las variantes con el MAE de test. En rigor esa elección era trabajo de validación."
+ },
+ {
+  "slug": "modelado-redes-neuronales",
+  "i": 18,
+  "clase": 4,
+  "slide_title": "Todo se aprende solo del train",
+  "slide_resumen": "μ, σ, medianas y diccionarios se calculan **solo con train** y viajan con el modelo. Calcularlos sobre todo el dataset es **data leakage**.",
+  "tp_texto": "Scaler, mediana, encoders y mapa de distritos ajustados solo en train. Pero el M5 (preprocesamiento dentro del modelo) quedó pendiente."
+ },
+ {
+  "slug": "modelado-redes-neuronales",
+  "i": 20,
+  "clase": 4,
+  "slide_title": "Qué hacer y qué no",
+  "slide_resumen": "Reglas: partir antes de explorar, por grupo, con semilla fija. No tunear contra test ni volver a partir si el número no cierra.",
+  "tp_texto": "Partiste antes de calcular cualquier estadística y con semilla 42, como pide la regla."
+ },
+ {
+  "slug": "modelado-redes-neuronales",
+  "i": 22,
+  "clase": 4,
+  "slide_title": "Un catálogo para elegir sin dudar",
+  "slide_resumen": "Catálogo: real → 1 lineal + MSE; sí/no → sigmoide + BCE; N clases → softmax + CE; percentiles → pinball. La tarea fija la salida.",
+  "tp_texto": "Para dólares usaste `Dense(1, activation='linear')` con MSE, en lugar de la sigmoide + BCE del notebook de clase."
+ },
+ {
+  "slug": "modelado-redes-neuronales",
+  "i": 28,
+  "clase": 4,
+  "slide_title": "Regresión: MSE, MAE y Huber",
+  "slide_resumen": "Regresión: **MSE** castiga al cuadrado (errores 1, 2, 10 → 1, 4, 100), **MAE** lineal, **Huber** mezcla. Cambia cuánto pesa un outlier.",
+  "tp_texto": "Sacar la casa de Wheatfield (error \\$226.171) bajó el RMSE 3,3% y el MAE solo 2,3%: el cuadrado pesa más los errores grandes."
+ },
+ {
+  "slug": "modelado-redes-neuronales",
+  "i": 32,
+  "clase": 4,
+  "slide_title": "Percentiles: la pinball loss",
+  "slide_resumen": "**Pinball**: la loss decide si la red aprende la media, la mediana o el P90. La loss no mide el error: lo **define**.",
+  "tp_texto": "El extra P10/P50/P90 con pinball loss quedó pendiente en tu TP2."
+ },
+ {
+  "slug": "modelado-redes-neuronales",
+  "i": 43,
+  "clase": 4,
+  "slide_title": "El learning rate es el paso",
+  "slide_resumen": "Diagnóstico: si la loss oscila, η es grande; si baja plana y no llega, es chico.",
+  "tp_texto": "Con Adam (η=0,001) y dólares crudos no convergía en 100 épocas; lo resolviste escalando el target."
+ },
+ {
+  "slug": "modelado-redes-neuronales",
+  "i": 44,
+  "clase": 4,
+  "slide_title": "Batch y época no son lo mismo",
+  "slide_resumen": "El train se parte en **batches**; cada batch produce **un** ajuste. Una **época** = tantos ajustes como batches (10.000 filas, batch 100 → 100).",
+  "tp_texto": "Con 1022 casas y `batch_size=32`, cada época fueron unos 32 ajustes de pesos."
+ },
+ {
+  "slug": "modelado-redes-neuronales",
+  "i": 46,
+  "clase": 4,
+  "slide_title": "La función objetivo",
+  "slide_resumen": "Se minimiza $J=\\text{cost}+\\lambda R(w)$. **L2** achica todos los pesos, **L1** lleva algunos a cero; **dropout** regulariza apagando neuronas al entrenar.",
+  "tp_texto": "En la red 512-512-512 usaste L2 con λ=0,001 (`kernel_regularizer`) y Dropout 0,3 entre capas."
+ },
+ {
+  "slug": "modelado-redes-neuronales",
+  "i": 47,
+  "clase": 4,
+  "slide_title": "Qué mirar cuando esto se entrena",
+  "slide_resumen": "Leer la curva: no baja → η chico o gradiente desvanecido; oscila → η grande; train baja y val sube → **overfitting**.",
+  "tp_texto": "Tu 512-512-512 terminó con train 0,0121 y val 0,1273. Con regularización y early stopping (cortó en la época 76), el MAE bajó a 16.538."
+ },
+ {
+  "slug": "modelado-redes-neuronales",
+  "i": 57,
+  "clase": 4,
+  "slide_title": "Cuántas capas y cuánto ancho",
+  "slide_resumen": "Ancho y profundidad: arrancar chico, 1 a 3 capas para tabulares. Train alto → agrandar; val mal y train bien → achicar o regularizar.",
+  "tp_texto": "La 512-512-512 tenía 550.985 parámetros para 1022 casas (unos 540 por ejemplo) y memorizó. Tu 32-32 era el punto de partida razonable."
+ },
+ {
+  "slug": "modelado-redes-neuronales",
+  "i": 61,
+  "clase": 4,
+  "slide_title": "Lo que hay que llevarse",
+  "slide_resumen": "El modelo se gana en la entrada y la salida, no en las capas. La partición hace honesta la métrica, la loss viene con la salida y accuracy sola engaña.",
+  "tp_texto": "Tu conclusión fue la misma: el salto no vino de la arquitectura sino de codificar la ubicación (MAE de 51 mil a 21 mil)."
+ },
+ {
+  "slug": "modelado-redes-neuronales",
+  "i": 62,
+  "clase": 4,
+  "slide_title": "Checklist operativo para la práctica",
+  "slide_resumen": "Checklist por variable: tipo, qué significa la resta, cardinalidad, si puede faltar y si la tendrás al predecir.",
+  "tp_texto": "La pregunta \"¿puede faltar?\" es tu `LotFrontage`: faltaba en 7%, y esas casas valen 12% menos, así que el flag aporta señal."
+ },
+ {
+  "slug": "modelado-redes-neuronales",
+  "i": 63,
+  "clase": 4,
+  "slide_title": "Los notebooks de la clase",
+  "slide_resumen": "Dos notebooks de clase sobre las mismas 2000 casas: uno para la entrada y otro para la salida. Base directa del TP.",
+  "tp_texto": "Tu repo partía del notebook de clase `house-prices.ipynb` (clasificador `AboveMedianPrice`) y lo pasó a regresión en dólares."
+ },
+ {
+  "slug": "palabra-al-transformer",
+  "i": 14,
+  "clase": 7,
+  "slide_title": "Tres formas de volver texto en números",
+  "slide_resumen": "Tres formas de pasar texto a números: bag of words/TF-IDF (sin orden ni significado), **one-hot** (|V| dimensiones equidistantes) y embeddings densos.",
+  "tp_texto": "En el TP2 elegiste one-hot para `State` (12 valores) y embedding de dimensión 8 para `District` (72): el mismo dilema."
+ },
+ {
+  "slug": "palabra-al-transformer",
+  "i": 15,
+  "clase": 7,
+  "slide_title": "De token a vector",
+  "slide_resumen": "Un **embedding** es un vector denso y aprendido por token. Sus números son coordenadas; ninguna dimensión se interpreta sola.",
+  "tp_texto": "Tu `Embedding(73, 8)` del TP2 es esto: una tabla con un vector aprendido por distrito (72 + 1 para desconocidos)."
+ },
+ {
+  "slug": "transformers-a-fondo",
+  "i": 23,
+  "clase": 8,
+  "slide_title": "La feed-forward: la misma red para cada posición",
+  "slide_resumen": "Tras la atención, cada token pasa solo por una **FFN** (d→4d, ReLU, →d). Es la única no linealidad del bloque y concentra 2/3 de sus parámetros.",
+  "tp_texto": "Es el mismo Dense + ReLU de tu MLP del TP2, pero aplicado token por token con los mismos pesos."
+ },
+ {
+  "slug": "transformers-a-fondo",
+  "i": 27,
+  "clase": 8,
+  "slide_title": "La fórmula de la posición: senos y cosenos",
+  "slide_resumen": "Posición fija del paper: $PE(pos,2i)=\\sin(pos/10000^{2i/d})$ y coseno en las impares; cada par de dimensiones a distinta frecuencia.",
+  "tp_texto": "Misma idea que `MonthSold` en el TP2: seno y coseno para que la posición en el ciclo quede bien codificada."
+ },
+ {
+  "slug": "redes-generativas-antagonicas",
+  "i": 23,
+  "clase": 11,
+  "slide_title": "Discriminador Como red neuronal",
+  "slide_resumen": "D es una sola neurona: $\\sigma(w\\cdot x+b)$ con $b=-1$; la cara da $\\sigma(1)\\approx0{,}73$ → real. Sin capa oculta no es MLP. Ojo: acá $z$ es el ruido de G.",
+  "tp_texto": "En el TP2 cada `Dense` hacía lo mismo ($W\\cdot x+b$ + activación), pero con dos capas ocultas de 32 ReLU y salida lineal."
+ },
+ {
+  "slug": "redes-generativas-antagonicas",
+  "i": 24,
+  "clase": 11,
+  "slide_title": "Función Sigmoid: la activación del Discriminador",
+  "slide_resumen": "**Sigmoide** $\\sigma(x)=1/(1+e^{-x})$: acota a (0,1), es diferenciable y $\\sigma(0)=0{,}5$ da el umbral. Por eso D la usa como probabilidad de «real».",
+  "tp_texto": "En el TP2 la salida fue `Dense(1, linear)`: una sigmoide habría acotado el precio a (0,1). Sirve para probabilidades, como en D."
+ },
+ {
+  "slug": "redes-generativas-antagonicas",
+  "i": 29,
+  "clase": 11,
+  "slide_title": "Binary cross-entropy: los dos casos del Discriminador",
+  "slide_resumen": "**BCE**: $-[y\\ln p+(1-y)\\ln(1-p)]$. Con $y=1$ queda $-\\ln p$; con $y=0$, $-\\ln(1-p)$. Castiga sin tope la confianza equivocada.",
+  "tp_texto": "El TP2 era regresión: entrenó con MSE (no BCE) y reportó MAE en dólares. BCE es la del clasificador `AboveMedianPrice` del notebook de clase."
+ },
+ {
+  "slug": "redes-generativas-antagonicas",
+  "i": 32,
+  "clase": 11,
+  "slide_title": "Backpropagation: el procedimiento paso a paso",
+  "slide_resumen": "Backprop en cuatro pasos: calcular el error, derivar $\\partial E/\\partial w$ con la regla de la cadena, actualizar $w\\leftarrow w-\\alpha\\,\\partial E/\\partial w$ y repetir en ambas redes.",
+  "tp_texto": "En el TP2 Keras corrió este ciclo con Adam (lr 0,001); escalaron `SalePrice` porque sin escalar los gradientes eran enormes y no convergía."
+ },
+ {
+  "slug": "redes-generativas-antagonicas",
+  "i": 34,
+  "clase": 11,
+  "slide_title": "El ciclo completo: Generador y Discriminador juntos",
+  "slide_resumen": "Entra un **lote** de m reales y m generadas. D se actualiza con ambas (objetivos 1 y 0); G solo con las generadas, objetivo 1, atravesando D sin cambiarlo.",
+  "tp_texto": "En el TP2, `batch_size=32` sobre 1022 casas: unos 32 ajustes de pesos por época, con el error promediado en cada lote."
+ },
+ {
+  "slug": "segmentacion-y-stable-diffusion",
+  "i": 2,
+  "clase": 12,
+  "slide_title": "Una red neuronal clásica solo acepta entradas de largo fijo",
+  "slide_resumen": "Puente desde lo conocido: una red densa funciona porque cada fila trae las mismas columnas. La pregunta es qué pasa si la entrada cambia de largo.",
+  "tp_texto": "Tu TP2 es exactamente este caso: cada casa, un vector fijo (z-score, one-hot, mes sin/cos) entrando a un MLP 32-32-1."
+ },
+ {
+  "slug": "segmentacion-y-stable-diffusion",
+  "i": 4,
+  "clase": 12,
+  "slide_title": "Cómo se entrena una red densa",
+  "slide_resumen": "Repaso con un MLP de juguete: forward, pérdida $-\\log p$, backward con deltas y $W\\leftarrow W-\\eta\\,\\partial L/\\partial W$. Es el ciclo que entrena todos los modelos de la clase.",
+  "tp_texto": "En el TP2 `fit` corrió este ciclo con Adam y `batch_size=32`; con early stopping la red 512-512-512 cortó en la época 76 de 150."
+ },
+ {
+  "slug": "segmentacion-y-stable-diffusion",
+  "i": 22,
+  "clase": 12,
+  "slide_title": "Embeddings más allá del texto",
+  "slide_resumen": "El encoder de una CNN termina en un vector fijo: un **embedding** donde vectores cercanos son contenidos parecidos. Vale para imagen, texto o audio.",
+  "tp_texto": "En el TP2 `District` (72 valores) pasó por `Embedding(73, 8)`: el MAE bajó de 30.956 a 25.380."
+ }
+]

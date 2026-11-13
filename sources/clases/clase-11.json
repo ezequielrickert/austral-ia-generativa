@@ -1,0 +1,702 @@
+{
+ "num": 11,
+ "fecha": "2026-10-21",
+ "titulo": "Redes generativas antagónicas (GANs)",
+ "talks": [
+  "redes-generativas-antagonicas"
+ ],
+ "bloque": "Visión y generativos",
+ "tesis": "En lugar de enseñarle a una red a crear directamente, se la pone a competir contra otra red que aprende a detectar sus errores: el Generador falsifica, el Discriminador juzga, y la presión de la competencia hace que ambas mejoren hasta que lo generado es indistinguible de lo real. (La cátedra no escribió una tesis explícita; esta es la idea central del talk.)",
+ "resumen": "La clase abre la parte de visión generativa: a diferencia de la IA discriminativa, que clasifica lo que ya existe (\"¿este dígito es un 7?\"), la generativa aprende la **distribución** de un conjunto de imágenes y crea imágenes nuevas (\"generá un 7\"). Se ubica a las GANs en la línea de tiempo (CNN desde 2012, GANs 2014–2020, difusión desde 2020, SAM desde 2023) y se cuenta su origen: Ian Goodfellow, en un bar de Montreal en 2014, propone poner a competir dos redes. La intuición es el **falsificador y el detective**. Después se baja todo a números con **Slanted Land** (el ejemplo de Luis Serrano): imágenes de 2×2 píxeles, un Discriminador de una sola neurona con pesos +1/−1 y sesgo −1, un Generador que convierte un número z en 4 píxeles, la **binary cross-entropy** como error y backpropagation para ajustar pesos, con el ciclo por lotes. Luego las variantes (Vanilla, cGAN, DCGAN, SRGAN, StyleGAN), las fortalezas (realismo, traducción con Pix2Pix/CycleGAN, inpainting) y las limitaciones: mode collapse, inestabilidad, evaluación difícil (FID, IS), costo y sesgo heredado.",
+ "secciones": [
+  {
+   "titulo": "IA generativa de visión vs. discriminativa",
+   "contenido": "**IA generativa de visión:** modelos que aprenden la *distribución* de un conjunto de imágenes —su estructura interna— y con ella crean imágenes nuevas: **no estaban en los datos, pero podrían haber estado**. Las dos palabras para retener son *distribución* (lo que aprende) e *imágenes nuevas* (lo que produce).\n\nLa IA visual se diseñó primero para **analizar** imágenes que ya existen: clasificar, detectar objetos, medir estructuras. Eso es la IA **discriminativa**.\n\n| Aspecto | Discriminativa | Generativa |\n|---|---|---|\n| ¿Qué hace? | Analiza y clasifica lo que existe | Crea contenido que no existía |\n| Pregunta típica | \"¿Este dígito es un 7?\" | \"Generá un 7\" |\n| Aprende | A distinguir categorías | La estructura interna de los datos |\n| Salida | Etiqueta o número | Imagen, sonido, texto |\n| Ejemplo | Clasificador de MNIST | cGAN que genera el dígito pedido |\n\n**Línea de tiempo** que da la clase:\n1. Era estadística (1950s–2000s): redes y backprop, prometedoras en teoría, pobres visualmente.\n2. **CNN (2012–hoy)**: filtros aprendidos que dominan la visión supervisada; también sirven para super-resolución y son la base de DCGAN (2015).\n3. **Era de las GANs (2014–2020)**: Goodfellow publica la GAN original; primera generación fotorrealista.\n4. **Era de la difusión (2020–hoy)**: DALL·E, Stable Diffusion, Midjourney; control por texto.\n5. **SAM (2023–hoy)**: segmentación promptable de Meta.\n\nTres familias que el curso cubre: **GANs** (dos redes que compiten; rápidas, una pasada; problema: inestabilidad y mode collapse), **difusión** (reconstruir desde ruido paso a paso; lenta pero diversa y controlable por texto) y **CNN** (filtros que detectan bordes y texturas; base de todo, pero solas no inventan detalle fino: al aumentar resolución minimizando error cuadrático la imagen sale lisa, por eso SRGAN les suma una GAN).",
+   "conceptos": [
+    "ia-generativa-vs-discriminativa",
+    "gan",
+    "difusion",
+    "cnn"
+   ],
+   "ejemplo": "Tabla de decisión de la clase: GANs → muy rápida, control moderado, caso típico SRGAN y Pix2Pix/CycleGAN. Difusión → lenta (muchos pasos), control alto por texto, caso típico Stable Diffusion/DALL·E/Midjourney. CNN → muy rápida, control bajo (misma entrada, misma salida), caso típico clasificación, detección, y el Generador/Discriminador de DCGAN."
+  },
+  {
+   "titulo": "La idea de Goodfellow: el falsificador y el detective",
+   "contenido": "**\"¿Cómo enseñarle a una máquina a crear algo que nunca ha visto?\"** Montreal, junio de 2014: Ian Goodfellow (27 años) propone en un bar usar **dos redes** en vez de una: una que genera y otra que evalúa, compitiendo. Sus colegas son escépticos; esa misma noche implementa el prototipo y funciona al primer intento. El paper tiene **más de 70.000 citas** y Yann LeCun la llamó *\"la idea más interesante en machine learning en los últimos 20 años\"*.\n\n**Modelo mental:** un mundo de rostros reales y dos personajes:\n- **El Falsificador**: quiere crear rostros que parezcan de ese mundo. Aprende por prueba y error; recibe feedback, ajusta, repite. Nunca sabe cómo se fabrican los rostros reales.\n- **El Detective**: quiere distinguir reales de falsos. Ve los dos tipos (dataset y falsificaciones). Como el falsificador mejora, él también tiene que mejorar.\n\nTras miles o millones de rondas, los dos se vuelven extraordinariamente buenos.\n\n**Mapeo técnico:**\n\n| Analogía | Componente | Función |\n|---|---|---|\n| Falsificador | **Generador (G)** | Transforma ruido aleatorio en imágenes sintéticas |\n| Rostros falsos | Imágenes generadas | Al principio, puro ruido visual |\n| Detective | **Discriminador (D)** | Da a cada imagen un score entre 0 y 1 (P(real)) |\n| Veredicto | Señal de pérdida | Mide el error de cada red y guía su aprendizaje |\n| Rondas | Épocas | Ciclos donde ambas actualizan parámetros |\n\n**Arquitectura Vanilla GAN:** ruido $z$ → G → muestra falsa; datos reales → muestra real; ambas → D → veredicto $P(\\text{real})$. De los veredictos salen la **pérdida de G** (solo veredictos sobre generadas) y la **pérdida de D** (veredictos sobre reales y generadas), cada una actualiza su red.\n\n**Entrenamiento en pasos:** (1) G produce un intento a partir de un vector de ruido —al principio, manchas—; (2) D evalúa reales y falsas; (3) D emite un número: cerca de 1 = \"real\", cerca de 0 = \"falso\", **0,5 = \"no tengo idea\"** —cuando G logra que D dé 0,5 de forma consistente, es el éxito—; (4) ambos aprenden del resultado; (5) el ciclo se repite cientos de miles de veces.",
+   "conceptos": [
+    "gan",
+    "generador",
+    "discriminador",
+    "juego-minimax"
+   ],
+   "ejemplo": "El falsificador en su primer día no sabe nada de rostros y produce garabatos; el detective lo descubre fácil. Esa es la situación al inicio del entrenamiento: D tiene la tarea fácil porque G produce ruido."
+  },
+  {
+   "titulo": "Slanted Land: el Discriminador a mano",
+   "contenido": "Ejemplo didáctico de **Luis Serrano** (\"A Friendly Introduction to GANs\"). En Slanted Land todo está inclinado; un rostro recto sería alienígena. La app de citas **TiltedTinder** solo tiene **4 fotos reales** y necesita generar perfiles: \"la supervivencia romántica de toda una civilización inclinada depende de nuestra GAN\".\n\n**Datos:** imágenes de **2×2 píxeles**, cada celda entre 0 (blanco) y 1 (negro). Una cara tiene la **diagonal principal oscura** (arriba-izq y abajo-der, valores altos) y la **diagonal secundaria clara** (valores bajos). El ruido no tiene patrón.\n\n**Pesos del Discriminador:** +1 a los píxeles de la diagonal principal, −1 a los de la secundaria. Score = suma ponderada:\n- Cara prototipo (1, 0, 0, 1): $1(+1)+0(-1)+0(-1)+1(+1) = 2$ → mayor que 1 → real.\n- Ruido (0.25, 1, 0.5, 0.75): $0.25 - 1 - 0.5 + 0.75 = -0.5$ → menor que 1 → falsa.\n\n**Como red neuronal:** las entradas $x_1..x_4$ no calculan; hay **una sola neurona de salida** (sin capa oculta, así que no es un MLP) que hace $w\\cdot x + b$ con **$b = -1$** y aplica la **sigmoide**. Restar 1 y comparar $\\sigma$ con 0,5 equivale a preguntar si el score supera 1.\n- Cara: $\\sigma(2-1)=\\sigma(1)\\approx 0.73$ → \"73% seguro de que es real\" → 0,73 > 0,5 ✓\n- Ruido: $\\sigma(-0.5-1)=\\sigma(-1.5)\\approx 0.18$ → falsa ✓\n\n**Por qué la sigmoide:** rango acotado (0 a 1, se lee como probabilidad), diferenciable (permite backprop), monótona creciente, y $\\sigma(0)=0.5$ es el umbral natural.\n\nOjo con la notación: en GANs **$z$ es el ruido que entra al Generador**, no la pre-activación de la clase de MLP.",
+   "conceptos": [
+    "discriminador",
+    "sigmoide",
+    "neurona",
+    "slanted-land"
+   ],
+   "ejemplo": "Cálculo completo: x = (1, 0, 0, 1), w = (+1, −1, −1, +1), b = −1 → w·x + b = 2 − 1 = 1 → σ(1) ≈ 0,73 → real. Con el ruido (0,25, 1, 0,5, 0,75): −0,5 − 1 = −1,5 → σ(−1,5) ≈ 0,18 → falsa."
+  },
+  {
+   "titulo": "El Generador: el objetivo opuesto",
+   "contenido": "Las dos redes leen el **mismo número** $D(\\cdot)$, pero quieren resultados contrarios:\n\n| | Discriminador (D) | Generador (G) |\n|---|---|---|\n| Entrada | Imagen $x$ de 4 píxeles | Número aleatorio $z$ entre 0 y 1 |\n| Salida | Un número $D(x)$ | Una imagen $G(z)$ de 2×2 |\n| Quiere | $D(x)\\to 1$ si es real, $D(G(z))\\to 0$ si es falsa | $D(G(z))\\to 1$ |\n\nLa arquitectura del Generador es la **inversa** del Discriminador: entra 1 número y salen 4 píxeles (D recibe 4 y devuelve 1). En redes reales, G **sube de resolución con capas de upsampling y convoluciones transpuestas**, hasta 1024×1024 en StyleGAN.\n\n**Punto clave:** el Generador **nunca ve una cara real**. Aprende solo por el gradiente que le devuelve D a través de $D(G(z))$; por eso su objetivo se define sobre la salida de D. Goodfellow et al. (2014): G se entrena para **maximizar la probabilidad de que D se equivoque**.\n\n**Espacio latente:** $z$ es aleatorio para que cada valor produzca una imagen distinta; el conjunto de valores posibles de $z$ es el espacio latente.\n\n**Generador en acción (z = 0.7):** cuatro neuronas sigmoides, cada una con peso ±1 y sesgo ±1. Las de la diagonal principal: $\\sigma(0.7+1)=\\sigma(1.7)\\approx 0.85$; las de la secundaria: $\\sigma(-1.7)\\approx 0.15$. Resultado: la imagen (0.85, 0.15 / 0.15, 0.85), que reproduce el patrón diagonal de una cara. El Generador internalizó la estructura del dataset.\n\nEn Slanted Land el Discriminador tiene **5 números** (4 pesos + sesgo) y el Generador **8**.",
+   "conceptos": [
+    "generador",
+    "espacio-latente"
+   ],
+   "ejemplo": "z = 0,7 → G → (0,85, 0,15 / 0,15, 0,85). Si ahora D evalúa esta imagen: 0,85 − 0,15 − 0,15 + 0,85 − 1 = 0,4 → σ(0,4) ≈ 0,60: D ya duda, G casi lo engaña."
+  },
+  {
+   "titulo": "Entrenamiento: binary cross-entropy y backpropagation",
+   "contenido": "Hasta acá los pesos se pusieron a mano. En la práctica cada red los aprende con tres pasos: **predecir** (D da un score), **medir el error** (contra el objetivo 1 = real, 0 = falsa, con **binary cross-entropy**) y **ajustar los pesos** (backpropagation). G hace lo mismo con el objetivo contrario.\n\n**Binary cross-entropy** (la misma de la clase de diseño de redes): $-[y\\ln p + (1-y)\\ln(1-p)]$.\n- Imagen real ($y=1$): error $= -\\ln D(x)$. Si D = 0,9 → ≈ 0,1 (acierta); si D = 0,1 → ≈ 2,3 (falla).\n- Imagen falsa ($y=0$): error $= -\\ln(1-D(G(z)))$. Si D = 0,1 → ≈ 0,1; si D = 0,9 → ≈ 2,3.\n\n**Propiedad clave:** el error es grande cuando la predicción está lejos del objetivo y chico cuando está cerca. El logaritmo **castiga sin tope la confianza equivocada** ($-\\ln p\\to\\infty$ cuando $p\\to 0$) y su derivada es grande justo cuando el modelo se equivoca. Un error lineal $1-p$ no tiene ninguna de las dos propiedades.\n\nEl **Generador** en la práctica minimiza $-\\ln D(G(z))$, que crece cuando D detecta la falsificación. El paper formaliza esta tensión como un **juego minimax**.\n\n**Backpropagation:** (1) calcular el error, (2) con la regla de la cadena obtener $\\partial E/\\partial w$ (si subo este peso, ¿el error sube o baja?), (3) $w_{nuevo} = w - \\alpha\\,\\partial E/\\partial w$, (4) repetir para todos los pesos de ambas redes.\n\n**Ejemplo Slanted Land:** una imagen falsa (0.25, 1, 0.5, 0.75) recibe $D=0.68$ (D quería 0). Error $=-\\ln(1-0.68)=1.14$. Con $\\partial E/\\partial w_i$ y $1-0.68=0.32$, $\\alpha=0.1$: el peso arriba-izq pasa de 1 a **1.008**, el de arriba-der de −1 a **−0.968**. D se vuelve más exigente.\n\n**El ciclo por lotes:** entra un lote de $m$ reales y $m$ generadas. **Paso de D**: objetivos 1 y 0, un error por imagen, se promedian (ej.: 0,52) y se hace un paso de backprop que actualiza **solo D**. **Paso de G**: solo las generadas, ahora con **objetivo 1**; el error atraviesa D **sin cambiarlo** y actualiza **solo G** (ej.: promedio 0,63). Después, el siguiente lote.",
+   "conceptos": [
+    "entropia-cruzada",
+    "backpropagation",
+    "learning-rate",
+    "batch",
+    "juego-minimax"
+   ],
+   "ejemplo": "Lote de 3 reales + 3 generadas. Errores de D: 0,11, 0,22, 0,36 (reales) y 1,14, 0,51, 0,80 (generadas) → promedio 0,52 → un paso que actualiza solo D. Errores de G (generadas con objetivo 1): 0,39, 0,92, 0,60 → promedio 0,63 → un paso que actualiza solo G."
+  },
+  {
+   "titulo": "Tipos de GANs: de Vanilla a StyleGAN",
+   "contenido": "Todo lo anterior es la **Vanilla GAN** (Goodfellow et al., 2014): genera desde ruido, sin control, inestable y de baja calidad visual. Punto de partida teórico. Las variantes resuelven problemas concretos:\n\n| Variante | Idea | Uso |\n|---|---|---|\n| **cGAN** (Mirza y Osindero, 2014) | G y D reciben la **etiqueta de clase** como condición: \"generá un 7\" (MNIST) | Síntesis por clase, aumentación controlada |\n| **DCGAN** (Radford et al., 2015) | Reemplaza capas densas por **convolucionales** | Entrenamiento estable, imágenes nítidas (dormitorios LSUN en color) |\n| **SRGAN** (Ledig et al., 2017) | Super-resolución: **infiere detalle fino** que no estaba (factor 4×) | Ampliar fotos e imágenes médicas; la bicúbica pierde pelo y plumas, SRGAN los inventa |\n| **StyleGAN** (NVIDIA, Karras et al., 2018/2019) | Separa el ruido en estilo por capas | Control de atributos, *style mixing* |\n\n**StyleGAN.** Problema: durante cuatro años no se podía pedir \"cara joven, pelo castaño, expresión neutral\"; en una GAN clásica el ruido entra una vez y forma, color y textura salen **entrelazados**. StyleGAN modifica **solo el Generador**:\n- **Red de mapeo** (8 capas densas): convierte $z$ en un **vector de estilo $w$** de 512 números.\n- **Red de síntesis**: arranca de una constante de 4×4 y crece hasta 1024×1024; en cada bloque el estilo entra por **AdaIN** (Adaptive Instance Normalization) y se suma **ruido por capa** (poros, pelo suelto, arrugas).\n- Capas bajas → pose y forma; capas altas → textura y color. De ahí el **style mixing**: estructura de una cara + estilo de otra.\n- Además: *progressive growing* (4×4 → 1024×1024) y *bilinear sampling*.\n\n**ThisPersonDoesNotExist.com** (Phillip Wang, 2019): cada recarga, StyleGAN genera una cara desde un vector de 512 números. Detrás: **70.000** fotos de Flickr (FFHQ, 1024×1024), **26,2 millones** de parámetros en G, **25 millones** de imágenes vistas por D, ≈ **USD 1.000** para entrenarla hoy (una semana en 8 V100). FID: 4,40 (StyleGAN) y 2,84 (StyleGAN2). Contra 5 números en Slanted Land: la idea es la misma, cambia la escala.",
+   "conceptos": [
+    "cgan",
+    "dcgan",
+    "srgan",
+    "stylegan",
+    "adain",
+    "espacio-latente"
+   ],
+   "ejemplo": "Leer la grilla de los papers como línea de tiempo: caras grises y borrosas (2014) → dígitos por etiqueta (cGAN) → dormitorios en color (DCGAN, 2015) → ampliación 4× (SRGAN, 2017). En la figura de la Vanilla GAN, la columna amarilla es la foto real más parecida: muestra que el modelo no memorizó."
+  },
+  {
+   "titulo": "Fortalezas: realismo, traducción e inpainting",
+   "contenido": "**1. Imágenes realistas.** Tras millones de rondas, G aprende proporciones, luz e imperfecciones. Evidencia: el **test de Turing visual de Salimans et al. (2016)**: con MNIST los jueces no distinguen; con CIFAR-10 se equivocan el **21,3%** de las veces. Ojo: es la **tasa de error humana**, no un porcentaje de realismo; si fuera indistinguible el error sería 50%, así que todavía detectaban la mayoría. También videojuegos (texturas, escenarios, personajes).\n\n**2. Traducción de imágenes (image translation):** transformar una imagen en otra conservando la estructura.\n- **Pix2Pix** (Isola et al., 2017): una cGAN de propósito general que aprende de **pares alineados**: etiquetas → calle, aérea → mapa, día → noche, boceto → foto, B/N → color.\n- **CycleGAN** (Zhu et al., 2017): aprende **sin pares**, desde dos colecciones sueltas: caballo ↔ cebra, foto ↔ Monet, verano ↔ invierno. Para muchas tareas no existen pares.\n- En medicina: **MRI → CT** sin escanear dos veces al paciente (Wolterink et al., 2017): menos costo, tiempo y radiación.\n- Librerías: pytorch-CycleGAN-and-pix2pix; **Real-ESRGAN** (sucesor práctico de SRGAN); DeOldify (colorizar, archivado en 2024).\n\n**3. Inpainting:** reconstruir regiones faltantes coherentes con el contexto; no copia píxeles vecinos, entiende la escena (DeepFill, Yu et al., 2018). Aplicación: tomografías con dosis reducida.\n\n**El dataset importa:** una GAN solo genera lo que aprendió. Solo gatos → gatos variados ✓; gatos + perros **sin etiqueta** → **híbridos incoherentes** ✗; gatos + perros con etiqueta (cGAN) → cada clase por separado ✓. Validar el dataset como cualquier entrada de un pipeline: limpio, bien etiquetado, homogéneo por clase.",
+   "conceptos": [
+    "pix2pix",
+    "cyclegan",
+    "cgan"
+   ],
+   "ejemplo": "Pix2Pix necesita el par (boceto del edificio, foto del edificio terminado); CycleGAN aprende caballo ↔ cebra con una carpeta de caballos y otra de cebras, sin que ninguna foto tenga su pareja."
+  },
+  {
+   "titulo": "Limitaciones y la práctica",
+   "contenido": "**Problemas de entrenamiento:**\n- **Mode collapse** (el más común y frustrante): G descubre un \"truco\" y produce siempre el mismo tipo de imagen que engaña a D, en vez de aprender toda la variedad. Analogía: el falsificador que solo falsifica un tipo de billete. Con MNIST, una GAN colapsada genera siempre el mismo dígito, y ese dataset sintético no sirve para entrenar un clasificador de diez clases.\n- **Inestabilidad:** el balance G–D es frágil. Si **D es demasiado bueno**, G no recibe señal útil y el gradiente \"desaparece\". Si **D es demasiado malo**, G aprende trucos baratos en vez de la distribución real.\n\n**Evaluación, costo y sesgo:**\n- **No hay métrica universal.** **FID** (compara la distribución de generadas y reales, más bajo es mejor) e **Inception Score** son aproximaciones imperfectas que no reemplazan la evaluación humana experta.\n- **Alta demanda computacional:** GPUs, datasets grandes, días de entrenamiento.\n- **Sesgo heredado:** si el dataset subrepresenta grupos o patologías, las imágenes generadas heredan y **amplifican** el sesgo.\n\n**Cierre de la clase:** intuición (falsificador y detective) → arquitectura (G y D) → entrenamiento (ciclo con Slanted Land) → lógica matemática (minimax, BCE, backprop) → fortalezas y limitaciones.\n\n**Práctica:** repositorio `gordicaleksa/pytorch-gans` (MIT): `train_vanilla_gan.py` (MNIST, la más parecida a Slanted Land), `train_cgan.py` (genera el dígito pedido), `train_dcgan.py` (caras de CelebA). TensorBoard para ver cómo mejora G.\n\n**TP \"La fábrica de datos\"** (missions/gans): clasificar calzado de Fashion-MNIST con **250 sandalias vs 6.000 zapatillas y 6.000 botas** (desbalance 1:24). Piso honesto (recall por clase, macro-F1, PR-AUC; pesos de clase, oversampling, aumentación) → DCGAN desde cero con 250 sandalias que **memoriza** (chequeo de **vecino más cercano L2**) → GAN que funciona (transferencia o **cGAN**) → curva macro-F1 vs cantidad de sintéticas → **filtro del discriminador** → extra **WGAN-GP**. Regla: el set de prueba real no se toca; \"una GAN que copia fabrica oversampling caro\".",
+   "conceptos": [
+    "mode-collapse",
+    "inestabilidad-gan",
+    "fid",
+    "datos-sinteticos"
+   ],
+   "ejemplo": "Pregunta del TP: si el histograma de distancias al vecino más cercano de las sandalias generadas está pegado a cero (comparado con el de distancias entre reales distintas), la GAN copió: agregar esas muestras equivale a oversampling, y su curva en el gráfico de la fábrica debería coincidir con la de oversampling."
+  }
+ ],
+ "conceptos": [
+  {
+   "id": "ia-generativa-vs-discriminativa",
+   "termino": "IA generativa vs. discriminativa",
+   "definicion": "La discriminativa aprende a distinguir categorías y responde \"¿este dígito es un 7?\"; la generativa aprende la distribución (estructura interna) de los datos y responde \"generá un 7\", creando muestras nuevas que podrían haber estado en el dataset.",
+   "por_que_importa": "Es el marco de toda la parte de visión generativa: GANs, difusión y Stable Diffusion aprenden distribuciones.",
+   "trampa": "Una GAN contiene un discriminador, pero el sistema es generativo: el Discriminador es una herramienta de entrenamiento."
+  },
+  {
+   "id": "gan",
+   "termino": "GAN (Generative Adversarial Network)",
+   "definicion": "Arquitectura de Goodfellow et al. (2014) con dos redes que compiten: un Generador que transforma ruido en muestras sintéticas y un Discriminador que estima la probabilidad de que una muestra sea real.",
+   "por_que_importa": "Fue la primera forma de generar imágenes fotorrealistas y es muy rápida en inferencia (una sola pasada).",
+   "trampa": "No hay una pérdida única que bajar: el entrenamiento es un juego; que las pérdidas oscilen es normal y no indica por sí solo que falle."
+  },
+  {
+   "id": "generador",
+   "termino": "Generador (G)",
+   "definicion": "Red que recibe un vector de ruido z del espacio latente y produce una muestra G(z); su objetivo es que el Discriminador la clasifique como real (D(G(z)) → 1).",
+   "por_que_importa": "Es la red que se conserva para generar; en imágenes reales sube de resolución con upsampling y convoluciones transpuestas.",
+   "trampa": "El Generador nunca ve una imagen real: aprende solo a través del gradiente que le devuelve D."
+  },
+  {
+   "id": "discriminador",
+   "termino": "Discriminador (D)",
+   "definicion": "Clasificador binario que recibe imágenes reales y generadas y devuelve P(real) entre 0 y 1 con una sigmoide; quiere D(x) → 1 para reales y D(G(z)) → 0 para falsas.",
+   "por_que_importa": "Su veredicto es la única señal de aprendizaje del Generador; en el TP se reusa como filtro de calidad de muestras.",
+   "trampa": "Un D demasiado bueno no es deseable: satura y deja al Generador sin gradiente útil."
+  },
+  {
+   "id": "juego-minimax",
+   "termino": "Juego minimax",
+   "definicion": "Formalización de Goodfellow (2014): D maximiza la función de valor V(D,G) (clasificar bien) y G la minimiza (hacer que D se equivoque). El óptimo teórico es D = 0,5 en todas partes.",
+   "por_que_importa": "Explica por qué el entrenamiento alterna dos pasos con objetivos opuestos sobre el mismo número D(·).",
+   "trampa": "En la práctica G no minimiza log(1 − D(G(z))) sino −log D(G(z)) (versión no saturante), porque al principio el primero da gradientes casi nulos."
+  },
+  {
+   "id": "espacio-latente",
+   "termino": "Espacio latente",
+   "definicion": "El conjunto de valores posibles del ruido z que entra al Generador; cada punto produce una imagen distinta. En StyleGAN, z se mapea a un vector de estilo w de 512 dimensiones.",
+   "por_que_importa": "Muestrear distintos z es lo que da variedad; en Stable Diffusion el latente es la versión comprimida de la imagen donde trabaja la difusión.",
+   "trampa": "En la notación de GANs, z es ruido de entrada, no la pre-activación de una neurona como en la clase de MLP."
+  },
+  {
+   "id": "slanted-land",
+   "termino": "Slanted Land",
+   "definicion": "Ejemplo didáctico de Luis Serrano: un mundo inclinado con caras de 2×2 píxeles (diagonal principal oscura, secundaria clara), un Discriminador de una neurona (pesos +1, −1, −1, +1; b = −1) y un Generador de 1 entrada y 4 salidas.",
+   "por_que_importa": "Permite hacer todas las cuentas de una GAN a mano: score, sigmoide, BCE y actualización de pesos.",
+   "trampa": "El Discriminador de Slanted Land no tiene capa oculta: es una sola neurona, no un MLP."
+  },
+  {
+   "id": "sigmoide",
+   "termino": "Sigmoide",
+   "definicion": "σ(x) = 1/(1 + e^(−x)): convierte cualquier real en un valor entre 0 y 1; σ(0) = 0,5, σ(1) ≈ 0,73, σ(−1,5) ≈ 0,18.",
+   "por_que_importa": "Es la activación de salida del Discriminador: su salida se lee como P(real) y es diferenciable para backprop.",
+   "trampa": "El umbral de decisión 0,5 sobre σ equivale a umbral 0 sobre la suma ponderada con sesgo (o 1 sin el sesgo de −1)."
+  },
+  {
+   "id": "entropia-cruzada",
+   "termino": "Binary cross-entropy (log-loss)",
+   "definicion": "Error −[y·ln p + (1 − y)·ln(1 − p)]: con imagen real vale −ln D(x), con imagen falsa −ln(1 − D(G(z))). Predecir 0,9 cuando el objetivo es 1 da ≈ 0,1; predecir 0,1 da ≈ 2,3.",
+   "por_que_importa": "Castiga sin tope la confianza equivocada y da gradientes grandes justo cuando la red se equivoca.",
+   "trampa": "Las dos curvas (−ln x y −ln(1 − x)) son los dos términos de la misma fórmula, no dos pérdidas distintas de G y de D."
+  },
+  {
+   "id": "mode-collapse",
+   "termino": "Mode collapse",
+   "definicion": "Falla en la que el Generador encuentra un tipo de muestra que engaña a D y produce siempre eso, en vez de cubrir toda la variedad de la distribución.",
+   "por_que_importa": "Un dataset sintético colapsado (siempre el mismo dígito) no sirve para entrenar un clasificador; la difusión no lo sufre.",
+   "trampa": "Imágenes de alta calidad no implican ausencia de mode collapse: hay que medir diversidad, no si \"se ven lindas\"."
+  },
+  {
+   "id": "inestabilidad-gan",
+   "termino": "Inestabilidad del entrenamiento",
+   "definicion": "El equilibrio G–D es frágil: si D es demasiado bueno el gradiente de G desaparece; si es demasiado malo, G aprende trucos baratos.",
+   "por_que_importa": "Motiva variantes como DCGAN (arquitectura estable) y WGAN-GP (pérdida que no se desarma).",
+   "trampa": "Que la pérdida de D llegue a cero no es éxito: suele significar que G dejó de aprender."
+  },
+  {
+   "id": "cgan",
+   "termino": "Conditional GAN (cGAN)",
+   "definicion": "GAN de Mirza y Osindero (2014) en la que G y D reciben además una condición (la etiqueta de clase), de modo que se puede pedir \"generá un 7\".",
+   "por_que_importa": "Resuelve los datasets multiclase (evita híbridos gato-perro) y permite aumentación controlada por clase; es uno de los caminos del TP.",
+   "trampa": "La condición entra a las dos redes, no solo al Generador."
+  },
+  {
+   "id": "dcgan",
+   "termino": "DCGAN",
+   "definicion": "Radford et al. (2015): GAN que reemplaza las capas densas por convolucionales (convoluciones transpuestas en G), con entrenamiento más estable e imágenes nítidas.",
+   "por_que_importa": "Es la base estándar de generación de imágenes con GANs y la conexión con las CNN de la clase 12.",
+   "trampa": "No cambia el juego adversarial, cambia la arquitectura de las dos redes."
+  },
+  {
+   "id": "srgan",
+   "termino": "SRGAN",
+   "definicion": "Ledig et al. (2017): GAN de super-resolución que amplía 4× infiriendo detalle fino que no estaba en la imagen original.",
+   "por_que_importa": "Una CNN entrenada solo con error cuadrático da imágenes lisas; la pérdida adversarial agrega el detalle. Real-ESRGAN es su sucesor práctico.",
+   "trampa": "El detalle es inventado (plausible), no recuperado: cuidado en usos diagnósticos."
+  },
+  {
+   "id": "stylegan",
+   "termino": "StyleGAN",
+   "definicion": "GAN de NVIDIA (Karras et al., 2018/2019) que cambia solo el Generador: una red de mapeo de 8 capas convierte z en un estilo w (512-d) que se inyecta en cada bloque de síntesis (4×4 → 1024×1024) vía AdaIN, más ruido por capa.",
+   "por_que_importa": "Da control por niveles (pose/forma en capas bajas, textura/color en altas) y permite style mixing; está detrás de ThisPersonDoesNotExist.",
+   "trampa": "El control es de estilo, no semántico: no se le puede pedir \"expresión melancólica al atardecer\" (eso requiere texto, clase 12)."
+  },
+  {
+   "id": "adain",
+   "termino": "AdaIN",
+   "definicion": "Adaptive Instance Normalization: reescala las activaciones de cada bloque con valores que salen del vector de estilo w.",
+   "por_que_importa": "Es el mecanismo con el que StyleGAN inyecta el estilo en cada capa en vez de solo al inicio.",
+   "trampa": "No es ruido: el ruido por capa es un componente aparte que controla variaciones finas."
+  },
+  {
+   "id": "pix2pix",
+   "termino": "Pix2Pix",
+   "definicion": "Isola et al. (2017): cGAN de propósito general para traducción imagen a imagen que aprende de pares alineados (boceto → foto, día → noche, aérea → mapa).",
+   "por_que_importa": "Muestra que la misma arquitectura sirve para muchas tareas cambiando solo los datos.",
+   "trampa": "Requiere pares; si no existen, hace falta CycleGAN."
+  },
+  {
+   "id": "cyclegan",
+   "termino": "CycleGAN",
+   "definicion": "Zhu et al. (2017): traducción imagen a imagen sin pares, a partir de dos colecciones sueltas (caballo ↔ cebra, foto ↔ Monet, verano ↔ invierno).",
+   "por_que_importa": "Para muchas tareas no hay datos apareados; en medicina permite MRI → CT.",
+   "trampa": "Pix2Pix y CycleGAN no se distinguen por la tarea sino por si el entrenamiento necesita pares alineados."
+  },
+  {
+   "id": "fid",
+   "termino": "FID e Inception Score",
+   "definicion": "Métricas de calidad de generación; FID compara la distribución de features de imágenes generadas y reales (más bajo es mejor: StyleGAN 4,40, StyleGAN2 2,84 en FFHQ).",
+   "por_que_importa": "No hay métrica universal; son aproximaciones imperfectas que no reemplazan la evaluación humana.",
+   "trampa": "Un FID calculado con otro extractor de features (por ejemplo, el clasificador propio del TP) no es comparable con los FID publicados (InceptionV3)."
+  },
+  {
+   "id": "datos-sinteticos",
+   "termino": "Datos sintéticos / aumentación con GANs",
+   "definicion": "Usar muestras generadas para ampliar un dataset escaso (casos raros, datos privados, etiquetado caro); el beneficio se mide en el clasificador que se entrena con ellas.",
+   "por_que_importa": "Es la pregunta del TP: ¿sirve fabricar las sandalias que faltan, y cuánto?",
+   "trampa": "Si la GAN memoriza, los sintéticos son oversampling caro; además una GAN puede filtrar datos privados del entrenamiento."
+  }
+ ],
+ "formulas": [
+  {
+   "nombre": "Objetivo minimax de la GAN (Goodfellow et al., 2014)",
+   "tex": "\\min_G \\max_D \\; V(D,G) = \\mathbb{E}_{x\\sim p_{data}}[\\log D(x)] + \\mathbb{E}_{z\\sim p_z}[\\log(1 - D(G(z)))]",
+   "explicacion": "D maximiza: quiere log D(x) alto en reales (D(x) → 1) y log(1 − D(G(z))) alto en falsas (D(G(z)) → 0). G minimiza el segundo término: quiere D(G(z)) → 1. La clase lo presenta como el \"juego minimax\" que formaliza la tensión; es la BCE con signo cambiado."
+  },
+  {
+   "nombre": "Binary cross-entropy",
+   "tex": "E = -[\\,y\\ln p + (1-y)\\ln(1-p)\\,]",
+   "explicacion": "y es la etiqueta (1 real, 0 falsa) y p la predicción de D. Con y = 1 queda −ln p; con y = 0 queda −ln(1 − p). −ln(0,9) ≈ 0,1 y −ln(0,1) ≈ 2,3."
+  },
+  {
+   "nombre": "Pérdidas por red (versión práctica)",
+   "tex": "L_D = -\\ln D(x) - \\ln(1 - D(G(z))) \\qquad L_G = -\\ln D(G(z))",
+   "explicacion": "D se entrena con reales (objetivo 1) y generadas (objetivo 0). G se entrena solo con las generadas, con objetivo 1: su error crece cuando D detecta la falsificación. En lotes, se promedia por imagen."
+  },
+  {
+   "nombre": "Neurona del Discriminador de Slanted Land",
+   "tex": "D(x) = \\sigma(w\\cdot x + b) = \\sigma(x_1 - x_2 - x_3 + x_4 - 1), \\quad \\sigma(t)=\\frac{1}{1+e^{-t}}",
+   "explicacion": "Pesos +1 en la diagonal principal, −1 en la secundaria, sesgo b = −1. Cara (1,0,0,1): σ(1) ≈ 0,73. Ruido (0,25, 1, 0,5, 0,75): σ(−1,5) ≈ 0,18."
+  },
+  {
+   "nombre": "Actualización por descenso de gradiente",
+   "tex": "w_{nuevo} = w - \\alpha\\,\\frac{\\partial E}{\\partial w}",
+   "explicacion": "α es el learning rate (0,1 en el ejemplo). Con D(G(z)) = 0,68 sobre una falsa, el peso arriba-izq pasa de 1 a 1,008 y el arriba-der de −1 a −0,968: D se vuelve más exigente."
+  }
+ ],
+ "comparaciones": [
+  {
+   "titulo": "GANs vs. difusión vs. CNN (tabla de la clase)",
+   "columnas": [
+    "Criterio",
+    "GANs",
+    "Difusión",
+    "CNN"
+   ],
+   "filas": [
+    [
+     "¿Para qué?",
+     "Imágenes realistas, transformar modalidades, aumentar datos",
+     "Imágenes desde texto, alta diversidad",
+     "Reconocer (clasificar, detectar, segmentar) y transformar"
+    ],
+    [
+     "Velocidad",
+     "Muy rápida (una pasada)",
+     "Lenta (muchos pasos)",
+     "Muy rápida"
+    ],
+    [
+     "Control",
+     "Moderado",
+     "Alto (guiado por texto)",
+     "Bajo: misma entrada, misma salida"
+    ],
+    [
+     "Limitación",
+     "Inestabilidad, mode collapse",
+     "Lenta, costosa",
+     "Sola no inventa detalle fino"
+    ],
+    [
+     "Caso típico",
+     "SRGAN, Pix2Pix, CycleGAN",
+     "Stable Diffusion, DALL·E, Midjourney",
+     "Clasificación, detección; G y D de DCGAN"
+    ]
+   ]
+  },
+  {
+   "titulo": "Discriminador vs. Generador",
+   "columnas": [
+    "Aspecto",
+    "Discriminador (D)",
+    "Generador (G)"
+   ],
+   "filas": [
+    [
+     "Entrada",
+     "Imagen x (4 píxeles en Slanted Land)",
+     "Ruido z (un número entre 0 y 1)"
+    ],
+    [
+     "Salida",
+     "Un número D(x) ∈ (0,1)",
+     "Una imagen G(z) de 2×2"
+    ],
+    [
+     "Quiere",
+     "D(x) → 1 en reales, D(G(z)) → 0 en falsas",
+     "D(G(z)) → 1"
+    ],
+    [
+     "Ve datos reales",
+     "Sí",
+     "Nunca; aprende por el gradiente de D"
+    ],
+    [
+     "Paso de entrenamiento",
+     "Reales (obj. 1) + generadas (obj. 0); actualiza solo D",
+     "Solo generadas con obj. 1; el gradiente cruza D sin cambiarlo"
+    ],
+    [
+     "Parámetros en Slanted Land",
+     "5 (4 pesos + sesgo)",
+     "8"
+    ]
+   ]
+  },
+  {
+   "titulo": "Variantes de GAN",
+   "columnas": [
+    "Modelo",
+    "Año / autores",
+    "Qué agrega",
+    "Uso"
+   ],
+   "filas": [
+    [
+     "Vanilla GAN",
+     "Goodfellow et al., 2014",
+     "Juego G vs D desde ruido",
+     "Punto de partida teórico"
+    ],
+    [
+     "cGAN",
+     "Mirza y Osindero, 2014",
+     "Condición (etiqueta) en G y D",
+     "Generar por clase"
+    ],
+    [
+     "DCGAN",
+     "Radford et al., 2015",
+     "Capas convolucionales",
+     "Base estable para imágenes"
+    ],
+    [
+     "SRGAN",
+     "Ledig et al., 2017",
+     "Super-resolución 4× con pérdida adversarial",
+     "Ampliar imágenes"
+    ],
+    [
+     "Pix2Pix",
+     "Isola et al., 2017",
+     "Traducción con pares",
+     "Boceto → foto, día → noche"
+    ],
+    [
+     "CycleGAN",
+     "Zhu et al., 2017",
+     "Traducción sin pares",
+     "Caballo ↔ cebra, MRI → CT"
+    ],
+    [
+     "StyleGAN",
+     "Karras et al. (NVIDIA), 2018/2019",
+     "Red de mapeo + AdaIN + ruido por capa",
+     "Control de estilo, style mixing"
+    ]
+   ]
+  }
+ ],
+ "flashcards": [
+  {
+   "q": "¿Qué aprende un modelo generativo de visión?",
+   "a": "La distribución (estructura interna) de un conjunto de imágenes, para crear imágenes nuevas que podrían haber estado en los datos."
+  },
+  {
+   "q": "¿Quién propuso las GANs, cuándo y dónde?",
+   "a": "Ian Goodfellow, en 2014, en un bar de Montreal; implementó el prototipo esa misma noche."
+  },
+  {
+   "q": "¿Qué representa el falsificador y qué el detective?",
+   "a": "El falsificador es el Generador; el detective es el Discriminador."
+  },
+  {
+   "q": "¿Qué valor de D(G(z)) indica que el Generador tuvo éxito?",
+   "a": "0,5 de forma consistente: el Discriminador \"no tiene idea\"."
+  },
+  {
+   "q": "Pesos y sesgo del Discriminador de Slanted Land",
+   "a": "+1 en la diagonal principal, −1 en la secundaria, b = −1."
+  },
+  {
+   "q": "¿Cuánto da el Discriminador para la cara prototipo y para el ruido?",
+   "a": "σ(1) ≈ 0,73 (real) y σ(−1,5) ≈ 0,18 (falsa)."
+  },
+  {
+   "q": "¿Qué produce el Generador de Slanted Land con z = 0,7?",
+   "a": "La imagen (0,85, 0,15 / 0,15, 0,85): σ(±1,7)."
+  },
+  {
+   "q": "Error de D con imagen real y con imagen falsa",
+   "a": "−ln D(x) y −ln(1 − D(G(z)))."
+  },
+  {
+   "q": "¿Cuánto vale −ln(0,1) y −ln(0,9)?",
+   "a": "≈ 2,3 y ≈ 0,1."
+  },
+  {
+   "q": "En el paso del Generador, ¿qué etiqueta llevan las generadas y qué red se actualiza?",
+   "a": "Etiqueta 1 (real); el gradiente cruza D sin modificarlo y se actualiza solo G."
+  },
+  {
+   "q": "¿Qué es el mode collapse?",
+   "a": "El Generador produce siempre el mismo tipo de imagen que engaña a D en vez de cubrir toda la variedad."
+  },
+  {
+   "q": "¿Qué pasa si el Discriminador es demasiado bueno?",
+   "a": "El Generador no recibe señal útil: el gradiente desaparece."
+  },
+  {
+   "q": "Diferencia entre Pix2Pix y CycleGAN",
+   "a": "Pix2Pix aprende de pares alineados; CycleGAN aprende sin pares, con dos colecciones sueltas."
+  },
+  {
+   "q": "¿Qué tres piezas agrega StyleGAN al Generador?",
+   "a": "Red de mapeo (z → w, 8 capas, 512-d), inyección de estilo por AdaIN en cada bloque, y ruido por capa."
+  },
+  {
+   "q": "¿Qué significa el 21,3% de Salimans et al. (2016)?",
+   "a": "La tasa de error de jueces humanos distinguiendo muestras de CIFAR-10 de imágenes reales (indistinguible sería 50%)."
+  },
+  {
+   "q": "¿Qué genera una GAN entrenada con gatos y perros sin etiquetas?",
+   "a": "Híbridos incoherentes; hace falta dataset homogéneo o una cGAN."
+  },
+  {
+   "q": "¿Qué mide el FID?",
+   "a": "La distancia entre la distribución de features de imágenes generadas y reales; más bajo es mejor."
+  }
+ ],
+ "quiz": [
+  {
+   "q": "En el TP de la fábrica de datos, el histograma de distancias al vecino más cercano de las sandalias generadas está concentrado cerca de cero. ¿Qué concluís?",
+   "opciones": [
+    "Hay que bajar el learning rate del clasificador",
+    "El set de prueba está desbalanceado",
+    "La GAN generaliza muy bien",
+    "La GAN está copiando el entrenamiento: equivale a oversampling caro"
+   ],
+   "correcta": 3,
+   "explicacion": "Distancias mucho menores que entre reales distintas indican memorización; las muestras no aportan información nueva."
+  },
+  {
+   "q": "El Discriminador asigna 0,68 a una imagen falsa. ¿Cuál es su error?",
+   "opciones": [
+    "−ln(0,68) ≈ 0,39",
+    "1 − 0,68 = 0,32",
+    "−ln(1 − 0,68) ≈ 1,14",
+    "0,68² ≈ 0,46"
+   ],
+   "correcta": 2,
+   "explicacion": "Con objetivo 0 la BCE es −ln(1 − p) = −ln(0,32) ≈ 1,14. −ln(0,68) ≈ 0,39 sería el error del Generador (objetivo 1). Las otras no son la pérdida usada."
+  },
+  {
+   "q": "Si el Discriminador se vuelve demasiado bueno muy temprano, ¿qué pasa?",
+   "opciones": [
+    "El gradiente que recibe el Generador se desvanece y deja de aprender",
+    "Aparecen híbridos incoherentes",
+    "El FID baja automáticamente",
+    "El Generador converge más rápido"
+   ],
+   "correcta": 0,
+   "explicacion": "Con D saturado, el Generador no recibe señal útil. Los híbridos vienen de datasets mezclados sin etiqueta."
+  },
+  {
+   "q": "¿Por qué la superresolución con una CNN que minimiza error cuadrático da imágenes lisas, y qué hace SRGAN?",
+   "opciones": [
+    "Porque minimizar MSE promedia los detalles posibles; SRGAN agrega una pérdida adversarial que premia detalle plausible",
+    "Porque la CNN no puede aumentar resolución; SRGAN usa difusión",
+    "Porque falta data augmentation; SRGAN la agrega",
+    "Porque la CNN usa sigmoide; SRGAN usa ReLU"
+   ],
+   "correcta": 0,
+   "explicacion": "El MSE favorece la media de las soluciones (borrosa). El Discriminador de SRGAN castiga lo que no parece real, forzando detalle fino inventado."
+  },
+  {
+   "q": "Salimans et al. (2016) reportan que jueces humanos se equivocan el 21,3% de las veces en CIFAR-10. ¿Cómo se interpreta?",
+   "opciones": [
+    "La GAN tiene 78,7% de accuracy",
+    "Las imágenes son 21,3% realistas",
+    "Los jueces todavía detectaban la mayoría de las falsificaciones; indistinguible sería 50%",
+    "Es el FID del modelo"
+   ],
+   "correcta": 2,
+   "explicacion": "Es la tasa de error humano. Si fueran indistinguibles, los jueces acertarían al azar (50% de error)."
+  },
+  {
+   "q": "¿Qué cambia StyleGAN respecto de una GAN clásica?",
+   "opciones": [
+    "Elimina el ruido de entrada",
+    "Reemplaza el Discriminador por un clasificador preentrenado",
+    "Usa texto como condición mediante CLIP",
+    "Agrega una red de mapeo z → w y lo inyecta en cada capa de síntesis vía AdaIN, más ruido por capa"
+   ],
+   "correcta": 3,
+   "explicacion": "StyleGAN modifica solo el Generador y mantiene el Discriminador estándar. No usa texto (eso es Stable Diffusion); el ruido sigue existiendo."
+  },
+  {
+   "q": "Querés convertir fotos de verano en invierno y no tenés la misma escena en ambas estaciones. ¿Qué modelo usás?",
+   "opciones": [
+    "Vanilla GAN",
+    "SRGAN",
+    "CycleGAN",
+    "Pix2Pix"
+   ],
+   "correcta": 2,
+   "explicacion": "CycleGAN aprende traducción sin pares. Pix2Pix necesita pares alineados; SRGAN es super-resolución; Vanilla GAN no traduce."
+  },
+  {
+   "q": "En el paso de entrenamiento del Generador, ¿qué ocurre?",
+   "opciones": [
+    "Se usan reales y generadas y se actualizan ambas redes",
+    "Se usan solo las reales con etiqueta 0",
+    "G compara píxel a píxel su salida con imágenes reales",
+    "Se usan solo las generadas con etiqueta 1; el gradiente atraviesa D sin modificarlo y se actualiza G"
+   ],
+   "correcta": 3,
+   "explicacion": "Cada paso actualiza una sola red. G nunca ve reales; aprende del gradiente de D sobre sus generadas, que se etiquetan como reales porque eso es lo que G quiere lograr."
+  },
+  {
+   "q": "¿Por qué se usa binary cross-entropy y no un error lineal 1 − p?",
+   "opciones": [
+    "Porque castiga sin tope la confianza equivocada y su gradiente es grande justo cuando la red se equivoca",
+    "Porque siempre da valores entre 0 y 1",
+    "Porque no requiere sigmoide",
+    "Porque es más barata de calcular"
+   ],
+   "correcta": 0,
+   "explicacion": "−ln p → ∞ cuando p → 0, y la derivada es grande en el error. La BCE no está acotada en [0,1] y sí presupone una salida probabilística (sigmoide)."
+  },
+  {
+   "q": "Una GAN entrenada con MNIST genera siempre el dígito 1, muy realista. ¿Qué problema es?",
+   "opciones": [
+    "Data leakage",
+    "Mode collapse",
+    "Overfitting del Discriminador",
+    "Gradiente explosivo"
+   ],
+   "correcta": 1,
+   "explicacion": "El Generador encontró un modo que engaña a D y dejó de cubrir la variedad: mode collapse. La calidad alta de cada muestra no lo descarta."
+  },
+  {
+   "q": "En una GAN, ¿cuál es el objetivo del Generador?",
+   "opciones": [
+    "Que el Discriminador asigne D(G(z)) cercano a 1",
+    "Que el Discriminador asigne D(G(z)) cercano a 0",
+    "Clasificar correctamente imágenes reales",
+    "Minimizar la distancia L2 a la imagen real más cercana"
+   ],
+   "correcta": 0,
+   "explicacion": "G quiere engañar a D: que su veredicto sobre las generadas se acerque a 1. D(G(z)) → 0 es el objetivo de D; minimizar L2 a reales llevaría a imágenes promedio/memorizadas; clasificar es tarea de D."
+  },
+  {
+   "q": "Con el Discriminador de Slanted Land (pesos +1, −1, −1, +1; b = −1), ¿qué devuelve para la imagen (1, 0, 0, 1)?",
+   "opciones": [
+    "σ(2) ≈ 0,88",
+    "σ(1) ≈ 0,73",
+    "σ(0) = 0,5",
+    "σ(−1,5) ≈ 0,18"
+   ],
+   "correcta": 1,
+   "explicacion": "1 − 0 − 0 + 1 = 2, más el sesgo −1 da 1, y σ(1) ≈ 0,73. σ(2) olvida el sesgo; σ(−1,5) es el resultado del ruido."
+  },
+  {
+   "q": "Un dataset tiene gatos y perros mezclados sin etiqueta. ¿Qué genera una Vanilla GAN y cuál es la solución?",
+   "opciones": [
+    "Solo gatos; agregar más perros",
+    "Híbridos incoherentes; usar una cGAN con la etiqueta o separar el dataset",
+    "Gatos y perros perfectos; nada",
+    "Ruido; bajar el learning rate"
+   ],
+   "correcta": 1,
+   "explicacion": "La GAN aprende la distribución mezclada y produce híbridos; la condición de clase (cGAN) o datasets homogéneos lo resuelven."
+  }
+ ],
+ "desarrollo": [
+  {
+   "pregunta": "Explicá cómo se entrena una GAN usando el ejemplo de Slanted Land: qué hace cada red, qué pérdida usa y cómo se actualizan los pesos.",
+   "respuesta_modelo": "En Slanted Land las caras son imágenes de 2×2 con la diagonal principal oscura. El **Discriminador** es una neurona: $D(x)=\\sigma(x_1-x_2-x_3+x_4-1)$; da $\\sigma(1)\\approx0.73$ a la cara prototipo y $\\sigma(-1.5)\\approx0.18$ al ruido. El **Generador** recibe un número $z$ y produce 4 píxeles; con $z=0.7$ y pesos ±1, sesgos ±1, da (0,85, 0,15 / 0,15, 0,85).\n\nEl error es **binary cross-entropy**: para D, $-\\ln D(x)$ en reales y $-\\ln(1-D(G(z)))$ en falsas; para G, $-\\ln D(G(z))$. Por ejemplo, si D da 0,68 a una falsa, su error es $-\\ln 0.32\\approx1.14$. Con la regla de la cadena se obtiene $\\partial E/\\partial w$ y se actualiza $w\\leftarrow w-\\alpha\\,\\partial E/\\partial w$ ($\\alpha=0.1$): el peso arriba-izq pasa de 1 a 1,008 y D se vuelve más exigente.\n\nEn la práctica se entrena por **lotes** y en dos pasos alternados: el de D usa reales (objetivo 1) y generadas (objetivo 0) y actualiza solo D; el de G usa solo generadas con objetivo 1, el gradiente atraviesa D sin cambiarlo y actualiza solo G. El ciclo se repite hasta que D da ≈ 0,5. Es la versión práctica del juego minimax de Goodfellow.",
+   "puntos_clave": [
+    "Roles opuestos de G y D sobre el mismo D(·)",
+    "Cuenta concreta con sigmoide y sesgo −1",
+    "BCE con sus dos casos y la pérdida de G",
+    "Regla de actualización con learning rate",
+    "Pasos alternados: cada uno actualiza una sola red; G nunca ve reales",
+    "Mención del minimax / D = 0,5 como equilibrio"
+   ]
+  },
+  {
+   "pregunta": "¿Qué es el mode collapse, por qué ocurre y cómo lo detectarías en la práctica?",
+   "respuesta_modelo": "El **mode collapse** ocurre cuando el Generador descubre un tipo de salida que engaña al Discriminador y la repite, en vez de aprender toda la variedad de la distribución. La analogía de la clase: el falsificador que solo falsifica un tipo de billete. Con MNIST, una GAN colapsada genera siempre el mismo dígito, y un dataset sintético así no sirve para entrenar un clasificador de diez clases.\n\nOcurre porque el objetivo de G es solo engañar a D en cada paso, no cubrir la distribución; si un modo funciona, el gradiente no lo empuja a explorar otros. Está ligado a la **inestabilidad**: el equilibrio G–D es frágil (D muy bueno → gradiente que desaparece; D muy malo → trucos baratos).\n\nPara detectarlo no alcanza con mirar si las imágenes \"se ven lindas\": hay que medir **diversidad**. Grillas de muestras a lo largo del entrenamiento, y como en el TP, el **chequeo de vecino más cercano**: cuántas imágenes de entrenamiento distintas aparecen como vecino más cercano de alguna generada. También métricas de distribución como FID. Soluciones: arquitecturas estables (DCGAN), condicionamiento (cGAN), pérdidas como WGAN-GP, o pasar a difusión, que no sufre mode collapse.",
+   "puntos_clave": [
+    "Definición: repetir un modo que engaña a D",
+    "Ejemplo MNIST / billete",
+    "Causa: objetivo de engañar, no cubrir la distribución; equilibrio frágil",
+    "Detección por diversidad, no por calidad visual",
+    "Vecino más cercano / FID / grillas",
+    "Mitigaciones (cGAN, WGAN-GP, difusión)"
+   ]
+  },
+  {
+   "pregunta": "Compará Vanilla GAN, cGAN, DCGAN, SRGAN y StyleGAN: qué problema resuelve cada una.",
+   "respuesta_modelo": "La **Vanilla GAN** (Goodfellow, 2014) genera desde ruido sin control, es inestable y produce caras grises y borrosas: es el punto de partida teórico. La **cGAN** (Mirza y Osindero, 2014) agrega una condición —la etiqueta de clase— a G y a D, para pedir \"generá un 7\" y evitar híbridos en datasets multiclase. **DCGAN** (Radford et al., 2015) cambia la arquitectura: capas convolucionales y convoluciones transpuestas en G, lo que estabiliza el entrenamiento y da imágenes nítidas (dormitorios LSUN en color). **SRGAN** (Ledig et al., 2017) aplica el esquema adversarial a super-resolución 4×: una CNN con MSE da imágenes lisas, la pérdida adversarial obliga a inventar detalle plausible (pelo, plumas). **StyleGAN** (NVIDIA, 2018/2019) ataca el control: en una GAN clásica el ruido entra una vez y los atributos salen entrelazados; StyleGAN usa una red de mapeo (8 capas) que convierte $z$ en un estilo $w$ de 512 dimensiones, inyectado en cada bloque de síntesis por AdaIN, más ruido por capa. Así las capas bajas controlan pose y forma y las altas textura y color, y se puede hacer style mixing. Ninguna da control semántico por texto: eso llega con Stable Diffusion.",
+   "puntos_clave": [
+    "Vanilla: sin control, inestable",
+    "cGAN: condición de clase en G y D",
+    "DCGAN: convoluciones, estabilidad",
+    "SRGAN: super-resolución 4×, detalle inventado",
+    "StyleGAN: mapeo z→w, AdaIN, ruido por capa, style mixing",
+    "Ninguna acepta texto libre"
+   ]
+  },
+  {
+   "pregunta": "¿Qué limitaciones tienen las GANs que deberías considerar antes de usarlas en producción (por ejemplo, para generar datos sintéticos)?",
+   "respuesta_modelo": "La clase lista cinco. Dos de **entrenamiento**: el **mode collapse** (el Generador repite lo que engaña a D, generando un dataset sin variedad) y la **inestabilidad** (si D es muy bueno el gradiente de G desaparece; si es muy malo G aprende trucos). Tres de **uso**: la **evaluación** es difícil, porque no hay métrica universal y FID e Inception Score son aproximaciones que no reemplazan la evaluación experta; la **demanda computacional** (GPUs, datasets grandes, días de entrenamiento: StyleGAN fueron 70.000 imágenes, 26,2 M de parámetros y una semana en 8 V100); y el **sesgo heredado**: si el dataset subrepresenta grupos o patologías, las imágenes generadas lo heredan y amplifican. También importa el **dataset**: mezclar clases sin etiqueta produce híbridos.\n\nPara datos sintéticos, el TP agrega una lección: el valor se mide en el **clasificador** que se entrena con ellos, contra baselines baratos (pesos de clase, oversampling, aumentación), sobre un set de prueba real intacto. Si la GAN memoriza, sus muestras son oversampling caro; y filtrar con el Discriminador puede subir la métrica a costa de diversidad.",
+   "puntos_clave": [
+    "Mode collapse e inestabilidad",
+    "Evaluación difícil (FID/IS)",
+    "Costo computacional",
+    "Sesgo heredado/amplificado",
+    "Validar contra baselines en test real",
+    "Memorización = oversampling caro"
+   ]
+  }
+ ],
+ "conexiones": [
+  {
+   "clase": 3,
+   "relacion": "El Discriminador de Slanted Land es una neurona con sigmoide; se entrena con descenso por gradiente, regla de la cadena y backpropagation exactamente como en la introducción a redes neuronales."
+  },
+  {
+   "clase": 4,
+   "relacion": "La binary cross-entropy es la misma pérdida de la clase de diseño de redes; el TP reusa matriz de confusión, recall por clase, macro-F1, desbalance y particiones sin data leakage."
+  },
+  {
+   "clase": 12,
+   "relacion": "Las CNN y las convoluciones transpuestas (DCGAN) se desarrollan en la clase 12; TilTedTinder vuelve con texto libre y la GAN no alcanza, lo que motiva CLIP y Stable Diffusion (difusión: una sola red, sin mode collapse)."
+  },
+  {
+   "clase": 13,
+   "relacion": "Los deepfakes, el sesgo heredado del dataset y la pregunta de si avisar que un perfil es sintético son temas de la clase de seguridad y ética; los modelos del mundo retoman la idea de generar para entender."
+  }
+ ],
+ "lecturas": [
+  "Goodfellow et al. (2014), Generative Adversarial Nets",
+  "Mirza y Osindero (2014), Conditional Generative Adversarial Nets",
+  "Radford, Metz y Chintala (2015), Unsupervised Representation Learning with Deep Convolutional GANs (DCGAN)",
+  "Ledig et al. (2017), Photo-Realistic Single Image Super-Resolution Using a GAN (SRGAN)",
+  "Isola et al. (2017), Image-to-Image Translation with Conditional Adversarial Networks (Pix2Pix)",
+  "Zhu et al. (2017), Unpaired Image-to-Image Translation using Cycle-Consistent Adversarial Networks (CycleGAN)",
+  "Karras, Laine y Aila (2019), A Style-Based Generator Architecture for GANs (StyleGAN); Karras et al. (2020), StyleGAN2",
+  "Salimans et al. (2016), Improved Techniques for Training GANs (test de Turing visual, Inception Score)",
+  "Yu et al. (2018), DeepFill (inpainting); Wolterink et al. (2017), MRI → CT con CycleGAN",
+  "Luis Serrano, A Friendly Introduction to Generative Adversarial Networks (Slanted Land)",
+  "AWS, ¿Qué es una GAN?; repositorio gordicaleksa/pytorch-gans"
+ ]
+}
