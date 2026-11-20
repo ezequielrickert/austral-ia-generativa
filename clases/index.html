@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>IA Generativa · Guía de estudio</title>
+  <meta name="description" content="Las diapositivas de IA Generativa (Universidad Austral, 2c 2026) con notas por diapositiva y vínculos a los TPs.">
+  <script>
+    (function(){try{var t=localStorage.getItem('iagen:theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t)}catch(e){}})();
+    window.SITE_BASE = "https://ezequielrickert.github.io/austral-ia-generativa".replace(/\/$/, '');
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <link rel="stylesheet" href="https://ezequielrickert.github.io/austral-ia-generativa/css/site.css?h=ede67d51655aa3494e82">
+</head>
+<body>
+
+
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <a class="sb-head" href="https://ezequielrickert.github.io/austral-ia-generativa/">
+      <span class="sb-logo">IA</span>
+      <span class="sb-title"><b>IA Generativa</b><span>Guía de estudio · 2c 2026</span></span>
+    </a>
+    <div class="sb-search">
+      <div class="input-icon">
+        <svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input class="input" id="search" type="search" placeholder="Buscar" autocomplete="off" aria-label="Buscar diapositivas y conceptos">
+        <kbd>/</kbd>
+      </div>
+      <div class="search-results" id="search-results" hidden></div>
+    </div>
+    <nav class="sb-body" aria-label="Navegación">
+      <div class="nav-group">
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/">
+          <svg class="i" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span class="t">Inicio</span></a>
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/">
+          <svg class="i" viewBox="0 0 24 24"><path d="M4 19.5V5a2 2 0 0 1 2-2h14v16H6.5A2.5 2.5 0 0 0 4 21.5"/><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/></svg><span class="t">Glosario</span></a>
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/practica/">
+          <svg class="i" viewBox="0 0 24 24"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg><span class="t">Práctica</span></a>
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/marcadas/">
+          <svg class="i" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg><span class="t">Marcadas</span><span class="count" id="star-count"></span></a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-label">Clases</div>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/" title="Bienvenida + CoWork: fundamentos de IA, modelos fundacionales y el chat extendido">
+          <span class="n">01</span><span class="t">Bienvenida + CoWork: fundamentos de IA, modelos fundacionales y el chat extendido</span><span class="meter" data-class="1" data-total="100"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/" title="CoWork: agentes de código, contexto, CLAUDE.md, Skills, subagentes y MCP">
+          <span class="n">02</span><span class="t">CoWork: agentes de código, contexto, CLAUDE.md, Skills, subagentes y MCP</span><span class="meter" data-class="2" data-total="66"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/03/" title="Introducción a las redes neuronales">
+          <span class="n">03</span><span class="t">Introducción a las redes neuronales</span><span class="meter" data-class="3" data-total="51"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/" title="Diseño de redes neuronales (modelado de un MLP)">
+          <span class="n">04</span><span class="t">Diseño de redes neuronales (modelado de un MLP)</span><span class="meter" data-class="4" data-total="64"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/05/" title="LLMs: prompting, costos y producción">
+          <span class="n">05</span><span class="t">LLMs: prompting, costos y producción</span><span class="meter" data-class="5" data-total="72"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/" title="RAG, bases vectoriales, inverted index">
+          <span class="n">06</span><span class="t">RAG, bases vectoriales, inverted index</span><span class="meter" data-class="6" data-total="71"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/" title="MCP y herramientas (con repaso de RAG) · De la palabra al transformer">
+          <span class="n">07</span><span class="t">MCP y herramientas (con repaso de RAG) · De la palabra al transformer</span><span class="meter" data-class="7" data-total="69"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/08/" title="El transformer por dentro: atención, el bloque completo y la familia de modelos">
+          <span class="n">08</span><span class="t">El transformer por dentro: atención, el bloque completo y la familia de modelos</span><span class="meter" data-class="8" data-total="43"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/" title="LLM training: pre-training, SFT, RLHF, herramientas y fine-tuning">
+          <span class="n">09</span><span class="t">LLM training: pre-training, SFT, RLHF, herramientas y fine-tuning</span><span class="meter" data-class="9" data-total="60"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/10/" title="Agentes: sistemas multiagente, especialización, contexto y orquestación">
+          <span class="n">10</span><span class="t">Agentes: sistemas multiagente, especialización, contexto y orquestación</span><span class="meter" data-class="10" data-total="64"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/11/" title="Redes generativas antagónicas (GANs)">
+          <span class="n">11</span><span class="t">Redes generativas antagónicas (GANs)</span><span class="meter" data-class="11" data-total="54"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/12/" title="Modelos generativos de señales, imágenes y multimodalidad">
+          <span class="n">12</span><span class="t">Modelos generativos de señales, imágenes y multimodalidad</span><span class="meter" data-class="12" data-total="79"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/" title="Del poder a la responsabilidad: seguridad, ética y lo que viene">
+          <span class="n">13</span><span class="t">Del poder a la responsabilidad: seguridad, ética y lo que viene</span><span class="meter" data-class="13" data-total="56"><i></i></span></a>
+        
+      </div>
+      <div class="nav-group">
+        <div class="nav-label">Trabajos prácticos</div>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/tp/1/" title="Corta, del caos a producción">
+          <span class="n">1</span><span class="t">Corta, del caos a producción</span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/tp/2/" title="¿Cuánto vale esta casa?">
+          <span class="n">2</span><span class="t">¿Cuánto vale esta casa?</span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/tp/3/" title="RAG, MCP y Transformers en el Hospital Arroyo Claro">
+          <span class="n">3</span><span class="t">RAG, MCP y Transformers en el Hospital Arroyo Claro</span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/tp/4/" title="El agente de admisión de guardia (TP final)">
+          <span class="n">4</span><span class="t">El agente de admisión de guardia (TP final)</span></a>
+        
+      </div>
+    </nav>
+    <div class="sb-foot">
+      <span id="exam-left">Final: 4 dic</span>
+      <button class="btn icon sm ghost" id="theme-btn" aria-label="Cambiar tema" title="Cambiar tema">
+        <svg class="i" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+    </div>
+  </aside>
+  <div class="main">
+    <div class="topbar">
+      <button class="btn icon" id="menu-btn" aria-label="Abrir navegación"><svg class="i" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+      <b>IA Generativa</b>
+    </div>
+    <main class="content ">
+      
+
+<header class="page-header">
+  <div class="ph-main">
+    <nav class="crumbs"><span>Universidad Austral</span><span class="sep">/</span><span>Ingeniería</span></nav>
+    <h1>Inteligencia Artificial Generativa</h1>
+    <div class="ph-meta"><span>Examen final: vie 4 dic</span><span class="sep"></span><span>2ª fecha: jue 10 dic</span><span class="sep"></span><span id="days" class="num"></span></div>
+  </div>
+  <div class="ph-actions">
+    <a class="btn" href="https://ezequielrickert.github.io/austral-ia-generativa/practica/">Practicar</a>
+    <a class="btn primary" id="continue" href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/">Empezar por la clase 1</a>
+  </div>
+</header>
+
+<div class="grid cols-4">
+  <div class="card stat"><span class="v num" id="st-seen">0</span><span class="l">Diapositivas vistas</span></div>
+  <div class="card stat"><span class="v num" id="st-key">0</span><span class="l">Claves para el examen vistas</span></div>
+  <div class="card stat"><span class="v num" id="st-acc">—</span><span class="l">Acierto en práctica</span></div>
+  <div class="card stat"><span class="v num" id="st-star">0</span><span class="l">Marcadas para repasar</span></div>
+</div>
+
+<section class="card">
+  <div class="card-header"><div class="card-title">Clases <span class="count">13</span></div></div>
+  <div class="card-body flush table-scroll">
+    <table class="table">
+      <thead><tr><th style="width:56px">#</th><th style="width:88px">Fecha</th><th>Clase</th><th class="r">Diapositivas</th><th class="r">Clave</th><th>TPs</th><th style="width:120px">Visto</th></tr></thead>
+      <tbody>
+      
+        <tr class="group"><td colspan="7">Introducción</td></tr>
+        
+        <tr data-href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/">
+          <td class="mono faint">01</td>
+          <td class="muted num">5 ago</td>
+          <td><a class="title" href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/">Bienvenida + CoWork: fundamentos de IA, modelos fundacionales y el chat extendido</a>
+            <div class="deck-list"><span class="">Bienvenida e introducción <span class="pill sched" title="Figura en el calendario de la materia">Calendario</span></span><span class="is-extra">Claude Desktop: chat <span class="pill compl" title="No figura en el calendario de la materia">Compl.</span></span></div></td>
+          <td class="r num muted">100</td>
+          <td class="r num muted">20</td>
+          <td><div class="pills"><span class="pill tp">TP1</span><span class="pill tp">TP2</span><span class="pill tp">TP3</span><span class="pill tp">TP4</span></div></td>
+          <td><span class="progress" data-class="1" data-total="100"><i></i></span></td>
+        </tr>
+        
+      
+        <tr class="group"><td colspan="7">Herramientas de trabajo con IA</td></tr>
+        
+        <tr data-href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/">
+          <td class="mono faint">02</td>
+          <td class="muted num">12 ago</td>
+          <td><a class="title" href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/">CoWork: agentes de código, contexto, CLAUDE.md, Skills, subagentes y MCP</a>
+            <div class="deck-list"><span class="">Agentes de código y la misión Corta <span class="pill sched" title="Figura en el calendario de la materia">Calendario</span></span><span class="is-extra">Claude Cowork <span class="pill compl" title="No figura en el calendario de la materia">Compl.</span></span></div></td>
+          <td class="r num muted">66</td>
+          <td class="r num muted">15</td>
+          <td><div class="pills"><span class="pill tp">TP1</span><span class="pill tp">TP3</span><span class="pill tp">TP4</span></div></td>
+          <td><span class="progress" data-class="2" data-total="66"><i></i></span></td>
+        </tr>
+        
+      
+        <tr class="group"><td colspan="7">Fundamentos de redes</td></tr>
+        
+        <tr data-href="https://ezequielrickert.github.io/austral-ia-generativa/clases/03/">
+          <td class="mono faint">03</td>
+          <td class="muted num">19 ago</td>
+          <td><a class="title" href="https://ezequielrickert.github.io/austral-ia-generativa/clases/03/">Introducción a las redes neuronales</a>
+            <div class="deck-list"><span class="">Introducción a las Redes Neuronales Artificiales (ANN) <span class="pill sched" title="Figura en el calendario de la materia">Calendario</span></span></div></td>
+          <td class="r num muted">51</td>
+          <td class="r num muted">11</td>
+          <td><div class="pills"><span class="pill tp">TP2</span></div></td>
+          <td><span class="progress" data-class="3" data-total="51"><i></i></span></td>
+        </tr>
+        
+        <tr data-href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/">
+          <td class="mono faint">04</td>
+          <td class="muted num">26 ago</td>
+          <td><a class="title" href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/">Diseño de redes neuronales (modelado de un MLP)</a>
+            <div class="deck-list"><span class="">Modelado de un Multi-Layer Perceptron (MLP) <span class="pill sched" title="Figura en el calendario de la materia">Calendario</span></span></div></td>
+          <td class="r num muted">64</td>
+          <td class="r num muted">15</td>
+          <td><div class="pills"><span class="pill tp">TP2</span><span class="pill tp">TP4</span></div></td>
+          <td><span class="progress" data-class="4" data-total="64"><i></i></span></td>
+        </tr>
+        
+      
+        <tr class="group"><td colspan="7">LLMs</td></tr>
+        
+        <tr data-href="https://ezequielrickert.github.io/austral-ia-generativa/clases/05/">
+          <td class="mono faint">05</td>
+          <td class="muted num">2 sep</td>
+          <td><a class="title" href="https://ezequielrickert.github.io/austral-ia-generativa/clases/05/">LLMs: prompting, costos y producción</a>
+            <div class="deck-list"><span class="">Trabajar con LLMs: prompts, costos y producción <span class="pill sched" title="Figura en el calendario de la materia">Calendario</span></span></div></td>
+          <td class="r num muted">72</td>
+          <td class="r num muted">17</td>
+          <td><div class="pills"><span class="pill tp">TP3</span><span class="pill tp">TP4</span></div></td>
+          <td><span class="progress" data-class="5" data-total="72"><i></i></span></td>
+        </tr>
+        
+      
+        <tr class="group"><td colspan="7">RAG, MCP y herramientas</td></tr>
+        
+        <tr data-href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/">
+          <td class="mono faint">06</td>
+          <td class="muted num">9 sep</td>
+          <td><a class="title" href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/">RAG, bases vectoriales, inverted index</a>
+            <div class="deck-list"><span class="">RAG y MCP: recuperar contexto y conectar herramientas <span class="pill sched" title="Figura en el calendario de la materia">Calendario</span></span></div></td>
+          <td class="r num muted">71</td>
+          <td class="r num muted">17</td>
+          <td><div class="pills"><span class="pill tp">TP1</span><span class="pill tp">TP3</span><span class="pill tp">TP4</span></div></td>
+          <td><span class="progress" data-class="6" data-total="71"><i></i></span></td>
+        </tr>
+        
+        <tr data-href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/">
+          <td class="mono faint">07</td>
+          <td class="muted num">16 sep</td>
+          <td><a class="title" href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/">MCP y herramientas (con repaso de RAG) · De la palabra al transformer</a>
+            <div class="deck-list"><span class="">MCP y herramientas <span class="pill sched" title="Figura en el calendario de la materia">Calendario</span></span><span class="">De la palabra al transformer <span class="pill sched" title="Figura en el calendario de la materia">Calendario</span></span></div></td>
+          <td class="r num muted">69</td>
+          <td class="r num muted">17</td>
+          <td><div class="pills"><span class="pill tp">TP1</span><span class="pill tp">TP2</span><span class="pill tp">TP3</span><span class="pill tp">TP4</span></div></td>
+          <td><span class="progress" data-class="7" data-total="69"><i></i></span></td>
+        </tr>
+        
+      
+        <tr class="group"><td colspan="7">Transformers</td></tr>
+        
+        <tr data-href="https://ezequielrickert.github.io/austral-ia-generativa/clases/08/">
+          <td class="mono faint">08</td>
+          <td class="muted num">23 sep</td>
+          <td><a class="title" href="https://ezequielrickert.github.io/austral-ia-generativa/clases/08/">El transformer por dentro: atención, el bloque completo y la familia de modelos</a>
+            <div class="deck-list"><span class="">Clase 8: El transformer por dentro <span class="pill sched" title="Figura en el calendario de la materia">Calendario</span></span></div></td>
+          <td class="r num muted">43</td>
+          <td class="r num muted">11</td>
+          <td><div class="pills"><span class="pill tp">TP2</span><span class="pill tp">TP3</span><span class="pill tp">TP4</span></div></td>
+          <td><span class="progress" data-class="8" data-total="43"><i></i></span></td>
+        </tr>
+        
+      
+        <tr class="group"><td colspan="7">Entrenamiento de LLMs</td></tr>
+        
+        <tr data-href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/">
+          <td class="mono faint">09</td>
+          <td class="muted num">30 sep</td>
+          <td><a class="title" href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/">LLM training: pre-training, SFT, RLHF, herramientas y fine-tuning</a>
+            <div class="deck-list"><span class="">Clase 9: Cómo se entrena un LLM <span class="pill sched" title="Figura en el calendario de la materia">Calendario</span></span></div></td>
+          <td class="r num muted">60</td>
+          <td class="r num muted">14</td>
+          <td><div class="pills"><span class="pill tp">TP3</span><span class="pill tp">TP4</span></div></td>
+          <td><span class="progress" data-class="9" data-total="60"><i></i></span></td>
+        </tr>
+        
+      
+        <tr class="group"><td colspan="7">Agentes</td></tr>
+        
+        <tr data-href="https://ezequielrickert.github.io/austral-ia-generativa/clases/10/">
+          <td class="mono faint">10</td>
+          <td class="muted num">7 oct</td>
+          <td><a class="title" href="https://ezequielrickert.github.io/austral-ia-generativa/clases/10/">Agentes: sistemas multiagente, especialización, contexto y orquestación</a>
+            <div class="deck-list"><span class="">Agentes y sistemas multiagente <span class="pill sched" title="Figura en el calendario de la materia">Calendario</span></span></div></td>
+          <td class="r num muted">64</td>
+          <td class="r num muted">15</td>
+          <td><div class="pills"><span class="pill tp">TP3</span><span class="pill tp">TP4</span></div></td>
+          <td><span class="progress" data-class="10" data-total="64"><i></i></span></td>
+        </tr>
+        
+      
+        <tr class="group"><td colspan="7">Visión y generativos</td></tr>
+        
+        <tr data-href="https://ezequielrickert.github.io/austral-ia-generativa/clases/11/">
+          <td class="mono faint">11</td>
+          <td class="muted num">21 oct</td>
+          <td><a class="title" href="https://ezequielrickert.github.io/austral-ia-generativa/clases/11/">Redes generativas antagónicas (GANs)</a>
+            <div class="deck-list"><span class="">Redes generativas antagónicas (GANs) <span class="pill sched" title="Figura en el calendario de la materia">Calendario</span></span></div></td>
+          <td class="r num muted">54</td>
+          <td class="r num muted">13</td>
+          <td><div class="pills"><span class="pill tp">TP2</span><span class="pill tp">TP4</span></div></td>
+          <td><span class="progress" data-class="11" data-total="54"><i></i></span></td>
+        </tr>
+        
+        <tr data-href="https://ezequielrickert.github.io/austral-ia-generativa/clases/12/">
+          <td class="mono faint">12</td>
+          <td class="muted num">28 oct</td>
+          <td><a class="title" href="https://ezequielrickert.github.io/austral-ia-generativa/clases/12/">Modelos generativos de señales, imágenes y multimodalidad</a>
+            <div class="deck-list"><span class="">Modelos Generativos de Señales, Imágenes y Multimodalidad <span class="pill sched" title="Figura en el calendario de la materia">Calendario</span></span></div></td>
+          <td class="r num muted">79</td>
+          <td class="r num muted">18</td>
+          <td><div class="pills"><span class="pill tp">TP2</span><span class="pill tp">TP3</span><span class="pill tp">TP4</span></div></td>
+          <td><span class="progress" data-class="12" data-total="79"><i></i></span></td>
+        </tr>
+        
+      
+        <tr class="group"><td colspan="7">Seguridad y ética</td></tr>
+        
+        <tr data-href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/">
+          <td class="mono faint">13</td>
+          <td class="muted num">4 nov</td>
+          <td><a class="title" href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/">Del poder a la responsabilidad: seguridad, ética y lo que viene</a>
+            <div class="deck-list"><span class="">Del poder a la responsabilidad — Clase de cierre: seguridad, ética y lo que viene <span class="pill sched" title="Figura en el calendario de la materia">Calendario</span></span></div></td>
+          <td class="r num muted">56</td>
+          <td class="r num muted">14</td>
+          <td><div class="pills"><span class="pill tp">TP1</span><span class="pill tp">TP3</span><span class="pill tp">TP4</span></div></td>
+          <td><span class="progress" data-class="13" data-total="56"><i></i></span></td>
+        </tr>
+        
+      
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="card">
+  <div class="card-header"><div class="card-title">Trabajos prácticos <span class="count">4</span></div></div>
+  <div class="card-body flush table-scroll">
+    <table class="table">
+      <thead><tr><th style="width:56px">TP</th><th>Título</th><th>Aparece en las clases</th><th class="r">Diapositivas</th></tr></thead>
+      <tbody>
+      
+        <tr data-href="https://ezequielrickert.github.io/austral-ia-generativa/tp/1/">
+          <td class="mono faint">1</td>
+          <td><a class="title" href="https://ezequielrickert.github.io/austral-ia-generativa/tp/1/">Corta, del caos a producción</a></td>
+          <td><div class="pills"><span class="pill">01</span><span class="pill">02</span><span class="pill">06</span><span class="pill">07</span><span class="pill">13</span></div></td>
+          <td class="r num muted">33</td>
+        </tr>
+      
+        <tr data-href="https://ezequielrickert.github.io/austral-ia-generativa/tp/2/">
+          <td class="mono faint">2</td>
+          <td><a class="title" href="https://ezequielrickert.github.io/austral-ia-generativa/tp/2/">¿Cuánto vale esta casa?</a></td>
+          <td><div class="pills"><span class="pill">01</span><span class="pill">03</span><span class="pill">04</span><span class="pill">07</span><span class="pill">08</span><span class="pill">11</span><span class="pill">12</span></div></td>
+          <td class="r num muted">45</td>
+        </tr>
+      
+        <tr data-href="https://ezequielrickert.github.io/austral-ia-generativa/tp/3/">
+          <td class="mono faint">3</td>
+          <td><a class="title" href="https://ezequielrickert.github.io/austral-ia-generativa/tp/3/">RAG, MCP y Transformers en el Hospital Arroyo Claro</a></td>
+          <td><div class="pills"><span class="pill">01</span><span class="pill">02</span><span class="pill">05</span><span class="pill">06</span><span class="pill">07</span><span class="pill">08</span><span class="pill">09</span><span class="pill">10</span><span class="pill">12</span><span class="pill">13</span></div></td>
+          <td class="r num muted">69</td>
+        </tr>
+      
+        <tr data-href="https://ezequielrickert.github.io/austral-ia-generativa/tp/4/">
+          <td class="mono faint">4</td>
+          <td><a class="title" href="https://ezequielrickert.github.io/austral-ia-generativa/tp/4/">El agente de admisión de guardia (TP final)</a></td>
+          <td><div class="pills"><span class="pill">01</span><span class="pill">02</span><span class="pill">04</span><span class="pill">05</span><span class="pill">06</span><span class="pill">07</span><span class="pill">08</span><span class="pill">09</span><span class="pill">10</span><span class="pill">11</span><span class="pill">12</span><span class="pill">13</span></div></td>
+          <td class="r num muted">49</td>
+        </tr>
+      
+      </tbody>
+    </table>
+  </div>
+</section>
+
+    </main>
+  </div>
+</div>
+<dialog class="code-dlg" id="code-dlg" aria-labelledby="code-dlg-title">
+  <div class="card-header">
+    <div class="code-dlg-title"><span class="pill tp" id="code-dlg-tp">TP</span><span class="card-title" id="code-dlg-title"></span></div>
+    <div class="card-actions"><a class="btn sm" id="code-dlg-open" href="#">Ver todo el código del TP</a><button class="btn icon sm ghost" id="code-dlg-close" aria-label="Cerrar" autofocus><svg class="i" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+  </div>
+  <div id="code-dlg-body"></div>
+</dialog>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<script src="https://ezequielrickert.github.io/austral-ia-generativa/js/site.js?h=f2262278f956a92874ef"></script>
+
+<script>
+(function(){
+  var p = Study.state, seen = 0;
+  Object.keys(p.seen).forEach(function(k){ seen += p.seen[k].length; });
+  document.getElementById('st-seen').innerHTML = seen + ' <small>/ 849</small>';
+  document.getElementById('st-key').innerHTML = Object.keys(p.seenKey || {}).length + ' <small>/ 197</small>';
+  var q = Object.keys(p.quiz).map(function(k){ return p.quiz[k]; });
+  document.getElementById('st-acc').textContent = q.length ? Math.round(100 * q.filter(function(x){return x.ok;}).length / q.length) + '%' : '—';
+  document.getElementById('st-star').textContent = Object.keys(p.star).length;
+  if (p.last) { var a = document.getElementById('continue'); a.href = SITE_BASE + p.last; a.textContent = 'Continuar donde quedaste'; }
+  var d = Math.round((new Date(2026, 11, 4) - new Date(new Date().toDateString())) / 864e5);
+  document.getElementById('days').textContent = d > 0 ? 'faltan ' + d + ' días' : (d === 0 ? 'es hoy' : '');
+})();
+</script>
+
+</body>
+</html>

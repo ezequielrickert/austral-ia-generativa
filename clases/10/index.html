@@ -1,0 +1,2367 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Clase 10 · Agentes: sistemas multiagente, especialización, contexto y orquestación · IA Generativa</title>
+  <meta name="description" content="Las diapositivas de IA Generativa (Universidad Austral, 2c 2026) con notas por diapositiva y vínculos a los TPs.">
+  <script>
+    (function(){try{var t=localStorage.getItem('iagen:theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t)}catch(e){}})();
+    window.SITE_BASE = "https://ezequielrickert.github.io/austral-ia-generativa".replace(/\/$/, '');
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <link rel="stylesheet" href="https://ezequielrickert.github.io/austral-ia-generativa/css/site.css?h=ede67d51655aa3494e82">
+</head>
+<body>
+
+
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <a class="sb-head" href="https://ezequielrickert.github.io/austral-ia-generativa/">
+      <span class="sb-logo">IA</span>
+      <span class="sb-title"><b>IA Generativa</b><span>Guía de estudio · 2c 2026</span></span>
+    </a>
+    <div class="sb-search">
+      <div class="input-icon">
+        <svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input class="input" id="search" type="search" placeholder="Buscar" autocomplete="off" aria-label="Buscar diapositivas y conceptos">
+        <kbd>/</kbd>
+      </div>
+      <div class="search-results" id="search-results" hidden></div>
+    </div>
+    <nav class="sb-body" aria-label="Navegación">
+      <div class="nav-group">
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/">
+          <svg class="i" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span class="t">Inicio</span></a>
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/">
+          <svg class="i" viewBox="0 0 24 24"><path d="M4 19.5V5a2 2 0 0 1 2-2h14v16H6.5A2.5 2.5 0 0 0 4 21.5"/><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/></svg><span class="t">Glosario</span></a>
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/practica/">
+          <svg class="i" viewBox="0 0 24 24"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg><span class="t">Práctica</span></a>
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/marcadas/">
+          <svg class="i" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg><span class="t">Marcadas</span><span class="count" id="star-count"></span></a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-label">Clases</div>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/" title="Bienvenida + CoWork: fundamentos de IA, modelos fundacionales y el chat extendido">
+          <span class="n">01</span><span class="t">Bienvenida + CoWork: fundamentos de IA, modelos fundacionales y el chat extendido</span><span class="meter" data-class="1" data-total="100"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/" title="CoWork: agentes de código, contexto, CLAUDE.md, Skills, subagentes y MCP">
+          <span class="n">02</span><span class="t">CoWork: agentes de código, contexto, CLAUDE.md, Skills, subagentes y MCP</span><span class="meter" data-class="2" data-total="66"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/03/" title="Introducción a las redes neuronales">
+          <span class="n">03</span><span class="t">Introducción a las redes neuronales</span><span class="meter" data-class="3" data-total="51"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/" title="Diseño de redes neuronales (modelado de un MLP)">
+          <span class="n">04</span><span class="t">Diseño de redes neuronales (modelado de un MLP)</span><span class="meter" data-class="4" data-total="64"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/05/" title="LLMs: prompting, costos y producción">
+          <span class="n">05</span><span class="t">LLMs: prompting, costos y producción</span><span class="meter" data-class="5" data-total="72"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/" title="RAG, bases vectoriales, inverted index">
+          <span class="n">06</span><span class="t">RAG, bases vectoriales, inverted index</span><span class="meter" data-class="6" data-total="71"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/" title="MCP y herramientas (con repaso de RAG) · De la palabra al transformer">
+          <span class="n">07</span><span class="t">MCP y herramientas (con repaso de RAG) · De la palabra al transformer</span><span class="meter" data-class="7" data-total="69"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/08/" title="El transformer por dentro: atención, el bloque completo y la familia de modelos">
+          <span class="n">08</span><span class="t">El transformer por dentro: atención, el bloque completo y la familia de modelos</span><span class="meter" data-class="8" data-total="43"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/" title="LLM training: pre-training, SFT, RLHF, herramientas y fine-tuning">
+          <span class="n">09</span><span class="t">LLM training: pre-training, SFT, RLHF, herramientas y fine-tuning</span><span class="meter" data-class="9" data-total="60"><i></i></span></a>
+        
+        <a class="nav-item active" href="https://ezequielrickert.github.io/austral-ia-generativa/clases/10/" title="Agentes: sistemas multiagente, especialización, contexto y orquestación">
+          <span class="n">10</span><span class="t">Agentes: sistemas multiagente, especialización, contexto y orquestación</span><span class="meter" data-class="10" data-total="64"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/11/" title="Redes generativas antagónicas (GANs)">
+          <span class="n">11</span><span class="t">Redes generativas antagónicas (GANs)</span><span class="meter" data-class="11" data-total="54"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/12/" title="Modelos generativos de señales, imágenes y multimodalidad">
+          <span class="n">12</span><span class="t">Modelos generativos de señales, imágenes y multimodalidad</span><span class="meter" data-class="12" data-total="79"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/" title="Del poder a la responsabilidad: seguridad, ética y lo que viene">
+          <span class="n">13</span><span class="t">Del poder a la responsabilidad: seguridad, ética y lo que viene</span><span class="meter" data-class="13" data-total="56"><i></i></span></a>
+        
+      </div>
+      <div class="nav-group">
+        <div class="nav-label">Trabajos prácticos</div>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/tp/1/" title="Corta, del caos a producción">
+          <span class="n">1</span><span class="t">Corta, del caos a producción</span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/tp/2/" title="¿Cuánto vale esta casa?">
+          <span class="n">2</span><span class="t">¿Cuánto vale esta casa?</span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/tp/3/" title="RAG, MCP y Transformers en el Hospital Arroyo Claro">
+          <span class="n">3</span><span class="t">RAG, MCP y Transformers en el Hospital Arroyo Claro</span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/tp/4/" title="El agente de admisión de guardia (TP final)">
+          <span class="n">4</span><span class="t">El agente de admisión de guardia (TP final)</span></a>
+        
+      </div>
+    </nav>
+    <div class="sb-foot">
+      <span id="exam-left">Final: 4 dic</span>
+      <button class="btn icon sm ghost" id="theme-btn" aria-label="Cambiar tema" title="Cambiar tema">
+        <svg class="i" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+    </div>
+  </aside>
+  <div class="main">
+    <div class="topbar">
+      <button class="btn icon" id="menu-btn" aria-label="Abrir navegación"><svg class="i" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+      <b>IA Generativa</b>
+    </div>
+    <main class="content is-viewer">
+      
+
+<div class="viewer-page" id="viewer" data-class="10">
+<header class="page-header">
+  <div class="ph-main">
+    <nav class="crumbs"><a href="https://ezequielrickert.github.io/austral-ia-generativa/">Clases</a><span class="sep">/</span><span>Clase 10</span><span class="sep">·</span><span>7 oct</span><span class="sep">·</span><span>Agentes</span></nav>
+    <h1>Agentes: sistemas multiagente, especialización, contexto y orquestación</h1>
+  </div>
+  <div class="ph-actions">
+    
+    <button class="btn icon" id="focus-btn" aria-pressed="false" title="Modo foco: ocultar el menú (f)" aria-label="Modo foco"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg></button>
+    <button class="btn icon" id="fs-btn" title="Pantalla completa: diapositivas, notas y TPs (p)" aria-label="Pantalla completa"><svg class="i" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+    <a class="btn" href="https://ezequielrickert.github.io/austral-ia-generativa/practica/#c10">Practicar</a>
+    <a class="btn icon " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/" aria-label="Clase anterior" title="Clase anterior"><svg class="i" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></a>
+    <a class="btn icon " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/11/" aria-label="Clase siguiente" title="Clase siguiente"><svg class="i" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></a>
+  </div>
+</header>
+
+<div class="viewer-area">
+<div class="viewer">
+  <section class="card stage-card">
+    <div class="card-header">
+      <span class="deck-kind"><span class="pill sched" id="deck-kind" data-kind-sched="Calendario" data-kind-extra="Complementaria" title="Figura en el calendario de la materia">Calendario</span><span class="card-sub" id="sec-name">&nbsp;</span></span>
+      <div class="seg" id="filter" aria-label="Filtrar diapositivas">
+        <button aria-pressed="true" data-f="all">Todas<span class="fc mono" data-fc="all"></span></button>
+        <button aria-pressed="false" data-f="key"><span class="bar"></span>Clave<span class="fc mono" data-fc="key"></span></button>
+        <button aria-pressed="false" data-f="tp"><span class="dot"></span>En TPs<span class="fc mono" data-fc="tp"></span></button>
+      </div>
+      <button class="btn icon sm ghost" id="fs-exit" title="Salir de pantalla completa (p o Esc)" aria-label="Salir de pantalla completa"><svg class="i" viewBox="0 0 24 24"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg></button>
+    </div>
+    <div class="stage" id="stage">
+      <iframe id="deck-frame" title="Diapositivas de la clase" allow="autoplay; fullscreen"></iframe>
+      <button class="tp-mark" id="tp-mark" hidden aria-expanded="false" aria-controls="tp-pop" title="¿Dónde lo usaste? (t)"><b>?</b><span id="tp-mark-label">TP</span></button>
+      <div class="tp-pop card" id="tp-pop" hidden role="dialog" aria-label="Dónde lo usaste en los TPs"></div>
+    </div>
+    <div class="card-footer">
+      <button class="btn icon sm" id="prev" aria-label="Diapositiva anterior"><svg class="i" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>
+      <span class="pos" id="pos">—</span>
+      <button class="btn icon sm" id="next" aria-label="Diapositiva siguiente"><svg class="i" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>
+      
+      <div class="scrub" data-scrub="agentes-y-multiagentes"  role="slider" aria-label="Ir a una diapositiva" aria-valuemin="0" aria-valuemax="63" tabindex="0">
+        <span class="tk" data-i="0" data-t="Inteligencia Artificial Generativa (AI Gen)"></span><span class="tk" data-i="1" data-t="Qué es un agente"></span><span class="tk" data-i="2" data-t="¿Un LLM es un agente?"></span><span class="tk key" data-i="3" data-t="La definición de Russell &amp; Norvig"></span><span class="tk" data-i="4" data-t="Lo que la definición no menciona"></span><span class="tk key tp" data-i="5" data-t="El agente racional"></span><span class="tk" data-i="6" data-t="Racionalidad: actuar bien según una medida"></span><span class="tk" data-i="7" data-t="Función de agente y programa de agente"></span><span class="tk" data-i="8" data-t="Arquitecturas clásicas de agente"></span><span class="tk" data-i="9" data-t="Un auto autónomo en cada arquitectura"></span><span class="tk key tp" data-i="10" data-t="Dos agentes, una descripción PEAS"></span><span class="tk" data-i="11" data-t="El agente basado en LLM"></span><span class="tk" data-i="12" data-t="Agente = LLM + planificación + tools"></span><span class="tk" data-i="13" data-t="Dos formas de conectar un LLM con tools"></span><span class="tk key tp" data-i="14" data-t="Workflow o agente"></span><span class="tk" data-i="15" data-t="Cuándo vale la pena un agente"></span><span class="tk" data-i="16" data-t="Los agentes tienen tools"></span><span class="tk key tp" data-i="17" data-t="Qué es una tool"></span><span class="tk" data-i="18" data-t="Un contrato con un sistema no determinístico"></span><span class="tk tp" data-i="19" data-t="Una tool en código"></span><span class="tk tp" data-i="20" data-t="Principios para diseñar tools"></span><span class="tk" data-i="21" data-t="ReAct"></span><span class="tk key" data-i="22" data-t="ReAct: pensar también es una acción"></span><span class="tk" data-i="23" data-t="Una trayectoria ReAct"></span><span class="tk" data-i="24" data-t="Las tools y la instrucción"></span><span class="tk" data-i="25" data-t="El prompt completo y el corte"></span><span class="tk tp" data-i="26" data-t="ReAct en LangGraph"></span><span class="tk" data-i="27" data-t="Dos sentidos de «agente ReAct»"></span><span class="tk" data-i="28" data-t="Otros tres tipos"></span><span class="tk" data-i="29" data-t="Dos preguntas para cada tipo"></span><span class="tk key" data-i="30" data-t="Plan-and-Execute: planificar primero"></span><span class="tk" data-i="31" data-t="Un plan para la misma pregunta"></span><span class="tk" data-i="32" data-t="Qué gana y qué cuesta planificar"></span><span class="tk key" data-i="33" data-t="Reflexion: intentar, evaluar, reflexionar"></span><span class="tk" data-i="34" data-t="Una reflexión, en código"></span><span class="tk" data-i="35" data-t="Qué gana y qué cuesta reflexionar"></span><span class="tk key" data-i="36" data-t="ReWOO: planificar con variables"></span><span class="tk" data-i="37" data-t="Un plan ReWOO"></span><span class="tk" data-i="38" data-t="Qué gana y qué cuesta planificar con variables"></span><span class="tk key" data-i="39" data-t="Los cuatro tipos, comparados"></span><span class="tk" data-i="40" data-t="Sistemas multiagente"></span><span class="tk key tp" data-i="41" data-t="El contexto se degrada"></span><span class="tk key" data-i="42" data-t="Qué es un sistema multiagente"></span><span class="tk" data-i="43" data-t="Multiagente: orquestador y workers"></span><span class="tk" data-i="44" data-t="Dónde aparece el orquestador con workers"></span><span class="tk" data-i="45" data-t="Estrella: orquestador y subagentes"></span><span class="tk" data-i="46" data-t="Router: despacho"></span><span class="tk" data-i="47" data-t="Red: el control pasa de agente en agente"></span><span class="tk" data-i="48" data-t="Pizarra: publicar y leer"></span><span class="tk" data-i="49" data-t="Pipeline y jerarquía"></span><span class="tk key" data-i="50" data-t="Las topologías, comparadas"></span><span class="tk tp" data-i="51" data-t="Primero, un solo agente"></span><span class="tk" data-i="52" data-t="Cuándo repartir"></span><span class="tk" data-i="53" data-t="El precio de paralelizar"></span><span class="tk" data-i="54" data-t="Cómo fallan"></span><span class="tk" data-i="55" data-t="El aislamiento hay que configurarlo"></span><span class="tk" data-i="56" data-t="Compartir el contexto no alcanza"></span><span class="tk" data-i="57" data-t="El debate: ¿construir multiagentes?"></span><span class="tk key" data-i="58" data-t="¿El trabajo lee o escribe?"></span><span class="tk" data-i="59" data-t="Un caso: cómo se descompone"></span><span class="tk" data-i="60" data-t="Conclusions"></span><span class="tk key" data-i="61" data-t="Lo que queda de la clase"></span><span class="tk" data-i="62" data-t="Cómo elegir la arquitectura"></span><span class="tk" data-i="63" data-t="Para leer después"></span>
+      </div>
+      
+      <button class="btn sm" id="side-toggle" aria-pressed="true" title="Esconder las notas (n)"><svg class="i chev-hide" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg><svg class="i chev-show" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>Notas</button>
+    </div>
+  </section>
+
+  <aside class="card side-card" id="side-card">
+    <div class="card-header">
+      <div class="seg" role="tablist" data-tabs="side-card">
+        <button role="tab" data-tab="nota" aria-selected="true">Nota</button>
+        <button role="tab" data-tab="indice" aria-selected="false">Índice</button>
+      </div>
+      <span class="count mono faint" id="note-pos" style="font-size:12px"></span>
+    </div>
+
+    <div class="side-panel" data-panel="nota" id="notes" aria-live="polite">
+      
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="0" hidden>
+          <div class="card-section head">
+            <h2>Inteligencia Artificial Generativa (AI Gen)</h2>
+            
+            <p class="summary">Portada de la clase 10: agentes y sistemas multiagente.</p>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="1" hidden>
+          <div class="card-section head">
+            <h2>Qué es un agente</h2>
+            
+            <p class="summary">Agenda: qué es un agente, el agente con LLM, tools, ReAct, otros tipos, multiagente y cuándo repartir.</p>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="2" hidden>
+          <div class="card-section head">
+            <h2>¿Un LLM es un agente?</h2>
+            
+            <p class="summary">Quiz: un LLM <strong>por sí solo no es un agente</strong>. Recibe texto y devuelve texto; se vuelve agente cuando percibe y actúa en un loop.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#agente">Agente</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#llm">LLM (Large Language Model)</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="3" hidden>
+          <div class="card-section head">
+            <h2>La definición de Russell &amp; Norvig</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary">Russell &amp; Norvig: un <strong>agente</strong> es cualquier cosa que percibe su entorno con <strong>sensores</strong> y actúa sobre él con <strong>actuadores</strong>. Es la definición canónica.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#agente">Agente</a><span>sensores</span><span>actuadores</span></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=introduccion&amp;s=63"><span class="ref">01·63</span><span><span class="t">Tipos de Agentes en IA</span><small>tipos de agentes en IA</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="4" hidden>
+          <div class="card-section head">
+            <h2>Lo que la definición no menciona</h2>
+            
+            <p class="summary">La definición es amplia a propósito: no exige LLM, ni robot, ni inteligencia. Antes de diseñar, preguntá qué percibe, qué hace y en qué ambiente.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#agente">Agente</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#peas">PEAS</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="5" hidden>
+          <div class="card-section head">
+            <h2>El agente racional</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary"><strong>Agente racional</strong>: elige la acción que maximiza la <strong>medida de performance</strong> esperada con lo que percibió. Si la medida está mal especificada, hace algo indeseable.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#agente-racional">Agente racional (definición de IA)</a><span>medida de performance</span></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/#d=cierre-magnifica-humanitas&amp;s=28"><span class="ref">13·28</span><span><span class="t">Objetivos instrumentales</span><small>objetivos instrumentales</small></span></a></div>
+          </div>
+          
+          
+          <template class="tp-data"><div class="tp-ref" data-tp="4"><a href="https://ezequielrickert.github.io/austral-ia-generativa/tp/4/">TP4 · El agente de admisión de guardia (TP final)</a><span>Tu medida de performance eran 9 controles: un caso cuenta como resuelto solo si los 9 están bien.</span><button class="btn sm code-btn" data-code="tp4-comparar-9-controles,tp4-puntuar-runner" data-nota="`comparar` define los 9 controles y `puntuar` los aplica a cada traza: resuelto solo si los 9 dan bien."><svg class="i" viewBox="0 0 24 24"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></svg>Ver en el código · 2 fragmentos</button></div></template>
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="6" hidden>
+          <div class="card-section head">
+            <h2>Racionalidad: actuar bien según una medida</h2>
+            
+            <p class="summary">Lo racional depende de cuatro factores: la medida, el conocimiento previo, las acciones posibles y lo percibido. Este último después se llama <strong>contexto</strong>.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#agente-racional">Agente racional (definición de IA)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#contexto-de-agente">El repo como contexto</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="7" hidden>
+          <div class="card-section head">
+            <h2>Función de agente y programa de agente</h2>
+            
+            <p class="summary">La <strong>función</strong> de agente mapea historias de percepciones a acciones (tabla casi infinita); el <strong>programa</strong> es el código que corre y solo ve la percepción actual.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><span>funcion de agente</span><span>programa de agente</span></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="8" hidden>
+          <div class="card-section head">
+            <h2>Arquitecturas clásicas de agente</h2>
+            
+            <p class="summary">Arquitecturas clásicas: reflejo simple, con modelo, basado en objetivos, en utilidad y que aprende. Cada una agrega una pieza a la anterior.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#arquitecturas-clasicas-de-agente">Arquitecturas clásicas de agente</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=introduccion&amp;s=63"><span class="ref">01·63</span><span><span class="t">Tipos de Agentes en IA</span><small>tipos de agentes en IA</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="9" hidden>
+          <div class="card-section head">
+            <h2>Un auto autónomo en cada arquitectura</h2>
+            
+            <p class="summary">El auto autónomo en cada arquitectura: el modelo recuerda lo que no ve, el objetivo da destino, la utilidad elige la ruta y el aprendizaje corrige al diseñador.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#arquitecturas-clasicas-de-agente">Arquitecturas clásicas de agente</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="10" hidden>
+          <div class="card-section head">
+            <h2>Dos agentes, una descripción PEAS</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary"><strong>PEAS</strong>: medida de <strong>P</strong>erformance, <strong>E</strong>ntorno, <strong>A</strong>ctuadores y <strong>S</strong>ensores. Al LLM, sus tools le dan los actuadores y sus resultados, los sensores.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#peas">PEAS</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#agente">Agente</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=introduccion&amp;s=64"><span class="ref">01·64</span><span><span class="t">Dimensiones del Entorno</span><small>dimensiones del entorno</small></span></a></div>
+          </div>
+          
+          
+          <template class="tp-data"><div class="tp-ref" data-tp="4"><a href="https://ezequielrickert.github.io/austral-ia-generativa/tp/4/">TP4 · El agente de admisión de guardia (TP final)</a><span>P: 9 controles. E: entorno de admisión. A: <code>preguntar</code>, <code>registrar_decision</code>. S: <code>leer_triage</code> y lo que devuelven las tools.</span><button class="btn sm code-btn" data-code="tp4-comparar-9-controles,tp4-entorno-herramientas,tp4-agente-bucle" data-nota="P = `comparar` (9 controles); E = `Entorno`; A = `preguntar`, `registrar_decision`; S = `leer_triage` y las observaciones que agrega el bucle."><svg class="i" viewBox="0 0 24 24"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></svg>Ver en el código · 3 fragmentos</button></div></template>
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="11" hidden>
+          <div class="card-section head">
+            <h2>El agente basado en LLM</h2>
+            
+            <p class="summary">Sección 2: el agente basado en LLM.</p>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="12" hidden>
+          <div class="card-section head">
+            <h2>Agente = LLM + planificación + tools</h2>
+            
+            <p class="summary">Lilian Weng: <strong>agente = LLM + planificación + tools</strong> (+ memoria). El LLM es el cerebro; tools y planificación organizan la clase.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#agente">Agente</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#llm">LLM (Large Language Model)</a><span>planificacion</span></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="13" hidden>
+          <div class="card-section head">
+            <h2>Dos formas de conectar un LLM con tools</h2>
+            
+            <p class="summary">Mismo LLM y mismas tools, dos formas: el <strong>código</strong> decide el próximo paso (pasos fijos) o lo decide el <strong>modelo</strong> en un loop.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#workflow-vs-agente">Workflow vs agente (Anthropic)</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="14" hidden>
+          <div class="card-section head">
+            <h2>Workflow o agente</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary">Anthropic: <strong>workflow</strong> si el código fija el camino; <strong>agente</strong> si el LLM usa tools en un loop según lo que observa. Los sistemas reales mezclan las dos.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#workflow-vs-agente">Workflow vs agente (Anthropic)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#agente">Agente</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/05/#d=prompting&amp;s=43"><span class="ref">05·43</span><span><span class="t">Prompt chaining</span><small>prompt chaining, un workflow</small></span></a></div>
+          </div>
+          
+          
+          <template class="tp-data"><div class="tp-ref" data-tp="3"><a href="https://ezequielrickert.github.io/austral-ia-generativa/tp/3/">TP3 · RAG, MCP y Transformers en el Hospital Arroyo Claro</a><span>Hiciste un agente: el modelo elige tools y cuándo terminar.</span><button class="btn sm code-btn" data-code="tp3-bucle-tool-calling,tp3-corrida-correr,tp3-agente-main" data-nota="Es agente y no workflow: el modelo decide qué tools llamar y cuándo cortar (`if not ai.tool_calls`)."><svg class="i" viewBox="0 0 24 24"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></svg>Ver en el código · 3 fragmentos</button></div><div class="tp-ref" data-tp="4"><a href="https://ezequielrickert.github.io/austral-ia-generativa/tp/4/">TP4 · El agente de admisión de guardia (TP final)</a><span>El de admisión también: 5 tools, el modelo decide el recorrido.</span><button class="btn sm code-btn" data-code="tp4-entorno-herramientas,tp4-agente-bucle" data-nota="No hay un orden fijo en el código: el modelo elige qué herramienta llamar en cada turno."><svg class="i" viewBox="0 0 24 24"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></svg>Ver en el código · 2 fragmentos</button></div></template>
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="15" hidden>
+          <div class="card-section head">
+            <h2>Cuándo vale la pena un agente</h2>
+            
+            <p class="summary">Empezá por <strong>lo más simple posible</strong>: a veces no hace falta un agente. Cuesta latencia y plata, y los errores se acumulan.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#workflow-vs-agente">Workflow vs agente (Anthropic)</a><span>costo</span></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="16" hidden>
+          <div class="card-section head">
+            <h2>Los agentes tienen tools</h2>
+            
+            <p class="summary">Sección 3: los agentes tienen tools.</p>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="17" hidden>
+          <div class="card-section head">
+            <h2>Qué es una tool</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary">Una <strong>tool</strong> es una función que el agente pide: nombre, descripción y parámetros van al contexto. El LLM solo genera el pedido; <strong>el programa ejecuta</strong>.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#tool-calling">Uso de herramientas (tool calling)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#descripcion-como-disparador">La descripción como disparador</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/#d=como-se-entrena-un-llm&amp;s=48"><span class="ref">09·48</span><span><span class="t">MCP: una herramienta es una definición</span><small>una tool es una definición</small></span></a></div>
+          </div>
+          
+          
+          <template class="tp-data"><div class="tp-ref" data-tp="4"><a href="https://ezequielrickert.github.io/austral-ia-generativa/tp/4/">TP4 · El agente de admisión de guardia (TP final)</a><span>Cinco tools fijas: <code>leer_triage</code>, <code>preguntar</code>, <code>verificar_afiliacion</code>, <code>buscar_normativa</code> y <code>registrar_decision</code>.</span><button class="btn sm code-btn" data-code="tp4-prompt-procedimiento-v1,tp4-agente-bucle,tp4-entorno-herramientas" data-nota="Las tools se describen en el `system_prompt`, el bucle despacha el JSON del modelo y el entorno las ejecuta."><svg class="i" viewBox="0 0 24 24"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></svg>Ver en el código · 3 fragmentos</button></div></template>
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="18" hidden>
+          <div class="card-section head">
+            <h2>Un contrato con un sistema no determinístico</h2>
+            
+            <p class="summary">Una tool es un contrato con un sistema <strong>no determinístico</strong>: puede llamarla de más, de menos o con argumentos raros. Se diseña pensando en quien la llama.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#tool-calling">Uso de herramientas (tool calling)</a><span>no determinismo</span></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="19" hidden>
+          <div class="card-section head">
+            <h2>Una tool en código</h2>
+            
+            <p class="summary">En código: <code>@tool</code> + docstring. El modelo ve el nombre, los tipos y el docstring, <strong>nunca el cuerpo</strong>. Ojo: <code>eval()</code> sobre texto del modelo es inaceptable en producción.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#tool-calling">Uso de herramientas (tool calling)</a><span>langchain</span></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/#d=como-se-entrena-un-llm&amp;s=42"><span class="ref">09·42</span><span><span class="t">Calcular: la misma cuenta por la API</span><small>la llamada vista desde la API</small></span></a></div>
+          </div>
+          
+          
+          <template class="tp-data"><div class="tp-ref" data-tp="3"><a href="https://ezequielrickert.github.io/austral-ia-generativa/tp/3/">TP3 · RAG, MCP y Transformers en el Hospital Arroyo Claro</a><span>Usaste <code>@tool</code> y <code>bind_tools</code> en LangChain, con <code>ChatOpenAI</code> apuntando a OpenRouter.</span><button class="btn sm code-btn" data-code="tp3-herramientas-langchain,tp3-bucle-tool-calling,tp3-modelo-llm-openrouter" data-nota="`@tool` en `herramientas.py`, `bind_tools` en `bucle.py` y `ChatOpenAI` contra OpenRouter en `modelo.py`."><svg class="i" viewBox="0 0 24 24"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></svg>Ver en el código · 3 fragmentos</button></div></template>
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="20" hidden>
+          <div class="card-section head">
+            <h2>Principios para diseñar tools</h2>
+            
+            <p class="summary">Diseño de tools: <strong>pocas y consolidadas</strong>, nombres con prefijo, devolver contexto con significado y respuestas cortas. El contexto es caro y la memoria, barata.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#tool-calling">Uso de herramientas (tool calling)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#routing-de-herramientas">Patrones de catálogo: routing jerárquico y catálogo por fase</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=63"><span class="ref">06·63</span><span><span class="t">Cuatro principios de diseño</span><small>cuatro principios de diseño</small></span></a></div>
+          </div>
+          
+          
+          <template class="tp-data"><div class="tp-ref" data-tp="3"><a href="https://ezequielrickert.github.io/austral-ia-generativa/tp/3/">TP3 · RAG, MCP y Transformers en el Hospital Arroyo Claro</a><span>Arreglaste A11 cambiando la descripción de <code>buscar_documentos</code> («con las palabras del paciente, una búsqueda por tema»): CR 5,000.</span><button class="btn sm code-btn" data-code="tp3-descripciones-tools,tp3-informe-a11" data-nota="La frase «con las mismas palabras que usó el paciente… una búsqueda por tema» es el arreglo de A11; el informe cuenta cómo se llegó."><svg class="i" viewBox="0 0 24 24"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></svg>Ver en el código · 2 fragmentos</button></div></template>
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="21" hidden>
+          <div class="card-section head">
+            <h2>ReAct</h2>
+            
+            <p class="summary">Sección 4: ReAct.</p>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="22" hidden>
+          <div class="card-section head">
+            <h2>ReAct: pensar también es una acción</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary"><strong>ReAct</strong> suma el lenguaje a las acciones ($\hat A = A \cup L$): intercala <strong>pensamientos</strong> y <strong>acciones</strong> hasta poder responder. Razonar para actuar y actuar para razonar.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#react">ReAct</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#chain-of-thought">Chain of Thought (CoT)</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/05/#d=prompting&amp;s=37"><span class="ref">05·37</span><span><span class="t">Chain of Thought (CoT)</span><small>chain of thought</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="23" hidden>
+          <div class="card-section head">
+            <h2>Una trayectoria ReAct</h2>
+            
+            <p class="summary">Una trayectoria de HotpotQA: los pensamientos descomponen la pregunta, extraen lo importante, reformulan cuando falla la búsqueda y sintetizan la respuesta.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#react">ReAct</a><span>trayectoria</span></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="24" hidden>
+          <div class="card-section head">
+            <h2>Las tools y la instrucción</h2>
+            
+            <p class="summary">En 2022, ReAct corría sobre modelos de <strong>completado</strong> (PaLM, davinci), sin roles; las tools eran tres líneas de texto en la instrucción.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#react">ReAct</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#few-shot">In-context learning: zero / few / many-shot</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="25" hidden>
+          <div class="card-section head">
+            <h2>El prompt completo y el corte</h2>
+            
+            <p class="summary">Cada paso es una llamada de completado cortada antes de <code>Observation</code>; el código ejecuta la acción, pega el resultado y repite hasta <code>Finish</code> o 7 pasos.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#react">ReAct</a><span>stop sequence</span></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/#d=como-se-entrena-un-llm&amp;s=40"><span class="ref">09·40</span><span><span class="t">Calcular: lo que escribe Llama 3.1</span><small>el modelo se detiene para la tool</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="26" hidden>
+          <div class="card-section head">
+            <h2>ReAct en LangGraph</h2>
+            
+            <p class="summary">ReAct en LangGraph: un <code>agent_node</code> con tools enlazadas y un <code>ToolNode</code>; la arista tools → agent es el loop, y el modelo decide cuándo salir.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#react">ReAct</a><span>langgraph</span></div>
+          </div>
+          
+          
+          
+          <template class="tp-data"><div class="tp-ref" data-tp="3"><a href="https://ezequielrickert.github.io/austral-ia-generativa/tp/3/">TP3 · RAG, MCP y Transformers en el Hospital Arroyo Claro</a><span>Escribiste ese mismo loop a mano, sin LangGraph ni AgentExecutor, para registrar cada mensaje en el log.</span><button class="btn sm code-btn" data-code="tp3-bucle-tool-calling,tp3-corrida-correr,tp3-agente-main" data-nota="El mismo ciclo ReAct que arma LangGraph, escrito a mano."><svg class="i" viewBox="0 0 24 24"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></svg>Ver en el código · 3 fragmentos</button></div></template>
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="27" hidden>
+          <div class="card-section head">
+            <h2>Dos sentidos de «agente ReAct»</h2>
+            
+            <p class="summary">«Agente ReAct» hoy tiene dos sentidos: el formato de prompt de 2022 o cualquier loop de tools con llamadas estructuradas (<code>bind_tools</code>).</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#react">ReAct</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#tool-calling">Uso de herramientas (tool calling)</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/#d=como-se-entrena-un-llm&amp;s=49"><span class="ref">09·49</span><span><span class="t">MCP: lo que aprende el modelo</span><small>function calling genérico</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="28" hidden>
+          <div class="card-section head">
+            <h2>Otros tres tipos</h2>
+            
+            <p class="summary">Sección 5: otros tres tipos de agente.</p>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="29" hidden>
+          <div class="card-section head">
+            <h2>Dos preguntas para cada tipo</h2>
+            
+            <p class="summary">Dos preguntas para comparar los tipos: <strong>¿cuándo se planifica?</strong> y <strong>¿cuántas veces vuelve a razonar el LLM?</strong> ReAct: nunca antes, y en cada paso.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#react">ReAct</a><span>planificacion</span></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="30" hidden>
+          <div class="card-section head">
+            <h2>Plan-and-Execute: planificar primero</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary"><strong>Plan-and-Execute</strong>: un planner escribe el plan completo, los executors (pequeños ReAct) resuelven cada paso y un re-planner decide si sigue o replanifica.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#plan-and-execute">Plan-and-Execute</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/05/#d=prompting&amp;s=43"><span class="ref">05·43</span><span><span class="t">Prompt chaining</span><small>prompt chaining</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="31" hidden>
+          <div class="card-section head">
+            <h2>Un plan para la misma pregunta</h2>
+            
+            <p class="summary">La misma pregunta del Apple Remote, con un plan de dos pasos armado por la cátedra. La búsqueda fallida la resuelve el executor sin volver al planner.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#plan-and-execute">Plan-and-Execute</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="32" hidden>
+          <div class="card-section head">
+            <h2>Qué gana y qué cuesta planificar</h2>
+            
+            <p class="summary">Planificar ahorra llamadas al modelo grande y fuerza a pensar la tarea entera, pero las ventajas no están medidas y el plan no conecta datos entre pasos.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#plan-and-execute">Plan-and-Execute</a><span>costo</span></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="33" hidden>
+          <div class="card-section head">
+            <h2>Reflexion: intentar, evaluar, reflexionar</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary"><strong>Reflexion</strong>: el Actor intenta, el Evaluator juzga y, si falla, se escribe una <strong>crítica en lenguaje natural</strong> como memoria para el próximo intento. No toca los pesos.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#reflexion">Reflexion</a><span>memoria</span></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="34" hidden>
+          <div class="card-section head">
+            <h2>Una reflexión, en código</h2>
+            
+            <p class="summary">Ejemplo: una solución que solo cuenta paréntesis falla los tests que generó el propio agente; la reflexión dice «importa el orden» y guía el siguiente intento.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#reflexion">Reflexion</a><span>tests</span></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="35" hidden>
+          <div class="card-section head">
+            <h2>Qué gana y qué cuesta reflexionar</h2>
+            
+            <p class="summary">Reflexion llegó a 91 % en HumanEval (vs 80,1 % de GPT-4), pero necesita una <strong>señal clara de éxito</strong> y cuesta varios intentos.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#reflexion">Reflexion</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#evals">Evals (eval set propio)</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="36" hidden>
+          <div class="card-section head">
+            <h2>ReWOO: planificar con variables</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary"><strong>ReWOO</strong>: el plan se escribe completo con <strong>variables</strong> (<code>#E1</code>) y todas las tools se ejecutan sin volver a razonar. El LLM piensa solo al planificar y al resolver.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#rewoo">ReWOO</a><span>planificacion</span></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="37" hidden>
+          <div class="card-section head">
+            <h2>Un plan ReWOO</h2>
+            
+            <p class="summary">En el plan ReWOO, E4 usa el resultado de E2 sin conocerlo todavía. Un LLM puede ser una tool (<code>LLM[...]</code>): una llamada al planner, cinco ejecuciones y un solver.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#rewoo">ReWOO</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="38" hidden>
+          <div class="card-section head">
+            <h2>Qué gana y qué cuesta planificar con variables</h2>
+            
+            <p class="summary">ReWOO ataca el <strong>costo</strong>: en ReAct cada paso reenvía el prompt acumulado. A cambio, si una tool devuelve algo inesperado, nadie replanifica.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#rewoo">ReWOO</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#costo-por-token">Costo por token / fórmula del costo</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="39" hidden>
+          <div class="card-section head">
+            <h2>Los cuatro tipos, comparados</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary">Comparación: <strong>ReAct</strong> para tareas exploratorias, <strong>Plan-and-Execute</strong> para largas y predecibles, <strong>ReWOO</strong> para ahorrar tokens y <strong>Reflexion</strong> cuando hay un evaluador claro.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#react">ReAct</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#plan-and-execute">Plan-and-Execute</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#reflexion">Reflexion</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#rewoo">ReWOO</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="40" hidden>
+          <div class="card-section head">
+            <h2>Sistemas multiagente</h2>
+            
+            <p class="summary">Sección 6: sistemas multiagente.</p>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="41" hidden>
+          <div class="card-section head">
+            <h2>El contexto se degrada</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary"><strong>Context rot</strong>: el contexto crece en cada vuelta y, cuanto más largo, peor recuerda el modelo. Hay que buscar el conjunto <strong>más chico</strong> de tokens útiles.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#context-rot">Context rot</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#contexto-de-agente">El repo como contexto</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=12"><span class="ref">02·12</span><span><span class="t">El manejo del contexto</span><small>el manejo del contexto</small></span></a></div>
+          </div>
+          
+          
+          <template class="tp-data"><div class="tp-ref" data-tp="4"><a href="https://ezequielrickert.github.io/austral-ia-generativa/tp/4/">TP4 · El agente de admisión de guardia (TP final)</a><span>El sistema ocupa el 55 % del contexto. <code>prefijos</code> subió el contexto por caso y bajó de 10/50 a 6/50 casos resueltos.</span><button class="btn sm code-btn" data-code="tp4-contexto-desglose,tp4-reparto-contexto-doc,tp4-informe-agente-buscador" data-nota=""><svg class="i" viewBox="0 0 24 24"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></svg>Ver en el código · 3 fragmentos</button></div></template>
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="42" hidden>
+          <div class="card-section head">
+            <h2>Qué es un sistema multiagente</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary"><strong>Multiagente</strong>: varios agentes que interactúan para un problema que excede a uno. Repartir mueve tres palancas: paralelismo, especialización y <strong>aislamiento de contexto</strong>.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#sistema-multiagente">Sistema multiagente</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#aislamiento-de-contexto">Aislamiento de contexto</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="43" hidden>
+          <div class="card-section head">
+            <h2>Multiagente: orquestador y workers</h2>
+            
+            <p class="summary">Forma básica: un <strong>orquestador</strong> parte la tarea en el momento y cada <strong>worker</strong> resuelve su parte con su propio loop.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#orquestador-workers">Fan-out / fan-in (orquestador y workers)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#subagente">Subagente</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=21"><span class="ref">02·21</span><span><span class="t">Subagentes: varios trabajando a la vez</span><small>subagentes en paralelo</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="44" hidden>
+          <div class="card-section head">
+            <h2>Dónde aparece el orquestador con workers</h2>
+            
+            <p class="summary">Dónde aparece: edición de código en varios archivos, búsqueda en muchas fuentes y el sistema de investigación de Anthropic. Leer en paralelo no choca; escribir, sí.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#orquestador-workers">Fan-out / fan-in (orquestador y workers)</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="45" hidden>
+          <div class="card-section head">
+            <h2>Estrella: orquestador y subagentes</h2>
+            
+            <p class="summary"><strong>Estrella</strong>: cada subagente habla solo con el orquestador, con <strong>su propia ventana</strong>; lee mucho y devuelve poco. «La esencia de buscar es comprimir».</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#topologias-multiagente">Topologías multiagente</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#subagente">Subagente</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=claude-cowork&amp;s=24"><span class="ref">02·24</span><span><span class="t">Subagentes: varios trabajando a la vez <span class="pill compl" title="Presentación complementaria: no figura en el calendario">Compl.</span></span><small>subagentes trabajando a la vez</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="46" hidden>
+          <div class="card-section head">
+            <h2>Router: despacho</h2>
+            
+            <p class="summary"><strong>Router</strong>: clasifica el pedido una vez y lo despacha al especialista; no vuelve a razonar sobre lo que devuelve.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#topologias-multiagente">Topologías multiagente</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#routing-jerarquico">Routing jerárquico / catálogo por fase</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=rag-mcp-rapida&amp;s=27"><span class="ref">07·27</span><span><span class="t">Routing jerárquico y catálogo por fase</span><small>routing jerárquico</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="47" hidden>
+          <div class="card-section head">
+            <h2>Red: el control pasa de agente en agente</h2>
+            
+            <p class="summary"><strong>Red</strong>: sin coordinador, el control pasa de agente en agente con el contexto armado (bienvenida → IT → finanzas).</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#topologias-multiagente">Topologías multiagente</a><span>handoff</span></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="48" hidden>
+          <div class="card-section head">
+            <h2>Pizarra: publicar y leer</h2>
+            
+            <p class="summary"><strong>Pizarra</strong>: cada agente publica en un espacio compartido y lee de ahí. No se mandan mensajes (MetaGPT).</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#topologias-multiagente">Topologías multiagente</a><span>pizarra</span></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="49" hidden>
+          <div class="card-section head">
+            <h2>Pipeline y jerarquía</h2>
+            
+            <p class="summary"><strong>Pipeline</strong>: cadena fija, un workflow con un agente por paso (ChatDev). <strong>Jerarquía</strong>: un árbol de orquestadores (Contract Net).</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#topologias-multiagente">Topologías multiagente</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#prompt-chaining">Prompt chaining</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="50" hidden>
+          <div class="card-section head">
+            <h2>Las topologías, comparadas</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary">Tabla de topologías: quién tiene el control, por dónde pasa el contexto, la latencia y los tokens. El orquestador central da trazabilidad a cambio de tiempo.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#topologias-multiagente">Topologías multiagente</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="51" hidden>
+          <div class="card-section head">
+            <h2>Primero, un solo agente</h2>
+            
+            <p class="summary">LangChain: <strong>empezá con un agente</strong> y buenas tools; repartí solo si el contexto o la especialización se vuelven un límite.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#sistema-multiagente">Sistema multiagente</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#agente">Agente</a></div>
+          </div>
+          
+          
+          
+          <template class="tp-data"><div class="tp-ref" data-tp="4"><a href="https://ezequielrickert.github.io/austral-ia-generativa/tp/4/">TP4 · El agente de admisión de guardia (TP final)</a><span>Tu agente es uno solo, con 5 tools: el trabajo es secuencial y nunca hizo falta repartir.</span><button class="btn sm code-btn" data-code="tp4-entrega-fabricas,tp4-jugar-runner,tp4-agente-bucle" data-nota="Una sola fábrica, un solo `AgentePrompt` por caso, con todas las herramientas: no hay subagentes."><svg class="i" viewBox="0 0 24 24"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></svg>Ver en el código · 3 fragmentos</button></div></template>
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="52" hidden>
+          <div class="card-section head">
+            <h2>Cuándo repartir</h2>
+            
+            <p class="summary">Sección 7: cuándo repartir.</p>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="53" hidden>
+          <div class="card-section head">
+            <h2>El precio de paralelizar</h2>
+            
+            <p class="summary">Un agente gasta ~4× los tokens de un chat; un multiagente, ~15×. El 80 % del desempeño en BrowseComp se explica por tokens: solo paga si la tarea vale.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#costo-por-token">Costo por token / fórmula del costo</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#sistema-multiagente">Sistema multiagente</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/05/#d=prompting&amp;s=8"><span class="ref">05·8</span><span><span class="t">La fórmula del costo</span><small>la fórmula del costo</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="54" hidden>
+          <div class="card-section head">
+            <h2>Cómo fallan</h2>
+            
+            <p class="summary"><strong>MAST</strong>: 1.642 trazas de 7 sistemas, entre 41 % y 86,7 % de fallas. Tres categorías: especificación, desalineación entre agentes y verificación.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#mast">MAST</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#evals">Evals (eval set propio)</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="55" hidden>
+          <div class="card-section head">
+            <h2>El aislamiento hay que configurarlo</h2>
+            
+            <p class="summary">Al pasar el control, el que recibe suele <strong>heredar toda la conversación</strong>. El aislamiento no viene solo: hay que configurarlo y verificarlo en los logs.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#aislamiento-de-contexto">Aislamiento de contexto</a><span>handoff</span></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="56" hidden>
+          <div class="card-section head">
+            <h2>Compartir el contexto no alcanza</h2>
+            
+            <p class="summary">Aun con todo el contexto compartido, cada subagente no ve las <strong>decisiones de su hermano</strong>, y chocan al combinar (el Flappy Bird de Cognition).</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#aislamiento-de-contexto">Aislamiento de contexto</a><span>decisiones implicitas</span></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="57" hidden>
+          <div class="card-section head">
+            <h2>El debate: ¿construir multiagentes?</h2>
+            
+            <p class="summary">Cognition («no construyas multiagentes»: un solo hilo) vs. Anthropic (a favor para investigación), con un día de diferencia. Discuten si los agentes necesitan verse.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#sistema-multiagente">Sistema multiagente</a><span>debate</span></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="58" hidden>
+          <div class="card-section head">
+            <h2>¿El trabajo lee o escribe?</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary">La regla: si el trabajo <strong>lee</strong>, repartir paga; si <strong>escribe</strong> sobre algo compartido, conviene un solo hilo o límites explícitos.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#lee-o-escribe">Regla «¿el trabajo lee o escribe?»</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#sistema-multiagente">Sistema multiagente</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="59" hidden>
+          <div class="card-section head">
+            <h2>Un caso: cómo se descompone</h2>
+            
+            <p class="summary">Caso Kore.ai: «pagá el crédito con la caja de ahorro». Dos lecturas en paralelo y una única escritura, la transferencia, al final y después de validar.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#lee-o-escribe">Regla «¿el trabajo lee o escribe?»</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#orquestador-workers">Fan-out / fan-in (orquestador y workers)</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="60" hidden>
+          <div class="card-section head">
+            <h2>Conclusions</h2>
+            
+            <p class="summary">Conclusiones.</p>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="61" hidden>
+          <div class="card-section head">
+            <h2>Lo que queda de la clase</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary">Resumen: agente, tools, tipos de agente, multiagente y la regla que los ordena: <strong>empezar por lo más simple que alcance</strong>.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#agente">Agente</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#tool-calling">Uso de herramientas (tool calling)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#sistema-multiagente">Sistema multiagente</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="62" hidden>
+          <div class="card-section head">
+            <h2>Cómo elegir la arquitectura</h2>
+            
+            <p class="summary">Árbol para elegir la arquitectura: workflow o agente, uno o varios, y qué topología. La mayoría de los casos se resuelve en la segunda o tercera pregunta.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#workflow-vs-agente">Workflow vs agente (Anthropic)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#topologias-multiagente">Topologías multiagente</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="agentes-y-multiagentes" data-i="63" hidden>
+          <div class="card-section head">
+            <h2>Para leer después</h2>
+            
+            <p class="summary">Lecturas: ReAct, Reflexion, <em>Building effective agents</em> de Anthropic y el debate Cognition vs. Anthropic.</p>
+          </div>
+          
+          
+          
+        </article>
+        
+      
+    </div>
+
+    <div class="side-panel" data-panel="indice" hidden>
+      
+      <div data-index="agentes-y-multiagentes" >
+        
+        <details class="idx-sec" data-first="0" data-last="1">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">Portada</span>
+            <span class="range">0–1</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="0"><span class="n">0</span><span class="t">Inteligencia Artificial Generativa (AI Gen)</span><span class="marks"></span></button><button class="idx-row" data-i="1"><span class="n">1</span><span class="t">Qué es un agente</span><span class="marks"></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="2" data-last="10">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">Qué es un agente</span>
+            <span class="range">2–10</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="2"><span class="n">2</span><span class="t">¿Un LLM es un agente?</span><span class="marks"></span></button><button class="idx-row" data-i="3"><span class="n">3</span><span class="t">La definición de Russell &amp; Norvig</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="4"><span class="n">4</span><span class="t">Lo que la definición no menciona</span><span class="marks"></span></button><button class="idx-row" data-i="5"><span class="n">5</span><span class="t">El agente racional</span><span class="marks"><span class="mk-tp"></span><span class="mk-key"></span></span></button><button class="idx-row" data-i="6"><span class="n">6</span><span class="t">Racionalidad: actuar bien según una medida</span><span class="marks"></span></button><button class="idx-row" data-i="7"><span class="n">7</span><span class="t">Función de agente y programa de agente</span><span class="marks"></span></button><button class="idx-row" data-i="8"><span class="n">8</span><span class="t">Arquitecturas clásicas de agente</span><span class="marks"></span></button><button class="idx-row" data-i="9"><span class="n">9</span><span class="t">Un auto autónomo en cada arquitectura</span><span class="marks"></span></button><button class="idx-row" data-i="10"><span class="n">10</span><span class="t">Dos agentes, una descripción PEAS</span><span class="marks"><span class="mk-tp"></span><span class="mk-key"></span></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="11" data-last="11">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">Portada</span>
+            <span class="range">11–11</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="11"><span class="n">11</span><span class="t">El agente basado en LLM</span><span class="marks"></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="12" data-last="15">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">El agente basado en LLM</span>
+            <span class="range">12–15</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="12"><span class="n">12</span><span class="t">Agente = LLM + planificación + tools</span><span class="marks"></span></button><button class="idx-row" data-i="13"><span class="n">13</span><span class="t">Dos formas de conectar un LLM con tools</span><span class="marks"></span></button><button class="idx-row" data-i="14"><span class="n">14</span><span class="t">Workflow o agente</span><span class="marks"><span class="mk-tp"></span><span class="mk-key"></span></span></button><button class="idx-row" data-i="15"><span class="n">15</span><span class="t">Cuándo vale la pena un agente</span><span class="marks"></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="16" data-last="16">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">Portada</span>
+            <span class="range">16–16</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="16"><span class="n">16</span><span class="t">Los agentes tienen tools</span><span class="marks"></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="17" data-last="20">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">Los agentes tienen tools</span>
+            <span class="range">17–20</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="17"><span class="n">17</span><span class="t">Qué es una tool</span><span class="marks"><span class="mk-tp"></span><span class="mk-key"></span></span></button><button class="idx-row" data-i="18"><span class="n">18</span><span class="t">Un contrato con un sistema no determinístico</span><span class="marks"></span></button><button class="idx-row" data-i="19"><span class="n">19</span><span class="t">Una tool en código</span><span class="marks"><span class="mk-tp"></span></span></button><button class="idx-row" data-i="20"><span class="n">20</span><span class="t">Principios para diseñar tools</span><span class="marks"><span class="mk-tp"></span></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="21" data-last="21">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">Portada</span>
+            <span class="range">21–21</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="21"><span class="n">21</span><span class="t">ReAct</span><span class="marks"></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="22" data-last="27">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">ReAct</span>
+            <span class="range">22–27</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="22"><span class="n">22</span><span class="t">ReAct: pensar también es una acción</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="23"><span class="n">23</span><span class="t">Una trayectoria ReAct</span><span class="marks"></span></button><button class="idx-row" data-i="24"><span class="n">24</span><span class="t">Las tools y la instrucción</span><span class="marks"></span></button><button class="idx-row" data-i="25"><span class="n">25</span><span class="t">El prompt completo y el corte</span><span class="marks"></span></button><button class="idx-row" data-i="26"><span class="n">26</span><span class="t">ReAct en LangGraph</span><span class="marks"><span class="mk-tp"></span></span></button><button class="idx-row" data-i="27"><span class="n">27</span><span class="t">Dos sentidos de «agente ReAct»</span><span class="marks"></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="28" data-last="28">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">Portada</span>
+            <span class="range">28–28</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="28"><span class="n">28</span><span class="t">Otros tres tipos</span><span class="marks"></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="29" data-last="39">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">Otros tres tipos</span>
+            <span class="range">29–39</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="29"><span class="n">29</span><span class="t">Dos preguntas para cada tipo</span><span class="marks"></span></button><button class="idx-row" data-i="30"><span class="n">30</span><span class="t">Plan-and-Execute: planificar primero</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="31"><span class="n">31</span><span class="t">Un plan para la misma pregunta</span><span class="marks"></span></button><button class="idx-row" data-i="32"><span class="n">32</span><span class="t">Qué gana y qué cuesta planificar</span><span class="marks"></span></button><button class="idx-row" data-i="33"><span class="n">33</span><span class="t">Reflexion: intentar, evaluar, reflexionar</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="34"><span class="n">34</span><span class="t">Una reflexión, en código</span><span class="marks"></span></button><button class="idx-row" data-i="35"><span class="n">35</span><span class="t">Qué gana y qué cuesta reflexionar</span><span class="marks"></span></button><button class="idx-row" data-i="36"><span class="n">36</span><span class="t">ReWOO: planificar con variables</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="37"><span class="n">37</span><span class="t">Un plan ReWOO</span><span class="marks"></span></button><button class="idx-row" data-i="38"><span class="n">38</span><span class="t">Qué gana y qué cuesta planificar con variables</span><span class="marks"></span></button><button class="idx-row" data-i="39"><span class="n">39</span><span class="t">Los cuatro tipos, comparados</span><span class="marks"><span class="mk-key"></span></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="40" data-last="40">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">Portada</span>
+            <span class="range">40–40</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="40"><span class="n">40</span><span class="t">Sistemas multiagente</span><span class="marks"></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="41" data-last="51">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">Sistemas multiagente</span>
+            <span class="range">41–51</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="41"><span class="n">41</span><span class="t">El contexto se degrada</span><span class="marks"><span class="mk-tp"></span><span class="mk-key"></span></span></button><button class="idx-row" data-i="42"><span class="n">42</span><span class="t">Qué es un sistema multiagente</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="43"><span class="n">43</span><span class="t">Multiagente: orquestador y workers</span><span class="marks"></span></button><button class="idx-row" data-i="44"><span class="n">44</span><span class="t">Dónde aparece el orquestador con workers</span><span class="marks"></span></button><button class="idx-row" data-i="45"><span class="n">45</span><span class="t">Estrella: orquestador y subagentes</span><span class="marks"></span></button><button class="idx-row" data-i="46"><span class="n">46</span><span class="t">Router: despacho</span><span class="marks"></span></button><button class="idx-row" data-i="47"><span class="n">47</span><span class="t">Red: el control pasa de agente en agente</span><span class="marks"></span></button><button class="idx-row" data-i="48"><span class="n">48</span><span class="t">Pizarra: publicar y leer</span><span class="marks"></span></button><button class="idx-row" data-i="49"><span class="n">49</span><span class="t">Pipeline y jerarquía</span><span class="marks"></span></button><button class="idx-row" data-i="50"><span class="n">50</span><span class="t">Las topologías, comparadas</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="51"><span class="n">51</span><span class="t">Primero, un solo agente</span><span class="marks"><span class="mk-tp"></span></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="52" data-last="52">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">Portada</span>
+            <span class="range">52–52</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="52"><span class="n">52</span><span class="t">Cuándo repartir</span><span class="marks"></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="53" data-last="59">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">Cuándo repartir</span>
+            <span class="range">53–59</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="53"><span class="n">53</span><span class="t">El precio de paralelizar</span><span class="marks"></span></button><button class="idx-row" data-i="54"><span class="n">54</span><span class="t">Cómo fallan</span><span class="marks"></span></button><button class="idx-row" data-i="55"><span class="n">55</span><span class="t">El aislamiento hay que configurarlo</span><span class="marks"></span></button><button class="idx-row" data-i="56"><span class="n">56</span><span class="t">Compartir el contexto no alcanza</span><span class="marks"></span></button><button class="idx-row" data-i="57"><span class="n">57</span><span class="t">El debate: ¿construir multiagentes?</span><span class="marks"></span></button><button class="idx-row" data-i="58"><span class="n">58</span><span class="t">¿El trabajo lee o escribe?</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="59"><span class="n">59</span><span class="t">Un caso: cómo se descompone</span><span class="marks"></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="60" data-last="60">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">Portada</span>
+            <span class="range">60–60</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="60"><span class="n">60</span><span class="t">Conclusions</span><span class="marks"></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="61" data-last="63">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">Conclusions</span>
+            <span class="range">61–63</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="61"><span class="n">61</span><span class="t">Lo que queda de la clase</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="62"><span class="n">62</span><span class="t">Cómo elegir la arquitectura</span><span class="marks"></span></button><button class="idx-row" data-i="63"><span class="n">63</span><span class="t">Para leer después</span><span class="marks"></span></button>
+          </div>
+        </details>
+        
+      </div>
+      
+    </div>
+
+    <div class="card-footer side-foot">
+      <button class="btn sm" id="star" title="Marcar para repasar (m)"><svg class="i" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg><span>Marcar</span></button>
+      <span class="hints"><kbd>←</kbd><kbd>→</kbd> <kbd>t</kbd> <kbd>m</kbd> <kbd>n</kbd> <kbd>p</kbd></span>
+    </div>
+  </aside>
+</div>
+</div>
+</div>
+<template id="sn-tp4-comparar-9-controles" data-title="Los 9 controles: medida de performance" data-tp="4" data-tp-title="El agente de admisión de guardia (TP final)" data-file="admision/comparar.py" data-from="7" data-to="48">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">admision/comparar.py</span><span class="mono faint">L7–48</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-python" data-start="7">CONTROLES = CAMPOS + [&quot;verificacion&quot;]
+
+
+def _doc(x) -&gt; str | None:
+    return None if x is None else &quot;&quot;.join(ch for ch in str(x).upper() if ch.isalnum())
+
+
+def _igual(campo: str, esperado, obtenido) -&gt; bool:
+    if campo == &quot;numero_documento&quot;:
+        return _doc(esperado) == _doc(obtenido)
+    if campo == &quot;entidad_a_notificar&quot;:
+        return (esperado is None and obtenido is None) or (
+            esperado is not None and obtenido is not None and _norm(esperado) == _norm(obtenido))
+    return esperado == obtenido
+
+
+def _verifico(verificacion: dict, log: list[dict]) -&gt; bool:
+    hechas = [(_norm(e[&quot;argumentos&quot;].get(&quot;entidad&quot;, &quot;&quot;)), _norm(e[&quot;argumentos&quot;].get(&quot;numero_afiliado&quot;, &quot;&quot;)))
+              for e in log if e[&quot;herramienta&quot;] == &quot;verificar_afiliacion&quot; and isinstance(e[&quot;argumentos&quot;], dict)]
+    if any(e in {_norm(x) for x in verificacion[&quot;prohibidas&quot;]} for e, _ in hechas):
+        return False
+    requerida = verificacion[&quot;requerida&quot;]
+    return requerida is None or (_norm(requerida[0]), _norm(requerida[1])) in hechas
+
+
+def comparar(esperada: dict, decision: dict | None, log: list[dict]) -&gt; dict:
+    ficha = esperada[&quot;ficha&quot;]
+    if decision is None:
+        controles = {k: False for k in CONTROLES}
+    else:
+        controles = {k: _igual(k, ficha[k], decision.get(k)) for k in CAMPOS}
+        controles[&quot;verificacion&quot;] = _verifico(esperada[&quot;verificacion&quot;], log)
+    return {
+        &quot;caso&quot;: esperada[&quot;caso&quot;],
+        &quot;resuelto&quot;: all(controles.values()),
+        &quot;parcial&quot;: round(sum(controles.values()) / len(controles), 3),
+        &quot;controles&quot;: controles,
+        &quot;esperada&quot;: ficha,
+        &quot;obtenida&quot;: decision,
+        &quot;llamadas&quot;: len(log),
+        &quot;invalidas&quot;: sum(not e[&quot;valida&quot;] for e in log),
+    }</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Compara la ficha registrada con la esperada: 8 campos más el control de verificación de afiliación; un caso cuenta como resuelto solo si los 9 dan bien.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li><code>CONTROLES = CAMPOS + ['verificacion']</code>.</li>
+<li><code>_igual</code> normaliza documento y entidad antes de comparar.</li>
+<li><code>_verifico</code> revisa en el <code>log</code> que se consultó la entidad requerida con el número correcto y ninguna prohibida.</li>
+<li><code>comparar</code> devuelve <code>resuelto = all(controles)</code>, <code>parcial</code> y el detalle.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Es código del kit de la cátedra; el TP lo usa como medida de performance tanto para elegir prompts como para reportar.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Lo usa <code>admision.correr.puntuar</code>; <code>admision_tp/evaluacion_prompts.calcular_metricas_candidato</code> exige exactamente estos <code>CONTROLES</code>.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Medida de performance de un agente racional: un criterio objetivo y estricto (todo o nada) de qué es hacerlo bien.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 3</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/#d=como-se-entrena-un-llm&amp;s=31"><span class="ref">09·31</span><span class="t">RL con verificador: el proceso</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/10/#d=agentes-y-multiagentes&amp;s=5"><span class="ref">10·5</span><span class="t">El agente racional</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/10/#d=agentes-y-multiagentes&amp;s=10"><span class="ref">10·10</span><span class="t">Dos agentes, una descripción PEAS</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp4-puntuar-runner" data-title="puntuar: los 9 controles caso por caso" data-tp="4" data-tp-title="El agente de admisión de guardia (TP final)" data-file="admision/correr.py" data-from="165" data-to="184">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">admision/correr.py</span><span class="mono faint">L165–184</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-python" data-start="165">def puntuar(trazas: list[dict], esperadas: dict, salida: Path | None = None,
+            tiempos: dict | None = None) -&gt; tuple[list[dict], dict]:
+    &quot;&quot;&quot;Segunda fase: el veredicto de cada traza contra su ficha esperada y el resumen. Si hay `salida`, escribe
+    `resultados.jsonl` y `resumen.json`. Con `tiempos` (lo que escribió jugar), los suma al resumen.&quot;&quot;&quot;
+    if not trazas:
+        raise ValueError(&quot;no hay trazas&quot;)
+    for t in trazas:
+        if t[&quot;caso&quot;] not in esperadas:
+            raise KeyError(f&quot;no hay ficha esperada para el caso {t[&#39;caso&#39;]}&quot;)
+    resultados = []
+    for t in trazas:
+        r = comparar(esperadas[t[&quot;caso&quot;]], t[&quot;decision&quot;], t[&quot;log&quot;])
+        r[&quot;busquedas&quot;] = sum(x[&quot;herramienta&quot;] == &quot;buscar_normativa&quot; for x in t[&quot;log&quot;])
+        r[&quot;caracteres_de_contexto&quot;] = caracteres_de_contexto(t[&quot;mensajes&quot;])
+        r[&quot;segundos&quot;] = t.get(&quot;segundos&quot;)
+        resultados.append(r)
+    resumen = resumir(resultados)
+    resumen[&quot;busquedas_por_caso&quot;] = round(sum(r[&quot;busquedas&quot;] for r in resultados) / len(resultados), 2)
+    resumen[&quot;caracteres_de_contexto_por_caso&quot;] = round(
+        sum(r[&quot;caracteres_de_contexto&quot;] for r in resultados) / len(resultados))</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Código del kit: compara cada traza con su ficha esperada usando <code>comparar</code> y agrega búsquedas y contexto por caso.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li>Exige una ficha esperada por traza.</li>
+<li>Para cada traza llama <code>comparar(esperadas[caso], decision, log)</code>, que devuelve los 9 controles y <code>resuelto</code>.</li>
+<li>Suma <code>busquedas</code> (llamadas a <code>buscar_normativa</code>) y <code>caracteres_de_contexto</code>.</li>
+<li><code>resumir(resultados)</code> arma el resumen por control y los casos resueltos.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Separa jugar de puntuar: las esperadas se leen recién después de jugar, así el agente no puede verlas.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Consume las trazas de <code>jugar</code>; lo usan <code>admision.correr</code> y <code>admision_tp/experimentos_prompt.ejecutar_evaluacion_prompt</code>. Su resumen alimenta las tablas del INFORME.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Medida de performance del agente racional: una métrica fija y externa al agente.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 1</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/10/#d=agentes-y-multiagentes&amp;s=5"><span class="ref">10·5</span><span class="t">El agente racional</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp4-entorno-herramientas" data-title="Las cinco herramientas del entorno (kit)" data-tp="4" data-tp-title="El agente de admisión de guardia (TP final)" data-file="admision/entorno.py" data-from="99" data-to="143">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">admision/entorno.py</span><span class="mono faint">L99–143</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-python" data-start="99">    def _ejecutar(self, h: str, a: dict) -&gt; str:
+        c = self.caso
+        if h == &quot;leer_triage&quot;:
+            self._paciente(a)
+            return nota_de_triage(c)
+        if h == &quot;preguntar&quot;:
+            self._paciente(a)
+            quien, tema = _norm(a.get(&quot;a_quien&quot;, &quot;&quot;)), _norm(a.get(&quot;tema&quot;, &quot;&quot;))
+            if quien not in (&quot;paciente&quot;, &quot;acompanante&quot;) or tema not in (&quot;cobertura&quot;, &quot;art&quot;):
+                raise ValueError(&quot;a_quien tiene que ser paciente o acompanante, y tema, cobertura o art.&quot;)
+            if quien == &quot;paciente&quot; and not c.puede_responder:
+                return &quot;El paciente no está en condiciones de responder.&quot;
+            if quien == &quot;acompanante&quot; and not c.acompanante:
+                return &quot;El paciente no tiene acompañante en la guardia.&quot;
+            sujeto = &quot;El paciente&quot; if quien == &quot;paciente&quot; else f&quot;El acompañante ({c.acompanante})&quot;
+            if tema == &quot;art&quot;:
+                if not c.trabajo:
+                    return f&quot;{sujeto} dice que no se lesionó ni enfermó trabajando ni en el trayecto.&quot;
+                return (f&quot;{sujeto} dice que la ART de su empleador es {c.art[0]}. CUIL del paciente: {c.art[1]}.&quot;)
+            if c.declarada is None:
+                return f&quot;{sujeto} dice que no tiene obra social ni prepaga.&quot;
+            tipo = &quot;obra social&quot; if c.declarada[0] == &quot;obra_social&quot; else &quot;prepaga&quot;
+            return (f&quot;{sujeto} dice que tiene {c.declarada[1]} ({tipo}), número de afiliado {c.declarada[2]}.&quot;)
+        if h == &quot;verificar_afiliacion&quot;:
+            entidad, numero = _norm(a.get(&quot;entidad&quot;, &quot;&quot;)), _norm(a.get(&quot;numero_afiliado&quot;, &quot;&quot;))
+            conocidas = {}
+            for clave, activa in c.afiliaciones.items():
+                e, n = clave.split(&quot;|&quot;)
+                conocidas.setdefault(_norm(e), {})[_norm(n)] = (e, activa)
+            if entidad not in {_norm(x) for x in OBRAS_SOCIALES + PREPAGAS + ARTS}:
+                return &quot;No hay ninguna entidad con ese nombre.&quot;
+            if numero not in conocidas.get(entidad, {}):
+                return &quot;La entidad no encuentra ese número de afiliado.&quot;
+            nombre, activa = conocidas[entidad][numero]
+            return f&quot;{nombre} informa que la afiliación {numero} está {&#39;activa&#39; if activa else &#39;inactiva&#39;}.&quot;
+        if h == &quot;buscar_normativa&quot;:
+            consulta = str(a.get(&quot;consulta&quot;, &quot;&quot;)).strip()
+            if not consulta:
+                raise ValueError(&quot;falta la consulta.&quot;)
+            try:
+                frs = self.buscador.recuperar(consulta, getattr(self.buscador, &quot;k_entorno&quot;, K_POR_DEFECTO))
+                return &quot;\n\n&quot;.join(_texto(f) for f in frs) if frs else &quot;No se encontró ninguna sección.&quot;
+            except Exception as e:  # un error del buscador del grupo no corta la corrida
+                raise ValueError(f&quot;el buscador falló: {type(e).__name__}.&quot;) from e
+        if h == &quot;registrar_decision&quot;:</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Implementa lo que hace cada herramienta: <code>leer_triage</code>, <code>preguntar</code>, <code>verificar_afiliacion</code>, <code>buscar_normativa</code> y <code>registrar_decision</code>.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li><code>leer_triage</code> valida el <code>paciente_id</code> y devuelve la nota de triage.</li>
+<li><code>preguntar</code> exige <code>a_quien</code> (paciente/acompañante) y <code>tema</code> (cobertura/art) y responde según el caso.</li>
+<li><code>verificar_afiliacion</code> consulta entidad y número contra las afiliaciones del caso.</li>
+<li><code>buscar_normativa</code> llama al buscador del grupo con <code>k_entorno</code> y une los textos.</li>
+<li><code>registrar_decision</code> valida la ficha y termina el caso. Los errores vuelven como observación.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Es el entorno de la cátedra (no se modifica): define las acciones del agente y lo que percibe. El TP decide sobre él con un solo agente que elige el orden de las llamadas.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p><code>Entorno.paso</code> (mismo archivo) lo invoca y aplica <code>MAX_LLAMADAS = 40</code>; el agente lo ve a través de <code>VistaDelAgente</code>. <code>agente_prompt._PartidaPrompt.recibir</code> le pasa <code>herramienta</code> y <code>argumentos</code> del JSON del modelo.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Tools de un agente: acciones (preguntar, registrar) y sensores (leer triage, observaciones) en la descripción PEAS.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 6</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=5"><span class="ref">06·5</span><span class="t">Cinco razones para no reentrenar</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=15"><span class="ref">06·15</span><span class="t">BM25 satura la frecuencia</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=rag-mcp-rapida&amp;s=5"><span class="ref">07·5</span><span class="t">Como herramienta: el agente decide cuándo buscar</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/10/#d=agentes-y-multiagentes&amp;s=10"><span class="ref">10·10</span><span class="t">Dos agentes, una descripción PEAS</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/10/#d=agentes-y-multiagentes&amp;s=14"><span class="ref">10·14</span><span class="t">Workflow o agente</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/10/#d=agentes-y-multiagentes&amp;s=17"><span class="ref">10·17</span><span class="t">Qué es una tool</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp4-agente-bucle" data-title="Ciclo del agente: JSON, corrección y tope de llamadas" data-tp="4" data-tp-title="El agente de admisión de guardia (TP final)" data-file="admision_tp/agente_prompt.py" data-from="25" data-to="68">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">admision_tp/agente_prompt.py</span><span class="mono faint">L25–68</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-python" data-start="25">class _PartidaPrompt:
+    def __init__(self, entorno, prompt: PromptSpec, max_turnos: int, max_sin_json: int,
+                 max_llamadas: int):
+        self.entorno = entorno
+        self.prompt = prompt
+        self.max_turnos = max_turnos
+        self.max_sin_json = max_sin_json
+        self.max_llamadas = max_llamadas
+        self.mensajes = [
+            {&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: prompt.system_prompt},
+            {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: prompt.mensaje_inicial_para(entorno.paciente_id)},
+        ]
+        self.turnos = self.sin_json = self.llamadas = 0
+        self.activa = True
+
+    def recibir(self, respuesta: str) -&gt; None:
+        self.turnos += 1
+        self.mensajes.append({&quot;role&quot;: &quot;assistant&quot;, &quot;content&quot;: respuesta})
+        obj = extraer_json(respuesta)
+        if obj is None:
+            self.sin_json += 1
+            if self.sin_json &gt;= self.max_sin_json:
+                self.activa = False
+                return
+            self.mensajes.append({&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: self.prompt.mensaje_json_invalido})
+        else:
+            self.sin_json = 0
+            herramienta = str(obj.get(&quot;herramienta&quot;, &quot;&quot;))
+            observacion, fin = self.entorno.paso(herramienta, obj.get(&quot;argumentos&quot;) or {})
+            self.llamadas += 1
+            if fin:
+                self.activa = False
+                return
+            self.mensajes.append({
+                &quot;role&quot;: &quot;user&quot;,
+                &quot;content&quot;: self.prompt.observacion_para(herramienta, observacion),
+            })
+        if self.turnos &gt;= self.max_turnos or self.llamadas &gt;= self.max_llamadas:
+            self.activa = False
+
+    def cortar_por_contexto(self, tokens: int, limite: int) -&gt; None:
+        self.mensajes.append({&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: MENSAJE_CONTEXTO_EXCEDIDO.format(
+            tokens=tokens, limite=limite)})
+        self.activa = False</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Mantiene la conversación de un caso: agrega la respuesta del modelo, ejecuta la herramienta pedida o, si no hay JSON válido, inserta el mensaje de corrección.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li><code>_PartidaPrompt.__init__</code> arranca con <code>system_prompt</code> y <code>mensaje_inicial_para(paciente_id)</code> del <code>PromptSpec</code>.</li>
+<li><code>recibir</code> usa <code>extraer_json</code>; si es <code>None</code>, suma <code>sin_json</code> y agrega <code>prompt.mensaje_json_invalido</code> (corta tras <code>max_sin_json</code> seguidas).</li>
+<li>Con JSON válido llama <code>entorno.paso(herramienta, argumentos)</code>, cuenta <code>llamadas</code> y agrega la observación con <code>observacion_para</code>.</li>
+<li>Termina si el entorno cerró el caso (registrar_decision) o al llegar a <code>max_turnos</code> o <code>max_llamadas</code> (40, del kit).</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Es un agente de un solo modelo que decide el recorrido: el código no impone orden de herramientas. Los textos vienen del <code>PromptSpec</code> para que agente y generador de datos rendericen idéntico.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p><code>AgentePrompt.jugar_lote</code> crea una <code>_PartidaPrompt</code> por caso y le pasa las respuestas de <code>ModeloLocal</code>; <code>entorno</code> es la <code>VistaDelAgente</code> del kit. <code>admision_tp/contexto.py</code> reusa este mismo ciclo para rejugar trazas.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Salida estructurada con reintento ante JSON inválido, dentro de un bucle de agente con herramientas y un límite de pasos.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 9</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=introduccion&amp;s=18"><span class="ref">01·18</span><span class="t">Trabajo final</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/05/#d=prompting&amp;s=29"><span class="ref">05·29</span><span class="t">Salidas estructuradas: JSON Schema</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=rag-mcp-rapida&amp;s=5"><span class="ref">07·5</span><span class="t">Como herramienta: el agente decide cuándo buscar</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/#d=como-se-entrena-un-llm&amp;s=36"><span class="ref">09·36</span><span class="t">El circuito con un agente</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/#d=como-se-entrena-un-llm&amp;s=42"><span class="ref">09·42</span><span class="t">Calcular: la misma cuenta por la API</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/10/#d=agentes-y-multiagentes&amp;s=10"><span class="ref">10·10</span><span class="t">Dos agentes, una descripción PEAS</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/10/#d=agentes-y-multiagentes&amp;s=14"><span class="ref">10·14</span><span class="t">Workflow o agente</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/10/#d=agentes-y-multiagentes&amp;s=17"><span class="ref">10·17</span><span class="t">Qué es una tool</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/10/#d=agentes-y-multiagentes&amp;s=51"><span class="ref">10·51</span><span class="t">Primero, un solo agente</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp3-bucle-tool-calling" data-title="El bucle de tool calling escrito a mano" data-tp="3" data-tp-title="RAG, MCP y Transformers en el Hospital Arroyo Claro" data-file="hospital/agente/bucle.py" data-from="25" data-to="48">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">hospital/agente/bucle.py</span><span class="mono faint">L25–48</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-python" data-start="25">async def _ejecutar(por_nombre, llamada):
+    tool = por_nombre.get(llamada[&quot;name&quot;])
+    if tool is None:
+        return ToolMessage(f&quot;Error: la herramienta &#39;{llamada[&#39;name&#39;]}&#39; no existe. Herramientas disponibles: &quot;
+                           f&quot;{&#39;, &#39;.join(sorted(por_nombre))}.&quot;, tool_call_id=llamada[&quot;id&quot;], name=llamada[&quot;name&quot;])
+    try:
+        return await tool.ainvoke({**llamada, &quot;type&quot;: &quot;tool_call&quot;})
+    except Exception as e:  # el error vuelve al modelo como texto para que pueda corregirse
+        return ToolMessage(f&quot;Error al ejecutar {llamada[&#39;name&#39;]}: {e}&quot;, tool_call_id=llamada[&quot;id&quot;], name=llamada[&quot;name&quot;])
+
+
+async def responder(llm, tools, pregunta):
+    &quot;&quot;&quot;Devuelve todos los mensajes de la conversación: sistema, pregunta, AIMessage y ToolMessage.&quot;&quot;&quot;
+    llm_con_tools = llm.bind_tools(tools)
+    por_nombre = {t.name: t for t in tools}
+    mensajes = [SystemMessage(PROMPT), HumanMessage(pregunta)]
+    for _ in range(MAX_PASOS):
+        ai = await llm_con_tools.ainvoke(mensajes)
+        mensajes.append(ai)
+        if not ai.tool_calls:
+            break
+        for llamada in ai.tool_calls:
+            mensajes.append(await _ejecutar(por_nombre, llamada))
+    return mensajes</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Implementa el agente: el modelo pide herramientas, se ejecutan, sus resultados vuelven como <code>ToolMessage</code> y se repite hasta que responde sin pedir nada o se llega a 6 pasos.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li><code>responder</code> enlaza las tools con <code>llm.bind_tools(tools)</code> y arma <code>por_nombre</code>.</li>
+<li>Arranca con <code>[SystemMessage(PROMPT), HumanMessage(pregunta)]</code>.</li>
+<li>En cada paso: <code>ai = await llm_con_tools.ainvoke(mensajes)</code>; si <code>ai.tool_calls</code> está vacío, termina.</li>
+<li>Si no, ejecuta cada llamada con <code>_ejecutar</code> y agrega el <code>ToolMessage</code> (puede haber varias en paralelo en el mismo paso).</li>
+<li><code>_ejecutar</code> devuelve un <code>ToolMessage</code> de error si la tool no existe o lanza una excepción.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Se escribió a mano, sin LangGraph ni AgentExecutor, para tener todos los mensajes y poder loguearlos. Es agnóstico del origen de las tools: el docstring lo prepara para las de <code>langchain-mcp-adapters</code> (parte 3, pendiente).</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Lo llama <code>correr()</code> en <code>hospital/agente/corrida.py</code> por cada pregunta; devuelve la lista completa de mensajes, que <code>resumir()</code> convierte en respuesta, contextos, herramientas y costo. <code>tests/test_agente.py</code> lo prueba con un modelo falso.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Agente ReAct / ciclo de vida de una tool: AIMessage con tool_calls → ejecución → ToolMessage → nueva llamada al modelo.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 16</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=introduccion&amp;s=62"><span class="ref">01·62</span><span class="t">El futuro: agentes autónomos e IA multimodal</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=25"><span class="ref">02·25</span><span class="t">Cómo el agente descubre y usa una herramienta</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/05/#d=prompting&amp;s=17"><span class="ref">05·17</span><span class="t">Mitigar alucinaciones: el prompt</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=3"><span class="ref">06·3</span><span class="t">Recuperar, aumentar, generar</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=54"><span class="ref">06·54</span><span class="t">El ciclo de vida de una herramienta MCP</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=57"><span class="ref">06·57</span><span class="t">Demo: un servidor MCP mínimo</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=rag-mcp-rapida&amp;s=5"><span class="ref">07·5</span><span class="t">Como herramienta: el agente decide cuándo buscar</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=rag-mcp-rapida&amp;s=19"><span class="ref">07·19</span><span class="t">Herramienta hardcodeada o servidor aparte</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=rag-mcp-rapida&amp;s=20"><span class="ref">07·20</span><span class="t">El ciclo de vida de una herramienta</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=rag-mcp-rapida&amp;s=25"><span class="ref">07·25</span><span class="t">Cuatro principios de diseño</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/#d=como-se-entrena-un-llm&amp;s=36"><span class="ref">09·36</span><span class="t">El circuito con un agente</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/#d=como-se-entrena-un-llm&amp;s=49"><span class="ref">09·49</span><span class="t">MCP: lo que aprende el modelo</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/10/#d=agentes-y-multiagentes&amp;s=14"><span class="ref">10·14</span><span class="t">Workflow o agente</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/10/#d=agentes-y-multiagentes&amp;s=19"><span class="ref">10·19</span><span class="t">Una tool en código</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/10/#d=agentes-y-multiagentes&amp;s=26"><span class="ref">10·26</span><span class="t">ReAct en LangGraph</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/#d=cierre-magnifica-humanitas&amp;s=25"><span class="ref">13·25</span><span class="t">De la alucinación al engaño funcional</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp3-corrida-correr" data-title="La corrida: una conversación por pregunta" data-tp="3" data-tp-title="RAG, MCP y Transformers en el Hospital Arroyo Claro" data-file="hospital/agente/corrida.py" data-from="98" data-to="117">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">hospital/agente/corrida.py</span><span class="mono faint">L98–117</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-python" data-start="98">async def correr(llm, tools, preguntas, salida, etiqueta, carpeta_log=CORRIDAS):
+    &quot;&quot;&quot;Corre todas las preguntas y devuelve la ruta del log .md.&quot;&quot;&quot;
+    inicio = datetime.now()
+    filas, secciones = [], []
+    for p in preguntas:
+        t0, error, mensajes = time.monotonic(), None, []
+        try:
+            mensajes = await responder(llm, tools, p[&quot;pregunta&quot;])
+        except Exception as e:  # una pregunta que falla no corta la corrida; queda en el log
+            error = f&quot;{type(e).__name__}: {e}&quot;
+        r = resumir(mensajes)
+        seg = time.monotonic() - t0
+        filas.append((p, r))
+        secciones += _log_pregunta(p, mensajes, r, seg, error)
+        print(f&quot;{p[&#39;id&#39;]}  {&#39;, &#39;.join(r[&#39;herramientas&#39;]) or &#39;-&#39;:45s} USD {r[&#39;costo&#39;]:.5f}  {seg:4.1f}s&quot;
+              + (f&quot;  ERROR {error}&quot; if error else &quot;&quot;), flush=True)
+
+    Path(salida).write_text(&quot;&quot;.join(
+        json.dumps({&quot;id&quot;: p[&quot;id&quot;], &quot;respuesta&quot;: r[&quot;respuesta&quot;], &quot;contextos&quot;: r[&quot;contextos&quot;],
+                    &quot;herramientas&quot;: r[&quot;herramientas&quot;]}, ensure_ascii=False) + &quot;\n&quot; for p, r in filas), encoding=&quot;utf-8&quot;)</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Pasa cada pregunta por el bucle del agente, resume la conversación y escribe <code>respuestas.jsonl</code> en el formato del evaluador.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li>Por cada pregunta llama a <code>responder(llm, tools, p["pregunta"])</code> y mide el tiempo.</li>
+<li>Si la pregunta falla, guarda el error y sigue con la próxima.</li>
+<li><code>resumir(mensajes)</code> extrae respuesta, contextos (los <code>ToolMessage</code>), herramientas usadas, tokens y costo.</li>
+<li><code>_log_pregunta</code> arma la sección del log <code>.md</code>; al final escribe una línea JSON por pregunta con <code>id</code>, <code>respuesta</code>, <code>contextos</code> y <code>herramientas</code>.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Separa el bucle (una conversación) de la corrida (el benchmark completo): así el bucle se puede probar solo y la misma corrida serviría para el agente MCP planeado.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>La llama <code>agente.py</code> con <code>HERRAMIENTAS</code> y el LLM de <code>crear_llm()</code>. Llama a <code>responder()</code> de <code>hospital/agente/bucle.py</code>; el <code>respuestas.jsonl</code> que escribe lo lee <code>evaluar/evaluar.py agente</code>. <code>tests/test_agente.py</code> la prueba con un modelo falso.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>El circuito de un agente medido de punta a punta: cada pregunta es una conversación completa con sus llamadas a tools, que después se evalúa.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 4</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=introduccion&amp;s=62"><span class="ref">01·62</span><span class="t">El futuro: agentes autónomos e IA multimodal</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/#d=como-se-entrena-un-llm&amp;s=36"><span class="ref">09·36</span><span class="t">El circuito con un agente</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/10/#d=agentes-y-multiagentes&amp;s=14"><span class="ref">10·14</span><span class="t">Workflow o agente</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/10/#d=agentes-y-multiagentes&amp;s=26"><span class="ref">10·26</span><span class="t">ReAct en LangGraph</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp3-agente-main" data-title="El punto de entrada del agente" data-tp="3" data-tp-title="RAG, MCP y Transformers en el Hospital Arroyo Claro" data-file="agente.py" data-from="19" data-to="29">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">agente.py</span><span class="mono faint">L19–29</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-python" data-start="19">def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument(&quot;--preguntas&quot;, required=True)
+    ap.add_argument(&quot;--salida&quot;, required=True)
+    a = ap.parse_args()
+
+    preguntas = [json.loads(l) for l in Path(a.preguntas).read_text(encoding=&quot;utf-8&quot;).splitlines() if l.strip()]
+    llm = crear_llm()
+    obtener_recuperador()  # carga el encoder antes de empezar, para no sumar ese tiempo a la primera pregunta
+    log = asyncio.run(correr(llm, HERRAMIENTAS, preguntas, a.salida, &quot;agente&quot;))
+    print(f&quot;respuestas en {a.salida}, log en {log}&quot;)</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Arma el agente de la parte 2: lee las preguntas, crea el LLM, precarga el recuperador y corre todas las preguntas con las seis tools.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li>Lee <code>--preguntas</code> (un JSON por línea) y <code>--salida</code>.</li>
+<li><code>llm = crear_llm()</code> crea el <code>ChatOpenAI</code> contra OpenRouter.</li>
+<li><code>obtener_recuperador()</code> carga el encoder antes de empezar, para no sumar ese tiempo a la primera pregunta.</li>
+<li><code>asyncio.run(correr(llm, HERRAMIENTAS, preguntas, a.salida, "agente"))</code> corre la corrida y devuelve la ruta del log.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Es la única pieza que conecta las partes: el modelo (<code>modelo.py</code>), las tools hardcodeadas (<code>herramientas.py</code>) y el bucle (<code>corrida.py</code> → <code>bucle.py</code>). Cambiar el origen de las tools (por ejemplo, un cliente MCP) solo cambiaría lo que se le pasa a <code>correr</code>.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Se ejecuta con <code>python3 agente.py --preguntas datos/preguntas_agente_dev.jsonl --salida respuestas.jsonl</code>. Le pasa <code>HERRAMIENTAS</code> y el LLM a <code>correr()</code> en <code>hospital/agente/corrida.py</code>.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Un agente es modelo + herramientas + bucle; acá las herramientas viven en el mismo proceso (hardcodeadas), no en un servidor aparte.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 5</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=introduccion&amp;s=62"><span class="ref">01·62</span><span class="t">El futuro: agentes autónomos e IA multimodal</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=rag-mcp-rapida&amp;s=19"><span class="ref">07·19</span><span class="t">Herramienta hardcodeada o servidor aparte</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/#d=como-se-entrena-un-llm&amp;s=36"><span class="ref">09·36</span><span class="t">El circuito con un agente</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/10/#d=agentes-y-multiagentes&amp;s=14"><span class="ref">10·14</span><span class="t">Workflow o agente</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/10/#d=agentes-y-multiagentes&amp;s=26"><span class="ref">10·26</span><span class="t">ReAct en LangGraph</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp4-prompt-procedimiento-v1" data-title="El prompt de la entrega: procedimiento-v1" data-tp="4" data-tp-title="El agente de admisión de guardia (TP final)" data-file="configuraciones/prompts/procedimiento-v1.json" data-from="1" data-to="9">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">configuraciones/prompts/procedimiento-v1.json</span><span class="mono faint">L1–9</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-json" data-start="1">{
+  &quot;version&quot;: 1,
+  &quot;nombre&quot;: &quot;procedimiento-v1&quot;,
+  &quot;system_prompt&quot;: &quot;Sos el agente de admisión de la guardia del Hospital General de Prueba. Para cada paciente que ingresa completás su ficha de admisión siguiendo las normas del hospital. No tomás decisiones clínicas.\n\nHerramientas:\n- leer_triage: Devuelve la nota de triage del paciente: edad, nivel, motivo de consulta, cómo llegó, documento y credenciales presentados, si puede responder preguntas, acompañante y si se lesionó trabajando.\n  argumentos: {\&quot;paciente_id\&quot;: id del paciente, por ejemplo P-1234}\n- preguntar: Le pregunta al paciente o a su acompañante por su obra social o prepaga (tema cobertura) o por la ART de su empleador (tema art).\n  argumentos: {\&quot;paciente_id\&quot;: id del paciente, \&quot;a_quien\&quot;: paciente | acompanante, \&quot;tema\&quot;: cobertura | art}\n- verificar_afiliacion: Consulta a la entidad si la afiliación está activa.\n  argumentos: {\&quot;entidad\&quot;: nombre de la entidad, tal como lo informaron, \&quot;numero_afiliado\&quot;: número de afiliado (en una ART, el CUIL)}\n- buscar_normativa: Busca en las normas del hospital y devuelve las 2 secciones más relevantes.\n  argumentos: {\&quot;consulta\&quot;: texto libre}\n- registrar_decision: Registra la ficha de admisión. Termina el caso.\n  argumentos: {\&quot;registro\&quot;: definitivo | provisorio, \&quot;numero_documento\&quot;: número del documento tal como figura en él, o null, \&quot;box_antes_del_registro\&quot;: true si se ubica al paciente en el box antes de registrarlo, si no false, \&quot;circuito\&quot;: ecg | codigo_acv | codigo_sepsis | ninguno, \&quot;plazo_circuito_min\&quot;: plazo del circuito en minutos desde el ingreso, o null si no hay circuito, \&quot;cobertura\&quot;: obra_social | prepaga | art | sin_cobertura, \&quot;entidad_a_notificar\&quot;: nombre de la entidad a la que se notifica la atención, o null, \&quot;aviso_al_voluntariado\&quot;: true o false, \&quot;fundamentos\&quot;: lista de los códigos de sección que fundamentan la ficha, por ejemplo [\&quot;NOR-ADM-01\&quot;]}\n\nEn cada turno respondé solo con un objeto JSON, sin texto antes ni después:\n{\&quot;herramienta\&quot;: \&quot;&lt;nombre&gt;\&quot;, \&quot;argumentos\&quot;: {...}}\nUsá una herramienta por turno. El caso termina cuando llamás a registrar_decision.\n\nLas normas que aplican son NOR-ADM-01 a NOR-ADM-03 (registro), NOR-COB-01 a NOR-COB-04 (coberturas) y NOR-TDE-01 a NOR-TDE-04 (circuitos tiempo-dependientes). Buscalas con buscar_normativa antes de decidir.\n\nLas normas del hospital contradicen lo habitual y sus valores (niveles, edades, plazos, dígitos) cambian: no decidas de memoria, aplicá lo que dicen las secciones recuperadas.\n\nProcedimiento:\n1. leer_triage.\n2. Buscá cada tema con una consulta propia, porque cada búsqueda trae pocas secciones:\n   a. registro: documento presentado y nivel de triage;\n   b. box antes del registro: nivel de triage y edad del paciente;\n   c. el circuito del motivo de consulta, su plazo y el ingreso en ambulancia;\n   d. cobertura: consulta, verificación de afiliación, ART y número de afiliado con terminación reservada.\n3. Si no presentó credencial, preguntá por la cobertura: al acompañante si el paciente no puede responder; si no hay nadie, no preguntes. Si se lesionó trabajando o en el trayecto, preguntá por la ART.\n4. Verificá la afiliación que corresponde según las normas antes de decidir la cobertura y la entidad a notificar.\n5. registrar_decision, aplicando cada sección a los datos del triage.&quot;,
+  &quot;mensaje_inicial&quot;: &quot;Ingresó a la guardia el paciente {paciente_id}. Completá su ficha de admisión.&quot;,
+  &quot;formato_observacion&quot;: &quot;Resultado de {herramienta}:\n{observacion}&quot;,
+  &quot;mensaje_json_invalido&quot;: &quot;No entendí tu respuesta. Respondé solo con un objeto JSON: {\&quot;herramienta\&quot;: \&quot;&lt;nombre&gt;\&quot;, \&quot;argumentos\&quot;: {...}}&quot;,
+  &quot;sha256&quot;: &quot;8c692c2c67850f1448b5f4ecbda6037713110983c41b0e9da933612d2291ecdd&quot;
+}</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>El <code>PromptSpec</code> de la entrega: rol, descripción de las cinco herramientas, formato JSON obligatorio, advertencia sobre las normas y un procedimiento paso a paso.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li><code>system_prompt</code> define el rol («agente de admisión de la guardia», sin decisiones clínicas).</li>
+<li>Describe cada herramienta con sus <code>argumentos</code> en el mismo texto.</li>
+<li>Pide responder solo con <code>{"herramienta": ..., "argumentos": ...}</code>, una herramienta por turno.</li>
+<li>«Procedimiento» obliga a buscar cada tema con una consulta propia (registro, box, circuito, cobertura).</li>
+<li><code>mensaje_json_invalido</code> es la corrección cuando el JSON llega mal; <code>sha256</code> fija el contenido.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>El paso 2 del procedimiento es lo que lo diferencia del baseline: el agente hacía ~1,3 búsquedas por caso y se le escapaban normas.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Lo carga <code>PromptSpec.cargar</code> desde <code>entrega.cargar_prompt</code> (<code>RUTA_ENTREGA</code>); <code>_PartidaPrompt</code> usa <code>system_prompt</code>, <code>mensaje_inicial</code>, <code>formato_observacion</code> y <code>mensaje_json_invalido</code> en cada turno.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Componentes de un prompt (rol, herramientas, formato de salida, instrucciones paso a paso) y salida estructurada en JSON.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 6</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/05/#d=prompting&amp;s=27"><span class="ref">05·27</span><span class="t">Los 6 componentes</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/05/#d=prompting&amp;s=29"><span class="ref">05·29</span><span class="t">Salidas estructuradas: JSON Schema</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/05/#d=prompting&amp;s=46"><span class="ref">05·46</span><span class="t">¿Por qué tardan más?</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=rag-mcp-rapida&amp;s=5"><span class="ref">07·5</span><span class="t">Como herramienta: el agente decide cuándo buscar</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/#d=como-se-entrena-un-llm&amp;s=42"><span class="ref">09·42</span><span class="t">Calcular: la misma cuenta por la API</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/10/#d=agentes-y-multiagentes&amp;s=17"><span class="ref">10·17</span><span class="t">Qué es una tool</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp3-herramientas-langchain" data-title="Las seis tools como @tool de LangChain" data-tp="3" data-tp-title="RAG, MCP y Transformers en el Hospital Arroyo Claro" data-file="hospital/herramientas.py" data-from="1" data-to="40">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">hospital/herramientas.py</span><span class="mono faint">L1–40</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-python" data-start="1">&quot;&quot;&quot;Las seis herramientas de la parte 2 como tools de LangChain. Los nombres son los que exige el evaluador y
+las descripciones salen de hospital/descripciones.py (las mismas que usa el servidor MCP).&quot;&quot;&quot;
+from langchain_core.tools import tool
+
+from hospital import api_cliente, documentos
+from hospital.descripciones import DESCRIPCIONES
+
+
+@tool(&quot;buscar_documentos&quot;, description=DESCRIPCIONES[&quot;buscar_documentos&quot;])
+def buscar_documentos(consulta: str) -&gt; str:
+    return documentos.buscar_documentos(consulta)
+
+
+@tool(&quot;consultar_camas&quot;, description=DESCRIPCIONES[&quot;consultar_camas&quot;])
+def consultar_camas(sector: str) -&gt; str:
+    return api_cliente.camas(sector)
+
+
+@tool(&quot;consultar_guardia&quot;, description=DESCRIPCIONES[&quot;consultar_guardia&quot;])
+def consultar_guardia(especialidad: str) -&gt; str:
+    return api_cliente.guardia(especialidad)
+
+
+@tool(&quot;consultar_turnos&quot;, description=DESCRIPCIONES[&quot;consultar_turnos&quot;])
+def consultar_turnos(especialidad: str) -&gt; str:
+    return api_cliente.turnos(especialidad)
+
+
+@tool(&quot;consultar_farmacia&quot;, description=DESCRIPCIONES[&quot;consultar_farmacia&quot;])
+def consultar_farmacia(medicamento: str) -&gt; str:
+    return api_cliente.farmacia(medicamento)
+
+
+@tool(&quot;consultar_espera&quot;, description=DESCRIPCIONES[&quot;consultar_espera&quot;])
+def consultar_espera() -&gt; str:
+    return api_cliente.espera()
+
+
+HERRAMIENTAS = [buscar_documentos, consultar_camas, consultar_guardia, consultar_turnos, consultar_farmacia,
+                consultar_espera]</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Envuelve las funciones planas del hospital como herramientas de LangChain con los nombres que exige el evaluador y las descripciones compartidas.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li>Cada función lleva <code>@tool(nombre, description=DESCRIPCIONES[nombre])</code>; LangChain arma el esquema JSON del parámetro a partir de la firma (<code>consulta: str</code>, <code>sector: str</code>, …).</li>
+<li><code>buscar_documentos</code> delega en <code>documentos.buscar_documentos</code>; las otras cinco en <code>api_cliente</code>.</li>
+<li><code>consultar_espera()</code> no tiene parámetros.</li>
+<li><code>HERRAMIENTAS</code> es la lista que se le pasa al agente.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Son herramientas «hardcodeadas» en el proceso del agente. La lógica real vive en módulos sin LangChain para que el servidor MCP planificado pueda publicar las mismas funciones sin duplicar código.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p><code>agente.py</code> pasa <code>HERRAMIENTAS</code> a <code>correr()</code>, que las entrega a <code>responder()</code> en <code>hospital/agente/bucle.py</code>, donde se enlazan con <code>bind_tools</code>.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Una tool en código: nombre, descripción y esquema de parámetros que el modelo ve; tool calling con LangChain.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 8</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=25"><span class="ref">02·25</span><span class="t">Cómo el agente descubre y usa una herramienta</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=64"><span class="ref">06·64</span><span class="t">Más herramientas, peor elección</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=rag-mcp-rapida&amp;s=5"><span class="ref">07·5</span><span class="t">Como herramienta: el agente decide cuándo buscar</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=rag-mcp-rapida&amp;s=19"><span class="ref">07·19</span><span class="t">Herramienta hardcodeada o servidor aparte</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=rag-mcp-rapida&amp;s=20"><span class="ref">07·20</span><span class="t">El ciclo de vida de una herramienta</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=rag-mcp-rapida&amp;s=26"><span class="ref">07·26</span><span class="t">Más herramientas, peor elección</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/#d=como-se-entrena-un-llm&amp;s=48"><span class="ref">09·48</span><span class="t">MCP: una herramienta es una definición</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/10/#d=agentes-y-multiagentes&amp;s=19"><span class="ref">10·19</span><span class="t">Una tool en código</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp3-modelo-llm-openrouter" data-title="El LLM: ChatOpenAI contra OpenRouter, temperatura 0" data-tp="3" data-tp-title="RAG, MCP y Transformers en el Hospital Arroyo Claro" data-file="hospital/agente/modelo.py" data-from="1" data-to="33">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">hospital/agente/modelo.py</span><span class="mono faint">L1–33</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-python" data-start="1">&quot;&quot;&quot;El LLM de los agentes: ChatOpenAI de langchain-openai apuntando a OpenRouter.&quot;&quot;&quot;
+import os
+from pathlib import Path
+
+MODELO = &quot;deepseek/deepseek-v4-flash-0731&quot;
+PRECIO_ENTRADA = 0.04 / 1e6  # USD por token; solo si OpenRouter no informa el costo
+PRECIO_SALIDA = 0.64 / 1e6
+RAIZ = Path(__file__).resolve().parents[2]
+
+
+def cargar_env(ruta=RAIZ / &quot;.env&quot;):
+    &quot;&quot;&quot;Carga VARIABLE=valor de .env sin pisar lo que ya está en el entorno.&quot;&quot;&quot;
+    if Path(ruta).exists():
+        for linea in Path(ruta).read_text(encoding=&quot;utf-8&quot;).splitlines():
+            if &quot;=&quot; in linea and not linea.lstrip().startswith(&quot;#&quot;):
+                k, v = linea.split(&quot;=&quot;, 1)
+                os.environ.setdefault(k.strip(), v.strip().strip(&quot;&#39;\&quot;&quot;))
+
+
+def crear_llm():
+    from langchain_openai import ChatOpenAI
+
+    cargar_env()
+    if not os.environ.get(&quot;OPENROUTER_API_KEY&quot;):
+        raise SystemExit(&quot;falta OPENROUTER_API_KEY (en el entorno o en .env)&quot;)
+    return ChatOpenAI(
+        model=MODELO,
+        base_url=&quot;https://openrouter.ai/api/v1&quot;,
+        api_key=os.environ[&quot;OPENROUTER_API_KEY&quot;],
+        temperature=0,
+        max_retries=3,
+        extra_body={&quot;usage&quot;: {&quot;include&quot;: True}},  # OpenRouter devuelve el costo de cada llamada
+    )</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Crea el modelo de chat del agente: <code>deepseek/deepseek-v4-flash-0731</code> vía OpenRouter con la interfaz <code>ChatOpenAI</code>, temperatura 0 y costo informado por llamada.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li><code>PRECIO_ENTRADA</code> y <code>PRECIO_SALIDA</code> (USD por token) sirven de respaldo si OpenRouter no informa el costo.</li>
+<li><code>cargar_env</code> carga variables de <code>.env</code> sin pisar el entorno (la clave nunca está en el código).</li>
+<li><code>crear_llm</code> corta si falta <code>OPENROUTER_API_KEY</code> y devuelve <code>ChatOpenAI(..., base_url="https://openrouter.ai/api/v1", temperature=0, max_retries=3)</code>.</li>
+<li><code>extra_body={"usage": {"include": True}}</code> pide a OpenRouter el costo de cada llamada.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Temperatura 0 hace que el decodificado elija siempre el token más probable, para que las corridas sean lo más comparables posible (aunque el INFORME muestra que la consulta igual varió entre corridas). OpenRouter permite usar cualquier modelo con la API de OpenAI.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p><code>agente.py</code> llama a <code>crear_llm()</code> y le pasa el LLM a <code>correr()</code>; <code>corrida._usage</code> usa los precios de respaldo.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Generación autoregresiva token a token; temperatura 0 = decodificación greedy. Costo = tokens de entrada × precio + tokens de salida × precio.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 5</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/05/#d=prompting&amp;s=8"><span class="ref">05·8</span><span class="t">La fórmula del costo</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/05/#d=prompting&amp;s=14"><span class="ref">05·14</span><span class="t">Limitaciones de los LLM</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=palabra-al-transformer&amp;s=32"><span class="ref">07·32</span><span class="t">El ciclo de un LLM, token a token</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/08/#d=transformers-a-fondo&amp;s=36"><span class="ref">08·36</span><span class="t">El mapa de la familia</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/10/#d=agentes-y-multiagentes&amp;s=19"><span class="ref">10·19</span><span class="t">Una tool en código</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp3-descripciones-tools" data-title="Descripciones de tools: fuente, uso, qué NO tienen, valores válidos" data-tp="3" data-tp-title="RAG, MCP y Transformers en el Hospital Arroyo Claro" data-file="hospital/descripciones.py" data-from="8" data-to="38">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">hospital/descripciones.py</span><span class="mono faint">L8–38</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-python" data-start="8">BUSCAR_DOCUMENTOS = (
+    &quot;Busca en los documentos oficiales del Hospital Provincial Arroyo Claro: normas y procedimientos que no &quot;
+    &quot;cambian de un día a otro. Sirve para horarios fijos (visitas, altas, farmacia, laboratorio, vacunatorio, &quot;
+    &quot;donación de sangre), quién puede visitar o quedarse con un paciente, preparación para estudios y cirugías &quot;
+    &quot;(ayunos, dietas), requisitos y documentación para turnos, internación, farmacia y coberturas, triage de &quot;
+    &quot;la guardia, derechos del paciente, accesos al edificio, control de infecciones, maternidad, pediatría, &quot;
+    &quot;kinesiología, salud mental y telemedicina. NO tiene el estado de hoy (camas libres, profesionales de &quot;
+    &quot;guardia, turnos disponibles, stock de farmacia ni tiempos de espera actuales). &quot;
+    &quot;consulta: el tema a buscar, en español y con las mismas palabras que usó el paciente (por ejemplo &quot;
+    &quot;&#39;cómo es una consulta por telemedicina&#39;). Si la pregunta toca varios temas de los documentos, hacé una &quot;
+    &quot;búsqueda por tema. Devuelve los fragmentos más relevantes con su documento y sección de origen.&quot;
+)
+
+CONSULTAR_CAMAS = (
+    &quot;Estado de HOY de las camas de internación de un sector: total, ocupadas y libres. Usala para saber si hay &quot;
+    &quot;lugar o camas disponibles para internar. &quot;
+    &quot;sector: uno de clinica_medica, cirugia_general, terapia_intensiva, pediatria, neonatologia, maternidad.&quot;
+)
+
+CONSULTAR_GUARDIA = (
+    &quot;Profesionales que están de guardia HOY en una especialidad, con su horario (por ejemplo 08:00-20:00 es &quot;
+    &quot;el turno de día y 20:00-08:00 el de la noche). Usala para saber quién atiende hoy o esta noche. &quot;
+    &quot;especialidad: una de clinica_medica, cardiologia, pediatria, traumatologia, obstetricia, salud_mental.&quot;
+)
+
+CONSULTAR_TURNOS = (
+    &quot;Próximos turnos disponibles (fecha y hora) con una especialidad en consultorios externos. Usala para saber &quot;
+    &quot;cuándo es el primer turno libre. No dice qué hay que llevar al turno: eso está en los documentos. &quot;
+    &quot;especialidad: una de cardiologia, dermatologia, traumatologia, psicologia, gastroenterologia, &quot;
+    &quot;obstetricia, kinesiologia.&quot;
+)</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Define el texto que lee el modelo para decidir qué herramienta llamar: <code>buscar_documentos</code> para normas fijas y las de la API para el estado de hoy.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li><code>BUSCAR_DOCUMENTOS</code> lista los temas de los documentos y aclara que NO tiene el estado de hoy; pide buscar «con las mismas palabras que usó el paciente» y hacer una búsqueda por tema.</li>
+<li><code>CONSULTAR_CAMAS</code>, <code>CONSULTAR_GUARDIA</code> y <code>CONSULTAR_TURNOS</code> dicen que son el estado de HOY y enumeran los valores válidos del parámetro.</li>
+<li><code>CONSULTAR_TURNOS</code> agrega: «No dice qué hay que llevar al turno: eso está en los documentos».</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>El ruteo depende solo de estas descripciones, así que separan norma (documentos) de estado (API) y dicen cuándo NO usar cada tool: ruteo 1,00 en las 4 corridas. La frase de las palabras del paciente arregló A11, y el ejemplo de consulta se cambió por uno de telemedicina para no filtrar la pregunta A01 de dev.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Las importa <code>hospital/herramientas.py</code> a través del diccionario <code>DESCRIPCIONES</code>; el PLAN prevé que el servidor MCP use exactamente los mismos textos para que la comparación parte 2 vs. parte 3 sea justa.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Diseño de herramientas: la descripción es la interfaz para el modelo (qué hace, cuándo usarla, cuándo no, parámetros válidos).</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 11</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=25"><span class="ref">02·25</span><span class="t">Cómo el agente descubre y usa una herramienta</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/05/#d=prompting&amp;s=33"><span class="ref">05·33</span><span class="t">Zero-shot vs. few-shot</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=10"><span class="ref">06·10</span><span class="t">Las fuentes ponen el techo de calidad</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=29"><span class="ref">06·29</span><span class="t">Tres síntomas de que falta una etapa</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=63"><span class="ref">06·63</span><span class="t">Cuatro principios de diseño</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=68"><span class="ref">06·68</span><span class="t">La descripción dice cuándo NO usarla</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=rag-mcp-rapida&amp;s=25"><span class="ref">07·25</span><span class="t">Cuatro principios de diseño</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=rag-mcp-rapida&amp;s=28"><span class="ref">07·28</span><span class="t">La descripción dice cuándo NO usarla</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=rag-mcp-rapida&amp;s=31"><span class="ref">07·31</span><span class="t">Poco y bien elegido</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/#d=como-se-entrena-un-llm&amp;s=48"><span class="ref">09·48</span><span class="t">MCP: una herramienta es una definición</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/10/#d=agentes-y-multiagentes&amp;s=20"><span class="ref">10·20</span><span class="t">Principios para diseñar tools</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp3-informe-a11" data-title="A11: el problema era la consulta, no la cantidad de fragmentos" data-tp="3" data-tp-title="RAG, MCP y Transformers en el Hospital Arroyo Claro" data-file="INFORME.md" data-from="216" data-to="247">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">INFORME.md</span><span class="mono faint">L216–247</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-markdown" data-start="216">### Dónde falló el agente y qué se cambió
+
+**A11** (&quot;Necesito turno con cardiología, ¿cuál es el primero y qué tengo que llevar?&quot;) fue la única pregunta con
+problemas en la corrida 1 (CR 4, AR 4). El log muestra que el ruteo estuvo bien: llamó a `consultar_turnos` y a
+`buscar_documentos`. Pero buscó *&quot;requisitos y documentación para turno en consultorios externos de cardiología&quot;*, y el
+recuperador devolvió solo la sección &quot;Cómo se pide un turno&quot;, que menciona la derivación. La sección &quot;Qué llevar a la
+primera consulta&quot; (DNI, credencial, derivación, estudios previos) quedó tercera, a 0,018 del primero y fuera del
+margen de 0,005. La respuesta fue fiel a lo que recibió (F 5), pero incompleta.
+
+Primero se probó darle más fragmentos al agente, porque la métrica de la parte 1 castiga cada fragmento extra y la del
+juez no tanto:
+
+- Con **top-3 fijo** (corrida 2), A11 sube a 5, pero el ruido baja el CR de A01–A04 y A12 (3 y 4): el juez penaliza
+  los fragmentos que no hacen falta. El promedio de CR cae a 4,417.
+- Con **margen 0,02** (corrida 3), el resto vuelve a 5. Pero A11 falla otra vez (CR 3), porque el modelo redactó la
+  consulta de otra forma y la sección correcta ya no quedaba cerca del primero.
+
+El problema no era la cantidad de fragmentos sino la consulta. Buscar &quot;requisitos y documentación&quot; no se parece al
+encabezado &quot;Qué llevar a la primera consulta&quot;; buscar con las palabras del paciente (&quot;qué tengo que llevar&quot;) sí. Por
+eso en la corrida 4 se volvió a la selección de la parte 1 y se cambió la descripción de `buscar_documentos`: la
+consulta va &quot;con las mismas palabras que usó el paciente&quot; y, si la pregunta toca varios temas, se hace una búsqueda por
+tema. En A11 el modelo buscó *&quot;qué llevar a un turno de cardiología…&quot;*, recibió la sección correcta y contestó completo.
+
+En el mismo cambio se reemplazó el ejemplo de la descripción (&quot;horario de visita de los abuelos en neonatología&quot;), que
+era literalmente la pregunta A01 de dev, por uno que no aparece en ninguna pregunta dev (&quot;cómo es una consulta por
+telemedicina&quot;). Así se evita ajustar el agente a las preguntas dev.
+
+**Límites de esta medición.** Son 12 preguntas y una corrida por configuración. El modelo redacta la consulta distinto
+en cada corrida aun con temperatura 0: en A11, con la misma descripción, las corridas 1 a 3 buscaron &quot;…consultorios
+externos de cardiología&quot;, &quot;…consultorios externos cardiología&quot; y &quot;…consultorios externos&quot; a secas. Así que una
+diferencia de una pregunta entre corridas está dentro del ruido. Lo que se sostiene en las cuatro corridas es el ruteo
+(1,00 siempre) y la fidelidad (5,00 siempre): el agente no inventó datos en ninguna respuesta.</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Analiza la única pregunta que falló (A11, turno de cardiología y qué llevar), las dos soluciones que no funcionaron y la que sí, más los límites de la medición.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li>El ruteo estaba bien, pero el modelo buscó «requisitos y documentación…» y la sección «Qué llevar a la primera consulta» quedó tercera, fuera del margen.</li>
+<li>Top-3 fijo la arreglaba pero el ruido bajó el CR general a 4,417; margen 0,02 falló por otra redacción de la consulta.</li>
+<li>Solución: la descripción de <code>buscar_documentos</code> pide usar las palabras del paciente y una búsqueda por tema.</li>
+<li>Se sacó del ejemplo la pregunta A01 de dev.</li>
+<li>Con 12 preguntas y una corrida, una pregunta de diferencia es ruido.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Muestra que se corrigió el síntoma «la sección correcta queda tercera» mejorando la consulta (descripción de la tool) en vez de agregar un reranker o más contexto.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Se apoya en los logs de <code>experimentos/corridas/</code> y explica el texto final de <code>BUSCAR_DOCUMENTOS</code> en <code>hospital/descripciones.py</code>.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Diagnóstico de RAG: cuando falta una etapa (consulta mal formulada) más contexto mete ruido; y la variabilidad del LLM aun con temperatura 0.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 4</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/05/#d=prompting&amp;s=14"><span class="ref">05·14</span><span class="t">Limitaciones de los LLM</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=29"><span class="ref">06·29</span><span class="t">Tres síntomas de que falta una etapa</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=rag-mcp-rapida&amp;s=31"><span class="ref">07·31</span><span class="t">Poco y bien elegido</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/10/#d=agentes-y-multiagentes&amp;s=20"><span class="ref">10·20</span><span class="t">Principios para diseñar tools</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp4-contexto-desglose" data-title="Desglose del contexto por tipo de mensaje" data-tp="4" data-tp-title="El agente de admisión de guardia (TP final)" data-file="admision_tp/contexto.py" data-from="70" data-to="92">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">admision_tp/contexto.py</span><span class="mono faint">L70–92</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-python" data-start="70">def desglose(mensajes: list[dict], prompt: PromptSpec) -&gt; dict:
+    &quot;&quot;&quot;`caracteres_de_contexto` repartido por tipo de mensaje; la suma es el total del kit.&quot;&quot;&quot;
+    partes = Counter({parte: 0 for parte in PARTES})
+    restantes = sum(m[&quot;role&quot;] == &quot;assistant&quot; for m in mensajes)
+    herramienta = None
+    for i, mensaje in enumerate(mensajes):
+        contenido = str(mensaje[&quot;content&quot;])
+        if mensaje[&quot;role&quot;] == &quot;assistant&quot;:
+            restantes -= 1
+            parte, obj = &quot;respuestas&quot;, extraer_json(contenido)
+            herramienta = str(obj.get(&quot;herramienta&quot;, &quot;&quot;)) if obj else None
+        elif i == 0:
+            parte = &quot;sistema&quot;
+        elif i == 1:
+            parte = &quot;inicial&quot;
+        elif contenido == prompt.mensaje_json_invalido:
+            parte = &quot;correcciones&quot;
+        else:
+            parte = &quot;busquedas&quot; if herramienta == &quot;buscar_normativa&quot; else &quot;otras_observaciones&quot;
+        partes[parte] += len(contenido) * restantes
+    if sum(partes.values()) != caracteres_de_contexto(mensajes):
+        raise RuntimeError(&quot;el desglose no coincide con caracteres_de_contexto&quot;)
+    return dict(partes)</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Reparte la métrica <code>caracteres_de_contexto</code> del kit entre sistema, mensaje inicial, búsquedas, otras observaciones, correcciones y respuestas.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li>Recorre los mensajes llevando <code>restantes</code>: cuántas respuestas del modelo faltan, porque cada mensaje se reenvía en cada llamada posterior.</li>
+<li>Clasifica: índice 0 = <code>sistema</code>, 1 = <code>inicial</code>, igual a <code>mensaje_json_invalido</code> = <code>correcciones</code>, observación tras <code>buscar_normativa</code> = <code>busquedas</code>.</li>
+<li>Suma <code>len(contenido) * restantes</code> por parte.</li>
+<li>Verifica que el total coincida con <code>caracteres_de_contexto(mensajes)</code>; si no, lanza error.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Permite saber dónde está el gasto de contexto antes de optimizar: así se vio que el sistema era el 55 % y las búsquedas el 25 %, y que la palanca era el mensaje de sistema.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Lo usa <code>scripts/medir_contexto.py</code>, que rejuega trazas con <code>rejugar_traza</code> (mismo <code>AgentePrompt</code>) y agrega la participación por parte para cada <code>PromptSpec</code>.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Qué ocupa un prompt: el sistema se repite en cada turno, así que su largo se multiplica por la cantidad de llamadas.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 2</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/05/#d=prompting&amp;s=3"><span class="ref">05·3</span><span class="t">¿Qué se guarda en un prompt?</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/10/#d=agentes-y-multiagentes&amp;s=41"><span class="ref">10·41</span><span class="t">El contexto se degrada</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp4-reparto-contexto-doc" data-title="Reparto medido: sistema 55 %, búsquedas 25 %" data-tp="4" data-tp-title="El agente de admisión de guardia (TP final)" data-file="docs/informe/optimizacion-prompt.md" data-from="338" data-to="366">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">docs/informe/optimizacion-prompt.md</span><span class="mono faint">L338–366</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-markdown" data-start="338">**Dónde está el contexto.** `python -m scripts.medir_contexto --trazas &lt;trazas.jsonl&gt; --prompt &lt;spec&gt;`
+rejuega trazas ya jugadas con otro `PromptSpec` (mismas respuestas y observaciones) y reparte
+`caracteres_de_contexto` del kit por tipo de mensaje. Antes de comparar, exige que el prompt de
+origen reproduzca exactamente cada conversación grabada. Sobre las 100 trazas v22 (Kaggle T4,
+Gemma sin entrenar, 50 casos × buscadores `baseline` y `prefijos`; artefactos locales no versionados):
+
+| Parte | `baseline` | `prefijos` |
+|---|---:|---:|
+| Mensaje de sistema | 55,0 % | 54,2 % |
+| Búsquedas | 24,8 % | 25,7 % |
+| Otras observaciones | 13,4 % | 13,3 % |
+| Respuestas del modelo | 5,0 % | 5,1 % |
+| Mensaje inicial | 1,8 % | 1,7 % |
+| Caracteres por caso | 19.954 | 20.689 |
+
+El mensaje de sistema (2.232 caracteres) se reenvía en cada turno: es la palanca principal. Con
+los ~5 turnos medios de v22 (máximo 8), cada 100 caracteres menos de sistema ahorran ~2,5 % por caso.
+
+Candidatos de formato que controla el agente (ahorro total sobre `caracteres_de_contexto`, mismas trazas):
+
+| Candidato | `baseline` | `prefijos` | Decisión |
+|---|---:|---:|---|
+| `{herramienta}:\n{observacion}` | 0,67 % | 0,67 % | No adoptado: sin pérdida, pero no justifica regenerar #8 |
+| `[{herramienta}]\n{observacion}` | 0,62 % | 0,62 % | No adoptado: ídem |
+| `{observacion}` sin herramienta | 1,43 % | 1,45 % | No adoptado: exige relajar `PromptSpec` y debilita la validación herramienta/observación de #8 |
+| Unir líneas en blanco de las observaciones | 0,10 % | 0,10 % | No adoptado: cambia la presentación del buscador (#6) |
+| Reemplazar secciones ya mostradas por una referencia | 0,05 % | 0,79 % | No adoptado: cambia la presentación del buscador (#6) |
+
+Supuesto: el modelo responde lo mismo con el formato nuevo; la medición es de formato, no de conducta.</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Resultado de <code>scripts.medir_contexto</code> sobre 100 trazas: qué porcentaje del contexto ocupa cada parte con <code>baseline</code> y <code>prefijos</code>.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li>Tabla: mensaje de sistema 55,0 %, búsquedas 24,8 %, otras observaciones 13,4 %, respuestas 5 %.</li>
+<li>El sistema (2.232 caracteres) se reenvía en cada turno: cada 100 caracteres menos ahorran ~2,5 % por caso.</li>
+<li>Candidatos de formato de observación ahorran menos de 1,5 % y no se adoptaron.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Justifica dónde optimizar: no en el formato de las observaciones sino en el mensaje de sistema.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Las cifras salen de <code>admision_tp/contexto.desglose</code>; la conclusión orienta el trabajo de prompts (#13) y el contrato con <code>PromptSpec</code>.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>El contexto se degrada y se encarece con su tamaño: medir su composición es el primer paso para recortarlo.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 2</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/05/#d=prompting&amp;s=3"><span class="ref">05·3</span><span class="t">¿Qué se guarda en un prompt?</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/10/#d=agentes-y-multiagentes&amp;s=41"><span class="ref">10·41</span><span class="t">El contexto se degrada</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp4-informe-agente-buscador" data-title="Mejor buscador aislado ≠ mejor agente" data-tp="4" data-tp-title="El agente de admisión de guardia (TP final)" data-file="INFORME.md" data-from="372" data-to="401">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">INFORME.md</span><span class="mono faint">L372–401</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-markdown" data-start="372">| Métrica | `baseline` | `prefijos` |
+|---|---:|---:|
+| Casos resueltos | **10/50** | 6/50 |
+| Parcial medio | **0,831** | 0,796 |
+| registro / box / circuito / plazo | 0,76 / 0,72 / 0,98 / 0,92 | 0,62 / 0,68 / 0,94 / 0,84 |
+| cobertura / entidad / aviso / verificación | 0,80 / 0,82 / 0,72 / 0,76 | 0,78 / 0,82 / 0,72 / 0,76 |
+| Llamadas / búsquedas por caso | 4,9 / 1,34 | 5,0 / 1,40 |
+| Caracteres de contexto por caso | 19.954 | 20.689 |
+| Segundos por caso (T4, lote 4; v25 / v41) | 16,07 | 16,09 |
+
+- **No es concluyente:** `prefijos` gana 3 casos (pev-005, pev-019, pev-037) y pierde 7 (pev-010, 012, 017,
+  021, 024, 049 y 050); con 10 casos discordantes, la prueba de signos da
+  p≈0,34. Tampoco hay señal de mejora.
+- **Por qué el mejor recall no ayudó.** `baseline` devuelve siempre 2 secciones. `prefijos` devolvió 1 sección en 30
+  búsquedas, 3 en 26 y 2 en 14.
+  - Con 3 secciones suele sumar secciones de otras áreas que no deciden la ficha.
+  - El contexto por caso subió 3,7 %.
+  - Es lo que muestran las trazas, no una causa probada.
+- **Costo de GPU:** la comparación usó 2.968 s de sesión T4.
+
+**Pasada 2: con el prompt elegido (Kaggle v26, dev de 40 casos).** `procedimiento-v1` con `prefijos` cae a 4/40,
+contra 9/40 con `baseline` (Parte 3).
+
+**Decisión.** El default sigue siendo `baseline` por tres motivos:
+
+- Es el que mejor resolvió con el agente.
+- Generó las conversaciones de entrenamiento.
+- El adapter aprendió a usarlo.
+
+`prefijos` queda seleccionable como resultado negativo: mejora la evaluación separada, pero no al agente.</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Compara <code>baseline</code> y <code>prefijos</code> jugando los 50 casos de práctica con Gemma sin entrenar: <code>baseline</code> resuelve 10/50 y <code>prefijos</code> 6/50.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li>Tabla por control, llamadas, contexto y segundos por caso.</li>
+<li>Por caso: <code>prefijos</code> gana 3 y pierde 7 (prueba de signos p≈0,34, no concluyente).</li>
+<li>Explica por qué: <code>prefijos</code> trae 1 o 3 secciones y con 3 suma secciones de otras áreas que no deciden la ficha; el contexto por caso sube 3,7 %.</li>
+<li>Con <code>procedimiento-v1</code> pasa lo mismo (4/40 contra 9/40).</li>
+<li>Decisión: el default sigue siendo <code>baseline</code> (mejor con el agente, generó las conversaciones de entrenamiento y el adapter aprendió a usarlo).</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Materializa la regla de que el buscador vale por lo que rinde el agente con él, no por su métrica aislada; <code>prefijos</code> queda como resultado negativo documentado.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Los datos vienen de <code>infra/kaggle_evaluacion.py</code> con el plan <code>configuraciones/evaluacion/buscador-prefijos.json</code> y se tabulan con <code>scripts.tabla_evaluacion</code>; los controles los puntúa <code>admision.correr.puntuar</code>. La decisión deja <code>entrega.construir_buscador</code> en <code>baseline</code>.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Evaluar las dos etapas de un RAG por separado y juntas: mejor recuperación aislada no garantiza mejor respuesta final.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 3</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=39"><span class="ref">06·39</span><span class="t">Evaluar las dos etapas por separado</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/10/#d=agentes-y-multiagentes&amp;s=41"><span class="ref">10·41</span><span class="t">El contexto se degrada</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/#d=cierre-magnifica-humanitas&amp;s=44"><span class="ref">13·44</span><span class="t">Evaluar es el nuevo cuello de botella</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp4-entrega-fabricas" data-title="Puntos de entrada de la entrega" data-tp="4" data-tp-title="El agente de admisión de guardia (TP final)" data-file="entrega.py" data-from="1" data-to="26">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">entrega.py</span><span class="mono faint">L1–26</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-python" data-start="1">&quot;&quot;&quot;Puntos de entrada de la entrega.&quot;&quot;&quot;
+
+from pathlib import Path
+import os
+
+from admision_tp.buscador import BuscadorBM25
+from admision_tp.prompts import RAIZ, RUTA_ENTREGA, PromptSpec
+
+
+def construir_buscador(ruta_normas: Path) -&gt; BuscadorBM25:
+    return BuscadorBM25(ruta_normas, variante=os.getenv(&quot;BUSCADOR_VARIANTE&quot;, &quot;baseline&quot;))
+
+
+def cargar_prompt() -&gt; PromptSpec:
+    &quot;&quot;&quot;PromptSpec de `PROMPT_SPEC` (relativa a la raíz del repo) o el de la entrega; valida su sha256.&quot;&quot;&quot;
+    ruta = Path(os.getenv(&quot;PROMPT_SPEC&quot;) or RUTA_ENTREGA)
+    return PromptSpec.cargar(ruta if ruta.is_absolute() else RAIZ / ruta)
+
+
+def construir_agente():
+    from admision_tp.agente_prompt import AgentePrompt
+    from admision_tp.configuracion import Configuracion
+    from admision_tp.modelo import ModeloLocal
+
+    prompt = cargar_prompt()  # antes de cargar el modelo: un prompt inválido falla sin usar la GPU
+    return AgentePrompt(ModeloLocal.cargar(Configuracion.desde_entorno()), prompt)</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Conecta las tres piezas que exige el kit de la cátedra: el buscador BM25 propio, el prompt versionado y el agente que corre Gemma local.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li><code>construir_buscador(ruta_normas)</code> arma un <code>BuscadorBM25</code> con la carpeta de normas recibida y la variante de <code>BUSCADOR_VARIANTE</code> (default <code>baseline</code>).</li>
+<li><code>cargar_prompt()</code> lee el <code>PromptSpec</code> de <code>PROMPT_SPEC</code> o, si no hay, el de la entrega (<code>RUTA_ENTREGA</code>, <code>procedimiento-v1</code>) y valida su sha256.</li>
+<li><code>construir_agente()</code> carga primero el prompt (si es inválido falla sin tocar la GPU) y después <code>ModeloLocal</code> con <code>Configuracion.desde_entorno()</code>, y devuelve un <code>AgentePrompt</code>.</li>
+<li>Los imports pesados están adentro de la función para que importar <code>entrega.py</code> no cargue torch.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Es el contrato con la cátedra: separa buscador, prompt y modelo para poder cambiar cada uno por variable de entorno sin tocar código. Las dependencias pesadas son lazy, como pide AGENTS.md.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Lo llaman <code>admision.contrato.cargar_entrega</code> y los runners (<code>admision.correr</code>, <code>admision.evaluar_rag</code>). Alimenta al <code>Entorno</code> del kit (buscador para <code>buscar_normativa</code>) y al ciclo de <code>admision_tp/agente_prompt.py</code>.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Es la arquitectura completa del trabajo final: un agente con herramientas, RAG léxico sobre normas y prompt optimizado/versionado.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 4</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=introduccion&amp;s=18"><span class="ref">01·18</span><span class="t">Trabajo final</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/05/#d=prompting&amp;s=66"><span class="ref">05·66</span><span class="t">Mitigaciones que funcionan</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=4"><span class="ref">06·4</span><span class="t">Antes de consultar hay que indexar</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/10/#d=agentes-y-multiagentes&amp;s=51"><span class="ref">10·51</span><span class="t">Primero, un solo agente</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp4-jugar-runner" data-title="El kit conecta la entrega y juega los casos" data-tp="4" data-tp-title="El agente de admisión de guardia (TP final)" data-file="admision/correr.py" data-from="63" data-to="93">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">admision/correr.py</span><span class="mono faint">L63–93</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-python" data-start="63">def _jugar(entrega, casos, ruta_normas: Path, salida: Path | None = None) -&gt; tuple[list[dict], dict]:
+    if not casos:
+        raise ValueError(&quot;no hay casos&quot;)
+    tiempos: dict = {&quot;casos&quot;: len(casos)}
+    with tempfile.TemporaryDirectory(prefix=&quot;admision-normas-&quot;) as carpeta:
+        # El buscador recibe una copia de las normas en una carpeta que no tiene nada más.
+        copia = Path(carpeta) / &quot;normas&quot;
+        shutil.copytree(Path(ruta_normas), copia)
+        t = time.perf_counter()
+        buscador = entrega.construir_buscador(copia)
+        tiempos[&quot;construir_buscador&quot;] = _segundos(t)
+        t = time.perf_counter()
+        agente = entrega.construir_agente()
+        tiempos[&quot;construir_agente&quot;] = _segundos(t)
+
+        entornos = [Entorno(c, buscador) for c in casos]
+        ultima_llamada: list[float | None] = [None] * len(casos)
+        inicio = time.perf_counter()
+
+        def paso_del_caso(i):
+            def paso(herramienta, argumentos):
+                try:
+                    return entornos[i].paso(herramienta, argumentos)
+                finally:
+                    ultima_llamada[i] = _segundos(inicio)
+            return paso
+
+        vistas = [VistaDelAgente(c.paciente_id, paso_del_caso(i)) for i, c in enumerate(casos)]
+        tiempos[&quot;error&quot;] = None
+        try:
+            conversaciones = agente.jugar_lote(vistas)</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Código del kit de la cátedra: arma el buscador y el agente con las fábricas de <code>entrega.py</code>, crea un <code>Entorno</code> por caso y llama a <code>jugar_lote</code>.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li>Copia las normas a una carpeta temporal aislada y llama <code>entrega.construir_buscador(copia)</code>.</li>
+<li>Llama <code>entrega.construir_agente()</code> y mide cuánto tarda cada construcción.</li>
+<li>Crea <code>Entorno(c, buscador)</code> por caso y lo envuelve en una <code>VistaDelAgente</code> que solo expone <code>paciente_id</code> y <code>paso</code>.</li>
+<li><code>agente.jugar_lote(vistas)</code> devuelve una conversación por caso.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Es el contrato: el agente nunca ve la ficha esperada ni el entorno completo, solo la vista con las cinco herramientas.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Usa <code>construir_buscador</code> y <code>construir_agente</code> de <code>entrega.py</code>; <code>jugar_lote</code> es <code>AgentePrompt.jugar_lote</code> (<code>admision_tp/agente_prompt.py</code>). Las trazas que devuelve las puntúa <code>puntuar</code> (mismo archivo).</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Arquitectura agente + entorno: el entorno ejecuta las herramientas y el agente solo decide qué llamar.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 2</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=introduccion&amp;s=18"><span class="ref">01·18</span><span class="t">Trabajo final</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/10/#d=agentes-y-multiagentes&amp;s=51"><span class="ref">10·51</span><span class="t">Primero, un solo agente</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+
+
+    </main>
+  </div>
+</div>
+<dialog class="code-dlg" id="code-dlg" aria-labelledby="code-dlg-title">
+  <div class="card-header">
+    <div class="code-dlg-title"><span class="pill tp" id="code-dlg-tp">TP</span><span class="card-title" id="code-dlg-title"></span></div>
+    <div class="card-actions"><a class="btn sm" id="code-dlg-open" href="#">Ver todo el código del TP</a><button class="btn icon sm ghost" id="code-dlg-close" aria-label="Cerrar" autofocus><svg class="i" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+  </div>
+  <div id="code-dlg-body"></div>
+</dialog>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<script src="https://ezequielrickert.github.io/austral-ia-generativa/js/site.js?h=f2262278f956a92874ef"></script>
+<script src="https://ezequielrickert.github.io/austral-ia-generativa/js/viewer.js?h=e95313f2efe7ebd8f130"></script>
+</body>
+</html>

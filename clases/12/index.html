@@ -1,0 +1,2300 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Clase 12 · Modelos generativos de señales, imágenes y multimodalidad · IA Generativa</title>
+  <meta name="description" content="Las diapositivas de IA Generativa (Universidad Austral, 2c 2026) con notas por diapositiva y vínculos a los TPs.">
+  <script>
+    (function(){try{var t=localStorage.getItem('iagen:theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t)}catch(e){}})();
+    window.SITE_BASE = "https://ezequielrickert.github.io/austral-ia-generativa".replace(/\/$/, '');
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <link rel="stylesheet" href="https://ezequielrickert.github.io/austral-ia-generativa/css/site.css?h=ede67d51655aa3494e82">
+</head>
+<body>
+
+
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <a class="sb-head" href="https://ezequielrickert.github.io/austral-ia-generativa/">
+      <span class="sb-logo">IA</span>
+      <span class="sb-title"><b>IA Generativa</b><span>Guía de estudio · 2c 2026</span></span>
+    </a>
+    <div class="sb-search">
+      <div class="input-icon">
+        <svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input class="input" id="search" type="search" placeholder="Buscar" autocomplete="off" aria-label="Buscar diapositivas y conceptos">
+        <kbd>/</kbd>
+      </div>
+      <div class="search-results" id="search-results" hidden></div>
+    </div>
+    <nav class="sb-body" aria-label="Navegación">
+      <div class="nav-group">
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/">
+          <svg class="i" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span class="t">Inicio</span></a>
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/">
+          <svg class="i" viewBox="0 0 24 24"><path d="M4 19.5V5a2 2 0 0 1 2-2h14v16H6.5A2.5 2.5 0 0 0 4 21.5"/><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/></svg><span class="t">Glosario</span></a>
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/practica/">
+          <svg class="i" viewBox="0 0 24 24"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg><span class="t">Práctica</span></a>
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/marcadas/">
+          <svg class="i" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg><span class="t">Marcadas</span><span class="count" id="star-count"></span></a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-label">Clases</div>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/" title="Bienvenida + CoWork: fundamentos de IA, modelos fundacionales y el chat extendido">
+          <span class="n">01</span><span class="t">Bienvenida + CoWork: fundamentos de IA, modelos fundacionales y el chat extendido</span><span class="meter" data-class="1" data-total="100"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/" title="CoWork: agentes de código, contexto, CLAUDE.md, Skills, subagentes y MCP">
+          <span class="n">02</span><span class="t">CoWork: agentes de código, contexto, CLAUDE.md, Skills, subagentes y MCP</span><span class="meter" data-class="2" data-total="66"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/03/" title="Introducción a las redes neuronales">
+          <span class="n">03</span><span class="t">Introducción a las redes neuronales</span><span class="meter" data-class="3" data-total="51"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/" title="Diseño de redes neuronales (modelado de un MLP)">
+          <span class="n">04</span><span class="t">Diseño de redes neuronales (modelado de un MLP)</span><span class="meter" data-class="4" data-total="64"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/05/" title="LLMs: prompting, costos y producción">
+          <span class="n">05</span><span class="t">LLMs: prompting, costos y producción</span><span class="meter" data-class="5" data-total="72"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/" title="RAG, bases vectoriales, inverted index">
+          <span class="n">06</span><span class="t">RAG, bases vectoriales, inverted index</span><span class="meter" data-class="6" data-total="71"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/" title="MCP y herramientas (con repaso de RAG) · De la palabra al transformer">
+          <span class="n">07</span><span class="t">MCP y herramientas (con repaso de RAG) · De la palabra al transformer</span><span class="meter" data-class="7" data-total="69"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/08/" title="El transformer por dentro: atención, el bloque completo y la familia de modelos">
+          <span class="n">08</span><span class="t">El transformer por dentro: atención, el bloque completo y la familia de modelos</span><span class="meter" data-class="8" data-total="43"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/" title="LLM training: pre-training, SFT, RLHF, herramientas y fine-tuning">
+          <span class="n">09</span><span class="t">LLM training: pre-training, SFT, RLHF, herramientas y fine-tuning</span><span class="meter" data-class="9" data-total="60"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/10/" title="Agentes: sistemas multiagente, especialización, contexto y orquestación">
+          <span class="n">10</span><span class="t">Agentes: sistemas multiagente, especialización, contexto y orquestación</span><span class="meter" data-class="10" data-total="64"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/11/" title="Redes generativas antagónicas (GANs)">
+          <span class="n">11</span><span class="t">Redes generativas antagónicas (GANs)</span><span class="meter" data-class="11" data-total="54"><i></i></span></a>
+        
+        <a class="nav-item active" href="https://ezequielrickert.github.io/austral-ia-generativa/clases/12/" title="Modelos generativos de señales, imágenes y multimodalidad">
+          <span class="n">12</span><span class="t">Modelos generativos de señales, imágenes y multimodalidad</span><span class="meter" data-class="12" data-total="79"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/" title="Del poder a la responsabilidad: seguridad, ética y lo que viene">
+          <span class="n">13</span><span class="t">Del poder a la responsabilidad: seguridad, ética y lo que viene</span><span class="meter" data-class="13" data-total="56"><i></i></span></a>
+        
+      </div>
+      <div class="nav-group">
+        <div class="nav-label">Trabajos prácticos</div>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/tp/1/" title="Corta, del caos a producción">
+          <span class="n">1</span><span class="t">Corta, del caos a producción</span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/tp/2/" title="¿Cuánto vale esta casa?">
+          <span class="n">2</span><span class="t">¿Cuánto vale esta casa?</span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/tp/3/" title="RAG, MCP y Transformers en el Hospital Arroyo Claro">
+          <span class="n">3</span><span class="t">RAG, MCP y Transformers en el Hospital Arroyo Claro</span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/tp/4/" title="El agente de admisión de guardia (TP final)">
+          <span class="n">4</span><span class="t">El agente de admisión de guardia (TP final)</span></a>
+        
+      </div>
+    </nav>
+    <div class="sb-foot">
+      <span id="exam-left">Final: 4 dic</span>
+      <button class="btn icon sm ghost" id="theme-btn" aria-label="Cambiar tema" title="Cambiar tema">
+        <svg class="i" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+    </div>
+  </aside>
+  <div class="main">
+    <div class="topbar">
+      <button class="btn icon" id="menu-btn" aria-label="Abrir navegación"><svg class="i" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+      <b>IA Generativa</b>
+    </div>
+    <main class="content is-viewer">
+      
+
+<div class="viewer-page" id="viewer" data-class="12">
+<header class="page-header">
+  <div class="ph-main">
+    <nav class="crumbs"><a href="https://ezequielrickert.github.io/austral-ia-generativa/">Clases</a><span class="sep">/</span><span>Clase 12</span><span class="sep">·</span><span>28 oct</span><span class="sep">·</span><span>Visión y generativos</span></nav>
+    <h1>Modelos generativos de señales, imágenes y multimodalidad</h1>
+  </div>
+  <div class="ph-actions">
+    
+    <button class="btn icon" id="focus-btn" aria-pressed="false" title="Modo foco: ocultar el menú (f)" aria-label="Modo foco"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg></button>
+    <button class="btn icon" id="fs-btn" title="Pantalla completa: diapositivas, notas y TPs (p)" aria-label="Pantalla completa"><svg class="i" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+    <a class="btn" href="https://ezequielrickert.github.io/austral-ia-generativa/practica/#c12">Practicar</a>
+    <a class="btn icon " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/11/" aria-label="Clase anterior" title="Clase anterior"><svg class="i" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></a>
+    <a class="btn icon " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/" aria-label="Clase siguiente" title="Clase siguiente"><svg class="i" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></a>
+  </div>
+</header>
+
+<div class="viewer-area">
+<div class="viewer">
+  <section class="card stage-card">
+    <div class="card-header">
+      <span class="deck-kind"><span class="pill sched" id="deck-kind" data-kind-sched="Calendario" data-kind-extra="Complementaria" title="Figura en el calendario de la materia">Calendario</span><span class="card-sub" id="sec-name">&nbsp;</span></span>
+      <div class="seg" id="filter" aria-label="Filtrar diapositivas">
+        <button aria-pressed="true" data-f="all">Todas<span class="fc mono" data-fc="all"></span></button>
+        <button aria-pressed="false" data-f="key"><span class="bar"></span>Clave<span class="fc mono" data-fc="key"></span></button>
+        <button aria-pressed="false" data-f="tp"><span class="dot"></span>En TPs<span class="fc mono" data-fc="tp"></span></button>
+      </div>
+      <button class="btn icon sm ghost" id="fs-exit" title="Salir de pantalla completa (p o Esc)" aria-label="Salir de pantalla completa"><svg class="i" viewBox="0 0 24 24"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg></button>
+    </div>
+    <div class="stage" id="stage">
+      <iframe id="deck-frame" title="Diapositivas de la clase" allow="autoplay; fullscreen"></iframe>
+      <button class="tp-mark" id="tp-mark" hidden aria-expanded="false" aria-controls="tp-pop" title="¿Dónde lo usaste? (t)"><b>?</b><span id="tp-mark-label">TP</span></button>
+      <div class="tp-pop card" id="tp-pop" hidden role="dialog" aria-label="Dónde lo usaste en los TPs"></div>
+    </div>
+    <div class="card-footer">
+      <button class="btn icon sm" id="prev" aria-label="Diapositiva anterior"><svg class="i" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>
+      <span class="pos" id="pos">—</span>
+      <button class="btn icon sm" id="next" aria-label="Diapositiva siguiente"><svg class="i" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>
+      
+      <div class="scrub" data-scrub="segmentacion-y-stable-diffusion"  role="slider" aria-label="Ir a una diapositiva" aria-valuemin="0" aria-valuemax="78" tabindex="0">
+        <span class="tk" data-i="0" data-t="Inteligencia Artificial Generativa (AI Gen)"></span><span class="tk" data-i="1" data-t="Qué es una convolución"></span><span class="tk tp" data-i="2" data-t="Una red neuronal clásica solo acepta entradas de largo fijo"></span><span class="tk" data-i="3" data-t="Una red neuronal clásica solo acepta entradas de largo fijo"></span><span class="tk key tp" data-i="4" data-t="Cómo se entrena una red densa"></span><span class="tk" data-i="5" data-t="El detector de voz: cada audio dura distinto"></span><span class="tk" data-i="6" data-t="El detector de voz: cada audio dura distinto"></span><span class="tk key" data-i="7" data-t="El sesgo inductivo equivocado"></span><span class="tk" data-i="8" data-t="El problema aparece en cualquier señal, y en las imágenes"></span><span class="tk" data-i="9" data-t="La solución: un kernel que se desliza"></span><span class="tk key" data-i="10" data-t="La solución: un kernel que se desliza"></span><span class="tk" data-i="11" data-t="Mismo mecanismo, otra tarea: detectar voz"></span><span class="tk" data-i="12" data-t="Mismo mecanismo, otra tarea: detectar voz"></span><span class="tk" data-i="13" data-t="El largo variable deja de ser un problema"></span><span class="tk" data-i="14" data-t="El largo variable deja de ser un problema"></span><span class="tk key" data-i="15" data-t="Dos soluciones al largo variable"></span><span class="tk" data-i="16" data-t="Convolución en imágenes"></span><span class="tk" data-i="17" data-t="Convolución en imágenes"></span><span class="tk" data-i="18" data-t="Distintos kernels, distintos rasgos"></span><span class="tk" data-i="19" data-t="Distintos kernels, distintos rasgos"></span><span class="tk" data-i="20" data-t="Cómo se aprende un kernel"></span><span class="tk" data-i="21" data-t="Embeddings más allá del texto"></span><span class="tk tp" data-i="22" data-t="Embeddings más allá del texto"></span><span class="tk" data-i="23" data-t="Segmentación: qué es y para qué sirve"></span><span class="tk key" data-i="24" data-t="¿Qué es segmentar?"></span><span class="tk key" data-i="25" data-t="Tipos de segmentación"></span><span class="tk" data-i="26" data-t="Dónde se usa"></span><span class="tk" data-i="27" data-t="Cómo se ve una salida"></span><span class="tk" data-i="28" data-t="De FCN a U-Net"></span><span class="tk" data-i="29" data-t="La intuición: clasificar cada píxel"></span><span class="tk" data-i="30" data-t="FCN por dentro"></span><span class="tk" data-i="31" data-t="FCN por dentro"></span><span class="tk" data-i="32" data-t="El problema de FCN"></span><span class="tk key" data-i="33" data-t="U-Net: la U y sus atajos"></span><span class="tk" data-i="34" data-t="U-Net: la U y sus atajos"></span><span class="tk" data-i="35" data-t="Cómo se entrena un modelo de segmentación"></span><span class="tk" data-i="36" data-t="Por qué funciona tan bien en medicina"></span><span class="tk" data-i="37" data-t="SAM: segmentar lo que le señalás"></span><span class="tk key" data-i="38" data-t="SAM: segmentación promptable"></span><span class="tk" data-i="39" data-t="SAM: segmentación promptable"></span><span class="tk" data-i="40" data-t="Cómo se entrena SAM"></span><span class="tk" data-i="41" data-t="SAM 2: memoria para video"></span><span class="tk" data-i="42" data-t="SAM 2: memoria para video"></span><span class="tk" data-i="43" data-t="Cómo se entrena SAM 2"></span><span class="tk" data-i="44" data-t="SAM 3 y 3.1: texto y muchos objetos"></span><span class="tk" data-i="45" data-t="U-Net es modular: adelanto"></span><span class="tk" data-i="46" data-t="Generación condicionada por texto"></span><span class="tk" data-i="47" data-t="TilTedTinder: el nuevo desafío"></span><span class="tk" data-i="48" data-t="Por qué la GAN no alcanza"></span><span class="tk" data-i="49" data-t="Text-to-image en cinco años"></span><span class="tk" data-i="50" data-t="CLIP: el puente texto ↔ imagen"></span><span class="tk key tp" data-i="51" data-t="CLIP: el puente texto ↔ imagen"></span><span class="tk tp" data-i="52" data-t="Cómo se entrena CLIP"></span><span class="tk key" data-i="53" data-t="La idea de condición"></span><span class="tk" data-i="54" data-t="Stable Diffusion por dentro"></span><span class="tk" data-i="55" data-t="La idea de difusión: agregar y quitar ruido"></span><span class="tk key" data-i="56" data-t="La idea de difusión: agregar y quitar ruido"></span><span class="tk" data-i="57" data-t="Del ruido a la imagen"></span><span class="tk key" data-i="58" data-t="Latent diffusion: difundir en un espacio comprimido"></span><span class="tk" data-i="59" data-t="Las tres piezas de Stable Diffusion"></span><span class="tk key" data-i="60" data-t="Las tres piezas de Stable Diffusion"></span><span class="tk" data-i="61" data-t="Componente 1: el VAE"></span><span class="tk" data-i="62" data-t="Componente 1: el VAE"></span><span class="tk" data-i="63" data-t="Cómo se entrena el VAE"></span><span class="tk" data-i="64" data-t="Componente 2: la U-Net, de vuelta"></span><span class="tk key" data-i="65" data-t="Componente 2: la U-Net, de vuelta"></span><span class="tk" data-i="66" data-t="Componente 3: el CLIP Text Encoder"></span><span class="tk" data-i="67" data-t="Pipeline completo de inferencia"></span><span class="tk key" data-i="68" data-t="Pipeline completo de inferencia"></span><span class="tk key" data-i="69" data-t="Cómo se entrena Stable Diffusion"></span><span class="tk key" data-i="70" data-t="Los hiperparámetros que importan"></span><span class="tk" data-i="71" data-t="Limitaciones de Stable Diffusion"></span><span class="tk" data-i="72" data-t="TilTedTinder v2 y notebook"></span><span class="tk" data-i="73" data-t="De preferencias a prompts"></span><span class="tk" data-i="74" data-t="De preferencias a prompts"></span><span class="tk tp" data-i="75" data-t="Lo que el equipo va a encontrar"></span><span class="tk" data-i="76" data-t="Pasamos al notebook"></span><span class="tk" data-i="77" data-t="Conclusiones"></span><span class="tk key" data-i="78" data-t="Key takeaways"></span>
+      </div>
+      
+      <button class="btn sm" id="side-toggle" aria-pressed="true" title="Esconder las notas (n)"><svg class="i chev-hide" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg><svg class="i chev-show" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>Notas</button>
+    </div>
+  </section>
+
+  <aside class="card side-card" id="side-card">
+    <div class="card-header">
+      <div class="seg" role="tablist" data-tabs="side-card">
+        <button role="tab" data-tab="nota" aria-selected="true">Nota</button>
+        <button role="tab" data-tab="indice" aria-selected="false">Índice</button>
+      </div>
+      <span class="count mono faint" id="note-pos" style="font-size:12px"></span>
+    </div>
+
+    <div class="side-panel" data-panel="nota" id="notes" aria-live="polite">
+      
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="0" hidden>
+          <div class="card-section head">
+            <h2>Inteligencia Artificial Generativa (AI Gen)</h2>
+            
+            <p class="summary">Portada de la clase 12: convolución, segmentación, multimodalidad y Stable Diffusion.</p>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="1" hidden>
+          <div class="card-section head">
+            <h2>Qué es una convolución</h2>
+            
+            <p class="summary">Agenda: convolución, segmentación, FCN y U-Net, SAM, generación por texto, Stable Diffusion y notebook.</p>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="2" hidden>
+          <div class="card-section head">
+            <h2>Una red neuronal clásica solo acepta entradas de largo fijo</h2>
+            
+            <p class="summary">Puente desde lo conocido: una red densa funciona porque cada fila trae las mismas columnas. La pregunta es qué pasa si la entrada cambia de largo.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#perceptron-multicapa">MLP (perceptrón multicapa)</a><span>entrada de largo fijo</span></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=2"><span class="ref">04·2</span><span><span class="t">La red ve una fila de números</span></span></a></div>
+          </div>
+          
+          
+          <template class="tp-data"><div class="tp-ref" data-tp="2"><a href="https://ezequielrickert.github.io/austral-ia-generativa/tp/2/">TP2 · ¿Cuánto vale esta casa?</a><span>Tu TP2 es exactamente este caso: cada casa, un vector fijo (z-score, one-hot, mes sin/cos) entrando a un MLP 32-32-1.</span><button class="btn sm code-btn" data-code="tp2-build-dense-features,tp2-train-categorical-variant,tp2-modelo-embedding-funcional" data-nota="Cada casa sale de `build_dense_features` como un vector de largo fijo, y ese largo (`X_dense_train.shape[1]`) define el `Input` del MLP."><svg class="i" viewBox="0 0 24 24"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></svg>Ver en el código · 3 fragmentos</button></div></template>
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="3" hidden>
+          <div class="card-section head">
+            <h2>Una red neuronal clásica solo acepta entradas de largo fijo</h2>
+            
+            <p class="summary">Un <strong>MLP</strong> fija la cantidad de entradas en la primera capa, porque cada entrada tiene sus propios pesos. Sirve para precios, MNIST aplanado (784) o riesgo crediticio.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#perceptron-multicapa">MLP (perceptrón multicapa)</a><span>entrada de largo fijo</span></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="4" hidden>
+          <div class="card-section head">
+            <h2>Cómo se entrena una red densa</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary">Repaso con un MLP de juguete: forward, pérdida $-\log p$, backward con deltas y $W\leftarrow W-\eta,\partial L/\partial W$. Es el ciclo que entrena todos los modelos de la clase.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#backpropagation">Backpropagation</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#delta">Delta (δ)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#learning-rate">Tasa de aprendizaje η</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/03/#d=intro-redes-neuronales&amp;s=29"><span class="ref">03·29</span><span><span class="t">Ida y vuelta: forward y backward</span><small>Forward y backward en la clase 3</small></span></a></div>
+          </div>
+          
+          
+          <template class="tp-data"><div class="tp-ref" data-tp="2"><a href="https://ezequielrickert.github.io/austral-ia-generativa/tp/2/">TP2 · ¿Cuánto vale esta casa?</a><span>En el TP2 <code>fit</code> corrió este ciclo con Adam y <code>batch_size=32</code>; con early stopping la red 512-512-512 cortó en la época 76 de 150.</span><button class="btn sm code-btn" data-code="tp2-features-milestone4,tp2-modelo-grande-512,tp2-regularizado-early-stopping" data-nota="Este `fit` es el ciclo forward/backward; con early stopping la red cortó en la época 76 de 150."><svg class="i" viewBox="0 0 24 24"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></svg>Ver en el código · 3 fragmentos</button></div></template>
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="5" hidden>
+          <div class="card-section head">
+            <h2>El detector de voz: cada audio dura distinto</h2>
+            
+            <p class="summary">Forzar todos los audios a un largo L es arbitrario: corto pierde información, largo es casi todo relleno. Y queda otro problema que la densa no modela.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><span>largo variable</span></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="6" hidden>
+          <div class="card-section head">
+            <h2>El detector de voz: cada audio dura distinto</h2>
+            
+            <p class="summary">Detector de voz: cada audio dura distinto. Con un MLP hay que recortar (se puede perder la voz) o rellenar con ceros (silencio artificial).</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><span>largo variable</span><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#perceptron-multicapa">MLP (perceptrón multicapa)</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="7" hidden>
+          <div class="card-section head">
+            <h2>El sesgo inductivo equivocado</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary"><strong>Sesgo inductivo</strong>: lo que la arquitectura asume antes de ver datos. La densa no asume orden ni invariancia a traslación: bien para tablas, mal para audio e imágenes.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#sesgo-inductivo">Sesgo inductivo</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=palabra-al-transformer&amp;s=21"><span class="ref">07·21</span><span><span class="t">Promediar una frase pierde el orden</span></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="8" hidden>
+          <div class="card-section head">
+            <h2>El problema aparece en cualquier señal, y en las imágenes</h2>
+            
+            <p class="summary">El problema aparece en cualquier señal (clasificar, filtrar, generar) y en imágenes en 2D: alto y ancho cambian, y un MLP obliga a redimensionar y aplanar.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><span>largo variable</span><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#cnn">CNN (red convolucional)</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="9" hidden>
+          <div class="card-section head">
+            <h2>La solución: un kernel que se desliza</h2>
+            
+            <p class="summary">Un kernel de 9 pesos de 1/9 (promedio móvil) filtra audio. Es una suma ponderada como la neurona, pero sobre una ventana y reutilizada en cada posición.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#convolucion">Convolución</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="10" hidden>
+          <div class="card-section head">
+            <h2>La solución: un kernel que se desliza</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary"><strong>Convolución</strong>: un vector chico de pesos recorre la señal, multiplica, suma y escribe una salida por posición. Con <strong>pesos compartidos</strong> detecta el patrón esté donde esté.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#convolucion">Convolución</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="11" hidden>
+          <div class="card-section head">
+            <h2>Mismo mecanismo, otra tarea: detectar voz</h2>
+            
+            <p class="summary">Los kernels del ejemplo están diseñados a mano; en una CNN arrancan al azar y el descenso por gradiente los ajusta.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#convolucion">Convolución</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#cnn">CNN (red convolucional)</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="12" hidden>
+          <div class="card-section head">
+            <h2>Mismo mecanismo, otra tarea: detectar voz</h2>
+            
+            <p class="summary">Otro kernel (ventana larga sobre la señal al cuadrado) mide la energía local: donde supera un umbral, hay voz. En una CNN esos pesos se aprenden.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#convolucion">Convolución</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#cnn">CNN (red convolucional)</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="13" hidden>
+          <div class="card-section head">
+            <h2>El largo variable deja de ser un problema</h2>
+            
+            <p class="summary">Clave de la sección: la cantidad de pesos depende del tamaño del kernel, no del largo de la entrada. El pooling global conecta la parte convolucional con la densa.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#convolucion">Convolución</a><span>pooling global</span></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="14" hidden>
+          <div class="card-section head">
+            <h2>El largo variable deja de ser un problema</h2>
+            
+            <p class="summary">El mismo kernel sirve para audios de 2 s o de 5 s; un <strong>pooling global</strong> (promedio o máximo) resume a largo fijo antes de la capa densa.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#convolucion">Convolución</a><span>pooling global</span></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="15" hidden>
+          <div class="card-section head">
+            <h2>Dos soluciones al largo variable</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary">Dos soluciones al largo variable: <strong>convolución</strong> (localidad, menos datos) y <strong>atención</strong> (todos con todos, más datos, costo cuadrático). Elegir arquitectura es elegir sesgo inductivo.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#convolucion">Convolución</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#atencion">Atención</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#sesgo-inductivo">Sesgo inductivo</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#costo-cuadratico">Costo cuadrático de la atención</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=palabra-al-transformer&amp;s=27"><span class="ref">07·27</span><span><span class="t">Cada token mira a todos</span><small>Atención: cada token mira a todos</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="16" hidden>
+          <div class="card-section head">
+            <h2>Convolución en imágenes</h2>
+            
+            <p class="summary">896 parámetros de una capa convolucional contra 38,5 millones de una densa: por eso las CNN entrenan con imágenes grandes y una red densa no.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#convolucion">Convolución</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#cnn">CNN (red convolucional)</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="17" hidden>
+          <div class="card-section head">
+            <h2>Convolución en imágenes</h2>
+            
+            <p class="summary">En imágenes el kernel es una grilla (3×3) que recorre alto y ancho; cada posición da una celda del <strong>feature map</strong> (7×7 → 5×5 sin relleno).</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#convolucion">Convolución</a><span>feature map</span></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="18" hidden>
+          <div class="card-section head">
+            <h2>Distintos kernels, distintos rasgos</h2>
+            
+            <p class="summary">32 kernels en una capa dan 32 feature maps, uno por rasgo; la capa siguiente los combina y detecta algo más complejo que un borde.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#cnn">CNN (red convolucional)</a><span>feature map</span></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="19" hidden>
+          <div class="card-section head">
+            <h2>Distintos kernels, distintos rasgos</h2>
+            
+            <p class="summary">Cada kernel detecta un rasgo; apilando capas: bordes → texturas → partes → objetos. Esa pila es el <strong>encoder</strong> de FCN y U-Net.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#cnn">CNN (red convolucional)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#convolucion">Convolución</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="20" hidden>
+          <div class="card-section head">
+            <h2>Cómo se aprende un kernel</h2>
+            
+            <p class="summary">Aprender un kernel: arranca al azar, pérdida MSE contra un mapa de bordes; su gradiente suma las contribuciones de las 25 posiciones. Termina en $[-1\ 0\ +1]$.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#convolucion">Convolución</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#backpropagation">Backpropagation</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#mse">MSE (y sus alternativas MAE y Huber)</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="21" hidden>
+          <div class="card-section head">
+            <h2>Embeddings más allá del texto</h2>
+            
+            <p class="summary">La idea de <strong>embedding</strong> se generaliza a cualquier modalidad. CLIP alineará dos encoders en un mismo espacio; el latente del VAE comprime, pero sin garantizar que cerca = parecido.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#embedding">Embedding</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#clip">CLIP</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#vae">VAE (Variational Autoencoder)</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="22" hidden>
+          <div class="card-section head">
+            <h2>Embeddings más allá del texto</h2>
+            
+            <p class="summary">El encoder de una CNN termina en un vector fijo: un <strong>embedding</strong> donde vectores cercanos son contenidos parecidos. Vale para imagen, texto o audio.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#embedding">Embedding</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#multimodalidad">Multimodalidad</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=palabra-al-transformer&amp;s=16"><span class="ref">07·16</span><span><span class="t">El espacio de embeddings</span></span></a></div>
+          </div>
+          
+          
+          <template class="tp-data"><div class="tp-ref" data-tp="2"><a href="https://ezequielrickert.github.io/austral-ia-generativa/tp/2/">TP2 · ¿Cuánto vale esta casa?</a><span>En el TP2 <code>District</code> (72 valores) pasó por <code>Embedding(73, 8)</code>: el MAE bajó de 30.956 a 25.380.</span><button class="btn sm code-btn" data-code="tp2-encoders-solo-train,tp2-modelo-embedding-funcional,tp2-train-categorical-variant,tp2-variantes-incrementales" data-nota=""><svg class="i" viewBox="0 0 24 24"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></svg>Ver en el código · 4 fragmentos</button></div><div class="tp-ref" data-tp="3"><a href="https://ezequielrickert.github.io/austral-ia-generativa/tp/3/">TP3 · RAG, MCP y Transformers en el Hospital Arroyo Claro</a><span>En el TP3 usaste embeddings de texto: e5-base con chunking por sección logró Context Recall 0,967 contra 0,350 de BERT promediado.</span><button class="btn sm code-btn" data-code="tp3-encoder-e5-prefijos,tp3-informe-por-que-e5" data-nota="e5-base embebe texto; el informe compara su CR (1,000 con k = 1) contra BERT promediado (0,350)."><svg class="i" viewBox="0 0 24 24"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></svg>Ver en el código · 2 fragmentos</button></div></template>
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="23" hidden>
+          <div class="card-section head">
+            <h2>Segmentación: qué es y para qué sirve</h2>
+            
+            <p class="summary">Separador: segmentación, qué es y para qué sirve.</p>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="24" hidden>
+          <div class="card-section head">
+            <h2>¿Qué es segmentar?</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary"><strong>Segmentar</strong> es darle significado a la imagen píxel por píxel: clasificación da una etiqueta, detección da cajas y segmentación da una máscara.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#segmentacion">Segmentación</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="25" hidden>
+          <div class="card-section head">
+            <h2>Tipos de segmentación</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary">Tres niveles: <strong>semántica</strong> (clase por píxel, sin individuos), <strong>de instancias</strong> (cada objeto aparte) y <strong>panóptica</strong> (ambas a la vez).</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#segmentacion-semantica">Segmentación semántica / de instancias / panóptica</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="26" hidden>
+          <div class="card-section head">
+            <h2>Dónde se usa</h2>
+            
+            <p class="summary">Usos: autos autónomos, satélites, fondo en videollamadas, tumores, ventrículos. En biomedicina la máscara final suele ser la respuesta clínica.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#segmentacion">Segmentación</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="27" hidden>
+          <div class="card-section head">
+            <h2>Cómo se ve una salida</h2>
+            
+            <p class="summary">La salida es una matriz del tamaño de la imagen con la clase de cada píxel (0/1 o 0..N−1); se ve como máscara, overlay o mapa de probabilidad.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#segmentacion">Segmentación</a><span>máscara</span></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="28" hidden>
+          <div class="card-section head">
+            <h2>De FCN a U-Net</h2>
+            
+            <p class="summary">Separador: de FCN a U-Net.</p>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="29" hidden>
+          <div class="card-section head">
+            <h2>La intuición: clasificar cada píxel</h2>
+            
+            <p class="summary"><strong>FCN</strong> (Long et al., 2015): quitar la densa final y usar convoluciones que devuelven un mapa espacial. Un clasificador de imágenes se vuelve clasificador de píxeles.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#fcn">FCN (Fully Convolutional Network)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#segmentacion">Segmentación</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="30" hidden>
+          <div class="card-section head">
+            <h2>FCN por dentro</h2>
+            
+            <p class="summary">Diagrama de FCN: encoder convolucional, convoluciones 1×1 y upsampling hasta el tamaño original.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#fcn">FCN (Fully Convolutional Network)</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="31" hidden>
+          <div class="card-section head">
+            <h2>FCN por dentro</h2>
+            
+            <p class="summary">FCN: el encoder comprime, convoluciones <strong>1×1</strong> reemplazan la densa y <strong>convoluciones transpuestas</strong> estiran el mapa. Primera segmentación end-to-end con deep learning.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#fcn">FCN (Fully Convolutional Network)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#convolucion-transpuesta">Convolución transpuesta</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="32" hidden>
+          <div class="card-section head">
+            <h2>El problema de FCN</h2>
+            
+            <p class="summary">Problema de FCN: 512×512 baja a 16×16 y al reconstruir los detalles ya se perdieron. Contornos borrosos; en medicina, 2 píxeles cambian el volumen del tumor.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#fcn">FCN (Fully Convolutional Network)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#segmentacion">Segmentación</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="33" hidden>
+          <div class="card-section head">
+            <h2>U-Net: la U y sus atajos</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary">En <strong>U-Net</strong> las <strong>skip connections</strong> llevan los detalles del encoder al decoder; sin ellas sería un FCN más elegante. Sigue siendo la base de la segmentación médica.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#u-net">U-Net</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#skip-connections">Skip connections (U-Net)</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/08/#d=transformers-a-fondo&amp;s=25"><span class="ref">08·25</span><span><span class="t">Residuales: la salida es la entrada más una corrección</span><small>Residuales: otro atajo en la red</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="34" hidden>
+          <div class="card-section head">
+            <h2>U-Net: la U y sus atajos</h2>
+            
+            <p class="summary">U-Net (2015, células al microscopio): el encoder baja resolución y duplica canales («qué hay»), el decoder la recupera («dónde»), los atajos copian los detalles.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#u-net">U-Net</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#skip-connections">Skip connections (U-Net)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#convolucion-transpuesta">Convolución transpuesta</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="35" hidden>
+          <div class="card-section head">
+            <h2>Cómo se entrena un modelo de segmentación</h2>
+            
+            <p class="summary">Entrenar una U-Net de juguete: cross-entropy por píxel promediada (L = 0,264); los errores se concentran en bordes y partes finas. El gradiente vuelve por decoder, skips y encoder.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#u-net">U-Net</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#entropia-cruzada">Entropía cruzada (BCE y cross-entropy)</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=29"><span class="ref">04·29</span><span><span class="t">Clasificación binaria: BCE</span><small>BCE en la clase de diseño</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="36" hidden>
+          <div class="card-section head">
+            <h2>Por qué funciona tan bien en medicina</h2>
+            
+            <p class="summary">Por qué en medicina: entrena con cientos de imágenes (los skips regularizan), da contornos precisos y se adapta a MRI, patología, retina o ecografía.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#u-net">U-Net</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#skip-connections">Skip connections (U-Net)</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="37" hidden>
+          <div class="card-section head">
+            <h2>SAM: segmentar lo que le señalás</h2>
+            
+            <p class="summary">Separador: SAM, segmentar lo que le señalás.</p>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="38" hidden>
+          <div class="card-section head">
+            <h2>SAM: segmentación promptable</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary"><strong>SAM</strong> trae a segmentación el paradigma foundation model + prompt: no se entrena por tarea, separa objetos en general y el prompt elige cuál. Sin el dataset SA-1B no funcionaría.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#sam">SAM (Segment Anything Model)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#foundation-model">Foundation model (modelo fundacional)</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=introduccion&amp;s=46"><span class="ref">01·46</span><span><span class="t">Modelos Fundacionales</span><small>Modelos fundacionales en la clase 1</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="39" hidden>
+          <div class="card-section head">
+            <h2>SAM: segmentación promptable</h2>
+            
+            <p class="summary">SAM (Meta, 2023): imagen + pista (click, caja, máscara; texto desde SAM 3) → máscara. La imagen se codifica una vez con un ViT y se prueban muchos prompts.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#sam">SAM (Segment Anything Model)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#foundation-model">Foundation model (modelo fundacional)</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/08/#d=transformers-a-fondo&amp;s=35"><span class="ref">08·35</span><span><span class="t">Fuera del texto: ViT</span><small>ViT: transformer sobre parches</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="40" hidden>
+          <div class="card-section head">
+            <h2>Cómo se entrena SAM</h2>
+            
+            <p class="summary">SAM de juguete: el prompt se sortea dentro de la máscara verdadera, la pérdida es focal + dice y los tres módulos se entrenan juntos; luego se simulan clics correctores.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#sam">SAM (Segment Anything Model)</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="41" hidden>
+          <div class="card-section head">
+            <h2>SAM 2: memoria para video</h2>
+            
+            <p class="summary">SAM 2 agrega memoria (memory encoder + memory bank), que también es la base del tracker de SAM 3.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#sam">SAM (Segment Anything Model)</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="42" hidden>
+          <div class="card-section head">
+            <h2>SAM 2: memoria para video</h2>
+            
+            <p class="summary">SAM 2 (2024) lleva SAM a video: cada máscara se guarda en un memory bank y la memory attention la usa en el frame siguiente para seguir al objeto.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#sam">SAM (Segment Anything Model)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#atencion">Atención</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="43" hidden>
+          <div class="card-section head">
+            <h2>Cómo se entrena SAM 2</h2>
+            
+            <p class="summary">SAM 2 de juguete: clip de 8 frames, pérdida focal + dice por frame, sumada; el gradiente viaja por la memoria a frames anteriores (el bank no tiene pesos).</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#sam">SAM (Segment Anything Model)</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="44" hidden>
+          <div class="card-section head">
+            <h2>SAM 3 y 3.1: texto y muchos objetos</h2>
+            
+            <p class="summary">Evolución: SAM (imagen) → SAM 2 (video) → SAM 3 (texto) → 3.1 (multiobjeto). En clínica conviven: U-Net para medir, SAM para anotación asistida.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#sam">SAM (Segment Anything Model)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#u-net">U-Net</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="45" hidden>
+          <div class="card-section head">
+            <h2>U-Net es modular: adelanto</h2>
+            
+            <p class="summary">U-Net es modular: encoder + decoder + skips sirve para cualquier tarea con entrada y salida del mismo tamaño: restauración, MRI → CT y el denoiser de Stable Diffusion.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#u-net">U-Net</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#stable-diffusion">Stable Diffusion</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/11/#d=redes-generativas-antagonicas&amp;s=45"><span class="ref">11·45</span><span><span class="t">Fortaleza 2: Transformación de imágenes (Image Translation)</span><small>Pix2Pix: image translation con GANs</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="46" hidden>
+          <div class="card-section head">
+            <h2>Generación condicionada por texto</h2>
+            
+            <p class="summary">Separador: generación condicionada por texto.</p>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="47" hidden>
+          <div class="card-section head">
+            <h2>TilTedTinder: el nuevo desafío</h2>
+            
+            <p class="summary">Vuelve TilTedTinder: la Vanilla GAN llenó la base desde 4 fotos; ahora cada usuario describe en lenguaje natural lo que le atrae.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#slanted-land">Slanted Land</a><span>text to image</span></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/11/#d=redes-generativas-antagonicas&amp;s=17"><span class="ref">11·17</span><span><span class="t">El problema urgente</span><small>El problema original de TiltedTinder</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="48" hidden>
+          <div class="card-section head">
+            <h2>Por qué la GAN no alcanza</h2>
+            
+            <p class="summary">Por qué la GAN no alcanza: Vanilla no recibe descripciones, cGAN usa etiquetas cerradas y StyleGAN controla estilo, no semántica. Hace falta <strong>text-to-image</strong>.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#cgan">Conditional GAN (cGAN)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#stylegan">StyleGAN</a><span>text to image</span></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/11/#d=redes-generativas-antagonicas&amp;s=38"><span class="ref">11·38</span><span><span class="t">Tipos de GANs: el punto de partida</span><small>Tipos de GANs y sus límites</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="49" hidden>
+          <div class="card-section head">
+            <h2>Text-to-image en cinco años</h2>
+            
+            <p class="summary">Cronología: DALL·E (2021), Imagen y Midjourney (2022), <strong>Stable Diffusion 1.4</strong> (agosto 2022, primer open source serio), FLUX y Sora (2024).</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#stable-diffusion">Stable Diffusion</a><span>text to image</span></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="50" hidden>
+          <div class="card-section head">
+            <h2>CLIP: el puente texto ↔ imagen</h2>
+            
+            <p class="summary">CLIP proyecta el texto a un espacio donde «perro corriendo en la playa» cae cerca de una foto real de eso; la U-Net usa ese embedding como entrada.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#clip">CLIP</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#embedding">Embedding</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="51" hidden>
+          <div class="card-section head">
+            <h2>CLIP: el puente texto ↔ imagen</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary"><strong>CLIP</strong> (2021): un encoder de imagen y otro de texto entrenados contrastivamente con 400M pares, para que los pares reales queden cerca en el mismo espacio.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#clip">CLIP</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#embedding">Embedding</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#multimodalidad">Multimodalidad</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/08/#d=transformers-a-fondo&amp;s=34"><span class="ref">08·34</span><span><span class="t">Del encoder al embedding de oración</span></span></a></div>
+          </div>
+          
+          
+          <template class="tp-data"><div class="tp-ref" data-tp="3"><a href="https://ezequielrickert.github.io/austral-ia-generativa/tp/3/">TP3 · RAG, MCP y Transformers en el Hospital Arroyo Claro</a><span>e5-base, el encoder que elegiste en el TP3, también es contrastivo (consulta–pasaje): por eso el fragmento correcto queda a 3,94 desvíos y con BERT crudo a 1,56.</span><button class="btn sm code-btn" data-code="tp3-encoder-e5-prefijos,tp3-informe-por-que-e5" data-nota="Como CLIP, e5 se entrenó de forma contrastiva acercando pares (consulta, pasaje)."><svg class="i" viewBox="0 0 24 24"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></svg>Ver en el código · 2 fragmentos</button></div></template>
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="52" hidden>
+          <div class="card-section head">
+            <h2>Cómo se entrena CLIP</h2>
+            
+            <p class="summary">Entrenar CLIP: matriz S de cosenos del batch, cross-entropy simétrica con objetivo en la diagonal y temperatura $\tau$. El gradiente llega a ambos encoders; no hay decoder.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#clip">CLIP</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#similitud-coseno">Similitud coseno</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#entropia-cruzada">Entropía cruzada (BCE y cross-entropy)</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=21"><span class="ref">06·21</span><span><span class="t">Coseno: importa el ángulo</span></span></a></div>
+          </div>
+          
+          
+          <template class="tp-data"><div class="tp-ref" data-tp="3"><a href="https://ezequielrickert.github.io/austral-ia-generativa/tp/3/">TP3 · RAG, MCP y Transformers en el Hospital Arroyo Claro</a><span>En el TP3 normalizaste los embeddings con L2, así el producto punto es el coseno, igual que en la matriz S de CLIP.</span><button class="btn sm code-btn" data-code="tp3-encoder-bert-promedio,tp3-recuperador-coseno-exacto" data-nota="`_normalizar` divide por la norma L2: después `matriz @ q` es el coseno, como en la matriz S de CLIP."><svg class="i" viewBox="0 0 24 24"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></svg>Ver en el código · 2 fragmentos</button></div></template>
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="53" hidden>
+          <div class="card-section head">
+            <h2>La idea de condición</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary"><strong>Condicionar</strong>: ruido + condición → imagen que la respeta. La condición puede ser una etiqueta (cGAN), una imagen (Pix2Pix) o un embedding de texto (SD), y guía cada paso.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#cgan">Conditional GAN (cGAN)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#pix2pix">Pix2Pix</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#stable-diffusion">Stable Diffusion</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="54" hidden>
+          <div class="card-section head">
+            <h2>Stable Diffusion por dentro</h2>
+            
+            <p class="summary">Separador: Stable Diffusion por dentro.</p>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="55" hidden>
+          <div class="card-section head">
+            <h2>La idea de difusión: agregar y quitar ruido</h2>
+            
+            <p class="summary">Difusión vs GAN: una sola red que aprende a quitar ruido; más estable, sin mode collapse y más diversa. SD «talla» la imagen desde un bloque de ruido.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#difusion">Modelo de difusión</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#mode-collapse">Mode collapse</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/11/#d=redes-generativas-antagonicas&amp;s=50"><span class="ref">11·50</span><span><span class="t">Limitaciones (1 de 2): los problemas de entrenamiento</span><small>Mode collapse e inestabilidad en GANs</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="56" hidden>
+          <div class="card-section head">
+            <h2>La idea de difusión: agregar y quitar ruido</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary"><strong>Difusión</strong>: el forward agrega ruido gaussiano hasta ruido puro (entrenamiento); el reverse lo quita paso a paso guiado por la condición. La red aprende a predecir el ruido.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#difusion">Modelo de difusión</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#proceso-forward">Proceso forward y reverse</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="57" hidden>
+          <div class="card-section head">
+            <h2>Del ruido a la imagen</h2>
+            
+            <p class="summary">Figura del proceso inverso: de ruido puro $x_T$ a la imagen limpia $x_0$.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#proceso-forward">Proceso forward y reverse</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#difusion">Modelo de difusión</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="58" hidden>
+          <div class="card-section head">
+            <h2>Latent diffusion: difundir en un espacio comprimido</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary"><strong>Latent diffusion</strong>: difundir en un latente de 64×64×4 (16.384 valores) en vez de 512×512×3 (786.432): 48× menos por paso. Así SD corre en GPUs de consumo.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#latent-diffusion">Latent diffusion</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#stable-diffusion">Stable Diffusion</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="59" hidden>
+          <div class="card-section head">
+            <h2>Las tres piezas de Stable Diffusion</h2>
+            
+            <p class="summary">Flujo: prompt → CLIP → embedding; la U-Net desruidiza el latente guiada por él; el decoder del VAE lo convierte en imagen.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#stable-diffusion">Stable Diffusion</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#clip">CLIP</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#u-net">U-Net</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#vae">VAE (Variational Autoencoder)</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="60" hidden>
+          <div class="card-section head">
+            <h2>Las tres piezas de Stable Diffusion</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary">Tres piezas: <strong>VAE</strong> (~80M, comprime), <strong>U-Net</strong> (~860M, denoiser condicional) y <strong>CLIP text encoder</strong> (~123M). Las dos últimas ya aparecieron en la clase.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#stable-diffusion">Stable Diffusion</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#vae">VAE (Variational Autoencoder)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#u-net">U-Net</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#clip">CLIP</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="61" hidden>
+          <div class="card-section head">
+            <h2>Componente 1: el VAE</h2>
+            
+            <p class="summary">El VAE convierte «generar 800K píxeles» en «generar 16K números latentes». Lo variacional: el latente es una distribución, no un punto fijo.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#vae">VAE (Variational Autoencoder)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#espacio-latente">Espacio latente</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="62" hidden>
+          <div class="card-section head">
+            <h2>Componente 1: el VAE</h2>
+            
+            <p class="summary">VAE: encoder 512×512×3 → 64×64×4 y decoder al revés. Se entrena aparte (decoder(encoder(x)) ≈ x) y queda congelado; en inferencia solo se usa el decoder.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#vae">VAE (Variational Autoencoder)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#latent-diffusion">Latent diffusion</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="63" hidden>
+          <div class="card-section head">
+            <h2>Cómo se entrena el VAE</h2>
+            
+            <p class="summary">Entrenar un VAE: el encoder da $\mu,\sigma$; $z=\mu+\sigma\varepsilon$; pérdida = reconstrucción + $\beta$·KL. La <strong>reparametrización</strong> deja pasar el gradiente por el sorteo.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#vae">VAE (Variational Autoencoder)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#espacio-latente">Espacio latente</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/11/#d=redes-generativas-antagonicas&amp;s=26"><span class="ref">11·26</span><span><span class="t">El Generador: el objetivo opuesto</span><small>El z de la GAN: espacio latente</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="64" hidden>
+          <div class="card-section head">
+            <h2>Componente 2: la U-Net, de vuelta</h2>
+            
+            <p class="summary">Se cierra el círculo: la U-Net que en 2015 segmentaba células hoy es el corazón de la generación de imágenes. Es un patrón arquitectónico reutilizable.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#u-net">U-Net</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="65" hidden>
+          <div class="card-section head">
+            <h2>Componente 2: la U-Net, de vuelta</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary">La U-Net de SD recibe latente ruidoso, timestep y embedding del prompt, y predice el <strong>ruido</strong>. La <strong>cross-attention</strong> cruza features de imagen con cada token de CLIP en cada nivel.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#u-net">U-Net</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#cross-attention">Cross-attention</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/08/#d=transformers-a-fondo&amp;s=31"><span class="ref">08·31</span><span><span class="t">Encoder y decoder en el paper de 2017</span><small>Encoder-decoder y cross-attention de 2017</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="66" hidden>
+          <div class="card-section head">
+            <h2>Componente 3: el CLIP Text Encoder</h2>
+            
+            <p class="summary">SD 1.x usa el text encoder de CLIP ViT-L/14 congelado: el prompt se tokeniza a 77 tokens y sale una matriz 77×768 que entra a la cross-attention.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#clip">CLIP</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#token">Token</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#cross-attention">Cross-attention</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/05/#d=prompting&amp;s=6"><span class="ref">05·6</span><span><span class="t">Cómo se tokeniza</span></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="67" hidden>
+          <div class="card-section head">
+            <h2>Pipeline completo de inferencia</h2>
+            
+            <p class="summary">SD no es un modelo monolítico: son tres piezas modulares orquestadas por un loop iterativo.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#stable-diffusion">Stable Diffusion</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="68" hidden>
+          <div class="card-section head">
+            <h2>Pipeline completo de inferencia</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary">Inferencia: prompt → CLIP (77×768); latente aleatorio 64×64×4 según la seed; ~50 pasos donde la U-Net predice el ruido y el scheduler lo resta; VAE decoder → 512×512.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#stable-diffusion">Stable Diffusion</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#latent-diffusion">Latent diffusion</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="69" hidden>
+          <div class="card-section head">
+            <h2>Cómo se entrena Stable Diffusion</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary">Entrenar SD: CLIP y VAE congelados; se sortean $t$ y $\varepsilon$, $z_t=\sqrt{\bar\alpha_t}z_0+\sqrt{1-\bar\alpha_t}\varepsilon$, y solo la U-Net aprende con $L=|\varepsilon-\hat\varepsilon|^2$.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#stable-diffusion">Stable Diffusion</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#proceso-forward">Proceso forward y reverse</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#mse">MSE (y sus alternativas MAE y Huber)</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="70" hidden>
+          <div class="card-section head">
+            <h2>Los hiperparámetros que importan</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary">Perillas: <code>num_inference_steps</code> (50; menos de 20 degrada), <code>guidance_scale</code> (7,5; bajo diverso, alto saturado) y <code>seed</code> (misma seed + prompt = misma imagen).</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#classifier-free-guidance">Classifier-free guidance (guidance_scale)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#stable-diffusion">Stable Diffusion</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="71" hidden>
+          <div class="card-section head">
+            <h2>Limitaciones de Stable Diffusion</h2>
+            
+            <p class="summary">Límites: manos y anatomía, texto en la imagen, conteo y composición, y sesgos de LAION-5B. Saber dónde falla importa tanto como saber qué hace.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#stable-diffusion">Stable Diffusion</a><span>sesgo del dataset</span></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/#d=cierre-magnifica-humanitas&amp;s=32"><span class="ref">13·32</span><span><span class="t">Para empezar</span><small>Sesgos como desafío ético</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="72" hidden>
+          <div class="card-section head">
+            <h2>TilTedTinder v2 y notebook</h2>
+            
+            <p class="summary">Separador: TilTedTinder v2 y notebook.</p>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="73" hidden>
+          <div class="card-section head">
+            <h2>De preferencias a prompts</h2>
+            
+            <p class="summary">Recap: el usuario escribe, CLIP codifica, la U-Net talla y el VAE decodifica. La imagen depende del prompt tanto como del modelo; la seed reproduce el perfil.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#stable-diffusion">Stable Diffusion</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#prompt-engineering">Prompt / prompt engineering</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="74" hidden>
+          <div class="card-section head">
+            <h2>De preferencias a prompts</h2>
+            
+            <p class="summary">Buen prompt = sujeto + atributos + estilo + luz. Mismo prompt + misma seed = el mismo perfil cada vez que el usuario vuelve a la app.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#prompt-engineering">Prompt / prompt engineering</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#stable-diffusion">Stable Diffusion</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="75" hidden>
+          <div class="card-section head">
+            <h2>Lo que el equipo va a encontrar</h2>
+            
+            <p class="summary">Lo que falta: LAION no tiene caras inclinadas, así que hay que hacer fine-tuning con <strong>DreamBooth</strong> o <strong>LoRA</strong>; además auditar sesgos y usar ControlNet o inpainting.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#lora">LoRA</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#fine-tuning">Fine-tuning (del equipo de producto)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#stable-diffusion">Stable Diffusion</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/#d=como-se-entrena-un-llm&amp;s=55"><span class="ref">09·55</span><span><span class="t">Fine-tuning local: el recorrido</span></span></a></div>
+          </div>
+          
+          
+          <template class="tp-data"><div class="tp-ref" data-tp="4"><a href="https://ezequielrickert.github.io/austral-ia-generativa/tp/4/">TP4 · El agente de admisión de guardia (TP final)</a><span>En el TP4 aplicaste LoRA (r=8, α=16, solo <code>q_proj</code>/<code>v_proj</code>) sobre el LLM, pero solo en corridas de humo: el entrenamiento real quedó pendiente.</span><button class="btn sm code-btn" data-code="tp4-lora-config,tp4-lora-aplicar,tp4-informe-sft-real" data-nota="La misma idea de LoRA que en Stable Diffusion, aplicada a la atención de un LLM. El entrenamiento real sí corrió (v32+v33, luego v39)."><svg class="i" viewBox="0 0 24 24"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></svg>Ver en el código · 3 fragmentos</button></div></template>
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="76" hidden>
+          <div class="card-section head">
+            <h2>Pasamos al notebook</h2>
+            
+            <p class="summary">Notebook: Colab T4 + Diffusers + SD v1.4 en float16. Pipeline de alto nivel, hiperparámetros, grids, dimensiones y el pipeline manual con el bucle de denoising.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#stable-diffusion">Stable Diffusion</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="77" hidden>
+          <div class="card-section head">
+            <h2>Conclusiones</h2>
+            
+            <p class="summary">Separador: conclusiones.</p>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="segmentacion-y-stable-diffusion" data-i="78" hidden>
+          <div class="card-section head">
+            <h2>Key takeaways</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary">Takeaways: la convolución acepta cualquier largo, segmentar es etiquetar píxeles, U-Net recupera bordes, SAM segmenta por pista y SD combina CLIP, U-Net y VAE en el latente.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#convolucion">Convolución</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#u-net">U-Net</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#sam">SAM (Segment Anything Model)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#stable-diffusion">Stable Diffusion</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+      
+    </div>
+
+    <div class="side-panel" data-panel="indice" hidden>
+      
+      <div data-index="segmentacion-y-stable-diffusion" >
+        
+        <details class="idx-sec" data-first="0" data-last="0">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">Portada</span>
+            <span class="range">0–0</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="0"><span class="n">0</span><span class="t">Inteligencia Artificial Generativa (AI Gen)</span><span class="marks"></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="1" data-last="22">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">Qué es una convolución</span>
+            <span class="range">1–22</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="1"><span class="n">1</span><span class="t">Qué es una convolución</span><span class="marks"></span></button><button class="idx-row" data-i="2"><span class="n">2</span><span class="t">Una red neuronal clásica solo acepta entradas de largo fijo</span><span class="marks"><span class="mk-tp"></span></span></button><button class="idx-row" data-i="3"><span class="n">3</span><span class="t">Una red neuronal clásica solo acepta entradas de largo fijo</span><span class="marks"></span></button><button class="idx-row" data-i="4"><span class="n">4</span><span class="t">Cómo se entrena una red densa</span><span class="marks"><span class="mk-tp"></span><span class="mk-key"></span></span></button><button class="idx-row" data-i="5"><span class="n">5</span><span class="t">El detector de voz: cada audio dura distinto</span><span class="marks"></span></button><button class="idx-row" data-i="6"><span class="n">6</span><span class="t">El detector de voz: cada audio dura distinto</span><span class="marks"></span></button><button class="idx-row" data-i="7"><span class="n">7</span><span class="t">El sesgo inductivo equivocado</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="8"><span class="n">8</span><span class="t">El problema aparece en cualquier señal, y en las imágenes</span><span class="marks"></span></button><button class="idx-row" data-i="9"><span class="n">9</span><span class="t">La solución: un kernel que se desliza</span><span class="marks"></span></button><button class="idx-row" data-i="10"><span class="n">10</span><span class="t">La solución: un kernel que se desliza</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="11"><span class="n">11</span><span class="t">Mismo mecanismo, otra tarea: detectar voz</span><span class="marks"></span></button><button class="idx-row" data-i="12"><span class="n">12</span><span class="t">Mismo mecanismo, otra tarea: detectar voz</span><span class="marks"></span></button><button class="idx-row" data-i="13"><span class="n">13</span><span class="t">El largo variable deja de ser un problema</span><span class="marks"></span></button><button class="idx-row" data-i="14"><span class="n">14</span><span class="t">El largo variable deja de ser un problema</span><span class="marks"></span></button><button class="idx-row" data-i="15"><span class="n">15</span><span class="t">Dos soluciones al largo variable</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="16"><span class="n">16</span><span class="t">Convolución en imágenes</span><span class="marks"></span></button><button class="idx-row" data-i="17"><span class="n">17</span><span class="t">Convolución en imágenes</span><span class="marks"></span></button><button class="idx-row" data-i="18"><span class="n">18</span><span class="t">Distintos kernels, distintos rasgos</span><span class="marks"></span></button><button class="idx-row" data-i="19"><span class="n">19</span><span class="t">Distintos kernels, distintos rasgos</span><span class="marks"></span></button><button class="idx-row" data-i="20"><span class="n">20</span><span class="t">Cómo se aprende un kernel</span><span class="marks"></span></button><button class="idx-row" data-i="21"><span class="n">21</span><span class="t">Embeddings más allá del texto</span><span class="marks"></span></button><button class="idx-row" data-i="22"><span class="n">22</span><span class="t">Embeddings más allá del texto</span><span class="marks"><span class="mk-tp"></span></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="23" data-last="27">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">Segmentación: qué es y para qué sirve</span>
+            <span class="range">23–27</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="23"><span class="n">23</span><span class="t">Segmentación: qué es y para qué sirve</span><span class="marks"></span></button><button class="idx-row" data-i="24"><span class="n">24</span><span class="t">¿Qué es segmentar?</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="25"><span class="n">25</span><span class="t">Tipos de segmentación</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="26"><span class="n">26</span><span class="t">Dónde se usa</span><span class="marks"></span></button><button class="idx-row" data-i="27"><span class="n">27</span><span class="t">Cómo se ve una salida</span><span class="marks"></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="28" data-last="36">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">De FCN a U-Net</span>
+            <span class="range">28–36</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="28"><span class="n">28</span><span class="t">De FCN a U-Net</span><span class="marks"></span></button><button class="idx-row" data-i="29"><span class="n">29</span><span class="t">La intuición: clasificar cada píxel</span><span class="marks"></span></button><button class="idx-row" data-i="30"><span class="n">30</span><span class="t">FCN por dentro</span><span class="marks"></span></button><button class="idx-row" data-i="31"><span class="n">31</span><span class="t">FCN por dentro</span><span class="marks"></span></button><button class="idx-row" data-i="32"><span class="n">32</span><span class="t">El problema de FCN</span><span class="marks"></span></button><button class="idx-row" data-i="33"><span class="n">33</span><span class="t">U-Net: la U y sus atajos</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="34"><span class="n">34</span><span class="t">U-Net: la U y sus atajos</span><span class="marks"></span></button><button class="idx-row" data-i="35"><span class="n">35</span><span class="t">Cómo se entrena un modelo de segmentación</span><span class="marks"></span></button><button class="idx-row" data-i="36"><span class="n">36</span><span class="t">Por qué funciona tan bien en medicina</span><span class="marks"></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="37" data-last="45">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">SAM: segmentar lo que le señalás</span>
+            <span class="range">37–45</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="37"><span class="n">37</span><span class="t">SAM: segmentar lo que le señalás</span><span class="marks"></span></button><button class="idx-row" data-i="38"><span class="n">38</span><span class="t">SAM: segmentación promptable</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="39"><span class="n">39</span><span class="t">SAM: segmentación promptable</span><span class="marks"></span></button><button class="idx-row" data-i="40"><span class="n">40</span><span class="t">Cómo se entrena SAM</span><span class="marks"></span></button><button class="idx-row" data-i="41"><span class="n">41</span><span class="t">SAM 2: memoria para video</span><span class="marks"></span></button><button class="idx-row" data-i="42"><span class="n">42</span><span class="t">SAM 2: memoria para video</span><span class="marks"></span></button><button class="idx-row" data-i="43"><span class="n">43</span><span class="t">Cómo se entrena SAM 2</span><span class="marks"></span></button><button class="idx-row" data-i="44"><span class="n">44</span><span class="t">SAM 3 y 3.1: texto y muchos objetos</span><span class="marks"></span></button><button class="idx-row" data-i="45"><span class="n">45</span><span class="t">U-Net es modular: adelanto</span><span class="marks"></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="46" data-last="53">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">Generación condicionada por texto</span>
+            <span class="range">46–53</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="46"><span class="n">46</span><span class="t">Generación condicionada por texto</span><span class="marks"></span></button><button class="idx-row" data-i="47"><span class="n">47</span><span class="t">TilTedTinder: el nuevo desafío</span><span class="marks"></span></button><button class="idx-row" data-i="48"><span class="n">48</span><span class="t">Por qué la GAN no alcanza</span><span class="marks"></span></button><button class="idx-row" data-i="49"><span class="n">49</span><span class="t">Text-to-image en cinco años</span><span class="marks"></span></button><button class="idx-row" data-i="50"><span class="n">50</span><span class="t">CLIP: el puente texto ↔ imagen</span><span class="marks"></span></button><button class="idx-row" data-i="51"><span class="n">51</span><span class="t">CLIP: el puente texto ↔ imagen</span><span class="marks"><span class="mk-tp"></span><span class="mk-key"></span></span></button><button class="idx-row" data-i="52"><span class="n">52</span><span class="t">Cómo se entrena CLIP</span><span class="marks"><span class="mk-tp"></span></span></button><button class="idx-row" data-i="53"><span class="n">53</span><span class="t">La idea de condición</span><span class="marks"><span class="mk-key"></span></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="54" data-last="71">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">Stable Diffusion por dentro</span>
+            <span class="range">54–71</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="54"><span class="n">54</span><span class="t">Stable Diffusion por dentro</span><span class="marks"></span></button><button class="idx-row" data-i="55"><span class="n">55</span><span class="t">La idea de difusión: agregar y quitar ruido</span><span class="marks"></span></button><button class="idx-row" data-i="56"><span class="n">56</span><span class="t">La idea de difusión: agregar y quitar ruido</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="57"><span class="n">57</span><span class="t">Del ruido a la imagen</span><span class="marks"></span></button><button class="idx-row" data-i="58"><span class="n">58</span><span class="t">Latent diffusion: difundir en un espacio comprimido</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="59"><span class="n">59</span><span class="t">Las tres piezas de Stable Diffusion</span><span class="marks"></span></button><button class="idx-row" data-i="60"><span class="n">60</span><span class="t">Las tres piezas de Stable Diffusion</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="61"><span class="n">61</span><span class="t">Componente 1: el VAE</span><span class="marks"></span></button><button class="idx-row" data-i="62"><span class="n">62</span><span class="t">Componente 1: el VAE</span><span class="marks"></span></button><button class="idx-row" data-i="63"><span class="n">63</span><span class="t">Cómo se entrena el VAE</span><span class="marks"></span></button><button class="idx-row" data-i="64"><span class="n">64</span><span class="t">Componente 2: la U-Net, de vuelta</span><span class="marks"></span></button><button class="idx-row" data-i="65"><span class="n">65</span><span class="t">Componente 2: la U-Net, de vuelta</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="66"><span class="n">66</span><span class="t">Componente 3: el CLIP Text Encoder</span><span class="marks"></span></button><button class="idx-row" data-i="67"><span class="n">67</span><span class="t">Pipeline completo de inferencia</span><span class="marks"></span></button><button class="idx-row" data-i="68"><span class="n">68</span><span class="t">Pipeline completo de inferencia</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="69"><span class="n">69</span><span class="t">Cómo se entrena Stable Diffusion</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="70"><span class="n">70</span><span class="t">Los hiperparámetros que importan</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="71"><span class="n">71</span><span class="t">Limitaciones de Stable Diffusion</span><span class="marks"></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="72" data-last="76">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">TilTedTinder v2 y notebook</span>
+            <span class="range">72–76</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="72"><span class="n">72</span><span class="t">TilTedTinder v2 y notebook</span><span class="marks"></span></button><button class="idx-row" data-i="73"><span class="n">73</span><span class="t">De preferencias a prompts</span><span class="marks"></span></button><button class="idx-row" data-i="74"><span class="n">74</span><span class="t">De preferencias a prompts</span><span class="marks"></span></button><button class="idx-row" data-i="75"><span class="n">75</span><span class="t">Lo que el equipo va a encontrar</span><span class="marks"><span class="mk-tp"></span></span></button><button class="idx-row" data-i="76"><span class="n">76</span><span class="t">Pasamos al notebook</span><span class="marks"></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="77" data-last="78">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">Portada</span>
+            <span class="range">77–78</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="77"><span class="n">77</span><span class="t">Conclusiones</span><span class="marks"></span></button><button class="idx-row" data-i="78"><span class="n">78</span><span class="t">Key takeaways</span><span class="marks"><span class="mk-key"></span></span></button>
+          </div>
+        </details>
+        
+      </div>
+      
+    </div>
+
+    <div class="card-footer side-foot">
+      <button class="btn sm" id="star" title="Marcar para repasar (m)"><svg class="i" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg><span>Marcar</span></button>
+      <span class="hints"><kbd>←</kbd><kbd>→</kbd> <kbd>t</kbd> <kbd>m</kbd> <kbd>n</kbd> <kbd>p</kbd></span>
+    </div>
+  </aside>
+</div>
+</div>
+</div>
+<template id="sn-tp2-build-dense-features" data-title="El vector de entrada: numéricas, flag, mes cíclico y one-hots (celda 26)" data-tp="2" data-tp-title="¿Cuánto vale esta casa?" data-file="calveyra-desivo-giordanelli-rickert.ipynb" data-from="1" data-to="34">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">calveyra-desivo-giordanelli-rickert.ipynb</span><span class="mono faint">L1–34</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-python" data-start="1">def build_dense_features(frame, fill_value, use_state, use_housestyle, use_centralair,
+                          use_salecondition, cyclical_month, district_int=False,
+                          scaler=None, fit_scaler=False):
+    &quot;&quot;&quot;Arma el bloque de features que entra &#39;directo&#39; a la red (sin pasar por embedding).
+    district_int=True mete a District como un entero plano más -del bloque numérico-
+    en vez de mandarlo por la rama de embedding: es el experimento a propósito de la Pregunta 2.&quot;&quot;&quot;
+    frame = frame.copy()
+    missing_flag = frame[&#39;LotFrontage&#39;].isna().to_numpy(dtype=float)
+    frame[&#39;LotFrontage&#39;] = frame[&#39;LotFrontage&#39;].fillna(fill_value)
+
+    numeric_cols_here = [c for c in NUMERIC_COLS if not (cyclical_month and c == &#39;MonthSold&#39;)]
+    X_num = frame[numeric_cols_here].to_numpy(dtype=float)
+    if district_int:
+        district_col = frame[&#39;District&#39;].map(
+            lambda d: district_to_idx.get(d, DISTRICT_OOV_IDX)).to_numpy(dtype=float).reshape(-1, 1)
+        X_num = np.column_stack([X_num, district_col])
+
+    if fit_scaler:
+        scaler = StandardScaler().fit(X_num)
+    X_num_scaled = scaler.transform(X_num)
+
+    blocks = [X_num_scaled, missing_flag.reshape(-1, 1)]
+    if cyclical_month:
+        blocks.append(month_cyclical(frame[&#39;MonthSold&#39;]))
+    if use_state:
+        blocks.append(state_encoder.transform(frame[[&#39;State&#39;]]))
+    if use_housestyle:
+        blocks.append(housestyle_encoder.transform(frame[[&#39;HouseStyle&#39;]]))
+    if use_salecondition:
+        blocks.append(salecondition_encoder.transform(frame[[&#39;SaleCondition&#39;]]))
+    if use_centralair:
+        blocks.append((frame[&#39;CentralAir&#39;] == &#39;Y&#39;).to_numpy(dtype=float).reshape(-1, 1))
+
+    return np.column_stack(blocks), scaler</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Arma el bloque de features “directo” de cada casa: numéricas escaladas, flag de faltante, mes sin/cos, one-hots y <code>CentralAir</code> 0/1.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ol>
+<li>Imputa <code>LotFrontage</code> y guarda <code>missing_flag</code>.</li>
+<li><code>numeric_cols_here</code> excluye <code>MonthSold</code> si va cíclico.</li>
+<li>Con <code>district_int=True</code> agrega District como entero plano (experimento trampa de la Pregunta 2).</li>
+<li><code>StandardScaler</code> se ajusta solo si <code>fit_scaler=True</code>.</li>
+<li><code>blocks</code> concatena según los flags <code>use_state</code>, <code>use_housestyle</code>, <code>use_salecondition</code>, <code>use_centralair</code> y <code>cyclical_month</code>.</li>
+</ol>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Los flags permiten encender bloques de a uno y medir el aporte de cada uno (criterio del Milestone 3). District queda afuera de este bloque porque va por su propia rama de embedding.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>La llaman <code>train_categorical_variant</code> (celda 26) y el Milestone 4 (celda 34). Usa los encoders y <code>month_cyclical</code> de la celda 25.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>La red solo ve una fila de floats de largo fijo: este es el traductor de casa a vector.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 8</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=2"><span class="ref">04·2</span><span class="t">La red ve una fila de números</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=10"><span class="ref">04·10</span><span class="t">La pregunta que decide la codificación</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=12"><span class="ref">04·12</span><span class="t">Categóricas: one-hot contra embedding</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=13"><span class="ref">04·13</span><span class="t">Errores de codificación caros</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=14"><span class="ref">04·14</span><span class="t">La tabla de decisiones</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=palabra-al-transformer&amp;s=14"><span class="ref">07·14</span><span class="t">Tres formas de volver texto en números</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/08/#d=transformers-a-fondo&amp;s=27"><span class="ref">08·27</span><span class="t">La fórmula de la posición: senos y cosenos</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/12/#d=segmentacion-y-stable-diffusion&amp;s=2"><span class="ref">12·2</span><span class="t">Una red neuronal clásica solo acepta entradas de largo fijo</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp2-train-categorical-variant" data-title="Entrenar una variante: features, índices de distrito y fit (celda 26)" data-tp="2" data-tp-title="¿Cuánto vale esta casa?" data-file="calveyra-desivo-giordanelli-rickert.ipynb" data-from="57" data-to="93">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">calveyra-desivo-giordanelli-rickert.ipynb</span><span class="mono faint">L57–93</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-python" data-start="57">def train_categorical_variant(use_state, use_district, use_housestyle, use_centralair,
+                               use_salecondition, cyclical_month, district_int=False, epochs=100):
+    X_dense_train, scaler = build_dense_features(
+        df_train, lotfrontage_median, use_state, use_housestyle, use_centralair,
+        use_salecondition, cyclical_month, district_int, fit_scaler=True)
+    X_dense_val, _ = build_dense_features(
+        df_val, lotfrontage_median, use_state, use_housestyle, use_centralair,
+        use_salecondition, cyclical_month, district_int, scaler=scaler)
+    X_dense_test, _ = build_dense_features(
+        df_test, lotfrontage_median, use_state, use_housestyle, use_centralair,
+        use_salecondition, cyclical_month, district_int, scaler=scaler)
+
+    y_train_raw = df_train[TARGET].to_numpy(dtype=float)
+    y_val_raw = df_val[TARGET].to_numpy(dtype=float)
+    y_test_raw = df_test[TARGET].to_numpy(dtype=float)
+    y_scaler = StandardScaler().fit(y_train_raw.reshape(-1, 1))
+    y_train = y_scaler.transform(y_train_raw.reshape(-1, 1)).ravel()
+    y_val = y_scaler.transform(y_val_raw.reshape(-1, 1)).ravel()
+
+    if use_district:
+        inputs_train = [X_dense_train, build_district_idx(df_train)]
+        inputs_val = [X_dense_val, build_district_idx(df_val)]
+        inputs_test = [X_dense_test, build_district_idx(df_test)]
+    else:
+        inputs_train, inputs_val, inputs_test = X_dense_train, X_dense_val, X_dense_test
+
+    keras.utils.set_random_seed(SEED)
+    model = build_model_categorical(X_dense_train.shape[1], use_district, DISTRICT_VOCAB_SIZE)
+    hist = model.fit(inputs_train, y_train, batch_size=32, epochs=epochs,
+                      validation_data=(inputs_val, y_val), verbose=0)
+
+    y_pred = y_scaler.inverse_transform(model.predict(inputs_test, verbose=0)).ravel()
+    mae = mean_absolute_error(y_test_raw, y_pred)
+    rmse = np.sqrt(mean_squared_error(y_test_raw, y_pred))
+    mape = 100 * mean_absolute_percentage_error(y_test_raw, y_pred)
+    return {&#39;model&#39;: model, &#39;history&#39;: hist, &#39;mae&#39;: mae, &#39;rmse&#39;: rmse, &#39;mape&#39;: mape,
+            &#39;y_test&#39;: y_test_raw, &#39;y_pred&#39;: y_pred}</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Arma las entradas de train/val/test para una combinación de columnas, construye la red con <code>build_model_categorical</code>, la entrena y devuelve MAE, RMSE y MAPE en dólares sobre test.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li>Llama tres veces a <code>build_dense_features</code>: con <code>fit_scaler=True</code> en <code>df_train</code> y reusando ese <code>scaler</code> en <code>df_val</code> y <code>df_test</code>.</li>
+<li>Escala <code>SalePrice</code> con un <code>y_scaler</code> ajustado solo en train.</li>
+<li>Si <code>use_district</code>, cada entrada pasa a ser una lista <code>[X_dense, build_district_idx(...)]</code> para las dos ramas del modelo.</li>
+<li>Fija <code>SEED</code>, entrena con <code>batch_size=32</code> y desescala las predicciones con <code>inverse_transform</code> antes de medir.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Es el banco de pruebas del Milestone 3: el mismo procedimiento para todas las variantes, así la única diferencia entre filas de la tabla es qué columnas entran y cómo se codifican.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>La llaman la celda 27 (<code>v1_state</code>, <code>v2_district</code>, <code>v3_full</code>) y la celda 31 (trampa con <code>district_int=True</code>). Consume <code>build_dense_features</code>, <code>build_district_idx</code> y <code>build_model_categorical</code> (misma celda) y los encoders de la celda 25.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Materializa la idea de que la red solo ve una fila de números: la arquitectura queda fija y lo que cambia es la codificación de la entrada.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 10</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=introduccion&amp;s=32"><span class="ref">01·32</span><span class="t">Ejemplos de problemas predictivos</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=2"><span class="ref">04·2</span><span class="t">La red ve una fila de números</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=12"><span class="ref">04·12</span><span class="t">Categóricas: one-hot contra embedding</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=13"><span class="ref">04·13</span><span class="t">Errores de codificación caros</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=17"><span class="ref">04·17</span><span class="t">Los tres, lado a lado</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=18"><span class="ref">04·18</span><span class="t">Todo se aprende solo del train</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=61"><span class="ref">04·61</span><span class="t">Lo que hay que llevarse</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=palabra-al-transformer&amp;s=15"><span class="ref">07·15</span><span class="t">De token a vector</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/12/#d=segmentacion-y-stable-diffusion&amp;s=2"><span class="ref">12·2</span><span class="t">Una red neuronal clásica solo acepta entradas de largo fijo</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/12/#d=segmentacion-y-stable-diffusion&amp;s=22"><span class="ref">12·22</span><span class="t">Embeddings más allá del texto</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp2-modelo-embedding-funcional" data-title="API funcional con Embedding(73, 8) para District (celda 26)" data-tp="2" data-tp-title="¿Cuánto vale esta casa?" data-file="calveyra-desivo-giordanelli-rickert.ipynb" data-from="36" data-to="55">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">calveyra-desivo-giordanelli-rickert.ipynb</span><span class="mono faint">L36–55</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-python" data-start="36">def build_district_idx(frame):
+    return frame[&#39;District&#39;].map(lambda d: district_to_idx.get(d, DISTRICT_OOV_IDX)).to_numpy(dtype=int)
+
+def build_model_categorical(n_dense, use_district, district_vocab_size=None, embed_dim=8):
+    dense_input = Input(shape=(n_dense,), name=&#39;dense_features&#39;)
+    if use_district:
+        district_input = Input(shape=(1,), name=&#39;district_idx&#39;)
+        embed = Embedding(input_dim=district_vocab_size, output_dim=embed_dim, name=&#39;district_embedding&#39;)(district_input)
+        embed = Flatten()(embed)
+        x = Concatenate()([dense_input, embed])
+        inputs = [dense_input, district_input]
+    else:
+        x = dense_input
+        inputs = dense_input
+    x = Dense(32, activation=&#39;relu&#39;)(x)
+    x = Dense(32, activation=&#39;relu&#39;)(x)
+    output = Dense(1, activation=&#39;linear&#39;)(x)
+    model = Model(inputs=inputs, outputs=output)
+    model.compile(optimizer=&#39;adam&#39;, loss=&#39;mse&#39;, metrics=[&#39;mae&#39;])
+    return model</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Construye el modelo del Milestone 3 con dos entradas: el bloque denso y el índice de distrito que pasa por un embedding.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li><code>build_district_idx</code> mapea cada distrito a su entero (o al OOV).</li>
+<li><code>Input(shape=(1,), name='district_idx')</code> → <code>Embedding(input_dim=district_vocab_size, output_dim=embed_dim)</code> (73×8) → <code>Flatten</code>.</li>
+<li><code>Concatenate()([dense_input, embed])</code> une ambos caminos.</li>
+<li>Sigue el tronco <code>Dense(32, relu)</code> → <code>Dense(32, relu)</code> → <code>Dense(1, linear)</code> con Adam + MSE.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>La tabla 73×8 es un parámetro aprendido, no una entrada: 8 floats densos por distrito en lugar de 72 columnas one-hot dispersas. Se pasó de <code>Sequential</code> a la API funcional porque hacen falta dos entradas.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>La llama <code>train_categorical_variant</code> (celda 26), que le pasa <code>[X_dense, district_idx]</code>; sus variantes se comparan en la celda 27.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Embedding: vector denso y aprendido por categoría, igual que el embedding de un token.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 6</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/03/#d=intro-redes-neuronales&amp;s=25"><span class="ref">03·25</span><span class="t">Las funciones de activación más comunes</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=12"><span class="ref">04·12</span><span class="t">Categóricas: one-hot contra embedding</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=palabra-al-transformer&amp;s=14"><span class="ref">07·14</span><span class="t">Tres formas de volver texto en números</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=palabra-al-transformer&amp;s=15"><span class="ref">07·15</span><span class="t">De token a vector</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/12/#d=segmentacion-y-stable-diffusion&amp;s=2"><span class="ref">12·2</span><span class="t">Una red neuronal clásica solo acepta entradas de largo fijo</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/12/#d=segmentacion-y-stable-diffusion&amp;s=22"><span class="ref">12·22</span><span class="t">Embeddings más allá del texto</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp2-features-milestone4" data-title="Entradas del Milestone 4: mismo vector del modelo completo (celda 34)" data-tp="2" data-tp-title="¿Cuánto vale esta casa?" data-file="calveyra-desivo-giordanelli-rickert.ipynb" data-from="1" data-to="17">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">calveyra-desivo-giordanelli-rickert.ipynb</span><span class="mono faint">L1–17</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-python" data-start="1">from keras.layers import Dropout
+from keras import regularizers
+from keras.callbacks import EarlyStopping
+
+# Mismo feature set que el modelo completo del Milestone 3 (fit_scaler solo en train).
+X4_train, scaler4 = build_dense_features(df_train, lotfrontage_median, True, True, True, True, True, fit_scaler=True)
+X4_val, _ = build_dense_features(df_val, lotfrontage_median, True, True, True, True, True, scaler=scaler4)
+X4_test, _ = build_dense_features(df_test, lotfrontage_median, True, True, True, True, True, scaler=scaler4)
+
+d4_train, d4_val, d4_test = build_district_idx(df_train), build_district_idx(df_val), build_district_idx(df_test)
+
+y4_train_raw = df_train[TARGET].to_numpy(dtype=float)
+y4_val_raw = df_val[TARGET].to_numpy(dtype=float)
+y4_test_raw = df_test[TARGET].to_numpy(dtype=float)
+y4_scaler = StandardScaler().fit(y4_train_raw.reshape(-1, 1))
+y4_train = y4_scaler.transform(y4_train_raw.reshape(-1, 1)).ravel()
+y4_val = y4_scaler.transform(y4_val_raw.reshape(-1, 1)).ravel()</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Construye una vez los tensores <code>X4_*</code> (features densas), <code>d4_*</code> (índices de distrito) e <code>y4_*</code> (target escalado) que usan la red grande y la regularizada.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li>Llama a <code>build_dense_features</code> con todas las opciones en <code>True</code>, ajustando <code>scaler4</code> solo con <code>df_train</code>.</li>
+<li><code>build_district_idx</code> convierte cada <code>District</code> en el índice que va al <code>Embedding</code>.</li>
+<li><code>y4_scaler</code> se ajusta con el precio de train y transforma train y val.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Fija el mismo conjunto de features del modelo completo del Milestone 3 para que la comparación del Milestone 4 aísle el efecto del tamaño y la regularización.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Sus salidas las consumen <code>build_big_model</code>/<code>model_overfit.fit</code> (misma celda), <code>model_regularized.fit</code> (celda 37) y la comparación en dólares con <code>y4_scaler.inverse_transform</code> (celda 38).</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Entrada de largo fijo, ajustada solo en train: el preprocesamiento queda separado de la arquitectura que se está probando.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 1</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/12/#d=segmentacion-y-stable-diffusion&amp;s=4"><span class="ref">12·4</span><span class="t">Cómo se entrena una red densa</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp2-modelo-grande-512" data-title="Red 512-512-512 sobredimensionada y configurable (celda 34)" data-tp="2" data-tp-title="¿Cuánto vale esta casa?" data-file="calveyra-desivo-giordanelli-rickert.ipynb" data-from="19" data-to="42">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">calveyra-desivo-giordanelli-rickert.ipynb</span><span class="mono faint">L19–42</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-python" data-start="19">def build_big_model(n_dense, district_vocab_size, embed_dim=8, units=(512, 512, 512),
+                     l2=0.0, dropout=0.0):
+    dense_input = Input(shape=(n_dense,), name=&#39;dense_features&#39;)
+    district_input = Input(shape=(1,), name=&#39;district_idx&#39;)
+    embed = Embedding(input_dim=district_vocab_size, output_dim=embed_dim, name=&#39;district_embedding&#39;)(district_input)
+    embed = Flatten()(embed)
+    x = Concatenate()([dense_input, embed])
+    reg = regularizers.l2(l2) if l2 &gt; 0 else None
+    for units_in_layer in units:
+        x = Dense(units_in_layer, activation=&#39;relu&#39;, kernel_regularizer=reg)(x)
+        if dropout &gt; 0:
+            x = Dropout(dropout)(x)
+    output = Dense(1, activation=&#39;linear&#39;)(x)
+    model = Model(inputs=[dense_input, district_input], outputs=output)
+    model.compile(optimizer=&#39;adam&#39;, loss=&#39;mse&#39;, metrics=[&#39;mae&#39;])
+    return model
+
+keras.utils.set_random_seed(SEED)
+model_overfit = build_big_model(X4_train.shape[1], DISTRICT_VOCAB_SIZE)
+print(f&quot;Parámetros del modelo sobredimensionado: {model_overfit.count_params():,}&quot;
+      f&quot;  (contra {X4_train.shape[0]} casas de entrenamiento)&quot;)
+
+hist_overfit = model_overfit.fit([X4_train, d4_train], y4_train, batch_size=32, epochs=150,
+                                  validation_data=([X4_val, d4_val], y4_val), verbose=0)</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Define <code>build_big_model</code> (embedding + capas anchas con L2 y dropout opcionales) y entrena la versión sin regularizar durante 150 épocas.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ol>
+<li>Misma entrada doble que el Milestone 3 (<code>dense_features</code> + <code>district_idx</code> → <code>Embedding</code> → <code>Flatten</code> → <code>Concatenate</code>).</li>
+<li><code>reg = regularizers.l2(l2)</code> si <code>l2 &gt; 0</code>; se pasa como <code>kernel_regularizer</code> a cada <code>Dense(units_in_layer, relu)</code>.</li>
+<li>Si <code>dropout &gt; 0</code> agrega <code>Dropout(dropout)</code> tras cada capa.</li>
+<li><code>model_overfit</code> usa los defaults (sin L2 ni dropout); <code>count_params()</code> imprime 550.985 parámetros contra 1022 casas.</li>
+<li><code>fit</code> 150 épocas sin callbacks.</li>
+</ol>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Overfitear a propósito para ver el problema en las curvas: ancho ×16 respecto del 32-32 (unos 540 parámetros por casa). Ancho, L2 y dropout son hiperparámetros que se fijan antes de entrenar.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Usa <code>X4_train</code>/<code>d4_train</code> armados al inicio de la celda con <code>build_dense_features</code>. La misma función se reutiliza en la celda 37 con <code>l2=0.001, dropout=0.3</code>.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Ancho y profundidad, parámetros vs hiperparámetros y la función objetivo $J=\text{cost}+\lambda R(w)$.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 8</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/03/#d=intro-redes-neuronales&amp;s=12"><span class="ref">03·12</span><span class="t">Las dos dimensiones: ancho y profundidad</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/03/#d=intro-redes-neuronales&amp;s=13"><span class="ref">03·13</span><span class="t">Parámetros contra hiperparámetros</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/03/#d=intro-redes-neuronales&amp;s=25"><span class="ref">03·25</span><span class="t">Las funciones de activación más comunes</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/03/#d=intro-redes-neuronales&amp;s=29"><span class="ref">03·29</span><span class="t">Ida y vuelta: forward y backward</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=46"><span class="ref">04·46</span><span class="t">La función objetivo</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=47"><span class="ref">04·47</span><span class="t">Qué mirar cuando esto se entrena</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=57"><span class="ref">04·57</span><span class="t">Cuántas capas y cuánto ancho</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/12/#d=segmentacion-y-stable-diffusion&amp;s=4"><span class="ref">12·4</span><span class="t">Cómo se entrena una red densa</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp2-regularizado-early-stopping" data-title="L2 0,001 + Dropout 0,3 + EarlyStopping (celda 37)" data-tp="2" data-tp-title="¿Cuánto vale esta casa?" data-file="calveyra-desivo-giordanelli-rickert.ipynb" data-from="1" data-to="11">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">calveyra-desivo-giordanelli-rickert.ipynb</span><span class="mono faint">L1–11</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-python" data-start="1">keras.utils.set_random_seed(SEED)
+model_regularized = build_big_model(X4_train.shape[1], DISTRICT_VOCAB_SIZE, l2=0.001, dropout=0.3)
+
+early_stopping = EarlyStopping(monitor=&#39;val_loss&#39;, patience=15, restore_best_weights=True)
+
+hist_regularized = model_regularized.fit(
+    [X4_train, d4_train], y4_train, batch_size=32, epochs=150,
+    validation_data=([X4_val, d4_val], y4_val), callbacks=[early_stopping], verbose=0)
+
+print(f&quot;Entrenó {len(hist_regularized.history[&#39;loss&#39;])} épocas &quot;
+      f&quot;(de las 150 posibles) antes de que early stopping cortara.&quot;)</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Entrena la misma red 512-512-512 pero regularizada y con early stopping sobre <code>val_loss</code>.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li><code>build_big_model(..., l2=0.001, dropout=0.3)</code>.</li>
+<li><code>EarlyStopping(monitor='val_loss', patience=15, restore_best_weights=True)</code> corta si la validación no mejora en 15 épocas y restaura los mejores pesos.</li>
+<li><code>fit</code> con <code>batch_size=32</code>, hasta 150 épocas; imprime cuántas corrió (76).</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Combina tres frenos al sobreajuste: L2 achica pesos, dropout apaga neuronas al azar en entrenamiento y early stopping usa la validación para decidir cuándo parar.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Usa <code>build_big_model</code> y los tensores de la celda 34; sus curvas y métricas se comparan con <code>model_overfit</code> en la celda 38.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Regularización y lectura de la curva train vs val; ciclo forward/backward por épocas y lotes.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 5</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/03/#d=intro-redes-neuronales&amp;s=13"><span class="ref">03·13</span><span class="t">Parámetros contra hiperparámetros</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/03/#d=intro-redes-neuronales&amp;s=29"><span class="ref">03·29</span><span class="t">Ida y vuelta: forward y backward</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=46"><span class="ref">04·46</span><span class="t">La función objetivo</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=47"><span class="ref">04·47</span><span class="t">Qué mirar cuando esto se entrena</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/12/#d=segmentacion-y-stable-diffusion&amp;s=4"><span class="ref">12·4</span><span class="t">Cómo se entrena una red densa</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp2-encoders-solo-train" data-title="One-hot y mapa District→índice ajustados en train (celda 25)" data-tp="2" data-tp-title="¿Cuánto vale esta casa?" data-file="calveyra-desivo-giordanelli-rickert.ipynb" data-from="1" data-to="17">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">calveyra-desivo-giordanelli-rickert.ipynb</span><span class="mono faint">L1–17</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-python" data-start="1">from sklearn.preprocessing import OneHotEncoder
+from keras.layers import Embedding, Flatten, Concatenate
+from keras.models import Model
+
+# Encoders de one-hot: se AJUSTAN solo con train, igual que el escalador numérico.
+state_encoder = OneHotEncoder(handle_unknown=&#39;ignore&#39;, sparse_output=False).fit(df_train[[&#39;State&#39;]])
+housestyle_encoder = OneHotEncoder(handle_unknown=&#39;ignore&#39;, sparse_output=False).fit(df_train[[&#39;HouseStyle&#39;]])
+salecondition_encoder = OneHotEncoder(handle_unknown=&#39;ignore&#39;, sparse_output=False).fit(df_train[[&#39;SaleCondition&#39;]])
+
+# Mapa de District -&gt; índice entero, para la rama de embedding. Se arma con las
+# categorías vistas en train; una categoría nueva en val/test cae en un índice
+# &quot;desconocido&quot; reservado aparte (robustez, aunque en este dataset no llega a usarse).
+district_categories = sorted(df_train[&#39;District&#39;].unique())
+district_to_idx = {cat: i for i, cat in enumerate(district_categories)}
+DISTRICT_OOV_IDX = len(district_categories)
+DISTRICT_VOCAB_SIZE = len(district_categories) + 1
+print(f&quot;Distritos vistos en train: {len(district_categories)} (+1 índice para desconocidos)&quot;)</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Crea los <code>OneHotEncoder</code> de <code>State</code>, <code>HouseStyle</code> y <code>SaleCondition</code> y el diccionario <code>district_to_idx</code>, todos ajustados solo con train.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ol>
+<li><code>OneHotEncoder(handle_unknown='ignore', sparse_output=False).fit(df_train[[...]])</code> para cada categórica chica.</li>
+<li><code>district_categories = sorted(df_train['District'].unique())</code> → 72 distritos vistos en train.</li>
+<li><code>district_to_idx</code> asigna un entero 0..71 a cada uno.</li>
+<li><code>DISTRICT_OOV_IDX = 72</code> reserva un índice para distritos desconocidos y <code>DISTRICT_VOCAB_SIZE = 73</code>.</li>
+</ol>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Igual que el scaler, los encoders y el vocabulario son parte del modelo y se aprenden de train. Para <code>State</code> (12) basta one-hot; para <code>District</code> (72) se arma el índice que consume el embedding.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Los usan <code>build_dense_features</code> (one-hots) y <code>build_district_idx</code> (celda 26), y <code>DISTRICT_VOCAB_SIZE</code> fija el tamaño de <code>Embedding</code> en las celdas 26 y 34.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>One-hot vs embedding según cardinalidad; diccionarios y encoders calculados solo con train para no filtrar información.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 5</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=12"><span class="ref">04·12</span><span class="t">Categóricas: one-hot contra embedding</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=18"><span class="ref">04·18</span><span class="t">Todo se aprende solo del train</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=palabra-al-transformer&amp;s=14"><span class="ref">07·14</span><span class="t">Tres formas de volver texto en números</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=palabra-al-transformer&amp;s=15"><span class="ref">07·15</span><span class="t">De token a vector</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/12/#d=segmentacion-y-stable-diffusion&amp;s=22"><span class="ref">12·22</span><span class="t">Embeddings más allá del texto</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp2-variantes-incrementales" data-title="Aporte incremental de cada bloque de columnas (celda 27)" data-tp="2" data-tp-title="¿Cuánto vale esta casa?" data-file="calveyra-desivo-giordanelli-rickert.ipynb" data-from="1" data-to="13">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">calveyra-desivo-giordanelli-rickert.ipynb</span><span class="mono faint">L1–13</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-python" data-start="1">v1_state = train_categorical_variant(use_state=True, use_district=False, use_housestyle=False,
+                                      use_centralair=False, use_salecondition=False, cyclical_month=False)
+v2_district = train_categorical_variant(use_state=True, use_district=True, use_housestyle=False,
+                                         use_centralair=False, use_salecondition=False, cyclical_month=False)
+v3_full = train_categorical_variant(use_state=True, use_district=True, use_housestyle=True,
+                                     use_centralair=True, use_salecondition=True, cyclical_month=True)
+
+print(f&quot;{&#39;Modelo&#39;:40} {&#39;MAE&#39;:&gt;12} {&#39;RMSE&#39;:&gt;12} {&#39;MAPE %&#39;:&gt;8}&quot;)
+print(&quot;-&quot; * 76)
+print(f&quot;{&#39;Solo numérico (Milestone 2)&#39;:40} {baseline[&#39;mae&#39;]:12,.0f} {baseline[&#39;rmse&#39;]:12,.0f} {baseline[&#39;mape&#39;]:8.2f}&quot;)
+print(f&quot;{&#39;+ State (one-hot)&#39;:40} {v1_state[&#39;mae&#39;]:12,.0f} {v1_state[&#39;rmse&#39;]:12,.0f} {v1_state[&#39;mape&#39;]:8.2f}&quot;)
+print(f&quot;{&#39;+ District (embedding)&#39;:40} {v2_district[&#39;mae&#39;]:12,.0f} {v2_district[&#39;rmse&#39;]:12,.0f} {v2_district[&#39;mape&#39;]:8.2f}&quot;)
+print(f&quot;{&#39;+ resto categóricas + mes cíclico&#39;:40} {v3_full[&#39;mae&#39;]:12,.0f} {v3_full[&#39;rmse&#39;]:12,.0f} {v3_full[&#39;mape&#39;]:8.2f}&quot;)</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Entrena tres modelos sumando bloques de a uno y tabula MAE, RMSE y MAPE contra el baseline numérico.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li><code>v1_state</code>: numéricas + <code>State</code> one-hot.</li>
+<li><code>v2_district</code>: + <code>District</code> por embedding.</li>
+<li><code>v3_full</code>: + <code>HouseStyle</code>, <code>CentralAir</code>, <code>SaleCondition</code> y mes cíclico.</li>
+<li>Imprime la tabla: MAE $51.411 → $30.956 → $25.380 → $20.844.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Muestra que con la misma red 32-32 la mejora vino de la entrada, no de la arquitectura. Ojo: la comparación se hace con métricas de test; en rigor elegir entre variantes es trabajo de validación.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Usa <code>train_categorical_variant</code> (celda 26) y <code>baseline</code> (celda 11). <code>v3_full</code> es la referencia para la trampa de District (celda 31) y para el Milestone 4.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>El modelo se gana en la entrada y la salida, no en las capas.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 5</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=introduccion&amp;s=32"><span class="ref">01·32</span><span class="t">Ejemplos de problemas predictivos</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=2"><span class="ref">04·2</span><span class="t">La red ve una fila de números</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=17"><span class="ref">04·17</span><span class="t">Los tres, lado a lado</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=61"><span class="ref">04·61</span><span class="t">Lo que hay que llevarse</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/12/#d=segmentacion-y-stable-diffusion&amp;s=22"><span class="ref">12·22</span><span class="t">Embeddings más allá del texto</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp3-encoder-e5-prefijos" data-title="Encoder de oraciones con prefijos query/passage" data-tp="3" data-tp-title="RAG, MCP y Transformers en el Hospital Arroyo Claro" data-file="hospital/rag/encoders.py" data-from="40" data-to="68">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">hospital/rag/encoders.py</span><span class="mono faint">L40–68</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-python" data-start="40">class SentenceTransformerEncoder:
+    &quot;&quot;&quot;Modelos entrenados para embeddings de oraciones (MiniLM, e5, bge-m3). Los e5 piden prefijos.&quot;&quot;&quot;
+
+    def __init__(self, modelo, prefijo_consulta=&quot;&quot;, prefijo_pasaje=&quot;&quot;, lote=16):
+        from sentence_transformers import SentenceTransformer
+
+        self.nombre, self.lote = modelo, lote
+        self.prefijo_consulta, self.prefijo_pasaje = prefijo_consulta, prefijo_pasaje
+        self.modelo = SentenceTransformer(modelo, device=&quot;cpu&quot;)
+
+    def _codificar(self, textos, prefijo):
+        m = self.modelo.encode([prefijo + t for t in textos], batch_size=self.lote,
+                               normalize_embeddings=True, show_progress_bar=False)
+        return np.asarray(m, dtype=np.float32)
+
+    def codificar_consultas(self, textos):
+        return self._codificar(textos, self.prefijo_consulta)
+
+    def codificar_pasajes(self, textos):
+        return self._codificar(textos, self.prefijo_pasaje)
+
+
+def crear_encoder(cfg):
+    &quot;&quot;&quot;cfg: {&quot;tipo&quot;: &quot;bert_promedio&quot; | &quot;sentence_transformer&quot;, &quot;modelo&quot;: ..., &quot;prefijo_consulta&quot;: ..., &quot;prefijo_pasaje&quot;: ...}&quot;&quot;&quot;
+    if cfg[&quot;tipo&quot;] == &quot;bert_promedio&quot;:
+        return BertPromedio(cfg[&quot;modelo&quot;])
+    if cfg[&quot;tipo&quot;] == &quot;sentence_transformer&quot;:
+        return SentenceTransformerEncoder(cfg[&quot;modelo&quot;], cfg.get(&quot;prefijo_consulta&quot;, &quot;&quot;), cfg.get(&quot;prefijo_pasaje&quot;, &quot;&quot;))
+    raise ValueError(f&quot;tipo de encoder desconocido: {cfg[&#39;tipo&#39;]}&quot;)</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Envuelve modelos de <code>sentence-transformers</code> (MiniLM, e5, bge-m3) con la misma interfaz que BERT y agrega los prefijos que piden los e5. <code>crear_encoder</code> elige la clase según la configuración.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li><code>SentenceTransformerEncoder</code> guarda <code>prefijo_consulta</code> y <code>prefijo_pasaje</code>.</li>
+<li><code>_codificar(textos, prefijo)</code> antepone el prefijo a cada texto y llama a <code>self.modelo.encode(..., normalize_embeddings=True)</code>.</li>
+<li><code>codificar_consultas</code> usa el prefijo de consulta (<code>"query: "</code>) y <code>codificar_pasajes</code> el de pasaje (<code>"passage: "</code>).</li>
+<li><code>crear_encoder(cfg)</code> despacha por <code>cfg["tipo"]</code>.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>e5 fue entrenado de forma contrastiva con pares consulta–pasaje y espera esos prefijos; sin ellos se pierde la asimetría pregunta/documento. Ganó e5-base: separó el fragmento correcto a z = 3,94 contra 3,07 de MiniLM (entrenado para paráfrasis).</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p><code>Recuperador.desde_config</code> lo crea a partir de <code>config.json</code> (<code>intfloat/multilingual-e5-base</code>, <code>query: </code> / <code>passage: </code>). <code>Recuperador._puntuar</code> llama a <code>codificar_consultas</code> y <code>_embeddings</code> a <code>codificar_pasajes</code>.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Embeddings de oración entrenados con aprendizaje contrastivo (como CLIP pero texto–texto): consulta y pasaje relevantes quedan cerca en el espacio.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 8</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=introduccion&amp;s=36"><span class="ref">01·36</span><span class="t">Ejemplos de problemas de representación</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=20"><span class="ref">06·20</span><span class="t">Embeddings: cada texto es un punto</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=21"><span class="ref">06·21</span><span class="t">Coseno: importa el ángulo</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=rag-mcp-rapida&amp;s=4"><span class="ref">07·4</span><span class="t">Por significado: embeddings y similitud</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/08/#d=transformers-a-fondo&amp;s=34"><span class="ref">08·34</span><span class="t">Del encoder al embedding de oración</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/08/#d=transformers-a-fondo&amp;s=36"><span class="ref">08·36</span><span class="t">El mapa de la familia</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/12/#d=segmentacion-y-stable-diffusion&amp;s=22"><span class="ref">12·22</span><span class="t">Embeddings más allá del texto</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/12/#d=segmentacion-y-stable-diffusion&amp;s=51"><span class="ref">12·51</span><span class="t">CLIP: el puente texto ↔ imagen</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp3-informe-por-que-e5" data-title="Por qué ganó e5-base (z del fragmento correcto)" data-tp="3" data-tp-title="RAG, MCP y Transformers en el Hospital Arroyo Claro" data-file="INFORME.md" data-from="47" data-to="66">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">INFORME.md</span><span class="mono faint">L47–66</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-markdown" data-start="47">### Por qué ganó e5-base
+
+| Encoder | Mejor CR | CR medio con k = 1 (10 configs) | Coseno medio entre fragmentos | z del fragmento correcto |
+|---|---|---|---|---|
+| BERT multilingüe (promedio) | 0,350 | 0,27 | 0,786 | 1,56 |
+| paraphrase-multilingual-MiniLM-L12-v2 | 0,950 | 0,76 | 0,365 | 3,07 |
+| multilingual-e5-small | 0,950 | 0,80 | 0,842 | 3,94 |
+| **multilingual-e5-base** | **1,000** | **0,85** | 0,830 | 3,94 |
+
+*z del fragmento correcto*: cuántos desvíos estándar está el coseno del fragmento con la evidencia por encima del
+promedio de todos los fragmentos para esa pregunta (secciones con metadatos, promedio sobre las 20 preguntas).
+
+- BERT sin ajustar no fue entrenado para que el coseno mida similitud de significado: el promedio de sus tokens
+  refleja sobre todo la forma superficial del texto, y el fragmento correcto apenas se separa del resto (z = 1,56).
+- Que los vectores estén &quot;amontonados&quot; no es el problema en sí: e5 tiene cosenos medios tan altos como BERT (0,83),
+  pero fue entrenado con pares consulta–pasaje (por eso los prefijos `query:` / `passage:`), así que ordena bien dentro
+  de esa franja: el fragmento correcto queda a 3,94 desvíos. MiniLM está entrenado para paráfrasis entre oraciones, no
+  para preguntas contra pasajes, y separa menos (3,07).
+- e5-base y e5-small separan igual en promedio, pero e5-base acierta el primer lugar en más configuraciones (CR medio
+  0,85 contra 0,80) y es el único que llega a 1,00 con k = 1. Corre en CPU en pocos segundos para las 56 secciones.</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Compara los cuatro encoders con el mejor CR, el CR medio con k = 1, el coseno medio entre fragmentos y cuántos desvíos queda el fragmento correcto sobre el promedio.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li>BERT promediado: CR 0,350 y z = 1,56; el coseno refleja forma superficial, no significado.</li>
+<li>e5 tiene cosenos medios altos (0,83, «amontonados») pero ordena bien: z = 3,94, porque fue entrenado con pares consulta–pasaje.</li>
+<li>MiniLM, entrenado para paráfrasis, separa menos (3,07).</li>
+<li>e5-base gana a e5-small por acertar el primer lugar en más configuraciones.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Explica la elección del encoder con una medida propia (z-score del fragmento correcto) en lugar de quedarse solo con el CR.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Se apoya en las corridas de <code>experimentos/recuperacion/</code> y en las clases <code>BertPromedio</code> y <code>SentenceTransformerEncoder</code> de <code>hospital/rag/encoders.py</code>.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Encoder sin ajustar vs. encoder contrastivo: lo que importa no es la escala absoluta del coseno sino cómo ordena consultas contra pasajes.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 5</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=introduccion&amp;s=36"><span class="ref">01·36</span><span class="t">Ejemplos de problemas de representación</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=palabra-al-transformer&amp;s=21"><span class="ref">07·21</span><span class="t">Promediar una frase pierde el orden</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/08/#d=transformers-a-fondo&amp;s=34"><span class="ref">08·34</span><span class="t">Del encoder al embedding de oración</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/12/#d=segmentacion-y-stable-diffusion&amp;s=22"><span class="ref">12·22</span><span class="t">Embeddings más allá del texto</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/12/#d=segmentacion-y-stable-diffusion&amp;s=51"><span class="ref">12·51</span><span class="t">CLIP: el puente texto ↔ imagen</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp3-encoder-bert-promedio" data-title="Línea de base: BERT sin ajustar, promedio de tokens" data-tp="3" data-tp-title="RAG, MCP y Transformers en el Hospital Arroyo Claro" data-file="hospital/rag/encoders.py" data-from="9" data-to="37">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">hospital/rag/encoders.py</span><span class="mono faint">L9–37</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-python" data-start="9">def _normalizar(m):
+    return m / np.linalg.norm(m, axis=1, keepdims=True).clip(min=1e-12)
+
+
+class BertPromedio:
+    &quot;&quot;&quot;Linea de base obligatoria: BERT sin ajustar para similitud, embedding = promedio de los
+    vectores de la ultima capa sobre los tokens reales (se ignora el padding).&quot;&quot;&quot;
+
+    def __init__(self, modelo=&quot;google-bert/bert-base-multilingual-cased&quot;, lote=16):
+        from transformers import AutoModel, AutoTokenizer
+
+        self.nombre, self.lote = modelo, lote
+        self.tokenizer = AutoTokenizer.from_pretrained(modelo)
+        self.modelo = AutoModel.from_pretrained(modelo).eval()
+
+    def _codificar(self, textos):
+        import torch
+
+        salidas = []
+        with torch.no_grad():
+            for i in range(0, len(textos), self.lote):
+                enc = self.tokenizer(textos[i:i + self.lote], padding=True, truncation=True,
+                                     max_length=512, return_tensors=&quot;pt&quot;)
+                h = self.modelo(**enc).last_hidden_state
+                m = enc[&quot;attention_mask&quot;].unsqueeze(-1).float()
+                salidas.append(((h * m).sum(1) / m.sum(1)).numpy())
+        return _normalizar(np.concatenate(salidas))
+
+    codificar_consultas = codificar_pasajes = _codificar</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Calcula el embedding de un texto como el promedio de los vectores de la última capa de BERT multilingüe, ignorando el padding, y lo normaliza a norma 1.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li><code>_normalizar</code> divide cada fila por su norma L2.</li>
+<li><code>BertPromedio._codificar</code> tokeniza en lotes de 16 (<code>padding=True</code>, <code>max_length=512</code>).</li>
+<li>Toma <code>last_hidden_state</code> (<code>h</code>) y la <code>attention_mask</code> (<code>m</code>) y calcula <code>(h * m).sum(1) / m.sum(1)</code>: promedio solo de tokens reales.</li>
+<li>Consultas y pasajes usan la misma función (<code>codificar_consultas = codificar_pasajes = _codificar</code>).</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Es la línea de base obligatoria de la consigna. Sirve para mostrar que un encoder no entrenado para similitud no alcanza: sacó CR 0,350 (igual que el recuperador léxico ingenuo) y el fragmento correcto quedaba apenas a z = 1,56 del promedio.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Lo crea <code>crear_encoder({"tipo": "bert_promedio"})</code>, usado desde <code>experimentos/correr_recuperacion.py</code> (clave <code>bert</code> de <code>ENCODERS</code>). La matriz que devuelve alimenta <code>Recuperador.matriz</code>.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Embedding de oración por promedio de tokens: promediar vectores contextuales pierde el orden y BERT no fue entrenado para que el coseno mida significado.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 4</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=introduccion&amp;s=36"><span class="ref">01·36</span><span class="t">Ejemplos de problemas de representación</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=palabra-al-transformer&amp;s=21"><span class="ref">07·21</span><span class="t">Promediar una frase pierde el orden</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/08/#d=transformers-a-fondo&amp;s=34"><span class="ref">08·34</span><span class="t">Del encoder al embedding de oración</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/12/#d=segmentacion-y-stable-diffusion&amp;s=52"><span class="ref">12·52</span><span class="t">Cómo se entrena CLIP</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp3-recuperador-coseno-exacto" data-title="Búsqueda exacta por coseno (y reranker opcional)" data-tp="3" data-tp-title="RAG, MCP y Transformers en el Hospital Arroyo Claro" data-file="hospital/rag/recuperador.py" data-from="51" data-to="74">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">hospital/rag/recuperador.py</span><span class="mono faint">L51–74</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-python" data-start="51">    def _puntuar(self, consulta):
+        &quot;&quot;&quot;[(Fragmento, score)] de todos los fragmentos (o de los candidatos rerankeados), de mayor a menor.&quot;&quot;&quot;
+        q = self.encoder.codificar_consultas([consulta])[0]
+        scores = self.matriz @ q
+        orden = np.argsort(-scores)
+        if self.reranker is None:
+            return [(self.fragmentos[i], float(scores[i])) for i in orden]
+        cand = orden[:self.candidatos]
+        pares = [(consulta, self.fragmentos[i].para_embedding(self.metadatos)) for i in cand]
+        re_scores = self.reranker.predict(pares, show_progress_bar=False)
+        return sorted(((self.fragmentos[i], float(s)) for i, s in zip(cand, re_scores)), key=lambda x: -x[1])
+
+    def puntuar(self, consulta):
+        &quot;&quot;&quot;[(texto, score)] de mayor a menor.&quot;&quot;&quot;
+        return [(f.texto, s) for f, s in self._puntuar(consulta)]
+
+    def buscar_fragmentos(self, consulta, **seleccion):
+        &quot;&quot;&quot;Los Fragmento elegidos (texto literal + documento, título y sección). top_k, umbral y margen se
+        pueden pisar por llamada; si no, se usan los de la configuración.&quot;&quot;&quot;
+        s = {&quot;top_k&quot;: self.top_k, &quot;umbral&quot;: self.umbral, &quot;margen&quot;: self.margen, **seleccion}
+        return seleccionar(self._puntuar(consulta), s[&quot;top_k&quot;], s[&quot;umbral&quot;], s[&quot;margen&quot;])
+
+    def buscar(self, consulta):
+        return [f.texto for f in self.buscar_fragmentos(consulta)]</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Puntúa todos los fragmentos contra la consulta con un producto matricial y los ordena; si hay cross-encoder configurado, rerankea los mejores candidatos.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li><code>q = self.encoder.codificar_consultas([consulta])[0]</code>: vector de la consulta, ya normalizado.</li>
+<li><code>scores = self.matriz @ q</code>: como todo tiene norma 1, cada producto punto es el coseno contra los 56 fragmentos.</li>
+<li><code>np.argsort(-scores)</code> ordena de mayor a menor.</li>
+<li>Si <code>self.reranker</code> no es <code>None</code>, toma <code>orden[:self.candidatos]</code>, arma pares <code>(consulta, texto)</code> y los vuelve a ordenar con <code>reranker.predict</code>.</li>
+<li><code>buscar_fragmentos</code> aplica <code>seleccionar</code> con top-k/umbral/margen; <code>buscar</code> devuelve solo los textos.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Con 56 secciones, comparar contra todas es instantáneo y exacto, así que no hizo falta un índice aproximado como HNSW. El reranker quedó soportado pero la entrega usa <code>reranker: null</code>: no mejoraba sobre e5-base con metadatos.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p><code>recuperar.py</code> llama a <code>buscar()</code> por pregunta; <code>hospital/documentos.py</code> llama a <code>buscar_fragmentos()</code> para la tool <code>buscar_documentos</code>; <code>correr_recuperacion.py</code> usa <code>puntuar()</code> una vez por pregunta y prueba varios k/umbral/margen sobre el mismo ranking.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Similitud coseno sobre vectores normalizados y búsqueda exacta (fuerza bruta); el cross-encoder como segunda etapa que lee consulta y pasaje juntos.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 8</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=3"><span class="ref">06·3</span><span class="t">Recuperar, aumentar, generar</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=21"><span class="ref">06·21</span><span class="t">Coseno: importa el ángulo</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=22"><span class="ref">06·22</span><span class="t">HNSW: no comparar contra todos</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=31"><span class="ref">06·31</span><span class="t">El cross-encoder lee los dos juntos</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=rag-mcp-rapida&amp;s=2"><span class="ref">07·2</span><span class="t">RAG en tres pasos</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=rag-mcp-rapida&amp;s=4"><span class="ref">07·4</span><span class="t">Por significado: embeddings y similitud</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=rag-mcp-rapida&amp;s=11"><span class="ref">07·11</span><span class="t">Reranking: la segunda etapa</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/12/#d=segmentacion-y-stable-diffusion&amp;s=52"><span class="ref">12·52</span><span class="t">Cómo se entrena CLIP</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp4-lora-config" data-title="LoRA r=8 sobre q_proj/v_proj" data-tp="4" data-tp-title="El agente de admisión de guardia (TP final)" data-file="admision_tp/entrenamiento.py" data-from="11" data-to="23">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">admision_tp/entrenamiento.py</span><span class="mono faint">L11–23</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-python" data-start="11"># Solo la atención del modelo de lenguaje. Gemma 4 es multimodal: sus torres de visión y audio también
+# tienen q_proj/v_proj, pero son Gemma4ClippableLinear y PEFT no los soporta (falló en Kaggle). PEFT
+# aplica un string con re.fullmatch sobre el nombre completo del módulo (peft/utils/other.py:1521).
+LORA_OBJETIVO = r&quot;(.*\.)?language_model\.layers\.\d+\.self_attn\.(q_proj|v_proj)&quot;
+LORA = {&quot;r&quot;: 8, &quot;lora_alpha&quot;: 16, &quot;lora_dropout&quot;: 0.0,
+        &quot;target_modules&quot;: LORA_OBJETIVO, &quot;task_type&quot;: &quot;CAUSAL_LM&quot;}
+POLITICA = {&quot;save_steps&quot;: 50, &quot;bf16&quot;: True, &quot;gradient_checkpointing&quot;: True,
+            &quot;gradient_checkpointing_kwargs&quot;: {&quot;use_reentrant&quot;: False}, &quot;save_only_model&quot;: False}
+# Defaults de la entrega (A100 de 40 GB). fp16 y &quot;auto&quot; existen para T4 x2 (Kaggle, desarrollo):
+# la T4 no tiene bf16 nativo y &quot;auto&quot; reparte el modelo entre GPU (paralelismo de modelo en un proceso).
+PRECISIONES = {&quot;bf16&quot;: &quot;bfloat16&quot;, &quot;fp16&quot;: &quot;float16&quot;}
+DISPOSITIVOS = (&quot;unico&quot;, &quot;auto&quot;)
+EJECUCION = {&quot;precision&quot;: &quot;bf16&quot;, &quot;dispositivos&quot;: &quot;unico&quot;, &quot;guardar_cada&quot;: 50}</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Define la configuración LoRA y la política de entrenamiento: rango 8, alfa 16, solo en las proyecciones Q y V de la atención del modelo de lenguaje.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li><code>LORA_OBJETIVO</code> es una regex que solo toma <code>language_model.layers.N.self_attn.(q_proj|v_proj)</code>.</li>
+<li><code>LORA</code> fija <code>r=8</code>, <code>lora_alpha=16</code>, <code>dropout=0</code> y <code>task_type=CAUSAL_LM</code>.</li>
+<li><code>POLITICA</code> guarda checkpoint cada 50 pasos, bf16 y gradient checkpointing.</li>
+<li><code>PRECISIONES</code> y <code>DISPOSITIVOS</code> permiten fp16/<code>auto</code> para las T4 de Kaggle.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Gemma 4 es multimodal y sus torres de visión/audio también tienen <code>q_proj</code>/<code>v_proj</code> que PEFT no soporta: la regex las excluye. QLoRA quedó como alternativa no hecha.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p><code>aplicar_lora</code> (mismo archivo) pasa <code>LoraConfig(**LORA)</code> a <code>get_peft_model</code> dentro de <code>_ejecutar_cuda</code>; <code>cargar_entradas</code> incluye <code>LORA</code> en la identidad de la corrida.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>LoRA agrega matrices de bajo rango a W_Q y W_V: se entrenan pocos parámetros y el modelo base queda congelado.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 3</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/08/#d=transformers-a-fondo&amp;s=15"><span class="ref">08·15</span><span class="t">Tres proyecciones del mismo vector</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/#d=como-se-entrena-un-llm&amp;s=51"><span class="ref">09·51</span><span class="t">Dónde entra el fine-tuning</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/12/#d=segmentacion-y-stable-diffusion&amp;s=75"><span class="ref">12·75</span><span class="t">Lo que el equipo va a encontrar</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp4-lora-aplicar" data-title="aplicar_lora: adapter nuevo o retomado" data-tp="4" data-tp-title="El agente de admisión de guardia (TP final)" data-file="admision_tp/entrenamiento.py" data-from="171" data-to="180">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">admision_tp/entrenamiento.py</span><span class="mono faint">L171–180</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-python" data-start="171">def aplicar_lora(peft, modelo, config):
+    &quot;&quot;&quot;LoRA nuevo, o el adapter de `adapter_inicial` entrenable (mismo r y módulos con que se publicó).&quot;&quot;&quot;
+    inicial = config.get(&quot;adapter_inicial&quot;)
+    if inicial is None:
+        return peft.get_peft_model(modelo, peft.LoraConfig(**LORA, revision=config[&quot;revision&quot;]))
+    origen = {&quot;revision&quot;: inicial[&quot;revision&quot;], &quot;subfolder&quot;: inicial[&quot;subcarpeta&quot;]}
+    previo = peft.PeftConfig.from_pretrained(inicial[&quot;repo&quot;], **origen)
+    if (previo.base_model_name_or_path, previo.revision) != (config[&quot;modelo&quot;], config[&quot;revision&quot;]):
+        raise ValueError(&quot;adapter_inicial entrenado sobre otra base o revisión&quot;)
+    return peft.PeftModel.from_pretrained(modelo, inicial[&quot;repo&quot;], config=previo, is_trainable=True, **origen)</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Envuelve el modelo con LoRA usando la configuración <code>LORA</code>, o retoma un adapter ya publicado para seguir entrenándolo.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li>Sin <code>adapter_inicial</code>: <code>get_peft_model(modelo, LoraConfig(**LORA))</code>.</li>
+<li>Con <code>adapter_inicial</code>: lee su <code>PeftConfig</code> y verifica base y revisión.</li>
+<li><code>PeftModel.from_pretrained(..., is_trainable=True)</code> deja entrenables solo las matrices LoRA.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Permitió continuar el adapter <code>dc41674a</code> sobre datos nuevos (v39) sin empezar de cero.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Lo llama <code>_ejecutar_cuda</code> (mismo archivo) después de cargar el modelo; usa <code>LORA</code> definido arriba en el mismo archivo.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>PEFT: se congela el modelo base y solo se entrenan las matrices A y B.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 3</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/08/#d=transformers-a-fondo&amp;s=15"><span class="ref">08·15</span><span class="t">Tres proyecciones del mismo vector</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/#d=como-se-entrena-un-llm&amp;s=51"><span class="ref">09·51</span><span class="t">Dónde entra el fine-tuning</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/12/#d=segmentacion-y-stable-diffusion&amp;s=75"><span class="ref">12·75</span><span class="t">Lo que el equipo va a encontrar</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp4-informe-sft-real" data-title="Entrenamiento real: 2.900 conversaciones en 2 T4" data-tp="4" data-tp-title="El agente de admisión de guardia (TP final)" data-file="docs/informe/informe-parte5.md" data-from="137" data-to="162">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">docs/informe/informe-parte5.md</span><span class="mono faint">L137–162</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-markdown" data-start="137">### 3.1 Entrenamiento real (Kaggle v32 + v33, 2026-11-11/12)
+
+Datos `datos/conversaciones/v3-procedimiento` (prompt `procedimiento-v1`): **2.900 conversaciones, 9.990.837
+tokens (~3.445 por conversación), 1.015.072 supervisados (10,2 %)**, ninguna recortada (`max_seq_length` 8192;
+`manifiesto-tokens.json`). Configuración `configuraciones/sft-ejemplo.json`: 1 época, lr 2e-4, semilla 42,
+`batch_size=1`, acumulación 8, LoRA r=8 en q/v de la atención del modelo de lenguaje. fp16, `device_map=auto`
+en 2 T4, commit `6169241`, W&amp;B `3add2742ddfd4b42`.
+
+| Medida | Valor | Fuente |
+|---|---|---|
+| Pasos de optimización | 363 (2.900 / 8, último paso incompleto) | `trainer_state`, recibos HF |
+| Tiempo por paso | ~85 s en v32; 80,5 s en v33 (5.072 s / 63 pasos) | bitácora; `runner.log` de v33 (`train_runtime`) |
+| Tiempo de cómputo de la época | **~8,1 h** (363 × ~80 s) | cálculo propio |
+| Reloj de pared | v32: cortada por el límite de 8 h de Kaggle en el paso 315; v33: 1 h 31 min (5.445 s de runner) reanudando de checkpoint-300 | `runner.json` |
+| VRAM pico (suma de 2 T4) | **19,97 GB** (12,1 + 7,87); reservada 20,58 GB | `entrenamiento/estado.json` de v33 |
+| Pérdida (supervisada) | 0,44 (paso 1) → ~0,03 (paso 100) → ~0,005 (paso 268) → 0,0044 media final | `runner.log` |
+| Checkpoints | cada 50 pasos, subidos a HF con revisión; `final` = `dc41674a` (adapter de v32+v33; el de la entrega desde 2026-11-13 es el v39, 3.1b) | `publicaciones` en `estado.json` |
+
+- **Casos a la vez al entrenar:** 1 conversación por pasada hacia adelante; 8 por paso de optimización. Con
+  ~3.445 tokens por conversación, la VRAM entra en 2 T4 gracias a calcular logits solo en posiciones supervisadas
+  (con logits completos en fp32, el paso 0 se quedó sin memoria en v28; ver [entrenamiento](entrenamiento-sft.md)).
+- **Interrupción y reanudación:** el corte por tiempo costó los pasos 301–315 (se rehicieron desde checkpoint-300).
+  Para A100 conviene guardar más seguido o medir antes cuánto tarda un paso.
+- **Pérdida baja ≠ agente bueno:** la pérdida media 0,005 no mostró que el modelo nunca aprendió el aviso al
+  voluntariado ([análisis de errores](analisis-errores.md), pasada 7). Hay un segundo entrenamiento corto en
+  curso para eso (v36, 633 conversaciones).</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Reporte del entrenamiento SFT real con los datos curados: tokens, pasos, tiempo, VRAM, pérdida y checkpoints.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li>2.900 conversaciones, ~3.445 tokens cada una, 10,2 % supervisados.</li>
+<li>1 época, lr 2e-4, acumulación 8, LoRA r=8 en q/v: 363 pasos de ~80 s (~8,1 h).</li>
+<li>VRAM pico 19,97 GB en 2 T4; Kaggle cortó a las 8 h y se reanudó desde <code>checkpoint-300</code>.</li>
+<li>Advierte que pérdida baja (0,005) no es agente bueno: el aviso al voluntariado no se aprendió.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Muestra con números lo que costó el SFT y por qué hizo falta una segunda pasada (v39) para el aviso.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Los números salen de <code>estado.json</code>, <code>runner.json</code> y <code>runner.log</code> que escriben <code>entrenar()</code> e <code>infra/kaggle_entrenamiento.correr</code>.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Fine-tuning con LoRA en hardware modesto y la diferencia entre pérdida de entrenamiento y calidad de la tarea.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 3</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/#d=como-se-entrena-un-llm&amp;s=55"><span class="ref">09·55</span><span class="t">Fine-tuning local: el recorrido</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/12/#d=segmentacion-y-stable-diffusion&amp;s=75"><span class="ref">12·75</span><span class="t">Lo que el equipo va a encontrar</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/#d=cierre-magnifica-humanitas&amp;s=24"><span class="ref">13·24</span><span class="t">Repaso: cómo aprende a «portarse bien»</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+
+
+    </main>
+  </div>
+</div>
+<dialog class="code-dlg" id="code-dlg" aria-labelledby="code-dlg-title">
+  <div class="card-header">
+    <div class="code-dlg-title"><span class="pill tp" id="code-dlg-tp">TP</span><span class="card-title" id="code-dlg-title"></span></div>
+    <div class="card-actions"><a class="btn sm" id="code-dlg-open" href="#">Ver todo el código del TP</a><button class="btn icon sm ghost" id="code-dlg-close" aria-label="Cerrar" autofocus><svg class="i" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+  </div>
+  <div id="code-dlg-body"></div>
+</dialog>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<script src="https://ezequielrickert.github.io/austral-ia-generativa/js/site.js?h=f2262278f956a92874ef"></script>
+<script src="https://ezequielrickert.github.io/austral-ia-generativa/js/viewer.js?h=e95313f2efe7ebd8f130"></script>
+</body>
+</html>

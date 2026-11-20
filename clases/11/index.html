@@ -1,0 +1,1378 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Clase 11 · Redes generativas antagónicas (GANs) · IA Generativa</title>
+  <meta name="description" content="Las diapositivas de IA Generativa (Universidad Austral, 2c 2026) con notas por diapositiva y vínculos a los TPs.">
+  <script>
+    (function(){try{var t=localStorage.getItem('iagen:theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t)}catch(e){}})();
+    window.SITE_BASE = "https://ezequielrickert.github.io/austral-ia-generativa".replace(/\/$/, '');
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <link rel="stylesheet" href="https://ezequielrickert.github.io/austral-ia-generativa/css/site.css?h=ede67d51655aa3494e82">
+</head>
+<body>
+
+
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <a class="sb-head" href="https://ezequielrickert.github.io/austral-ia-generativa/">
+      <span class="sb-logo">IA</span>
+      <span class="sb-title"><b>IA Generativa</b><span>Guía de estudio · 2c 2026</span></span>
+    </a>
+    <div class="sb-search">
+      <div class="input-icon">
+        <svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input class="input" id="search" type="search" placeholder="Buscar" autocomplete="off" aria-label="Buscar diapositivas y conceptos">
+        <kbd>/</kbd>
+      </div>
+      <div class="search-results" id="search-results" hidden></div>
+    </div>
+    <nav class="sb-body" aria-label="Navegación">
+      <div class="nav-group">
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/">
+          <svg class="i" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span class="t">Inicio</span></a>
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/">
+          <svg class="i" viewBox="0 0 24 24"><path d="M4 19.5V5a2 2 0 0 1 2-2h14v16H6.5A2.5 2.5 0 0 0 4 21.5"/><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/></svg><span class="t">Glosario</span></a>
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/practica/">
+          <svg class="i" viewBox="0 0 24 24"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg><span class="t">Práctica</span></a>
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/marcadas/">
+          <svg class="i" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg><span class="t">Marcadas</span><span class="count" id="star-count"></span></a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-label">Clases</div>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/" title="Bienvenida + CoWork: fundamentos de IA, modelos fundacionales y el chat extendido">
+          <span class="n">01</span><span class="t">Bienvenida + CoWork: fundamentos de IA, modelos fundacionales y el chat extendido</span><span class="meter" data-class="1" data-total="100"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/" title="CoWork: agentes de código, contexto, CLAUDE.md, Skills, subagentes y MCP">
+          <span class="n">02</span><span class="t">CoWork: agentes de código, contexto, CLAUDE.md, Skills, subagentes y MCP</span><span class="meter" data-class="2" data-total="66"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/03/" title="Introducción a las redes neuronales">
+          <span class="n">03</span><span class="t">Introducción a las redes neuronales</span><span class="meter" data-class="3" data-total="51"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/" title="Diseño de redes neuronales (modelado de un MLP)">
+          <span class="n">04</span><span class="t">Diseño de redes neuronales (modelado de un MLP)</span><span class="meter" data-class="4" data-total="64"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/05/" title="LLMs: prompting, costos y producción">
+          <span class="n">05</span><span class="t">LLMs: prompting, costos y producción</span><span class="meter" data-class="5" data-total="72"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/" title="RAG, bases vectoriales, inverted index">
+          <span class="n">06</span><span class="t">RAG, bases vectoriales, inverted index</span><span class="meter" data-class="6" data-total="71"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/" title="MCP y herramientas (con repaso de RAG) · De la palabra al transformer">
+          <span class="n">07</span><span class="t">MCP y herramientas (con repaso de RAG) · De la palabra al transformer</span><span class="meter" data-class="7" data-total="69"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/08/" title="El transformer por dentro: atención, el bloque completo y la familia de modelos">
+          <span class="n">08</span><span class="t">El transformer por dentro: atención, el bloque completo y la familia de modelos</span><span class="meter" data-class="8" data-total="43"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/" title="LLM training: pre-training, SFT, RLHF, herramientas y fine-tuning">
+          <span class="n">09</span><span class="t">LLM training: pre-training, SFT, RLHF, herramientas y fine-tuning</span><span class="meter" data-class="9" data-total="60"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/10/" title="Agentes: sistemas multiagente, especialización, contexto y orquestación">
+          <span class="n">10</span><span class="t">Agentes: sistemas multiagente, especialización, contexto y orquestación</span><span class="meter" data-class="10" data-total="64"><i></i></span></a>
+        
+        <a class="nav-item active" href="https://ezequielrickert.github.io/austral-ia-generativa/clases/11/" title="Redes generativas antagónicas (GANs)">
+          <span class="n">11</span><span class="t">Redes generativas antagónicas (GANs)</span><span class="meter" data-class="11" data-total="54"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/12/" title="Modelos generativos de señales, imágenes y multimodalidad">
+          <span class="n">12</span><span class="t">Modelos generativos de señales, imágenes y multimodalidad</span><span class="meter" data-class="12" data-total="79"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/" title="Del poder a la responsabilidad: seguridad, ética y lo que viene">
+          <span class="n">13</span><span class="t">Del poder a la responsabilidad: seguridad, ética y lo que viene</span><span class="meter" data-class="13" data-total="56"><i></i></span></a>
+        
+      </div>
+      <div class="nav-group">
+        <div class="nav-label">Trabajos prácticos</div>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/tp/1/" title="Corta, del caos a producción">
+          <span class="n">1</span><span class="t">Corta, del caos a producción</span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/tp/2/" title="¿Cuánto vale esta casa?">
+          <span class="n">2</span><span class="t">¿Cuánto vale esta casa?</span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/tp/3/" title="RAG, MCP y Transformers en el Hospital Arroyo Claro">
+          <span class="n">3</span><span class="t">RAG, MCP y Transformers en el Hospital Arroyo Claro</span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/tp/4/" title="El agente de admisión de guardia (TP final)">
+          <span class="n">4</span><span class="t">El agente de admisión de guardia (TP final)</span></a>
+        
+      </div>
+    </nav>
+    <div class="sb-foot">
+      <span id="exam-left">Final: 4 dic</span>
+      <button class="btn icon sm ghost" id="theme-btn" aria-label="Cambiar tema" title="Cambiar tema">
+        <svg class="i" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+    </div>
+  </aside>
+  <div class="main">
+    <div class="topbar">
+      <button class="btn icon" id="menu-btn" aria-label="Abrir navegación"><svg class="i" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+      <b>IA Generativa</b>
+    </div>
+    <main class="content is-viewer">
+      
+
+<div class="viewer-page" id="viewer" data-class="11">
+<header class="page-header">
+  <div class="ph-main">
+    <nav class="crumbs"><a href="https://ezequielrickert.github.io/austral-ia-generativa/">Clases</a><span class="sep">/</span><span>Clase 11</span><span class="sep">·</span><span>21 oct</span><span class="sep">·</span><span>Visión y generativos</span></nav>
+    <h1>Redes generativas antagónicas (GANs)</h1>
+  </div>
+  <div class="ph-actions">
+    
+    <button class="btn icon" id="focus-btn" aria-pressed="false" title="Modo foco: ocultar el menú (f)" aria-label="Modo foco"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg></button>
+    <button class="btn icon" id="fs-btn" title="Pantalla completa: diapositivas, notas y TPs (p)" aria-label="Pantalla completa"><svg class="i" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+    <a class="btn" href="https://ezequielrickert.github.io/austral-ia-generativa/practica/#c11">Practicar</a>
+    <a class="btn icon " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/10/" aria-label="Clase anterior" title="Clase anterior"><svg class="i" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></a>
+    <a class="btn icon " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/12/" aria-label="Clase siguiente" title="Clase siguiente"><svg class="i" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></a>
+  </div>
+</header>
+
+<div class="viewer-area">
+<div class="viewer">
+  <section class="card stage-card">
+    <div class="card-header">
+      <span class="deck-kind"><span class="pill sched" id="deck-kind" data-kind-sched="Calendario" data-kind-extra="Complementaria" title="Figura en el calendario de la materia">Calendario</span><span class="card-sub" id="sec-name">&nbsp;</span></span>
+      <div class="seg" id="filter" aria-label="Filtrar diapositivas">
+        <button aria-pressed="true" data-f="all">Todas<span class="fc mono" data-fc="all"></span></button>
+        <button aria-pressed="false" data-f="key"><span class="bar"></span>Clave<span class="fc mono" data-fc="key"></span></button>
+        <button aria-pressed="false" data-f="tp"><span class="dot"></span>En TPs<span class="fc mono" data-fc="tp"></span></button>
+      </div>
+      <button class="btn icon sm ghost" id="fs-exit" title="Salir de pantalla completa (p o Esc)" aria-label="Salir de pantalla completa"><svg class="i" viewBox="0 0 24 24"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg></button>
+    </div>
+    <div class="stage" id="stage">
+      <iframe id="deck-frame" title="Diapositivas de la clase" allow="autoplay; fullscreen"></iframe>
+      <button class="tp-mark" id="tp-mark" hidden aria-expanded="false" aria-controls="tp-pop" title="¿Dónde lo usaste? (t)"><b>?</b><span id="tp-mark-label">TP</span></button>
+      <div class="tp-pop card" id="tp-pop" hidden role="dialog" aria-label="Dónde lo usaste en los TPs"></div>
+    </div>
+    <div class="card-footer">
+      <button class="btn icon sm" id="prev" aria-label="Diapositiva anterior"><svg class="i" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>
+      <span class="pos" id="pos">—</span>
+      <button class="btn icon sm" id="next" aria-label="Diapositiva siguiente"><svg class="i" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>
+      
+      <div class="scrub" data-scrub="redes-generativas-antagonicas"  role="slider" aria-label="Ir a una diapositiva" aria-valuemin="0" aria-valuemax="53" tabindex="0">
+        <span class="tk" data-i="0" data-t="Inteligencia Artificial Generativa (AI Gen)"></span><span class="tk" data-i="1" data-t="IA generativa de visión"></span><span class="tk" data-i="2" data-t="IA Generativa de Visión"></span><span class="tk key" data-i="3" data-t="¿Qué es la IA Generativa de Visión?"></span><span class="tk" data-i="4" data-t="Línea de tiempo: el camino hasta hoy"></span><span class="tk" data-i="5" data-t="Los modelos que veremos en el curso"></span><span class="tk" data-i="6" data-t="Tabla comparativa rápida"></span><span class="tk" data-i="7" data-t="Introducción a las GANs"></span><span class="tk" data-i="8" data-t="Generative Adversarial Networks (GANs)"></span><span class="tk" data-i="9" data-t="Punto de partida"></span><span class="tk" data-i="10" data-t="El origen: una noche en un bar (2014)"></span><span class="tk" data-i="11" data-t="Modelo Mental Para Entenderlo"></span><span class="tk key" data-i="12" data-t="Arquitectura de una GAN"></span><span class="tk" data-i="13" data-t="Arquitectura de una &quot;Vanilla&quot; GAN"></span><span class="tk" data-i="14" data-t="Entrenamiento paso a paso"></span><span class="tk" data-i="15" data-t="Slanted Land"></span><span class="tk" data-i="16" data-t="El Problema: ¡Bienvenidos a Slanted Land! 🌀"></span><span class="tk" data-i="17" data-t="El problema urgente"></span><span class="tk" data-i="18" data-t="El mundo de Slanted Land"></span><span class="tk" data-i="19" data-t="Los datos reales: caras con patrón"></span><span class="tk" data-i="20" data-t="Caras vs. ruido: los dos tipos de imágenes"></span><span class="tk" data-i="21" data-t="Construyendo el Discriminador"></span><span class="tk" data-i="22" data-t="Construyendo el Discriminador"></span><span class="tk key tp" data-i="23" data-t="Discriminador Como red neuronal"></span><span class="tk key tp" data-i="24" data-t="Función Sigmoid: la activación del Discriminador"></span><span class="tk" data-i="25" data-t="Pongamos todo junto del Discriminador"></span><span class="tk key" data-i="26" data-t="El Generador: el objetivo opuesto"></span><span class="tk" data-i="27" data-t="Construyendo el Generador"></span><span class="tk" data-i="28" data-t="Proceso de Entrenamiento"></span><span class="tk key tp" data-i="29" data-t="Binary cross-entropy: los dos casos del Discriminador"></span><span class="tk" data-i="30" data-t="Loss Function: Discriminador — imagen real"></span><span class="tk" data-i="31" data-t="Loss Function: Generador — imagen falsa"></span><span class="tk key tp" data-i="32" data-t="Backpropagation: el procedimiento paso a paso"></span><span class="tk" data-i="33" data-t="Backpropagation: ejemplo con Slanted Land"></span><span class="tk key tp" data-i="34" data-t="El ciclo completo: Generador y Discriminador juntos"></span><span class="tk" data-i="35" data-t="El error del Discriminador"></span><span class="tk" data-i="36" data-t="Para los curiosos: la derivada del error"></span><span class="tk" data-i="37" data-t="Tipos y aplicaciones"></span><span class="tk key" data-i="38" data-t="Tipos de GANs: el punto de partida"></span><span class="tk" data-i="39" data-t="Tipos de GANs: cómo se ven sus imágenes"></span><span class="tk key" data-i="40" data-t="El salto que lo cambió todo: StyleGAN (2018)"></span><span class="tk" data-i="41" data-t="StyleGAN: arquitectura"></span><span class="tk" data-i="42" data-t="StyleGAN: Innovaciones Clave (Resumen)"></span><span class="tk" data-i="43" data-t="ThisPersonDoesNotExist.com en números"></span><span class="tk" data-i="44" data-t="Fortaleza 1: Generación de imágenes realistas"></span><span class="tk key" data-i="45" data-t="Fortaleza 2: Transformación de imágenes (Image Translation)"></span><span class="tk" data-i="46" data-t="Image Translation: modelos y librerías"></span><span class="tk" data-i="47" data-t="Fortaleza 3: Completado de imágenes (Image Inpainting)"></span><span class="tk tp" data-i="48" data-t="El dataset importa: lo que le das es lo que obtenés"></span><span class="tk" data-i="49" data-t="Limitaciones y cierre"></span><span class="tk key" data-i="50" data-t="Limitaciones (1 de 2): los problemas de entrenamiento"></span><span class="tk" data-i="51" data-t="Limitaciones (2 de 2): evaluación, coste y sesgo"></span><span class="tk key" data-i="52" data-t="Cierre: lo que aprendimos y lo que sigue"></span><span class="tk" data-i="53" data-t="Práctica: entrenar una GAN"></span>
+      </div>
+      
+      <button class="btn sm" id="side-toggle" aria-pressed="true" title="Esconder las notas (n)"><svg class="i chev-hide" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg><svg class="i chev-show" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>Notas</button>
+    </div>
+  </section>
+
+  <aside class="card side-card" id="side-card">
+    <div class="card-header">
+      <div class="seg" role="tablist" data-tabs="side-card">
+        <button role="tab" data-tab="nota" aria-selected="true">Nota</button>
+        <button role="tab" data-tab="indice" aria-selected="false">Índice</button>
+      </div>
+      <span class="count mono faint" id="note-pos" style="font-size:12px"></span>
+    </div>
+
+    <div class="side-panel" data-panel="nota" id="notes" aria-live="polite">
+      
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="0" hidden>
+          <div class="card-section head">
+            <h2>Inteligencia Artificial Generativa (AI Gen)</h2>
+            
+            <p class="summary">Portada de la clase 11: redes generativas antagónicas (GANs).</p>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="1" hidden>
+          <div class="card-section head">
+            <h2>IA generativa de visión</h2>
+            
+            <p class="summary">Agenda: IA generativa de visión, GANs, Slanted Land, tipos y aplicaciones, limitaciones.</p>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="2" hidden>
+          <div class="card-section head">
+            <h2>IA Generativa de Visión</h2>
+            
+            <p class="summary">La IA generativa de visión aprende la <strong>distribución</strong> de un conjunto de imágenes y crea imágenes nuevas que podrían haber estado en los datos.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#ia-generativa-vs-discriminativa">IA generativa vs. discriminativa</a><span>distribución</span></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="3" hidden>
+          <div class="card-section head">
+            <h2>¿Qué es la IA Generativa de Visión?</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary"><strong>Discriminativa</strong> analiza y clasifica lo que existe («¿es un 7?»); <strong>generativa</strong> crea contenido nuevo («generá un 7»). Es la distinción base de la clase.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#ia-generativa-vs-discriminativa">IA generativa vs. discriminativa</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#generativo-vs-discriminativo">Modelo generativo vs discriminativo</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=introduccion&amp;s=60"><span class="ref">01·60</span><span><span class="t">Modelos Discriminativos vs Generativos</span><small>La misma distinción en la clase 1</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="4" hidden>
+          <div class="card-section head">
+            <h2>Línea de tiempo: el camino hasta hoy</h2>
+            
+            <p class="summary">Recorrido histórico: redes estadísticas, CNN, GANs (2014) y difusión. El bloque arranca por las GANs, el hito más influyente de su era.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#gan">GAN (Generative Adversarial Network)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#cnn">CNN (red convolucional)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#difusion">Modelo de difusión</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="5" hidden>
+          <div class="card-section head">
+            <h2>Los modelos que veremos en el curso</h2>
+            
+            <p class="summary">Tres familias del bloque: <strong>GANs</strong> (generador contra evaluador), <strong>difusión</strong> (quitar ruido) y <strong>CNN</strong> (analizar imágenes). Cada una responde una pregunta distinta.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#gan">GAN (Generative Adversarial Network)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#difusion">Modelo de difusión</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#cnn">CNN (red convolucional)</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="6" hidden>
+          <div class="card-section head">
+            <h2>Tabla comparativa rápida</h2>
+            
+            <p class="summary">Tabla de consulta para elegir herramienta: GANs rápidas y realistas, difusión diversa y guiada por texto, CNN para reconocer y transformar.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#gan">GAN (Generative Adversarial Network)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#difusion">Modelo de difusión</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#cnn">CNN (red convolucional)</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="7" hidden>
+          <div class="card-section head">
+            <h2>Introducción a las GANs</h2>
+            
+            <p class="summary">Separador: introducción a las GANs.</p>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="8" hidden>
+          <div class="card-section head">
+            <h2>Generative Adversarial Networks (GANs)</h2>
+            
+            <p class="summary">Portada de sección: Generative Adversarial Networks.</p>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="9" hidden>
+          <div class="card-section head">
+            <h2>Punto de partida</h2>
+            
+            <p class="summary">Idea central de Goodfellow (2014): en vez de enseñarle a una red a crear directamente, ponerla a competir contra otra que detecta sus errores.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#gan">GAN (Generative Adversarial Network)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#generador">Generador (G)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#discriminador">Discriminador (D)</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="10" hidden>
+          <div class="card-section head">
+            <h2>El origen: una noche en un bar (2014)</h2>
+            
+            <p class="summary">Anécdota del origen: Goodfellow propone dos redes que compiten y el prototipo funciona esa misma noche. LeCun la llamó la idea más interesante en 20 años.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#gan">GAN (Generative Adversarial Network)</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="11" hidden>
+          <div class="card-section head">
+            <h2>Modelo Mental Para Entenderlo</h2>
+            
+            <p class="summary">Modelo mental: el <strong>falsificador</strong> crea rostros y el <strong>detective</strong> los distingue de los reales; compitiendo millones de rondas, ambos mejoran.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#generador">Generador (G)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#discriminador">Discriminador (D)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#juego-minimax">Juego minimax</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="12" hidden>
+          <div class="card-section head">
+            <h2>Arquitectura de una GAN</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary">Analogía → técnica: falsificador = <strong>Generador</strong> (ruido → imagen sintética), detective = <strong>Discriminador</strong> (real o falsa). El veredicto de D entrena a ambos.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#gan">GAN (Generative Adversarial Network)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#generador">Generador (G)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#discriminador">Discriminador (D)</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="13" hidden>
+          <div class="card-section head">
+            <h2>Arquitectura de una &quot;Vanilla&quot; GAN</h2>
+            
+            <p class="summary">Diagrama de la Vanilla GAN: ruido → G → imagen falsa; D recibe reales y falsas y emite un veredicto.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#gan">GAN (Generative Adversarial Network)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#generador">Generador (G)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#discriminador">Discriminador (D)</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="14" hidden>
+          <div class="card-section head">
+            <h2>Entrenamiento paso a paso</h2>
+            
+            <p class="summary">Ciclo de entrenamiento: G genera desde ruido, D juzga reales y falsas, ambos reciben su error y ajustan pesos; se repite miles de veces.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#gan">GAN (Generative Adversarial Network)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#backpropagation">Backpropagation</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="15" hidden>
+          <div class="card-section head">
+            <h2>Slanted Land</h2>
+            
+            <p class="summary">Separador: Slanted Land.</p>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="16" hidden>
+          <div class="card-section head">
+            <h2>El Problema: ¡Bienvenidos a Slanted Land! 🌀</h2>
+            
+            <p class="summary">Slanted Land: un mundo donde todos los rostros están inclinados. Es el ejemplo de juguete para construir una GAN a mano.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#slanted-land">Slanted Land</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="17" hidden>
+          <div class="card-section head">
+            <h2>El problema urgente</h2>
+            
+            <p class="summary">El problema: TiltedTinder tiene solo 4 fotos reales y necesita más perfiles. Una GAN debe generar caras nuevas y plausibles.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#slanted-land">Slanted Land</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#datos-sinteticos">Datos sintéticos / aumentación con GANs</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="18" hidden>
+          <div class="card-section head">
+            <h2>El mundo de Slanted Land</h2>
+            
+            <p class="summary">Simplificación: imágenes de 2×2 píxeles con valores entre 0 y 1, y redes de una sola capa, para seguir cada número.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#slanted-land">Slanted Land</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="19" hidden>
+          <div class="card-section head">
+            <h2>Los datos reales: caras con patrón</h2>
+            
+            <p class="summary">La «firma» de una cara: diagonal principal oscura (valores altos) y secundaria clara (bajos). El Discriminador tiene que aprender ese patrón.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#slanted-land">Slanted Land</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#discriminador">Discriminador (D)</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="20" hidden>
+          <div class="card-section head">
+            <h2>Caras vs. ruido: los dos tipos de imágenes</h2>
+            
+            <p class="summary">Las caras reales tienen estructura diagonal; el ruido no tiene patrón. D debe separarlos solo a partir de los valores numéricos.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#slanted-land">Slanted Land</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#discriminador">Discriminador (D)</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="21" hidden>
+          <div class="card-section head">
+            <h2>Construyendo el Discriminador</h2>
+            
+            <p class="summary">D asigna peso <strong>+1</strong> a los píxeles de la diagonal principal y <strong>−1</strong> a los de la secundaria: así premia el patrón de cara.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#discriminador">Discriminador (D)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#matriz-de-pesos">Matriz de pesos</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="22" hidden>
+          <div class="card-section head">
+            <h2>Construyendo el Discriminador</h2>
+            
+            <p class="summary">Score = suma ponderada píxel × peso: la cara prototipo da 2 y el ruido −0,5. El umbral 1 pasa a la neurona como sesgo $b=-1$.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#discriminador">Discriminador (D)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#sesgo">Sesgo (bias)</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="23" hidden>
+          <div class="card-section head">
+            <h2>Discriminador Como red neuronal</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary">D es una sola neurona: $\sigma(w\cdot x+b)$ con $b=-1$; la cara da $\sigma(1)\approx0{,}73$ → real. Sin capa oculta no es MLP. Ojo: acá $z$ es el ruido de G.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#neurona">Neurona artificial</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#discriminador">Discriminador (D)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#sesgo">Sesgo (bias)</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/03/#d=intro-redes-neuronales&amp;s=7"><span class="ref">03·7</span><span><span class="t">La neurona: primero, una combinación lineal</span><small>La neurona como combinación lineal</small></span></a></div>
+          </div>
+          
+          
+          <template class="tp-data"><div class="tp-ref" data-tp="2"><a href="https://ezequielrickert.github.io/austral-ia-generativa/tp/2/">TP2 · ¿Cuánto vale esta casa?</a><span>En el TP2 cada <code>Dense</code> hacía lo mismo ($W\cdot x+b$ + activación), pero con dos capas ocultas de 32 ReLU y salida lineal.</span><button class="btn sm code-btn" data-code="tp2-baseline-mlp-32-32" data-nota="El discriminador es una sola neurona; acá hay dos capas ocultas de 32 antes de la salida."><svg class="i" viewBox="0 0 24 24"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></svg>Ver en el código</button></div></template>
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="24" hidden>
+          <div class="card-section head">
+            <h2>Función Sigmoid: la activación del Discriminador</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary"><strong>Sigmoide</strong> $\sigma(x)=1/(1+e^{-x})$: acota a (0,1), es diferenciable y $\sigma(0)=0{,}5$ da el umbral. Por eso D la usa como probabilidad de «real».</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#sigmoide">Sigmoide</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#funcion-de-activacion">Función de activación</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/03/#d=intro-redes-neuronales&amp;s=8"><span class="ref">03·8</span><span><span class="t">La sigmoide: la no linealidad clásica</span><small>La sigmoide en la clase 3</small></span></a></div>
+          </div>
+          
+          
+          <template class="tp-data"><div class="tp-ref" data-tp="2"><a href="https://ezequielrickert.github.io/austral-ia-generativa/tp/2/">TP2 · ¿Cuánto vale esta casa?</a><span>En el TP2 la salida fue <code>Dense(1, linear)</code>: una sigmoide habría acotado el precio a (0,1). Sirve para probabilidades, como en D.</span><button class="btn sm code-btn" data-code="tp2-clase-sigmoide,tp2-baseline-mlp-32-32" data-nota="La sigmoide sirve para probabilidades (como en D o en este clasificador de clase), no para un precio."><svg class="i" viewBox="0 0 24 24"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></svg>Ver en el código · 2 fragmentos</button></div></template>
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="25" hidden>
+          <div class="card-section head">
+            <h2>Pongamos todo junto del Discriminador</h2>
+            
+            <p class="summary">Todo junto: la cara prototipo da $\sigma(1)=0{,}73$ (real) y el ruido $\sigma(-1{,}5)=0{,}18$ (falsa). D clasifica bien ambas.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#discriminador">Discriminador (D)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#sigmoide">Sigmoide</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="26" hidden>
+          <div class="card-section head">
+            <h2>El Generador: el objetivo opuesto</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary">Objetivos opuestos sobre el mismo $D(\cdot)$: D quiere $D(G(z))\to0$, G quiere $\to1$. G nunca ve caras reales: aprende por el gradiente de D. Los $z$ forman el <strong>espacio latente</strong>.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#generador">Generador (G)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#espacio-latente">Espacio latente</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#juego-minimax">Juego minimax</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/12/#d=segmentacion-y-stable-diffusion&amp;s=31"><span class="ref">12·31</span><span><span class="t">FCN por dentro</span><small>Convoluciones transpuestas para subir resolución</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="27" hidden>
+          <div class="card-section head">
+            <h2>Construyendo el Generador</h2>
+            
+            <p class="summary">Con $z=0{,}7$ y pesos aprendidos, G produce una imagen con el patrón diagonal: internalizó la estructura del dataset y engaña a D.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#generador">Generador (G)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#espacio-latente">Espacio latente</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="28" hidden>
+          <div class="card-section head">
+            <h2>Proceso de Entrenamiento</h2>
+            
+            <p class="summary">Bisagra: en la práctica los pesos no se ponen a mano. Cada red predice, mide su error con <strong>binary cross-entropy</strong> y ajusta con backpropagation.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#entropia-cruzada">Entropía cruzada (BCE y cross-entropy)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#backpropagation">Backpropagation</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="29" hidden>
+          <div class="card-section head">
+            <h2>Binary cross-entropy: los dos casos del Discriminador</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary"><strong>BCE</strong>: $-[y\ln p+(1-y)\ln(1-p)]$. Con $y=1$ queda $-\ln p$; con $y=0$, $-\ln(1-p)$. Castiga sin tope la confianza equivocada.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#entropia-cruzada">Entropía cruzada (BCE y cross-entropy)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#funcion-de-perdida">Función de coste (pérdida L2)</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=29"><span class="ref">04·29</span><span><span class="t">Clasificación binaria: BCE</span><small>BCE en la clase de diseño</small></span></a></div>
+          </div>
+          
+          
+          <template class="tp-data"><div class="tp-ref" data-tp="2"><a href="https://ezequielrickert.github.io/austral-ia-generativa/tp/2/">TP2 · ¿Cuánto vale esta casa?</a><span>El TP2 era regresión: entrenó con MSE (no BCE) y reportó MAE en dólares. BCE es la del clasificador <code>AboveMedianPrice</code> del notebook de clase.</span><button class="btn sm code-btn" data-code="tp2-clase-compile-bce,tp2-baseline-mlp-32-32" data-nota="BCE es la loss del clasificador de clase; el TP2 la cambió por MSE (paso 2)."><svg class="i" viewBox="0 0 24 24"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></svg>Ver en el código · 2 fragmentos</button></div></template>
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="30" hidden>
+          <div class="card-section head">
+            <h2>Loss Function: Discriminador — imagen real</h2>
+            
+            <p class="summary">Con imagen real el error es $-\ln(D(x))$: alto si D predice bajo. D quiere acercarse a 1 con lo real.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#entropia-cruzada">Entropía cruzada (BCE y cross-entropy)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#discriminador">Discriminador (D)</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="31" hidden>
+          <div class="card-section head">
+            <h2>Loss Function: Generador — imagen falsa</h2>
+            
+            <p class="summary">Con imagen generada el error de D es $-\ln(1-D(G(z)))$; G quiere lo contrario: que D le dé un score cercano a 1.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#entropia-cruzada">Entropía cruzada (BCE y cross-entropy)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#generador">Generador (G)</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="32" hidden>
+          <div class="card-section head">
+            <h2>Backpropagation: el procedimiento paso a paso</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary">Backprop en cuatro pasos: calcular el error, derivar $\partial E/\partial w$ con la regla de la cadena, actualizar $w\leftarrow w-\alpha,\partial E/\partial w$ y repetir en ambas redes.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#backpropagation">Backpropagation</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#regla-de-la-cadena">Regla de la cadena</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#learning-rate">Tasa de aprendizaje η</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/03/#d=intro-redes-neuronales&amp;s=34"><span class="ref">03·34</span><span><span class="t">El paso de actualización</span></span></a></div>
+          </div>
+          
+          
+          <template class="tp-data"><div class="tp-ref" data-tp="2"><a href="https://ezequielrickert.github.io/austral-ia-generativa/tp/2/">TP2 · ¿Cuánto vale esta casa?</a><span>En el TP2 Keras corrió este ciclo con Adam (lr 0,001); escalaron <code>SalePrice</code> porque sin escalar los gradientes eran enormes y no convergía.</span><button class="btn sm code-btn" data-code="tp2-baseline-mlp-32-32,tp2-train-and-report" data-nota="Keras hace los cuatro pasos de backprop dentro de `model.fit`; Adam (compilado en el paso 1) aplica la actualización."><svg class="i" viewBox="0 0 24 24"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></svg>Ver en el código · 2 fragmentos</button></div></template>
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="33" hidden>
+          <div class="card-section head">
+            <h2>Backpropagation: ejemplo con Slanted Land</h2>
+            
+            <p class="summary">Ejemplo numérico con $\partial E/\partial w_i=-[1-D(x)],x_i$ y $\alpha=0{,}1$: los pesos se mueven poco y D se vuelve más exigente con imágenes similares.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#backpropagation">Backpropagation</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#learning-rate">Tasa de aprendizaje η</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="34" hidden>
+          <div class="card-section head">
+            <h2>El ciclo completo: Generador y Discriminador juntos</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary">Entra un <strong>lote</strong> de m reales y m generadas. D se actualiza con ambas (objetivos 1 y 0); G solo con las generadas, objetivo 1, atravesando D sin cambiarlo.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#batch">Batch (lote)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#gan">GAN (Generative Adversarial Network)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#backpropagation">Backpropagation</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=44"><span class="ref">04·44</span><span><span class="t">Batch y época no son lo mismo</span></span></a></div>
+          </div>
+          
+          
+          <template class="tp-data"><div class="tp-ref" data-tp="2"><a href="https://ezequielrickert.github.io/austral-ia-generativa/tp/2/">TP2 · ¿Cuánto vale esta casa?</a><span>En el TP2, <code>batch_size=32</code> sobre 1022 casas: unos 32 ajustes de pesos por época, con el error promediado en cada lote.</span><button class="btn sm code-btn" data-code="tp2-train-and-report" data-nota="`batch_size=32`: el error se promedia por lote y cada lote produce un ajuste."><svg class="i" viewBox="0 0 24 24"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></svg>Ver en el código</button></div></template>
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="35" hidden>
+          <div class="card-section head">
+            <h2>El error del Discriminador</h2>
+            
+            <p class="summary">D le dio 0,68 a una falsa: $E_D=-\ln(0{,}32)\approx1{,}14$. Un error considerable que lo empuja a ser más exigente.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#discriminador">Discriminador (D)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#entropia-cruzada">Entropía cruzada (BCE y cross-entropy)</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="36" hidden>
+          <div class="card-section head">
+            <h2>Para los curiosos: la derivada del error</h2>
+            
+            <p class="summary">Opcional: la derivada $\partial E/\partial w_i=-[1-D(x)],x_i$. Backprop la calcula para todos los pesos y la regla de la cadena lo hace eficiente.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#regla-de-la-cadena">Regla de la cadena</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#backpropagation">Backpropagation</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/03/#d=intro-redes-neuronales&amp;s=31"><span class="ref">03·31</span><span><span class="t">La regla de la cadena</span></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="37" hidden>
+          <div class="card-section head">
+            <h2>Tipos y aplicaciones</h2>
+            
+            <p class="summary">Separador: tipos y aplicaciones.</p>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="38" hidden>
+          <div class="card-section head">
+            <h2>Tipos de GANs: el punto de partida</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary">Variantes: <strong>Vanilla</strong> (sin control, inestable), <strong>cGAN</strong> (condiciona por etiqueta), <strong>DCGAN</strong> (convolucional, más estable) y <strong>SRGAN</strong> (super-resolución).</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#cgan">Conditional GAN (cGAN)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#dcgan">DCGAN</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#srgan">SRGAN</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/12/#d=segmentacion-y-stable-diffusion&amp;s=53"><span class="ref">12·53</span><span><span class="t">La idea de condición</span><small>La condición: de etiqueta a texto</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="39" hidden>
+          <div class="card-section head">
+            <h2>Tipos de GANs: cómo se ven sus imágenes</h2>
+            
+            <p class="summary">Lo que muestra cada paper: caras en B/N (Vanilla, sin copiar el entrenamiento), dígitos por etiqueta (cGAN), dormitorios en color (DCGAN) e imágenes ampliadas (SRGAN).</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#cgan">Conditional GAN (cGAN)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#dcgan">DCGAN</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#srgan">SRGAN</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="40" hidden>
+          <div class="card-section head">
+            <h2>El salto que lo cambió todo: StyleGAN (2018)</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary"><strong>StyleGAN</strong> resolvió el control de atributos: una red de mapeo convierte $z$ en un estilo $w$ que se inyecta por capa; las capas chicas deciden pose, las grandes detalles.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#stylegan">StyleGAN</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#espacio-latente">Espacio latente</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="41" hidden>
+          <div class="card-section head">
+            <h2>StyleGAN: arquitectura</h2>
+            
+            <p class="summary">Arquitectura: red de mapeo (8 capas densas, $z\to w$ de 512) y red de síntesis de 4×4 a 1024×1024; $w$ entra en cada bloque por <strong>AdaIN</strong>, más un ruido propio.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#stylegan">StyleGAN</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#adain">AdaIN</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="42" hidden>
+          <div class="card-section head">
+            <h2>StyleGAN: Innovaciones Clave (Resumen)</h2>
+            
+            <p class="summary">StyleGAN solo cambia el Generador: progressive growing (4×4 → 1024×1024), muestreo bilineal y estilo por capa dan estabilidad y control fino.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#stylegan">StyleGAN</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="43" hidden>
+          <div class="card-section head">
+            <h2>ThisPersonDoesNotExist.com en números</h2>
+            
+            <p class="summary">Escala real: 70.000 caras FFHQ y 26,2M parámetros en G, contra los 5 números del D de Slanted Land. Misma idea; <strong>FID</strong> 4,40 (más bajo, mejor).</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#stylegan">StyleGAN</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#fid">FID e Inception Score</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="44" hidden>
+          <div class="card-section head">
+            <h2>Fortaleza 1: Generación de imágenes realistas</h2>
+            
+            <p class="summary">Realismo medido: en CIFAR-10 los jueces humanos se equivocan 21,3% (azar sería 50%). Modelo de validación: jueces ciegos, tarea definida, error reportado.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#gan">GAN (Generative Adversarial Network)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#fid">FID e Inception Score</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="45" hidden>
+          <div class="card-section head">
+            <h2>Fortaleza 2: Transformación de imágenes (Image Translation)</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary">Image translation: <strong>Pix2Pix</strong> aprende de pares alineados (boceto → foto); <strong>CycleGAN</strong> aprende sin pares (caballo ↔ cebra).</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#pix2pix">Pix2Pix</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#cyclegan">CycleGAN</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/12/#d=segmentacion-y-stable-diffusion&amp;s=45"><span class="ref">12·45</span><span><span class="t">U-Net es modular: adelanto</span><small>U-Net también hace image-to-image</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="46" hidden>
+          <div class="card-section head">
+            <h2>Image Translation: modelos y librerías</h2>
+            
+            <p class="summary">Usos y librerías: MRI → CT, día → noche, caballo → cebra (pytorch-CycleGAN-and-pix2pix); Real-ESRGAN es lo que se usa hoy para ampliar fotos.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#pix2pix">Pix2Pix</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#cyclegan">CycleGAN</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#srgan">SRGAN</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="47" hidden>
+          <div class="card-section head">
+            <h2>Fortaleza 3: Completado de imágenes (Image Inpainting)</h2>
+            
+            <p class="summary"><strong>Inpainting</strong>: la GAN reconstruye regiones faltantes coherentes con el contexto (DeepFill); en medicina recupera información de tomografías de baja dosis.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#gan">GAN (Generative Adversarial Network)</a><span>inpainting</span></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="48" hidden>
+          <div class="card-section head">
+            <h2>El dataset importa: lo que le das es lo que obtenés</h2>
+            
+            <p class="summary">Una GAN solo genera lo que aprendió: clases mezcladas sin etiqueta dan híbridos. Hay que validar el dataset (limpio, etiquetado, homogéneo) o usar cGAN.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#datos-sinteticos">Datos sintéticos / aumentación con GANs</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#cgan">Conditional GAN (cGAN)</a></div>
+          </div>
+          
+          
+          
+          <template class="tp-data"><div class="tp-ref" data-tp="4"><a href="https://ezequielrickert.github.io/austral-ia-generativa/tp/4/">TP4 · El agente de admisión de guardia (TP final)</a><span>En el TP4 sacaron del SFT las 240 filas con error y las 160 de ruido: el modelo copia lo que ve, igual que una GAN.</span><button class="btn sm code-btn" data-code="tp4-clasificar-tipo,tp4-seleccionar-ids" data-nota=""><svg class="i" viewBox="0 0 24 24"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></svg>Ver en el código · 2 fragmentos</button></div></template>
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="49" hidden>
+          <div class="card-section head">
+            <h2>Limitaciones y cierre</h2>
+            
+            <p class="summary">Separador: limitaciones y cierre.</p>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="50" hidden>
+          <div class="card-section head">
+            <h2>Limitaciones (1 de 2): los problemas de entrenamiento</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary">Problemas de entrenamiento: <strong>mode collapse</strong> (G produce siempre lo mismo que engaña a D) e <strong>inestabilidad</strong> del equilibrio entre las dos redes.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#mode-collapse">Mode collapse</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#inestabilidad-gan">Inestabilidad del entrenamiento</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/12/#d=segmentacion-y-stable-diffusion&amp;s=56"><span class="ref">12·56</span><span><span class="t">La idea de difusión: agregar y quitar ruido</span><small>Difusión: sin mode collapse</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="51" hidden>
+          <div class="card-section head">
+            <h2>Limitaciones (2 de 2): evaluación, coste y sesgo</h2>
+            
+            <p class="summary">Más límites: no hay métrica universal (FID e IS aproximan), entrenar es caro y la GAN hereda los <strong>sesgos</strong> del dataset.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#fid">FID e Inception Score</a><span>sesgo del dataset</span></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/#d=cierre-magnifica-humanitas&amp;s=32"><span class="ref">13·32</span><span><span class="t">Para empezar</span><small>Sesgos como desafío ético</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="52" hidden>
+          <div class="card-section head">
+            <h2>Cierre: lo que aprendimos y lo que sigue</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary">Recap: intuición (falsificador y detective), arquitectura, entrenamiento con Slanted Land, el <strong>juego minimax</strong> como marco, variantes y limitaciones.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#juego-minimax">Juego minimax</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#gan">GAN (Generative Adversarial Network)</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="redes-generativas-antagonicas" data-i="53" hidden>
+          <div class="card-section head">
+            <h2>Práctica: entrenar una GAN</h2>
+            
+            <p class="summary">Práctica: repo pytorch-gans con Vanilla GAN (MNIST), cGAN (genera el dígito pedido) y DCGAN (CelebA). La Vanilla es la más parecida a Slanted Land.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#gan">GAN (Generative Adversarial Network)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#cgan">Conditional GAN (cGAN)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#dcgan">DCGAN</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+      
+    </div>
+
+    <div class="side-panel" data-panel="indice" hidden>
+      
+      <div data-index="redes-generativas-antagonicas" >
+        
+        <details class="idx-sec" data-first="0" data-last="0">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">Portada</span>
+            <span class="range">0–0</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="0"><span class="n">0</span><span class="t">Inteligencia Artificial Generativa (AI Gen)</span><span class="marks"></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="1" data-last="6">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">IA generativa de visión</span>
+            <span class="range">1–6</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="1"><span class="n">1</span><span class="t">IA generativa de visión</span><span class="marks"></span></button><button class="idx-row" data-i="2"><span class="n">2</span><span class="t">IA Generativa de Visión</span><span class="marks"></span></button><button class="idx-row" data-i="3"><span class="n">3</span><span class="t">¿Qué es la IA Generativa de Visión?</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="4"><span class="n">4</span><span class="t">Línea de tiempo: el camino hasta hoy</span><span class="marks"></span></button><button class="idx-row" data-i="5"><span class="n">5</span><span class="t">Los modelos que veremos en el curso</span><span class="marks"></span></button><button class="idx-row" data-i="6"><span class="n">6</span><span class="t">Tabla comparativa rápida</span><span class="marks"></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="7" data-last="14">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">Introducción a las GANs</span>
+            <span class="range">7–14</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="7"><span class="n">7</span><span class="t">Introducción a las GANs</span><span class="marks"></span></button><button class="idx-row" data-i="8"><span class="n">8</span><span class="t">Generative Adversarial Networks (GANs)</span><span class="marks"></span></button><button class="idx-row" data-i="9"><span class="n">9</span><span class="t">Punto de partida</span><span class="marks"></span></button><button class="idx-row" data-i="10"><span class="n">10</span><span class="t">El origen: una noche en un bar (2014)</span><span class="marks"></span></button><button class="idx-row" data-i="11"><span class="n">11</span><span class="t">Modelo Mental Para Entenderlo</span><span class="marks"></span></button><button class="idx-row" data-i="12"><span class="n">12</span><span class="t">Arquitectura de una GAN</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="13"><span class="n">13</span><span class="t">Arquitectura de una &quot;Vanilla&quot; GAN</span><span class="marks"></span></button><button class="idx-row" data-i="14"><span class="n">14</span><span class="t">Entrenamiento paso a paso</span><span class="marks"></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="15" data-last="36">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">Slanted Land</span>
+            <span class="range">15–36</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="15"><span class="n">15</span><span class="t">Slanted Land</span><span class="marks"></span></button><button class="idx-row" data-i="16"><span class="n">16</span><span class="t">El Problema: ¡Bienvenidos a Slanted Land! 🌀</span><span class="marks"></span></button><button class="idx-row" data-i="17"><span class="n">17</span><span class="t">El problema urgente</span><span class="marks"></span></button><button class="idx-row" data-i="18"><span class="n">18</span><span class="t">El mundo de Slanted Land</span><span class="marks"></span></button><button class="idx-row" data-i="19"><span class="n">19</span><span class="t">Los datos reales: caras con patrón</span><span class="marks"></span></button><button class="idx-row" data-i="20"><span class="n">20</span><span class="t">Caras vs. ruido: los dos tipos de imágenes</span><span class="marks"></span></button><button class="idx-row" data-i="21"><span class="n">21</span><span class="t">Construyendo el Discriminador</span><span class="marks"></span></button><button class="idx-row" data-i="22"><span class="n">22</span><span class="t">Construyendo el Discriminador</span><span class="marks"></span></button><button class="idx-row" data-i="23"><span class="n">23</span><span class="t">Discriminador Como red neuronal</span><span class="marks"><span class="mk-tp"></span><span class="mk-key"></span></span></button><button class="idx-row" data-i="24"><span class="n">24</span><span class="t">Función Sigmoid: la activación del Discriminador</span><span class="marks"><span class="mk-tp"></span><span class="mk-key"></span></span></button><button class="idx-row" data-i="25"><span class="n">25</span><span class="t">Pongamos todo junto del Discriminador</span><span class="marks"></span></button><button class="idx-row" data-i="26"><span class="n">26</span><span class="t">El Generador: el objetivo opuesto</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="27"><span class="n">27</span><span class="t">Construyendo el Generador</span><span class="marks"></span></button><button class="idx-row" data-i="28"><span class="n">28</span><span class="t">Proceso de Entrenamiento</span><span class="marks"></span></button><button class="idx-row" data-i="29"><span class="n">29</span><span class="t">Binary cross-entropy: los dos casos del Discriminador</span><span class="marks"><span class="mk-tp"></span><span class="mk-key"></span></span></button><button class="idx-row" data-i="30"><span class="n">30</span><span class="t">Loss Function: Discriminador — imagen real</span><span class="marks"></span></button><button class="idx-row" data-i="31"><span class="n">31</span><span class="t">Loss Function: Generador — imagen falsa</span><span class="marks"></span></button><button class="idx-row" data-i="32"><span class="n">32</span><span class="t">Backpropagation: el procedimiento paso a paso</span><span class="marks"><span class="mk-tp"></span><span class="mk-key"></span></span></button><button class="idx-row" data-i="33"><span class="n">33</span><span class="t">Backpropagation: ejemplo con Slanted Land</span><span class="marks"></span></button><button class="idx-row" data-i="34"><span class="n">34</span><span class="t">El ciclo completo: Generador y Discriminador juntos</span><span class="marks"><span class="mk-tp"></span><span class="mk-key"></span></span></button><button class="idx-row" data-i="35"><span class="n">35</span><span class="t">El error del Discriminador</span><span class="marks"></span></button><button class="idx-row" data-i="36"><span class="n">36</span><span class="t">Para los curiosos: la derivada del error</span><span class="marks"></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="37" data-last="48">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">Tipos y aplicaciones</span>
+            <span class="range">37–48</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="37"><span class="n">37</span><span class="t">Tipos y aplicaciones</span><span class="marks"></span></button><button class="idx-row" data-i="38"><span class="n">38</span><span class="t">Tipos de GANs: el punto de partida</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="39"><span class="n">39</span><span class="t">Tipos de GANs: cómo se ven sus imágenes</span><span class="marks"></span></button><button class="idx-row" data-i="40"><span class="n">40</span><span class="t">El salto que lo cambió todo: StyleGAN (2018)</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="41"><span class="n">41</span><span class="t">StyleGAN: arquitectura</span><span class="marks"></span></button><button class="idx-row" data-i="42"><span class="n">42</span><span class="t">StyleGAN: Innovaciones Clave (Resumen)</span><span class="marks"></span></button><button class="idx-row" data-i="43"><span class="n">43</span><span class="t">ThisPersonDoesNotExist.com en números</span><span class="marks"></span></button><button class="idx-row" data-i="44"><span class="n">44</span><span class="t">Fortaleza 1: Generación de imágenes realistas</span><span class="marks"></span></button><button class="idx-row" data-i="45"><span class="n">45</span><span class="t">Fortaleza 2: Transformación de imágenes (Image Translation)</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="46"><span class="n">46</span><span class="t">Image Translation: modelos y librerías</span><span class="marks"></span></button><button class="idx-row" data-i="47"><span class="n">47</span><span class="t">Fortaleza 3: Completado de imágenes (Image Inpainting)</span><span class="marks"></span></button><button class="idx-row" data-i="48"><span class="n">48</span><span class="t">El dataset importa: lo que le das es lo que obtenés</span><span class="marks"><span class="mk-tp"></span></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="49" data-last="53">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">Limitaciones y cierre</span>
+            <span class="range">49–53</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="49"><span class="n">49</span><span class="t">Limitaciones y cierre</span><span class="marks"></span></button><button class="idx-row" data-i="50"><span class="n">50</span><span class="t">Limitaciones (1 de 2): los problemas de entrenamiento</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="51"><span class="n">51</span><span class="t">Limitaciones (2 de 2): evaluación, coste y sesgo</span><span class="marks"></span></button><button class="idx-row" data-i="52"><span class="n">52</span><span class="t">Cierre: lo que aprendimos y lo que sigue</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="53"><span class="n">53</span><span class="t">Práctica: entrenar una GAN</span><span class="marks"></span></button>
+          </div>
+        </details>
+        
+      </div>
+      
+    </div>
+
+    <div class="card-footer side-foot">
+      <button class="btn sm" id="star" title="Marcar para repasar (m)"><svg class="i" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg><span>Marcar</span></button>
+      <span class="hints"><kbd>←</kbd><kbd>→</kbd> <kbd>t</kbd> <kbd>m</kbd> <kbd>n</kbd> <kbd>p</kbd></span>
+    </div>
+  </aside>
+</div>
+</div>
+</div>
+<template id="sn-tp2-baseline-mlp-32-32" data-title="MLP baseline Dense(32)→Dense(32)→Dense(1, linear) (celda 10)" data-tp="2" data-tp-title="¿Cuánto vale esta casa?" data-file="calveyra-desivo-giordanelli-rickert.ipynb" data-from="31" data-to="41">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">calveyra-desivo-giordanelli-rickert.ipynb</span><span class="mono faint">L31–41</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-python" data-start="31">def build_baseline_model(n_features):
+    model = Sequential([
+        Input(shape=(n_features,)),
+        Dense(32, activation=&#39;relu&#39;),
+        Dense(32, activation=&#39;relu&#39;),
+        Dense(1, activation=&#39;linear&#39;),
+    ])
+    # Salida real -&gt; activación lineal + loss de regresión (mse). &#39;accuracy&#39; no aplica acá:
+    # no hay clases que acertar, hay una distancia en dólares que minimizar.
+    model.compile(optimizer=&#39;adam&#39;, loss=&#39;mse&#39;, metrics=[&#39;mae&#39;])
+    return model</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Construye y compila el MLP del baseline numérico: dos capas ocultas de 32 ReLU y una salida lineal para predecir un real.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li><code>Input(shape=(n_features,))</code> recibe la fila de floats (13 numéricas + flag).</li>
+<li>Cada <code>Dense(32, activation='relu')</code> calcula $W\cdot x+b$ y aplica ReLU.</li>
+<li><code>Dense(1, activation='linear')</code> devuelve un número sin acotar (el precio escalado).</li>
+<li><code>compile(optimizer='adam', loss='mse', metrics=['mae'])</code>: el comentario explica por qué <code>accuracy</code> no aplica.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Pasar de la sigmoide + BCE del notebook de clase a lineal + MSE es el cambio central de la misión: la tarea (predecir dólares) fija la salida y la loss.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>La usan <code>train_and_report</code> (celda 10) y el experimento con <code>ListingId</code> (celda 21). En el Milestone 3, <code>build_model_categorical</code> repite el mismo tronco 32-32-1 con la API funcional.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Neurona/capa = combinación lineal + no linealidad; ReLU en ocultas y salida lineal + MSE para regresión.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 16</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=introduccion&amp;s=26"><span class="ref">01·26</span><span class="t">Redes Neuronales — Estructura y Celda Básica</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/03/#d=intro-redes-neuronales&amp;s=8"><span class="ref">03·8</span><span class="t">La sigmoide: la no linealidad clásica</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/03/#d=intro-redes-neuronales&amp;s=9"><span class="ref">03·9</span><span class="t">La capa: el bloque que se repite</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/03/#d=intro-redes-neuronales&amp;s=12"><span class="ref">03·12</span><span class="t">Las dos dimensiones: ancho y profundidad</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/03/#d=intro-redes-neuronales&amp;s=24"><span class="ref">03·24</span><span class="t">Sin activación, la red colapsa</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/03/#d=intro-redes-neuronales&amp;s=25"><span class="ref">03·25</span><span class="t">Las funciones de activación más comunes</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/03/#d=intro-redes-neuronales&amp;s=30"><span class="ref">03·30</span><span class="t">El error: la función de coste</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=22"><span class="ref">04·22</span><span class="t">Un catálogo para elegir sin dudar</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=43"><span class="ref">04·43</span><span class="t">El learning rate es el paso</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=57"><span class="ref">04·57</span><span class="t">Cuántas capas y cuánto ancho</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=63"><span class="ref">04·63</span><span class="t">Los notebooks de la clase</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/08/#d=transformers-a-fondo&amp;s=23"><span class="ref">08·23</span><span class="t">La feed-forward: la misma red para cada posición</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/11/#d=redes-generativas-antagonicas&amp;s=23"><span class="ref">11·23</span><span class="t">Discriminador Como red neuronal</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/11/#d=redes-generativas-antagonicas&amp;s=24"><span class="ref">11·24</span><span class="t">Función Sigmoid: la activación del Discriminador</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/11/#d=redes-generativas-antagonicas&amp;s=29"><span class="ref">11·29</span><span class="t">Binary cross-entropy: los dos casos del Discriminador</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/11/#d=redes-generativas-antagonicas&amp;s=32"><span class="ref">11·32</span><span class="t">Backpropagation: el procedimiento paso a paso</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp2-clase-sigmoide" data-title="Notebook de clase: Dense(1, sigmoid) para AboveMedianPrice (house-prices.ipynb, celda 25)" data-tp="2" data-tp-title="¿Cuánto vale esta casa?" data-file="house-prices.ipynb" data-from="1" data-to="5">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">house-prices.ipynb</span><span class="mono faint">L1–5</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-python" data-start="1">model = Sequential([
+    Dense(32, activation=&#39;relu&#39;, input_shape=(10,)),
+    Dense(32, activation=&#39;relu&#39;),
+    Dense(1, activation=&#39;sigmoid&#39;),
+])</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Es el modelo del notebook de clase del que partió el TP: el mismo 32-32 pero con una neurona sigmoide de salida.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li><code>Dense(32, relu, input_shape=(10,))</code> y <code>Dense(32, relu)</code> sobre las 10 numéricas escaladas con MinMax.</li>
+<li><code>Dense(1, activation='sigmoid')</code> devuelve una probabilidad en (0,1) de estar sobre la mediana.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Muestra el punto de partida: en el TP2 solo la salida cambió a <code>linear</code>, porque una sigmoide acotaría el precio a (0,1).</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>En el notebook de clase lo compila la celda 29 con BCE; en el TP2 lo reemplaza <code>build_baseline_model</code> (celda 10 del notebook del grupo).</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Sigmoide como activación de salida para probabilidades; el catálogo salida ↔ tarea.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 4</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/03/#d=intro-redes-neuronales&amp;s=8"><span class="ref">03·8</span><span class="t">La sigmoide: la no linealidad clásica</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=22"><span class="ref">04·22</span><span class="t">Un catálogo para elegir sin dudar</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=63"><span class="ref">04·63</span><span class="t">Los notebooks de la clase</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/11/#d=redes-generativas-antagonicas&amp;s=24"><span class="ref">11·24</span><span class="t">Función Sigmoid: la activación del Discriminador</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp2-clase-compile-bce" data-title="Notebook de clase: SGD + binary_crossentropy + accuracy (house-prices.ipynb, celda 29)" data-tp="2" data-tp-title="¿Cuánto vale esta casa?" data-file="house-prices.ipynb" data-from="1" data-to="3">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">house-prices.ipynb</span><span class="mono faint">L1–3</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-python" data-start="1">model.compile(optimizer=&#39;sgd&#39;,
+              loss=&#39;binary_crossentropy&#39;,
+              metrics=[&#39;accuracy&#39;])</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Compila el clasificador de clase con BCE y accuracy.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li><code>optimizer='sgd'</code>.</li>
+<li><code>loss='binary_crossentropy'</code>: la pérdida natural para una salida sigmoide 0/1.</li>
+<li><code>metrics=['accuracy']</code>.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Es el contraste directo con el TP2, que pasó a <code>adam</code> + <code>mse</code> + <code>mae</code> porque el objetivo es un real en dólares, donde accuracy no significa nada.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Se aplica al <code>model</code> de la celda 25 del notebook de clase y lo entrena la celda 31.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Binary cross-entropy para clasificación binaria vs MSE para regresión.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 3</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=22"><span class="ref">04·22</span><span class="t">Un catálogo para elegir sin dudar</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=63"><span class="ref">04·63</span><span class="t">Los notebooks de la clase</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/11/#d=redes-generativas-antagonicas&amp;s=29"><span class="ref">11·29</span><span class="t">Binary cross-entropy: los dos casos del Discriminador</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp2-train-and-report" data-title="Escalado del target, fit y desescalado a dólares (celda 10)" data-tp="2" data-tp-title="¿Cuánto vale esta casa?" data-file="calveyra-desivo-giordanelli-rickert.ipynb" data-from="43" data-to="68">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">calveyra-desivo-giordanelli-rickert.ipynb</span><span class="mono faint">L43–68</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-python" data-start="43">def train_and_report(fill_value, add_indicator, epochs=100, verbose=0):
+    X_train, y_train_raw, scaler = prepare_numeric_split(df_train, fill_value, add_indicator, fit_scaler=True)
+    X_val, y_val_raw, _ = prepare_numeric_split(df_val, fill_value, add_indicator, scaler=scaler)
+    X_test, y_test_raw, _ = prepare_numeric_split(df_test, fill_value, add_indicator, scaler=scaler)
+
+    # SalePrice va de ~50 mil a ~1,6 millones: sin escalar el target, el gradiente
+    # tiene que moverse en un rango enorme y la red no converge en 100 épocas.
+    # Escalamos y TAMBIÉN ajustando el scaler solo con train, y deshacemos el
+    # escalado sobre las predicciones para reportar todo en dólares.
+    y_scaler = StandardScaler().fit(y_train_raw.reshape(-1, 1))
+    y_train = y_scaler.transform(y_train_raw.reshape(-1, 1)).ravel()
+    y_val = y_scaler.transform(y_val_raw.reshape(-1, 1)).ravel()
+
+    keras.utils.set_random_seed(SEED)
+    model = build_baseline_model(X_train.shape[1])
+    hist = model.fit(X_train, y_train, batch_size=32, epochs=epochs,
+                      validation_data=(X_val, y_val), verbose=verbose)
+
+    y_pred_scaled = model.predict(X_test, verbose=0).ravel()
+    y_pred = y_scaler.inverse_transform(y_pred_scaled.reshape(-1, 1)).ravel()
+    mae = mean_absolute_error(y_test_raw, y_pred)
+    rmse = np.sqrt(mean_squared_error(y_test_raw, y_pred))
+    mape = 100 * mean_absolute_percentage_error(y_test_raw, y_pred)
+    return {&#39;model&#39;: model, &#39;history&#39;: hist, &#39;scaler&#39;: scaler, &#39;y_scaler&#39;: y_scaler,
+            &#39;mae&#39;: mae, &#39;rmse&#39;: rmse, &#39;mape&#39;: mape,
+            &#39;X_test&#39;: X_test, &#39;y_test&#39;: y_test_raw, &#39;y_pred&#39;: y_pred}</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Entrena una variante del baseline de punta a punta: prepara los tres splits, escala <code>SalePrice</code>, corre <code>fit</code> y reporta MAE, RMSE y MAPE en dólares.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ol>
+<li>Llama a <code>prepare_numeric_split</code> para train/val/test.</li>
+<li><code>y_scaler = StandardScaler().fit(y_train_raw...)</code>: el target también se z-normaliza con estadísticas de train.</li>
+<li><code>keras.utils.set_random_seed(SEED)</code> y <code>build_baseline_model</code>.</li>
+<li><code>model.fit(..., batch_size=32, epochs=epochs, validation_data=(X_val, y_val))</code>: forward + backward por lotes durante 100 épocas.</li>
+<li><code>y_scaler.inverse_transform</code> vuelve las predicciones a dólares y calcula <code>mae</code>, <code>rmse</code>, <code>mape</code>.</li>
+</ol>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>El comentario lo dice: con <code>SalePrice</code> crudo (50 mil a 1,6 millones) los gradientes eran enormes para el paso de Adam y no convergía en 100 épocas; escalar el target lo resolvió sin tocar el learning rate.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>La llama la celda 11 con tres imputaciones; el resultado <code>variant_median_flag</code> pasa a ser <code>baseline</code> (celdas 15, 17, 18) y la referencia del Milestone 3.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Paso de actualización $w\leftarrow w-\eta,\partial E/\partial w$: la escala del target condiciona el tamaño del gradiente; épocas y batches del ciclo de entrenamiento.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 14</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=introduccion&amp;s=26"><span class="ref">01·26</span><span class="t">Redes Neuronales — Estructura y Celda Básica</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=introduccion&amp;s=32"><span class="ref">01·32</span><span class="t">Ejemplos de problemas predictivos</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=introduccion&amp;s=50"><span class="ref">01·50</span><span class="t">Paradigmas de Aprendizaje</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/03/#d=intro-redes-neuronales&amp;s=9"><span class="ref">03·9</span><span class="t">La capa: el bloque que se repite</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/03/#d=intro-redes-neuronales&amp;s=29"><span class="ref">03·29</span><span class="t">Ida y vuelta: forward y backward</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/03/#d=intro-redes-neuronales&amp;s=30"><span class="ref">03·30</span><span class="t">El error: la función de coste</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/03/#d=intro-redes-neuronales&amp;s=34"><span class="ref">03·34</span><span class="t">El paso de actualización</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=11"><span class="ref">04·11</span><span class="t">Numéricas: normalizar no es opcional</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=16"><span class="ref">04·16</span><span class="t">Un dataset, tres trabajos distintos</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=28"><span class="ref">04·28</span><span class="t">Regresión: MSE, MAE y Huber</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=43"><span class="ref">04·43</span><span class="t">El learning rate es el paso</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=44"><span class="ref">04·44</span><span class="t">Batch y época no son lo mismo</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/11/#d=redes-generativas-antagonicas&amp;s=32"><span class="ref">11·32</span><span class="t">Backpropagation: el procedimiento paso a paso</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/11/#d=redes-generativas-antagonicas&amp;s=34"><span class="ref">11·34</span><span class="t">El ciclo completo: Generador y Discriminador juntos</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp4-clasificar-tipo" data-title="error &gt; ruido &gt; correcta" data-tp="4" data-tp-title="El agente de admisión de guardia (TP final)" data-file="scripts/clasificar_historial.py" data-from="474" data-to="489">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">scripts/clasificar_historial.py</span><span class="mono faint">L474–489</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-python" data-start="474">def clasificar(
+    rows: list[dict[str, str]],
+    parametros: dict[str, int],
+    trazas: dict | None = None,
+) -&gt; tuple[list[dict[str, str]], dict]:
+    costumbres = inferir_costumbres(rows, parametros, trazas)
+    razones = {row[&quot;id&quot;]: razones_normativas(row, parametros) for row in rows}
+    ids_ruido = {i for costumbre in costumbres for i in costumbre.get(&quot;ids_ruido&quot;, [])}
+    salida = []
+    for row in rows:
+        tipo = &quot;error&quot; if razones[row[&quot;id&quot;]] else &quot;ruido&quot; if row[&quot;id&quot;] in ids_ruido else &quot;correcta&quot;
+        salida.append({&quot;id&quot;: row[&quot;id&quot;], &quot;tipo&quot;: tipo})
+    return salida, {
+        &quot;costumbres&quot;: costumbres,
+        &quot;desvios_por_operador&quot;: desvios_por_operador(costumbres, rows),
+    }</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Clasifica cada fila del historial: error si contradice alguna norma, ruido si se desvía de la costumbre, correcta si no.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li><code>inferir_costumbres</code> deduce las costumbres del historial y sus <code>ids_ruido</code>.</li>
+<li><code>razones_normativas(row, parametros)</code> lista los campos que no coinciden con lo que exigen las normas.</li>
+<li>La prioridad es <code>error</code> &gt; <code>ruido</code> &gt; <code>correcta</code>.</li>
+<li>Devuelve la lista de <code>{id, tipo}</code> y el resumen de costumbres.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Un filtro simbólico y auditable: cada fila excluida tiene una razón concreta, en vez de un puntaje de calidad.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Usa <code>circuito_esperado</code>, <code>plazo_esperado</code> y <code>registro_esperado</code> (mismo archivo); su salida es <code>historial_clasificado.csv</code>, que lee <code>seleccionar_ids</code>.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Curado de datos con reglas: verificar cada ejemplo contra una fuente de verdad antes de entrenar.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 4</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=introduccion&amp;s=42"><span class="ref">01·42</span><span class="t">Ejemplos de problemas de razonamiento simbólico</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/#d=como-se-entrena-un-llm&amp;s=7"><span class="ref">09·7</span><span class="t">C4: cómo Google depuró Common Crawl</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/#d=como-se-entrena-un-llm&amp;s=22"><span class="ref">09·22</span><span class="t">Quiz: ¿qué aprende el SFT?</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/11/#d=redes-generativas-antagonicas&amp;s=48"><span class="ref">11·48</span><span class="t">El dataset importa: lo que le das es lo que obtenés</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp4-seleccionar-ids" data-title="Solo las filas correctas entran al SFT" data-tp="4" data-tp-title="El agente de admisión de guardia (TP final)" data-file="scripts/seleccionar_entrenamiento.py" data-from="40" data-to="66">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">scripts/seleccionar_entrenamiento.py</span><span class="mono faint">L40–66</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-python" data-start="40">def seleccionar_ids(
+    filas: list[dict[str, str]],
+    clasificacion: dict[str, str],
+    costumbre: dict,
+) -&gt; tuple[list[str], dict]:
+    faltantes = {fila[&quot;id&quot;] for fila in filas} - clasificacion.keys()
+    if faltantes:
+        raise ValueError(f&quot;faltan clasificaciones para {len(faltantes)} filas&quot;)
+    ids_error = sorted(i for i, tipo in clasificacion.items() if tipo == &quot;error&quot;)
+    ids_ruido = sorted(i for i, tipo in clasificacion.items() if tipo == &quot;ruido&quot;)
+    seleccionados = [fila[&quot;id&quot;] for fila in filas if clasificacion[fila[&quot;id&quot;]] == &quot;correcta&quot;]
+    # Toda fila correcta sigue la costumbre completa; si no, la clasificación y el informe
+    # de costumbres no corresponden entre sí y no se arma el dataset.
+    inconsistentes = sorted(
+        fila[&quot;id&quot;] for fila in filas
+        if clasificacion[fila[&quot;id&quot;]] == &quot;correcta&quot;
+        and aviso_segun_costumbre(fila, costumbre) != (fila[&quot;aviso_al_voluntariado&quot;] == SI)
+    )
+    if inconsistentes:
+        raise ValueError(f&quot;filas correctas que contradicen la costumbre: {inconsistentes[:5]}&quot;)
+    return seleccionados, {
+        &quot;total_historial&quot;: len(filas),
+        &quot;correctas_clasificadas&quot;: len(seleccionados),
+        &quot;excluidas_error&quot;: len(ids_error),
+        &quot;excluidas_ruido&quot;: len(ids_ruido),
+        &quot;seleccionadas&quot;: len(seleccionados),
+    }</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Selecciona del historial solo las filas clasificadas como <code>correcta</code> y excluye errores y ruido, controlando consistencia con la costumbre.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li>Falla si alguna fila no tiene clasificación.</li>
+<li>Separa <code>ids_error</code> e <code>ids_ruido</code> y toma como <code>seleccionados</code> solo las <code>correcta</code>.</li>
+<li>Revisa que toda fila correcta siga la costumbre del aviso (<code>aviso_segun_costumbre</code>); si no, no arma el dataset.</li>
+<li>Devuelve los ids y un resumen (2.000 → 1.600; 240 y 160 excluidas).</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>El SFT imita las demostraciones: si entraran errores o desvíos, el modelo los aprendería. Se descartan en vez de corregirlos.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Lo llama <code>scripts/generar_conversaciones.generar_dataset</code> con <code>historial_clasificado.csv</code> y <code>historial_costumbres.json</code>; los ids elegidos filtran <code>historial/trazas.jsonl</code>.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Curado del dataset de demostraciones: la calidad de los datos de SFT determina lo que aprende el modelo.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 5</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=introduccion&amp;s=42"><span class="ref">01·42</span><span class="t">Ejemplos de problemas de razonamiento simbólico</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/#d=como-se-entrena-un-llm&amp;s=7"><span class="ref">09·7</span><span class="t">C4: cómo Google depuró Common Crawl</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/#d=como-se-entrena-un-llm&amp;s=20"><span class="ref">09·20</span><span class="t">Un dataset de SFT</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/#d=como-se-entrena-un-llm&amp;s=22"><span class="ref">09·22</span><span class="t">Quiz: ¿qué aprende el SFT?</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/11/#d=redes-generativas-antagonicas&amp;s=48"><span class="ref">11·48</span><span class="t">El dataset importa: lo que le das es lo que obtenés</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+
+
+    </main>
+  </div>
+</div>
+<dialog class="code-dlg" id="code-dlg" aria-labelledby="code-dlg-title">
+  <div class="card-header">
+    <div class="code-dlg-title"><span class="pill tp" id="code-dlg-tp">TP</span><span class="card-title" id="code-dlg-title"></span></div>
+    <div class="card-actions"><a class="btn sm" id="code-dlg-open" href="#">Ver todo el código del TP</a><button class="btn icon sm ghost" id="code-dlg-close" aria-label="Cerrar" autofocus><svg class="i" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+  </div>
+  <div id="code-dlg-body"></div>
+</dialog>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<script src="https://ezequielrickert.github.io/austral-ia-generativa/js/site.js?h=f2262278f956a92874ef"></script>
+<script src="https://ezequielrickert.github.io/austral-ia-generativa/js/viewer.js?h=e95313f2efe7ebd8f130"></script>
+</body>
+</html>

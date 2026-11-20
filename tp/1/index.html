@@ -1,0 +1,1682 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>TP1 · Corta, del caos a producción · IA Generativa</title>
+  <meta name="description" content="Las diapositivas de IA Generativa (Universidad Austral, 2c 2026) con notas por diapositiva y vínculos a los TPs.">
+  <script>
+    (function(){try{var t=localStorage.getItem('iagen:theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t)}catch(e){}})();
+    window.SITE_BASE = "https://ezequielrickert.github.io/austral-ia-generativa".replace(/\/$/, '');
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <link rel="stylesheet" href="https://ezequielrickert.github.io/austral-ia-generativa/css/site.css?h=ede67d51655aa3494e82">
+</head>
+<body>
+
+
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <a class="sb-head" href="https://ezequielrickert.github.io/austral-ia-generativa/">
+      <span class="sb-logo">IA</span>
+      <span class="sb-title"><b>IA Generativa</b><span>Guía de estudio · 2c 2026</span></span>
+    </a>
+    <div class="sb-search">
+      <div class="input-icon">
+        <svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input class="input" id="search" type="search" placeholder="Buscar" autocomplete="off" aria-label="Buscar diapositivas y conceptos">
+        <kbd>/</kbd>
+      </div>
+      <div class="search-results" id="search-results" hidden></div>
+    </div>
+    <nav class="sb-body" aria-label="Navegación">
+      <div class="nav-group">
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/">
+          <svg class="i" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span class="t">Inicio</span></a>
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/">
+          <svg class="i" viewBox="0 0 24 24"><path d="M4 19.5V5a2 2 0 0 1 2-2h14v16H6.5A2.5 2.5 0 0 0 4 21.5"/><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/></svg><span class="t">Glosario</span></a>
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/practica/">
+          <svg class="i" viewBox="0 0 24 24"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg><span class="t">Práctica</span></a>
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/marcadas/">
+          <svg class="i" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg><span class="t">Marcadas</span><span class="count" id="star-count"></span></a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-label">Clases</div>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/" title="Bienvenida + CoWork: fundamentos de IA, modelos fundacionales y el chat extendido">
+          <span class="n">01</span><span class="t">Bienvenida + CoWork: fundamentos de IA, modelos fundacionales y el chat extendido</span><span class="meter" data-class="1" data-total="100"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/" title="CoWork: agentes de código, contexto, CLAUDE.md, Skills, subagentes y MCP">
+          <span class="n">02</span><span class="t">CoWork: agentes de código, contexto, CLAUDE.md, Skills, subagentes y MCP</span><span class="meter" data-class="2" data-total="66"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/03/" title="Introducción a las redes neuronales">
+          <span class="n">03</span><span class="t">Introducción a las redes neuronales</span><span class="meter" data-class="3" data-total="51"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/" title="Diseño de redes neuronales (modelado de un MLP)">
+          <span class="n">04</span><span class="t">Diseño de redes neuronales (modelado de un MLP)</span><span class="meter" data-class="4" data-total="64"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/05/" title="LLMs: prompting, costos y producción">
+          <span class="n">05</span><span class="t">LLMs: prompting, costos y producción</span><span class="meter" data-class="5" data-total="72"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/" title="RAG, bases vectoriales, inverted index">
+          <span class="n">06</span><span class="t">RAG, bases vectoriales, inverted index</span><span class="meter" data-class="6" data-total="71"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/" title="MCP y herramientas (con repaso de RAG) · De la palabra al transformer">
+          <span class="n">07</span><span class="t">MCP y herramientas (con repaso de RAG) · De la palabra al transformer</span><span class="meter" data-class="7" data-total="69"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/08/" title="El transformer por dentro: atención, el bloque completo y la familia de modelos">
+          <span class="n">08</span><span class="t">El transformer por dentro: atención, el bloque completo y la familia de modelos</span><span class="meter" data-class="8" data-total="43"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/" title="LLM training: pre-training, SFT, RLHF, herramientas y fine-tuning">
+          <span class="n">09</span><span class="t">LLM training: pre-training, SFT, RLHF, herramientas y fine-tuning</span><span class="meter" data-class="9" data-total="60"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/10/" title="Agentes: sistemas multiagente, especialización, contexto y orquestación">
+          <span class="n">10</span><span class="t">Agentes: sistemas multiagente, especialización, contexto y orquestación</span><span class="meter" data-class="10" data-total="64"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/11/" title="Redes generativas antagónicas (GANs)">
+          <span class="n">11</span><span class="t">Redes generativas antagónicas (GANs)</span><span class="meter" data-class="11" data-total="54"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/12/" title="Modelos generativos de señales, imágenes y multimodalidad">
+          <span class="n">12</span><span class="t">Modelos generativos de señales, imágenes y multimodalidad</span><span class="meter" data-class="12" data-total="79"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/" title="Del poder a la responsabilidad: seguridad, ética y lo que viene">
+          <span class="n">13</span><span class="t">Del poder a la responsabilidad: seguridad, ética y lo que viene</span><span class="meter" data-class="13" data-total="56"><i></i></span></a>
+        
+      </div>
+      <div class="nav-group">
+        <div class="nav-label">Trabajos prácticos</div>
+        
+        <a class="nav-item active" href="https://ezequielrickert.github.io/austral-ia-generativa/tp/1/" title="Corta, del caos a producción">
+          <span class="n">1</span><span class="t">Corta, del caos a producción</span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/tp/2/" title="¿Cuánto vale esta casa?">
+          <span class="n">2</span><span class="t">¿Cuánto vale esta casa?</span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/tp/3/" title="RAG, MCP y Transformers en el Hospital Arroyo Claro">
+          <span class="n">3</span><span class="t">RAG, MCP y Transformers en el Hospital Arroyo Claro</span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/tp/4/" title="El agente de admisión de guardia (TP final)">
+          <span class="n">4</span><span class="t">El agente de admisión de guardia (TP final)</span></a>
+        
+      </div>
+    </nav>
+    <div class="sb-foot">
+      <span id="exam-left">Final: 4 dic</span>
+      <button class="btn icon sm ghost" id="theme-btn" aria-label="Cambiar tema" title="Cambiar tema">
+        <svg class="i" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+    </div>
+  </aside>
+  <div class="main">
+    <div class="topbar">
+      <button class="btn icon" id="menu-btn" aria-label="Abrir navegación"><svg class="i" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+      <b>IA Generativa</b>
+    </div>
+    <main class="content ">
+      
+
+<header class="page-header">
+  <div class="ph-main">
+    <nav class="crumbs"><span>Trabajos prácticos</span><span class="sep">/</span><span>TP1</span></nav>
+    <h1>Corta, del caos a producción</h1>
+    <div class="ph-meta"><span class="mono">corta</span><span class="sep"></span><span>33 diapositivas relacionadas</span></div>
+  </div>
+  <div class="ph-actions">
+    <a class="btn primary" href="https://ezequielrickert.github.io/austral-ia-generativa/practica/#t1">Preguntas de defensa</a>
+  </div>
+</header>
+
+<div class="grid main-side">
+  <section class="card" id="tp-panels">
+    <div class="card-header">
+      <div class="seg" role="tablist" data-tabs="tp-panels">
+        <button role="tab" data-tab="res" aria-selected="true">Resultados</button>
+        <button role="tab" data-tab="con" aria-selected="false">Consigna</button>
+        <button role="tab" data-tab="hic" aria-selected="false">Qué hicimos</button>
+        <button role="tab" data-tab="dec" aria-selected="false">Decisiones</button>
+        <button role="tab" data-tab="cod" aria-selected="false" id="tab-cod">Código <span class="mono faint">25</span></button>
+      </div>
+    </div>
+    <div class="card-body" data-panel="res"><div class="prose"><ul>
+<li><strong>Los 5 milestones cerrados</strong> según <code>docs/PROGRESS.md</code>. App en producción en <code>https://corta-production-7bc5.up.railway.app</code>.</li>
+<li><strong>Historia trazable:</strong> 21 commits desde el estado heredado; los pares <code>test:</code> → <code>fix:</code>/<code>feat:</code> aparecen en orden en 4 ciclos (redirect, colisión, stats, PostgreSQL).</li>
+<li><strong>Suite de tests</strong> (<code>npm test</code>, <code>node:test</code>, <strong>sin necesitar PostgreSQL</strong>): 5 archivos (<code>redirect</code>, <code>collision</code>, <code>stats</code>, <code>health</code>, <code>postgres</code>) que cubren redirect 302 + incremento de clicks, 404 sin tocar contadores, reintento ante colisión, stats reales y 404, coherencia clicks = redirecciones, healthcheck y el SQL del repositorio (tabla, <code>ON CONFLICT</code>, incremento atómico).</li>
+<li><strong>Persistencia verificada end-to-end:</strong> link <code>v4v</code> con 1 click sobrevivió a un redeploy forzado.</li>
+<li><strong>Seguridad:</strong> credencial de <code>notas.txt</code> nunca llegó al remoto (gitignore + reescritura de historia antes del primer push); <code>.env*</code> ignorado salvo <code>.env.example</code>.</li>
+<li><strong>Extras:</strong> commits de tres autores distintos (extra de equipo parcial: no hay evidencia de la tarea programada en el repo); la memoria del agente se resolvió con <code>CLAUDE.md</code> mantenido a mano/por el agente + la Skill <code>progress-log</code>, no con <code>/collect-memory</code> tal cual lo pedía la consigna.</li>
+</ul>
+<p><strong>Brechas honestas (útiles para la defensa):</strong></p>
+<ul>
+<li><code>SPEC.md</code> promete <strong>400 para URLs inválidas</strong> (<code>"hola"</code>, <code>"ftp://x"</code>), pero <code>POST /api/links</code> solo valida que <code>url</code> exista; ese caso borde no tiene test. Es justo el tipo de desincronización spec↔código que el TDD derivado del SPEC debería atrapar.</li>
+<li>El reintento ante colisión es un <code>while</code> sin tope: con el espacio de 46.656 códigos casi lleno, se degradaría (habría que agrandar el código o cortar tras N intentos).</li>
+<li><code>axios</code> sigue como dependencia solo por <code>manual-check.js</code>.</li>
+</ul>
+<p><strong>Conclusión:</strong> el agente hizo casi todo el tipeo, pero lo que hizo confiable el resultado fue el <strong>contexto en <code>.md</code></strong> (CLAUDE.md, SPEC.md, PROGRESS.md) y los <strong>tests como verificación</strong> de cada vuelta chica.</p>
+</div></div>
+    <div class="card-body" data-panel="con" hidden><div class="prose"><p><strong>Contexto (clase 2, misión <code>missions/clase2</code>).</strong> Se suman a una empresa donde el dev anterior se fue sin documentar y les dejó <strong>Corta</strong>, el acortador de URLs interno: una carpeta copiada de su computadora, <strong>sin git, sin README</strong>, con duplicados (<code>server_OLD.js</code>, <code>index_v2_FINAL.js</code>, <code>links_backup_marzo.json</code>), un <code>notas.txt</code>, dependencias que nadie usa, bugs conocidos y una feature a medio hacer. El trabajo: <strong>llevar Corta a producción con la historia completa en GitHub</strong> desde ese estado.</p>
+<p><strong>Herramientas:</strong> un agente de código (recomendado Claude Code o Codex) + dos <strong>MCP servers</strong>: GitHub (versionado) y Railway (infra, deploy y base de datos). <strong>Paso 0 obligatorio:</strong> pararse en <code>corta/</code>, configurar ambos MCP y hacerle leer al agente su documentación (que pueda explicar qué tools expone cada uno y para qué las va a usar).</p>
+<p><strong>Forma de trabajo obligatoria:</strong> <code>SPEC.md</code> (el comportamiento esperado, con casos borde) + <strong>TDD</strong>: tests derivados del SPEC, escritos <strong>antes</strong> de implementar; la historia de git tiene que mostrar los tests antes que los fixes.</p>
+<p><strong>Milestones:</strong></p>
+<ol>
+<li><strong>Trackear:</strong> primer commit con la carpeta <em>tal cual</em> (con el matiz: ¿todo merece viajar a un remoto?).</li>
+<li><strong>Ordenar:</strong> sin archivos muertos ni dependencias sin uso, con README y <code>.gitignore</code> (criterio: entender el repo en &lt; 2 minutos).</li>
+<li><strong>Corregir:</strong> acortar funciona, el link <strong>te lleva</strong> a destino, las estadísticas dicen la verdad, y una colisión de códigos no rompe nada.</li>
+<li><strong>Completar:</strong> <code>GET /api/links/:codigo/stats</code> (clicks, URL, fecha) y <code>stats.html</code> consumiéndolo.</li>
+<li><strong>Producción</strong> en Railway vía MCP; <em>¿dónde viven los datos?</em> — los links y clicks tienen que <strong>sobrevivir a un redeploy</strong>; secretos fuera del código.</li>
+</ol>
+<p><strong>Extras:</strong> equipo (todos colaboradores, commits con autor real, tarea programada que reporta cambios) y memoria del agente (Skill <code>/collect-memory</code> que mantiene <code>CLAUDE.md</code> al día). <strong>Entrega:</strong> URL pública + link al repo.</p>
+</div></div>
+    <div class="card-body" data-panel="hic" hidden><div class="prose"><p>Trabajamos con <strong>Claude Code (y Codex)</strong> parados en <code>corta/</code>, siguiendo el ciclo de la clase 2: el repo como contexto, un <code>CLAUDE.md</code> como contrato, <code>SPEC.md</code> como especificación y los tests como unidad de revisión. El repo tiene <strong>21 commits</strong> de tres autores (FranCalveyra 16, MartuGiordanelli 4, ezequielrickert 1), todos con <em>conventional commits</em>.</p>
+<p><strong>M1 — Trackear.</strong> El primer commit (<code>a6061b7</code>, <em>“chore: estado inicial heredado de Corta”</em>) sube la carpeta sin curar —duplicados, backups y <code>test.js</code> incluidos— <strong>salvo dos cosas</strong>, explicadas en el mensaje: <code>node_modules/</code> (regenerable con <code>npm install</code>) y <code>notas.txt</code>, que contenía <strong>una credencial de Postgres en texto plano</strong>. Se gitignoreó desde el inicio y la historia se reescribió una vez antes del primer push para que no quedara rastro.</p>
+<p><strong>El contrato del agente.</strong> Antes de tocar código se agregaron <code>CLAUDE.md</code> y <code>MISSION.md</code>, y después <code>SPEC.md</code> (modelo de datos, cada endpoint, tabla de casos borde, “fuera de alcance”). <code>CLAUDE.md</code> fija las reglas no negociables: <em>spec-first</em>, <em>test-first</em> con commits de test e implementación <strong>separados</strong>, <code>node:test</code> como framework (sin dependencias nuevas), nada de secretos versionados, usar las herramientas de infraestructura (MCP) antes que comandos sueltos, sin atribución de IA en commits, y <strong>push solo al cerrar un milestone</strong>. Un <code>docs/PROGRESS.md</code> registra el estado de cada milestone.</p>
+<p><strong>M3 — Corregir (TDD).</strong> Dos ciclos rojo→verde visibles en <code>git log</code>:</p>
+<ul>
+<li><code>test: … bug de redirect</code> → <code>fix: redirigir a destino y persistir clicks</code>. El bug: <code>GET /:codigo</code> hacía <code>res.send(link.url)</code> (mostraba la URL como texto) y además incrementaba <code>clicks</code> <strong>en memoria sin guardar</strong> — las estadísticas mentían.</li>
+<li><code>test: cubrir colision</code> → <code>fix: reintentar generacion de codigo</code>. Con 3 caracteres <code>[a-z0-9]</code> hay <strong>46.656</strong> códigos; el test <em>mockea</em> <code>Math.random</code> para forzar que el primer código choque con uno existente (<code>aaa</code>) y verifica que se genere otro (<code>sss</code>) sin pisar el link viejo.</li>
+</ul>
+<p><strong>M2 — Ordenar.</strong> Estructura <code>src/</code>, <code>data/</code>, <code>public/</code>, <code>tests/</code>, <code>docs/</code>; se borraron <code>server_OLD.js</code>, <code>index_v2_FINAL.js</code>, <code>links_backup_marzo.json</code>, <code>estilos_viejos.css</code> y las dependencias <code>lodash</code> y <code>moment</code>; <code>test.js</code> pasó a <code>manual-check.js</code> porque <code>node --test</code> lo descubría solo y le pegaba a un server real. README con uso, estructura y configuración.</p>
+<p><strong>M4 — Completar.</strong> Test primero (<code>tests/stats.test.js</code>, incluido un test de que <strong>los clicks reportados coinciden con las redirecciones servidas</strong>), después el endpoint y <code>stats.html</code> haciendo <code>fetch</code> a <code>/api/links/:codigo/stats</code>.</p>
+<p><strong>M5 — Producción.</strong> Se respondió <em>“¿dónde viven los datos?”</em>: el JSON en disco no sobrevive a un redeploy, así que se migró a <strong>PostgreSQL en Railway</strong>. Otra vez test primero (<code>tests/postgres.test.js</code> con un <em>pool falso</em>). La app se refactorizó a <code>crearApp(repositorio)</code> (inyección del repositorio, que permite testear con uno en memoria), <code>INSERT … ON CONFLICT (codigo) DO NOTHING</code> para colisiones y para importar los datos heredados sin pisar nada, <code>UPDATE … SET clicks = clicks + 1</code> <strong>atómico</strong>, <code>GET /health</code> que también chequea la base, <code>railway.json</code> (Railpack + healthcheck), <code>PORT</code> dinámico y <code>DATABASE_URL</code> por variable de entorno (<code>${{Postgres.DATABASE_URL}}</code>). Prueba de fuego hecha: link <code>v4v</code>, una redirección, redeploy forzado, y siguió con <code>clicks: 1</code>. URL: <code>corta-production-7bc5.up.railway.app</code>.</p>
+<p><strong>Memoria del agente.</strong> En vez de <code>/collect-memory</code> se armó una Skill <strong><code>progress-log</code></strong> (en <code>.claude/skills/</code> y su gemela para Codex en <code>.codex/prompts/</code>) con un script <code>scripts/progress-log-missing.sh</code>: escribe en <code>progress_log/</code> <strong>un <code>.md</code> por commit</strong> (resumen, archivos, impacto), solo agrega, nunca reescribe.</p>
+</div></div>
+    
+    <div class="card-body flush" data-panel="dec" hidden>
+      <div class="rows">
+        
+        <div class="row-item" style="cursor:default;grid-template-columns:32px minmax(0,1fr)"><span class="ref">1</span><span><span class="t">Primer commit ‘tal cual’ pero excluyendo <code>notas.txt</code> (credencial) y <code>node_modules/</code>, reescribiendo la historia antes del primer push.</span><span class="d" style="-webkit-line-clamp:unset;display:block">La consigna pide registrar el caos inicial, pero un secreto que llega a un remoto queda comprometido para siempre (aunque después se borre). <code>node_modules/</code> es generado y reproducible con <code>npm install</code>.</span></span></div>
+        
+        <div class="row-item" style="cursor:default;grid-template-columns:32px minmax(0,1fr)"><span class="ref">2</span><span><span class="t">Escribir <code>CLAUDE.md</code> (contrato) y <code>SPEC.md</code> antes de tocar código, y mantener <code>docs/PROGRESS.md</code> con el estado por milestone.</span><span class="d" style="-webkit-line-clamp:unset;display:block">El modelo responde de memoria y lo único que cambia su comportamiento es el contexto (in-context learning). Destilar reglas y estado a <code>.md</code> versionados permite sesiones nuevas con ventanas chicas que arrancan sabiendo qué está hecho y qué reglas rigen.</span></span></div>
+        
+        <div class="row-item" style="cursor:default;grid-template-columns:32px minmax(0,1fr)"><span class="ref">3</span><span><span class="t">TDD estricto con commits de test e implementación separados (<code>test:</code> antes que <code>fix:</code>/<code>feat:</code>).</span><span class="d" style="-webkit-line-clamp:unset;display:block">Los tests son la unidad de revisión principal: el agente itera hasta ponerlos en verde y el humano revisa contra criterios acordados de antemano. Separar commits hace visible en <code>git log</code> que el test existía antes del fix (criterio de éxito de la misión).</span></span></div>
+        
+        <div class="row-item" style="cursor:default;grid-template-columns:32px minmax(0,1fr)"><span class="ref">4</span><span><span class="t"><code>node:test</code> nativo, tests en <code>tests/</code> y renombrar <code>test.js</code> a <code>manual-check.js</code>.</span><span class="d" style="-webkit-line-clamp:unset;display:block">Cero dependencias nuevas. <code>node --test</code> descubre automáticamente archivos llamados <code>test.js</code> o dentro de <code>test/</code>; el script heredado terminaba pegándole a un server real si había uno corriendo.</span></span></div>
+        
+        <div class="row-item" style="cursor:default;grid-template-columns:32px minmax(0,1fr)"><span class="ref">5</span><span><span class="t">Resolver colisiones reintentando la generación del código hasta encontrar uno libre; en Postgres, con <code>codigo</code> como PRIMARY KEY e <code>INSERT … ON CONFLICT DO NOTHING</code>.</span><span class="d" style="-webkit-line-clamp:unset;display:block">Con 3 caracteres hay 46.656 combinaciones: las colisiones son reales (paradoja del cumpleaños). La restricción de unicidad en la base hace que la garantía no dependa de que el código de la app chequee bien, y evita la carrera entre ‘chequear’ e ‘insertar’.</span></span></div>
+        
+        <div class="row-item" style="cursor:default;grid-template-columns:32px minmax(0,1fr)"><span class="ref">6</span><span><span class="t">Migrar de <code>links.json</code> a PostgreSQL de Railway con incremento atómico <code>SET clicks = clicks + 1</code> y migración inicial no destructiva de los datos heredados.</span><span class="d" style="-webkit-line-clamp:unset;display:block">El filesystem de un contenedor no sobrevive a un redeploy: la ‘base’ del dev anterior no aguanta producción. El UPDATE atómico evita perder clicks con redirecciones concurrentes, que es parte de que ‘las estadísticas digan la verdad’.</span></span></div>
+        
+        <div class="row-item" style="cursor:default;grid-template-columns:32px minmax(0,1fr)"><span class="ref">7</span><span><span class="t">Inyectar el repositorio en <code>crearApp(repositorio)</code> y testear la app con un repositorio en memoria y el SQL con un pool falso.</span><span class="d" style="-webkit-line-clamp:unset;display:block">La suite corre en segundos y sin base de datos (<code>npm test</code> no requiere PostgreSQL), así cada vuelta del agente se verifica rápido y en cualquier máquina.</span></span></div>
+        
+        <div class="row-item" style="cursor:default;grid-template-columns:32px minmax(0,1fr)"><span class="ref">8</span><span><span class="t">Credenciales solo por variable de entorno (<code>DATABASE_URL=${{Postgres.DATABASE_URL}}</code> en Railway, <code>.env</code> gitignoreado en local, <code>.env.example</code> versionado).</span><span class="d" style="-webkit-line-clamp:unset;display:block">Regla de la clase: secretos fuera del código y fuera del contexto; lo que el agente lee puede terminar en un commit. La consigna lo anticipa: ‘en el código no. Ni en un .txt’.</span></span></div>
+        
+        <div class="row-item" style="cursor:default;grid-template-columns:32px minmax(0,1fr)"><span class="ref">9</span><span><span class="t">Push a <code>origin</code> solo al cerrar un milestone; commits locales chicos y frecuentes.</span><span class="d" style="-webkit-line-clamp:unset;display:block">Commits chicos hacen cada vuelta del agente reversible; el push por milestone deja el remoto siempre en un estado coherente y revisado.</span></span></div>
+        
+        <div class="row-item" style="cursor:default;grid-template-columns:32px minmax(0,1fr)"><span class="ref">10</span><span><span class="t">Skill <code>progress-log</code> (Claude) + prompt gemelo para Codex + script <code>progress-log-missing.sh</code>, que escribe un <code>.md</code> por commit.</span><span class="d" style="-webkit-line-clamp:unset;display:block">‘Todo lo que le explicás al agente más de una vez es una Skill que deberías escribir una vez’. Un trabajo por Skill, disparada por su <code>description</code>; el script determinista decide qué falta y el modelo solo redacta.</span></span></div>
+        
+      </div>
+    </div>
+    
+    
+    <div class="card-body flush" data-panel="cod" hidden>
+      <div class="rows">
+        
+        <button class="row-item code-row" data-code="tp1-skill-progress-log" style="grid-template-columns:minmax(0,1fr) auto"><span><span class="t">Skill progress-log: metadata y pasos</span><span class="d mono" style="font-size:12px">.claude/skills/progress-log/SKILL.md · L1–33</span><span class="d">Define la Skill <code>progress-log</code>: cuándo dispararse y cómo escribir un <code>.md</code> por commit en <code>progress_log/</code>.</span></span><span class="pill">4 diap.</span></button>
+        
+        <button class="row-item code-row" data-code="tp1-codex-prompt-progress-log" style="grid-template-columns:minmax(0,1fr) auto"><span><span class="t">La misma Skill para Codex</span><span class="d mono" style="font-size:12px">.codex/prompts/progress-log.md · L1–18</span><span class="d">Es la versión de <code>progress-log</code> para Codex: mismas instrucciones, en el formato de prompts de <code>.codex/prompts/</code>.</span></span><span class="pill">2 diap.</span></button>
+        
+        <button class="row-item code-row" data-code="tp1-gitignore-secretos" style="grid-template-columns:minmax(0,1fr) auto"><span><span class="t">.gitignore: fuera notas.txt y los .env</span><span class="d mono" style="font-size:12px">.gitignore · L1–5</span><span class="d">Excluye del repositorio <code>node_modules/</code>, <code>.DS_Store</code>, <code>notas.txt</code> (que tenía una credencial de Postgres) y cualquier <code>.env*</code> salvo <code>.env.example</code>.</span></span><span class="pill">5 diap.</span></button>
+        
+        <button class="row-item code-row" data-code="tp1-claude-md-estado" style="grid-template-columns:minmax(0,1fr) auto"><span><span class="t">CLAUDE.md: qué es Corta y en qué estado está</span><span class="d mono" style="font-size:12px">CLAUDE.md · L1–26</span><span class="d">Es la primera mitad de <code>CLAUDE.md</code>: presenta el proyecto y resume el estado de cada milestone para que el agente arranque cada sesión sabiendo dónde está parado.</span></span><span class="pill">4 diap.</span></button>
+        
+        <button class="row-item code-row" data-code="tp1-claude-md-reglas" style="grid-template-columns:minmax(0,1fr) auto"><span><span class="t">CLAUDE.md: reglas no negociables (spec-first, test-first, secretos, MCP)</span><span class="d mono" style="font-size:12px">CLAUDE.md · L28–51</span><span class="d">Fija las cuatro prácticas de trabajo que el agente tiene que respetar en cualquier tarea dentro del repo.</span></span><span class="pill">6 diap.</span></button>
+        
+        <button class="row-item code-row" data-code="tp1-claude-md-commits-correr" style="grid-template-columns:minmax(0,1fr) auto"><span><span class="t">CLAUDE.md: commits, política de push y cómo correr</span><span class="d mono" style="font-size:12px">CLAUDE.md · L53–73</span><span class="d">Define el formato de los commits, cuándo se puede pushear y los tres comandos para instalar, levantar y testear.</span></span><span class="pill">5 diap.</span></button>
+        
+        <button class="row-item code-row" data-code="tp1-readme-estructura" style="grid-template-columns:minmax(0,1fr) auto"><span><span class="t">README: uso y estructura del repo</span><span class="d mono" style="font-size:12px">README.md · L1–28</span><span class="d">Explica en pocas líneas qué es Corta, cómo levantarlo y testearlo, y qué hay en cada carpeta.</span></span><span class="pill">1 diap.</span></button>
+        
+        <button class="row-item code-row" data-code="tp1-readme-deploy" style="grid-template-columns:minmax(0,1fr) auto"><span><span class="t">README: configuración y deploy en Railway</span><span class="d mono" style="font-size:12px">README.md · L30–48</span><span class="d">Documenta las variables de entorno y cómo quedó armado el deploy en Railway.</span></span><span class="pill">6 diap.</span></button>
+        
+        <button class="row-item code-row" data-code="tp1-progress-md-milestones" style="grid-template-columns:minmax(0,1fr) auto"><span><span class="t">docs/PROGRESS.md: estado por milestone</span><span class="d mono" style="font-size:12px">docs/PROGRESS.md · L1–35</span><span class="d">Registra el estado de cada milestone con checklist: qué se hizo y cómo quedó cubierto.</span></span><span class="pill">2 diap.</span></button>
+        
+        <button class="row-item code-row" data-code="tp1-progress-md-produccion" style="grid-template-columns:minmax(0,1fr) auto"><span><span class="t">PROGRESS.md: Milestone 5 y la prueba de redeploy</span><span class="d mono" style="font-size:12px">docs/PROGRESS.md · L46–58</span><span class="d">Registra el cierre del Milestone 5: deploy en Railway, migración a PostgreSQL, credenciales por variable de entorno y la prueba de persistencia con el link <code>v4v</code>.</span></span><span class="pill">2 diap.</span></button>
+        
+        <button class="row-item code-row" data-code="tp1-spec-post-redirect" style="grid-template-columns:minmax(0,1fr) auto"><span><span class="t">SPEC.md: contrato de POST /api/links y GET /:codigo</span><span class="d mono" style="font-size:12px">docs/SPEC.md · L31–56</span><span class="d">Especifica qué debe hacer cada endpoint principal, incluidos los códigos de error y el comportamiento ante colisiones.</span></span><span class="pill">3 diap.</span></button>
+        
+        <button class="row-item code-row" data-code="tp1-package-json-scripts" style="grid-template-columns:minmax(0,1fr) auto"><span><span class="t">package.json: npm start con .env opcional y npm test</span><span class="d mono" style="font-size:12px">package.json · L9–12</span><span class="d">Define los dos comandos del proyecto: <code>npm start</code> levanta <code>src/server.js</code> cargando <code>.env</code> solo si existe, y <code>npm test</code> corre la suite nativa de Node.</span></span><span class="pill">4 diap.</span></button>
+        
+        <button class="row-item code-row" data-code="tp1-progress-log-0001" style="grid-template-columns:minmax(0,1fr) auto"><span><span class="t">progress_log/: el primer commit documentado</span><span class="d mono" style="font-size:12px">progress_log/0001-a6061b7.md · L1–21</span><span class="d">Es el log generado para el primer commit (<code>a6061b7</code>): quién, cuándo, qué se subió y qué se dejó afuera.</span></span><span class="pill">4 diap.</span></button>
+        
+        <button class="row-item code-row" data-code="tp1-stats-html-fetch" style="grid-template-columns:minmax(0,1fr) auto"><span><span class="t">stats.html: la página que consume el endpoint de stats</span><span class="d mono" style="font-size:12px">public/stats.html · L34–51</span><span class="d">Al enviar el formulario, pide las estadísticas del código al backend y muestra clicks, URL y fecha, o un error si no existe.</span></span><span class="pill">1 diap.</span></button>
+        
+        <button class="row-item code-row" data-code="tp1-railway-json" style="grid-template-columns:minmax(0,1fr) auto"><span><span class="t">railway.json: build y healthcheck versionados</span><span class="d mono" style="font-size:12px">railway.json · L1–12</span><span class="d">Configura en el repo cómo Railway construye y despliega Corta.</span></span><span class="pill">4 diap.</span></button>
+        
+        <button class="row-item code-row" data-code="tp1-script-progress-log" style="grid-template-columns:minmax(0,1fr) auto"><span><span class="t">Script determinista: commits sin log</span><span class="d mono" style="font-size:12px">scripts/progress-log-missing.sh · L15–28</span><span class="d">Lista, en orden cronológico, los commits que todavía no tienen archivo en <code>progress_log/</code>.</span></span><span class="pill">2 diap.</span></button>
+        
+        <button class="row-item code-row" data-code="tp1-postgres-repo" style="grid-template-columns:minmax(0,1fr) auto"><span><span class="t">Repositorio PostgreSQL: crear sin pisar e incremento atómico</span><span class="d mono" style="font-size:12px">src/postgres.js · L15–56</span><span class="d">Implementa la persistencia en PostgreSQL: crea la tabla, inserta links sin pisar códigos existentes, busca y suma clicks de forma atómica.</span></span><span class="pill">2 diap.</span></button>
+        
+        <button class="row-item code-row" data-code="tp1-server-rutas" style="grid-template-columns:minmax(0,1fr) auto"><span><span class="t">Rutas de Corta: crear, stats y redirigir</span><span class="d mono" style="font-size:12px">src/server.js · L23–63</span><span class="d">Define los tres endpoints de negocio: crear un link, consultar sus estadísticas y redirigir incrementando clicks.</span></span><span class="pill">4 diap.</span></button>
+        
+        <button class="row-item code-row" data-code="tp1-server-iniciar" style="grid-template-columns:minmax(0,1fr) auto"><span><span class="t">iniciar(): DATABASE_URL, migración y puerto</span><span class="d mono" style="font-size:12px">src/server.js · L73–103</span><span class="d">Arranca Corta en producción: exige <code>DATABASE_URL</code>, conecta a Postgres, crea la tabla, importa los links heredados y escucha en <code>PORT</code>.</span></span><span class="pill">6 diap.</span></button>
+        
+        <button class="row-item code-row" data-code="tp1-utils-generar-codigo" style="grid-template-columns:minmax(0,1fr) auto"><span><span class="t">generarCodigo(): 3 caracteres al azar</span><span class="d mono" style="font-size:12px">src/utils.js · L1–12</span><span class="d">Genera un código corto de 3 caracteres tomados al azar de letras minúsculas y dígitos.</span></span><span class="pill">1 diap.</span></button>
+        
+        <button class="row-item code-row" data-code="tp1-test-colision" style="grid-template-columns:minmax(0,1fr) auto"><span><span class="t">Test de colisión con Math.random mockeado</span><span class="d mono" style="font-size:12px">tests/collision.test.js · L5–33</span><span class="d">Fuerza una colisión de códigos y verifica que <code>POST /api/links</code> genere otro sin pisar el link existente.</span></span><span class="pill">1 diap.</span></button>
+        
+        <button class="row-item code-row" data-code="tp1-helpers-repo-memoria" style="grid-template-columns:minmax(0,1fr) auto"><span><span class="t">tests/helpers.js: repositorio en memoria para crearApp</span><span class="d mono" style="font-size:12px">tests/helpers.js · L1–28</span><span class="d">Arma un repositorio en memoria con la misma interfaz que el de Postgres y levanta la app real con <code>crearApp</code> para los tests.</span></span><span class="pill">2 diap.</span></button>
+        
+        <button class="row-item code-row" data-code="tp1-test-postgres-pool-falso" style="grid-template-columns:minmax(0,1fr) auto"><span><span class="t">Tests de Postgres con un pool falso</span><span class="d mono" style="font-size:12px">tests/postgres.test.js · L5–45</span><span class="d">Testea el repositorio PostgreSQL sin base real, con un <code>pool</code> falso que registra las consultas y devuelve resultados preparados.</span></span><span class="pill">1 diap.</span></button>
+        
+        <button class="row-item code-row" data-code="tp1-test-redirect" style="grid-template-columns:minmax(0,1fr) auto"><span><span class="t">Test del bug de redirect</span><span class="d mono" style="font-size:12px">tests/redirect.test.js · L5–36</span><span class="d">Verifica que <code>GET /:codigo</code> redirija con 302 al destino e incremente clicks, y que un código inexistente dé 404 sin tocar contadores.</span></span><span class="pill">3 diap.</span></button>
+        
+        <button class="row-item code-row" data-code="tp1-test-stats-verdad" style="grid-template-columns:minmax(0,1fr) auto"><span><span class="t">Test: las estadísticas dicen la verdad</span><span class="d mono" style="font-size:12px">tests/stats.test.js · L37–53</span><span class="d">Comprueba que los clicks que reporta <code>/api/links/:codigo/stats</code> coinciden con las redirecciones realmente servidas.</span></span><span class="pill">1 diap.</span></button>
+        
+      </div>
+    </div>
+    
+  </section>
+
+  <section class="card sticky" style="max-height:calc(100vh - 48px)">
+    <div class="card-header">
+      <div class="card-title">Diapositivas relacionadas <span class="count">33</span></div>
+      <select class="input" id="rel-filter" style="width:auto;height:28px" aria-label="Filtrar por clase">
+        <option value="">Todas</option>
+        <option value="01">Clase 01</option><option value="02">Clase 02</option><option value="06">Clase 06</option><option value="07">Clase 07</option><option value="13">Clase 13</option>
+      </select>
+    </div>
+    <div class="card-body flush scroll">
+      
+      <div data-group="01">
+        <div class="row-group"><span>Clase 01 · Bienvenida + CoWork: fundamentos de IA, modelos fundacionales y el chat extendido</span><span class="mono">7</span></div>
+        <div class="rows">
+          
+          <a class="row-item" href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=claude-desktop-chat&amp;s=5"><span class="ref">01·5</span><span><span class="t">Las cuatro herramientas de Claude <span class="pill compl" title="Presentación complementaria: no figura en el calendario">Compl.</span></span><span class="d">Para Corta usaste Claude Code (y Codex) en la terminal, parados en la carpeta <code>corta/</code>.</span></span></a>
+          
+          <a class="row-item" href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=claude-desktop-chat&amp;s=9"><span class="ref">01·9</span><span><span class="t">El chat responde de memoria <span class="pill compl" title="Presentación complementaria: no figura en el calendario">Compl.</span></span><span class="d">Por eso en Corta escribiste <code>CLAUDE.md</code>, <code>SPEC.md</code> y <code>docs/PROGRESS.md</code> antes de tocar código: cada sesión arranca sabiendo reglas y estado.</span></span></a>
+          
+          <a class="row-item" href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=claude-desktop-chat&amp;s=20"><span class="ref">01·20</span><span><span class="t">External connectors: todo pasa por MCP <span class="pill compl" title="Presentación complementaria: no figura en el calendario">Compl.</span></span><span class="d">En Corta usaste los MCP de GitHub y Railway: crear el repo, provisionar Postgres, setear <code>DATABASE_URL</code> y deployar fueron llamadas a tools.</span></span></a>
+          
+          <a class="row-item" href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=claude-desktop-chat&amp;s=27"><span class="ref">01·27</span><span><span class="t">Describir una vez, que corra sola <span class="pill compl" title="Presentación complementaria: no figura en el calendario">Compl.</span></span><span class="d">El extra de una tarea programada que reportara cambios del repo quedó sin evidencia en Corta.</span></span></a>
+          
+          <a class="row-item" href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=introduccion&amp;s=12"><span class="ref">01·12</span><span><span class="t">Transformación en Ingeniería de Software</span><span class="d">En Corta el agente tipeó casi todo, pero la confianza vino de lo que diseñó el equipo: tests con <code>node:test</code> y la prueba de redeploy del link <code>v4v</code>.</span></span></a>
+          
+          <a class="row-item" href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=introduccion&amp;s=13"><span class="ref">01·13</span><span><span class="t">Limitaciones de la IA Generativa</span><span class="d">Privacidad real en Corta: <code>notas.txt</code> tenía una credencial de Postgres; quedó gitignoreado y se reescribió la historia antes del primer push.</span></span></a>
+          
+          <a class="row-item" href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=introduccion&amp;s=17"><span class="ref">01·17</span><span><span class="t">Entregables de clase</span><span class="d">Trazabilidad en Corta: 21 commits convencionales de tres autores, pares <code>test:</code>→<code>fix:</code> visibles en <code>git log</code> y <code>progress_log/</code> con un <code>.md</code> por commit.</span></span></a>
+          
+        </div>
+      </div>
+      
+      <div data-group="02">
+        <div class="row-group"><span>Clase 02 · CoWork: agentes de código, contexto, CLAUDE.md, Skills, subagentes y MCP</span><span class="mono">17</span></div>
+        <div class="rows">
+          
+          <a class="row-item" href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=claude-cowork&amp;s=17"><span class="ref">02·17</span><span><span class="t">Qué es una Skill <span class="pill compl" title="Presentación complementaria: no figura en el calendario">Compl.</span></span><span class="d">Tu Skill <code>progress-log</code> de Corta vive en <code>.claude/skills/</code>, con su gemela para Codex en <code>.codex/prompts/</code>.</span></span></a>
+          
+          <a class="row-item" href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=3"><span class="ref">02·3</span><span><span class="t">Agentes de código: Claude Code y Codex</span><span class="d">Corta se hizo con Claude Code y Codex parados en <code>corta/</code>: el agente editó, corrió <code>npm test</code>, commiteó y deployó.</span></span></a>
+          
+          <a class="row-item" href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=4"><span class="ref">02·4</span><span><span class="t">Delegar una tarea completa</span><span class="d">El ejemplo de la lámina pasó en Corta: delegaste «migrá la persistencia a Postgres», con <code>tests/postgres.test.js</code> escrito antes.</span></span></a>
+          
+          <a class="row-item" href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=6"><span class="ref">02·6</span><span><span class="t">Dónde se empieza: pararse en una carpeta</span><span class="d">Paso 0 de Corta: pararse en <code>corta/</code>, configurar los MCP de GitHub y Railway y hacer que el agente explique qué tools expone cada uno.</span></span></a>
+          
+          <a class="row-item" href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=9"><span class="ref">02·9</span><span><span class="t">Qué lee el agente al pararse en el repo</span><span class="d">En el M2 ordenaste Corta (<code>src/</code>, <code>tests/</code>, <code>docs/</code>, README) y borraste <code>server_OLD.js</code> e <code>index_v2_FINAL.js</code>: entenderlo en menos de 2 minutos.</span></span></a>
+          
+          <a class="row-item" href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=11"><span class="ref">02·11</span><span><span class="t">El conocimiento del proyecto en .md</span><span class="d">Tu <code>SPEC.md</code> de Corta tiene modelo de datos, endpoints y casos borde; ojo: promete 400 para URLs inválidas y el código no lo valida ni lo testea.</span></span></a>
+          
+          <a class="row-item" href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=12"><span class="ref">02·12</span><span><span class="t">El manejo del contexto</span><span class="d"><code>docs/PROGRESS.md</code> guardó el estado por milestone para que cada sesión nueva arrancara con ventana chica y sin re-explicar.</span></span></a>
+          
+          <a class="row-item" href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=13"><span class="ref">02·13</span><span><span class="t">Iterar con el agente sobre el código</span><span class="d">Cuatro ciclos <code>test:</code>→<code>fix:</code>/<code>feat:</code> en <code>git log</code> (redirect, colisión, stats, Postgres); la colisión se forzó mockeando <code>Math.random</code>.</span></span></a>
+          
+          <a class="row-item" href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=15"><span class="ref">02·15</span><span><span class="t">CLAUDE.md / AGENTS.md: la memoria del repo</span><span class="d">Tu <code>CLAUDE.md</code> de Corta fija spec-first, test-first con commits separados, <code>node:test</code>, cero secretos y push solo al cerrar un milestone.</span></span></a>
+          
+          <a class="row-item" href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=16"><span class="ref">02·16</span><span><span class="t">Un ejemplo de CLAUDE.md</span><span class="d">La consigna pedía la Skill <code>/collect-memory</code> para mantener <code>CLAUDE.md</code>; resolviste la memoria con la Skill <code>progress-log</code> y <code>CLAUDE.md</code> mantenido aparte.</span></span></a>
+          
+          <a class="row-item" href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=18"><span class="ref">02·18</span><span><span class="t">Qué es una Skill</span><span class="d">Armaste la Skill <code>progress-log</code>: un script determinista lista los commits sin log y el modelo redacta un <code>.md</code> por commit.</span></span></a>
+          
+          <a class="row-item" href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=19"><span class="ref">02·19</span><span><span class="t">Cómo se dispara una Skill</span><span class="d">La <code>description</code> de <code>progress-log</code> enumera frases como «log progress» o «update the progress log» para dispararse sola.</span></span></a>
+          
+          <a class="row-item" href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=24"><span class="ref">02·24</span><span><span class="t">Qué es MCP</span><span class="d">Usaste el MCP de GitHub para versionar y el de Railway para crear la base Postgres, setear variables y deployar Corta.</span></span></a>
+          
+          <a class="row-item" href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=29"><span class="ref">02·29</span><span><span class="t">El nuevo rol: Diseñar, delegar y revisar</span><span class="d">Conclusión de Corta: el agente tipeó casi todo; lo confiable fue el contexto en <code>.md</code> y los tests verificando cada vuelta chica.</span></span></a>
+          
+          <a class="row-item" href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=30"><span class="ref">02·30</span><span><span class="t">Antes de cerrar: cuidados</span><span class="d"><code>notas.txt</code> traía una credencial de Postgres: quedó fuera del primer commit, se reescribió la historia antes del push y <code>DATABASE_URL</code> va solo por variable de entorno.</span></span></a>
+          
+          <a class="row-item" href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=32"><span class="ref">02·32</span><span><span class="t">La historia de Corta</span><span class="d">El primer commit (<code>a6061b7</code>) subió el caos tal cual, salvo <code>node_modules/</code> y <code>notas.txt</code> (credencial).</span></span></a>
+          
+          <a class="row-item" href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=33"><span class="ref">02·33</span><span><span class="t">La misión: del caos a producción</span><span class="d">Los datos pasaron de <code>links.json</code> a PostgreSQL en Railway; el link <code>v4v</code> sobrevivió a un redeploy forzado con <code>clicks: 1</code>.</span></span></a>
+          
+        </div>
+      </div>
+      
+      <div data-group="06">
+        <div class="row-group"><span>Clase 06 · RAG, bases vectoriales, inverted index</span><span class="mono">3</span></div>
+        <div class="rows">
+          
+          <a class="row-item" href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=46"><span class="ref">06·46</span><span><span class="t">MCP conecta modelos con herramientas</span><span class="d">En el TP1 el agente creó el repo, la base y el deploy llamando tools de los servidores MCP de GitHub y Railway.</span></span></a>
+          
+          <a class="row-item" href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=55"><span class="ref">06·55</span><span><span class="t">Conectar un servidor MCP: tres caminos</span><span class="d">El paso 0 del TP1 fue configurar los MCP de GitHub y Railway y hacer que el agente explicara qué tools expone cada uno.</span></span></a>
+          
+          <a class="row-item" href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=59"><span class="ref">06·59</span><span><span class="t">Un agente, varios servidores</span><span class="d">En el TP1 el agente combinó dos servidores: GitHub para versionar y Railway para la infraestructura y el deploy.</span></span></a>
+          
+        </div>
+      </div>
+      
+      <div data-group="07">
+        <div class="row-group"><span>Clase 07 · MCP y herramientas (con repaso de RAG) · De la palabra al transformer</span><span class="mono">2</span></div>
+        <div class="rows">
+          
+          <a class="row-item" href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=rag-mcp-rapida&amp;s=16"><span class="ref">07·16</span><span><span class="t">MCP conecta modelos con herramientas</span><span class="d">En el TP1 usaste los MCP de GitHub y Railway para crear el repo, provisionar Postgres y deployar.</span></span></a>
+          
+          <a class="row-item" href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=rag-mcp-rapida&amp;s=21"><span class="ref">07·21</span><span><span class="t">Conectar un servidor: los caminos y la configuración</span><span class="d">En Corta les diste credenciales de GitHub y Railway a servidores MCP de terceros.</span></span></a>
+          
+        </div>
+      </div>
+      
+      <div data-group="13">
+        <div class="row-group"><span>Clase 13 · Del poder a la responsabilidad: seguridad, ética y lo que viene</span><span class="mono">4</span></div>
+        <div class="rows">
+          
+          <a class="row-item" href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/#d=cierre-magnifica-humanitas&amp;s=14"><span class="ref">13·14</span><span><span class="t">Clasificá antes de pegar</span><span class="d">En el TP1, <code>notas.txt</code> tenía una credencial de Postgres: se gitignoreó desde el primer commit y se reescribió la historia antes del primer push.</span></span></a>
+          
+          <a class="row-item" href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/#d=cierre-magnifica-humanitas&amp;s=20"><span class="ref">13·20</span><span><span class="t">Cada conector, una decisión de confianza</span><span class="d">En el TP1 el agente creó el repo, provisionó Postgres y deployó vía los MCP de GitHub y Railway: permisos reales sobre tu infraestructura.</span></span></a>
+          
+          <a class="row-item" href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/#d=cierre-magnifica-humanitas&amp;s=23"><span class="ref">13·23</span><span><span class="t">Defensa en profundidad</span><span class="d">En el TP1 apilaste capas: gitignore, credenciales solo por variables de entorno, la regla en <code>CLAUDE.md</code> y push solo al cerrar cada milestone.</span></span></a>
+          
+          <a class="row-item" href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/#d=cierre-magnifica-humanitas&amp;s=33"><span class="ref">13·33</span><span><span class="t">La potencia del centauro</span><span class="d">En el TP1 el agente hizo el tipeo, pero la validación la diseñó el equipo: tests, prueba de redeploy (<code>clicks: 1</code>) y revisión de diffs.</span></span></a>
+          
+        </div>
+      </div>
+      
+    </div>
+  </section>
+</div>
+<template id="sn-tp1-skill-progress-log" data-title="Skill progress-log: metadata y pasos" data-tp="1" data-tp-title="Corta, del caos a producción" data-file=".claude/skills/progress-log/SKILL.md" data-from="1" data-to="33">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">.claude/skills/progress-log/SKILL.md</span><span class="mono faint">L1–33</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-markdown" data-start="1">---
+name: progress-log
+description: Backfill and update progress_log/ with one file per commit, summarizing what changed and why. Use when the user asks to &quot;log progress&quot;, &quot;update the progress log&quot;, &quot;document commit history&quot;, or &quot;dump a log of what was done&quot; for this repo.
+---
+
+# progress-log
+
+Maintains `progress_log/` — one markdown file per commit in this repo&#39;s history, in
+chronological order. Each run finds commits that don&#39;t have a file yet and writes only those;
+it never edits or deletes files for commits already logged.
+
+## File naming
+
+`progress_log/NNNN-hash.md`, e.g. `progress_log/0007-dbcba0f.md`:
+
+- `NNNN` — the commit&#39;s 1-based position in the full history (`git log --reverse`), zero-padded
+  to 4 digits. This is a stable sequence number, not a &quot;how many logs exist&quot; counter — a commit
+  keeps its number even if earlier commits get logged later.
+- `hash` — the commit&#39;s short hash (7 chars).
+
+## Steps
+
+1. Run `scripts/progress-log-missing.sh` from the repo root. It prints one `NNNN hash` line per
+   commit that still needs a log file, oldest first. If it prints nothing, tell the user the log
+   is up to date and stop — don&#39;t touch existing files.
+
+2. For each missing commit, oldest first, one at a time:
+   a. `git show --format=fuller &lt;hash&gt;` — get author, date, full commit message, the diff, and
+      the list of changed files (`--stat` if you want that separated out).
+   b. Read the diff and write a prose summary of what actually changed and why — don&#39;t just
+      restate the commit message. Pull the &quot;why&quot; from the commit message/body when it explains
+      intent; infer it from context (e.g. `docs/PROGRESS.md`, `docs/SPEC.md`) when it doesn&#39;t.
+   c. Write `progress_log/NNNN-hash.md` with these sections:</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Define la Skill <code>progress-log</code>: cuándo dispararse y cómo escribir un <code>.md</code> por commit en <code>progress_log/</code>.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li>Frontmatter: <code>name</code> y una <code>description</code> con frases gatillo («log progress», «update the progress log», «document commit history»).</li>
+<li>Convención de nombres <code>NNNN-hash.md</code> con número estable por posición en la historia.</li>
+<li>Pasos: correr <code>scripts/progress-log-missing.sh</code>; por cada commit faltante, <code>git show --format=fuller</code>, redactar un resumen propio (no copiar el mensaje) y escribir el archivo con secciones fijas.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Empaqueta una tarea que se repetía (documentar commits) para que salga siempre igual. Reemplaza a la <code>/collect-memory</code> de la consigna: en vez de mantener <code>CLAUDE.md</code>, mantiene una bitácora que solo agrega y nunca reescribe.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Claude Code la carga desde <code>.claude/skills/</code>; su gemela para Codex es <code>.codex/prompts/progress-log.md</code>. Llama a <code>scripts/progress-log-missing.sh</code> y produce los archivos de <code>progress_log/</code>.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Skill: carpeta con <code>SKILL.md</code> (metadata + pasos en prosa); se dispara con <code>/progress-log</code> o sola cuando el pedido coincide con la <code>description</code>.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 4</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=claude-desktop-chat&amp;s=5"><span class="ref">01·5</span><span class="t">Las cuatro herramientas de Claude <span class="pill compl" title="Presentación complementaria: no figura en el calendario">Compl.</span></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=18"><span class="ref">02·18</span><span class="t">Qué es una Skill</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=19"><span class="ref">02·19</span><span class="t">Cómo se dispara una Skill</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=claude-cowork&amp;s=17"><span class="ref">02·17</span><span class="t">Qué es una Skill <span class="pill compl" title="Presentación complementaria: no figura en el calendario">Compl.</span></span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp1-codex-prompt-progress-log" data-title="La misma Skill para Codex" data-tp="1" data-tp-title="Corta, del caos a producción" data-file=".codex/prompts/progress-log.md" data-from="1" data-to="18">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">.codex/prompts/progress-log.md</span><span class="mono faint">L1–18</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-markdown" data-start="1">Maintain `progress_log/` in this repo — one markdown file per commit in the repo&#39;s history, in
+chronological order. Find commits that don&#39;t have a file yet and write only those; never edit or
+delete files for commits already logged.
+
+## File naming
+
+`progress_log/NNNN-hash.md`, e.g. `progress_log/0007-dbcba0f.md`:
+
+- `NNNN` — the commit&#39;s 1-based position in the full history (`git log --reverse`), zero-padded
+  to 4 digits. Stable sequence number, not a &quot;how many logs exist&quot; counter — a commit keeps its
+  number even if earlier commits get logged later.
+- `hash` — the commit&#39;s short hash (7 chars).
+
+## Steps
+
+1. Run `scripts/progress-log-missing.sh` from the repo root. It prints one `NNNN hash` line per
+   commit that still needs a log file, oldest first. If it prints nothing, tell the user the log
+   is up to date and stop — don&#39;t touch existing files.</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Es la versión de <code>progress-log</code> para Codex: mismas instrucciones, en el formato de prompts de <code>.codex/prompts/</code>.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li>Sin frontmatter (Codex lo invoca como prompt por nombre).</li>
+<li>Repite la convención <code>NNNN-hash.md</code> y el paso 1: correr <code>scripts/progress-log-missing.sh</code>.</li>
+<li>El resto (pasos 2-4) coincide con <code>SKILL.md</code>.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>El equipo trabajó con dos agentes de código (Claude Code y Codex) sobre la misma carpeta; duplicar el instructivo deja que cualquiera de los dos mantenga la bitácora igual.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Comparte el script <code>scripts/progress-log-missing.sh</code> con <code>.claude/skills/progress-log/SKILL.md</code>, y ambos escriben en <code>progress_log/</code>.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Mismo agente/flujo en distintas superficies: las instrucciones viven en archivos del repo y se portan entre herramientas.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 2</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=claude-desktop-chat&amp;s=5"><span class="ref">01·5</span><span class="t">Las cuatro herramientas de Claude <span class="pill compl" title="Presentación complementaria: no figura en el calendario">Compl.</span></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=claude-cowork&amp;s=17"><span class="ref">02·17</span><span class="t">Qué es una Skill <span class="pill compl" title="Presentación complementaria: no figura en el calendario">Compl.</span></span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp1-gitignore-secretos" data-title=".gitignore: fuera notas.txt y los .env" data-tp="1" data-tp-title="Corta, del caos a producción" data-file=".gitignore" data-from="1" data-to="5">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">.gitignore</span><span class="mono faint">L1–5</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-text" data-start="1">node_modules/
+.DS_Store
+notas.txt
+.env*
+!.env.example</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Excluye del repositorio <code>node_modules/</code>, <code>.DS_Store</code>, <code>notas.txt</code> (que tenía una credencial de Postgres) y cualquier <code>.env*</code> salvo <code>.env.example</code>.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li><code>notas.txt</code> está desde el primer commit (<code>a6061b7</code>): nunca viajó al remoto.</li>
+<li><code>.env*</code> + <code>!.env.example</code> (commit <code>9ac90f4</code>): se ignoran todos los archivos de entorno, pero se versiona la plantilla sin valores reales.</li>
+<li><code>node_modules/</code> se regenera con <code>npm install</code>.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Materializa la respuesta a «¿todo merece viajar a un remoto?»: el estado heredado se subió tal cual menos lo regenerable y lo secreto. Como el archivo con la credencial ya había entrado a la historia local, además se reescribió la historia una vez antes del primer push.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Lo aplica git en cada <code>git add</code>. Se complementa con <code>README.md</code> (<code>cp .env.example .env</code>), con <code>package.json</code> (<code>--env-file-if-exists=.env</code>) y con <code>src/server.js</code>, que lee <code>DATABASE_URL</code> solo del entorno.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Privacidad y secretos: clasificar el dato antes de compartirlo y mantener credenciales fuera del código y del contexto.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 5</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=introduccion&amp;s=13"><span class="ref">01·13</span><span class="t">Limitaciones de la IA Generativa</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=30"><span class="ref">02·30</span><span class="t">Antes de cerrar: cuidados</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=32"><span class="ref">02·32</span><span class="t">La historia de Corta</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/#d=cierre-magnifica-humanitas&amp;s=14"><span class="ref">13·14</span><span class="t">Clasificá antes de pegar</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/#d=cierre-magnifica-humanitas&amp;s=23"><span class="ref">13·23</span><span class="t">Defensa en profundidad</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp1-claude-md-estado" data-title="CLAUDE.md: qué es Corta y en qué estado está" data-tp="1" data-tp-title="Corta, del caos a producción" data-file="CLAUDE.md" data-from="1" data-to="26">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">CLAUDE.md</span><span class="mono faint">L1–26</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-markdown" data-start="1"># Corta — instrucciones para el agente
+
+Corta es un acortador de URLs interno heredado, sin documentación previa. Este archivo fija las
+prácticas de trabajo del repo — léelo antes de tocar código.
+
+## Estado del proyecto
+
+- Repo inicializado con el estado heredado tal cual, salvo `node_modules/` (excluido por ser
+  generado). Ese primer commit es el punto de partida trazable; todo lo posterior es diff sobre él.
+- Milestone 3 (bug de redirect + colisión de códigos) resuelto con TDD (`tests/`).
+- Milestone 2 (ordenar) hecho: se sacaron los archivos muertos (`server_OLD.js`,
+  `index_v2_FINAL.js`, `links_backup_marzo.json`, `public/estilos_viejos.css`), las dependencias
+  sin uso (`lodash`, `moment`), y se agregó `README.md`. Estructura actual:
+  - `src/` — código de la app (`server.js`, `utils.js`).
+  - `data/` — persistencia en disco (`links.json`), reemplazada por una base de datos en
+    Milestone 5.
+  - `public/` — frontend estático servido por Express.
+  - `tests/` — suite de `node:test`.
+  - `docs/` — `SPEC.md`, `MISSION.md` y `PROGRESS.md` (registro de avance por milestone,
+    actualizar al cerrar o arrancar trabajo en alguno).
+- Milestone 4 (endpoint de stats + `stats.html` conectado) hecho, con TDD (`tests/stats.test.js`).
+- Milestone 5 (producción) hecho: servicio y PostgreSQL desplegados en Railway, credenciales por
+  variable de entorno y persistencia comprobada después de un redeploy. URL pública:
+  `https://corta-production-7bc5.up.railway.app`.
+
+Actualizá esta sección a medida que el proyecto avance. No la dejes desincronizada del estado real.</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Es la primera mitad de <code>CLAUDE.md</code>: presenta el proyecto y resume el estado de cada milestone para que el agente arranque cada sesión sabiendo dónde está parado.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li>El encabezado le ordena al agente leer el archivo «antes de tocar código».</li>
+<li>«Estado del proyecto» lista qué milestones están hechos (M1, M3, M2, M4, M5), la estructura <code>src/</code>, <code>data/</code>, <code>public/</code>, <code>tests/</code>, <code>docs/</code> y la URL pública.</li>
+<li>La última línea es una instrucción para el propio agente: «Actualizá esta sección… No la dejes desincronizada del estado real».</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>El modelo no recuerda sesiones anteriores: todo lo que sabe del proyecto es lo que entra en su contexto. Este bloque reemplaza el «re-explicar todo» de cada sesión. La consigna sugería una Skill <code>/collect-memory</code> para mantenerlo; el equipo lo mantuvo a mano/por instrucción y resolvió la memoria histórica con la Skill <code>progress-log</code>.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Claude Code lo carga automáticamente al abrir una sesión en <code>corta/</code>. Remite a <code>docs/SPEC.md</code>, <code>docs/MISSION.md</code> y <code>docs/PROGRESS.md</code>, que el agente lee cuando necesita detalle.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>In-context learning y memoria del repo: el contexto es la única palanca para que el modelo sepa reglas y estado sin depender de su memoria de entrenamiento.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 4</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=claude-desktop-chat&amp;s=9"><span class="ref">01·9</span><span class="t">El chat responde de memoria <span class="pill compl" title="Presentación complementaria: no figura en el calendario">Compl.</span></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=9"><span class="ref">02·9</span><span class="t">Qué lee el agente al pararse en el repo</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=12"><span class="ref">02·12</span><span class="t">El manejo del contexto</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=16"><span class="ref">02·16</span><span class="t">Un ejemplo de CLAUDE.md</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp1-claude-md-reglas" data-title="CLAUDE.md: reglas no negociables (spec-first, test-first, secretos, MCP)" data-tp="1" data-tp-title="Corta, del caos a producción" data-file="CLAUDE.md" data-from="28" data-to="51">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">CLAUDE.md</span><span class="mono faint">L28–51</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-markdown" data-start="28">## Prácticas de trabajo
+
+1. **Documentar el comportamiento esperado antes de tocarlo.** Mantené `docs/SPEC.md` con el
+   comportamiento de cada endpoint y los casos borde relevantes (entradas inválidas, duplicados,
+   recursos inexistentes). Se actualiza cada vez que el entendimiento del sistema cambia — no es
+   un documento que se escribe una vez y se abandona.
+
+2. **Test-first.** Para cada fix o feature: primero el test, después la implementación que lo
+   hace pasar. Commits separados para uno y otro, así queda trazable en `git log`.
+   - Framework: `node:test` (nativo, sin dependencias nuevas). Correr con `npm test`.
+   - Los tests viven en `tests/` (no `test/` — un directorio llamado `test` hace que Node trate
+     cualquier `.js` adentro como archivo de test, incluidos los helpers). Los archivos de test
+     siguen el patrón `*.test.js`.
+   - `manual-check.js` en la raíz es el script manual heredado (requiere el server ya levantado
+     con `npm start`, se corre aparte con `node manual-check.js`); no es parte de la suite de
+     `npm test` — se renombró desde `test.js` porque ese nombre matcheaba el descubrimiento
+     automático de `node --test` y terminaba pegándole a un server real si había uno corriendo.
+
+3. **Nada de secretos versionados.** Ni hardcodeados en código, ni en archivos de texto o JSON
+   commiteados. Credenciales van en variables de entorno (del proveedor de hosting en
+   producción, `.env` gitignoreado en local).
+
+4. **Usar las herramientas de infraestructura disponibles**, no comandos manuales sueltos,
+   cuando el flujo lo soporta (gestión de repo/colaboradores, servicios, bases de datos, deploy).</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Fija las cuatro prácticas de trabajo que el agente tiene que respetar en cualquier tarea dentro del repo.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ol>
+<li><strong>Spec-first</strong>: mantener <code>docs/SPEC.md</code> con endpoints y casos borde.</li>
+<li><strong>Test-first</strong>: primero el test, después la implementación, en commits separados; framework <code>node:test</code>, tests en <code>tests/*.test.js</code> y la explicación de por qué <code>test.js</code> pasó a <code>manual-check.js</code>.</li>
+<li><strong>Nada de secretos versionados</strong>: credenciales solo en variables de entorno.</li>
+<li><strong>Usar las herramientas de infraestructura disponibles</strong> (los servidores MCP de GitHub y Railway) antes que comandos manuales sueltos.</li>
+</ol>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Convierte decisiones del equipo en reglas que el agente hereda en cada sesión, en vez de repetirlas en cada prompt. La regla 4 es la que empuja al agente a crear repo, base y deploy vía tools MCP; la regla 3 es una capa más de defensa contra filtrar la credencial que venía en <code>notas.txt</code>.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Lo lee el agente al arrancar. Gobierna cómo se escribieron <code>tests/*.test.js</code>, <code>src/server.js</code> y <code>src/postgres.js</code>, y cómo se configuró Railway (<code>railway.json</code>, <code>DATABASE_URL</code>).</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>CLAUDE.md como contrato/memoria del repo: reglas duras, cómo testear y convenciones, en un .md versionado que el agente lee siempre.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 6</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=6"><span class="ref">02·6</span><span class="t">Dónde se empieza: pararse en una carpeta</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=15"><span class="ref">02·15</span><span class="t">CLAUDE.md / AGENTS.md: la memoria del repo</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=16"><span class="ref">02·16</span><span class="t">Un ejemplo de CLAUDE.md</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=55"><span class="ref">06·55</span><span class="t">Conectar un servidor MCP: tres caminos</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=rag-mcp-rapida&amp;s=21"><span class="ref">07·21</span><span class="t">Conectar un servidor: los caminos y la configuración</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/#d=cierre-magnifica-humanitas&amp;s=23"><span class="ref">13·23</span><span class="t">Defensa en profundidad</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp1-claude-md-commits-correr" data-title="CLAUDE.md: commits, política de push y cómo correr" data-tp="1" data-tp-title="Corta, del caos a producción" data-file="CLAUDE.md" data-from="53" data-to="73">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">CLAUDE.md</span><span class="mono faint">L53–73</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-markdown" data-start="53">## Convenciones de commits
+
+- Conventional commits (`feat:`, `fix:`, `test:`, `chore:`, `docs:`, `refactor:`).
+- El commit de test y el de implementación van separados, no amontonados.
+- Sin atribución de IA en los mensajes de commit.
+
+## Cuándo pushear
+
+- Se commitea localmente con la frecuencia que haga falta (test rojo, fix, doc, etc.) — eso no
+  cambia.
+- El **push** a `origin` se hace recién cuando se cierra un milestone completo (ver
+  `docs/PROGRESS.md`), no commit a commit. Excepción: si el usuario pide explícitamente pushear
+  antes.
+
+## Cómo correr la app
+
+```bash
+npm install
+npm start        # levanta server.js en localhost:3000
+npm test         # corre la suite de tests (node:test)
+```</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Define el formato de los commits, cuándo se puede pushear y los tres comandos para instalar, levantar y testear.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li>Conventional commits (<code>feat:</code>, <code>fix:</code>, <code>test:</code>…) con test e implementación en commits separados y sin atribución de IA.</li>
+<li>Commits locales libres, pero <strong>push a <code>origin</code> solo al cerrar un milestone</strong> (o si el usuario lo pide).</li>
+<li><code>npm install</code>, <code>npm start</code>, <code>npm test</code>: lo que el agente corre en su loop para verificar.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Le da al agente el «cómo verifico» (<code>npm test</code>) y pone un punto de control humano antes de que algo salga al remoto. Es la razón por la que en <code>git log</code> se ven pares <code>test:</code>→<code>fix:</code>.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p><code>npm test</code> ejecuta <code>node --test</code> (definido en <code>package.json</code>), que descubre los archivos de <code>tests/</code>. La política de push se apoya en <code>docs/PROGRESS.md</code> para saber cuándo un milestone está cerrado.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Agente de código en loop (planificar, editar, correr, verificar) con un humano que controla los puntos irreversibles.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 5</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=introduccion&amp;s=17"><span class="ref">01·17</span><span class="t">Entregables de clase</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=3"><span class="ref">02·3</span><span class="t">Agentes de código: Claude Code y Codex</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=15"><span class="ref">02·15</span><span class="t">CLAUDE.md / AGENTS.md: la memoria del repo</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=16"><span class="ref">02·16</span><span class="t">Un ejemplo de CLAUDE.md</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/#d=cierre-magnifica-humanitas&amp;s=23"><span class="ref">13·23</span><span class="t">Defensa en profundidad</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp1-readme-estructura" data-title="README: uso y estructura del repo" data-tp="1" data-tp-title="Corta, del caos a producción" data-file="README.md" data-from="1" data-to="28">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">README.md</span><span class="mono faint">L1–28</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-markdown" data-start="1"># Corta
+
+Acortador de URLs interno.
+
+Producción: [https://corta-production-7bc5.up.railway.app](https://corta-production-7bc5.up.railway.app)
+
+## Uso
+
+```bash
+npm install
+cp .env.example .env
+# editar DATABASE_URL en .env con una base PostgreSQL local
+npm start         # levanta el server en http://localhost:3000
+npm test          # corre la suite de tests (node:test, no requiere PostgreSQL)
+```
+
+Interfaz web en `http://localhost:3000` (crear links) y `http://localhost:3000/stats.html`
+(consultar estadísticas).
+
+## Estructura
+
+```
+src/      código de la app (server.js, utils.js)
+data/     datos heredados que se importan a PostgreSQL sin pisar registros
+public/   frontend estático
+tests/    suite de node:test
+docs/      documentación del proyecto
+```</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Explica en pocas líneas qué es Corta, cómo levantarlo y testearlo, y qué hay en cada carpeta.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li>Link a producción.</li>
+<li>«Uso»: <code>npm install</code>, copiar <code>.env.example</code>, <code>npm start</code>, <code>npm test</code> (que no requiere PostgreSQL).</li>
+<li>«Estructura»: <code>src/</code>, <code>data/</code>, <code>public/</code>, <code>tests/</code>, <code>docs/</code> con una línea cada una.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Cumple el criterio del M2: entender el repo en menos de 2 minutos. El orden (y haber borrado <code>server_OLD.js</code> e <code>index_v2_FINAL.js</code>) también es contexto para el agente, que explora el repo leyendo README y árbol en vez de cargarlo entero.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Remite a <code>docs/MISSION.md</code>, <code>docs/SPEC.md</code>, <code>docs/PROGRESS.md</code> y <code>CLAUDE.md</code>; los comandos coinciden con los <code>scripts</code> de <code>package.json</code>.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>El agente explora el repo con herramientas (árbol, README, configs): el orden del repo es contexto.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 1</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=9"><span class="ref">02·9</span><span class="t">Qué lee el agente al pararse en el repo</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp1-readme-deploy" data-title="README: configuración y deploy en Railway" data-tp="1" data-tp-title="Corta, del caos a producción" data-file="README.md" data-from="30" data-to="48">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">README.md</span><span class="mono faint">L30–48</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-markdown" data-start="30">## Configuración
+
+- `DATABASE_URL` (obligatoria): URL de conexión a PostgreSQL. Nunca se versiona su valor real.
+- `PORT` (opcional): puerto HTTP; por defecto `3000`. Railway lo define automáticamente.
+
+Al arrancar, la app crea la tabla `links` si no existe e importa los registros heredados de
+`data/links.json` con `ON CONFLICT DO NOTHING`. A partir de ahí, PostgreSQL es la única fuente de
+verdad. `GET /health` comprueba también que la base esté accesible.
+
+## Deploy en Railway
+
+El repo incluye `railway.json` con Railpack y healthcheck en `/health`. El servicio web necesita
+una base PostgreSQL en el mismo proyecto y una variable de referencia:
+
+```text
+DATABASE_URL=${{Postgres.DATABASE_URL}}
+```
+
+Luego se despliega con `railway up` y se genera el dominio público con `railway domain`.</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Documenta las variables de entorno y cómo quedó armado el deploy en Railway.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li><code>DATABASE_URL</code> obligatoria y nunca versionada; <code>PORT</code> lo define Railway.</li>
+<li>Al arrancar se crea la tabla <code>links</code> y se importan los datos heredados con <code>ON CONFLICT DO NOTHING</code>.</li>
+<li>El servicio web referencia la base del mismo proyecto con <code>DATABASE_URL=${{Postgres.DATABASE_URL}}</code>.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Deja por escrito el resultado de lo que el agente hizo contra Railway vía MCP (provisionar Postgres, setear la variable de referencia, deployar y generar el dominio). La configuración de los servidores MCP en sí no está versionada en el repo: lo que queda es este resultado y <code>railway.json</code>.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Describe cómo se conectan <code>railway.json</code>, <code>src/server.js</code> (<code>iniciar()</code> lee <code>DATABASE_URL</code> y <code>PORT</code>) y <code>src/postgres.js</code>.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>MCP: el servidor expone acciones de un servicio (crear base, variables, deploy) como tools que el agente llama dentro de su loop.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 6</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=claude-desktop-chat&amp;s=20"><span class="ref">01·20</span><span class="t">External connectors: todo pasa por MCP <span class="pill compl" title="Presentación complementaria: no figura en el calendario">Compl.</span></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=24"><span class="ref">02·24</span><span class="t">Qué es MCP</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=46"><span class="ref">06·46</span><span class="t">MCP conecta modelos con herramientas</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=59"><span class="ref">06·59</span><span class="t">Un agente, varios servidores</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=rag-mcp-rapida&amp;s=16"><span class="ref">07·16</span><span class="t">MCP conecta modelos con herramientas</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/#d=cierre-magnifica-humanitas&amp;s=20"><span class="ref">13·20</span><span class="t">Cada conector, una decisión de confianza</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp1-progress-md-milestones" data-title="docs/PROGRESS.md: estado por milestone" data-tp="1" data-tp-title="Corta, del caos a producción" data-file="docs/PROGRESS.md" data-from="1" data-to="35">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">docs/PROGRESS.md</span><span class="mono faint">L1–35</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-markdown" data-start="1"># Progreso — Corta
+
+Registro del avance sobre los milestones definidos en `MISSION.md`. Se actualiza a medida que
+se cierra o arranca trabajo — no es un documento de una sola vez.
+
+## Milestone 1 — Trackear desde el principio
+
+**Estado: hecho.**
+
+- Repo inicializado con el estado heredado tal cual (salvo `node_modules/`), como primer commit.
+- `notas.txt` (contenía una credencial de Postgres) gitignoreado desde el inicio; la historia se
+  reescribió una vez para sacarla por completo antes del primer push.
+
+## Milestone 2 — Ordenar
+
+**Estado: hecho.**
+
+- [x] Archivos muertos eliminados: `server_OLD.js`, `index_v2_FINAL.js`,
+      `links_backup_marzo.json`, `public/estilos_viejos.css`.
+- [x] Dependencias sin uso eliminadas: `lodash`, `moment`.
+- [x] Estructura de directorios: `src/` (código), `data/` (persistencia), `docs/` (documentación),
+      `public/` (frontend), `tests/` (suite de `node:test`).
+- [x] `README.md`.
+
+## Milestone 3 — Corregir errores conocidos
+
+**Estado: hecho.**
+
+- [x] Bug de redirect: `GET /:codigo` hacía `res.send(link.url)` en vez de redirigir. Corregido a
+      `res.redirect(...)`. De paso se encontró y corrigió que el incremento de `clicks` no se
+      persistía en disco.
+- [x] Colisión de código: `POST /api/links` ahora reintenta la generación hasta encontrar un
+      código libre, en vez de pisar un link existente.
+- Ambos cubiertos con TDD (`tests/redirect.test.js`, `tests/collision.test.js`), test-first con
+  commits de test e implementación separados.</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Registra el estado de cada milestone con checklist: qué se hizo y cómo quedó cubierto.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li>Encabezado: «se actualiza a medida que se cierra o arranca trabajo».</li>
+<li>M1: estado heredado como primer commit; <code>notas.txt</code> gitignoreado y la historia reescrita antes del primer push.</li>
+<li>M2: archivos muertos y dependencias eliminadas, estructura de carpetas, README.</li>
+<li>M3: bug de redirect y colisión, ambos con TDD y commits separados.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Mantiene la ventana de contexto chica: una sesión nueva lee este archivo y sabe qué falta, sin arrastrar la conversación anterior ni re-explicar. Además sirve como criterio para la política de push de <code>CLAUDE.md</code>.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p><code>CLAUDE.md</code> lo nombra como lugar a actualizar al cerrar o arrancar un milestone; el commit <code>d777803</code> lo agregó y los siguientes lo fueron completando.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Manejo del contexto: persistir el estado en un archivo en vez de en el historial de chat, para poder abrir sesiones nuevas (o <code>/compact</code>) sin perder información.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 2</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=claude-desktop-chat&amp;s=9"><span class="ref">01·9</span><span class="t">El chat responde de memoria <span class="pill compl" title="Presentación complementaria: no figura en el calendario">Compl.</span></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=12"><span class="ref">02·12</span><span class="t">El manejo del contexto</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp1-progress-md-produccion" data-title="PROGRESS.md: Milestone 5 y la prueba de redeploy" data-tp="1" data-tp-title="Corta, del caos a producción" data-file="docs/PROGRESS.md" data-from="46" data-to="58">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">docs/PROGRESS.md</span><span class="mono faint">L46–58</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-markdown" data-start="46">## Milestone 5 — Producción
+
+**Estado: hecho.**
+
+- [x] Deploy en Railway (servicio `corta` + PostgreSQL) disponible en
+      `https://corta-production-7bc5.up.railway.app`.
+- [x] Persistencia migrada de JSON a PostgreSQL, con incremento atómico de clicks y migración
+      inicial no destructiva de los datos heredados.
+- [x] Variables de entorno para credenciales, sin secretos en el código (`DATABASE_URL`).
+- [x] Configuración de Railway versionada (`railway.json`), puerto dinámico y healthcheck de app +
+      base de datos en `GET /health`.
+- [x] Persistencia verificada end-to-end: se creó el link `v4v`, se registró una redirección,
+      se forzó un redeploy y luego se confirmó que seguía existiendo con `clicks: 1`.</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Registra el cierre del Milestone 5: deploy en Railway, migración a PostgreSQL, credenciales por variable de entorno y la prueba de persistencia con el link <code>v4v</code>.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li>Lista cada requisito de producción como checkbox hecho.</li>
+<li>La última viñeta documenta la verificación end-to-end: crear <code>v4v</code>, redirigir una vez, forzar un redeploy y confirmar <code>clicks: 1</code>.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>La evidencia de que la migración funcionó no es un test unitario sino una prueba contra producción, y queda escrita para la próxima sesión y para la defensa.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Lo actualiza el agente al cerrar el milestone, como pide <code>CLAUDE.md</code>. Resume lo que implementan <code>src/postgres.js</code>, <code>src/server.js</code> (<code>iniciar()</code>) y <code>railway.json</code>.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Validación humana del trabajo del agente: una prueba diseñada por el equipo que verifica el comportamiento real, no solo el código.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 2</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=33"><span class="ref">02·33</span><span class="t">La misión: del caos a producción</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/#d=cierre-magnifica-humanitas&amp;s=33"><span class="ref">13·33</span><span class="t">La potencia del centauro</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp1-spec-post-redirect" data-title="SPEC.md: contrato de POST /api/links y GET /:codigo" data-tp="1" data-tp-title="Corta, del caos a producción" data-file="docs/SPEC.md" data-from="31" data-to="56">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">docs/SPEC.md</span><span class="mono faint">L31–56</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-markdown" data-start="31">## Endpoints
+
+### `POST /api/links`
+
+Crea un link corto.
+
+- **Request**: `{ &quot;url&quot;: string }`
+- **200**: `{ &quot;codigo&quot;: string, &quot;corta&quot;: &quot;/&lt;codigo&gt;&quot; }`
+- **400** si falta `url`, o si `url` no es una URL absoluta válida con esquema `http`/`https`
+  (ej: `&quot;no es una url&quot;`, `&quot;ftp://algo&quot;`, string vacío).
+- El código se genera al azar entre `[a-z0-9]{3}` (46656 combinaciones posibles). **Si el código
+  generado ya existe, se descarta y se genera otro** — se reintenta hasta encontrar uno libre.
+  Dos URLs nunca deben terminar compartiendo el mismo código. Cubierto por
+  `tests/collision.test.js`.
+
+### `GET /:codigo`
+
+Redirige al destino.
+
+- Si `codigo` existe: **redirección HTTP (302)** hacia la `url` guardada, e incrementa `clicks`
+  en 1 antes de responder.
+- Si `codigo` no existe: **404**, sin tocar ningún contador.
+
+&gt; **Bug corregido** (era `res.send(link.url)` en vez de `res.redirect(...)`, y además el
+&gt; incremento de `clicks` no se persistía en disco): ambos quedan cubiertos por
+&gt; `tests/redirect.test.js`.</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Especifica qué debe hacer cada endpoint principal, incluidos los códigos de error y el comportamiento ante colisiones.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li><code>POST /api/links</code>: recibe <code>{ url }</code>, devuelve <code>{ codigo, corta }</code>; <strong>400</strong> si falta la url o no es <code>http</code>/<code>https</code> válida.</li>
+<li>Colisión: si el código generado ya existe, se descarta y se genera otro (cubierto por <code>tests/collision.test.js</code>).</li>
+<li><code>GET /:codigo</code>: <strong>302</strong> al destino e incremento de <code>clicks</code>; <strong>404</strong> si no existe.</li>
+<li>Nota «Bug corregido»: documenta el <code>res.send(link.url)</code> original y el clic que no se persistía.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Es la fuente de la que se derivan los tests: «todo lo que describe acá tiene que estar cubierto por un test». Ojo para la defensa: la validación de URL inválida (400 para <code>"ftp://algo"</code>) está prometida acá pero <code>src/server.js</code> solo chequea <code>!url</code> y no hay test que la cubra.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Alimenta <code>tests/redirect.test.js</code> y <code>tests/collision.test.js</code>, que a su vez guiaron los cambios en <code>src/server.js</code>. <code>CLAUDE.md</code> obliga a mantenerlo al día.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Especificación en .md dentro del repo (SPEC.md) como conocimiento del proyecto y base de TDD.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 3</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=claude-desktop-chat&amp;s=9"><span class="ref">01·9</span><span class="t">El chat responde de memoria <span class="pill compl" title="Presentación complementaria: no figura en el calendario">Compl.</span></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=11"><span class="ref">02·11</span><span class="t">El conocimiento del proyecto en .md</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=29"><span class="ref">02·29</span><span class="t">El nuevo rol: Diseñar, delegar y revisar</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp1-package-json-scripts" data-title="package.json: npm start con .env opcional y npm test" data-tp="1" data-tp-title="Corta, del caos a producción" data-file="package.json" data-from="9" data-to="12">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">package.json</span><span class="mono faint">L9–12</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-json" data-start="9">  &quot;scripts&quot;: {
+    &quot;start&quot;: &quot;node --env-file-if-exists=.env src/server.js&quot;,
+    &quot;test&quot;: &quot;node --test&quot;
+  },</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Define los dos comandos del proyecto: <code>npm start</code> levanta <code>src/server.js</code> cargando <code>.env</code> solo si existe, y <code>npm test</code> corre la suite nativa de Node.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li><code>start</code> usa <code>node --env-file-if-exists=.env</code>: en local toma las variables de un <code>.env</code> gitignoreado; en Railway el archivo no existe y las variables vienen del proveedor.</li>
+<li><code>test</code> es <code>node --test</code>, que descubre los <code>*.test.js</code> de <code>tests/</code> sin dependencias extra.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Saca las credenciales del código: <code>src/server.js</code> solo lee <code>process.env.DATABASE_URL</code>, y quién la provee (un <code>.env</code> local o Railway) queda fuera del repo. <code>node:test</code> evita sumar un framework de tests.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p><code>npm start</code> ejecuta <code>iniciar()</code> de <code>src/server.js</code>; <code>npm test</code> corre <code>tests/*.test.js</code>. <code>CLAUDE.md</code> y <code>README.md</code> remiten a estos dos comandos.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Separar secretos del código (variables de entorno) y darle al agente un comando único y verificable para validar cada cambio.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 4</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=introduccion&amp;s=13"><span class="ref">01·13</span><span class="t">Limitaciones de la IA Generativa</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=3"><span class="ref">02·3</span><span class="t">Agentes de código: Claude Code y Codex</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=30"><span class="ref">02·30</span><span class="t">Antes de cerrar: cuidados</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/#d=cierre-magnifica-humanitas&amp;s=23"><span class="ref">13·23</span><span class="t">Defensa en profundidad</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp1-progress-log-0001" data-title="progress_log/: el primer commit documentado" data-tp="1" data-tp-title="Corta, del caos a producción" data-file="progress_log/0001-a6061b7.md" data-from="1" data-to="21">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">progress_log/0001-a6061b7.md</span><span class="mono faint">L1–21</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-markdown" data-start="1"># 0001 — chore: estado inicial heredado de Corta
+
+- **Commit:** a6061b7f2f3aa89b9b2abccd011e820328a8dad3
+- **Author:** FranCalveyra
+- **Date:** Wed Aug 12 17:23:20 2026 -0300
+
+## Summary
+
+First commit of the repo: the Corta project dumped exactly as the previous developer left it,
+deliberately uncurated. It&#39;s a small Express URL shortener: `server.js` is the real entrypoint
+(reads/writes `links.json`, exposes `POST /api/links` and `GET /:codigo`), with `utils.js` for
+code generation. But it ships alongside dead weight typical of an unmaintained handoff:
+`index_v2_FINAL.js` and `server_OLD.js` (abandoned duplicate/older entrypoints),
+`links_backup_marzo.json` (a stale backup of the link store), `public/estilos_viejos.css` (an
+unused old stylesheet next to the real `public/estilos.css`), a stray `public/logo (1).png`, and
+`test.js` (a manual smoke-test script, not a real test suite). `package.json`/`package-lock.json`
+declare the original dependencies (`express`, `axios`, plus two that turn out unused —
+`lodash`, `moment`). Only `node_modules/` (regenerable via `npm install`) and a `notas.txt` that
+held a plaintext credential were excluded, via a new `.gitignore`. The intent, per the commit
+message, is a trace-able starting point: everything from here on is a diff against this exact
+inherited state, duplicates and all.</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Es el log generado para el primer commit (<code>a6061b7</code>): quién, cuándo, qué se subió y qué se dejó afuera.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li>Cabecera con hash completo, autor (<code>FranCalveyra</code>) y fecha.</li>
+<li>«Summary» explica que el commit sube el caos heredado sin curar (<code>server_OLD.js</code>, <code>index_v2_FINAL.js</code>, backups, <code>test.js</code>).</li>
+<li>Aclara las dos exclusiones: <code>node_modules/</code> y <code>notas.txt</code> con la credencial en texto plano.</li>
+<li>El nombre <code>0001-a6061b7</code> es la posición en <code>git log --reverse</code> + el hash corto.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Da trazabilidad: cada uno de los 21 commits tiene su <code>.md</code> con resumen, archivos e impacto, así cualquiera (o el agente) reconstruye por qué se hizo cada cambio sin leer todos los diffs. Este en particular documenta el punto de partida del M1.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Lo escribió el agente siguiendo <code>.claude/skills/progress-log/SKILL.md</code>, a partir de la lista que devuelve <code>scripts/progress-log-missing.sh</code> y de <code>git show</code>.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Trazabilidad de decisiones, código y pruebas como entregable; el repo con historia completa como evidencia.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 4</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=introduccion&amp;s=17"><span class="ref">01·17</span><span class="t">Entregables de clase</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=18"><span class="ref">02·18</span><span class="t">Qué es una Skill</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=32"><span class="ref">02·32</span><span class="t">La historia de Corta</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/#d=cierre-magnifica-humanitas&amp;s=14"><span class="ref">13·14</span><span class="t">Clasificá antes de pegar</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp1-stats-html-fetch" data-title="stats.html: la página que consume el endpoint de stats" data-tp="1" data-tp-title="Corta, del caos a producción" data-file="public/stats.html" data-from="34" data-to="51">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">public/stats.html</span><span class="mono faint">L34–51</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-javascript" data-start="34">    form.addEventListener(&#39;submit&#39;, async (e) =&gt; {
+      e.preventDefault();
+      const codigo = document.getElementById(&#39;codigo&#39;).value.trim();
+      const res = await fetch(&#39;/api/links/&#39; + encodeURIComponent(codigo) + &#39;/stats&#39;);
+
+      if (!res.ok) {
+        stats.classList.add(&#39;oculto&#39;);
+        statsError.classList.remove(&#39;oculto&#39;);
+        return;
+      }
+
+      const data = await res.json();
+      document.getElementById(&#39;stat-clicks&#39;).textContent = data.clicks;
+      document.getElementById(&#39;stat-url&#39;).textContent = data.url;
+      document.getElementById(&#39;stat-creado&#39;).textContent = new Date(data.creado).toLocaleDateString();
+      statsError.classList.add(&#39;oculto&#39;);
+      stats.classList.remove(&#39;oculto&#39;);
+    });</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Al enviar el formulario, pide las estadísticas del código al backend y muestra clicks, URL y fecha, o un error si no existe.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li>Toma el código del input y hace <code>fetch('/api/links/' + encodeURIComponent(codigo) + '/stats')</code>.</li>
+<li>Si <code>res.ok</code> es falso (404), muestra <code>stats-error</code>.</li>
+<li>Si no, pinta <code>data.clicks</code>, <code>data.url</code> y <code>data.creado</code> en la tarjeta.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Cierra el Milestone 4: la página existía en el código heredado pero no estaba conectada a datos reales.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Consume <code>GET /api/links/:codigo/stats</code> de <code>src/server.js</code>; Express la sirve desde <code>public/</code> con <code>express.static</code>.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>El último eslabón de la cadena: lo que el test garantiza es lo que termina viendo el usuario.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 1</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=introduccion&amp;s=12"><span class="ref">01·12</span><span class="t">Transformación en Ingeniería de Software</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp1-railway-json" data-title="railway.json: build y healthcheck versionados" data-tp="1" data-tp-title="Corta, del caos a producción" data-file="railway.json" data-from="1" data-to="12">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">railway.json</span><span class="mono faint">L1–12</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-json" data-start="1">{
+  &quot;$schema&quot;: &quot;https://railway.com/railway.schema.json&quot;,
+  &quot;build&quot;: {
+    &quot;builder&quot;: &quot;RAILPACK&quot;
+  },
+  &quot;deploy&quot;: {
+    &quot;healthcheckPath&quot;: &quot;/health&quot;,
+    &quot;healthcheckTimeout&quot;: 120,
+    &quot;restartPolicyType&quot;: &quot;ON_FAILURE&quot;,
+    &quot;restartPolicyMaxRetries&quot;: 3
+  }
+}</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Configura en el repo cómo Railway construye y despliega Corta.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li><code>builder: RAILPACK</code> detecta y construye la app Node.</li>
+<li><code>healthcheckPath: /health</code> con 120 s de timeout: Railway solo activa el deploy si la app responde.</li>
+<li><code>restartPolicyType: ON_FAILURE</code> con 3 reintentos.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Versionar la configuración de infraestructura evita que dependa de clics en un panel o de lo que el agente haya hecho en una sesión: queda revisable en un diff. Combinado con el MCP de Railway, el agente deploya y la config queda en GitHub.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Railway lo lee en cada deploy; el healthcheck pega a <code>GET /health</code> de <code>src/server.js</code>, que llama a <code>verificarConexion()</code> de <code>src/postgres.js</code>.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Un agente con varios servidores MCP (GitHub para versionar, Railway para infraestructura) y la infraestructura como archivos revisables.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 4</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=24"><span class="ref">02·24</span><span class="t">Qué es MCP</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=46"><span class="ref">06·46</span><span class="t">MCP conecta modelos con herramientas</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=59"><span class="ref">06·59</span><span class="t">Un agente, varios servidores</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=rag-mcp-rapida&amp;s=16"><span class="ref">07·16</span><span class="t">MCP conecta modelos con herramientas</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp1-script-progress-log" data-title="Script determinista: commits sin log" data-tp="1" data-tp-title="Corta, del caos a producción" data-file="scripts/progress-log-missing.sh" data-from="15" data-to="28">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">scripts/progress-log-missing.sh</span><span class="mono faint">L15–28</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-bash" data-start="15">set -euo pipefail
+
+REPO_ROOT=$(git rev-parse --show-toplevel)
+LOG_DIR=&quot;$REPO_ROOT/progress_log&quot;
+mkdir -p &quot;$LOG_DIR&quot;
+
+seq=0
+while IFS= read -r hash; do
+  seq=$((seq + 1))
+  num=$(printf &quot;%04d&quot; &quot;$seq&quot;)
+  if ! ls &quot;$LOG_DIR&quot; 2&gt;/dev/null | grep -q &quot;^${num}-&quot;; then
+    echo &quot;${num} ${hash}&quot;
+  fi
+done &lt; &lt;(git -C &quot;$REPO_ROOT&quot; log --reverse --format=&#39;%H&#39;)</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Lista, en orden cronológico, los commits que todavía no tienen archivo en <code>progress_log/</code>.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li><code>set -euo pipefail</code> corta ante cualquier error.</li>
+<li>Ubica la raíz con <code>git rev-parse --show-toplevel</code> y crea <code>progress_log/</code> si falta.</li>
+<li>Recorre <code>git log --reverse --format='%H'</code>, incrementa <code>seq</code> y lo formatea a 4 dígitos (<code>num</code>).</li>
+<li>Si no hay un archivo que empiece con <code>${num}-</code>, imprime <code>NNNN hash</code>.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Separa lo determinista (qué commits faltan, con qué número) de lo que hace bien el modelo (resumir un diff en prosa). Así la numeración no depende de que el modelo cuente bien y la Skill es idempotente.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Lo invoca el paso 1 de <code>.claude/skills/progress-log/SKILL.md</code> y de <code>.codex/prompts/progress-log.md</code>; su salida decide qué <code>progress_log/NNNN-hash.md</code> escribe el agente.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Skills que combinan instrucciones en prosa con scripts: el código hace lo exacto y el modelo lo interpretativo.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 2</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=18"><span class="ref">02·18</span><span class="t">Qué es una Skill</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=claude-cowork&amp;s=17"><span class="ref">02·17</span><span class="t">Qué es una Skill <span class="pill compl" title="Presentación complementaria: no figura en el calendario">Compl.</span></span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp1-postgres-repo" data-title="Repositorio PostgreSQL: crear sin pisar e incremento atómico" data-tp="1" data-tp-title="Corta, del caos a producción" data-file="src/postgres.js" data-from="15" data-to="56">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">src/postgres.js</span><span class="mono faint">L15–56</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-javascript" data-start="15">function crearRepositorioPostgres(pool) {
+  return {
+    async inicializar() {
+      await pool.query(`
+        CREATE TABLE IF NOT EXISTS links (
+          codigo VARCHAR(3) PRIMARY KEY CHECK (codigo ~ &#39;^[a-z0-9]{3}$&#39;),
+          url TEXT NOT NULL,
+          clicks INTEGER NOT NULL DEFAULT 0 CHECK (clicks &gt;= 0),
+          creado TIMESTAMPTZ NOT NULL
+        )
+      `);
+    },
+
+    async crear(link) {
+      const resultado = await pool.query(
+        `INSERT INTO links (codigo, url, clicks, creado)
+         VALUES ($1, $2, $3, $4)
+         ON CONFLICT (codigo) DO NOTHING
+         RETURNING codigo`,
+        [link.codigo, link.url, link.clicks, link.creado]
+      );
+      return resultado.rowCount === 1;
+    },
+
+    async buscar(codigo) {
+      const resultado = await pool.query(
+        &#39;SELECT codigo, url, clicks, creado FROM links WHERE codigo = $1&#39;,
+        [codigo]
+      );
+      return normalizarLink(resultado.rows[0]);
+    },
+
+    async incrementarClicks(codigo) {
+      const resultado = await pool.query(
+        `UPDATE links
+         SET clicks = clicks + 1
+         WHERE codigo = $1
+         RETURNING codigo, url, clicks, creado`,
+        [codigo]
+      );
+      return normalizarLink(resultado.rows[0]);
+    },</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Implementa la persistencia en PostgreSQL: crea la tabla, inserta links sin pisar códigos existentes, busca y suma clicks de forma atómica.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li><code>inicializar()</code>: <code>CREATE TABLE IF NOT EXISTS links</code> con <code>codigo</code> como PRIMARY KEY y <code>CHECK</code> del formato <code>[a-z0-9]{3}</code>.</li>
+<li><code>crear(link)</code>: <code>INSERT … ON CONFLICT (codigo) DO NOTHING</code> y devuelve <code>rowCount === 1</code> (true si insertó, false si chocó).</li>
+<li><code>buscar(codigo)</code>: <code>SELECT</code> + <code>normalizarLink</code> para devolver <code>creado</code> como ISO.</li>
+<li><code>incrementarClicks(codigo)</code>: <code>UPDATE … SET clicks = clicks + 1 … RETURNING</code>, una sola sentencia.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Responde «¿dónde viven los datos?»: el <code>links.json</code> en disco no sobrevive a un redeploy en Railway; Postgres sí (prueba: el link <code>v4v</code> siguió con <code>clicks: 1</code> tras un redeploy forzado). El <code>UPDATE</code> atómico evita perder clicks con redirecciones concurrentes, y <code>ON CONFLICT</code> sirve tanto para colisiones como para importar datos heredados.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Lo crea <code>conectarPostgres()</code> y lo usan <code>iniciar()</code> y <code>crearApp()</code> en <code>src/server.js</code>. Se testea con un pool falso en <code>tests/postgres.test.js</code>.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Delegar una tarea completa al agente (migrar la persistencia) con el criterio de aceptación fijado antes en tests.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 2</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=4"><span class="ref">02·4</span><span class="t">Delegar una tarea completa</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=33"><span class="ref">02·33</span><span class="t">La misión: del caos a producción</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp1-server-rutas" data-title="Rutas de Corta: crear, stats y redirigir" data-tp="1" data-tp-title="Corta, del caos a producción" data-file="src/server.js" data-from="23" data-to="63">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">src/server.js</span><span class="mono faint">L23–63</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-javascript" data-start="23">  // crear un link corto
+  app.post(&#39;/api/links&#39;, rutaAsync(async function (req, res) {
+    const { url } = req.body;
+    if (!url) {
+      return res.status(400).json({ error: &#39;Falta la url&#39; });
+    }
+
+    const creado = new Date().toISOString();
+    let codigo;
+    let creadoEnDB = false;
+
+    while (!creadoEnDB) {
+      codigo = generarCodigo();
+      creadoEnDB = await repositorio.crear({
+        codigo,
+        url,
+        clicks: 0,
+        creado
+      });
+    }
+
+    res.json({ codigo, corta: &#39;/&#39; + codigo });
+  }));
+
+  // estadisticas de un link
+  app.get(&#39;/api/links/:codigo/stats&#39;, rutaAsync(async function (req, res) {
+    const link = await repositorio.buscar(req.params.codigo);
+    if (!link) {
+      return res.status(404).json({ error: &#39;No existe ese link&#39; });
+    }
+    res.json(link);
+  }));
+
+  // redirigir al destino e incrementar el contador en una sola operacion atomica
+  app.get(&#39;/:codigo&#39;, rutaAsync(async function (req, res) {
+    const link = await repositorio.incrementarClicks(req.params.codigo);
+    if (!link) {
+      return res.status(404).send(&#39;No existe ese link&#39;);
+    }
+    res.redirect(link.url);
+  }));</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Define los tres endpoints de negocio: crear un link, consultar sus estadísticas y redirigir incrementando clicks.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li><code>POST /api/links</code>: si falta <code>url</code> responde 400; después repite <code>generarCodigo()</code> + <code>repositorio.crear(...)</code> hasta que <code>creadoEnDB</code> sea <code>true</code> (resuelve colisiones).</li>
+<li><code>GET /api/links/:codigo/stats</code>: <code>repositorio.buscar</code> y 404 si no existe.</li>
+<li><code>GET /:codigo</code>: <code>repositorio.incrementarClicks</code> en una sola operación y <code>res.redirect(link.url)</code> (302); 404 si no existe.</li>
+<li>Todo envuelto en <code>rutaAsync</code> para que los errores lleguen al middleware de 500.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Es el código que el agente tipeó en las vueltas <code>fix:</code>/<code>feat:</code>; cada rama tiene un test que la fijó antes. Nótese que solo valida <code>!url</code>: el 400 por URL inválida que promete <code>SPEC.md</code> no está implementado.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Vive dentro de <code>crearApp(repositorio)</code>, que recibe Postgres en producción (<code>iniciar()</code>) o el repositorio en memoria de <code>tests/helpers.js</code> en los tests. <code>public/stats.html</code> consume la ruta de stats.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Revisión humana del output del agente: el código se acepta porque los tests derivados del SPEC lo verifican, no porque «parezca bien».</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 4</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=introduccion&amp;s=12"><span class="ref">01·12</span><span class="t">Transformación en Ingeniería de Software</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=11"><span class="ref">02·11</span><span class="t">El conocimiento del proyecto en .md</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=13"><span class="ref">02·13</span><span class="t">Iterar con el agente sobre el código</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=29"><span class="ref">02·29</span><span class="t">El nuevo rol: Diseñar, delegar y revisar</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp1-server-iniciar" data-title="iniciar(): DATABASE_URL, migración y puerto" data-tp="1" data-tp-title="Corta, del caos a producción" data-file="src/server.js" data-from="73" data-to="103">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">src/server.js</span><span class="mono faint">L73–103</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-javascript" data-start="73">async function iniciar() {
+  if (!process.env.DATABASE_URL) {
+    throw new Error(&#39;Falta la variable de entorno DATABASE_URL&#39;);
+  }
+
+  const repositorio = conectarPostgres(process.env.DATABASE_URL);
+  await repositorio.inicializar();
+
+  // Migra una sola vez los links heredados; los codigos ya presentes nunca se pisan.
+  for (const link of linksIniciales) {
+    await repositorio.crear(link);
+  }
+
+  const app = crearApp(repositorio);
+  const puerto = Number(process.env.PORT) || 3000;
+  const server = app.listen(puerto, &#39;0.0.0.0&#39;, function () {
+    console.log(`Corta escuchando en el puerto ${puerto}`);
+  });
+
+  async function cerrar() {
+    server.close(async function () {
+      await repositorio.cerrar();
+      process.exit(0);
+    });
+  }
+
+  process.once(&#39;SIGTERM&#39;, cerrar);
+  process.once(&#39;SIGINT&#39;, cerrar);
+
+  return { app, server, repositorio };
+}</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Arranca Corta en producción: exige <code>DATABASE_URL</code>, conecta a Postgres, crea la tabla, importa los links heredados y escucha en <code>PORT</code>.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li>Si falta <code>process.env.DATABASE_URL</code>, lanza un error: no hay credencial por defecto en el código.</li>
+<li><code>conectarPostgres(...)</code> y <code>repositorio.inicializar()</code> crean la tabla <code>links</code> si no existe.</li>
+<li>Recorre <code>linksIniciales</code> (de <code>data/links.json</code>) y llama a <code>repositorio.crear(link)</code>: los códigos existentes no se pisan.</li>
+<li>Escucha en <code>Number(process.env.PORT) || 3000</code> sobre <code>0.0.0.0</code> y cierra el pool ante <code>SIGTERM</code>/<code>SIGINT</code>.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Es donde se materializa «secretos fuera del código»: la credencial la inyecta Railway (<code>${{Postgres.DATABASE_URL}}</code>, seteada vía MCP) y el código solo la lee. La importación idempotente permite redeployar sin duplicar ni perder datos.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Se ejecuta con <code>npm start</code> (<code>node --env-file-if-exists=.env src/server.js</code>). Usa <code>conectarPostgres</code> de <code>src/postgres.js</code> y <code>crearApp</code> del mismo archivo.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Mínimo privilegio y separación de secretos: la app recibe credenciales por entorno, nunca por código ni por contexto del agente.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 6</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=introduccion&amp;s=13"><span class="ref">01·13</span><span class="t">Limitaciones de la IA Generativa</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=claude-desktop-chat&amp;s=20"><span class="ref">01·20</span><span class="t">External connectors: todo pasa por MCP <span class="pill compl" title="Presentación complementaria: no figura en el calendario">Compl.</span></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=4"><span class="ref">02·4</span><span class="t">Delegar una tarea completa</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=30"><span class="ref">02·30</span><span class="t">Antes de cerrar: cuidados</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=33"><span class="ref">02·33</span><span class="t">La misión: del caos a producción</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/#d=cierre-magnifica-humanitas&amp;s=20"><span class="ref">13·20</span><span class="t">Cada conector, una decisión de confianza</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp1-utils-generar-codigo" data-title="generarCodigo(): 3 caracteres al azar" data-tp="1" data-tp-title="Corta, del caos a producción" data-file="src/utils.js" data-from="1" data-to="12">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">src/utils.js</span><span class="mono faint">L1–12</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-javascript" data-start="1">const CARACTERES = &#39;abcdefghijklmnopqrstuvwxyz0123456789&#39;;
+
+// genera un codigo corto de 3 caracteres
+function generarCodigo() {
+  let codigo = &#39;&#39;;
+  for (let i = 0; i &lt; 3; i++) {
+    codigo += CARACTERES[Math.floor(Math.random() * CARACTERES.length)];
+  }
+  return codigo;
+}
+
+module.exports = { generarCodigo };</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Genera un código corto de 3 caracteres tomados al azar de letras minúsculas y dígitos.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li><code>CARACTERES</code> tiene 36 símbolos.</li>
+<li>El bucle elige 3 veces un índice con <code>Math.floor(Math.random() * CARACTERES.length)</code>.</li>
+<li>No revisa si el código ya existe: con 36³ combinaciones las colisiones son posibles.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Es código heredado y se dejó tal cual: la colisión se resolvió afuera, en el bucle de reintento de <code>POST /api/links</code>, y en Postgres con la clave primaria. Depender de <code>Math.random</code> es lo que permitió forzar la colisión en el test.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Lo llama el <code>while</code> de <code>POST /api/links</code> en <code>src/server.js</code>. <code>tests/collision.test.js</code> mockea <code>Math.random</code> para que devuelva el mismo código dos veces.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Iterar con el agente sobre código real: un test que fuerza un caso borde reproducible antes del fix.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 1</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=13"><span class="ref">02·13</span><span class="t">Iterar con el agente sobre el código</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp1-test-colision" data-title="Test de colisión con Math.random mockeado" data-tp="1" data-tp-title="Corta, del caos a producción" data-file="tests/collision.test.js" data-from="5" data-to="33">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">tests/collision.test.js</span><span class="mono faint">L5–33</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-javascript" data-start="5">test(&#39;POST /api/links reintenta el codigo si el generado ya existe&#39;, async function (t) {
+  const ctx = await iniciarServerDeTest([
+    { codigo: &#39;aaa&#39;, url: &#39;https://ya-existia.com&#39;, clicks: 0, creado: &#39;2026-01-01T00:00:00.000Z&#39; }
+  ]);
+
+  // primer intento de generarCodigo cae en &quot;aaa&quot; (colision), el segundo en &quot;sss&quot; (libre)
+  const secuencia = [0, 0, 0, 0.5, 0.5, 0.5];
+  t.mock.method(Math, &#39;random&#39;, function () {
+    return secuencia.shift();
+  });
+
+  try {
+    const res = await fetch(ctx.baseUrl + &#39;/api/links&#39;, {
+      method: &#39;POST&#39;,
+      headers: { &#39;Content-Type&#39;: &#39;application/json&#39; },
+      body: JSON.stringify({ url: &#39;https://ejemplo.com/nueva&#39; })
+    });
+    const body = await res.json();
+
+    assert.equal(body.codigo, &#39;sss&#39;);
+
+    const links = ctx.leerDB();
+    assert.equal(links.length, 2);
+    assert.equal(links.find(function (l) { return l.codigo === &#39;aaa&#39;; }).url, &#39;https://ya-existia.com&#39;);
+    assert.equal(links.find(function (l) { return l.codigo === &#39;sss&#39;; }).url, &#39;https://ejemplo.com/nueva&#39;);
+  } finally {
+    await ctx.cerrar();
+  }
+});</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Fuerza una colisión de códigos y verifica que <code>POST /api/links</code> genere otro sin pisar el link existente.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li>Arranca con un link existente <code>aaa</code>.</li>
+<li><code>t.mock.method(Math, 'random', …)</code> devuelve la secuencia <code>[0,0,0,0.5,0.5,0.5]</code>: el primer código es <code>aaa</code> (choca) y el segundo <code>sss</code>.</li>
+<li>Comprueba que la respuesta trae <code>sss</code>, que hay 2 links y que <code>aaa</code> conserva su URL original.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Con 46.656 códigos posibles una colisión es rara y no se puede esperar a que pase sola: mockear la aleatoriedad la vuelve determinista y testeable. Es uno de los ciclos <code>test:</code> (<code>c1ace5f</code>) → <code>fix:</code> (<code>dbcba0f</code>) visibles en <code>git log</code>.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Ejerce el bucle de reintento de <code>POST /api/links</code> en <code>src/server.js</code> y <code>generarCodigo()</code> de <code>src/utils.js</code>, a través de <code>tests/helpers.js</code>.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Iterar en vueltas chicas con TDD: tests derivados del SPEC, escritos antes, como unidad de revisión.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 1</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=13"><span class="ref">02·13</span><span class="t">Iterar con el agente sobre el código</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp1-helpers-repo-memoria" data-title="tests/helpers.js: repositorio en memoria para crearApp" data-tp="1" data-tp-title="Corta, del caos a producción" data-file="tests/helpers.js" data-from="1" data-to="28">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">tests/helpers.js</span><span class="mono faint">L1–28</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-javascript" data-start="1">// Repositorio en memoria para probar la app sin depender de PostgreSQL.
+function iniciarServerDeTest(linksIniciales) {
+  const links = structuredClone(linksIniciales || []);
+  const repositorio = {
+    async crear(link) {
+      if (links.some(function (l) { return l.codigo === link.codigo; })) {
+        return false;
+      }
+      links.push(structuredClone(link));
+      return true;
+    },
+    async buscar(codigo) {
+      const link = links.find(function (l) { return l.codigo === codigo; });
+      return link ? structuredClone(link) : null;
+    },
+    async incrementarClicks(codigo) {
+      const link = links.find(function (l) { return l.codigo === codigo; });
+      if (!link) return null;
+      link.clicks += 1;
+      return structuredClone(link);
+    },
+    async verificarConexion() {
+      return true;
+    }
+  };
+  const { crearApp } = require(&#39;../src/server&#39;);
+  const app = crearApp(repositorio);</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Arma un repositorio en memoria con la misma interfaz que el de Postgres y levanta la app real con <code>crearApp</code> para los tests.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li><code>iniciarServerDeTest(linksIniciales)</code> clona los datos iniciales en <code>links</code>.</li>
+<li><code>repositorio</code> implementa <code>crear</code> (devuelve <code>false</code> si el código ya existe), <code>buscar</code>, <code>incrementarClicks</code> y <code>verificarConexion</code>.</li>
+<li>Importa <code>crearApp</code> de <code>src/server.js</code> y le inyecta ese repositorio; después escucha en un puerto libre (<code>listen(0)</code>).</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Permite probar las rutas HTTP reales sin una base PostgreSQL. Funciona porque <code>crearApp(repositorio)</code> recibe la persistencia por parámetro en vez de crearla adentro.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Lo usan <code>tests/redirect.test.js</code>, <code>tests/collision.test.js</code>, <code>tests/stats.test.js</code> y <code>tests/health.test.js</code>. Devuelve <code>baseUrl</code>, <code>leerDB()</code> para mirar el estado y <code>cerrar()</code>.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Verificación diseñada por el equipo: el entorno de prueba aísla la lógica para que cada vuelta del agente se valide rápido con <code>npm test</code>.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 2</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=introduccion&amp;s=12"><span class="ref">01·12</span><span class="t">Transformación en Ingeniería de Software</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/#d=cierre-magnifica-humanitas&amp;s=33"><span class="ref">13·33</span><span class="t">La potencia del centauro</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp1-test-postgres-pool-falso" data-title="Tests de Postgres con un pool falso" data-tp="1" data-tp-title="Corta, del caos a producción" data-file="tests/postgres.test.js" data-from="5" data-to="45">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">tests/postgres.test.js</span><span class="mono faint">L5–45</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-javascript" data-start="5">function poolFalso(resultados) {
+  const consultas = [];
+  return {
+    consultas,
+    async query(texto, valores) {
+      consultas.push({ texto, valores });
+      return resultados.shift() || { rows: [], rowCount: 0 };
+    },
+    async end() {}
+  };
+}
+
+test(&#39;inicializa en PostgreSQL una tabla con codigo unico y datos del link&#39;, async function () {
+  const pool = poolFalso([]);
+  const repositorio = crearRepositorioPostgres(pool);
+
+  await repositorio.inicializar();
+
+  assert.match(pool.consultas[0].texto, /CREATE TABLE IF NOT EXISTS links/i);
+  assert.match(pool.consultas[0].texto, /codigo\s+VARCHAR\(3\)\s+PRIMARY KEY/i);
+  assert.match(pool.consultas[0].texto, /clicks\s+INTEGER\s+NOT NULL/i);
+});
+
+test(&#39;crea un link sin pisar otro codigo y avisa si hubo colision&#39;, async function () {
+  const pool = poolFalso([
+    { rows: [{ codigo: &#39;a3k&#39; }], rowCount: 1 },
+    { rows: [], rowCount: 0 }
+  ]);
+  const repositorio = crearRepositorioPostgres(pool);
+  const link = {
+    codigo: &#39;a3k&#39;,
+    url: &#39;https://ejemplo.com&#39;,
+    clicks: 0,
+    creado: &#39;2026-03-02T14:11:09.000Z&#39;
+  };
+
+  assert.equal(await repositorio.crear(link), true);
+  assert.equal(await repositorio.crear(link), false);
+  assert.match(pool.consultas[0].texto, /ON CONFLICT \(codigo\) DO NOTHING/i);
+  assert.deepEqual(pool.consultas[0].valores, [&#39;a3k&#39;, &#39;https://ejemplo.com&#39;, 0, link.creado]);
+});</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Testea el repositorio PostgreSQL sin base real, con un <code>pool</code> falso que registra las consultas y devuelve resultados preparados.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li><code>poolFalso(resultados)</code> guarda cada <code>query</code> en <code>consultas</code> y devuelve el siguiente resultado de la lista.</li>
+<li>El primer test exige <code>CREATE TABLE IF NOT EXISTS links</code> con <code>codigo VARCHAR(3) PRIMARY KEY</code>.</li>
+<li>El segundo simula un insert exitoso (<code>rowCount: 1</code>) y uno que choca (<code>rowCount: 0</code>), y exige <code>ON CONFLICT (codigo) DO NOTHING</code> con los valores correctos.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Fijó el contrato de la migración a Postgres antes de implementarla (commit <code>d541d7c</code>, test; <code>c331778</code>, feat). Así se pudo delegar «migrá la persistencia a Postgres» y revisar el resultado contra un criterio objetivo, sin necesitar una base para correr <code>npm test</code>.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Importa <code>crearRepositorioPostgres</code> de <code>src/postgres.js</code>, que recibe el pool por parámetro justamente para poder inyectar este falso.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Delegar una tarea completa: el humano define el criterio (tests) y revisa el diff; el agente planifica y ejecuta.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 1</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=4"><span class="ref">02·4</span><span class="t">Delegar una tarea completa</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp1-test-redirect" data-title="Test del bug de redirect" data-tp="1" data-tp-title="Corta, del caos a producción" data-file="tests/redirect.test.js" data-from="5" data-to="36">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">tests/redirect.test.js</span><span class="mono faint">L5–36</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-javascript" data-start="5">test(&#39;GET /:codigo con codigo existente redirige (302) al destino e incrementa clicks&#39;, async function () {
+  const ctx = await iniciarServerDeTest([
+    { codigo: &#39;a3k&#39;, url: &#39;https://ejemplo.com/pagina-larga&#39;, clicks: 0, creado: &#39;2026-03-02T14:11:09.000Z&#39; }
+  ]);
+
+  try {
+    const res = await fetch(ctx.baseUrl + &#39;/a3k&#39;, { redirect: &#39;manual&#39; });
+
+    assert.equal(res.status, 302);
+    assert.equal(res.headers.get(&#39;location&#39;), &#39;https://ejemplo.com/pagina-larga&#39;);
+
+    const links = ctx.leerDB();
+    assert.equal(links.find(function (l) { return l.codigo === &#39;a3k&#39;; }).clicks, 1);
+  } finally {
+    await ctx.cerrar();
+  }
+});
+
+test(&#39;GET /:codigo con codigo inexistente responde 404 sin tocar clicks de otros links&#39;, async function () {
+  const ctx = await iniciarServerDeTest([
+    { codigo: &#39;a3k&#39;, url: &#39;https://ejemplo.com/pagina-larga&#39;, clicks: 5, creado: &#39;2026-03-02T14:11:09.000Z&#39; }
+  ]);
+
+  try {
+    const res = await fetch(ctx.baseUrl + &#39;/zzz&#39;, { redirect: &#39;manual&#39; });
+
+    assert.equal(res.status, 404);
+    assert.equal(ctx.leerDB()[0].clicks, 5);
+  } finally {
+    await ctx.cerrar();
+  }
+});</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Verifica que <code>GET /:codigo</code> redirija con 302 al destino e incremente clicks, y que un código inexistente dé 404 sin tocar contadores.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li>Levanta la app con <code>iniciarServerDeTest</code> y un link <code>a3k</code>.</li>
+<li>Hace <code>fetch</code> con <code>redirect: 'manual'</code> para poder ver el 302 y el header <code>location</code>.</li>
+<li>Lee el almacenamiento con <code>ctx.leerDB()</code> y comprueba <code>clicks === 1</code>.</li>
+<li>Segundo test: <code>/zzz</code> → 404 y el link <code>a3k</code> sigue con 5 clicks.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Se escribió antes del fix (commit <code>c4deae1</code>, rojo) y el fix vino después (<code>d87bffd</code>): el bug original hacía <code>res.send(link.url)</code> y sumaba clicks solo en memoria. El test es la validación diseñada por el equipo; el agente puede tipear el fix, pero el criterio lo fija esto.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Usa <code>tests/helpers.js</code> (repositorio en memoria + <code>crearApp</code> de <code>src/server.js</code>). Corre con <code>npm test</code>.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Humano + máquina (centauro): la IA produce, el equipo diseña la verificación y revisa.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 3</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=11"><span class="ref">02·11</span><span class="t">El conocimiento del proyecto en .md</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=29"><span class="ref">02·29</span><span class="t">El nuevo rol: Diseñar, delegar y revisar</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/#d=cierre-magnifica-humanitas&amp;s=33"><span class="ref">13·33</span><span class="t">La potencia del centauro</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp1-test-stats-verdad" data-title="Test: las estadísticas dicen la verdad" data-tp="1" data-tp-title="Corta, del caos a producción" data-file="tests/stats.test.js" data-from="37" data-to="53">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">tests/stats.test.js</span><span class="mono faint">L37–53</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-javascript" data-start="37">test(&#39;los clicks reportados por stats coinciden con las redirecciones servidas&#39;, async function () {
+  const ctx = await iniciarServerDeTest([
+    { codigo: &#39;a3k&#39;, url: &#39;https://ejemplo.com/pagina-larga&#39;, clicks: 0, creado: &#39;2026-03-02T14:11:09.000Z&#39; }
+  ]);
+
+  try {
+    await fetch(ctx.baseUrl + &#39;/a3k&#39;, { redirect: &#39;manual&#39; });
+    await fetch(ctx.baseUrl + &#39;/a3k&#39;, { redirect: &#39;manual&#39; });
+
+    const res = await fetch(ctx.baseUrl + &#39;/api/links/a3k/stats&#39;);
+    const body = await res.json();
+
+    assert.equal(body.clicks, 2);
+  } finally {
+    await ctx.cerrar();
+  }
+});</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Comprueba que los clicks que reporta <code>/api/links/:codigo/stats</code> coinciden con las redirecciones realmente servidas.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li>Arranca con <code>a3k</code> en 0 clicks.</li>
+<li>Hace dos <code>fetch</code> a <code>/a3k</code> con <code>redirect: 'manual'</code>.</li>
+<li>Consulta <code>/api/links/a3k/stats</code> y exige <code>body.clicks === 2</code>.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Traduce a un test la frase de la consigna «que las estadísticas digan la verdad». Junto con la prueba manual en producción (link <code>v4v</code> con <code>clicks: 1</code> después de un redeploy) es la evidencia de que se puede confiar en lo que el agente escribió.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Pega a dos rutas de <code>src/server.js</code> (redirect y stats) sobre el repositorio en memoria de <code>tests/helpers.js</code>. Se escribió en <code>0b1c040</code> antes del endpoint (<code>038948a</code>).</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>La responsabilidad sigue en el equipo: definir qué significa «correcto» y verificarlo, aunque la IA escriba el código.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 1</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=introduccion&amp;s=12"><span class="ref">01·12</span><span class="t">Transformación en Ingeniería de Software</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+
+
+    </main>
+  </div>
+</div>
+<dialog class="code-dlg" id="code-dlg" aria-labelledby="code-dlg-title">
+  <div class="card-header">
+    <div class="code-dlg-title"><span class="pill tp" id="code-dlg-tp">TP</span><span class="card-title" id="code-dlg-title"></span></div>
+    <div class="card-actions"><a class="btn sm" id="code-dlg-open" href="#">Ver todo el código del TP</a><button class="btn icon sm ghost" id="code-dlg-close" aria-label="Cerrar" autofocus><svg class="i" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+  </div>
+  <div id="code-dlg-body"></div>
+</dialog>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<script src="https://ezequielrickert.github.io/austral-ia-generativa/js/site.js?h=f2262278f956a92874ef"></script>
+
+<script>
+if (location.hash.indexOf('#codigo') === 0) { var tc = document.getElementById('tab-cod'); if (tc) tc.click(); var k = location.hash.split('=')[1]; if (k) Study.openCode(k); }
+document.getElementById('rel-filter').addEventListener('change', function (e) {
+  var v = e.target.value;
+  document.querySelectorAll('[data-group]').forEach(function (g) { g.hidden = v && g.dataset.group !== v; });
+});
+</script>
+
+</body>
+</html>
