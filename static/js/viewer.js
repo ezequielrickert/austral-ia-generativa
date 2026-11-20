@@ -67,7 +67,7 @@
       try { w.document.addEventListener("keydown", function (e) {
         if (!handleKey(e, true)) return;
         e.preventDefault();
-        if (e.key === "p" || e.key === "P") e.stopPropagation();   // reveal.js maps P to "previous slide"
+        if (/^[pn]$/i.test(e.key)) e.stopPropagation();   // reveal.js maps P / N to previous / next slide
       }, true); } catch (e) {}
     })();
   }
@@ -174,6 +174,7 @@
     if (e.key === "m" || e.key === "M") { toggleStar(); return true; }
     if (e.key === "f" || e.key === "F") { setFocus(!app.classList.contains("focus")); return true; }
     if (e.key === "p" || e.key === "P") { toggleFullscreen(); return true; }
+    if (e.key === "n" || e.key === "N") { toggleSide(); return true; }
     return false;
   }
 
@@ -231,6 +232,20 @@
     docEl.classList.toggle("is-fs", on);
     try { if (cur.R) cur.R.layout(); } catch (e) {}
   }
+  // hide / show the notes column so the slide can grow; remembered across classes
+  // one toggle in a fixed place (right end of the slide footer), in and out of full screen
+  var viewerEl = document.querySelector(".viewer"), sideBtn = document.getElementById("side-toggle");
+  function setSide(show) {
+    viewerEl.classList.toggle("no-side", !show);
+    sideBtn.setAttribute("aria-pressed", String(show));
+    sideBtn.title = show ? "Esconder las notas (n)" : "Mostrar las notas (n)";
+    try { localStorage.setItem("iagen:noside", show ? "" : "1"); } catch (e) {}
+    try { if (cur.R) cur.R.layout(); } catch (e) {}
+  }
+  function toggleSide() { setSide(viewerEl.classList.contains("no-side")); }
+  sideBtn.addEventListener("click", toggleSide);
+  try { if (localStorage.getItem("iagen:noside")) setSide(false); } catch (e) {}
+
   fsBtn.addEventListener("click", toggleFullscreen);
   document.getElementById("fs-exit").addEventListener("click", toggleFullscreen);
   document.addEventListener("fullscreenchange", onFullscreen);

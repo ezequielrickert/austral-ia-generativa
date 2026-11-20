@@ -313,7 +313,7 @@ kbd { font: 11px/1.5 var(--mono); border: 1px solid var(--border); border-bottom
 @media (max-width: 960px), (max-height: 560px) {
   .content.is-viewer { height: auto; overflow: visible; }
   .viewer-area { container-type: normal; }
-  .viewer { grid-template-columns: minmax(0, 1fr); height: auto; }
+  .viewer, .viewer-area .viewer.no-side { grid-template-columns: minmax(0, 1fr); height: auto; }
   .stage { flex: none; aspect-ratio: 16 / 9; }
   .side-card { height: 70vh; }
 }
@@ -388,6 +388,14 @@ html.is-fs .viewer-page { gap: 0; }
 html.is-fs .viewer { --gap: 0px; grid-template-columns: minmax(0, 1fr) clamp(var(--side-min), 26vw, 460px); height: 100%; }
 html.is-fs .stage-card, html.is-fs .side-card { border: 0; border-radius: 0; box-shadow: none; }
 html.is-fs .side-card { border-left: 1px solid var(--border); }
+/* notes column hidden (n): the slide takes its room, in and out of full screen */
+.viewer.no-side { --side-min: 0px; --gap: 0px; grid-template-columns: var(--sw); }
+html.is-fs .viewer.no-side { grid-template-columns: minmax(0, 1fr); }
+.viewer.no-side .side-card { display: none; }
+/* one notes toggle, always at the right end of the slide footer; only the arrow flips */
+#side-toggle { flex: none; }
+#side-toggle .chev-show, .viewer.no-side #side-toggle .chev-hide { display: none; }
+.viewer.no-side #side-toggle .chev-show { display: block; }
 #focus-btn[aria-pressed="true"] { background: var(--text); color: var(--surface); border-color: var(--text); }
 
 /* ======================= code viewer ======================= */
