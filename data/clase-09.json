@@ -60,8 +60,9 @@
        "tp": 4,
        "texto": "Lo mismo en la consigna: Gemma de referencia pasa de 12/15/12 a 25/24/25 casos con un SFT simple.",
        "tp_titulo": "El agente de admisión de guardia (TP final)",
-       "code": "tp4-plantilla-cuatro-filas",
-       "nota": ""
+       "code": "tp4-plantilla-cuatro-filas,tp4-modelo-cargar-adapter,tp4-informe-antes-despues",
+       "ncode": 3,
+       "nota": "En el TP4, con el adapter v39 la fila `solo_entrenamiento` dio 17/14/20 y `ambos` (la entrega) 36/28/36, contra 10/10/7 sin entrenar."
       }
      ],
      "ver": [],
@@ -139,7 +140,8 @@
        "cnn": "07",
        "i": 8,
        "title": "Predecir la palabra que sigue",
-       "por": "predecir la palabra que sigue"
+       "por": "predecir la palabra que sigue",
+       "extra": false
       },
       {
        "url": "/clases/08/#d=transformers-a-fondo&s=40",
@@ -147,7 +149,8 @@
        "cnn": "08",
        "i": 40,
        "title": "Qué se minimiza",
-       "por": "la misma pérdida"
+       "por": "la misma pérdida",
+       "extra": false
       }
      ],
      "key": true,
@@ -179,7 +182,8 @@
        "cnn": "01",
        "i": 52,
        "title": "¿Con qué datos se entrenan?",
-       "por": "con qué datos se entrenan"
+       "por": "con qué datos se entrenan",
+       "extra": false
       }
      ],
      "key": false,
@@ -208,7 +212,8 @@
        "tp": 4,
        "texto": "Curaste el historial: 2.000 filas → 1.600 correctas, 240 errores y 160 de ruido. Solo las correctas entran al entrenamiento.",
        "tp_titulo": "El agente de admisión de guardia (TP final)",
-       "code": "tp4-clasificar-historial",
+       "code": "tp4-clasificar-historial,tp4-clasificar-tipo,tp4-seleccionar-ids",
+       "ncode": 3,
        "nota": ""
       }
      ],
@@ -242,7 +247,8 @@
        "cnn": "01",
        "i": 53,
        "title": "Escala, datos y poder de cómputo",
-       "por": "escala, datos y cómputo"
+       "por": "escala, datos y cómputo",
+       "extra": false
       }
      ],
      "key": true,
@@ -297,7 +303,8 @@
        "cnn": "13",
        "i": 47,
        "title": "¿Alcanza con escalar?",
-       "por": "¿alcanza con escalar?"
+       "por": "¿alcanza con escalar?",
+       "extra": false
       }
      ],
      "key": false,
@@ -456,7 +463,8 @@
        "cnn": "13",
        "i": 24,
        "title": "Repaso: cómo aprende a «portarse bien»",
-       "por": "cómo aprende a portarse bien"
+       "por": "cómo aprende a portarse bien",
+       "extra": false
       }
      ],
      "key": false,
@@ -513,8 +521,9 @@
        "tp": 4,
        "texto": "`tokenizacion.py`: labels = −100 en sistema, triage y observaciones; la pérdida cuenta solo las acciones JSON del asistente.",
        "tp_titulo": "El agente de admisión de guardia (TP final)",
-       "code": "tp4-tokenizar-mascara",
-       "nota": ""
+       "code": "tp4-tokenizar-mascara,tp4-tokenizar-preparacion,tp4-entrenamiento-verifica-mascaras",
+       "ncode": 3,
+       "nota": "La máscara se calcula en `tokenizar_conversacion`, se aplica a todo el dataset y se vuelve a verificar antes de cargar pesos."
       }
      ],
      "ver": [
@@ -524,7 +533,8 @@
        "cnn": "08",
        "i": 40,
        "title": "Qué se minimiza",
-       "por": "qué se minimiza"
+       "por": "qué se minimiza",
+       "extra": false
       },
       {
        "url": "/clases/04/#d=modelado-redes-neuronales&s=30",
@@ -532,7 +542,8 @@
        "cnn": "04",
        "i": 30,
        "title": "Clasificación multiclase: cross-entropy",
-       "por": "cross-entropy multiclase"
+       "por": "cross-entropy multiclase",
+       "extra": false
       }
      ],
      "key": true,
@@ -561,8 +572,9 @@
        "tp": 4,
        "texto": "Armaste 2.900 conversaciones: 1.600 del historial correcto, 800 de la cátedra y 500 sintéticas.",
        "tp_titulo": "El agente de admisión de guardia (TP final)",
-       "code": "tp4-generar-dataset",
-       "nota": ""
+       "code": "tp4-seleccionar-ids,tp4-sinteticos-variados,tp4-generar-dataset,tp4-tokenizar-preparacion",
+       "ncode": 4,
+       "nota": "`seleccionar_ids` aporta las 1.600 correctas del historial, `generar_sinteticos` las 500 sintéticas y `generar_dataset` las junta con las 800 de la cátedra."
       }
      ],
      "ver": [],
@@ -620,8 +632,9 @@
        "tp": 4,
        "texto": "Por eso excluiste errores y ruido del entrenamiento: el SFT copiaría esos desvíos.",
        "tp_titulo": "El agente de admisión de guardia (TP final)",
-       "code": "tp4-seleccionar-ids",
-       "nota": ""
+       "code": "tp4-clasificar-tipo,tp4-seleccionar-ids,tp4-generar-dataset",
+       "ncode": 3,
+       "nota": "La clasificación marca error y ruido; `seleccionar_ids` solo deja pasar `correcta` y `generar_dataset` usa esa lista."
       }
      ],
      "ver": [],
@@ -789,6 +802,7 @@
        "texto": "DPO con los errores del historial como respuestas malas quedó como opción; no se hizo.",
        "tp_titulo": "El agente de admisión de guardia (TP final)",
        "code": "tp4-mission-estrategias",
+       "ncode": 1,
        "nota": "DPO aparece como opción de la consigna; en el repo no hay código de DPO."
       }
      ],
@@ -831,8 +845,9 @@
        "tp": 4,
        "texto": "Quedó como alternativa no hecha: RL usando los 9 controles de la ficha como recompensa.",
        "tp_titulo": "El agente de admisión de guardia (TP final)",
-       "code": "tp4-mission-estrategias",
-       "nota": "El RL con los 9 controles como recompensa es la tercera opción de la consigna; no se implementó."
+       "code": "tp4-mission-estrategias,tp4-comparar-9-controles",
+       "ncode": 2,
+       "nota": "El RL con los 9 controles como recompensa es la tercera opción de la consigna; no se implementó, pero `comparar` ya sería el verificador."
       }
      ],
      "ver": [
@@ -842,7 +857,8 @@
        "cnn": "05",
        "i": 53,
        "title": "De dónde salió el thinking",
-       "por": "de dónde salió el thinking"
+       "por": "de dónde salió el thinking",
+       "extra": false
       }
      ],
      "key": true,
@@ -874,7 +890,8 @@
        "cnn": "05",
        "i": 49,
        "title": "Thinking: el mecanismo",
-       "por": "thinking: el mecanismo"
+       "por": "thinking: el mecanismo",
+       "extra": false
       }
      ],
      "key": false,
@@ -966,15 +983,17 @@
        "tp": 3,
        "texto": "`bucle.py`: el mismo loop a mano con `ToolMessage` y tope de 6 llamadas.",
        "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
-       "code": "tp3-bucle-tool-calling",
+       "code": "tp3-bucle-tool-calling,tp3-corrida-correr,tp3-agente-main",
+       "ncode": 3,
        "nota": ""
       },
       {
        "tp": 4,
        "texto": "El agente de admisión tiene tope de 40 llamadas.",
        "tp_titulo": "El agente de admisión de guardia (TP final)",
-       "code": "tp4-agente-bucle",
-       "nota": "El tope está en la última condición: `self.llamadas >= self.max_llamadas` (40, `MAX_LLAMADAS` del kit)."
+       "code": "tp4-entorno-paso,tp4-agente-bucle",
+       "ncode": 2,
+       "nota": "El tope lo impone el entorno (`len(self.log) >= MAX_LLAMADAS`) y el agente lo replica en `self.llamadas >= self.max_llamadas`."
       }
      ],
      "ver": [
@@ -984,7 +1003,8 @@
        "cnn": "07",
        "i": 5,
        "title": "Como herramienta: el agente decide cuándo buscar",
-       "por": "el agente decide cuándo buscar"
+       "por": "el agente decide cuándo buscar",
+       "extra": false
       }
      ],
      "key": true,
@@ -1016,7 +1036,8 @@
        "cnn": "06",
        "i": 54,
        "title": "El ciclo de vida de una herramienta MCP",
-       "por": "ciclo de vida de una herramienta"
+       "por": "ciclo de vida de una herramienta",
+       "extra": false
       }
      ],
      "key": false,
@@ -1048,7 +1069,8 @@
        "cnn": "06",
        "i": 2,
        "title": "RAG suma lo que no está en los pesos",
-       "por": "lo que no está en los pesos"
+       "por": "lo que no está en los pesos",
+       "extra": false
       }
      ],
      "key": false,
@@ -1146,8 +1168,9 @@
        "tp": 4,
        "texto": "Gemma corre local y responde acciones JSON; si el JSON es inválido, el `PromptSpec` trae un mensaje de corrección.",
        "tp_titulo": "El agente de admisión de guardia (TP final)",
-       "code": "tp4-agente-bucle",
-       "nota": ""
+       "code": "tp4-prompt-procedimiento-v1,tp4-agente-bucle,tp4-modelo-generar",
+       "ncode": 3,
+       "nota": "El prompt pide JSON, el bucle lo interpreta (o manda la corrección) y `ModeloLocal` genera localmente con Gemma."
       }
      ],
      "ver": [],
@@ -1208,7 +1231,8 @@
        "cnn": "01",
        "i": 9,
        "title": "El chat responde de memoria",
-       "por": "el chat responde de memoria"
+       "por": "el chat responde de memoria",
+       "extra": true
       }
      ],
      "key": false,
@@ -1284,6 +1308,7 @@
        "texto": "El servidor MCP del TP3 (FastMCP, 6 tools) quedó pendiente: solo está diseñado en `PLAN.md`.",
        "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
        "code": "tp3-plan-mcp-pendiente",
+       "ncode": 1,
        "nota": ""
       }
      ],
@@ -1294,7 +1319,8 @@
        "cnn": "06",
        "i": 52,
        "title": "JSON-RPC 2.0: la capa de mensajes de MCP",
-       "por": "JSON-RPC, la capa de mensajes"
+       "por": "JSON-RPC, la capa de mensajes",
+       "extra": false
       }
      ],
      "key": false,
@@ -1323,7 +1349,8 @@
        "tp": 3,
        "texto": "`descripciones.py`: cada tool dice su fuente, qué NO tiene y los valores válidos; ruteo 1,00 en las 4 corridas.",
        "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
-       "code": "tp3-descripciones-tools",
+       "code": "tp3-descripciones-tools,tp3-descripciones-api-y-registro,tp3-herramientas-langchain",
+       "ncode": 3,
        "nota": "En MCP una herramienta es nombre + descripción + esquema; estas descripciones son las que iba a publicar el servidor."
       }
      ],
@@ -1334,7 +1361,8 @@
        "cnn": "06",
        "i": 68,
        "title": "La descripción dice cuándo NO usarla",
-       "por": "la descripción dice cuándo NO usarla"
+       "por": "la descripción dice cuándo NO usarla",
+       "extra": false
       }
      ],
      "key": false,
@@ -1363,8 +1391,9 @@
        "tp": 3,
        "texto": "En las preguntas mixtas (A10–A12), el modelo pidió las dos tools en paralelo en el mismo paso.",
        "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
-       "code": "tp3-log-a10-paralelo",
-       "nota": ""
+       "code": "tp3-bucle-tool-calling,tp3-log-a10-paralelo",
+       "ncode": 2,
+       "nota": "`for llamada in ai.tool_calls` ejecuta todas las tools pedidas en un mismo paso; en A10 el modelo pidió camas y documentos juntos."
       }
      ],
      "ver": [],
@@ -1411,8 +1440,9 @@
        "tp": 4,
        "texto": "LoRA r=8, α=16 sobre `q_proj`/`v_proj` de Gemma 4 E4B. QLoRA quedó como alternativa.",
        "tp_titulo": "El agente de admisión de guardia (TP final)",
-       "code": "tp4-lora-config",
-       "nota": ""
+       "code": "tp4-lora-config,tp4-lora-aplicar,tp4-modelo-cargar-adapter",
+       "ncode": 3,
+       "nota": "LoRA se define en `LORA`, se aplica al entrenar con `aplicar_lora` y en inferencia se fusiona con `merge_and_unload`."
       }
      ],
      "ver": [
@@ -1422,7 +1452,8 @@
        "cnn": "08",
        "i": 15,
        "title": "Tres proyecciones del mismo vector",
-       "por": "las proyecciones Q, K, V"
+       "por": "las proyecciones Q, K, V",
+       "extra": false
       }
      ],
      "key": true,
@@ -1456,8 +1487,9 @@
        "tp": 4,
        "texto": "La idea central del TP: los números de las normas van al BM25 y el oficio y las costumbres, a los pesos con SFT.",
        "tp_titulo": "El agente de admisión de guardia (TP final)",
-       "code": "tp4-sinteticos-variados",
-       "nota": ""
+       "code": "tp4-normas-valores,tp4-normas-variables-carpetas,tp4-sinteticos-variados,tp4-informe-antes-despues",
+       "ncode": 4,
+       "nota": "Los números van al BM25 vía `parametros.yaml`; las sintéticas varían esos valores para que el SFT aprenda a leerlos; la tabla muestra que combinar prompt y SFT rinde más."
       }
      ],
      "ver": [
@@ -1467,7 +1499,8 @@
        "cnn": "06",
        "i": 5,
        "title": "Cinco razones para no reentrenar",
-       "por": "cinco razones para no reentrenar"
+       "por": "cinco razones para no reentrenar",
+       "extra": false
       }
      ],
      "key": true,
@@ -1496,8 +1529,9 @@
        "tp": 4,
        "texto": "Con `procedimiento-v1` siguieron las fallas de verificación, entidad y voluntariado: son de comportamiento, y eso le tocaba al SFT.",
        "tp_titulo": "El agente de admisión de guardia (TP final)",
-       "code": "tp4-procedimiento-dev",
-       "nota": "Mirá el párrafo «Para #15»: lo que queda es comportamiento y se deja al SFT."
+       "code": "tp4-procedimiento-dev,tp4-informe-antes-despues",
+       "ncode": 2,
+       "nota": "Mirá el párrafo «Para #15»: lo que quedaba era comportamiento y se dejó al SFT; la tabla muestra lo que agregó el adapter."
       }
      ],
      "ver": [],
@@ -1555,8 +1589,9 @@
        "tp": 4,
        "texto": "TRL/PEFT en Kaggle 2× T4 con checkpoints en HF. Solo corrió el humo (15,7 GB pico); faltó el entrenamiento con los datos curados.",
        "tp_titulo": "El agente de admisión de guardia (TP final)",
-       "code": "tp4-trainer-cuda",
-       "nota": "En el código se ve PEFT con el `Trainer` de transformers (no `SFTTrainer` de TRL); la medición de 15,7 GB está en docs/informe-parte5.md."
+       "code": "tp4-kaggle-armar-comando,tp4-trainer-cuda,tp4-informe-humo,tp4-informe-sft-real",
+       "ncode": 4,
+       "nota": "En el código se ve PEFT con el `Trainer` de transformers (no `SFTTrainer` de TRL). El humo midió 15,7 GB; después corrió el entrenamiento real con los datos curados (19,97 GB, ~8 h)."
       }
      ],
      "ver": [],
@@ -1586,7 +1621,8 @@
        "tp": 4,
        "texto": "500 conversaciones sintéticas (semilla 12012) con valores de normas variados, para que el modelo los lea y no los memorice.",
        "tp_titulo": "El agente de admisión de guardia (TP final)",
-       "code": "tp4-sinteticos-variados",
+       "code": "tp4-normas-variables-carpetas,tp4-sinteticos-variados,tp4-generar-dataset",
+       "ncode": 3,
        "nota": ""
       }
      ],
@@ -2178,8 +2214,8 @@
    "lenguaje": "json",
    "codigo": "{\n  \"version\": 1,\n  \"nombre\": \"parte4-cuatro-filas\",\n  \"descripcion\": \"PLANTILLA, no ejecutable: el runner la rechaza mientras tenga plantilla=true. Copiala, reemplazá los <...> por la ruta y el sha256 del prompt optimizado y por el repo y el commit HF (40 hex) del adapter publicado, y sacá el campo plantilla.\",\n  \"plantilla\": true,\n  \"cantidad\": 50,\n  \"versiones\": [\"original\", \"b\", \"c\"],\n  \"lote\": 4,\n  \"buscador\": \"baseline\",\n  \"configuraciones\": [\n    {\n      \"etiqueta\": \"sin_entrenar\",\n      \"descripcion\": \"Modelo base sin adapter y prompt baseline.\",\n      \"prompt\": \"configuraciones/prompts/baseline.json\",\n      \"prompt_sha256\": \"944ae7f6f52d2052b43be770f891593abfbefb86af088df672687590bfeaf474\",\n      \"adapter\": null\n    },\n    {\n      \"etiqueta\": \"solo_prompt\",\n      \"descripcion\": \"Modelo base sin adapter y prompt optimizado.\",\n      \"prompt\": \"<configuraciones/prompts/optimizado.json>\",\n      \"prompt_sha256\": \"<sha256 del prompt optimizado>\",\n      \"adapter\": null\n    },\n    {\n      \"etiqueta\": \"solo_entrenamiento\",\n      \"descripcion\": \"Adapter entrenado y prompt baseline.\",\n      \"prompt\": \"configuraciones/prompts/baseline.json\",\n      \"prompt_sha256\": \"944ae7f6f52d2052b43be770f891593abfbefb86af088df672687590bfeaf474\",\n      \"adapter\": {\"repo\": \"FranCalveyra/tp-admision\", \"revision\": \"<commit HF de 40 hex>\", \"subcarpeta\": \"final\"}\n    },\n    {\n      \"etiqueta\": \"ambos\",\n      \"descripcion\": \"Adapter entrenado y prompt optimizado.\",\n      \"prompt\": \"<configuraciones/prompts/optimizado.json>\",\n      \"prompt_sha256\": \"<sha256 del prompt optimizado>\",\n      \"adapter\": {\"repo\": \"FranCalveyra/tp-admision\", \"revision\": \"<commit HF de 40 hex>\", \"subcarpeta\": \"final\"}\n    }\n  ]\n}",
    "que_hace": "Plantilla de evaluación con las cuatro configuraciones que pide la consigna: sin entrenar, solo prompt, solo entrenamiento y ambos, en normas original, b y c.",
-   "como_funciona": "- Cada fila combina un `prompt` (con su sha256) y un `adapter` (repo + commit HF) o `null`.\n- `plantilla: true` hace que el runner la rechace hasta completar los `<...>`.\n- Solo existe la fila `sin_entrenar` en `actual.json`: el adapter real no se publicó.",
-   "proposito": "Prepara la comparación contra la referencia de la cátedra (12/15/12 sin entrenar, 25/24/25 con SFT); la fila con adapter quedó pendiente.",
+   "como_funciona": "- Cada fila combina un `prompt` (con su sha256) y un `adapter` (repo + commit HF) o `null`.\n- `plantilla: true` hace que el runner la rechace hasta completar los `<...>`.\n- Las filas reales están en `actual.json`, `solo-prompt.json` y, con el adapter de la entrega, `entrenado-v39.json`.",
+   "proposito": "Fija la comparación contra la referencia de la cátedra (12/15/12 sin entrenar, 25/24/25 con SFT): las cuatro filas se corren con los mismos casos, normas y lote.",
    "interaccion": "La consume el runner de evaluación (`infra/kaggle_evaluacion.py`); `ModeloLocal.cargar` aplica el adapter si la fila lo tiene.",
    "teoria": "Comparar prompting contra fine-tuning y su combinación: el SFT puede hacer que un modelo chico supere a uno sin ajustar.",
    "key": "tp4-plantilla-cuatro-filas",
@@ -2192,10 +2228,105 @@
      "slug": "como-se-entrena-un-llm",
      "i": 2,
      "title": "Un modelo 100 veces más chico gana",
+     "extra": false,
      "url": "/clases/09/#d=como-se-entrena-un-llm&s=2"
     }
    ],
    "nusos": 1
+  },
+  {
+   "id": "modelo-cargar-adapter",
+   "titulo": "Cargar Gemma y fusionar el adapter LoRA",
+   "archivo": "admision_tp/modelo.py",
+   "desde": 13,
+   "hasta": 47,
+   "lenguaje": "python",
+   "codigo": "    @classmethod\n    def cargar(cls, configuracion: Configuracion):\n        import torch\n\n        if not torch.cuda.is_available():\n            raise RuntimeError(\"El baseline requiere una GPU CUDA; no se carga en CPU\")\n        import transformers\n        from .carga import cargar_solo_texto\n        # Tokenizer, no AutoProcessor: el agente es solo texto, usa el mismo chat template que el\n        # entrenamiento, y el procesador de Gemma 4 exige torchvision por su parte de video.\n        procesador = transformers.AutoTokenizer.from_pretrained(\n            configuracion.modelo, revision=configuracion.revision, padding_side=\"left\")\n        modelo = cargar_solo_texto(transformers, configuracion.modelo, configuracion.revision,\n                                   dtype=getattr(torch, configuracion.dtype),\n                                   device_map=configuracion.device_map)\n        # Sin attn_implementation: transformers elige SDPA donde se soporta. Forzarlo rompía la torre\n        # de audio de Gemma 4 (hoy ya no se carga, pero el default sigue siendo lo correcto).\n        if configuracion.adapter_repo:\n            modelo = cls._fusionar_adapter(modelo, configuracion)\n        modelo.eval()\n        return cls(modelo, procesador, configuracion)\n\n    @staticmethod\n    def _fusionar_adapter(modelo, configuracion: Configuracion):\n        \"\"\"Aplica el LoRA y lo fusiona en memoria: la inferencia no paga capas extra.\"\"\"\n        from peft import PeftConfig, PeftModel\n\n        origen = {\"revision\": configuracion.adapter_revision,\n                  \"subfolder\": configuracion.adapter_subcarpeta or None}\n        config = PeftConfig.from_pretrained(configuracion.adapter_repo, **origen)\n        # `config.revision` es la revisión de la base con la que se entrenó el adapter.\n        if (config.base_model_name_or_path, config.revision) != (configuracion.modelo, configuracion.revision):\n            raise ValueError(\"El adapter fue entrenado sobre otra base o revisión\")\n        peft = PeftModel.from_pretrained(modelo, configuracion.adapter_repo, config=config, **origen)\n        return peft.merge_and_unload()",
+   "que_hace": "Carga Gemma solo texto en GPU y, si la configuración trae un adapter, lo aplica y lo fusiona con los pesos base.",
+   "como_funciona": "- Exige CUDA; carga tokenizer y modelo con revisión fija.\n- Si hay `adapter_repo`, `_fusionar_adapter` lee el `PeftConfig`.\n- Verifica que el adapter se haya entrenado sobre la misma base y revisión.\n- `PeftModel.from_pretrained(...).merge_and_unload()` suma ΔW = BA a los pesos y quita las capas extra.",
+   "proposito": "Fusionar evita pagar capas LoRA en cada paso de inferencia; el chequeo de revisión impide usar un adapter con otra base.",
+   "interaccion": "Lo llama `entrega.construir_agente` (y los runners de evaluación) con `Configuracion.desde_entorno()`; el adapter es el `final` que publica `_ejecutar_cuda` en HF.",
+   "teoria": "LoRA en inferencia: las matrices de bajo rango se pueden sumar a W y el modelo queda del mismo tamaño.",
+   "key": "tp4-modelo-cargar-adapter",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 2,
+     "title": "Un modelo 100 veces más chico gana",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=2"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 51,
+     "title": "Dónde entra el fine-tuning",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=51"
+    }
+   ],
+   "nusos": 2
+  },
+  {
+   "id": "informe-antes-despues",
+   "titulo": "Antes y después: las cuatro filas",
+   "archivo": "docs/informe/informe-parte5.md",
+   "desde": 176,
+   "hasta": 186,
+   "lenguaje": "markdown",
+   "codigo": "### 3.2 Antes y después (práctica, 50 casos × 3 versiones, T4, lote 4; adapter v39, Kaggle v40)\n\n| Configuración | Resueltos original / b / c | s/caso | Tokens de entrada por caso | Tokens generados por caso | VRAM pico | Ancho máx. |\n|---|---|---:|---:|---:|---:|---:|\n| `sin_entrenar` (baseline, v25) | 10 / 10 / 7 | 15,4–16,1 | ~5.690–5.750 | ~270–271 | 18,12 GB solo texto (19,08 GB con torres en `base-*-l4`, histórico) | 3.072 |\n| `solo_prompt` (procedimiento-v1) | 14 / 16 / 12 | 24,4–26,6 | ~13.650–14.640 | ~322–332 | 19,25–19,64 GB | 4.436 |\n| `solo_entrenamiento` (adapter v39 + baseline) | 17 / 14 / 20 | 27,7–30,2 | ~12.150–14.200 | ~333–338 | 20,25–21,71 GB | 7.636 |\n| **`ambos` (la entrega, adapter v39)** | **36 / 28 / 36** | **27,8–28,8** | **~14.100–14.200** | **~353–355** | **19,94 GB** | **4.395** |\n| `solo_entrenamiento` con el adapter anterior `dc41674a` (v34, historial) | 11 / 13 / 12 | 18,7–19,7 | ~7.860–8.430 | ~286–293 | 18,69–18,91 GB | 4.476 |\n| `ambos` con el adapter anterior `dc41674a` (v34, historial) | 30 / 29 / 33 | 24,7–24,9 | ~13.840 | ~336 | 19,56 GB | 4.160 |\n",
+   "que_hace": "Tabla de la práctica (50 casos × 3 versiones de normas) con las cuatro configuraciones: sin entrenar, solo prompt, solo entrenamiento y ambos.",
+   "como_funciona": "- `sin_entrenar`: 10/10/7; `solo_prompt` (procedimiento-v1): 14/16/12.\n- `solo_entrenamiento` (adapter v39): 17/14/20.\n- `ambos` (la entrega): 36/28/36.\n- Agrega segundos, tokens por caso y VRAM pico de cada fila.",
+   "proposito": "Es la comparación que pide la consigna: separa cuánto aporta el prompt, cuánto el SFT y cuánto la combinación.",
+   "interaccion": "Las filas salen de correr `infra/kaggle_evaluacion.py` con los planes de `configuraciones/evaluacion/`; el adapter lo aplica `ModeloLocal.cargar`.",
+   "teoria": "Prompt, RAG o fine-tuning: combinarlos rinde más que cada uno por separado.",
+   "key": "tp4-informe-antes-despues",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 2,
+     "title": "Un modelo 100 veces más chico gana",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=2"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 52,
+     "title": "Prompt, RAG o fine-tuning",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=52"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 53,
+     "title": "Cuándo vale la pena el fine-tuning",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=53"
+    },
+    {
+     "clase": 13,
+     "cnn": "13",
+     "slug": "cierre-magnifica-humanitas",
+     "i": 24,
+     "title": "Repaso: cómo aprende a «portarse bien»",
+     "extra": false,
+     "url": "/clases/13/#d=cierre-magnifica-humanitas&s=24"
+    }
+   ],
+   "nusos": 4
   },
   {
    "id": "clasificar-historial",
@@ -2220,6 +2351,7 @@
      "slug": "introduccion",
      "i": 42,
      "title": "Ejemplos de problemas de razonamiento simbólico",
+     "extra": false,
      "url": "/clases/01/#d=introduccion&s=42"
     },
     {
@@ -2228,10 +2360,132 @@
      "slug": "como-se-entrena-un-llm",
      "i": 7,
      "title": "C4: cómo Google depuró Common Crawl",
+     "extra": false,
      "url": "/clases/09/#d=como-se-entrena-un-llm&s=7"
     }
    ],
    "nusos": 2
+  },
+  {
+   "id": "clasificar-tipo",
+   "titulo": "error > ruido > correcta",
+   "archivo": "scripts/clasificar_historial.py",
+   "desde": 474,
+   "hasta": 489,
+   "lenguaje": "python",
+   "codigo": "def clasificar(\n    rows: list[dict[str, str]],\n    parametros: dict[str, int],\n    trazas: dict | None = None,\n) -> tuple[list[dict[str, str]], dict]:\n    costumbres = inferir_costumbres(rows, parametros, trazas)\n    razones = {row[\"id\"]: razones_normativas(row, parametros) for row in rows}\n    ids_ruido = {i for costumbre in costumbres for i in costumbre.get(\"ids_ruido\", [])}\n    salida = []\n    for row in rows:\n        tipo = \"error\" if razones[row[\"id\"]] else \"ruido\" if row[\"id\"] in ids_ruido else \"correcta\"\n        salida.append({\"id\": row[\"id\"], \"tipo\": tipo})\n    return salida, {\n        \"costumbres\": costumbres,\n        \"desvios_por_operador\": desvios_por_operador(costumbres, rows),\n    }",
+   "que_hace": "Clasifica cada fila del historial: error si contradice alguna norma, ruido si se desvía de la costumbre, correcta si no.",
+   "como_funciona": "- `inferir_costumbres` deduce las costumbres del historial y sus `ids_ruido`.\n- `razones_normativas(row, parametros)` lista los campos que no coinciden con lo que exigen las normas.\n- La prioridad es `error` > `ruido` > `correcta`.\n- Devuelve la lista de `{id, tipo}` y el resumen de costumbres.",
+   "proposito": "Un filtro simbólico y auditable: cada fila excluida tiene una razón concreta, en vez de un puntaje de calidad.",
+   "interaccion": "Usa `circuito_esperado`, `plazo_esperado` y `registro_esperado` (mismo archivo); su salida es `historial_clasificado.csv`, que lee `seleccionar_ids`.",
+   "teoria": "Curado de datos con reglas: verificar cada ejemplo contra una fuente de verdad antes de entrenar.",
+   "key": "tp4-clasificar-tipo",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "introduccion",
+     "i": 42,
+     "title": "Ejemplos de problemas de razonamiento simbólico",
+     "extra": false,
+     "url": "/clases/01/#d=introduccion&s=42"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 7,
+     "title": "C4: cómo Google depuró Common Crawl",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=7"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 22,
+     "title": "Quiz: ¿qué aprende el SFT?",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=22"
+    },
+    {
+     "clase": 11,
+     "cnn": "11",
+     "slug": "redes-generativas-antagonicas",
+     "i": 48,
+     "title": "El dataset importa: lo que le das es lo que obtenés",
+     "extra": false,
+     "url": "/clases/11/#d=redes-generativas-antagonicas&s=48"
+    }
+   ],
+   "nusos": 4
+  },
+  {
+   "id": "seleccionar-ids",
+   "titulo": "Solo las filas correctas entran al SFT",
+   "archivo": "scripts/seleccionar_entrenamiento.py",
+   "desde": 40,
+   "hasta": 66,
+   "lenguaje": "python",
+   "codigo": "def seleccionar_ids(\n    filas: list[dict[str, str]],\n    clasificacion: dict[str, str],\n    costumbre: dict,\n) -> tuple[list[str], dict]:\n    faltantes = {fila[\"id\"] for fila in filas} - clasificacion.keys()\n    if faltantes:\n        raise ValueError(f\"faltan clasificaciones para {len(faltantes)} filas\")\n    ids_error = sorted(i for i, tipo in clasificacion.items() if tipo == \"error\")\n    ids_ruido = sorted(i for i, tipo in clasificacion.items() if tipo == \"ruido\")\n    seleccionados = [fila[\"id\"] for fila in filas if clasificacion[fila[\"id\"]] == \"correcta\"]\n    # Toda fila correcta sigue la costumbre completa; si no, la clasificación y el informe\n    # de costumbres no corresponden entre sí y no se arma el dataset.\n    inconsistentes = sorted(\n        fila[\"id\"] for fila in filas\n        if clasificacion[fila[\"id\"]] == \"correcta\"\n        and aviso_segun_costumbre(fila, costumbre) != (fila[\"aviso_al_voluntariado\"] == SI)\n    )\n    if inconsistentes:\n        raise ValueError(f\"filas correctas que contradicen la costumbre: {inconsistentes[:5]}\")\n    return seleccionados, {\n        \"total_historial\": len(filas),\n        \"correctas_clasificadas\": len(seleccionados),\n        \"excluidas_error\": len(ids_error),\n        \"excluidas_ruido\": len(ids_ruido),\n        \"seleccionadas\": len(seleccionados),\n    }",
+   "que_hace": "Selecciona del historial solo las filas clasificadas como `correcta` y excluye errores y ruido, controlando consistencia con la costumbre.",
+   "como_funciona": "- Falla si alguna fila no tiene clasificación.\n- Separa `ids_error` e `ids_ruido` y toma como `seleccionados` solo las `correcta`.\n- Revisa que toda fila correcta siga la costumbre del aviso (`aviso_segun_costumbre`); si no, no arma el dataset.\n- Devuelve los ids y un resumen (2.000 → 1.600; 240 y 160 excluidas).",
+   "proposito": "El SFT imita las demostraciones: si entraran errores o desvíos, el modelo los aprendería. Se descartan en vez de corregirlos.",
+   "interaccion": "Lo llama `scripts/generar_conversaciones.generar_dataset` con `historial_clasificado.csv` y `historial_costumbres.json`; los ids elegidos filtran `historial/trazas.jsonl`.",
+   "teoria": "Curado del dataset de demostraciones: la calidad de los datos de SFT determina lo que aprende el modelo.",
+   "key": "tp4-seleccionar-ids",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "introduccion",
+     "i": 42,
+     "title": "Ejemplos de problemas de razonamiento simbólico",
+     "extra": false,
+     "url": "/clases/01/#d=introduccion&s=42"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 7,
+     "title": "C4: cómo Google depuró Common Crawl",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=7"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 20,
+     "title": "Un dataset de SFT",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=20"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 22,
+     "title": "Quiz: ¿qué aprende el SFT?",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=22"
+    },
+    {
+     "clase": 11,
+     "cnn": "11",
+     "slug": "redes-generativas-antagonicas",
+     "i": 48,
+     "title": "El dataset importa: lo que le das es lo que obtenés",
+     "extra": false,
+     "url": "/clases/11/#d=redes-generativas-antagonicas&s=48"
+    }
+   ],
+   "nusos": 5
   },
   {
    "id": "tokenizar-mascara",
@@ -2256,6 +2510,7 @@
      "slug": "transformers-a-fondo",
      "i": 40,
      "title": "Qué se minimiza",
+     "extra": false,
      "url": "/clases/08/#d=transformers-a-fondo&s=40"
     },
     {
@@ -2264,470 +2519,87 @@
      "slug": "como-se-entrena-un-llm",
      "i": 19,
      "title": "Datos de demostración",
+     "extra": false,
      "url": "/clases/09/#d=como-se-entrena-un-llm&s=19"
+    },
+    {
+     "clase": 13,
+     "cnn": "13",
+     "slug": "cierre-magnifica-humanitas",
+     "i": 24,
+     "title": "Repaso: cómo aprende a «portarse bien»",
+     "extra": false,
+     "url": "/clases/13/#d=cierre-magnifica-humanitas&s=24"
     }
    ],
-   "nusos": 2
+   "nusos": 3
   },
   {
-   "id": "generar-dataset",
-   "titulo": "Dataset de 2.900 conversaciones: tres fuentes",
-   "archivo": "scripts/generar_conversaciones.py",
-   "desde": 527,
-   "hasta": 568,
+   "id": "tokenizar-preparacion",
+   "titulo": "Tokenizar todo el dataset",
+   "archivo": "admision_tp/tokenizacion.py",
+   "desde": 82,
+   "hasta": 104,
    "lenguaje": "python",
-   "codigo": "def generar_dataset(salida: Path, *, raiz: Path = RAIZ, ruta_prompt: Path = RUTA_BASELINE,\n                    variante: str | None = None, semilla: int = SEMILLA, candidatos: int = CANDIDATOS) -> dict:\n    salida, raiz = Path(salida), Path(raiz)\n    if salida.exists() or salida.is_symlink():\n        raise FileExistsError(f\"la salida ya existe: {salida}\")\n    prompt = PromptSpec.cargar(ruta_prompt)\n    fabrica = fabrica_buscador(variante)\n    normas = raiz / \"normas/original\"\n    with tempfile.TemporaryDirectory(prefix=\"normas-variadas-\") as temporal:\n        carpetas = CarpetasNormas(normas, Path(temporal), fabrica)\n        _, buscador_original = carpetas.obtener({})\n        unidades = {p[\"codigo\"]: p[\"unidad\"] for p in parametros_base(normas)}\n        referencia = _leer_jsonl(raiz / \"entrenamiento/trazas.jsonl\")\n        contexto = {\n            \"prompt\": prompt, \"carpetas\": carpetas, \"unidades\": unidades,\n            \"candidatos\": valores_observados(referencia, unidades),\n            \"costumbres\": costumbres_por_tipo(json.loads((raiz / \"historial_costumbres.json\").read_text(\"utf-8\"))),\n            \"practica\": huellas_practica(raiz / \"practica/casos.jsonl\"),\n        }\n        ref, aud_ref, exc_ref = convertir_trazas(\n            referencia, origen=\"referencia\", referencia=\"entrenamiento/trazas.jsonl\", contexto=contexto)\n\n        filas = cargar_filas(raiz / \"historial/historial.csv\")\n        ids, seleccion = seleccionar_ids(filas, cargar_clasificacion(raiz / \"historial_clasificado.csv\"),\n                                         costumbre_aviso(raiz / \"historial_costumbres.json\"))\n        elegidas = set(ids)\n        historial = [t for t in _leer_jsonl(raiz / \"historial/trazas.jsonl\") if t[\"id\"] in elegidas]\n        csv_por_id = {f[\"id\"]: {k: v for k, v in f.items() if k not in (\"fecha\", \"operador\")}\n                      for f in filas if f[\"id\"] in elegidas}\n        his, aud_his, exc_his = convertir_trazas(\n            historial, origen=\"historial\", referencia=\"historial/trazas.jsonl\", contexto=contexto,\n            valores_fijos=csv_por_id)\n        sin, aud_sin, exc_sin = generar_sinteticos(contexto, semilla, candidatos)\n        carpetas_usadas = len(carpetas)\n        busqueda = {\"variante\": getattr(buscador_original, \"variante\", None),\n                    \"clase\": type(buscador_original).__name__,\n                    \"configuracion\": asdict(buscador_original.config) if hasattr(buscador_original, \"config\") else None,\n                    \"k_entorno\": getattr(buscador_original, \"k_entorno\", None),\n                    \"construido_con\": \"entrega.construir_buscador\" if variante is None\n                    else \"admision_tp.buscador.BuscadorBM25(ruta, variante)\"}\n\n    registros, auditorias = ref + his + sin, aud_ref + aud_his + aud_sin",
-   "que_hace": "Arma el dataset de entrenamiento uniendo 800 trazas de referencia, 1.600 del historial correcto y 500 sintéticas, todas renderizadas con el prompt y el buscador reales.",
-   "como_funciona": "- Carga el `PromptSpec` y una fábrica de buscador; crea `CarpetasNormas` en un temporal.\n- `convertir_trazas` convierte las 800 de `entrenamiento/trazas.jsonl` re-ejecutando las búsquedas con los valores de cada traza.\n- `seleccionar_ids` filtra el historial a las filas `correcta` y las convierte igual.\n- `generar_sinteticos` agrega los casos del generador.\n- Concatena `ref + his + sin` y registra el buscador usado.",
-   "proposito": "Las búsquedas se vuelven a ejecutar con el buscador de la entrega para que el modelo entrene con exactamente las observaciones que verá en inferencia.",
-   "interaccion": "Se corre con `python -m scripts.generar_conversaciones`; escribe `conversaciones.jsonl`, auditoría y manifiesto, validados por `validar_archivo`. La salida es la entrada de `admision_tp/preparacion.py` y `tokenizacion.py`.",
-   "teoria": "Dataset de SFT: conversaciones completas (sistema, usuario, asistente, observaciones) como demostraciones del comportamiento deseado.",
-   "key": "tp4-generar-dataset",
+   "codigo": "    with tempfile.TemporaryDirectory(prefix=\".tokens-\", dir=destino.parent) as temporal:\n        carpeta = Path(temporal)\n        snapshot = carpeta / \"conversaciones.jsonl\"\n        snapshot.write_bytes(datos)\n        if validar_archivo(snapshot)[\"errores\"]:\n            raise ValueError(\"dataset inválido\")\n        ejemplos, supervisados = [], 0\n        for linea in datos.decode(\"utf-8\").splitlines():\n            if not linea.strip():\n                continue\n            registro = _json(linea)\n            ejemplo = tokenizar_conversacion(registro, tokenizer, config[\"max_seq_length\"])\n            supervisados += sum(x != -100 for x in ejemplo[\"labels\"])\n            ejemplos.append({\"id\": registro[\"id\"], **ejemplo})\n        contenido = (\"\".join(json.dumps(x, ensure_ascii=False) + \"\\n\" for x in ejemplos)).encode()\n        resultado = {\"version\": 1, \"estado\": \"tokenizada_no_entrenada\", \"codigo\": codigo,\n            \"preparacion_sha256\": _sha(manifiesto_bytes), \"snapshots\": hashes,\n            \"modelo\": config[\"modelo\"], \"revision\": config[\"revision\"],\n            \"plantilla_sha256\": hashlib.sha256(template.encode()).hexdigest(),\n            \"mascara\": \"prefijos_verificados_assistant_con_cierre\", \"enable_thinking\": False,\n            \"max_seq_length\": config[\"max_seq_length\"], \"registros\": len(ejemplos),\n            \"tokens\": sum(len(x[\"input_ids\"]) for x in ejemplos), \"supervisados\": supervisados,\n            \"archivos\": {\"tokens.jsonl\": _sha(contenido)}}",
+   "que_hace": "Valida el snapshot de conversaciones, tokeniza cada una con la máscara assistant-only y escribe `tokens.jsonl` con su manifiesto.",
+   "como_funciona": "- `validar_archivo(snapshot)` revisa el formato de todas las conversaciones.\n- Por línea llama `tokenizar_conversacion` y suma los tokens supervisados (`!= -100`).\n- El manifiesto guarda `plantilla_sha256`, el tipo de máscara, total de tokens y supervisados.",
+   "proposito": "Deja la tokenización como artefacto aparte y verificable: el entrenamiento no tokeniza, solo comprueba.",
+   "interaccion": "Llama a `tokenizar_conversacion` (mismo archivo); lo corre `scripts/tokenizar_entrenamiento.py` y su salida la consume `entrenamiento.cargar_entradas`.",
+   "teoria": "Preparar demostraciones para SFT: el 10 % de los tokens (respuestas del asistente) es lo único supervisado.",
+   "key": "tp4-tokenizar-preparacion",
    "tp": 4,
    "tp_titulo": "El agente de admisión de guardia (TP final)",
    "usos": [
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 19,
+     "title": "Datos de demostración",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=19"
+    },
     {
      "clase": 9,
      "cnn": "09",
      "slug": "como-se-entrena-un-llm",
      "i": 20,
      "title": "Un dataset de SFT",
+     "extra": false,
      "url": "/clases/09/#d=como-se-entrena-un-llm&s=20"
     }
    ],
-   "nusos": 1
-  },
-  {
-   "id": "seleccionar-ids",
-   "titulo": "Solo las filas correctas entran al SFT",
-   "archivo": "scripts/seleccionar_entrenamiento.py",
-   "desde": 40,
-   "hasta": 66,
-   "lenguaje": "python",
-   "codigo": "def seleccionar_ids(\n    filas: list[dict[str, str]],\n    clasificacion: dict[str, str],\n    costumbre: dict,\n) -> tuple[list[str], dict]:\n    faltantes = {fila[\"id\"] for fila in filas} - clasificacion.keys()\n    if faltantes:\n        raise ValueError(f\"faltan clasificaciones para {len(faltantes)} filas\")\n    ids_error = sorted(i for i, tipo in clasificacion.items() if tipo == \"error\")\n    ids_ruido = sorted(i for i, tipo in clasificacion.items() if tipo == \"ruido\")\n    seleccionados = [fila[\"id\"] for fila in filas if clasificacion[fila[\"id\"]] == \"correcta\"]\n    # Toda fila correcta sigue la costumbre completa; si no, la clasificación y el informe\n    # de costumbres no corresponden entre sí y no se arma el dataset.\n    inconsistentes = sorted(\n        fila[\"id\"] for fila in filas\n        if clasificacion[fila[\"id\"]] == \"correcta\"\n        and aviso_segun_costumbre(fila, costumbre) != (fila[\"aviso_al_voluntariado\"] == SI)\n    )\n    if inconsistentes:\n        raise ValueError(f\"filas correctas que contradicen la costumbre: {inconsistentes[:5]}\")\n    return seleccionados, {\n        \"total_historial\": len(filas),\n        \"correctas_clasificadas\": len(seleccionados),\n        \"excluidas_error\": len(ids_error),\n        \"excluidas_ruido\": len(ids_ruido),\n        \"seleccionadas\": len(seleccionados),\n    }",
-   "que_hace": "Selecciona del historial solo las filas clasificadas como `correcta` y excluye errores y ruido, controlando consistencia con la costumbre.",
-   "como_funciona": "- Falla si alguna fila no tiene clasificación.\n- Separa `ids_error` e `ids_ruido` y toma como `seleccionados` solo las `correcta`.\n- Revisa que toda fila correcta siga la costumbre del aviso (`aviso_segun_costumbre`); si no, no arma el dataset.\n- Devuelve los ids y un resumen (2.000 → 1.600; 240 y 160 excluidas).",
-   "proposito": "El SFT imita las demostraciones: si entraran errores o desvíos, el modelo los aprendería. Se descartan en vez de corregirlos.",
-   "interaccion": "Lo llama `scripts/generar_conversaciones.generar_dataset` con `historial_clasificado.csv` y `historial_costumbres.json`; los ids elegidos filtran `historial/trazas.jsonl`.",
-   "teoria": "Curado del dataset de demostraciones: la calidad de los datos de SFT determina lo que aprende el modelo.",
-   "key": "tp4-seleccionar-ids",
-   "tp": 4,
-   "tp_titulo": "El agente de admisión de guardia (TP final)",
-   "usos": [
-    {
-     "clase": 9,
-     "cnn": "09",
-     "slug": "como-se-entrena-un-llm",
-     "i": 22,
-     "title": "Quiz: ¿qué aprende el SFT?",
-     "url": "/clases/09/#d=como-se-entrena-un-llm&s=22"
-    },
-    {
-     "clase": 11,
-     "cnn": "11",
-     "slug": "redes-generativas-antagonicas",
-     "i": 48,
-     "title": "El dataset importa: lo que le das es lo que obtenés",
-     "url": "/clases/11/#d=redes-generativas-antagonicas&s=48"
-    }
-   ],
    "nusos": 2
   },
   {
-   "id": "mission-estrategias",
-   "titulo": "Estrategias de post-entrenamiento de la consigna",
-   "archivo": "mission.md",
-   "desde": 131,
-   "hasta": 146,
-   "lenguaje": "markdown",
-   "codigo": "## Parte 3: optimización de prompt, antes de entrenar\n\nEs obligatoria y va **antes** del entrenamiento.\n\n- Optimicen el mensaje de sistema y el formato de los mensajes al modelo, con el modelo sin entrenar. Sugerimos DSPy, por ejemplo con su optimizador GEPA.\n- Valoramos la calidad del resultado y también el largo del prompt. El prompt se repite en cada llamada al modelo: cuesta cómputo y ocupa VRAM al usar el modelo y al entrenarlo. En la referencia de la cátedra, el mensaje de sistema es la quinta parte de cada conversación.\n- **Nunca optimicen sobre el test.** El test solo sirve para evaluar.\n- Después entrenen con el prompt optimizado.\n\n## Parte 4: entrenamiento\n\nCualquier estrategia de post-entrenamiento. Por ejemplo:\n\n- fine-tuning supervisado (SFT), con las conversaciones que armaron en la Parte 1;\n- DPO, con pares de respuestas al mismo paso del caso, una buena y una mala;\n- aprendizaje por refuerzo, con los 9 controles de la ficha como puntaje.",
-   "que_hace": "Fragmento de la consigna: optimizar el prompt antes de entrenar y elegir una estrategia de post-entrenamiento (SFT, DPO o RL con los 9 controles).",
-   "como_funciona": "- Parte 3: optimizar sistema y formato con el modelo sin entrenar, valorando también el largo.\n- Parte 4: SFT con las conversaciones, DPO con pares buena/mala, o RL con los 9 controles como puntaje.",
-   "proposito": "El TP implementó solo SFT con LoRA; DPO (con errores del historial como respuestas malas) y RL con verificador quedaron como alternativas no hechas, y así lo registra docs/informe-parte4-infra.md.",
-   "interaccion": "Es la consigna, no código: la estrategia elegida vive en `admision_tp/entrenamiento.py`.",
-   "teoria": "Alineamiento por preferencias (DPO/PPO) y RL con recompensa verificable como alternativas al SFT.",
-   "key": "tp4-mission-estrategias",
-   "tp": 4,
-   "tp_titulo": "El agente de admisión de guardia (TP final)",
-   "usos": [
-    {
-     "clase": 9,
-     "cnn": "09",
-     "slug": "como-se-entrena-un-llm",
-     "i": 29,
-     "title": "Paso 2: optimizar con PPO",
-     "url": "/clases/09/#d=como-se-entrena-un-llm&s=29"
-    },
-    {
-     "clase": 9,
-     "cnn": "09",
-     "slug": "como-se-entrena-un-llm",
-     "i": 31,
-     "title": "RL con verificador: el proceso",
-     "url": "/clases/09/#d=como-se-entrena-un-llm&s=31"
-    }
-   ],
-   "nusos": 2
-  },
-  {
-   "id": "bucle-tool-calling",
-   "titulo": "El bucle de tool calling escrito a mano",
-   "archivo": "hospital/agente/bucle.py",
-   "desde": 25,
-   "hasta": 48,
-   "lenguaje": "python",
-   "codigo": "async def _ejecutar(por_nombre, llamada):\n    tool = por_nombre.get(llamada[\"name\"])\n    if tool is None:\n        return ToolMessage(f\"Error: la herramienta '{llamada['name']}' no existe. Herramientas disponibles: \"\n                           f\"{', '.join(sorted(por_nombre))}.\", tool_call_id=llamada[\"id\"], name=llamada[\"name\"])\n    try:\n        return await tool.ainvoke({**llamada, \"type\": \"tool_call\"})\n    except Exception as e:  # el error vuelve al modelo como texto para que pueda corregirse\n        return ToolMessage(f\"Error al ejecutar {llamada['name']}: {e}\", tool_call_id=llamada[\"id\"], name=llamada[\"name\"])\n\n\nasync def responder(llm, tools, pregunta):\n    \"\"\"Devuelve todos los mensajes de la conversación: sistema, pregunta, AIMessage y ToolMessage.\"\"\"\n    llm_con_tools = llm.bind_tools(tools)\n    por_nombre = {t.name: t for t in tools}\n    mensajes = [SystemMessage(PROMPT), HumanMessage(pregunta)]\n    for _ in range(MAX_PASOS):\n        ai = await llm_con_tools.ainvoke(mensajes)\n        mensajes.append(ai)\n        if not ai.tool_calls:\n            break\n        for llamada in ai.tool_calls:\n            mensajes.append(await _ejecutar(por_nombre, llamada))\n    return mensajes",
-   "que_hace": "Implementa el agente: el modelo pide herramientas, se ejecutan, sus resultados vuelven como `ToolMessage` y se repite hasta que responde sin pedir nada o se llega a 6 pasos.",
-   "como_funciona": "- `responder` enlaza las tools con `llm.bind_tools(tools)` y arma `por_nombre`.\n- Arranca con `[SystemMessage(PROMPT), HumanMessage(pregunta)]`.\n- En cada paso: `ai = await llm_con_tools.ainvoke(mensajes)`; si `ai.tool_calls` está vacío, termina.\n- Si no, ejecuta cada llamada con `_ejecutar` y agrega el `ToolMessage` (puede haber varias en paralelo en el mismo paso).\n- `_ejecutar` devuelve un `ToolMessage` de error si la tool no existe o lanza una excepción.",
-   "proposito": "Se escribió a mano, sin LangGraph ni AgentExecutor, para tener todos los mensajes y poder loguearlos. Es agnóstico del origen de las tools: el docstring lo prepara para las de `langchain-mcp-adapters` (parte 3, pendiente).",
-   "interaccion": "Lo llama `correr()` en `hospital/agente/corrida.py` por cada pregunta; devuelve la lista completa de mensajes, que `resumir()` convierte en respuesta, contextos, herramientas y costo. `tests/test_agente.py` lo prueba con un modelo falso.",
-   "teoria": "Agente ReAct / ciclo de vida de una tool: AIMessage con tool_calls → ejecución → ToolMessage → nueva llamada al modelo.",
-   "key": "tp3-bucle-tool-calling",
-   "tp": 3,
-   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
-   "usos": [
-    {
-     "clase": 1,
-     "cnn": "01",
-     "slug": "introduccion",
-     "i": 62,
-     "title": "El futuro: agentes autónomos e IA multimodal",
-     "url": "/clases/01/#d=introduccion&s=62"
-    },
-    {
-     "clase": 6,
-     "cnn": "06",
-     "slug": "rag-y-mcp",
-     "i": 57,
-     "title": "Demo: un servidor MCP mínimo",
-     "url": "/clases/06/#d=rag-y-mcp&s=57"
-    },
-    {
-     "clase": 7,
-     "cnn": "07",
-     "slug": "rag-mcp-rapida",
-     "i": 20,
-     "title": "El ciclo de vida de una herramienta",
-     "url": "/clases/07/#d=rag-mcp-rapida&s=20"
-    },
-    {
-     "clase": 9,
-     "cnn": "09",
-     "slug": "como-se-entrena-un-llm",
-     "i": 36,
-     "title": "El circuito con un agente",
-     "url": "/clases/09/#d=como-se-entrena-un-llm&s=36"
-    },
-    {
-     "clase": 10,
-     "cnn": "10",
-     "slug": "agentes-y-multiagentes",
-     "i": 14,
-     "title": "Workflow o agente",
-     "url": "/clases/10/#d=agentes-y-multiagentes&s=14"
-    },
-    {
-     "clase": 10,
-     "cnn": "10",
-     "slug": "agentes-y-multiagentes",
-     "i": 26,
-     "title": "ReAct en LangGraph",
-     "url": "/clases/10/#d=agentes-y-multiagentes&s=26"
-    }
-   ],
-   "nusos": 6
-  },
-  {
-   "id": "agente-bucle",
-   "titulo": "Ciclo del agente: JSON, corrección y tope de llamadas",
-   "archivo": "admision_tp/agente_prompt.py",
-   "desde": 25,
-   "hasta": 68,
-   "lenguaje": "python",
-   "codigo": "class _PartidaPrompt:\n    def __init__(self, entorno, prompt: PromptSpec, max_turnos: int, max_sin_json: int,\n                 max_llamadas: int):\n        self.entorno = entorno\n        self.prompt = prompt\n        self.max_turnos = max_turnos\n        self.max_sin_json = max_sin_json\n        self.max_llamadas = max_llamadas\n        self.mensajes = [\n            {\"role\": \"system\", \"content\": prompt.system_prompt},\n            {\"role\": \"user\", \"content\": prompt.mensaje_inicial_para(entorno.paciente_id)},\n        ]\n        self.turnos = self.sin_json = self.llamadas = 0\n        self.activa = True\n\n    def recibir(self, respuesta: str) -> None:\n        self.turnos += 1\n        self.mensajes.append({\"role\": \"assistant\", \"content\": respuesta})\n        obj = extraer_json(respuesta)\n        if obj is None:\n            self.sin_json += 1\n            if self.sin_json >= self.max_sin_json:\n                self.activa = False\n                return\n            self.mensajes.append({\"role\": \"user\", \"content\": self.prompt.mensaje_json_invalido})\n        else:\n            self.sin_json = 0\n            herramienta = str(obj.get(\"herramienta\", \"\"))\n            observacion, fin = self.entorno.paso(herramienta, obj.get(\"argumentos\") or {})\n            self.llamadas += 1\n            if fin:\n                self.activa = False\n                return\n            self.mensajes.append({\n                \"role\": \"user\",\n                \"content\": self.prompt.observacion_para(herramienta, observacion),\n            })\n        if self.turnos >= self.max_turnos or self.llamadas >= self.max_llamadas:\n            self.activa = False\n\n    def cortar_por_contexto(self, tokens: int, limite: int) -> None:\n        self.mensajes.append({\"role\": \"user\", \"content\": MENSAJE_CONTEXTO_EXCEDIDO.format(\n            tokens=tokens, limite=limite)})\n        self.activa = False",
-   "que_hace": "Mantiene la conversación de un caso: agrega la respuesta del modelo, ejecuta la herramienta pedida o, si no hay JSON válido, inserta el mensaje de corrección.",
-   "como_funciona": "- `_PartidaPrompt.__init__` arranca con `system_prompt` y `mensaje_inicial_para(paciente_id)` del `PromptSpec`.\n- `recibir` usa `extraer_json`; si es `None`, suma `sin_json` y agrega `prompt.mensaje_json_invalido` (corta tras `max_sin_json` seguidas).\n- Con JSON válido llama `entorno.paso(herramienta, argumentos)`, cuenta `llamadas` y agrega la observación con `observacion_para`.\n- Termina si el entorno cerró el caso (registrar_decision) o al llegar a `max_turnos` o `max_llamadas` (40, del kit).",
-   "proposito": "Es un agente de un solo modelo que decide el recorrido: el código no impone orden de herramientas. Los textos vienen del `PromptSpec` para que agente y generador de datos rendericen idéntico.",
-   "interaccion": "`AgentePrompt.jugar_lote` crea una `_PartidaPrompt` por caso y le pasa las respuestas de `ModeloLocal`; `entorno` es la `VistaDelAgente` del kit. `admision_tp/contexto.py` reusa este mismo ciclo para rejugar trazas.",
-   "teoria": "Salida estructurada con reintento ante JSON inválido, dentro de un bucle de agente con herramientas y un límite de pasos.",
-   "key": "tp4-agente-bucle",
-   "tp": 4,
-   "tp_titulo": "El agente de admisión de guardia (TP final)",
-   "usos": [
-    {
-     "clase": 5,
-     "cnn": "05",
-     "slug": "prompting",
-     "i": 29,
-     "title": "Salidas estructuradas: JSON Schema",
-     "url": "/clases/05/#d=prompting&s=29"
-    },
-    {
-     "clase": 9,
-     "cnn": "09",
-     "slug": "como-se-entrena-un-llm",
-     "i": 36,
-     "title": "El circuito con un agente",
-     "url": "/clases/09/#d=como-se-entrena-un-llm&s=36"
-    },
-    {
-     "clase": 9,
-     "cnn": "09",
-     "slug": "como-se-entrena-un-llm",
-     "i": 42,
-     "title": "Calcular: la misma cuenta por la API",
-     "url": "/clases/09/#d=como-se-entrena-un-llm&s=42"
-    },
-    {
-     "clase": 10,
-     "cnn": "10",
-     "slug": "agentes-y-multiagentes",
-     "i": 51,
-     "title": "Primero, un solo agente",
-     "url": "/clases/10/#d=agentes-y-multiagentes&s=51"
-    }
-   ],
-   "nusos": 4
-  },
-  {
-   "id": "plan-mcp-pendiente",
-   "titulo": "Diseño del servidor y cliente MCP (pendiente)",
-   "archivo": "PLAN.md",
-   "desde": 155,
-   "hasta": 171,
-   "lenguaje": "markdown",
-   "codigo": "## Step 3 — Part 3: MCP server + LangChain MCP client (15 pts)\nDepends on Step 2.\n\n**3.1 `servidor_mcp.py`** — `mcp.server.fastmcp.FastMCP(\"hospital\")`, 6 `@mcp.tool(name=..., description=DESCRIPCIONES[...])`\nwrapping `hospital.api_cliente` and `Recuperador`; `mcp.run()` (stdio). Nothing on stdout except the protocol (logs → stderr);\nwarm up the retriever at startup so the first call doesn’t time out.\n\n**3.2 `agente_mcp.py`** — **no API/retriever code of its own**: `MultiServerMCPClient({\"hospital\": {\"command\": sys.executable, \"args\": [\"servidor_mcp.py\"], \"transport\": \"stdio\"}})`,\n`tools = await client.get_tools()` (tools/list; log the discovered names), then reuse `responder` + `correr(..., etiqueta=\"mcp\")`\nwith the same LLM and prompt.\n\n**3.3 Inspector** (manual, user) — `npx @modelcontextprotocol/inspector python3 servidor_mcp.py`, call all 6 tools, save screenshots to `experimentos/inspector/`.\n\n**3.4 Compare** — run benchmark → `respuestas_mcp.jsonl` + log + eval. `experimentos/comparar_agentes.py` prints a table\n(ruteo, CR, F, AR, agent cost from log totals, judge cost) for Part 2 vs 3. INFORME §3: table + explanation of any difference from the logs (e.g. tool-result formatting, nondeterminism).\n\n**Done when:** `python3 agente_mcp.py --preguntas datos/preguntas_agente_dev.jsonl --salida respuestas_mcp.jsonl` works with the API running, `grep -E \"urllib|Recuperador|localhost\" agente_mcp.py` is empty, 6 inspector screenshots exist.",
-   "que_hace": "Es el diseño, no código: la parte 3 quedó pendiente y no existen `servidor_mcp.py` ni `agente_mcp.py`. El PLAN describe un servidor FastMCP por stdio con las 6 tools y un cliente LangChain con `MultiServerMCPClient`.",
-   "como_funciona": "- 3.1: `FastMCP(\"hospital\")` con 6 `@mcp.tool(name=..., description=DESCRIPCIONES[...])` que envuelven `api_cliente` y el recuperador; `mcp.run()` por stdio; logs a stderr porque stdout es el canal del protocolo.\n- 3.2: `agente_mcp.py` sin código propio de API: `MultiServerMCPClient` lanza el servidor, `get_tools()` descubre las tools (tools/list) y se reusa `responder` y `correr`.\n- 3.3: probar con MCP Inspector.\n- 3.4: comparar parte 2 vs. parte 3.",
-   "proposito": "Separa herramienta y agente: el mismo set de tools podría usarlo cualquier host MCP. Reusar `descripciones.py` y el bucle agnóstico haría justa la comparación. Quedó pendiente en la entrega.",
-   "interaccion": "Se apoyaría en `hospital/descripciones.py`, `hospital/api_cliente.py`, `hospital/documentos.py`, `hospital/agente/bucle.py` y `corrida.py` (que ya normaliza bloques de contenido MCP en `texto()`).",
-   "teoria": "Arquitectura MCP: host, cliente y servidor; descubrimiento con tools/list y ejecución con tools/call sobre JSON-RPC 2.0 por stdio.",
-   "key": "tp3-plan-mcp-pendiente",
-   "tp": 3,
-   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
-   "usos": [
-    {
-     "clase": 1,
-     "cnn": "01",
-     "slug": "claude-desktop-chat",
-     "i": 21,
-     "title": "Agregar un external connector",
-     "url": "/clases/01/#d=claude-desktop-chat&s=21"
-    },
-    {
-     "clase": 6,
-     "cnn": "06",
-     "slug": "rag-y-mcp",
-     "i": 53,
-     "title": "El servidor separa herramienta y agente",
-     "url": "/clases/06/#d=rag-y-mcp&s=53"
-    },
-    {
-     "clase": 6,
-     "cnn": "06",
-     "slug": "rag-y-mcp",
-     "i": 54,
-     "title": "El ciclo de vida de una herramienta MCP",
-     "url": "/clases/06/#d=rag-y-mcp&s=54"
-    },
-    {
-     "clase": 7,
-     "cnn": "07",
-     "slug": "rag-mcp-rapida",
-     "i": 16,
-     "title": "MCP conecta modelos con herramientas",
-     "url": "/clases/07/#d=rag-mcp-rapida&s=16"
-    },
-    {
-     "clase": 7,
-     "cnn": "07",
-     "slug": "rag-mcp-rapida",
-     "i": 18,
-     "title": "JSON-RPC 2.0: la capa de mensajes",
-     "url": "/clases/07/#d=rag-mcp-rapida&s=18"
-    },
-    {
-     "clase": 9,
-     "cnn": "09",
-     "slug": "como-se-entrena-un-llm",
-     "i": 47,
-     "title": "MCP: host, cliente y servidor",
-     "url": "/clases/09/#d=como-se-entrena-un-llm&s=47"
-    },
-    {
-     "clase": 13,
-     "cnn": "13",
-     "slug": "cierre-magnifica-humanitas",
-     "i": 45,
-     "title": "Hacia un Internet de Agentes",
-     "url": "/clases/13/#d=cierre-magnifica-humanitas&s=45"
-    }
-   ],
-   "nusos": 7
-  },
-  {
-   "id": "descripciones-tools",
-   "titulo": "Descripciones de tools: fuente, uso, qué NO tienen, valores válidos",
-   "archivo": "hospital/descripciones.py",
-   "desde": 8,
-   "hasta": 38,
-   "lenguaje": "python",
-   "codigo": "BUSCAR_DOCUMENTOS = (\n    \"Busca en los documentos oficiales del Hospital Provincial Arroyo Claro: normas y procedimientos que no \"\n    \"cambian de un día a otro. Sirve para horarios fijos (visitas, altas, farmacia, laboratorio, vacunatorio, \"\n    \"donación de sangre), quién puede visitar o quedarse con un paciente, preparación para estudios y cirugías \"\n    \"(ayunos, dietas), requisitos y documentación para turnos, internación, farmacia y coberturas, triage de \"\n    \"la guardia, derechos del paciente, accesos al edificio, control de infecciones, maternidad, pediatría, \"\n    \"kinesiología, salud mental y telemedicina. NO tiene el estado de hoy (camas libres, profesionales de \"\n    \"guardia, turnos disponibles, stock de farmacia ni tiempos de espera actuales). \"\n    \"consulta: el tema a buscar, en español y con las mismas palabras que usó el paciente (por ejemplo \"\n    \"'cómo es una consulta por telemedicina'). Si la pregunta toca varios temas de los documentos, hacé una \"\n    \"búsqueda por tema. Devuelve los fragmentos más relevantes con su documento y sección de origen.\"\n)\n\nCONSULTAR_CAMAS = (\n    \"Estado de HOY de las camas de internación de un sector: total, ocupadas y libres. Usala para saber si hay \"\n    \"lugar o camas disponibles para internar. \"\n    \"sector: uno de clinica_medica, cirugia_general, terapia_intensiva, pediatria, neonatologia, maternidad.\"\n)\n\nCONSULTAR_GUARDIA = (\n    \"Profesionales que están de guardia HOY en una especialidad, con su horario (por ejemplo 08:00-20:00 es \"\n    \"el turno de día y 20:00-08:00 el de la noche). Usala para saber quién atiende hoy o esta noche. \"\n    \"especialidad: una de clinica_medica, cardiologia, pediatria, traumatologia, obstetricia, salud_mental.\"\n)\n\nCONSULTAR_TURNOS = (\n    \"Próximos turnos disponibles (fecha y hora) con una especialidad en consultorios externos. Usala para saber \"\n    \"cuándo es el primer turno libre. No dice qué hay que llevar al turno: eso está en los documentos. \"\n    \"especialidad: una de cardiologia, dermatologia, traumatologia, psicologia, gastroenterologia, \"\n    \"obstetricia, kinesiologia.\"\n)",
-   "que_hace": "Define el texto que lee el modelo para decidir qué herramienta llamar: `buscar_documentos` para normas fijas y las de la API para el estado de hoy.",
-   "como_funciona": "- `BUSCAR_DOCUMENTOS` lista los temas de los documentos y aclara que NO tiene el estado de hoy; pide buscar «con las mismas palabras que usó el paciente» y hacer una búsqueda por tema.\n- `CONSULTAR_CAMAS`, `CONSULTAR_GUARDIA` y `CONSULTAR_TURNOS` dicen que son el estado de HOY y enumeran los valores válidos del parámetro.\n- `CONSULTAR_TURNOS` agrega: «No dice qué hay que llevar al turno: eso está en los documentos».",
-   "proposito": "El ruteo depende solo de estas descripciones, así que separan norma (documentos) de estado (API) y dicen cuándo NO usar cada tool: ruteo 1,00 en las 4 corridas. La frase de las palabras del paciente arregló A11, y el ejemplo de consulta se cambió por uno de telemedicina para no filtrar la pregunta A01 de dev.",
-   "interaccion": "Las importa `hospital/herramientas.py` a través del diccionario `DESCRIPCIONES`; el PLAN prevé que el servidor MCP use exactamente los mismos textos para que la comparación parte 2 vs. parte 3 sea justa.",
-   "teoria": "Diseño de herramientas: la descripción es la interfaz para el modelo (qué hace, cuándo usarla, cuándo no, parámetros válidos).",
-   "key": "tp3-descripciones-tools",
-   "tp": 3,
-   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
-   "usos": [
-    {
-     "clase": 2,
-     "cnn": "02",
-     "slug": "cowork-intro",
-     "i": 25,
-     "title": "Cómo el agente descubre y usa una herramienta",
-     "url": "/clases/02/#d=cowork-intro&s=25"
-    },
-    {
-     "clase": 5,
-     "cnn": "05",
-     "slug": "prompting",
-     "i": 33,
-     "title": "Zero-shot vs. few-shot",
-     "url": "/clases/05/#d=prompting&s=33"
-    },
-    {
-     "clase": 6,
-     "cnn": "06",
-     "slug": "rag-y-mcp",
-     "i": 10,
-     "title": "Las fuentes ponen el techo de calidad",
-     "url": "/clases/06/#d=rag-y-mcp&s=10"
-    },
-    {
-     "clase": 6,
-     "cnn": "06",
-     "slug": "rag-y-mcp",
-     "i": 63,
-     "title": "Cuatro principios de diseño",
-     "url": "/clases/06/#d=rag-y-mcp&s=63"
-    },
-    {
-     "clase": 6,
-     "cnn": "06",
-     "slug": "rag-y-mcp",
-     "i": 68,
-     "title": "La descripción dice cuándo NO usarla",
-     "url": "/clases/06/#d=rag-y-mcp&s=68"
-    },
-    {
-     "clase": 7,
-     "cnn": "07",
-     "slug": "rag-mcp-rapida",
-     "i": 28,
-     "title": "La descripción dice cuándo NO usarla",
-     "url": "/clases/07/#d=rag-mcp-rapida&s=28"
-    },
-    {
-     "clase": 9,
-     "cnn": "09",
-     "slug": "como-se-entrena-un-llm",
-     "i": 48,
-     "title": "MCP: una herramienta es una definición",
-     "url": "/clases/09/#d=como-se-entrena-un-llm&s=48"
-    },
-    {
-     "clase": 10,
-     "cnn": "10",
-     "slug": "agentes-y-multiagentes",
-     "i": 20,
-     "title": "Principios para diseñar tools",
-     "url": "/clases/10/#d=agentes-y-multiagentes&s=20"
-    }
-   ],
-   "nusos": 8
-  },
-  {
-   "id": "log-a10-paralelo",
-   "titulo": "Log real: A10 pide las dos fuentes en paralelo",
-   "archivo": "experimentos/corridas/agente_20260929-105719.md",
-   "desde": 302,
-   "hasta": 337,
-   "lenguaje": "markdown",
-   "codigo": "## A10: Quiero internar a mi nene en pediatría, ¿hay lugar y me puedo quedar con él?\n\n### Llamada al modelo 1\n\n- Tokens: entrada 1577 (cache 1536), salida 211 (razonamiento 116)\n- Costo: USD 0.000096\n- Generación: `gen-1790690305-njr9UFOvy47hBsCpf6aG`\n\n**Herramienta** `consultar_camas` con argumentos `{\"sector\": \"pediatria\"}`\n\n```\n{\"sector\": \"pediatria\", \"fecha\": \"2026-10-05\", \"datos\": {\"total\": 24, \"ocupadas\": 17, \"libres\": 7}}\n```\n\n**Herramienta** `buscar_documentos` con argumentos `{\"consulta\": \"acompañante de paciente pediátrico internado puede quedarse\"}`\n\n```\n[Ingreso a internación programada > Acompañante]\nSe permite un acompañante por paciente internado durante la noche, salvo en terapia intensiva. El acompañante recibe una tarjeta que presenta en el control de acceso.\n```\n\n### Llamada al modelo 2\n\n- Tokens: entrada 1787 (cache 1536), salida 153 (razonamiento 86)\n- Costo: USD 0.000081\n- Generación: `gen-1790690313-9NZL4I4ymMq06XPo3UnQ`\n\nTexto del modelo:\n\n> Sí, hoy hay lugar en pediatría: 7 camas libres de 24. Y sí, podés quedarte: se permite un acompañante por paciente internado durante la noche (excepto en terapia intensiva), que recibe una tarjeta para presentar en el control de acceso.\n\n**Respuesta final:**\n\nSí, hoy hay lugar en pediatría: 7 camas libres de 24. Y sí, podés quedarte: se permite un acompañante por paciente internado durante la noche (excepto en terapia intensiva), que recibe una tarjeta para presentar en el control de acceso.\n\n_Herramientas: consultar_camas, buscar_documentos · llamadas al modelo: 2 · tokens 3364 / 364 · USD 0.000177 · 15.1 s_",
-   "que_hace": "Extracto del log de la corrida 4 para la pregunta mixta A10: en la primera llamada el modelo pide `consultar_camas` y `buscar_documentos` a la vez y en la segunda responde.",
-   "como_funciona": "- Llamada 1: 1577 tokens de entrada (1536 de cache), 211 de salida (116 de razonamiento), USD 0,000096.\n- Dos herramientas en el mismo paso: camas de pediatría (7 libres de 24) y la norma de acompañantes.\n- Cada resultado vuelve como `ToolMessage` (fragmento con `[Ingreso a internación programada > Acompañante]`).\n- Llamada 2: el modelo combina ambos datos sin agregar nada que no esté en los resultados.",
-   "proposito": "Muestra en datos reales el ruteo entre norma (documentos) y estado (API), el tool calling paralelo y el registro de tokens y costo.",
-   "interaccion": "Lo generó `_log_pregunta` de `hospital/agente/corrida.py` al correr `agente.py`; es la corrida entregada (`respuestas.jsonl`).",
-   "teoria": "RAG como herramienta: el agente decide cuándo y con qué consulta buscar, y puede combinar varias fuentes en un mismo paso.",
-   "key": "tp3-log-a10-paralelo",
-   "tp": 3,
-   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
-   "usos": [
-    {
-     "clase": 7,
-     "cnn": "07",
-     "slug": "rag-mcp-rapida",
-     "i": 5,
-     "title": "Como herramienta: el agente decide cuándo buscar",
-     "url": "/clases/07/#d=rag-mcp-rapida&s=5"
-    },
-    {
-     "clase": 9,
-     "cnn": "09",
-     "slug": "como-se-entrena-un-llm",
-     "i": 49,
-     "title": "MCP: lo que aprende el modelo",
-     "url": "/clases/09/#d=como-se-entrena-un-llm&s=49"
-    }
-   ],
-   "nusos": 2
-  },
-  {
-   "id": "lora-config",
-   "titulo": "LoRA r=8 sobre q_proj/v_proj",
+   "id": "entrenamiento-verifica-mascaras",
+   "titulo": "Antes de entrenar: máscaras reproducibles",
    "archivo": "admision_tp/entrenamiento.py",
-   "desde": 11,
-   "hasta": 23,
+   "desde": 294,
+   "hasta": 306,
    "lenguaje": "python",
-   "codigo": "# Solo la atención del modelo de lenguaje. Gemma 4 es multimodal: sus torres de visión y audio también\n# tienen q_proj/v_proj, pero son Gemma4ClippableLinear y PEFT no los soporta (falló en Kaggle). PEFT\n# aplica un string con re.fullmatch sobre el nombre completo del módulo (peft/utils/other.py:1521).\nLORA_OBJETIVO = r\"(.*\\.)?language_model\\.layers\\.\\d+\\.self_attn\\.(q_proj|v_proj)\"\nLORA = {\"r\": 8, \"lora_alpha\": 16, \"lora_dropout\": 0.0,\n        \"target_modules\": LORA_OBJETIVO, \"task_type\": \"CAUSAL_LM\"}\nPOLITICA = {\"save_steps\": 50, \"bf16\": True, \"gradient_checkpointing\": True,\n            \"gradient_checkpointing_kwargs\": {\"use_reentrant\": False}, \"save_only_model\": False}\n# Defaults de la entrega (A100 de 40 GB). fp16 y \"auto\" existen para T4 x2 (Kaggle, desarrollo):\n# la T4 no tiene bf16 nativo y \"auto\" reparte el modelo entre GPU (paralelismo de modelo en un proceso).\nPRECISIONES = {\"bf16\": \"bfloat16\", \"fp16\": \"float16\"}\nDISPOSITIVOS = (\"unico\", \"auto\")\nEJECUCION = {\"precision\": \"bf16\", \"dispositivos\": \"unico\", \"guardar_cada\": 50}",
-   "que_hace": "Define la configuración LoRA y la política de entrenamiento: rango 8, alfa 16, solo en las proyecciones Q y V de la atención del modelo de lenguaje.",
-   "como_funciona": "- `LORA_OBJETIVO` es una regex que solo toma `language_model.layers.N.self_attn.(q_proj|v_proj)`.\n- `LORA` fija `r=8`, `lora_alpha=16`, `dropout=0` y `task_type=CAUSAL_LM`.\n- `POLITICA` guarda checkpoint cada 50 pasos, bf16 y gradient checkpointing.\n- `PRECISIONES` y `DISPOSITIVOS` permiten fp16/`auto` para las T4 de Kaggle.",
-   "proposito": "Gemma 4 es multimodal y sus torres de visión/audio también tienen `q_proj`/`v_proj` que PEFT no soporta: la regex las excluye. QLoRA quedó como alternativa no hecha.",
-   "interaccion": "`_ejecutar_cuda` pasa `LoraConfig(**LORA)` a `get_peft_model`; `cargar_entradas` incluye `LORA` en la identidad de la corrida.",
-   "teoria": "LoRA agrega matrices de bajo rango a W_Q y W_V: se entrenan pocos parámetros y el modelo base queda congelado.",
-   "key": "tp4-lora-config",
+   "codigo": "    set_seed(config[\"semilla\"])\n    tokenizer = AutoTokenizer.from_pretrained(config[\"modelo\"], revision=config[\"revision\"])\n    if _sha(tokenizer.chat_template.encode()) != tokens[\"plantilla_sha256\"]:\n        raise ValueError(\"plantilla distinta de la tokenización\")\n    for registro, ejemplo in zip(registros, ejemplos, strict=True):\n        if tokenizar_conversacion(registro, tokenizer, config[\"max_seq_length\"]) != {\n                k: ejemplo[k] for k in (\"input_ids\", \"attention_mask\", \"labels\")}:\n            raise ValueError(\"tokens o máscaras no reproducibles\")\n    if tokenizer.pad_token_id is None:\n        raise ValueError(\"tokenizador sin token de padding\")\n    if config.get(\"peso_aviso\"):  # Antes de cargar pesos: un aviso no encontrado falla barato.\n        ejemplos = [{**x, \"pesos\": pesos_del_aviso(x[\"input_ids\"], x[\"labels\"], tokenizer.decode,\n                                                    config[\"peso_aviso\"])} for x in ejemplos]",
+   "que_hace": "Antes de cargar pesos, retokeniza cada conversación y exige que tokens, máscara y labels coincidan con `tokens.jsonl`.",
+   "como_funciona": "- Compara el sha256 de la plantilla de chat con el de la tokenización.\n- Para cada registro llama `tokenizar_conversacion` y compara `input_ids`, `attention_mask` y `labels`.\n- Si hay `peso_aviso`, calcula los pesos del token del aviso.",
+   "proposito": "Un `tokens.jsonl` alterado o con otra plantilla fallaría acá, barato, y no después de horas de GPU.",
+   "interaccion": "Es el comienzo de `_ejecutar_cuda`; usa `tokenizar_conversacion` de `admision_tp/tokenizacion.py` y `pesos_del_aviso` (mismo archivo).",
+   "teoria": "Datos de demostración confiables: lo que se supervisa tiene que ser exactamente lo que se diseñó.",
+   "key": "tp4-entrenamiento-verifica-mascaras",
    "tp": 4,
    "tp_titulo": "El agente de admisión de guardia (TP final)",
    "usos": [
     {
-     "clase": 8,
-     "cnn": "08",
-     "slug": "transformers-a-fondo",
-     "i": 15,
-     "title": "Tres proyecciones del mismo vector",
-     "url": "/clases/08/#d=transformers-a-fondo&s=15"
-    },
-    {
      "clase": 9,
      "cnn": "09",
      "slug": "como-se-entrena-un-llm",
-     "i": 51,
-     "title": "Dónde entra el fine-tuning",
-     "url": "/clases/09/#d=como-se-entrena-un-llm&s=51"
-    },
-    {
-     "clase": 12,
-     "cnn": "12",
-     "slug": "segmentacion-y-stable-diffusion",
-     "i": 75,
-     "title": "Lo que el equipo va a encontrar",
-     "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=75"
+     "i": 19,
+     "title": "Datos de demostración",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=19"
     }
    ],
-   "nusos": 3
+   "nusos": 1
   },
   {
    "id": "sinteticos-variados",
@@ -2752,7 +2624,17 @@
      "slug": "introduccion",
      "i": 44,
      "title": "Ejemplos de problemas de generación",
+     "extra": false,
      "url": "/clases/01/#d=introduccion&s=44"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 20,
+     "title": "Un dataset de SFT",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=20"
     },
     {
      "clase": 9,
@@ -2760,6 +2642,7 @@
      "slug": "como-se-entrena-un-llm",
      "i": 52,
      "title": "Prompt, RAG o fine-tuning",
+     "extra": false,
      "url": "/clases/09/#d=como-se-entrena-un-llm&s=52"
     },
     {
@@ -2768,15 +2651,1305 @@
      "slug": "como-se-entrena-un-llm",
      "i": 56,
      "title": "Qué pedirle a los datos",
+     "extra": false,
      "url": "/clases/09/#d=como-se-entrena-un-llm&s=56"
+    }
+   ],
+   "nusos": 4
+  },
+  {
+   "id": "generar-dataset",
+   "titulo": "Dataset de 2.900 conversaciones: tres fuentes",
+   "archivo": "scripts/generar_conversaciones.py",
+   "desde": 527,
+   "hasta": 568,
+   "lenguaje": "python",
+   "codigo": "def generar_dataset(salida: Path, *, raiz: Path = RAIZ, ruta_prompt: Path = RUTA_BASELINE,\n                    variante: str | None = None, semilla: int = SEMILLA, candidatos: int = CANDIDATOS) -> dict:\n    salida, raiz = Path(salida), Path(raiz)\n    if salida.exists() or salida.is_symlink():\n        raise FileExistsError(f\"la salida ya existe: {salida}\")\n    prompt = PromptSpec.cargar(ruta_prompt)\n    fabrica = fabrica_buscador(variante)\n    normas = raiz / \"normas/original\"\n    with tempfile.TemporaryDirectory(prefix=\"normas-variadas-\") as temporal:\n        carpetas = CarpetasNormas(normas, Path(temporal), fabrica)\n        _, buscador_original = carpetas.obtener({})\n        unidades = {p[\"codigo\"]: p[\"unidad\"] for p in parametros_base(normas)}\n        referencia = _leer_jsonl(raiz / \"entrenamiento/trazas.jsonl\")\n        contexto = {\n            \"prompt\": prompt, \"carpetas\": carpetas, \"unidades\": unidades,\n            \"candidatos\": valores_observados(referencia, unidades),\n            \"costumbres\": costumbres_por_tipo(json.loads((raiz / \"historial_costumbres.json\").read_text(\"utf-8\"))),\n            \"practica\": huellas_practica(raiz / \"practica/casos.jsonl\"),\n        }\n        ref, aud_ref, exc_ref = convertir_trazas(\n            referencia, origen=\"referencia\", referencia=\"entrenamiento/trazas.jsonl\", contexto=contexto)\n\n        filas = cargar_filas(raiz / \"historial/historial.csv\")\n        ids, seleccion = seleccionar_ids(filas, cargar_clasificacion(raiz / \"historial_clasificado.csv\"),\n                                         costumbre_aviso(raiz / \"historial_costumbres.json\"))\n        elegidas = set(ids)\n        historial = [t for t in _leer_jsonl(raiz / \"historial/trazas.jsonl\") if t[\"id\"] in elegidas]\n        csv_por_id = {f[\"id\"]: {k: v for k, v in f.items() if k not in (\"fecha\", \"operador\")}\n                      for f in filas if f[\"id\"] in elegidas}\n        his, aud_his, exc_his = convertir_trazas(\n            historial, origen=\"historial\", referencia=\"historial/trazas.jsonl\", contexto=contexto,\n            valores_fijos=csv_por_id)\n        sin, aud_sin, exc_sin = generar_sinteticos(contexto, semilla, candidatos)\n        carpetas_usadas = len(carpetas)\n        busqueda = {\"variante\": getattr(buscador_original, \"variante\", None),\n                    \"clase\": type(buscador_original).__name__,\n                    \"configuracion\": asdict(buscador_original.config) if hasattr(buscador_original, \"config\") else None,\n                    \"k_entorno\": getattr(buscador_original, \"k_entorno\", None),\n                    \"construido_con\": \"entrega.construir_buscador\" if variante is None\n                    else \"admision_tp.buscador.BuscadorBM25(ruta, variante)\"}\n\n    registros, auditorias = ref + his + sin, aud_ref + aud_his + aud_sin",
+   "que_hace": "Arma el dataset de entrenamiento uniendo 800 trazas de referencia, 1.600 del historial correcto y 500 sintéticas, todas renderizadas con el prompt y el buscador reales.",
+   "como_funciona": "- Carga el `PromptSpec` y una fábrica de buscador; crea `CarpetasNormas` en un temporal.\n- `convertir_trazas` convierte las 800 de `entrenamiento/trazas.jsonl` re-ejecutando las búsquedas con los valores de cada traza.\n- `seleccionar_ids` filtra el historial a las filas `correcta` y las convierte igual.\n- `generar_sinteticos` agrega los casos del generador.\n- Concatena `ref + his + sin` y registra el buscador usado.",
+   "proposito": "Las búsquedas se vuelven a ejecutar con el buscador de la entrega para que el modelo entrene con exactamente las observaciones que verá en inferencia.",
+   "interaccion": "Se corre con `python -m scripts.generar_conversaciones`; escribe `conversaciones.jsonl`, auditoría y manifiesto, validados por `validar_archivo`. La salida es la entrada de `admision_tp/preparacion.py` y `tokenizacion.py`.",
+   "teoria": "Dataset de SFT: conversaciones completas (sistema, usuario, asistente, observaciones) como demostraciones del comportamiento deseado.",
+   "key": "tp4-generar-dataset",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "introduccion",
+     "i": 44,
+     "title": "Ejemplos de problemas de generación",
+     "extra": false,
+     "url": "/clases/01/#d=introduccion&s=44"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 20,
+     "title": "Un dataset de SFT",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=20"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 22,
+     "title": "Quiz: ¿qué aprende el SFT?",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=22"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 56,
+     "title": "Qué pedirle a los datos",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=56"
+    }
+   ],
+   "nusos": 4
+  },
+  {
+   "id": "mission-estrategias",
+   "titulo": "Estrategias de post-entrenamiento de la consigna",
+   "archivo": "mission.md",
+   "desde": 131,
+   "hasta": 146,
+   "lenguaje": "markdown",
+   "codigo": "## Parte 3: optimización de prompt, antes de entrenar\n\nEs obligatoria y va **antes** del entrenamiento.\n\n- Optimicen el mensaje de sistema y el formato de los mensajes al modelo, con el modelo sin entrenar. Sugerimos DSPy, por ejemplo con su optimizador GEPA.\n- Valoramos la calidad del resultado y también el largo del prompt. El prompt se repite en cada llamada al modelo: cuesta cómputo y ocupa VRAM al usar el modelo y al entrenarlo. En la referencia de la cátedra, el mensaje de sistema es la quinta parte de cada conversación.\n- **Nunca optimicen sobre el test.** El test solo sirve para evaluar.\n- Después entrenen con el prompt optimizado.\n\n## Parte 4: entrenamiento\n\nCualquier estrategia de post-entrenamiento. Por ejemplo:\n\n- fine-tuning supervisado (SFT), con las conversaciones que armaron en la Parte 1;\n- DPO, con pares de respuestas al mismo paso del caso, una buena y una mala;\n- aprendizaje por refuerzo, con los 9 controles de la ficha como puntaje.",
+   "que_hace": "Fragmento de la consigna: optimizar el prompt antes de entrenar y elegir una estrategia de post-entrenamiento (SFT, DPO o RL con los 9 controles).",
+   "como_funciona": "- Parte 3: optimizar sistema y formato con el modelo sin entrenar, valorando también el largo.\n- Parte 4: SFT con las conversaciones, DPO con pares buena/mala, o RL con los 9 controles como puntaje.",
+   "proposito": "El TP implementó solo SFT con LoRA; DPO (con errores del historial como respuestas malas) y RL con verificador quedaron como alternativas no hechas, y así lo registra docs/informe-parte4-infra.md.",
+   "interaccion": "Es la consigna, no código: la estrategia elegida vive en `admision_tp/entrenamiento.py`.",
+   "teoria": "Alineamiento por preferencias (DPO/PPO) y RL con recompensa verificable como alternativas al SFT.",
+   "key": "tp4-mission-estrategias",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 29,
+     "title": "Paso 2: optimizar con PPO",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=29"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 31,
+     "title": "RL con verificador: el proceso",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=31"
+    }
+   ],
+   "nusos": 2
+  },
+  {
+   "id": "comparar-9-controles",
+   "titulo": "Los 9 controles: medida de performance",
+   "archivo": "admision/comparar.py",
+   "desde": 7,
+   "hasta": 48,
+   "lenguaje": "python",
+   "codigo": "CONTROLES = CAMPOS + [\"verificacion\"]\n\n\ndef _doc(x) -> str | None:\n    return None if x is None else \"\".join(ch for ch in str(x).upper() if ch.isalnum())\n\n\ndef _igual(campo: str, esperado, obtenido) -> bool:\n    if campo == \"numero_documento\":\n        return _doc(esperado) == _doc(obtenido)\n    if campo == \"entidad_a_notificar\":\n        return (esperado is None and obtenido is None) or (\n            esperado is not None and obtenido is not None and _norm(esperado) == _norm(obtenido))\n    return esperado == obtenido\n\n\ndef _verifico(verificacion: dict, log: list[dict]) -> bool:\n    hechas = [(_norm(e[\"argumentos\"].get(\"entidad\", \"\")), _norm(e[\"argumentos\"].get(\"numero_afiliado\", \"\")))\n              for e in log if e[\"herramienta\"] == \"verificar_afiliacion\" and isinstance(e[\"argumentos\"], dict)]\n    if any(e in {_norm(x) for x in verificacion[\"prohibidas\"]} for e, _ in hechas):\n        return False\n    requerida = verificacion[\"requerida\"]\n    return requerida is None or (_norm(requerida[0]), _norm(requerida[1])) in hechas\n\n\ndef comparar(esperada: dict, decision: dict | None, log: list[dict]) -> dict:\n    ficha = esperada[\"ficha\"]\n    if decision is None:\n        controles = {k: False for k in CONTROLES}\n    else:\n        controles = {k: _igual(k, ficha[k], decision.get(k)) for k in CAMPOS}\n        controles[\"verificacion\"] = _verifico(esperada[\"verificacion\"], log)\n    return {\n        \"caso\": esperada[\"caso\"],\n        \"resuelto\": all(controles.values()),\n        \"parcial\": round(sum(controles.values()) / len(controles), 3),\n        \"controles\": controles,\n        \"esperada\": ficha,\n        \"obtenida\": decision,\n        \"llamadas\": len(log),\n        \"invalidas\": sum(not e[\"valida\"] for e in log),\n    }",
+   "que_hace": "Compara la ficha registrada con la esperada: 8 campos más el control de verificación de afiliación; un caso cuenta como resuelto solo si los 9 dan bien.",
+   "como_funciona": "- `CONTROLES = CAMPOS + ['verificacion']`.\n- `_igual` normaliza documento y entidad antes de comparar.\n- `_verifico` revisa en el `log` que se consultó la entidad requerida con el número correcto y ninguna prohibida.\n- `comparar` devuelve `resuelto = all(controles)`, `parcial` y el detalle.",
+   "proposito": "Es código del kit de la cátedra; el TP lo usa como medida de performance tanto para elegir prompts como para reportar.",
+   "interaccion": "Lo usa `admision.correr.puntuar`; `admision_tp/evaluacion_prompts.calcular_metricas_candidato` exige exactamente estos `CONTROLES`.",
+   "teoria": "Medida de performance de un agente racional: un criterio objetivo y estricto (todo o nada) de qué es hacerlo bien.",
+   "key": "tp4-comparar-9-controles",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 31,
+     "title": "RL con verificador: el proceso",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=31"
+    },
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 5,
+     "title": "El agente racional",
+     "extra": false,
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=5"
+    },
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 10,
+     "title": "Dos agentes, una descripción PEAS",
+     "extra": false,
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=10"
     }
    ],
    "nusos": 3
   },
   {
+   "id": "bucle-tool-calling",
+   "titulo": "El bucle de tool calling escrito a mano",
+   "archivo": "hospital/agente/bucle.py",
+   "desde": 25,
+   "hasta": 48,
+   "lenguaje": "python",
+   "codigo": "async def _ejecutar(por_nombre, llamada):\n    tool = por_nombre.get(llamada[\"name\"])\n    if tool is None:\n        return ToolMessage(f\"Error: la herramienta '{llamada['name']}' no existe. Herramientas disponibles: \"\n                           f\"{', '.join(sorted(por_nombre))}.\", tool_call_id=llamada[\"id\"], name=llamada[\"name\"])\n    try:\n        return await tool.ainvoke({**llamada, \"type\": \"tool_call\"})\n    except Exception as e:  # el error vuelve al modelo como texto para que pueda corregirse\n        return ToolMessage(f\"Error al ejecutar {llamada['name']}: {e}\", tool_call_id=llamada[\"id\"], name=llamada[\"name\"])\n\n\nasync def responder(llm, tools, pregunta):\n    \"\"\"Devuelve todos los mensajes de la conversación: sistema, pregunta, AIMessage y ToolMessage.\"\"\"\n    llm_con_tools = llm.bind_tools(tools)\n    por_nombre = {t.name: t for t in tools}\n    mensajes = [SystemMessage(PROMPT), HumanMessage(pregunta)]\n    for _ in range(MAX_PASOS):\n        ai = await llm_con_tools.ainvoke(mensajes)\n        mensajes.append(ai)\n        if not ai.tool_calls:\n            break\n        for llamada in ai.tool_calls:\n            mensajes.append(await _ejecutar(por_nombre, llamada))\n    return mensajes",
+   "que_hace": "Implementa el agente: el modelo pide herramientas, se ejecutan, sus resultados vuelven como `ToolMessage` y se repite hasta que responde sin pedir nada o se llega a 6 pasos.",
+   "como_funciona": "- `responder` enlaza las tools con `llm.bind_tools(tools)` y arma `por_nombre`.\n- Arranca con `[SystemMessage(PROMPT), HumanMessage(pregunta)]`.\n- En cada paso: `ai = await llm_con_tools.ainvoke(mensajes)`; si `ai.tool_calls` está vacío, termina.\n- Si no, ejecuta cada llamada con `_ejecutar` y agrega el `ToolMessage` (puede haber varias en paralelo en el mismo paso).\n- `_ejecutar` devuelve un `ToolMessage` de error si la tool no existe o lanza una excepción.",
+   "proposito": "Se escribió a mano, sin LangGraph ni AgentExecutor, para tener todos los mensajes y poder loguearlos. Es agnóstico del origen de las tools: el docstring lo prepara para las de `langchain-mcp-adapters` (parte 3, pendiente).",
+   "interaccion": "Lo llama `correr()` en `hospital/agente/corrida.py` por cada pregunta; devuelve la lista completa de mensajes, que `resumir()` convierte en respuesta, contextos, herramientas y costo. `tests/test_agente.py` lo prueba con un modelo falso.",
+   "teoria": "Agente ReAct / ciclo de vida de una tool: AIMessage con tool_calls → ejecución → ToolMessage → nueva llamada al modelo.",
+   "key": "tp3-bucle-tool-calling",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "introduccion",
+     "i": 62,
+     "title": "El futuro: agentes autónomos e IA multimodal",
+     "extra": false,
+     "url": "/clases/01/#d=introduccion&s=62"
+    },
+    {
+     "clase": 2,
+     "cnn": "02",
+     "slug": "cowork-intro",
+     "i": 25,
+     "title": "Cómo el agente descubre y usa una herramienta",
+     "extra": false,
+     "url": "/clases/02/#d=cowork-intro&s=25"
+    },
+    {
+     "clase": 5,
+     "cnn": "05",
+     "slug": "prompting",
+     "i": 17,
+     "title": "Mitigar alucinaciones: el prompt",
+     "extra": false,
+     "url": "/clases/05/#d=prompting&s=17"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 3,
+     "title": "Recuperar, aumentar, generar",
+     "extra": false,
+     "url": "/clases/06/#d=rag-y-mcp&s=3"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 54,
+     "title": "El ciclo de vida de una herramienta MCP",
+     "extra": false,
+     "url": "/clases/06/#d=rag-y-mcp&s=54"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 57,
+     "title": "Demo: un servidor MCP mínimo",
+     "extra": false,
+     "url": "/clases/06/#d=rag-y-mcp&s=57"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 5,
+     "title": "Como herramienta: el agente decide cuándo buscar",
+     "extra": false,
+     "url": "/clases/07/#d=rag-mcp-rapida&s=5"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 19,
+     "title": "Herramienta hardcodeada o servidor aparte",
+     "extra": false,
+     "url": "/clases/07/#d=rag-mcp-rapida&s=19"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 20,
+     "title": "El ciclo de vida de una herramienta",
+     "extra": false,
+     "url": "/clases/07/#d=rag-mcp-rapida&s=20"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 25,
+     "title": "Cuatro principios de diseño",
+     "extra": false,
+     "url": "/clases/07/#d=rag-mcp-rapida&s=25"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 36,
+     "title": "El circuito con un agente",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=36"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 49,
+     "title": "MCP: lo que aprende el modelo",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=49"
+    },
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 14,
+     "title": "Workflow o agente",
+     "extra": false,
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=14"
+    },
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 19,
+     "title": "Una tool en código",
+     "extra": false,
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=19"
+    },
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 26,
+     "title": "ReAct en LangGraph",
+     "extra": false,
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=26"
+    },
+    {
+     "clase": 13,
+     "cnn": "13",
+     "slug": "cierre-magnifica-humanitas",
+     "i": 25,
+     "title": "De la alucinación al engaño funcional",
+     "extra": false,
+     "url": "/clases/13/#d=cierre-magnifica-humanitas&s=25"
+    }
+   ],
+   "nusos": 16
+  },
+  {
+   "id": "corrida-correr",
+   "titulo": "La corrida: una conversación por pregunta",
+   "archivo": "hospital/agente/corrida.py",
+   "desde": 98,
+   "hasta": 117,
+   "lenguaje": "python",
+   "codigo": "async def correr(llm, tools, preguntas, salida, etiqueta, carpeta_log=CORRIDAS):\n    \"\"\"Corre todas las preguntas y devuelve la ruta del log .md.\"\"\"\n    inicio = datetime.now()\n    filas, secciones = [], []\n    for p in preguntas:\n        t0, error, mensajes = time.monotonic(), None, []\n        try:\n            mensajes = await responder(llm, tools, p[\"pregunta\"])\n        except Exception as e:  # una pregunta que falla no corta la corrida; queda en el log\n            error = f\"{type(e).__name__}: {e}\"\n        r = resumir(mensajes)\n        seg = time.monotonic() - t0\n        filas.append((p, r))\n        secciones += _log_pregunta(p, mensajes, r, seg, error)\n        print(f\"{p['id']}  {', '.join(r['herramientas']) or '-':45s} USD {r['costo']:.5f}  {seg:4.1f}s\"\n              + (f\"  ERROR {error}\" if error else \"\"), flush=True)\n\n    Path(salida).write_text(\"\".join(\n        json.dumps({\"id\": p[\"id\"], \"respuesta\": r[\"respuesta\"], \"contextos\": r[\"contextos\"],\n                    \"herramientas\": r[\"herramientas\"]}, ensure_ascii=False) + \"\\n\" for p, r in filas), encoding=\"utf-8\")",
+   "que_hace": "Pasa cada pregunta por el bucle del agente, resume la conversación y escribe `respuestas.jsonl` en el formato del evaluador.",
+   "como_funciona": "- Por cada pregunta llama a `responder(llm, tools, p[\"pregunta\"])` y mide el tiempo.\n- Si la pregunta falla, guarda el error y sigue con la próxima.\n- `resumir(mensajes)` extrae respuesta, contextos (los `ToolMessage`), herramientas usadas, tokens y costo.\n- `_log_pregunta` arma la sección del log `.md`; al final escribe una línea JSON por pregunta con `id`, `respuesta`, `contextos` y `herramientas`.",
+   "proposito": "Separa el bucle (una conversación) de la corrida (el benchmark completo): así el bucle se puede probar solo y la misma corrida serviría para el agente MCP planeado.",
+   "interaccion": "La llama `agente.py` con `HERRAMIENTAS` y el LLM de `crear_llm()`. Llama a `responder()` de `hospital/agente/bucle.py`; el `respuestas.jsonl` que escribe lo lee `evaluar/evaluar.py agente`. `tests/test_agente.py` la prueba con un modelo falso.",
+   "teoria": "El circuito de un agente medido de punta a punta: cada pregunta es una conversación completa con sus llamadas a tools, que después se evalúa.",
+   "key": "tp3-corrida-correr",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "introduccion",
+     "i": 62,
+     "title": "El futuro: agentes autónomos e IA multimodal",
+     "extra": false,
+     "url": "/clases/01/#d=introduccion&s=62"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 36,
+     "title": "El circuito con un agente",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=36"
+    },
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 14,
+     "title": "Workflow o agente",
+     "extra": false,
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=14"
+    },
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 26,
+     "title": "ReAct en LangGraph",
+     "extra": false,
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=26"
+    }
+   ],
+   "nusos": 4
+  },
+  {
+   "id": "agente-main",
+   "titulo": "El punto de entrada del agente",
+   "archivo": "agente.py",
+   "desde": 19,
+   "hasta": 29,
+   "lenguaje": "python",
+   "codigo": "def main():\n    ap = argparse.ArgumentParser()\n    ap.add_argument(\"--preguntas\", required=True)\n    ap.add_argument(\"--salida\", required=True)\n    a = ap.parse_args()\n\n    preguntas = [json.loads(l) for l in Path(a.preguntas).read_text(encoding=\"utf-8\").splitlines() if l.strip()]\n    llm = crear_llm()\n    obtener_recuperador()  # carga el encoder antes de empezar, para no sumar ese tiempo a la primera pregunta\n    log = asyncio.run(correr(llm, HERRAMIENTAS, preguntas, a.salida, \"agente\"))\n    print(f\"respuestas en {a.salida}, log en {log}\")",
+   "que_hace": "Arma el agente de la parte 2: lee las preguntas, crea el LLM, precarga el recuperador y corre todas las preguntas con las seis tools.",
+   "como_funciona": "- Lee `--preguntas` (un JSON por línea) y `--salida`.\n- `llm = crear_llm()` crea el `ChatOpenAI` contra OpenRouter.\n- `obtener_recuperador()` carga el encoder antes de empezar, para no sumar ese tiempo a la primera pregunta.\n- `asyncio.run(correr(llm, HERRAMIENTAS, preguntas, a.salida, \"agente\"))` corre la corrida y devuelve la ruta del log.",
+   "proposito": "Es la única pieza que conecta las partes: el modelo (`modelo.py`), las tools hardcodeadas (`herramientas.py`) y el bucle (`corrida.py` → `bucle.py`). Cambiar el origen de las tools (por ejemplo, un cliente MCP) solo cambiaría lo que se le pasa a `correr`.",
+   "interaccion": "Se ejecuta con `python3 agente.py --preguntas datos/preguntas_agente_dev.jsonl --salida respuestas.jsonl`. Le pasa `HERRAMIENTAS` y el LLM a `correr()` en `hospital/agente/corrida.py`.",
+   "teoria": "Un agente es modelo + herramientas + bucle; acá las herramientas viven en el mismo proceso (hardcodeadas), no en un servidor aparte.",
+   "key": "tp3-agente-main",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "introduccion",
+     "i": 62,
+     "title": "El futuro: agentes autónomos e IA multimodal",
+     "extra": false,
+     "url": "/clases/01/#d=introduccion&s=62"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 19,
+     "title": "Herramienta hardcodeada o servidor aparte",
+     "extra": false,
+     "url": "/clases/07/#d=rag-mcp-rapida&s=19"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 36,
+     "title": "El circuito con un agente",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=36"
+    },
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 14,
+     "title": "Workflow o agente",
+     "extra": false,
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=14"
+    },
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 26,
+     "title": "ReAct en LangGraph",
+     "extra": false,
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=26"
+    }
+   ],
+   "nusos": 5
+  },
+  {
+   "id": "entorno-paso",
+   "titulo": "Entorno.paso: el tope de 40 llamadas",
+   "archivo": "admision/entorno.py",
+   "desde": 82,
+   "hasta": 93,
+   "lenguaje": "python",
+   "codigo": "    def paso(self, herramienta: str, argumentos: dict) -> tuple[str, bool]:\n        if self.terminado:\n            return \"El caso ya terminó.\", True\n        try:\n            obs = self._ejecutar(herramienta, argumentos if isinstance(argumentos, dict) else {})\n            ok = True\n        except ValueError as e:\n            obs, ok = f\"Error: {e}\", False\n        self.log.append({\"herramienta\": herramienta, \"argumentos\": argumentos, \"observacion\": obs, \"valida\": ok})\n        if not self.terminado and len(self.log) >= MAX_LLAMADAS:\n            self.terminado = True\n        return obs, self.terminado",
+   "que_hace": "Código del kit: ejecuta una herramienta, la registra en el log y cierra el caso al llegar a `MAX_LLAMADAS` (40).",
+   "como_funciona": "- Si el caso ya terminó, devuelve «El caso ya terminó.».\n- `_ejecutar` corre la herramienta; un `ValueError` vuelve como observación `Error: ...` y no corta el caso.\n- Cada llamada se agrega a `self.log` con `valida`.\n- Con 40 llamadas el caso termina sin ficha.",
+   "proposito": "Pone un límite duro de llamadas para que un agente que se queda en loop no corra para siempre.",
+   "interaccion": "Lo llama la `VistaDelAgente` que recibe `_PartidaPrompt.recibir` (`admision_tp/agente_prompt.py`) con la herramienta y los argumentos del JSON del modelo; `_ejecutar` está en el mismo archivo.",
+   "teoria": "Ciclo agente-entorno con presupuesto: el entorno, no el modelo, impone el máximo de pasos.",
+   "key": "tp4-entorno-paso",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 36,
+     "title": "El circuito con un agente",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=36"
+    }
+   ],
+   "nusos": 1
+  },
+  {
+   "id": "agente-bucle",
+   "titulo": "Ciclo del agente: JSON, corrección y tope de llamadas",
+   "archivo": "admision_tp/agente_prompt.py",
+   "desde": 25,
+   "hasta": 68,
+   "lenguaje": "python",
+   "codigo": "class _PartidaPrompt:\n    def __init__(self, entorno, prompt: PromptSpec, max_turnos: int, max_sin_json: int,\n                 max_llamadas: int):\n        self.entorno = entorno\n        self.prompt = prompt\n        self.max_turnos = max_turnos\n        self.max_sin_json = max_sin_json\n        self.max_llamadas = max_llamadas\n        self.mensajes = [\n            {\"role\": \"system\", \"content\": prompt.system_prompt},\n            {\"role\": \"user\", \"content\": prompt.mensaje_inicial_para(entorno.paciente_id)},\n        ]\n        self.turnos = self.sin_json = self.llamadas = 0\n        self.activa = True\n\n    def recibir(self, respuesta: str) -> None:\n        self.turnos += 1\n        self.mensajes.append({\"role\": \"assistant\", \"content\": respuesta})\n        obj = extraer_json(respuesta)\n        if obj is None:\n            self.sin_json += 1\n            if self.sin_json >= self.max_sin_json:\n                self.activa = False\n                return\n            self.mensajes.append({\"role\": \"user\", \"content\": self.prompt.mensaje_json_invalido})\n        else:\n            self.sin_json = 0\n            herramienta = str(obj.get(\"herramienta\", \"\"))\n            observacion, fin = self.entorno.paso(herramienta, obj.get(\"argumentos\") or {})\n            self.llamadas += 1\n            if fin:\n                self.activa = False\n                return\n            self.mensajes.append({\n                \"role\": \"user\",\n                \"content\": self.prompt.observacion_para(herramienta, observacion),\n            })\n        if self.turnos >= self.max_turnos or self.llamadas >= self.max_llamadas:\n            self.activa = False\n\n    def cortar_por_contexto(self, tokens: int, limite: int) -> None:\n        self.mensajes.append({\"role\": \"user\", \"content\": MENSAJE_CONTEXTO_EXCEDIDO.format(\n            tokens=tokens, limite=limite)})\n        self.activa = False",
+   "que_hace": "Mantiene la conversación de un caso: agrega la respuesta del modelo, ejecuta la herramienta pedida o, si no hay JSON válido, inserta el mensaje de corrección.",
+   "como_funciona": "- `_PartidaPrompt.__init__` arranca con `system_prompt` y `mensaje_inicial_para(paciente_id)` del `PromptSpec`.\n- `recibir` usa `extraer_json`; si es `None`, suma `sin_json` y agrega `prompt.mensaje_json_invalido` (corta tras `max_sin_json` seguidas).\n- Con JSON válido llama `entorno.paso(herramienta, argumentos)`, cuenta `llamadas` y agrega la observación con `observacion_para`.\n- Termina si el entorno cerró el caso (registrar_decision) o al llegar a `max_turnos` o `max_llamadas` (40, del kit).",
+   "proposito": "Es un agente de un solo modelo que decide el recorrido: el código no impone orden de herramientas. Los textos vienen del `PromptSpec` para que agente y generador de datos rendericen idéntico.",
+   "interaccion": "`AgentePrompt.jugar_lote` crea una `_PartidaPrompt` por caso y le pasa las respuestas de `ModeloLocal`; `entorno` es la `VistaDelAgente` del kit. `admision_tp/contexto.py` reusa este mismo ciclo para rejugar trazas.",
+   "teoria": "Salida estructurada con reintento ante JSON inválido, dentro de un bucle de agente con herramientas y un límite de pasos.",
+   "key": "tp4-agente-bucle",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "introduccion",
+     "i": 18,
+     "title": "Trabajo final",
+     "extra": false,
+     "url": "/clases/01/#d=introduccion&s=18"
+    },
+    {
+     "clase": 5,
+     "cnn": "05",
+     "slug": "prompting",
+     "i": 29,
+     "title": "Salidas estructuradas: JSON Schema",
+     "extra": false,
+     "url": "/clases/05/#d=prompting&s=29"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 5,
+     "title": "Como herramienta: el agente decide cuándo buscar",
+     "extra": false,
+     "url": "/clases/07/#d=rag-mcp-rapida&s=5"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 36,
+     "title": "El circuito con un agente",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=36"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 42,
+     "title": "Calcular: la misma cuenta por la API",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=42"
+    },
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 10,
+     "title": "Dos agentes, una descripción PEAS",
+     "extra": false,
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=10"
+    },
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 14,
+     "title": "Workflow o agente",
+     "extra": false,
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=14"
+    },
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 17,
+     "title": "Qué es una tool",
+     "extra": false,
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=17"
+    },
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 51,
+     "title": "Primero, un solo agente",
+     "extra": false,
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=51"
+    }
+   ],
+   "nusos": 9
+  },
+  {
+   "id": "prompt-procedimiento-v1",
+   "titulo": "El prompt de la entrega: procedimiento-v1",
+   "archivo": "configuraciones/prompts/procedimiento-v1.json",
+   "desde": 1,
+   "hasta": 9,
+   "lenguaje": "json",
+   "codigo": "{\n  \"version\": 1,\n  \"nombre\": \"procedimiento-v1\",\n  \"system_prompt\": \"Sos el agente de admisión de la guardia del Hospital General de Prueba. Para cada paciente que ingresa completás su ficha de admisión siguiendo las normas del hospital. No tomás decisiones clínicas.\\n\\nHerramientas:\\n- leer_triage: Devuelve la nota de triage del paciente: edad, nivel, motivo de consulta, cómo llegó, documento y credenciales presentados, si puede responder preguntas, acompañante y si se lesionó trabajando.\\n  argumentos: {\\\"paciente_id\\\": id del paciente, por ejemplo P-1234}\\n- preguntar: Le pregunta al paciente o a su acompañante por su obra social o prepaga (tema cobertura) o por la ART de su empleador (tema art).\\n  argumentos: {\\\"paciente_id\\\": id del paciente, \\\"a_quien\\\": paciente | acompanante, \\\"tema\\\": cobertura | art}\\n- verificar_afiliacion: Consulta a la entidad si la afiliación está activa.\\n  argumentos: {\\\"entidad\\\": nombre de la entidad, tal como lo informaron, \\\"numero_afiliado\\\": número de afiliado (en una ART, el CUIL)}\\n- buscar_normativa: Busca en las normas del hospital y devuelve las 2 secciones más relevantes.\\n  argumentos: {\\\"consulta\\\": texto libre}\\n- registrar_decision: Registra la ficha de admisión. Termina el caso.\\n  argumentos: {\\\"registro\\\": definitivo | provisorio, \\\"numero_documento\\\": número del documento tal como figura en él, o null, \\\"box_antes_del_registro\\\": true si se ubica al paciente en el box antes de registrarlo, si no false, \\\"circuito\\\": ecg | codigo_acv | codigo_sepsis | ninguno, \\\"plazo_circuito_min\\\": plazo del circuito en minutos desde el ingreso, o null si no hay circuito, \\\"cobertura\\\": obra_social | prepaga | art | sin_cobertura, \\\"entidad_a_notificar\\\": nombre de la entidad a la que se notifica la atención, o null, \\\"aviso_al_voluntariado\\\": true o false, \\\"fundamentos\\\": lista de los códigos de sección que fundamentan la ficha, por ejemplo [\\\"NOR-ADM-01\\\"]}\\n\\nEn cada turno respondé solo con un objeto JSON, sin texto antes ni después:\\n{\\\"herramienta\\\": \\\"<nombre>\\\", \\\"argumentos\\\": {...}}\\nUsá una herramienta por turno. El caso termina cuando llamás a registrar_decision.\\n\\nLas normas que aplican son NOR-ADM-01 a NOR-ADM-03 (registro), NOR-COB-01 a NOR-COB-04 (coberturas) y NOR-TDE-01 a NOR-TDE-04 (circuitos tiempo-dependientes). Buscalas con buscar_normativa antes de decidir.\\n\\nLas normas del hospital contradicen lo habitual y sus valores (niveles, edades, plazos, dígitos) cambian: no decidas de memoria, aplicá lo que dicen las secciones recuperadas.\\n\\nProcedimiento:\\n1. leer_triage.\\n2. Buscá cada tema con una consulta propia, porque cada búsqueda trae pocas secciones:\\n   a. registro: documento presentado y nivel de triage;\\n   b. box antes del registro: nivel de triage y edad del paciente;\\n   c. el circuito del motivo de consulta, su plazo y el ingreso en ambulancia;\\n   d. cobertura: consulta, verificación de afiliación, ART y número de afiliado con terminación reservada.\\n3. Si no presentó credencial, preguntá por la cobertura: al acompañante si el paciente no puede responder; si no hay nadie, no preguntes. Si se lesionó trabajando o en el trayecto, preguntá por la ART.\\n4. Verificá la afiliación que corresponde según las normas antes de decidir la cobertura y la entidad a notificar.\\n5. registrar_decision, aplicando cada sección a los datos del triage.\",\n  \"mensaje_inicial\": \"Ingresó a la guardia el paciente {paciente_id}. Completá su ficha de admisión.\",\n  \"formato_observacion\": \"Resultado de {herramienta}:\\n{observacion}\",\n  \"mensaje_json_invalido\": \"No entendí tu respuesta. Respondé solo con un objeto JSON: {\\\"herramienta\\\": \\\"<nombre>\\\", \\\"argumentos\\\": {...}}\",\n  \"sha256\": \"8c692c2c67850f1448b5f4ecbda6037713110983c41b0e9da933612d2291ecdd\"\n}",
+   "que_hace": "El `PromptSpec` de la entrega: rol, descripción de las cinco herramientas, formato JSON obligatorio, advertencia sobre las normas y un procedimiento paso a paso.",
+   "como_funciona": "- `system_prompt` define el rol («agente de admisión de la guardia», sin decisiones clínicas).\n- Describe cada herramienta con sus `argumentos` en el mismo texto.\n- Pide responder solo con `{\"herramienta\": ..., \"argumentos\": ...}`, una herramienta por turno.\n- «Procedimiento» obliga a buscar cada tema con una consulta propia (registro, box, circuito, cobertura).\n- `mensaje_json_invalido` es la corrección cuando el JSON llega mal; `sha256` fija el contenido.",
+   "proposito": "El paso 2 del procedimiento es lo que lo diferencia del baseline: el agente hacía ~1,3 búsquedas por caso y se le escapaban normas.",
+   "interaccion": "Lo carga `PromptSpec.cargar` desde `entrega.cargar_prompt` (`RUTA_ENTREGA`); `_PartidaPrompt` usa `system_prompt`, `mensaje_inicial`, `formato_observacion` y `mensaje_json_invalido` en cada turno.",
+   "teoria": "Componentes de un prompt (rol, herramientas, formato de salida, instrucciones paso a paso) y salida estructurada en JSON.",
+   "key": "tp4-prompt-procedimiento-v1",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 5,
+     "cnn": "05",
+     "slug": "prompting",
+     "i": 27,
+     "title": "Los 6 componentes",
+     "extra": false,
+     "url": "/clases/05/#d=prompting&s=27"
+    },
+    {
+     "clase": 5,
+     "cnn": "05",
+     "slug": "prompting",
+     "i": 29,
+     "title": "Salidas estructuradas: JSON Schema",
+     "extra": false,
+     "url": "/clases/05/#d=prompting&s=29"
+    },
+    {
+     "clase": 5,
+     "cnn": "05",
+     "slug": "prompting",
+     "i": 46,
+     "title": "¿Por qué tardan más?",
+     "extra": false,
+     "url": "/clases/05/#d=prompting&s=46"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 5,
+     "title": "Como herramienta: el agente decide cuándo buscar",
+     "extra": false,
+     "url": "/clases/07/#d=rag-mcp-rapida&s=5"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 42,
+     "title": "Calcular: la misma cuenta por la API",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=42"
+    },
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 17,
+     "title": "Qué es una tool",
+     "extra": false,
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=17"
+    }
+   ],
+   "nusos": 6
+  },
+  {
+   "id": "modelo-generar",
+   "titulo": "Generación local por lotes",
+   "archivo": "admision_tp/modelo.py",
+   "desde": 62,
+   "hasta": 92,
+   "lenguaje": "python",
+   "codigo": "    def __call__(self, conversaciones: list[list[dict]]) -> list[str]:\n        if not conversaciones:\n            return []\n        import torch\n\n        respuestas = []\n        for inicio in range(0, len(conversaciones), self.configuracion.lote):\n            lote = conversaciones[inicio:inicio + self.configuracion.lote]\n            entradas = self.procesador.apply_chat_template(\n                lote, tokenize=True, add_generation_prompt=True, enable_thinking=False,\n                padding=True, truncation=False, return_dict=True, return_tensors=\"pt\")\n            ancho = entradas[\"input_ids\"].shape[-1]\n            if ancho + self.configuracion.max_tokens_nuevos > self.configuracion.max_contexto:\n                raise ValueError(\"Contexto excedido: no se recorta la conversación silenciosamente\")\n            medir = self.configuracion.metricas is not None\n            if medir:\n                for gpu in range(torch.cuda.device_count()):\n                    torch.cuda.reset_peak_memory_stats(gpu)\n                inicio_lote = time.perf_counter()\n            entradas = entradas.to(self.modelo.device)\n            with torch.inference_mode():\n                salida = self.modelo.generate(**entradas, do_sample=False,\n                    max_new_tokens=self.configuracion.max_tokens_nuevos)\n            generados = salida[:, ancho:]\n            textos = self.procesador.batch_decode(generados, skip_special_tokens=True)\n            if len(textos) != len(lote):\n                raise RuntimeError(\"El modelo no devolvió una respuesta por conversación\")\n            if medir:\n                self._registrar(torch, entradas, generados, ancho, time.perf_counter() - inicio_lote)\n            respuestas.extend(textos)\n        return respuestas",
+   "que_hace": "Genera la próxima respuesta de varias conversaciones a la vez con Gemma local, en greedy, y devuelve solo el texto nuevo.",
+   "como_funciona": "- Parte las conversaciones en lotes de `configuracion.lote`.\n- `apply_chat_template` con padding y sin truncar; si `ancho + max_tokens_nuevos` excede `max_contexto`, lanza error.\n- `generate(do_sample=False)` bajo `inference_mode`.\n- Recorta los tokens de entrada (`salida[:, ancho:]`) y decodifica.",
+   "proposito": "El modelo no conoce las herramientas: solo devuelve texto. Toda la lógica del agente queda en `AgentePrompt`.",
+   "interaccion": "Lo llama `AgentePrompt.jugar_lote` con las conversaciones activas; las respuestas van a `_PartidaPrompt.recibir`. Lo construye `ModeloLocal.cargar` desde `entrega.construir_agente`.",
+   "teoria": "Inferencia local de un LLM: el mismo cálculo que una API, pero en GPU propia y sin servicios externos.",
+   "key": "tp4-modelo-generar",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 5,
+     "cnn": "05",
+     "slug": "prompting",
+     "i": 4,
+     "title": "Ventana de contexto",
+     "extra": false,
+     "url": "/clases/05/#d=prompting&s=4"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 42,
+     "title": "Calcular: la misma cuenta por la API",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=42"
+    }
+   ],
+   "nusos": 2
+  },
+  {
+   "id": "plan-mcp-pendiente",
+   "titulo": "Diseño del servidor y cliente MCP (pendiente)",
+   "archivo": "PLAN.md",
+   "desde": 155,
+   "hasta": 171,
+   "lenguaje": "markdown",
+   "codigo": "## Step 3 — Part 3: MCP server + LangChain MCP client (15 pts)\nDepends on Step 2.\n\n**3.1 `servidor_mcp.py`** — `mcp.server.fastmcp.FastMCP(\"hospital\")`, 6 `@mcp.tool(name=..., description=DESCRIPCIONES[...])`\nwrapping `hospital.api_cliente` and `Recuperador`; `mcp.run()` (stdio). Nothing on stdout except the protocol (logs → stderr);\nwarm up the retriever at startup so the first call doesn’t time out.\n\n**3.2 `agente_mcp.py`** — **no API/retriever code of its own**: `MultiServerMCPClient({\"hospital\": {\"command\": sys.executable, \"args\": [\"servidor_mcp.py\"], \"transport\": \"stdio\"}})`,\n`tools = await client.get_tools()` (tools/list; log the discovered names), then reuse `responder` + `correr(..., etiqueta=\"mcp\")`\nwith the same LLM and prompt.\n\n**3.3 Inspector** (manual, user) — `npx @modelcontextprotocol/inspector python3 servidor_mcp.py`, call all 6 tools, save screenshots to `experimentos/inspector/`.\n\n**3.4 Compare** — run benchmark → `respuestas_mcp.jsonl` + log + eval. `experimentos/comparar_agentes.py` prints a table\n(ruteo, CR, F, AR, agent cost from log totals, judge cost) for Part 2 vs 3. INFORME §3: table + explanation of any difference from the logs (e.g. tool-result formatting, nondeterminism).\n\n**Done when:** `python3 agente_mcp.py --preguntas datos/preguntas_agente_dev.jsonl --salida respuestas_mcp.jsonl` works with the API running, `grep -E \"urllib|Recuperador|localhost\" agente_mcp.py` is empty, 6 inspector screenshots exist.",
+   "que_hace": "Es el diseño, no código: la parte 3 quedó pendiente y no existen `servidor_mcp.py` ni `agente_mcp.py`. El PLAN describe un servidor FastMCP por stdio con las 6 tools y un cliente LangChain con `MultiServerMCPClient`.",
+   "como_funciona": "- 3.1: `FastMCP(\"hospital\")` con 6 `@mcp.tool(name=..., description=DESCRIPCIONES[...])` que envuelven `api_cliente` y el recuperador; `mcp.run()` por stdio; logs a stderr porque stdout es el canal del protocolo.\n- 3.2: `agente_mcp.py` sin código propio de API: `MultiServerMCPClient` lanza el servidor, `get_tools()` descubre las tools (tools/list) y se reusa `responder` y `correr`.\n- 3.3: probar con MCP Inspector.\n- 3.4: comparar parte 2 vs. parte 3.",
+   "proposito": "Separa herramienta y agente: el mismo set de tools podría usarlo cualquier host MCP. Reusar `descripciones.py` y el bucle agnóstico haría justa la comparación. Quedó pendiente en la entrega.",
+   "interaccion": "Se apoyaría en `hospital/descripciones.py`, `hospital/api_cliente.py`, `hospital/documentos.py`, `hospital/agente/bucle.py` y `corrida.py` (que ya normaliza bloques de contenido MCP en `texto()`).",
+   "teoria": "Arquitectura MCP: host, cliente y servidor; descubrimiento con tools/list y ejecución con tools/call sobre JSON-RPC 2.0 por stdio.",
+   "key": "tp3-plan-mcp-pendiente",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "claude-desktop-chat",
+     "i": 21,
+     "title": "Agregar un external connector",
+     "extra": true,
+     "url": "/clases/01/#d=claude-desktop-chat&s=21"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 53,
+     "title": "El servidor separa herramienta y agente",
+     "extra": false,
+     "url": "/clases/06/#d=rag-y-mcp&s=53"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 54,
+     "title": "El ciclo de vida de una herramienta MCP",
+     "extra": false,
+     "url": "/clases/06/#d=rag-y-mcp&s=54"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 57,
+     "title": "Demo: un servidor MCP mínimo",
+     "extra": false,
+     "url": "/clases/06/#d=rag-y-mcp&s=57"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 16,
+     "title": "MCP conecta modelos con herramientas",
+     "extra": false,
+     "url": "/clases/07/#d=rag-mcp-rapida&s=16"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 18,
+     "title": "JSON-RPC 2.0: la capa de mensajes",
+     "extra": false,
+     "url": "/clases/07/#d=rag-mcp-rapida&s=18"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 47,
+     "title": "MCP: host, cliente y servidor",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=47"
+    },
+    {
+     "clase": 13,
+     "cnn": "13",
+     "slug": "cierre-magnifica-humanitas",
+     "i": 45,
+     "title": "Hacia un Internet de Agentes",
+     "extra": false,
+     "url": "/clases/13/#d=cierre-magnifica-humanitas&s=45"
+    }
+   ],
+   "nusos": 8
+  },
+  {
+   "id": "descripciones-tools",
+   "titulo": "Descripciones de tools: fuente, uso, qué NO tienen, valores válidos",
+   "archivo": "hospital/descripciones.py",
+   "desde": 8,
+   "hasta": 38,
+   "lenguaje": "python",
+   "codigo": "BUSCAR_DOCUMENTOS = (\n    \"Busca en los documentos oficiales del Hospital Provincial Arroyo Claro: normas y procedimientos que no \"\n    \"cambian de un día a otro. Sirve para horarios fijos (visitas, altas, farmacia, laboratorio, vacunatorio, \"\n    \"donación de sangre), quién puede visitar o quedarse con un paciente, preparación para estudios y cirugías \"\n    \"(ayunos, dietas), requisitos y documentación para turnos, internación, farmacia y coberturas, triage de \"\n    \"la guardia, derechos del paciente, accesos al edificio, control de infecciones, maternidad, pediatría, \"\n    \"kinesiología, salud mental y telemedicina. NO tiene el estado de hoy (camas libres, profesionales de \"\n    \"guardia, turnos disponibles, stock de farmacia ni tiempos de espera actuales). \"\n    \"consulta: el tema a buscar, en español y con las mismas palabras que usó el paciente (por ejemplo \"\n    \"'cómo es una consulta por telemedicina'). Si la pregunta toca varios temas de los documentos, hacé una \"\n    \"búsqueda por tema. Devuelve los fragmentos más relevantes con su documento y sección de origen.\"\n)\n\nCONSULTAR_CAMAS = (\n    \"Estado de HOY de las camas de internación de un sector: total, ocupadas y libres. Usala para saber si hay \"\n    \"lugar o camas disponibles para internar. \"\n    \"sector: uno de clinica_medica, cirugia_general, terapia_intensiva, pediatria, neonatologia, maternidad.\"\n)\n\nCONSULTAR_GUARDIA = (\n    \"Profesionales que están de guardia HOY en una especialidad, con su horario (por ejemplo 08:00-20:00 es \"\n    \"el turno de día y 20:00-08:00 el de la noche). Usala para saber quién atiende hoy o esta noche. \"\n    \"especialidad: una de clinica_medica, cardiologia, pediatria, traumatologia, obstetricia, salud_mental.\"\n)\n\nCONSULTAR_TURNOS = (\n    \"Próximos turnos disponibles (fecha y hora) con una especialidad en consultorios externos. Usala para saber \"\n    \"cuándo es el primer turno libre. No dice qué hay que llevar al turno: eso está en los documentos. \"\n    \"especialidad: una de cardiologia, dermatologia, traumatologia, psicologia, gastroenterologia, \"\n    \"obstetricia, kinesiologia.\"\n)",
+   "que_hace": "Define el texto que lee el modelo para decidir qué herramienta llamar: `buscar_documentos` para normas fijas y las de la API para el estado de hoy.",
+   "como_funciona": "- `BUSCAR_DOCUMENTOS` lista los temas de los documentos y aclara que NO tiene el estado de hoy; pide buscar «con las mismas palabras que usó el paciente» y hacer una búsqueda por tema.\n- `CONSULTAR_CAMAS`, `CONSULTAR_GUARDIA` y `CONSULTAR_TURNOS` dicen que son el estado de HOY y enumeran los valores válidos del parámetro.\n- `CONSULTAR_TURNOS` agrega: «No dice qué hay que llevar al turno: eso está en los documentos».",
+   "proposito": "El ruteo depende solo de estas descripciones, así que separan norma (documentos) de estado (API) y dicen cuándo NO usar cada tool: ruteo 1,00 en las 4 corridas. La frase de las palabras del paciente arregló A11, y el ejemplo de consulta se cambió por uno de telemedicina para no filtrar la pregunta A01 de dev.",
+   "interaccion": "Las importa `hospital/herramientas.py` a través del diccionario `DESCRIPCIONES`; el PLAN prevé que el servidor MCP use exactamente los mismos textos para que la comparación parte 2 vs. parte 3 sea justa.",
+   "teoria": "Diseño de herramientas: la descripción es la interfaz para el modelo (qué hace, cuándo usarla, cuándo no, parámetros válidos).",
+   "key": "tp3-descripciones-tools",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 2,
+     "cnn": "02",
+     "slug": "cowork-intro",
+     "i": 25,
+     "title": "Cómo el agente descubre y usa una herramienta",
+     "extra": false,
+     "url": "/clases/02/#d=cowork-intro&s=25"
+    },
+    {
+     "clase": 5,
+     "cnn": "05",
+     "slug": "prompting",
+     "i": 33,
+     "title": "Zero-shot vs. few-shot",
+     "extra": false,
+     "url": "/clases/05/#d=prompting&s=33"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 10,
+     "title": "Las fuentes ponen el techo de calidad",
+     "extra": false,
+     "url": "/clases/06/#d=rag-y-mcp&s=10"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 29,
+     "title": "Tres síntomas de que falta una etapa",
+     "extra": false,
+     "url": "/clases/06/#d=rag-y-mcp&s=29"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 63,
+     "title": "Cuatro principios de diseño",
+     "extra": false,
+     "url": "/clases/06/#d=rag-y-mcp&s=63"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 68,
+     "title": "La descripción dice cuándo NO usarla",
+     "extra": false,
+     "url": "/clases/06/#d=rag-y-mcp&s=68"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 25,
+     "title": "Cuatro principios de diseño",
+     "extra": false,
+     "url": "/clases/07/#d=rag-mcp-rapida&s=25"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 28,
+     "title": "La descripción dice cuándo NO usarla",
+     "extra": false,
+     "url": "/clases/07/#d=rag-mcp-rapida&s=28"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 31,
+     "title": "Poco y bien elegido",
+     "extra": false,
+     "url": "/clases/07/#d=rag-mcp-rapida&s=31"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 48,
+     "title": "MCP: una herramienta es una definición",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=48"
+    },
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 20,
+     "title": "Principios para diseñar tools",
+     "extra": false,
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=20"
+    }
+   ],
+   "nusos": 11
+  },
+  {
+   "id": "descripciones-api-y-registro",
+   "titulo": "Descripciones de farmacia y espera, y el registro de las seis",
+   "archivo": "hospital/descripciones.py",
+   "desde": 40,
+   "hasta": 61,
+   "lenguaje": "python",
+   "codigo": "CONSULTAR_FARMACIA = (\n    \"Stock de HOY de un medicamento en la farmacia del hospital y, si no hay, la fecha de reposición. Usala para \"\n    \"saber si un medicamento está disponible. No dice cómo retirarlo ni qué papeles hacen falta: eso está en los \"\n    \"documentos. \"\n    \"medicamento: uno de 'amoxicilina 500 mg', 'enalapril 10 mg', 'metformina 850 mg', 'salbutamol aerosol', \"\n    \"'insulina NPH', 'paracetamol 500 mg', 'levotiroxina 50 mcg'.\"\n)\n\nCONSULTAR_ESPERA = (\n    \"Minutos de espera ACTUALES en la guardia para cada nivel de triage (rojo, naranja, amarillo, verde, azul). \"\n    \"Usala para saber cuánto se está esperando hoy en la guardia. No recibe parámetros. Los tiempos máximos \"\n    \"que fija la norma de triage están en los documentos, no acá.\"\n)\n\nDESCRIPCIONES = {\n    \"buscar_documentos\": BUSCAR_DOCUMENTOS,\n    \"consultar_camas\": CONSULTAR_CAMAS,\n    \"consultar_guardia\": CONSULTAR_GUARDIA,\n    \"consultar_turnos\": CONSULTAR_TURNOS,\n    \"consultar_farmacia\": CONSULTAR_FARMACIA,\n    \"consultar_espera\": CONSULTAR_ESPERA,\n}",
+   "que_hace": "Completa las descripciones de las dos tools de la API que faltan y arma el diccionario nombre → descripción con las seis herramientas.",
+   "como_funciona": "- `CONSULTAR_FARMACIA` aclara que no dice cómo retirar el medicamento («eso está en los documentos») y lista los siete medicamentos válidos.\n- `CONSULTAR_ESPERA` no recibe parámetros y aclara que los tiempos máximos de la norma de triage están en los documentos.\n- `DESCRIPCIONES` mapea los seis nombres exactos que exige el evaluador.",
+   "proposito": "Mantiene en un único lugar el contrato de las tools, sin depender de LangChain, para reusarlo en la parte 2 y en la parte 3 (MCP). Con solo 6 tools bien descritas no hizo falta routing jerárquico.",
+   "interaccion": "`hospital/herramientas.py` toma `DESCRIPCIONES[nombre]` para cada `@tool`; `tests/test_agente.py` verifica que las descripciones de las tools coincidan con este diccionario.",
+   "teoria": "Pocas herramientas bien elegidas y con descripciones que marcan límites entre fuentes reducen errores de selección.",
+   "key": "tp3-descripciones-api-y-registro",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 2,
+     "cnn": "02",
+     "slug": "cowork-intro",
+     "i": 25,
+     "title": "Cómo el agente descubre y usa una herramienta",
+     "extra": false,
+     "url": "/clases/02/#d=cowork-intro&s=25"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 63,
+     "title": "Cuatro principios de diseño",
+     "extra": false,
+     "url": "/clases/06/#d=rag-y-mcp&s=63"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 64,
+     "title": "Más herramientas, peor elección",
+     "extra": false,
+     "url": "/clases/06/#d=rag-y-mcp&s=64"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 16,
+     "title": "MCP conecta modelos con herramientas",
+     "extra": false,
+     "url": "/clases/07/#d=rag-mcp-rapida&s=16"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 26,
+     "title": "Más herramientas, peor elección",
+     "extra": false,
+     "url": "/clases/07/#d=rag-mcp-rapida&s=26"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 48,
+     "title": "MCP: una herramienta es una definición",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=48"
+    }
+   ],
+   "nusos": 6
+  },
+  {
+   "id": "herramientas-langchain",
+   "titulo": "Las seis tools como @tool de LangChain",
+   "archivo": "hospital/herramientas.py",
+   "desde": 1,
+   "hasta": 40,
+   "lenguaje": "python",
+   "codigo": "\"\"\"Las seis herramientas de la parte 2 como tools de LangChain. Los nombres son los que exige el evaluador y\nlas descripciones salen de hospital/descripciones.py (las mismas que usa el servidor MCP).\"\"\"\nfrom langchain_core.tools import tool\n\nfrom hospital import api_cliente, documentos\nfrom hospital.descripciones import DESCRIPCIONES\n\n\n@tool(\"buscar_documentos\", description=DESCRIPCIONES[\"buscar_documentos\"])\ndef buscar_documentos(consulta: str) -> str:\n    return documentos.buscar_documentos(consulta)\n\n\n@tool(\"consultar_camas\", description=DESCRIPCIONES[\"consultar_camas\"])\ndef consultar_camas(sector: str) -> str:\n    return api_cliente.camas(sector)\n\n\n@tool(\"consultar_guardia\", description=DESCRIPCIONES[\"consultar_guardia\"])\ndef consultar_guardia(especialidad: str) -> str:\n    return api_cliente.guardia(especialidad)\n\n\n@tool(\"consultar_turnos\", description=DESCRIPCIONES[\"consultar_turnos\"])\ndef consultar_turnos(especialidad: str) -> str:\n    return api_cliente.turnos(especialidad)\n\n\n@tool(\"consultar_farmacia\", description=DESCRIPCIONES[\"consultar_farmacia\"])\ndef consultar_farmacia(medicamento: str) -> str:\n    return api_cliente.farmacia(medicamento)\n\n\n@tool(\"consultar_espera\", description=DESCRIPCIONES[\"consultar_espera\"])\ndef consultar_espera() -> str:\n    return api_cliente.espera()\n\n\nHERRAMIENTAS = [buscar_documentos, consultar_camas, consultar_guardia, consultar_turnos, consultar_farmacia,\n                consultar_espera]",
+   "que_hace": "Envuelve las funciones planas del hospital como herramientas de LangChain con los nombres que exige el evaluador y las descripciones compartidas.",
+   "como_funciona": "- Cada función lleva `@tool(nombre, description=DESCRIPCIONES[nombre])`; LangChain arma el esquema JSON del parámetro a partir de la firma (`consulta: str`, `sector: str`, ...).\n- `buscar_documentos` delega en `documentos.buscar_documentos`; las otras cinco en `api_cliente`.\n- `consultar_espera()` no tiene parámetros.\n- `HERRAMIENTAS` es la lista que se le pasa al agente.",
+   "proposito": "Son herramientas «hardcodeadas» en el proceso del agente. La lógica real vive en módulos sin LangChain para que el servidor MCP planificado pueda publicar las mismas funciones sin duplicar código.",
+   "interaccion": "`agente.py` pasa `HERRAMIENTAS` a `correr()`, que las entrega a `responder()` en `hospital/agente/bucle.py`, donde se enlazan con `bind_tools`.",
+   "teoria": "Una tool en código: nombre, descripción y esquema de parámetros que el modelo ve; tool calling con LangChain.",
+   "key": "tp3-herramientas-langchain",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 2,
+     "cnn": "02",
+     "slug": "cowork-intro",
+     "i": 25,
+     "title": "Cómo el agente descubre y usa una herramienta",
+     "extra": false,
+     "url": "/clases/02/#d=cowork-intro&s=25"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 64,
+     "title": "Más herramientas, peor elección",
+     "extra": false,
+     "url": "/clases/06/#d=rag-y-mcp&s=64"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 5,
+     "title": "Como herramienta: el agente decide cuándo buscar",
+     "extra": false,
+     "url": "/clases/07/#d=rag-mcp-rapida&s=5"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 19,
+     "title": "Herramienta hardcodeada o servidor aparte",
+     "extra": false,
+     "url": "/clases/07/#d=rag-mcp-rapida&s=19"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 20,
+     "title": "El ciclo de vida de una herramienta",
+     "extra": false,
+     "url": "/clases/07/#d=rag-mcp-rapida&s=20"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 26,
+     "title": "Más herramientas, peor elección",
+     "extra": false,
+     "url": "/clases/07/#d=rag-mcp-rapida&s=26"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 48,
+     "title": "MCP: una herramienta es una definición",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=48"
+    },
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 19,
+     "title": "Una tool en código",
+     "extra": false,
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=19"
+    }
+   ],
+   "nusos": 8
+  },
+  {
+   "id": "log-a10-paralelo",
+   "titulo": "Log real: A10 pide las dos fuentes en paralelo",
+   "archivo": "experimentos/corridas/agente_20260929-105719.md",
+   "desde": 302,
+   "hasta": 337,
+   "lenguaje": "markdown",
+   "codigo": "## A10: Quiero internar a mi nene en pediatría, ¿hay lugar y me puedo quedar con él?\n\n### Llamada al modelo 1\n\n- Tokens: entrada 1577 (cache 1536), salida 211 (razonamiento 116)\n- Costo: USD 0.000096\n- Generación: `gen-1790690305-njr9UFOvy47hBsCpf6aG`\n\n**Herramienta** `consultar_camas` con argumentos `{\"sector\": \"pediatria\"}`\n\n```\n{\"sector\": \"pediatria\", \"fecha\": \"2026-10-05\", \"datos\": {\"total\": 24, \"ocupadas\": 17, \"libres\": 7}}\n```\n\n**Herramienta** `buscar_documentos` con argumentos `{\"consulta\": \"acompañante de paciente pediátrico internado puede quedarse\"}`\n\n```\n[Ingreso a internación programada > Acompañante]\nSe permite un acompañante por paciente internado durante la noche, salvo en terapia intensiva. El acompañante recibe una tarjeta que presenta en el control de acceso.\n```\n\n### Llamada al modelo 2\n\n- Tokens: entrada 1787 (cache 1536), salida 153 (razonamiento 86)\n- Costo: USD 0.000081\n- Generación: `gen-1790690313-9NZL4I4ymMq06XPo3UnQ`\n\nTexto del modelo:\n\n> Sí, hoy hay lugar en pediatría: 7 camas libres de 24. Y sí, podés quedarte: se permite un acompañante por paciente internado durante la noche (excepto en terapia intensiva), que recibe una tarjeta para presentar en el control de acceso.\n\n**Respuesta final:**\n\nSí, hoy hay lugar en pediatría: 7 camas libres de 24. Y sí, podés quedarte: se permite un acompañante por paciente internado durante la noche (excepto en terapia intensiva), que recibe una tarjeta para presentar en el control de acceso.\n\n_Herramientas: consultar_camas, buscar_documentos · llamadas al modelo: 2 · tokens 3364 / 364 · USD 0.000177 · 15.1 s_",
+   "que_hace": "Extracto del log de la corrida 4 para la pregunta mixta A10: en la primera llamada el modelo pide `consultar_camas` y `buscar_documentos` a la vez y en la segunda responde.",
+   "como_funciona": "- Llamada 1: 1577 tokens de entrada (1536 de cache), 211 de salida (116 de razonamiento), USD 0,000096.\n- Dos herramientas en el mismo paso: camas de pediatría (7 libres de 24) y la norma de acompañantes.\n- Cada resultado vuelve como `ToolMessage` (fragmento con `[Ingreso a internación programada > Acompañante]`).\n- Llamada 2: el modelo combina ambos datos sin agregar nada que no esté en los resultados.",
+   "proposito": "Muestra en datos reales el ruteo entre norma (documentos) y estado (API), el tool calling paralelo y el registro de tokens y costo.",
+   "interaccion": "Lo generó `_log_pregunta` de `hospital/agente/corrida.py` al correr `agente.py`; es la corrida entregada (`respuestas.jsonl`).",
+   "teoria": "RAG como herramienta: el agente decide cuándo y con qué consulta buscar, y puede combinar varias fuentes en un mismo paso.",
+   "key": "tp3-log-a10-paralelo",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 69,
+     "title": "Analítica en producción",
+     "extra": false,
+     "url": "/clases/06/#d=rag-y-mcp&s=69"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 5,
+     "title": "Como herramienta: el agente decide cuándo buscar",
+     "extra": false,
+     "url": "/clases/07/#d=rag-mcp-rapida&s=5"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 29,
+     "title": "Analítica en producción",
+     "extra": false,
+     "url": "/clases/07/#d=rag-mcp-rapida&s=29"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 49,
+     "title": "MCP: lo que aprende el modelo",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=49"
+    }
+   ],
+   "nusos": 4
+  },
+  {
+   "id": "lora-config",
+   "titulo": "LoRA r=8 sobre q_proj/v_proj",
+   "archivo": "admision_tp/entrenamiento.py",
+   "desde": 11,
+   "hasta": 23,
+   "lenguaje": "python",
+   "codigo": "# Solo la atención del modelo de lenguaje. Gemma 4 es multimodal: sus torres de visión y audio también\n# tienen q_proj/v_proj, pero son Gemma4ClippableLinear y PEFT no los soporta (falló en Kaggle). PEFT\n# aplica un string con re.fullmatch sobre el nombre completo del módulo (peft/utils/other.py:1521).\nLORA_OBJETIVO = r\"(.*\\.)?language_model\\.layers\\.\\d+\\.self_attn\\.(q_proj|v_proj)\"\nLORA = {\"r\": 8, \"lora_alpha\": 16, \"lora_dropout\": 0.0,\n        \"target_modules\": LORA_OBJETIVO, \"task_type\": \"CAUSAL_LM\"}\nPOLITICA = {\"save_steps\": 50, \"bf16\": True, \"gradient_checkpointing\": True,\n            \"gradient_checkpointing_kwargs\": {\"use_reentrant\": False}, \"save_only_model\": False}\n# Defaults de la entrega (A100 de 40 GB). fp16 y \"auto\" existen para T4 x2 (Kaggle, desarrollo):\n# la T4 no tiene bf16 nativo y \"auto\" reparte el modelo entre GPU (paralelismo de modelo en un proceso).\nPRECISIONES = {\"bf16\": \"bfloat16\", \"fp16\": \"float16\"}\nDISPOSITIVOS = (\"unico\", \"auto\")\nEJECUCION = {\"precision\": \"bf16\", \"dispositivos\": \"unico\", \"guardar_cada\": 50}",
+   "que_hace": "Define la configuración LoRA y la política de entrenamiento: rango 8, alfa 16, solo en las proyecciones Q y V de la atención del modelo de lenguaje.",
+   "como_funciona": "- `LORA_OBJETIVO` es una regex que solo toma `language_model.layers.N.self_attn.(q_proj|v_proj)`.\n- `LORA` fija `r=8`, `lora_alpha=16`, `dropout=0` y `task_type=CAUSAL_LM`.\n- `POLITICA` guarda checkpoint cada 50 pasos, bf16 y gradient checkpointing.\n- `PRECISIONES` y `DISPOSITIVOS` permiten fp16/`auto` para las T4 de Kaggle.",
+   "proposito": "Gemma 4 es multimodal y sus torres de visión/audio también tienen `q_proj`/`v_proj` que PEFT no soporta: la regex las excluye. QLoRA quedó como alternativa no hecha.",
+   "interaccion": "`aplicar_lora` (mismo archivo) pasa `LoraConfig(**LORA)` a `get_peft_model` dentro de `_ejecutar_cuda`; `cargar_entradas` incluye `LORA` en la identidad de la corrida.",
+   "teoria": "LoRA agrega matrices de bajo rango a W_Q y W_V: se entrenan pocos parámetros y el modelo base queda congelado.",
+   "key": "tp4-lora-config",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
+     "i": 15,
+     "title": "Tres proyecciones del mismo vector",
+     "extra": false,
+     "url": "/clases/08/#d=transformers-a-fondo&s=15"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 51,
+     "title": "Dónde entra el fine-tuning",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=51"
+    },
+    {
+     "clase": 12,
+     "cnn": "12",
+     "slug": "segmentacion-y-stable-diffusion",
+     "i": 75,
+     "title": "Lo que el equipo va a encontrar",
+     "extra": false,
+     "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=75"
+    }
+   ],
+   "nusos": 3
+  },
+  {
+   "id": "lora-aplicar",
+   "titulo": "aplicar_lora: adapter nuevo o retomado",
+   "archivo": "admision_tp/entrenamiento.py",
+   "desde": 171,
+   "hasta": 180,
+   "lenguaje": "python",
+   "codigo": "def aplicar_lora(peft, modelo, config):\n    \"\"\"LoRA nuevo, o el adapter de `adapter_inicial` entrenable (mismo r y módulos con que se publicó).\"\"\"\n    inicial = config.get(\"adapter_inicial\")\n    if inicial is None:\n        return peft.get_peft_model(modelo, peft.LoraConfig(**LORA, revision=config[\"revision\"]))\n    origen = {\"revision\": inicial[\"revision\"], \"subfolder\": inicial[\"subcarpeta\"]}\n    previo = peft.PeftConfig.from_pretrained(inicial[\"repo\"], **origen)\n    if (previo.base_model_name_or_path, previo.revision) != (config[\"modelo\"], config[\"revision\"]):\n        raise ValueError(\"adapter_inicial entrenado sobre otra base o revisión\")\n    return peft.PeftModel.from_pretrained(modelo, inicial[\"repo\"], config=previo, is_trainable=True, **origen)",
+   "que_hace": "Envuelve el modelo con LoRA usando la configuración `LORA`, o retoma un adapter ya publicado para seguir entrenándolo.",
+   "como_funciona": "- Sin `adapter_inicial`: `get_peft_model(modelo, LoraConfig(**LORA))`.\n- Con `adapter_inicial`: lee su `PeftConfig` y verifica base y revisión.\n- `PeftModel.from_pretrained(..., is_trainable=True)` deja entrenables solo las matrices LoRA.",
+   "proposito": "Permitió continuar el adapter `dc41674a` sobre datos nuevos (v39) sin empezar de cero.",
+   "interaccion": "Lo llama `_ejecutar_cuda` (mismo archivo) después de cargar el modelo; usa `LORA` definido arriba en el mismo archivo.",
+   "teoria": "PEFT: se congela el modelo base y solo se entrenan las matrices A y B.",
+   "key": "tp4-lora-aplicar",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
+     "i": 15,
+     "title": "Tres proyecciones del mismo vector",
+     "extra": false,
+     "url": "/clases/08/#d=transformers-a-fondo&s=15"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 51,
+     "title": "Dónde entra el fine-tuning",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=51"
+    },
+    {
+     "clase": 12,
+     "cnn": "12",
+     "slug": "segmentacion-y-stable-diffusion",
+     "i": 75,
+     "title": "Lo que el equipo va a encontrar",
+     "extra": false,
+     "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=75"
+    }
+   ],
+   "nusos": 3
+  },
+  {
+   "id": "normas-valores",
+   "titulo": "Normas + parámetros de la carpeta recibida (kit)",
+   "archivo": "admision/normas.py",
+   "desde": 36,
+   "hasta": 56,
+   "lenguaje": "python",
+   "codigo": "def cargar_parametros(ruta: Path) -> dict[str, str]:\n    \"\"\"{código: valor con su unidad}, desde `ruta/parametros.yaml`.\"\"\"\n    datos = yaml.safe_load((Path(ruta) / \"parametros.yaml\").read_text(encoding=\"utf-8\"))\n    return {p[\"codigo\"]: valor_como_texto(p[\"valor\"], p[\"unidad\"]) for p in datos[\"parametros\"]}\n\n\ndef linea_de_valores(cuerpo: str, valores: dict[str, str]) -> str:\n    \"\"\"«Valores: P-TDE-3 = 15 min; P-TDE-4 = 60 min.» con los parámetros que cita el cuerpo, en orden de aparición.\"\"\"\n    citados = list(dict.fromkeys(f\"{prefijo}-{n}\" for prefijo, desde, hasta in PATRON_PARAMETRO.findall(cuerpo)\n                                 for n in range(int(desde), int(hasta or desde) + 1)))\n    return (\"Valores: \" + \"; \".join(f\"{c} = {valores[c]}\" for c in citados) + \".\") if citados else \"\"\n\n\ndef cargar_normas(ruta: Path) -> list[Seccion]:\n    \"\"\"Las secciones de `ruta`, en orden alfabético de archivo.\"\"\"\n    valores = cargar_parametros(ruta)\n    secciones = []\n    for archivo in sorted(Path(ruta).glob(\"NOR-*.md\")):\n        cuerpo = archivo.read_text(encoding=\"utf-8\").strip()\n        secciones.append(Seccion(archivo.stem, cuerpo, linea_de_valores(cuerpo, valores)))\n    return secciones",
+   "que_hace": "Carga `parametros.yaml` de la carpeta de normas y agrega a cada sección una línea «Valores: P-XXX-N = …» con los números vigentes que cita.",
+   "como_funciona": "- `cargar_parametros` lee el YAML y formatea cada valor con su unidad (`nivel 2`, `15 min`).\n- `linea_de_valores` busca con `PATRON_PARAMETRO` los códigos citados en el cuerpo (incluye rangos «P-ADM-1 a P-ADM-3») y arma la línea.\n- `cargar_normas` recorre `NOR-*.md` en orden alfabético y devuelve `Seccion(id, cuerpo, valores)`.",
+   "proposito": "Es código del kit de la cátedra (no se modifica), pero el TP se apoya en él a propósito: como el buscador se reconstruye con la carpeta que llega en cada corrida, los números de las normas b, c o del test entran por búsqueda y no quedan fijados en código ni en los pesos.",
+   "interaccion": "`BuscadorBM25.__init__` llama a `cargar_normas(ruta_normas)` y indexa `Seccion.texto` (cuerpo + valores). `normas_variables.escribir_normas` genera carpetas con otros valores usando el mismo formato.",
+   "teoria": "Indexación del RAG: antes de consultar se indexa el corpus actual; el conocimiento que cambia vive en el índice, no en los parámetros del modelo.",
+   "key": "tp4-normas-valores",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 4,
+     "title": "Antes de consultar hay que indexar",
+     "extra": false,
+     "url": "/clases/06/#d=rag-y-mcp&s=4"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 5,
+     "title": "Cinco razones para no reentrenar",
+     "extra": false,
+     "url": "/clases/06/#d=rag-y-mcp&s=5"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 9,
+     "title": "Chunking: dónde cortar y cuánto solapar",
+     "extra": false,
+     "url": "/clases/07/#d=rag-mcp-rapida&s=9"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 52,
+     "title": "Prompt, RAG o fine-tuning",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=52"
+    }
+   ],
+   "nusos": 4
+  },
+  {
+   "id": "normas-variables-carpetas",
+   "titulo": "Carpetas de normas con otros valores",
+   "archivo": "admision_tp/normas_variables.py",
+   "desde": 34,
+   "hasta": 78,
+   "lenguaje": "python",
+   "codigo": "def escribir_normas(base: Path, destino: Path, valores: dict[str, int]) -> Path:\n    \"\"\"Copia las secciones de `base` a `destino` (nueva) con `valores` aplicados a sus parámetros.\"\"\"\n    base, destino = Path(base), Path(destino)\n    entradas = parametros_base(base)\n    desconocidos = set(valores) - {p[\"codigo\"] for p in entradas}\n    if desconocidos:\n        raise ValueError(f\"parámetros inexistentes: {sorted(desconocidos)}\")\n    destino.mkdir(parents=True)\n    for archivo in sorted(base.glob(\"NOR-*.md\")):\n        shutil.copyfile(archivo, destino / archivo.name)\n    for entrada in entradas:\n        if entrada[\"codigo\"] in valores:\n            valor = valores[entrada[\"codigo\"]]\n            if type(valor) is not int or valor < 0:\n                raise ValueError(\"los valores de parámetros son enteros no negativos\")\n            entrada[\"valor\"] = valor\n    (destino / \"parametros.yaml\").write_text(\n        yaml.safe_dump({\"parametros\": entradas}, allow_unicode=True, sort_keys=False), encoding=\"utf-8\")\n    cargar_parametros(destino)  # falla aquí si el archivo escrito no es legible por el kit\n    return destino\n\n\nclass CarpetasNormas:\n    \"\"\"Una carpeta por conjunto de valores, creada una sola vez bajo `raiz`, con su buscador.\n\n    `fabrica(ruta)` arma el buscador igual que la entrega (por ejemplo `entrega.construir_buscador`).\n    \"\"\"\n\n    def __init__(self, base: Path, raiz: Path, fabrica):\n        self.base, self.raiz, self.fabrica = Path(base), Path(raiz), fabrica\n        self.originales = {p[\"codigo\"]: p[\"valor\"] for p in parametros_base(self.base)}\n        self._carpetas: dict[tuple, tuple[Path, object]] = {}\n\n    def completar(self, valores: dict[str, int]) -> dict[str, int]:\n        \"\"\"Valores originales con `valores` aplicados encima.\"\"\"\n        return {**self.originales, **valores}\n\n    def obtener(self, valores: dict[str, int]):\n        \"\"\"(ruta, buscador) de la carpeta con esos valores sobre los originales.\"\"\"\n        completos = self.completar(valores)\n        clave = tuple(sorted(completos.items()))\n        if clave not in self._carpetas:\n            ruta = escribir_normas(self.base, self.raiz / f\"normas-{len(self._carpetas):05d}\", completos)\n            self._carpetas[clave] = (ruta, self.fabrica(ruta))\n        return self._carpetas[clave]",
+   "que_hace": "Crea carpetas de normas con los mismos textos y otro `parametros.yaml`, y arma un buscador por carpeta.",
+   "como_funciona": "- `escribir_normas` copia los `NOR-*.md` byte a byte y reescribe solo los valores pedidos.\n- Rechaza parámetros inexistentes o negativos y relee con `cargar_parametros` del kit.\n- `CarpetasNormas.obtener(valores)` crea una carpeta por combinación (una sola vez) y la indexa con `fabrica(ruta)`.",
+   "proposito": "Los números de las normas llegan como datos: generar conversaciones con valores variados enseña a leerlos de la búsqueda en vez de memorizarlos.",
+   "interaccion": "Lo usan `generar_conversaciones.generar_dataset` (con `fabrica_buscador`) y `generar_sinteticos`, que llama `obtener` con valores sorteados.",
+   "teoria": "Datos de entrenamiento diversos: variar lo que no debe memorizarse para que el modelo aprenda el comportamiento.",
+   "key": "tp4-normas-variables-carpetas",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 52,
+     "title": "Prompt, RAG o fine-tuning",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=52"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 56,
+     "title": "Qué pedirle a los datos",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=56"
+    }
+   ],
+   "nusos": 2
+  },
+  {
    "id": "procedimiento-dev",
    "titulo": "procedimiento-v1 contra baseline en prompt-dev",
-   "archivo": "docs/analisis-errores.md",
+   "archivo": "docs/informe/analisis-errores.md",
    "desde": 171,
    "hasta": 202,
    "lenguaje": "markdown",
@@ -2796,6 +3969,7 @@
      "slug": "prompting",
      "i": 46,
      "title": "¿Por qué tardan más?",
+     "extra": false,
      "url": "/clases/05/#d=prompting&s=46"
     },
     {
@@ -2804,25 +3978,26 @@
      "slug": "como-se-entrena-un-llm",
      "i": 53,
      "title": "Cuándo vale la pena el fine-tuning",
+     "extra": false,
      "url": "/clases/09/#d=como-se-entrena-un-llm&s=53"
     }
    ],
    "nusos": 2
   },
   {
-   "id": "trainer-cuda",
-   "titulo": "Entrenamiento SFT con PEFT y Trainer",
-   "archivo": "admision_tp/entrenamiento.py",
-   "desde": 232,
-   "hasta": 276,
+   "id": "kaggle-armar-comando",
+   "titulo": "Lanzar el entrenamiento en Kaggle",
+   "archivo": "infra/kaggle_entrenamiento.py",
+   "desde": 77,
+   "hasta": 87,
    "lenguaje": "python",
-   "codigo": "        ejecucion = auditoria.get(\"ejecucion\", EJECUCION)\n        # \"auto\" reparte las capas entre las GPU; Trainer lo detecta (hf_device_map) y no usa DataParallel.\n        reparto = {\"device_map\": \"auto\"} if ejecucion[\"dispositivos\"] == \"auto\" else {}\n        import transformers\n        from .carga import cargar_solo_texto\n        modelo = cargar_solo_texto(transformers, config[\"modelo\"], config[\"revision\"],\n                                   dtype=getattr(torch, PRECISIONES[ejecucion[\"precision\"]]), **reparto)\n        # Sin attn_implementation: forzar \"sdpa\" rompe la torre de audio de Gemma 4 (ver modelo.py).\n        modelo.config.use_cache = False\n        modelo = get_peft_model(modelo, LoraConfig(**LORA, revision=config[\"revision\"]))\n        modelo.enable_input_require_grads()\n\n        class Auditor(TrainerCallback):\n            def on_log(self, args, state, control, logs=None, **kwargs):\n                run.log({**(logs or {}), **_vram(torch), \"trainer_step\": state.global_step})\n\n            def guardar(self, carpeta, nombre):\n                (carpeta / \"corrida.json\").write_bytes(_canonical(auditoria))\n                hashes = {p.name: _sha(p.read_bytes()) for p in carpeta.iterdir()\n                          if p.is_file() and p.name != \"integridad.json\"}\n                (carpeta / \"integridad.json\").write_bytes(_canonical(hashes))\n                if persistir:\n                    persistir()\n                if auditoria[\"publicar\"]:\n                    publicaciones.append(publicar_checkpoint(carpeta, nombre, api, config[\"hf_repo\"], run))\n                    (destino / \"publicaciones.json\").write_bytes(_canonical(publicaciones))\n                    if persistir:\n                        persistir()\n\n            def on_save(self, args, state, control, **kwargs):\n                self.guardar(destino / f\"checkpoint-{state.global_step}\", f\"checkpoint-{state.global_step}\")\n\n        callback = Auditor()\n        args = TrainingArguments(output_dir=str(destino), seed=config[\"semilla\"], data_seed=config[\"semilla\"],\n            learning_rate=config[\"learning_rate\"], num_train_epochs=config[\"epochs\"],\n            per_device_train_batch_size=config[\"batch_size\"],\n            gradient_accumulation_steps=config[\"gradient_accumulation_steps\"],\n            **_politica(ejecucion), save_strategy=\"steps\", logging_steps=1,\n            report_to=\"none\", push_to_hub=False, remove_unused_columns=False)\n        def collator(filas):\n            return {k: torch.tensor(v, dtype=torch.long) for k, v in formar_lote(filas, tokenizer.pad_token_id).items()}\n        trainer = Trainer(model=modelo, args=args, train_dataset=ejemplos,\n                          data_collator=collator, processing_class=tokenizer, callbacks=[callback])\n        trainer.train(resume_from_checkpoint=str(checkpoint) if checkpoint else None)\n        trainer.save_model(str(destino / \"final\"))",
-   "que_hace": "Carga el modelo solo texto, le aplica LoRA, configura el `Trainer` de Hugging Face con un callback que audita y publica checkpoints, y entrena.",
-   "como_funciona": "- `cargar_solo_texto` carga Gemma con la precisión elegida (y `device_map='auto'` para dos GPU).\n- `get_peft_model(modelo, LoraConfig(**LORA))` y `enable_input_require_grads` para gradient checkpointing.\n- `Auditor` loguea VRAM a W&B y en cada `on_save` escribe `integridad.json` y publica el checkpoint en HF.\n- `TrainingArguments` con semilla, lr, épocas, batch y acumulación de la config; `collator` usa `formar_lote` (padding con −100).\n- `trainer.train(resume_from_checkpoint=...)` permite reanudar.",
-   "proposito": "Prioriza auditabilidad y reanudación (Kaggle corta sesiones). Solo se validó en corridas de humo; el entrenamiento con los datos curados quedó pendiente.",
-   "interaccion": "Lo llama `entrenar()` (mismo archivo) desde `scripts/entrenar.py`, lanzado por `infra/kaggle_entrenamiento.py`. Consume `tokens.jsonl`; el adapter final lo carga `ModeloLocal._fusionar_adapter`.",
-   "teoria": "Fine-tuning supervisado eficiente: SFT con LoRA sobre las demostraciones, con la pérdida solo en tokens del asistente.",
-   "key": "tp4-trainer-cuda",
+   "codigo": "def armar_comando(preparacion, tokens, salida, ejecucion, online, publicar, checkpoint=None):\n    comando = [sys.executable, \"-m\", \"scripts.entrenar\", \"--preparacion\", str(preparacion),\n               \"--tokens\", str(tokens), \"--salida\", str(salida), \"--precision\", ejecucion[\"precision\"],\n               \"--dispositivos\", ejecucion[\"dispositivos\"], \"--guardar-cada\", str(ejecucion[\"guardar_cada\"])]\n    if online:\n        comando.append(\"--online\")\n    if publicar:\n        comando.append(\"--publicar\")\n    if checkpoint:\n        comando += [\"--reanudar\", str(checkpoint)]\n    return comando",
+   "que_hace": "Arma el comando que corre `scripts.entrenar` en Kaggle con precisión, dispositivos, frecuencia de checkpoints y, si corresponde, W&B, HF y reanudación.",
+   "como_funciona": "- Base: `python -m scripts.entrenar --preparacion ... --tokens ... --salida ...`.\n- `--online` solo si hay clave de W&B; `--publicar` para subir checkpoints a HF.\n- `--reanudar` con el checkpoint bajado de HF.",
+   "proposito": "Separa la infraestructura (Kaggle, secretos, logs) del entrenador: `entrenar()` no sabe dónde corre.",
+   "interaccion": "Lo usa `correr` (mismo archivo), que ejecuta el comando con log y escribe `runner.json`; `scripts/entrenar.py` llama a `admision_tp.entrenamiento.entrenar`.",
+   "teoria": "Fine-tuning local: el entrenamiento corre en GPU propia con checkpoints reanudables.",
+   "key": "tp4-kaggle-armar-comando",
    "tp": 4,
    "tp_titulo": "El agente de admisión de guardia (TP final)",
    "usos": [
@@ -2832,10 +4007,152 @@
      "slug": "como-se-entrena-un-llm",
      "i": 55,
      "title": "Fine-tuning local: el recorrido",
+     "extra": false,
      "url": "/clases/09/#d=como-se-entrena-un-llm&s=55"
     }
    ],
    "nusos": 1
+  },
+  {
+   "id": "trainer-cuda",
+   "titulo": "Entrenamiento SFT con PEFT y Trainer",
+   "archivo": "admision_tp/entrenamiento.py",
+   "desde": 325,
+   "hasta": 369,
+   "lenguaje": "python",
+   "codigo": "        modelo = cargar_solo_texto(transformers, config[\"modelo\"], config[\"revision\"],\n                                   dtype=getattr(torch, PRECISIONES[ejecucion[\"precision\"]]), **reparto)\n        # Sin attn_implementation: forzar \"sdpa\" rompe la torre de audio de Gemma 4 (ver modelo.py).\n        modelo.config.use_cache = False\n        modelo = aplicar_lora(peft, modelo, config)\n        modelo.enable_input_require_grads()\n\n        class Auditor(TrainerCallback):\n            def on_log(self, args, state, control, logs=None, **kwargs):\n                run.log({**(logs or {}), **_vram(torch), \"trainer_step\": state.global_step})\n\n            def guardar(self, carpeta, nombre):\n                (carpeta / \"corrida.json\").write_bytes(_canonical(auditoria))\n                hashes = {p.name: _sha(p.read_bytes()) for p in carpeta.iterdir()\n                          if p.is_file() and p.name != \"integridad.json\"}\n                (carpeta / \"integridad.json\").write_bytes(_canonical(hashes))\n                if persistir:\n                    persistir()\n                if auditoria[\"publicar\"]:\n                    publicaciones.append(publicar_checkpoint(carpeta, nombre, api, config[\"hf_repo\"], run))\n                    (destino / \"publicaciones.json\").write_bytes(_canonical(publicaciones))\n                    if persistir:\n                        persistir()\n\n            def on_save(self, args, state, control, **kwargs):\n                self.guardar(destino / f\"checkpoint-{state.global_step}\", f\"checkpoint-{state.global_step}\")\n\n        callback = Auditor()\n        args = TrainingArguments(output_dir=str(destino), seed=config[\"semilla\"], data_seed=config[\"semilla\"],\n            learning_rate=config[\"learning_rate\"], num_train_epochs=config[\"epochs\"],\n            per_device_train_batch_size=config[\"batch_size\"],\n            gradient_accumulation_steps=config[\"gradient_accumulation_steps\"],\n            **_politica(ejecucion), save_strategy=\"steps\", logging_steps=1,\n            report_to=\"none\", push_to_hub=False, remove_unused_columns=False)\n        def collator(filas):\n            return {k: torch.tensor(v, dtype=torch.float32 if k == \"pesos\" else torch.long)\n                    for k, v in formar_lote(filas, tokenizer.pad_token_id).items()}\n        class TrainerSupervisado(Trainer):\n            # Misma normalización que la pérdida del modelo (suma / num_items_in_batch con acumulación).\n            def compute_loss(self, model, inputs, return_outputs=False, num_items_in_batch=None):\n                return perdida_supervisada(torch, model, inputs, num_items_in_batch)\n\n        trainer = TrainerSupervisado(model=modelo, args=args, train_dataset=ejemplos,\n                                     data_collator=collator, processing_class=tokenizer, callbacks=[callback])\n        trainer.train(resume_from_checkpoint=str(checkpoint) if checkpoint else None)",
+   "que_hace": "Carga el modelo solo texto, le aplica LoRA, configura el `Trainer` de Hugging Face con un callback que audita y publica checkpoints, y entrena.",
+   "como_funciona": "- `cargar_solo_texto` carga Gemma con la precisión elegida (y `device_map='auto'` para dos GPU).\n- `aplicar_lora(peft, modelo, config)` envuelve el modelo con LoRA (o retoma un adapter publicado) y `enable_input_require_grads` habilita gradient checkpointing.\n- `Auditor` loguea VRAM a W&B y en cada `on_save` escribe `integridad.json` y publica el checkpoint en HF.\n- `TrainingArguments` toma semilla, lr, épocas, batch y acumulación de la config; `collator` usa `formar_lote` (padding con −100).\n- `TrainerSupervisado.compute_loss` reemplaza la pérdida por `perdida_supervisada`, y `trainer.train(resume_from_checkpoint=...)` permite reanudar.",
+   "proposito": "Prioriza auditabilidad y reanudación (Kaggle corta sesiones a las 8 h). Primero se validó con corridas de humo; después entrenó con las 2.900 conversaciones (Kaggle v32+v33) y continuó para el adapter de la entrega (v39).",
+   "interaccion": "Es el cuerpo de `_ejecutar_cuda`, que llama `entrenar()` (mismo archivo) desde `scripts/entrenar.py`, lanzado por `infra/kaggle_entrenamiento.py`. Consume `tokens.jsonl`; el adapter final lo carga `ModeloLocal._fusionar_adapter`.",
+   "teoria": "Fine-tuning supervisado eficiente: SFT con LoRA sobre las demostraciones, con la pérdida solo en tokens del asistente.",
+   "key": "tp4-trainer-cuda",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
+     "i": 15,
+     "title": "Tres proyecciones del mismo vector",
+     "extra": false,
+     "url": "/clases/08/#d=transformers-a-fondo&s=15"
+    },
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
+     "i": 40,
+     "title": "Qué se minimiza",
+     "extra": false,
+     "url": "/clases/08/#d=transformers-a-fondo&s=40"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 55,
+     "title": "Fine-tuning local: el recorrido",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=55"
+    },
+    {
+     "clase": 13,
+     "cnn": "13",
+     "slug": "cierre-magnifica-humanitas",
+     "i": 24,
+     "title": "Repaso: cómo aprende a «portarse bien»",
+     "extra": false,
+     "url": "/clases/13/#d=cierre-magnifica-humanitas&s=24"
+    }
+   ],
+   "nusos": 4
+  },
+  {
+   "id": "informe-humo",
+   "titulo": "Corridas de humo: 15,7 GB de VRAM",
+   "archivo": "docs/informe/informe-parte5.md",
+   "desde": 214,
+   "hasta": 237,
+   "lenguaje": "markdown",
+   "codigo": "Conversaciones sintéticas de `scripts.datos_humo`: prueban el pipeline, **no** la calidad ni los tiempos del\nentrenamiento real. Kaggle T4 x2, fp16, `device_map=auto`, commit `acc95b2` limpio, LoRA solo en la atención\ndel modelo de lenguaje (r=8, alpha 16), `corrida.json`.\n\n| Corrida | Qué hizo | Tiempo del runner | `train_runtime` | Pérdida paso 1 a 8 |\n|---|---|---|---|---|\n| v6 (`humo-entrena-1-v6`) | desde cero, 8 pasos, checkpoint cada 2 | 163 s | 17,4 s (2,18 s/paso) | 2,679 a 2,178 |\n| v7 (`humo-entrena-2-v7`) | reanuda desde `checkpoint-2` bajado de HF | 177 s | 15,8 s (pasos 3 a 8) | pasos 3 a 8 cercanos a v6, no idénticos |\n\nFuentes: `evaluaciones/recursos/humo-entrena-{1-v6,2-v7}/{runner.json,runner.log,entrenamiento/checkpoint-*/trainer_state.json}`.\nEl tiempo del runner excluye la instalación de dependencias; la carga de pesos tardó ~43 s\n(`runner.log`). La bitácora reporta 7 y 9 min de sesión completa.\n\n- **Casos a la vez al entrenar:** `batch_size=1`, `gradient_accumulation_steps=1`, 2 épocas,\n  `max_seq_length=8192` (`entrenamiento/corrida.json`). O sea, **1 conversación por paso**. Es la\n  configuración del humo, no una decisión de la corrida final.\n- **VRAM de entrenamiento (humo, solo texto): 15,7 GB pico** (9,5 + 6,1 por GPU; 15,8 GB reservada),\n  de `evaluaciones/recursos/humo-solo-texto/runner.json` (`vram`). Son 4 conversaciones sintéticas cortas con\n  batch 1: **no representa** la corrida real. **PENDIENTE:** el valor con secuencias reales, que el\n  entrenador ya registra en W&B, `estado.json` y `runner.json`.\n- **Checkpoints y publicación:** cada checkpoint se sube a HF con revisión, y la reanudación\n  reprodujo la curva (2,5196/2,4173/2,3468 contra 2,5196/2,4179/2,3464). Pasa en T4, no en A100.\n- El 2,18 s/paso del humo **no** servía para extrapolar (secuencias cortas y sintéticas): el real fue ~80 s/paso\n  con 8 conversaciones de ~3.445 tokens (sección 3.1).",
+   "que_hace": "Reporte de las corridas de humo de entrenamiento en Kaggle: tiempos, reanudación desde HF y VRAM pico.",
+   "como_funciona": "- v6 entrenó 8 pasos y v7 reanudó desde `checkpoint-2` bajado de HF con curva casi igual.\n- VRAM pico 15,7 GB (9,5 + 6,1 en dos T4) con 4 conversaciones sintéticas cortas.\n- Aclara que esos 2,18 s/paso no servían para extrapolar: el entrenamiento real (sección 3.1) tardó ~80 s/paso.",
+   "proposito": "Distingue «validado en GPU» (la infraestructura funciona) de «mejora del agente» (no demostrada), como exige AGENTS.md.",
+   "interaccion": "Los números vienen de `evaluaciones/recursos/humo-*/runner.json`, que escribe `infra/kaggle_entrenamiento.correr`. La sección 3.1 del mismo archivo reporta el entrenamiento real.",
+   "teoria": "Recorrido del fine-tuning local: antes de gastar horas de GPU se prueba la plomería (datos, checkpoints, reanudación) con una corrida chica.",
+   "key": "tp4-informe-humo",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 55,
+     "title": "Fine-tuning local: el recorrido",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=55"
+    },
+    {
+     "clase": 13,
+     "cnn": "13",
+     "slug": "cierre-magnifica-humanitas",
+     "i": 24,
+     "title": "Repaso: cómo aprende a «portarse bien»",
+     "extra": false,
+     "url": "/clases/13/#d=cierre-magnifica-humanitas&s=24"
+    }
+   ],
+   "nusos": 2
+  },
+  {
+   "id": "informe-sft-real",
+   "titulo": "Entrenamiento real: 2.900 conversaciones en 2 T4",
+   "archivo": "docs/informe/informe-parte5.md",
+   "desde": 137,
+   "hasta": 162,
+   "lenguaje": "markdown",
+   "codigo": "### 3.1 Entrenamiento real (Kaggle v32 + v33, 2026-11-11/12)\n\nDatos `datos/conversaciones/v3-procedimiento` (prompt `procedimiento-v1`): **2.900 conversaciones, 9.990.837\ntokens (~3.445 por conversación), 1.015.072 supervisados (10,2 %)**, ninguna recortada (`max_seq_length` 8192;\n`manifiesto-tokens.json`). Configuración `configuraciones/sft-ejemplo.json`: 1 época, lr 2e-4, semilla 42,\n`batch_size=1`, acumulación 8, LoRA r=8 en q/v de la atención del modelo de lenguaje. fp16, `device_map=auto`\nen 2 T4, commit `6169241`, W&B `3add2742ddfd4b42`.\n\n| Medida | Valor | Fuente |\n|---|---|---|\n| Pasos de optimización | 363 (2.900 / 8, último paso incompleto) | `trainer_state`, recibos HF |\n| Tiempo por paso | ~85 s en v32; 80,5 s en v33 (5.072 s / 63 pasos) | bitácora; `runner.log` de v33 (`train_runtime`) |\n| Tiempo de cómputo de la época | **~8,1 h** (363 × ~80 s) | cálculo propio |\n| Reloj de pared | v32: cortada por el límite de 8 h de Kaggle en el paso 315; v33: 1 h 31 min (5.445 s de runner) reanudando de checkpoint-300 | `runner.json` |\n| VRAM pico (suma de 2 T4) | **19,97 GB** (12,1 + 7,87); reservada 20,58 GB | `entrenamiento/estado.json` de v33 |\n| Pérdida (supervisada) | 0,44 (paso 1) → ~0,03 (paso 100) → ~0,005 (paso 268) → 0,0044 media final | `runner.log` |\n| Checkpoints | cada 50 pasos, subidos a HF con revisión; `final` = `dc41674a` (adapter de v32+v33; el de la entrega desde 2026-11-13 es el v39, 3.1b) | `publicaciones` en `estado.json` |\n\n- **Casos a la vez al entrenar:** 1 conversación por pasada hacia adelante; 8 por paso de optimización. Con\n  ~3.445 tokens por conversación, la VRAM entra en 2 T4 gracias a calcular logits solo en posiciones supervisadas\n  (con logits completos en fp32, el paso 0 se quedó sin memoria en v28; ver [entrenamiento](entrenamiento-sft.md)).\n- **Interrupción y reanudación:** el corte por tiempo costó los pasos 301–315 (se rehicieron desde checkpoint-300).\n  Para A100 conviene guardar más seguido o medir antes cuánto tarda un paso.\n- **Pérdida baja ≠ agente bueno:** la pérdida media 0,005 no mostró que el modelo nunca aprendió el aviso al\n  voluntariado ([análisis de errores](analisis-errores.md), pasada 7). Hay un segundo entrenamiento corto en\n  curso para eso (v36, 633 conversaciones).",
+   "que_hace": "Reporte del entrenamiento SFT real con los datos curados: tokens, pasos, tiempo, VRAM, pérdida y checkpoints.",
+   "como_funciona": "- 2.900 conversaciones, ~3.445 tokens cada una, 10,2 % supervisados.\n- 1 época, lr 2e-4, acumulación 8, LoRA r=8 en q/v: 363 pasos de ~80 s (~8,1 h).\n- VRAM pico 19,97 GB en 2 T4; Kaggle cortó a las 8 h y se reanudó desde `checkpoint-300`.\n- Advierte que pérdida baja (0,005) no es agente bueno: el aviso al voluntariado no se aprendió.",
+   "proposito": "Muestra con números lo que costó el SFT y por qué hizo falta una segunda pasada (v39) para el aviso.",
+   "interaccion": "Los números salen de `estado.json`, `runner.json` y `runner.log` que escriben `entrenar()` e `infra/kaggle_entrenamiento.correr`.",
+   "teoria": "Fine-tuning con LoRA en hardware modesto y la diferencia entre pérdida de entrenamiento y calidad de la tarea.",
+   "key": "tp4-informe-sft-real",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 55,
+     "title": "Fine-tuning local: el recorrido",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=55"
+    },
+    {
+     "clase": 12,
+     "cnn": "12",
+     "slug": "segmentacion-y-stable-diffusion",
+     "i": 75,
+     "title": "Lo que el equipo va a encontrar",
+     "extra": false,
+     "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=75"
+    },
+    {
+     "clase": 13,
+     "cnn": "13",
+     "slug": "cierre-magnifica-humanitas",
+     "i": 24,
+     "title": "Repaso: cómo aprende a «portarse bien»",
+     "extra": false,
+     "url": "/clases/13/#d=cierre-magnifica-humanitas&s=24"
+    }
+   ],
+   "nusos": 3
   }
  ]
 }

@@ -75,7 +75,7 @@ for c in clases:
 
 # ---------- code catalogs (sources/code/tp-N.json) ----------
 SNIPPETS = {}   # key "tp3-id" -> snippet dict (+ tp, usos)
-CODE_REF = {}   # (tp, slug, i) -> (key, nota)
+CODE_REF = {}   # (tp, slug, i) -> ([keys in reading order], nota)
 for t in tps:
     pth = f"{SRC}/code/tp-{t['num']}.json"
     if not os.path.exists(pth):
@@ -85,10 +85,12 @@ for t in tps:
         k = f"tp{t['num']}-{sn['id']}"
         SNIPPETS[k] = dict(sn, key=k, tp=t["num"], tp_titulo=t["titulo"], usos=[])
     for r in cat.get("refs", []):
-        if r.get("snippet"):
-            k = f"tp{t['num']}-{r['snippet']}"
-            if k in SNIPPETS:
-                CODE_REF[(t["num"], r["slug"], int(r["i"]))] = (k, r.get("nota", ""))
+        # "snippets": the chain for this slide (definition → where it is wired → where it is used).
+        # "snippet" (a single id) is the older form and still accepted.
+        ids = r.get("snippets") or ([r["snippet"]] if r.get("snippet") else [])
+        ks = [f"tp{t['num']}-{x}" for x in ids if f"tp{t['num']}-{x}" in SNIPPETS]
+        if ks:
+            CODE_REF[(t["num"], r["slug"], int(r["i"]))] = (ks, r.get("nota", ""))
 
 
 def title_of(slug, i):
@@ -127,25 +129,26 @@ for c in clases:
         if slug not in deck_slides:
             continue
         slides = []
+        ex = slug in EXTRA_DECKS   # every reference to these slides carries the flag, so the UI can tag it
         for i, s in enumerate(deck_slides[slug]):
             nt = deck_notes[slug][i]
             claves = []
             for k in nt.get("claves", []) or []:
                 if k in concepts:
                     claves.append({"id": k, "label": concepts[k]["termino"], "glos": True})
-                    concepts[k]["refs"].append({"slug": slug, "i": i, "clase": n, "title": s["title"]})
+                    concepts[k]["refs"].append({"slug": slug, "i": i, "clase": n, "title": s["title"], "extra": ex})
                 else:
                     claves.append({"id": k, "label": k.replace("-", " "), "glos": False})
             tpl = []
             for t in nt.get("tp", []) or []:
                 tn = int(t.get("tp", 0))
                 if tn in tp_by:
-                    ck, cnota = CODE_REF.get((tn, slug, i), (None, ""))
+                    cks, cnota = CODE_REF.get((tn, slug, i), ([], ""))
                     tpl.append({"tp": tn, "texto": t.get("texto", ""), "tp_titulo": tp_by[tn]["titulo"],
-                                "code": ck or "", "nota": cnota})
-                    if ck:
-                        SNIPPETS[ck]["usos"].append({"clase": n, "cnn": nn(n), "slug": slug, "i": i, "title": s["title"]})
-                    tp_refs[tn].append({"clase": n, "slug": slug, "i": i, "title": s["title"], "texto": t.get("texto", "")})
+                                "code": ",".join(cks), "ncode": len(cks), "nota": cnota})
+                    for ck in cks:
+                        SNIPPETS[ck]["usos"].append({"clase": n, "cnn": nn(n), "slug": slug, "i": i, "title": s["title"], "extra": ex})
+                    tp_refs[tn].append({"clase": n, "slug": slug, "i": i, "title": s["title"], "texto": t.get("texto", ""), "extra": ex})
             ver = []
             for v in nt.get("ver", []) or []:
                 ref = str(v.get("ref", ""))
@@ -158,15 +161,16 @@ for c in clases:
                     continue
                 if vs in deck_class:
                     ver.append({"url": slide_url(vs, vi), "clase": deck_class[vs], "cnn": nn(deck_class[vs]), "i": vi,
-                                "title": title_of(vs, vi), "por": v.get("por", "")})
+                                "title": title_of(vs, vi), "por": v.get("por", ""), "extra": vs in EXTRA_DECKS})
             slides.append({"i": i, "title": s["title"] or ("Portada" if i == 0 else f"Diapositiva {i}"),
                            "section": s["section"], "resumen": nt.get("resumen", ""), "claves": claves,
                            "tp": tpl, "ver": ver, "key": bool(nt.get("clave_examen"))})
             tot += 1
             key += bool(nt.get("clave_examen"))
             tpn += bool(tpl)
-            search.append({"t": s["title"], "c": n, "d": slug, "i": i,
-                           "x": (nt.get("resumen", "") + " " + " ".join(nt.get("claves", []) or []) + " " + s.get("visible_text", "")[:240]).strip()})
+            search.append(dict({"t": s["title"], "c": n, "d": slug, "i": i,
+                           "x": (nt.get("resumen", "") + " " + " ".join(nt.get("claves", []) or []) + " " + s.get("visible_text", "")[:240]).strip()},
+                          **({"e": 1} if ex else {})))
         groups = []
         for sl in slides:
             lab = sl["section"] or "Portada"
@@ -187,6 +191,7 @@ for c in clases:
           "multi": len(decks) > 1, "prev": nn(n - 1) if n > 1 else "", "next": nn(n + 1) if n < len(clases) else ""})
     index_rows.append({"num": n, "nn": nn(n), "fecha": fecha_txt(c.get("fecha")), "titulo": c["titulo"], "bloque": bloque,
                        "slides": tot, "key": key, "tp": tpn,
+                       "decks": [{"tab": d["tab"], "extra": d["extra"]} for d in decks],
                        "tps": sorted({r["tp"] for d in decks for s in d["slides"] for r in s["tp"]})})
     write(f"{CONTENT}/clases/{n:02d}.md",
           f'+++\ntitle = {toml_str(c["titulo"])}\nweight = {n}\ntemplate = "clase.html"\n[extra]\nnum = {n}\ndata = "data/clase-{n:02d}.json"\n+++\n')
@@ -201,8 +206,9 @@ for cp in class_payloads:
     for d in cp["decks"]:
         for sl in d["slides"]:
             for t in sl["tp"]:
-                if t["code"] and t["code"] not in keys:
-                    keys.append(t["code"])
+                for k in filter(None, t["code"].split(",")):
+                    if k not in keys:
+                        keys.append(k)
     cp["snippets"] = [SNIPPETS[k] for k in keys]
     dump(cp, f"{DATA}/clase-{cp['num']:02d}.json")
 

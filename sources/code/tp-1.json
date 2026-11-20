@@ -279,187 +279,376 @@
    "proposito": "Fijó el contrato de la migración a Postgres antes de implementarla (commit `d541d7c`, test; `c331778`, feat). Así se pudo delegar «migrá la persistencia a Postgres» y revisar el resultado contra un criterio objetivo, sin necesitar una base para correr `npm test`.",
    "interaccion": "Importa `crearRepositorioPostgres` de `src/postgres.js`, que recibe el pool por parámetro justamente para poder inyectar este falso.",
    "teoria": "Delegar una tarea completa: el humano define el criterio (tests) y revisa el diff; el agente planifica y ejecuta."
+  },
+  {
+   "id": "package-json-scripts",
+   "titulo": "package.json: npm start con .env opcional y npm test",
+   "archivo": "package.json",
+   "desde": 9,
+   "hasta": 12,
+   "lenguaje": "json",
+   "codigo": "  \"scripts\": {\n    \"start\": \"node --env-file-if-exists=.env src/server.js\",\n    \"test\": \"node --test\"\n  },",
+   "que_hace": "Define los dos comandos del proyecto: `npm start` levanta `src/server.js` cargando `.env` solo si existe, y `npm test` corre la suite nativa de Node.",
+   "como_funciona": "- `start` usa `node --env-file-if-exists=.env`: en local toma las variables de un `.env` gitignoreado; en Railway el archivo no existe y las variables vienen del proveedor.\n- `test` es `node --test`, que descubre los `*.test.js` de `tests/` sin dependencias extra.",
+   "proposito": "Saca las credenciales del código: `src/server.js` solo lee `process.env.DATABASE_URL`, y quién la provee (un `.env` local o Railway) queda fuera del repo. `node:test` evita sumar un framework de tests.",
+   "interaccion": "`npm start` ejecuta `iniciar()` de `src/server.js`; `npm test` corre `tests/*.test.js`. `CLAUDE.md` y `README.md` remiten a estos dos comandos.",
+   "teoria": "Separar secretos del código (variables de entorno) y darle al agente un comando único y verificable para validar cada cambio."
+  },
+  {
+   "id": "utils-generar-codigo",
+   "titulo": "generarCodigo(): 3 caracteres al azar",
+   "archivo": "src/utils.js",
+   "desde": 1,
+   "hasta": 12,
+   "lenguaje": "javascript",
+   "codigo": "const CARACTERES = 'abcdefghijklmnopqrstuvwxyz0123456789';\n\n// genera un codigo corto de 3 caracteres\nfunction generarCodigo() {\n  let codigo = '';\n  for (let i = 0; i < 3; i++) {\n    codigo += CARACTERES[Math.floor(Math.random() * CARACTERES.length)];\n  }\n  return codigo;\n}\n\nmodule.exports = { generarCodigo };",
+   "que_hace": "Genera un código corto de 3 caracteres tomados al azar de letras minúsculas y dígitos.",
+   "como_funciona": "- `CARACTERES` tiene 36 símbolos.\n- El bucle elige 3 veces un índice con `Math.floor(Math.random() * CARACTERES.length)`.\n- No revisa si el código ya existe: con 36³ combinaciones las colisiones son posibles.",
+   "proposito": "Es código heredado y se dejó tal cual: la colisión se resolvió afuera, en el bucle de reintento de `POST /api/links`, y en Postgres con la clave primaria. Depender de `Math.random` es lo que permitió forzar la colisión en el test.",
+   "interaccion": "Lo llama el `while` de `POST /api/links` en `src/server.js`. `tests/collision.test.js` mockea `Math.random` para que devuelva el mismo código dos veces.",
+   "teoria": "Iterar con el agente sobre código real: un test que fuerza un caso borde reproducible antes del fix."
+  },
+  {
+   "id": "helpers-repo-memoria",
+   "titulo": "tests/helpers.js: repositorio en memoria para crearApp",
+   "archivo": "tests/helpers.js",
+   "desde": 1,
+   "hasta": 28,
+   "lenguaje": "javascript",
+   "codigo": "// Repositorio en memoria para probar la app sin depender de PostgreSQL.\nfunction iniciarServerDeTest(linksIniciales) {\n  const links = structuredClone(linksIniciales || []);\n  const repositorio = {\n    async crear(link) {\n      if (links.some(function (l) { return l.codigo === link.codigo; })) {\n        return false;\n      }\n      links.push(structuredClone(link));\n      return true;\n    },\n    async buscar(codigo) {\n      const link = links.find(function (l) { return l.codigo === codigo; });\n      return link ? structuredClone(link) : null;\n    },\n    async incrementarClicks(codigo) {\n      const link = links.find(function (l) { return l.codigo === codigo; });\n      if (!link) return null;\n      link.clicks += 1;\n      return structuredClone(link);\n    },\n    async verificarConexion() {\n      return true;\n    }\n  };\n  const { crearApp } = require('../src/server');\n  const app = crearApp(repositorio);",
+   "que_hace": "Arma un repositorio en memoria con la misma interfaz que el de Postgres y levanta la app real con `crearApp` para los tests.",
+   "como_funciona": "- `iniciarServerDeTest(linksIniciales)` clona los datos iniciales en `links`.\n- `repositorio` implementa `crear` (devuelve `false` si el código ya existe), `buscar`, `incrementarClicks` y `verificarConexion`.\n- Importa `crearApp` de `src/server.js` y le inyecta ese repositorio; después escucha en un puerto libre (`listen(0)`).",
+   "proposito": "Permite probar las rutas HTTP reales sin una base PostgreSQL. Funciona porque `crearApp(repositorio)` recibe la persistencia por parámetro en vez de crearla adentro.",
+   "interaccion": "Lo usan `tests/redirect.test.js`, `tests/collision.test.js`, `tests/stats.test.js` y `tests/health.test.js`. Devuelve `baseUrl`, `leerDB()` para mirar el estado y `cerrar()`.",
+   "teoria": "Verificación diseñada por el equipo: el entorno de prueba aísla la lógica para que cada vuelta del agente se valide rápido con `npm test`."
+  },
+  {
+   "id": "stats-html-fetch",
+   "titulo": "stats.html: la página que consume el endpoint de stats",
+   "archivo": "public/stats.html",
+   "desde": 34,
+   "hasta": 51,
+   "lenguaje": "javascript",
+   "codigo": "    form.addEventListener('submit', async (e) => {\n      e.preventDefault();\n      const codigo = document.getElementById('codigo').value.trim();\n      const res = await fetch('/api/links/' + encodeURIComponent(codigo) + '/stats');\n\n      if (!res.ok) {\n        stats.classList.add('oculto');\n        statsError.classList.remove('oculto');\n        return;\n      }\n\n      const data = await res.json();\n      document.getElementById('stat-clicks').textContent = data.clicks;\n      document.getElementById('stat-url').textContent = data.url;\n      document.getElementById('stat-creado').textContent = new Date(data.creado).toLocaleDateString();\n      statsError.classList.add('oculto');\n      stats.classList.remove('oculto');\n    });",
+   "que_hace": "Al enviar el formulario, pide las estadísticas del código al backend y muestra clicks, URL y fecha, o un error si no existe.",
+   "como_funciona": "- Toma el código del input y hace `fetch('/api/links/' + encodeURIComponent(codigo) + '/stats')`.\n- Si `res.ok` es falso (404), muestra `stats-error`.\n- Si no, pinta `data.clicks`, `data.url` y `data.creado` en la tarjeta.",
+   "proposito": "Cierra el Milestone 4: la página existía en el código heredado pero no estaba conectada a datos reales.",
+   "interaccion": "Consume `GET /api/links/:codigo/stats` de `src/server.js`; Express la sirve desde `public/` con `express.static`.",
+   "teoria": "El último eslabón de la cadena: lo que el test garantiza es lo que termina viendo el usuario."
+  },
+  {
+   "id": "progress-md-produccion",
+   "titulo": "PROGRESS.md: Milestone 5 y la prueba de redeploy",
+   "archivo": "docs/PROGRESS.md",
+   "desde": 46,
+   "hasta": 58,
+   "lenguaje": "markdown",
+   "codigo": "## Milestone 5 — Producción\n\n**Estado: hecho.**\n\n- [x] Deploy en Railway (servicio `corta` + PostgreSQL) disponible en\n      `https://corta-production-7bc5.up.railway.app`.\n- [x] Persistencia migrada de JSON a PostgreSQL, con incremento atómico de clicks y migración\n      inicial no destructiva de los datos heredados.\n- [x] Variables de entorno para credenciales, sin secretos en el código (`DATABASE_URL`).\n- [x] Configuración de Railway versionada (`railway.json`), puerto dinámico y healthcheck de app +\n      base de datos en `GET /health`.\n- [x] Persistencia verificada end-to-end: se creó el link `v4v`, se registró una redirección,\n      se forzó un redeploy y luego se confirmó que seguía existiendo con `clicks: 1`.",
+   "que_hace": "Registra el cierre del Milestone 5: deploy en Railway, migración a PostgreSQL, credenciales por variable de entorno y la prueba de persistencia con el link `v4v`.",
+   "como_funciona": "- Lista cada requisito de producción como checkbox hecho.\n- La última viñeta documenta la verificación end-to-end: crear `v4v`, redirigir una vez, forzar un redeploy y confirmar `clicks: 1`.",
+   "proposito": "La evidencia de que la migración funcionó no es un test unitario sino una prueba contra producción, y queda escrita para la próxima sesión y para la defensa.",
+   "interaccion": "Lo actualiza el agente al cerrar el milestone, como pide `CLAUDE.md`. Resume lo que implementan `src/postgres.js`, `src/server.js` (`iniciar()`) y `railway.json`.",
+   "teoria": "Validación humana del trabajo del agente: una prueba diseñada por el equipo que verifica el comportamiento real, no solo el código."
   }
  ],
  "refs": [
   {
    "slug": "introduccion",
    "i": 12,
-   "snippet": "test-stats-verdad"
+   "snippets": [
+    "test-stats-verdad",
+    "helpers-repo-memoria",
+    "server-rutas",
+    "stats-html-fetch"
+   ]
   },
   {
    "slug": "introduccion",
    "i": 13,
-   "snippet": "gitignore-secretos"
+   "snippets": [
+    "gitignore-secretos",
+    "package-json-scripts",
+    "server-iniciar"
+   ],
+   "nota": "La credencial queda fuera de git; la app la recibe solo por `DATABASE_URL`, desde un `.env` local o desde Railway."
   },
   {
    "slug": "introduccion",
    "i": 17,
-   "snippet": "progress-log-0001",
-   "nota": "Cada commit tiene su `.md` en `progress_log/`; este es el del primero, que muestra la decisión sobre `notas.txt`."
+   "snippets": [
+    "claude-md-commits-correr",
+    "progress-log-0001"
+   ],
+   "nota": "Las convenciones de commit de `CLAUDE.md` dan el `git log` legible; cada commit además tiene su `.md` en `progress_log/`, como este del primero."
   },
   {
    "slug": "claude-desktop-chat",
    "i": 5,
-   "snippet": "codex-prompt-progress-log",
+   "snippets": [
+    "skill-progress-log",
+    "codex-prompt-progress-log"
+   ],
    "nota": "Rastro en el repo de que se usaron dos agentes de terminal: la misma Skill existe para Claude Code y para Codex."
   },
   {
    "slug": "claude-desktop-chat",
    "i": 9,
-   "snippet": "claude-md-estado"
+   "snippets": [
+    "claude-md-estado",
+    "spec-post-redirect",
+    "progress-md-milestones"
+   ],
+   "nota": "Los tres archivos que cargan contexto en cada sesión: estado y reglas, contrato de la API y avance por milestone."
   },
   {
    "slug": "claude-desktop-chat",
    "i": 20,
-   "snippet": "server-iniciar",
-   "nota": "La `DATABASE_URL` que este código lee la seteó el agente en Railway llamando tools del MCP."
+   "snippets": [
+    "readme-deploy",
+    "server-iniciar"
+   ],
+   "nota": "El README documenta la variable de referencia que se configuró en Railway vía MCP; `iniciar()` es quien la lee."
   },
   {
    "slug": "claude-desktop-chat",
    "i": 27,
-   "snippet": null,
+   "snippets": [],
    "nota": "No hay en el repo ninguna tarea programada ni script que reporte cambios: el extra quedó sin hacer."
   },
   {
    "slug": "cowork-intro",
    "i": 3,
-   "snippet": "claude-md-commits-correr"
+   "snippets": [
+    "claude-md-commits-correr",
+    "package-json-scripts"
+   ]
   },
   {
    "slug": "cowork-intro",
    "i": 4,
-   "snippet": "test-postgres-pool-falso"
+   "snippets": [
+    "test-postgres-pool-falso",
+    "postgres-repo",
+    "server-iniciar"
+   ],
+   "nota": "Primero el test con pool falso, después el repositorio que lo hace pasar y por último `iniciar()`, que lo conecta en producción."
   },
   {
    "slug": "cowork-intro",
    "i": 6,
-   "snippet": "claude-md-reglas",
+   "snippets": [
+    "claude-md-reglas"
+   ],
    "nota": "La regla 4 es la consecuencia del paso 0: con los MCP configurados en `corta/`, el agente debe usarlos en vez de comandos sueltos."
   },
   {
    "slug": "cowork-intro",
    "i": 9,
-   "snippet": "readme-estructura"
+   "snippets": [
+    "readme-estructura",
+    "claude-md-estado"
+   ],
+   "nota": "Al pararse en `corta/`, el agente lee el README y `CLAUDE.md`: los dos describen la misma estructura ordenada."
   },
   {
    "slug": "cowork-intro",
    "i": 11,
-   "snippet": "spec-post-redirect",
+   "snippets": [
+    "spec-post-redirect",
+    "server-rutas",
+    "test-redirect"
+   ],
    "nota": "Mirá la línea del 400 por URL inválida: está en el SPEC, pero ni `src/server.js` ni los tests la cubren."
   },
   {
    "slug": "cowork-intro",
    "i": 12,
-   "snippet": "progress-md-milestones"
+   "snippets": [
+    "progress-md-milestones",
+    "claude-md-estado"
+   ],
+   "nota": "`CLAUDE.md` le indica al agente que actualice `docs/PROGRESS.md` al cerrar o arrancar un milestone."
   },
   {
    "slug": "cowork-intro",
    "i": 13,
-   "snippet": "test-colision"
+   "snippets": [
+    "test-colision",
+    "utils-generar-codigo",
+    "server-rutas"
+   ],
+   "nota": "El test mockea el `Math.random` que usa `generarCodigo()`; el fix es el bucle de reintento de `POST /api/links`."
   },
   {
    "slug": "cowork-intro",
    "i": 15,
-   "snippet": "claude-md-reglas"
+   "snippets": [
+    "claude-md-reglas",
+    "claude-md-commits-correr"
+   ]
   },
   {
    "slug": "cowork-intro",
    "i": 16,
-   "snippet": "claude-md-estado",
+   "snippets": [
+    "claude-md-estado",
+    "claude-md-reglas",
+    "claude-md-commits-correr"
+   ],
    "nota": "La consigna pedía `/collect-memory` para mantener esta sección; acá se mantiene por instrucción («Actualizá esta sección…»)."
   },
   {
    "slug": "cowork-intro",
    "i": 18,
-   "snippet": "script-progress-log"
+   "snippets": [
+    "skill-progress-log",
+    "script-progress-log",
+    "progress-log-0001"
+   ],
+   "nota": "La Skill describe los pasos, el script determinista lista los commits sin log y el modelo escribe un `.md` como este."
   },
   {
    "slug": "cowork-intro",
    "i": 19,
-   "snippet": "skill-progress-log",
+   "snippets": [
+    "skill-progress-log"
+   ],
    "nota": "Fijate en la `description` del frontmatter: enumera las frases que disparan la Skill sola."
   },
   {
    "slug": "cowork-intro",
    "i": 24,
-   "snippet": "readme-deploy"
+   "snippets": [
+    "readme-deploy",
+    "railway-json"
+   ],
+   "nota": "Esto es lo que quedó versionado de un deploy hecho con tools del MCP de Railway."
   },
   {
    "slug": "cowork-intro",
    "i": 29,
-   "snippet": "server-rutas",
-   "nota": "Este código lo tipeó el agente; lo que lo hace confiable son los tests y el SPEC escritos antes."
+   "snippets": [
+    "spec-post-redirect",
+    "test-redirect",
+    "server-rutas"
+   ],
+   "nota": "El SPEC y el test se escribieron antes; el código de las rutas lo tipeó el agente y lo hacen confiable esas dos piezas."
   },
   {
    "slug": "cowork-intro",
    "i": 30,
-   "snippet": "gitignore-secretos"
+   "snippets": [
+    "gitignore-secretos",
+    "package-json-scripts",
+    "server-iniciar"
+   ]
   },
   {
    "slug": "cowork-intro",
    "i": 32,
-   "snippet": "progress-log-0001"
+   "snippets": [
+    "progress-log-0001",
+    "gitignore-secretos"
+   ]
   },
   {
    "slug": "cowork-intro",
    "i": 33,
-   "snippet": "postgres-repo"
+   "snippets": [
+    "postgres-repo",
+    "server-iniciar",
+    "progress-md-produccion"
+   ],
+   "nota": "`iniciar()` migra `data/links.json` con `crear()` sin pisar códigos; la prueba del redeploy con `v4v` quedó registrada en `docs/PROGRESS.md`."
   },
   {
    "slug": "claude-cowork",
    "i": 17,
-   "snippet": "skill-progress-log"
+   "snippets": [
+    "skill-progress-log",
+    "codex-prompt-progress-log",
+    "script-progress-log"
+   ]
   },
   {
    "slug": "rag-y-mcp",
    "i": 46,
-   "snippet": "readme-deploy"
+   "snippets": [
+    "readme-deploy",
+    "railway-json"
+   ]
   },
   {
    "slug": "rag-y-mcp",
    "i": 55,
-   "snippet": "claude-md-reglas",
+   "snippets": [
+    "claude-md-reglas"
+   ],
    "nota": "La config de los servidores MCP no está versionada en el repo; lo que quedó es la regla 4 que obliga a usarlos."
   },
   {
    "slug": "rag-y-mcp",
    "i": 59,
-   "snippet": "railway-json",
+   "snippets": [
+    "railway-json",
+    "readme-deploy"
+   ],
    "nota": "Lo de Railway (esta config, base, deploy) y lo de GitHub (repo, commits) vinieron de dos servidores MCP distintos."
   },
   {
    "slug": "rag-mcp-rapida",
    "i": 16,
-   "snippet": "readme-deploy"
+   "snippets": [
+    "readme-deploy",
+    "railway-json"
+   ]
   },
   {
    "slug": "rag-mcp-rapida",
    "i": 21,
-   "snippet": "claude-md-reglas",
+   "snippets": [
+    "claude-md-reglas"
+   ],
    "nota": "La config de los servidores MCP no está versionada en el repo; lo que quedó es la regla 4 que obliga a usarlos."
   },
   {
    "slug": "cierre-magnifica-humanitas",
    "i": 14,
-   "snippet": "gitignore-secretos"
+   "snippets": [
+    "gitignore-secretos",
+    "progress-log-0001"
+   ],
+   "nota": "El `.gitignore` excluye `notas.txt`, y el log del primer commit deja escrita esa decisión."
   },
   {
    "slug": "cierre-magnifica-humanitas",
    "i": 20,
-   "snippet": "server-iniciar",
+   "snippets": [
+    "readme-deploy",
+    "server-iniciar"
+   ],
    "nota": "El agente, vía MCP, pudo crear la base y setear esta credencial: permisos reales sobre la infraestructura."
   },
   {
    "slug": "cierre-magnifica-humanitas",
    "i": 23,
-   "snippet": "claude-md-commits-correr",
-   "nota": "Capa humana: el push a `origin` solo ocurre al cerrar un milestone; se suma a `.gitignore`, variables de entorno y la regla 3 de `CLAUDE.md`."
+   "snippets": [
+    "gitignore-secretos",
+    "package-json-scripts",
+    "claude-md-reglas",
+    "claude-md-commits-correr"
+   ],
+   "nota": "Cuatro capas: `.gitignore`, credenciales por variable de entorno, la regla 3 de `CLAUDE.md` y el push solo al cerrar un milestone."
   },
   {
    "slug": "cierre-magnifica-humanitas",
    "i": 33,
-   "snippet": "test-redirect"
+   "snippets": [
+    "test-redirect",
+    "helpers-repo-memoria",
+    "progress-md-produccion"
+   ],
+   "nota": "La validación del equipo en dos niveles: tests automáticos sobre un repositorio en memoria y la prueba manual del redeploy con `clicks: 1`."
   }
  ]
 }

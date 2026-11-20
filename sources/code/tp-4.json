@@ -7,9 +7,9 @@
       "desde": 1,
       "hasta": 26,
       "lenguaje": "python",
-      "codigo": "\"\"\"Puntos de entrada de la entrega.\"\"\"\n\nfrom pathlib import Path\nimport os\n\nfrom admision_tp.buscador import BuscadorBM25\nfrom admision_tp.prompts import RAIZ, RUTA_BASELINE, PromptSpec\n\n\ndef construir_buscador(ruta_normas: Path) -> BuscadorBM25:\n    return BuscadorBM25(ruta_normas, variante=os.getenv(\"BUSCADOR_VARIANTE\", \"baseline\"))\n\n\ndef cargar_prompt() -> PromptSpec:\n    \"\"\"PromptSpec de `PROMPT_SPEC` (relativa a la raíz del repo) o el baseline; valida su sha256.\"\"\"\n    ruta = Path(os.getenv(\"PROMPT_SPEC\") or RUTA_BASELINE)\n    return PromptSpec.cargar(ruta if ruta.is_absolute() else RAIZ / ruta)\n\n\ndef construir_agente():\n    from admision_tp.agente_prompt import AgentePrompt\n    from admision_tp.configuracion import Configuracion\n    from admision_tp.modelo import ModeloLocal\n\n    prompt = cargar_prompt()  # antes de cargar el modelo: un prompt inválido falla sin usar la GPU\n    return AgentePrompt(ModeloLocal.cargar(Configuracion.desde_entorno()), prompt)",
+      "codigo": "\"\"\"Puntos de entrada de la entrega.\"\"\"\n\nfrom pathlib import Path\nimport os\n\nfrom admision_tp.buscador import BuscadorBM25\nfrom admision_tp.prompts import RAIZ, RUTA_ENTREGA, PromptSpec\n\n\ndef construir_buscador(ruta_normas: Path) -> BuscadorBM25:\n    return BuscadorBM25(ruta_normas, variante=os.getenv(\"BUSCADOR_VARIANTE\", \"baseline\"))\n\n\ndef cargar_prompt() -> PromptSpec:\n    \"\"\"PromptSpec de `PROMPT_SPEC` (relativa a la raíz del repo) o el de la entrega; valida su sha256.\"\"\"\n    ruta = Path(os.getenv(\"PROMPT_SPEC\") or RUTA_ENTREGA)\n    return PromptSpec.cargar(ruta if ruta.is_absolute() else RAIZ / ruta)\n\n\ndef construir_agente():\n    from admision_tp.agente_prompt import AgentePrompt\n    from admision_tp.configuracion import Configuracion\n    from admision_tp.modelo import ModeloLocal\n\n    prompt = cargar_prompt()  # antes de cargar el modelo: un prompt inválido falla sin usar la GPU\n    return AgentePrompt(ModeloLocal.cargar(Configuracion.desde_entorno()), prompt)",
       "que_hace": "Conecta las tres piezas que exige el kit de la cátedra: el buscador BM25 propio, el prompt versionado y el agente que corre Gemma local.",
-      "como_funciona": "- `construir_buscador(ruta_normas)` arma un `BuscadorBM25` con la carpeta de normas recibida y la variante de `BUSCADOR_VARIANTE` (default `baseline`).\n- `cargar_prompt()` lee el `PromptSpec` de `PROMPT_SPEC` o el baseline y valida su sha256.\n- `construir_agente()` carga primero el prompt (si es inválido falla sin tocar la GPU) y después `ModeloLocal` con `Configuracion.desde_entorno()`, y devuelve un `AgentePrompt`.\n- Los imports pesados están adentro de la función para que importar `entrega.py` no cargue torch.",
+      "como_funciona": "- `construir_buscador(ruta_normas)` arma un `BuscadorBM25` con la carpeta de normas recibida y la variante de `BUSCADOR_VARIANTE` (default `baseline`).\n- `cargar_prompt()` lee el `PromptSpec` de `PROMPT_SPEC` o, si no hay, el de la entrega (`RUTA_ENTREGA`, `procedimiento-v1`) y valida su sha256.\n- `construir_agente()` carga primero el prompt (si es inválido falla sin tocar la GPU) y después `ModeloLocal` con `Configuracion.desde_entorno()`, y devuelve un `AgentePrompt`.\n- Los imports pesados están adentro de la función para que importar `entrega.py` no cargue torch.",
       "proposito": "Es el contrato con la cátedra: separa buscador, prompt y modelo para poder cambiar cada uno por variable de entorno sin tocar código. Las dependencias pesadas son lazy, como pide AGENTS.md.",
       "interaccion": "Lo llaman `admision.contrato.cargar_entrega` y los runners (`admision.correr`, `admision.evaluar_rag`). Alimenta al `Entorno` del kit (buscador para `buscar_normativa`) y al ciclo de `admision_tp/agente_prompt.py`.",
       "teoria": "Es la arquitectura completa del trabajo final: un agente con herramientas, RAG léxico sobre normas y prompt optimizado/versionado."
@@ -74,12 +74,12 @@
       "id": "informe-evaluacion-buscador",
       "titulo": "Evaluación aparte del buscador (INFORME)",
       "archivo": "INFORME.md",
-      "desde": 241,
-      "hasta": 276,
+      "desde": 310,
+      "hasta": 350,
       "lenguaje": "markdown",
-      "codigo": "| Buscador | Secciones por búsqueda | Completas | Recall de evidencia | Precisión | Tokens/consulta |\n|---|---|---:|---:|---:|---:|\n| Referencia BM25 de la cátedra | 2 | 51/60 | 0,875 | 0,492 | 580 |\n| `baseline` (default de la entrega) | 2 | 48/60 | 0,817 | 0,467 | 618 |\n| `sin_comunes` | 2 | 50/60 | 0,850 | 0,483 | 591 |\n| `prefijos` | 1 a 3 (umbral 0,6) | **55/60** | **0,933** | **0,686** | **549** |\n\n- `baseline`: BM25 sobre la sección entera, 2 secciones. Queda por debajo de la referencia; las consultas\n  coloquiales tienen recall 0,25 porque depende de compartir palabras.\n- `sin_comunes`: quita una lista fija de palabras comunes del índice y de la consulta (conserva `no`, `sin`,\n  `ni` y números). Gana 3 consultas y pierde 1 contra `baseline`.\n- `prefijos`: sin palabras comunes, cada palabra recortada a sus primeras 4 letras (une `registro`,\n  `registrarlo`, `registra`) y hasta 3 secciones, descartando las que puntúan menos de 0,6 × la primera.\n  Supera la referencia en las cuatro métricas; gana 9 consultas y pierde 2 (d027 y d052, por colisiones de\n  prefijo). Coloquiales: recall 0,75.\n\n**Variantes probadas y descartadas.** Además de las tres seleccionables se midieron 68 configuraciones,\nreproducibles con `python -m scripts.explorar_buscadores --salida <carpeta nueva>`; la tabla completa está en\nla guía. En resumen:\n\n| Familia | Mejor resultado | Por qué se descartó |\n|---|---|---|\n| Fragmentos por párrafo (top 2–5, con o sin puntaje de sección) | 49/60, 0,833, 291–341 tokens | Menos tokens, pero menos recall que la referencia |\n| Sección recortada a los párrafos con coincidencia | 51/60, 0,867, 535 tokens | Pierde evidencia de párrafos sin palabras de la consulta |\n| Otros stemmers (plurales, sufijos, prefijo 5 o 6) | 51/60, 0,867 | Peores que prefijo 4 |\n| Título con más peso, ajustes de k1/b | 49–51/60 | Ganancia de 1 consulta como mucho |\n| Peso 0,25 para palabras comunes | 49/60, 0,833, 605 tokens | Pierde d011 igual que `sin_comunes`, gana menos |\n| Fusión BM25 + n-gramas de caracteres (RRF) | 48/60, 0,817, 612 tokens | No supera a `sin_comunes` |\n| `prefijos` sin umbral (k=3) | 56/60, 0,942, 895 tokens | +45 % de tokens por 1 consulta |\n| `prefijos` con umbral 0,4 / 0,5 / 0,7 / 0,8 | 56 / 55 / 53 / 52 de 60 | 0,6 es el codo entre recall y tokens |\n\nPrefijo, umbral y k se eligieron mirando estas mismas 60 consultas: son números de desarrollo, no una\nevaluación independiente. Con normas b y c el texto es el mismo y solo cambian los valores; con la evidencia\najustada a esos valores las tres variantes dan lo mismo que con original. Densos, híbridos con embeddings y\nrerankers quedaron fuera: requieren descargas o dependencias nuevas no autorizadas. Lo que sigue sin\nresolverse (d030 pecho ↔ dolor torácico, d023 abuela ↔ edad) necesita sinónimos.",
+      "codigo": "| Buscador | Secciones por búsqueda | Completas | Recall de evidencia | Precisión | Tokens/consulta |\n|---|---|---:|---:|---:|---:|\n| Referencia BM25 de la cátedra | 2 | 51/60 | 0,875 | 0,492 | 580 |\n| **`baseline` (entrega)** | 2 | 48/60 | 0,817 | 0,467 | 618 |\n| `sin_comunes` | 2 | 50/60 | 0,850 | 0,483 | 591 |\n| `prefijos` | 1 a 3 (umbral 0,6) | **55/60** | **0,933** | **0,686** | **549** |\n| BM25 con 4 secciones (comparación) | 4 | 57/60 | 0,950 | 0,271 | 1.270 |\n\n- **`baseline`** queda por debajo de la referencia. Las consultas coloquiales tienen recall 0,25 porque dependen de\n  compartir palabras.\n- **`sin_comunes`** quita una lista fija de palabras comunes, pero conserva `no`, `sin`, `ni` y los números. Gana\n  d022, d026 y d028 y pierde d011 contra `baseline`.\n- **`prefijos`** recorta cada palabra a sus primeras 4 letras y trae hasta 3 secciones. Descarta las que puntúan\n  menos de 0,6 × la primera.\n  - Supera a la referencia en las cuatro métricas.\n  - Gana 9 consultas y pierde 2 (d027 y d052, por colisiones de prefijo).\n  - El recall de las consultas coloquiales es 0,75.\n\n**Pasadas que no se adoptaron.** El script de exploración mide 68 configuraciones (las entradas de `INTENTOS` en\n`scripts/explorar_buscadores.py`, incluidas `baseline` y `sin_comunes`). Se reproducen con\n`python -m scripts.explorar_buscadores --salida <carpeta nueva>`; la tabla completa está en\n[buscador baseline](docs/informe/buscador-baseline.md#exploración-descartada).\n\n| Familia | Mejor resultado | Por qué se descartó |\n|---|---|---|\n| Fragmentos por párrafo (top 2–5) | 39–46/60, 0,683–0,792, 176–389 tokens | Pierde el contexto de la sección |\n| Fragmentos por párrafo con stop + prefijo 4 (top 4–5) | 49/60, 0,833, 291–341 tokens | Menos tokens, pero menos recall que la referencia |\n| Sección recortada a los párrafos con coincidencia | 51/60, 0,867, 535 tokens | Pierde evidencia de párrafos sin palabras de la consulta |\n| Otros stemmers (plurales, sufijos, prefijo 5 o 6) | 51/60, 0,867 | Peores que prefijo 4 |\n| Título con más peso, ajustes de k1/b | 49–51/60 | Ganancia de 1 consulta como mucho |\n| Peso 0,25 para palabras comunes | 49/60, 0,833, 605 tokens | Pierde d011 igual que `sin_comunes` y gana menos |\n| Fusión BM25 + n-gramas de caracteres (RRF) | 48/60, 0,817, 612 tokens | No supera a `sin_comunes` |\n| `prefijos` sin umbral (k=3) | 56/60, 0,942, 895 tokens | +45 % de tokens por 1 consulta |\n| `prefijos` con umbral 0,4 / 0,5 / 0,7 / 0,8 | 56 / 55 / 53 / 52 de 60 | 0,6 es el codo entre recall y tokens |\n\n**Límites de esta evaluación:**\n\n- Prefijo, umbral y k se eligieron con estas mismas 60 consultas: son números de desarrollo.\n- Con normas b y c cambian solo los valores, y las tres variantes dan lo mismo que con original.\n- Densos, híbridos y rerankers quedaron fuera porque requieren descargas no autorizadas.\n- Siguen sin resolverse d030 (pecho ↔ dolor torácico) y d023 (abuela ↔ edad), que necesitan sinónimos.",
       "que_hace": "Tabla de `admision.evaluar_rag` sobre 60 consultas de desarrollo: referencia de la cátedra, `baseline`, `sin_comunes` y `prefijos`, más las familias descartadas.",
-      "como_funciona": "- Compara completas, recall de evidencia, precisión y tokens por consulta.\n- `baseline` queda en 48/60 contra 51/60 de la referencia; `prefijos` llega a 55/60 y recall 0,933.\n- Explica la variante `prefijos` (prefijo de 4 letras, umbral 0,6, hasta 3 secciones).\n- Lista lo descartado (párrafos, stemmers, RRF) y lo que queda sin resolver: sinónimos como «pecho» ↔ «dolor torácico».",
+      "como_funciona": "- Compara completas, recall de evidencia, precisión y tokens por consulta.\n- `baseline` queda en 48/60 contra 51/60 de la referencia; `prefijos` llega a 55/60 y recall 0,933; traer 4 secciones da 57/60 pero duplica los tokens.\n- Explica la variante `prefijos` (prefijo de 4 letras, umbral 0,6, hasta 3 secciones).\n- Lista lo descartado (párrafos, stemmers, RRF) y lo que queda sin resolver: sinónimos como «pecho» ↔ «dolor torácico».",
       "proposito": "Documenta la decisión de quedarse con un buscador léxico local y sus límites: no une sinónimos, cosa que un buscador denso sí haría pero requería descargas.",
       "interaccion": "Los números salen de `python -m admision.evaluar_rag --entrega entrega.py ...` con `BUSCADOR_VARIANTE`; la configuración vive en `admision_tp/buscador.py`.",
       "teoria": "Elegir entre búsqueda léxica y semántica: BM25 es exacto y barato pero falla con sinónimos; los embeddings los unen."
@@ -88,14 +88,14 @@
       "id": "informe-agente-buscador",
       "titulo": "Mejor buscador aislado ≠ mejor agente",
       "archivo": "INFORME.md",
-      "desde": 288,
-      "hasta": 320,
+      "desde": 372,
+      "hasta": 401,
       "lenguaje": "markdown",
-      "codigo": "| Métrica | `baseline` | `prefijos` |\n|---|---:|---:|\n| Casos resueltos | **10/50** | 6/50 |\n| Parcial medio | **0,831** | 0,796 |\n| registro / box / circuito / plazo | 0,76 / 0,72 / 0,98 / 0,92 | 0,62 / 0,68 / 0,94 / 0,84 |\n| cobertura / entidad / aviso / verificación | 0,80 / 0,82 / 0,72 / 0,76 | 0,78 / 0,82 / 0,72 / 0,76 |\n| Llamadas / búsquedas por caso | 4,9 / 1,34 | 5,0 / 1,40 |\n| Caracteres de contexto por caso | 19.954 | 20.689 |\n| Segundos por caso (T4, lote 4) | 15,2 | 15,7 |\n\n`baseline` reproduce exactamente la corrida anterior del modelo sin entrenar (10/50, 0,831; commit `a89f5b9`).\nPor caso, `prefijos` gana 3 (pev-005, 019, 037) y pierde 7 (pev-010, 012, 017, 021, 024, 049, 050); con 10\ncasos discordantes la prueba de signos da p≈0,34, así que la diferencia **no es concluyente**, pero tampoco\nhay señal de mejora.\n\n**Por qué el mejor recall no ayudó.** `baseline` devuelve siempre 2 secciones; `prefijos` devolvió 1 en 30\nbúsquedas, 3 en 26 y 2 en 14. Con 3 suele sumar secciones parecidas de otras áreas (por ejemplo NOR-DER-01 o\nNOR-GUA-02), justamente las que no deciden la ficha. Por eso el contexto por caso subió 3,7 % en vez de bajar\ncomo en la evaluación separada, y cambió el recorrido del agente (en pev-021 nunca buscó el circuito). Es lo\nque muestran las trazas, no una causa probada.\n\n**Costo de contexto.** Con las dos variantes el agente hace pocas búsquedas (1,3–1,4 por caso) y cada caso usa\nunos 20.000 caracteres de contexto (~5.000 tokens a 4 caracteres por token). `prefijos` trae menos tokens por\nconsulta en `evaluar_rag` (549 contra 618) pero más contexto por caso con el agente. El costo de GPU de la\ncomparación fue 2.968 s de sesión T4 (≈ 49,5 min, ~20 min de instalación de dependencias); tiempos T4 **no\ncomparables** con la A100-40GB de la entrega.\n\n### Decisión\n\nEl default de la entrega sigue siendo `baseline` (`entrega.py` no cambia): es el que mejor resolvió con el\nagente y el que se usó para generar las conversaciones de entrenamiento. `prefijos` queda documentado y\nseleccionable como resultado negativo: mejora la evaluación separada pero no al agente sin entrenar. Si\nalcanzan tiempo y cuota, se repetirá la comparación con el modelo entrenado.",
+      "codigo": "| Métrica | `baseline` | `prefijos` |\n|---|---:|---:|\n| Casos resueltos | **10/50** | 6/50 |\n| Parcial medio | **0,831** | 0,796 |\n| registro / box / circuito / plazo | 0,76 / 0,72 / 0,98 / 0,92 | 0,62 / 0,68 / 0,94 / 0,84 |\n| cobertura / entidad / aviso / verificación | 0,80 / 0,82 / 0,72 / 0,76 | 0,78 / 0,82 / 0,72 / 0,76 |\n| Llamadas / búsquedas por caso | 4,9 / 1,34 | 5,0 / 1,40 |\n| Caracteres de contexto por caso | 19.954 | 20.689 |\n| Segundos por caso (T4, lote 4; v25 / v41) | 16,07 | 16,09 |\n\n- **No es concluyente:** `prefijos` gana 3 casos (pev-005, pev-019, pev-037) y pierde 7 (pev-010, 012, 017,\n  021, 024, 049 y 050); con 10 casos discordantes, la prueba de signos da\n  p≈0,34. Tampoco hay señal de mejora.\n- **Por qué el mejor recall no ayudó.** `baseline` devuelve siempre 2 secciones. `prefijos` devolvió 1 sección en 30\n  búsquedas, 3 en 26 y 2 en 14.\n  - Con 3 secciones suele sumar secciones de otras áreas que no deciden la ficha.\n  - El contexto por caso subió 3,7 %.\n  - Es lo que muestran las trazas, no una causa probada.\n- **Costo de GPU:** la comparación usó 2.968 s de sesión T4.\n\n**Pasada 2: con el prompt elegido (Kaggle v26, dev de 40 casos).** `procedimiento-v1` con `prefijos` cae a 4/40,\ncontra 9/40 con `baseline` (Parte 3).\n\n**Decisión.** El default sigue siendo `baseline` por tres motivos:\n\n- Es el que mejor resolvió con el agente.\n- Generó las conversaciones de entrenamiento.\n- El adapter aprendió a usarlo.\n\n`prefijos` queda seleccionable como resultado negativo: mejora la evaluación separada, pero no al agente.",
       "que_hace": "Compara `baseline` y `prefijos` jugando los 50 casos de práctica con Gemma sin entrenar: `baseline` resuelve 10/50 y `prefijos` 6/50.",
-      "como_funciona": "- Tabla por control, llamadas, contexto y segundos por caso.\n- Por caso: `prefijos` gana 3 y pierde 7 (prueba de signos p≈0,34, no concluyente).\n- Explica por qué: `prefijos` trae 1 o 3 secciones y con 3 suma secciones parecidas que no deciden la ficha; el contexto por caso sube 3,7 %.\n- Decisión: el default sigue siendo `baseline`.",
+      "como_funciona": "- Tabla por control, llamadas, contexto y segundos por caso.\n- Por caso: `prefijos` gana 3 y pierde 7 (prueba de signos p≈0,34, no concluyente).\n- Explica por qué: `prefijos` trae 1 o 3 secciones y con 3 suma secciones de otras áreas que no deciden la ficha; el contexto por caso sube 3,7 %.\n- Con `procedimiento-v1` pasa lo mismo (4/40 contra 9/40).\n- Decisión: el default sigue siendo `baseline` (mejor con el agente, generó las conversaciones de entrenamiento y el adapter aprendió a usarlo).",
       "proposito": "Materializa la regla de que el buscador vale por lo que rinde el agente con él, no por su métrica aislada; `prefijos` queda como resultado negativo documentado.",
-      "interaccion": "Los datos vienen de `infra/kaggle_baseline.py` con `BUSCADOR_VARIANTE` y se puntúan con `admision.correr puntuar`; la decisión deja `entrega.construir_buscador` en `baseline`.",
+      "interaccion": "Los datos vienen de `infra/kaggle_evaluacion.py` con el plan `configuraciones/evaluacion/buscador-prefijos.json` y se tabulan con `scripts.tabla_evaluacion`; los controles los puntúa `admision.correr.puntuar`. La decisión deja `entrega.construir_buscador` en `baseline`.",
       "teoria": "Evaluar las dos etapas de un RAG por separado y juntas: mejor recuperación aislada no garantiza mejor respuesta final."
     },
     {
@@ -130,8 +130,8 @@
       "id": "promptspec-sha256",
       "titulo": "PromptSpec: prompt versionado con sha256",
       "archivo": "admision_tp/prompts.py",
-      "desde": 29,
-      "hasta": 72,
+      "desde": 31,
+      "hasta": 74,
       "lenguaje": "python",
       "codigo": "@dataclass(frozen=True)\nclass PromptSpec:\n    \"\"\"Todo texto configurable que el coordinador agrega a la conversación.\n\n    El hash cubre la versión del formato y los cuatro textos que afectan al modelo.\n    `nombre` es una etiqueta humana y no modifica la identidad del contenido.\n    \"\"\"\n\n    version: int\n    nombre: str\n    system_prompt: str\n    mensaje_inicial: str\n    formato_observacion: str\n    mensaje_json_invalido: str\n\n    def __post_init__(self):\n        if type(self.version) is not int or self.version <= 0:\n            raise ValueError(\"version requiere un entero positivo\")\n        if not isinstance(self.nombre, str) or not re.fullmatch(r\"[a-z0-9][a-z0-9._-]*\", self.nombre):\n            raise ValueError(\"nombre de prompt inválido\")\n        textos = (self.system_prompt, self.mensaje_inicial,\n                  self.formato_observacion, self.mensaje_json_invalido)\n        if any(not isinstance(texto, str) or not texto.strip() for texto in textos):\n            raise ValueError(\"los textos del prompt no pueden estar vacíos\")\n        if _placeholders(self.mensaje_inicial) != {\"paciente_id\"}:\n            raise ValueError(\"mensaje_inicial requiere únicamente {paciente_id}\")\n        if _placeholders(self.formato_observacion) != {\"herramienta\", \"observacion\"}:\n            raise ValueError(\"formato_observacion requiere {herramienta} y {observacion}\")\n\n    def _contenido(self) -> dict:\n        return {\n            \"version\": self.version,\n            \"system_prompt\": self.system_prompt,\n            \"mensaje_inicial\": self.mensaje_inicial,\n            \"formato_observacion\": self.formato_observacion,\n            \"mensaje_json_invalido\": self.mensaje_json_invalido,\n        }\n\n    @property\n    def sha256(self) -> str:\n        contenido = json.dumps(\n            self._contenido(), ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")\n        ).encode(\"utf-8\")\n        return hashlib.sha256(contenido).hexdigest()",
       "que_hace": "Dataclass inmutable con todos los textos que el agente le manda al modelo y un hash sha256 que identifica su contenido.",
@@ -157,9 +157,9 @@
     {
       "id": "reparto-contexto-doc",
       "titulo": "Reparto medido: sistema 55 %, búsquedas 25 %",
-      "archivo": "docs/optimizacion-prompt.md",
-      "desde": 324,
-      "hasta": 352,
+      "archivo": "docs/informe/optimizacion-prompt.md",
+      "desde": 338,
+      "hasta": 366,
       "lenguaje": "markdown",
       "codigo": "**Dónde está el contexto.** `python -m scripts.medir_contexto --trazas <trazas.jsonl> --prompt <spec>`\nrejuega trazas ya jugadas con otro `PromptSpec` (mismas respuestas y observaciones) y reparte\n`caracteres_de_contexto` del kit por tipo de mensaje. Antes de comparar, exige que el prompt de\norigen reproduzca exactamente cada conversación grabada. Sobre las 100 trazas v22 (Kaggle T4,\nGemma sin entrenar, 50 casos × buscadores `baseline` y `prefijos`; artefactos locales no versionados):\n\n| Parte | `baseline` | `prefijos` |\n|---|---:|---:|\n| Mensaje de sistema | 55,0 % | 54,2 % |\n| Búsquedas | 24,8 % | 25,7 % |\n| Otras observaciones | 13,4 % | 13,3 % |\n| Respuestas del modelo | 5,0 % | 5,1 % |\n| Mensaje inicial | 1,8 % | 1,7 % |\n| Caracteres por caso | 19.954 | 20.689 |\n\nEl mensaje de sistema (2.232 caracteres) se reenvía en cada turno: es la palanca principal. Con\nlos ~5 turnos medios de v22 (máximo 8), cada 100 caracteres menos de sistema ahorran ~2,5 % por caso.\n\nCandidatos de formato que controla el agente (ahorro total sobre `caracteres_de_contexto`, mismas trazas):\n\n| Candidato | `baseline` | `prefijos` | Decisión |\n|---|---:|---:|---|\n| `{herramienta}:\\n{observacion}` | 0,67 % | 0,67 % | No adoptado: sin pérdida, pero no justifica regenerar #8 |\n| `[{herramienta}]\\n{observacion}` | 0,62 % | 0,62 % | No adoptado: ídem |\n| `{observacion}` sin herramienta | 1,43 % | 1,45 % | No adoptado: exige relajar `PromptSpec` y debilita la validación herramienta/observación de #8 |\n| Unir líneas en blanco de las observaciones | 0,10 % | 0,10 % | No adoptado: cambia la presentación del buscador (#6) |\n| Reemplazar secciones ya mostradas por una referencia | 0,05 % | 0,79 % | No adoptado: cambia la presentación del buscador (#6) |\n\nSupuesto: el modelo responde lo mismo con el formato nuevo; la medición es de formato, no de conducta.",
       "que_hace": "Resultado de `scripts.medir_contexto` sobre 100 trazas: qué porcentaje del contexto ocupa cada parte con `baseline` y `prefijos`.",
@@ -172,20 +172,20 @@
       "id": "guarda-practica",
       "titulo": "Guarda: nunca optimizar con práctica",
       "archivo": "admision_tp/experimentos_prompt.py",
-      "desde": 135,
-      "hasta": 158,
+      "desde": 149,
+      "hasta": 172,
       "lenguaje": "python",
       "codigo": "def _verificar_origen(casos, esperadas, normas, proposito) -> dict:\n    \"\"\"Guardas previas a copiar cualquier entrada; devuelve qué se verificó.\n\n    Las rutas se resuelven (incluidos symlinks) antes de comparar con ``practica/``. El\n    chequeo del kit se corre sobre las rutas ORIGINALES: la copia en ``salida/entradas``\n    nunca tiene esperadas al lado y por eso no lo dispararía.\n    \"\"\"\n    if proposito not in PROPOSITOS:\n        raise ValueError(f\"propósito inválido; usar uno de {', '.join(PROPOSITOS)}\")\n    practica = _PRACTICA.resolve()\n    en_practica = []\n    for nombre, ruta in ((\"casos\", casos), (\"esperadas\", esperadas)):\n        resuelta = Path(ruta).resolve()\n        if resuelta == practica or practica in resuelta.parents:\n            en_practica.append(nombre)\n    if proposito == \"plomeria\":\n        # Solo plomería puede usar práctica; la copia aislada sigue revisada por `jugar`.\n        return {\"datos_practica\": en_practica, \"esperadas_al_alcance\": \"omitida_plomeria\"}\n    if en_practica:\n        raise ValueError(\n            f\"{' y '.join(en_practica)} dentro de practica/: nunca se evalúan ni optimizan prompts \"\n            \"con práctica; para probar solo la plomería usar --solo-plomeria\")\n    revisar_que_no_haya_esperadas(Path(normas), Path(casos))\n    return {\"datos_practica\": [], \"esperadas_al_alcance\": \"verificada_en_origen\"}",
       "que_hace": "Antes de una corrida de evaluación de prompts, rechaza casos o esperadas que estén dentro de `practica/` y verifica que no haya respuestas esperadas al alcance del agente.",
       "como_funciona": "- Valida `proposito` (`evaluacion` o `plomeria`).\n- Resuelve rutas (incluidos symlinks) y comprueba si caen bajo `_PRACTICA`.\n- En `plomeria` (solo probar que el pipeline anda) lo permite y lo registra.\n- En `evaluacion` lanza `ValueError` si hay práctica y corre `revisar_que_no_haya_esperadas` del kit sobre las rutas originales.",
       "proposito": "Materializa la decisión de elegir prompts en un conjunto prompt-dev propio y dejar la práctica solo para reportar una vez, para no sobreajustar al conjunto de evaluación.",
-      "interaccion": "La llama el runner de evaluación de prompts antes de copiar entradas; el resultado queda en el manifiesto (`guardas`). Sus métricas pasan por `evaluacion_prompts.calcular_metricas_candidato`.",
+      "interaccion": "La llama `ejecutar_evaluacion_prompt` (mismo archivo) antes de copiar cualquier entrada; el resultado queda en el manifiesto (`guardas`). Sus métricas pasan por `evaluacion_prompts.calcular_metricas_candidato`.",
       "teoria": "Separación de conjuntos: desarrollo para elegir, evaluación solo para medir; usar el test para elegir infla los resultados."
     },
     {
       "id": "procedimiento-dev",
       "titulo": "procedimiento-v1 contra baseline en prompt-dev",
-      "archivo": "docs/analisis-errores.md",
+      "archivo": "docs/informe/analisis-errores.md",
       "desde": 171,
       "hasta": 202,
       "lenguaje": "markdown",
@@ -199,7 +199,7 @@
     {
       "id": "solo-prompt-practica",
       "titulo": "Fila solo_prompt en práctica: 10/10/7 → 14/16/12",
-      "archivo": "docs/analisis-errores.md",
+      "archivo": "docs/informe/analisis-errores.md",
       "desde": 204,
       "hasta": 228,
       "lenguaje": "markdown",
@@ -319,36 +319,36 @@
       "que_hace": "Define la configuración LoRA y la política de entrenamiento: rango 8, alfa 16, solo en las proyecciones Q y V de la atención del modelo de lenguaje.",
       "como_funciona": "- `LORA_OBJETIVO` es una regex que solo toma `language_model.layers.N.self_attn.(q_proj|v_proj)`.\n- `LORA` fija `r=8`, `lora_alpha=16`, `dropout=0` y `task_type=CAUSAL_LM`.\n- `POLITICA` guarda checkpoint cada 50 pasos, bf16 y gradient checkpointing.\n- `PRECISIONES` y `DISPOSITIVOS` permiten fp16/`auto` para las T4 de Kaggle.",
       "proposito": "Gemma 4 es multimodal y sus torres de visión/audio también tienen `q_proj`/`v_proj` que PEFT no soporta: la regex las excluye. QLoRA quedó como alternativa no hecha.",
-      "interaccion": "`_ejecutar_cuda` pasa `LoraConfig(**LORA)` a `get_peft_model`; `cargar_entradas` incluye `LORA` en la identidad de la corrida.",
+      "interaccion": "`aplicar_lora` (mismo archivo) pasa `LoraConfig(**LORA)` a `get_peft_model` dentro de `_ejecutar_cuda`; `cargar_entradas` incluye `LORA` en la identidad de la corrida.",
       "teoria": "LoRA agrega matrices de bajo rango a W_Q y W_V: se entrenan pocos parámetros y el modelo base queda congelado."
     },
     {
       "id": "trainer-cuda",
       "titulo": "Entrenamiento SFT con PEFT y Trainer",
       "archivo": "admision_tp/entrenamiento.py",
-      "desde": 232,
-      "hasta": 276,
+      "desde": 325,
+      "hasta": 369,
       "lenguaje": "python",
-      "codigo": "        ejecucion = auditoria.get(\"ejecucion\", EJECUCION)\n        # \"auto\" reparte las capas entre las GPU; Trainer lo detecta (hf_device_map) y no usa DataParallel.\n        reparto = {\"device_map\": \"auto\"} if ejecucion[\"dispositivos\"] == \"auto\" else {}\n        import transformers\n        from .carga import cargar_solo_texto\n        modelo = cargar_solo_texto(transformers, config[\"modelo\"], config[\"revision\"],\n                                   dtype=getattr(torch, PRECISIONES[ejecucion[\"precision\"]]), **reparto)\n        # Sin attn_implementation: forzar \"sdpa\" rompe la torre de audio de Gemma 4 (ver modelo.py).\n        modelo.config.use_cache = False\n        modelo = get_peft_model(modelo, LoraConfig(**LORA, revision=config[\"revision\"]))\n        modelo.enable_input_require_grads()\n\n        class Auditor(TrainerCallback):\n            def on_log(self, args, state, control, logs=None, **kwargs):\n                run.log({**(logs or {}), **_vram(torch), \"trainer_step\": state.global_step})\n\n            def guardar(self, carpeta, nombre):\n                (carpeta / \"corrida.json\").write_bytes(_canonical(auditoria))\n                hashes = {p.name: _sha(p.read_bytes()) for p in carpeta.iterdir()\n                          if p.is_file() and p.name != \"integridad.json\"}\n                (carpeta / \"integridad.json\").write_bytes(_canonical(hashes))\n                if persistir:\n                    persistir()\n                if auditoria[\"publicar\"]:\n                    publicaciones.append(publicar_checkpoint(carpeta, nombre, api, config[\"hf_repo\"], run))\n                    (destino / \"publicaciones.json\").write_bytes(_canonical(publicaciones))\n                    if persistir:\n                        persistir()\n\n            def on_save(self, args, state, control, **kwargs):\n                self.guardar(destino / f\"checkpoint-{state.global_step}\", f\"checkpoint-{state.global_step}\")\n\n        callback = Auditor()\n        args = TrainingArguments(output_dir=str(destino), seed=config[\"semilla\"], data_seed=config[\"semilla\"],\n            learning_rate=config[\"learning_rate\"], num_train_epochs=config[\"epochs\"],\n            per_device_train_batch_size=config[\"batch_size\"],\n            gradient_accumulation_steps=config[\"gradient_accumulation_steps\"],\n            **_politica(ejecucion), save_strategy=\"steps\", logging_steps=1,\n            report_to=\"none\", push_to_hub=False, remove_unused_columns=False)\n        def collator(filas):\n            return {k: torch.tensor(v, dtype=torch.long) for k, v in formar_lote(filas, tokenizer.pad_token_id).items()}\n        trainer = Trainer(model=modelo, args=args, train_dataset=ejemplos,\n                          data_collator=collator, processing_class=tokenizer, callbacks=[callback])\n        trainer.train(resume_from_checkpoint=str(checkpoint) if checkpoint else None)\n        trainer.save_model(str(destino / \"final\"))",
+      "codigo": "        modelo = cargar_solo_texto(transformers, config[\"modelo\"], config[\"revision\"],\n                                   dtype=getattr(torch, PRECISIONES[ejecucion[\"precision\"]]), **reparto)\n        # Sin attn_implementation: forzar \"sdpa\" rompe la torre de audio de Gemma 4 (ver modelo.py).\n        modelo.config.use_cache = False\n        modelo = aplicar_lora(peft, modelo, config)\n        modelo.enable_input_require_grads()\n\n        class Auditor(TrainerCallback):\n            def on_log(self, args, state, control, logs=None, **kwargs):\n                run.log({**(logs or {}), **_vram(torch), \"trainer_step\": state.global_step})\n\n            def guardar(self, carpeta, nombre):\n                (carpeta / \"corrida.json\").write_bytes(_canonical(auditoria))\n                hashes = {p.name: _sha(p.read_bytes()) for p in carpeta.iterdir()\n                          if p.is_file() and p.name != \"integridad.json\"}\n                (carpeta / \"integridad.json\").write_bytes(_canonical(hashes))\n                if persistir:\n                    persistir()\n                if auditoria[\"publicar\"]:\n                    publicaciones.append(publicar_checkpoint(carpeta, nombre, api, config[\"hf_repo\"], run))\n                    (destino / \"publicaciones.json\").write_bytes(_canonical(publicaciones))\n                    if persistir:\n                        persistir()\n\n            def on_save(self, args, state, control, **kwargs):\n                self.guardar(destino / f\"checkpoint-{state.global_step}\", f\"checkpoint-{state.global_step}\")\n\n        callback = Auditor()\n        args = TrainingArguments(output_dir=str(destino), seed=config[\"semilla\"], data_seed=config[\"semilla\"],\n            learning_rate=config[\"learning_rate\"], num_train_epochs=config[\"epochs\"],\n            per_device_train_batch_size=config[\"batch_size\"],\n            gradient_accumulation_steps=config[\"gradient_accumulation_steps\"],\n            **_politica(ejecucion), save_strategy=\"steps\", logging_steps=1,\n            report_to=\"none\", push_to_hub=False, remove_unused_columns=False)\n        def collator(filas):\n            return {k: torch.tensor(v, dtype=torch.float32 if k == \"pesos\" else torch.long)\n                    for k, v in formar_lote(filas, tokenizer.pad_token_id).items()}\n        class TrainerSupervisado(Trainer):\n            # Misma normalización que la pérdida del modelo (suma / num_items_in_batch con acumulación).\n            def compute_loss(self, model, inputs, return_outputs=False, num_items_in_batch=None):\n                return perdida_supervisada(torch, model, inputs, num_items_in_batch)\n\n        trainer = TrainerSupervisado(model=modelo, args=args, train_dataset=ejemplos,\n                                     data_collator=collator, processing_class=tokenizer, callbacks=[callback])\n        trainer.train(resume_from_checkpoint=str(checkpoint) if checkpoint else None)",
       "que_hace": "Carga el modelo solo texto, le aplica LoRA, configura el `Trainer` de Hugging Face con un callback que audita y publica checkpoints, y entrena.",
-      "como_funciona": "- `cargar_solo_texto` carga Gemma con la precisión elegida (y `device_map='auto'` para dos GPU).\n- `get_peft_model(modelo, LoraConfig(**LORA))` y `enable_input_require_grads` para gradient checkpointing.\n- `Auditor` loguea VRAM a W&B y en cada `on_save` escribe `integridad.json` y publica el checkpoint en HF.\n- `TrainingArguments` con semilla, lr, épocas, batch y acumulación de la config; `collator` usa `formar_lote` (padding con −100).\n- `trainer.train(resume_from_checkpoint=...)` permite reanudar.",
-      "proposito": "Prioriza auditabilidad y reanudación (Kaggle corta sesiones). Solo se validó en corridas de humo; el entrenamiento con los datos curados quedó pendiente.",
-      "interaccion": "Lo llama `entrenar()` (mismo archivo) desde `scripts/entrenar.py`, lanzado por `infra/kaggle_entrenamiento.py`. Consume `tokens.jsonl`; el adapter final lo carga `ModeloLocal._fusionar_adapter`.",
+      "como_funciona": "- `cargar_solo_texto` carga Gemma con la precisión elegida (y `device_map='auto'` para dos GPU).\n- `aplicar_lora(peft, modelo, config)` envuelve el modelo con LoRA (o retoma un adapter publicado) y `enable_input_require_grads` habilita gradient checkpointing.\n- `Auditor` loguea VRAM a W&B y en cada `on_save` escribe `integridad.json` y publica el checkpoint en HF.\n- `TrainingArguments` toma semilla, lr, épocas, batch y acumulación de la config; `collator` usa `formar_lote` (padding con −100).\n- `TrainerSupervisado.compute_loss` reemplaza la pérdida por `perdida_supervisada`, y `trainer.train(resume_from_checkpoint=...)` permite reanudar.",
+      "proposito": "Prioriza auditabilidad y reanudación (Kaggle corta sesiones a las 8 h). Primero se validó con corridas de humo; después entrenó con las 2.900 conversaciones (Kaggle v32+v33) y continuó para el adapter de la entrega (v39).",
+      "interaccion": "Es el cuerpo de `_ejecutar_cuda`, que llama `entrenar()` (mismo archivo) desde `scripts/entrenar.py`, lanzado por `infra/kaggle_entrenamiento.py`. Consume `tokens.jsonl`; el adapter final lo carga `ModeloLocal._fusionar_adapter`.",
       "teoria": "Fine-tuning supervisado eficiente: SFT con LoRA sobre las demostraciones, con la pérdida solo en tokens del asistente."
     },
     {
       "id": "informe-humo",
       "titulo": "Corridas de humo: 15,7 GB de VRAM",
-      "archivo": "docs/informe-parte5.md",
-      "desde": 135,
-      "hasta": 158,
+      "archivo": "docs/informe/informe-parte5.md",
+      "desde": 214,
+      "hasta": 237,
       "lenguaje": "markdown",
-      "codigo": "| Corrida | Qué hizo | Tiempo del runner | `train_runtime` | Pérdida paso 1 a 8 |\n|---|---|---|---|---|\n| v6 (`humo-entrena-1-v6`) | desde cero, 8 pasos, checkpoint cada 2 | 163 s | 17,4 s (2,18 s/paso) | 2,679 a 2,178 |\n| v7 (`humo-entrena-2-v7`) | reanuda desde `checkpoint-2` bajado de HF | 177 s | 15,8 s (pasos 3 a 8) | pasos 3 a 8 cercanos a v6, no idénticos |\n\nFuentes: `corridas/kaggle/humo-entrena-{1-v6,2-v7}/{runner.json,runner.log,entrenamiento/checkpoint-*/trainer_state.json}`.\nEl tiempo del runner excluye la instalación de dependencias; la carga de pesos tardó ~43 s\n(`runner.log`). La bitácora reporta 7 y 9 min de sesión completa.\n\n- **Casos a la vez al entrenar:** `batch_size=1`, `gradient_accumulation_steps=1`, 2 épocas,\n  `max_seq_length=8192` (`entrenamiento/corrida.json`). O sea, **1 conversación por paso**. Es la\n  configuración del humo, no una decisión de la corrida final.\n- **VRAM de entrenamiento (humo, solo texto): 15,7 GB pico** (9,5 + 6,1 por GPU; 15,8 GB reservada),\n  de `corridas/kaggle/humo-solo-texto/runner.json` (`vram`). Son 4 conversaciones sintéticas cortas con\n  batch 1: **no representa** la corrida real. **PENDIENTE:** el valor con secuencias reales, que el\n  entrenador ya registra en W&B, `estado.json` y `runner.json`.\n- **Checkpoints y publicación:** cada checkpoint se sube a HF con revisión, y la reanudación\n  reprodujo la curva (2,5196/2,4173/2,3468 contra 2,5196/2,4179/2,3464). Pasa en T4, no en A100.\n- **Tiempo total del entrenamiento real: PENDIENTE.** Depende de cuántas conversaciones tenga el\n  dataset final (Eze/Yas), de su largo en tokens y del prompt optimizado (Martu). Fórmula:\n  `pasos_aprox = conversaciones x épocas / (batch_size x acumulación)` (redondeos/último lote y\n  acumulación por época los resuelve Trainer); `tiempo_runner ≈ tiempo_train + carga + verificaciones + subidas`.\n  `train_runtime` y tiempo de runner no son intercambiables, y ninguno incluye necesariamente la sesión completa. El 2,18 s/paso del humo **no** sirve para extrapolar: eran\n  secuencias cortas y sintéticas.",
+      "codigo": "Conversaciones sintéticas de `scripts.datos_humo`: prueban el pipeline, **no** la calidad ni los tiempos del\nentrenamiento real. Kaggle T4 x2, fp16, `device_map=auto`, commit `acc95b2` limpio, LoRA solo en la atención\ndel modelo de lenguaje (r=8, alpha 16), `corrida.json`.\n\n| Corrida | Qué hizo | Tiempo del runner | `train_runtime` | Pérdida paso 1 a 8 |\n|---|---|---|---|---|\n| v6 (`humo-entrena-1-v6`) | desde cero, 8 pasos, checkpoint cada 2 | 163 s | 17,4 s (2,18 s/paso) | 2,679 a 2,178 |\n| v7 (`humo-entrena-2-v7`) | reanuda desde `checkpoint-2` bajado de HF | 177 s | 15,8 s (pasos 3 a 8) | pasos 3 a 8 cercanos a v6, no idénticos |\n\nFuentes: `evaluaciones/recursos/humo-entrena-{1-v6,2-v7}/{runner.json,runner.log,entrenamiento/checkpoint-*/trainer_state.json}`.\nEl tiempo del runner excluye la instalación de dependencias; la carga de pesos tardó ~43 s\n(`runner.log`). La bitácora reporta 7 y 9 min de sesión completa.\n\n- **Casos a la vez al entrenar:** `batch_size=1`, `gradient_accumulation_steps=1`, 2 épocas,\n  `max_seq_length=8192` (`entrenamiento/corrida.json`). O sea, **1 conversación por paso**. Es la\n  configuración del humo, no una decisión de la corrida final.\n- **VRAM de entrenamiento (humo, solo texto): 15,7 GB pico** (9,5 + 6,1 por GPU; 15,8 GB reservada),\n  de `evaluaciones/recursos/humo-solo-texto/runner.json` (`vram`). Son 4 conversaciones sintéticas cortas con\n  batch 1: **no representa** la corrida real. **PENDIENTE:** el valor con secuencias reales, que el\n  entrenador ya registra en W&B, `estado.json` y `runner.json`.\n- **Checkpoints y publicación:** cada checkpoint se sube a HF con revisión, y la reanudación\n  reprodujo la curva (2,5196/2,4173/2,3468 contra 2,5196/2,4179/2,3464). Pasa en T4, no en A100.\n- El 2,18 s/paso del humo **no** servía para extrapolar (secuencias cortas y sintéticas): el real fue ~80 s/paso\n  con 8 conversaciones de ~3.445 tokens (sección 3.1).",
       "que_hace": "Reporte de las corridas de humo de entrenamiento en Kaggle: tiempos, reanudación desde HF y VRAM pico.",
-      "como_funciona": "- v6 entrenó 8 pasos y v7 reanudó desde `checkpoint-2` bajado de HF con curva casi igual.\n- VRAM pico 15,7 GB (9,5 + 6,1 en dos T4) con 4 conversaciones sintéticas cortas.\n- Marca como PENDIENTE el tiempo y la VRAM del entrenamiento real con el dataset curado.",
+      "como_funciona": "- v6 entrenó 8 pasos y v7 reanudó desde `checkpoint-2` bajado de HF con curva casi igual.\n- VRAM pico 15,7 GB (9,5 + 6,1 en dos T4) con 4 conversaciones sintéticas cortas.\n- Aclara que esos 2,18 s/paso no servían para extrapolar: el entrenamiento real (sección 3.1) tardó ~80 s/paso.",
       "proposito": "Distingue «validado en GPU» (la infraestructura funciona) de «mejora del agente» (no demostrada), como exige AGENTS.md.",
-      "interaccion": "Los números vienen de `corridas/kaggle/humo-*/runner.json` que escribe `infra/kaggle_entrenamiento.correr`.",
-      "teoria": "Recorrido del fine-tuning local: preparar datos, entrenar con checkpoints, medir recursos; acá solo se completó la plomería."
+      "interaccion": "Los números vienen de `evaluaciones/recursos/humo-*/runner.json`, que escribe `infra/kaggle_entrenamiento.correr`. La sección 3.1 del mismo archivo reporta el entrenamiento real.",
+      "teoria": "Recorrido del fine-tuning local: antes de gastar horas de GPU se prueba la plomería (datos, checkpoints, reanudación) con una corrida chica."
     },
     {
       "id": "plantilla-cuatro-filas",
@@ -359,8 +359,8 @@
       "lenguaje": "json",
       "codigo": "{\n  \"version\": 1,\n  \"nombre\": \"parte4-cuatro-filas\",\n  \"descripcion\": \"PLANTILLA, no ejecutable: el runner la rechaza mientras tenga plantilla=true. Copiala, reemplazá los <...> por la ruta y el sha256 del prompt optimizado y por el repo y el commit HF (40 hex) del adapter publicado, y sacá el campo plantilla.\",\n  \"plantilla\": true,\n  \"cantidad\": 50,\n  \"versiones\": [\"original\", \"b\", \"c\"],\n  \"lote\": 4,\n  \"buscador\": \"baseline\",\n  \"configuraciones\": [\n    {\n      \"etiqueta\": \"sin_entrenar\",\n      \"descripcion\": \"Modelo base sin adapter y prompt baseline.\",\n      \"prompt\": \"configuraciones/prompts/baseline.json\",\n      \"prompt_sha256\": \"944ae7f6f52d2052b43be770f891593abfbefb86af088df672687590bfeaf474\",\n      \"adapter\": null\n    },\n    {\n      \"etiqueta\": \"solo_prompt\",\n      \"descripcion\": \"Modelo base sin adapter y prompt optimizado.\",\n      \"prompt\": \"<configuraciones/prompts/optimizado.json>\",\n      \"prompt_sha256\": \"<sha256 del prompt optimizado>\",\n      \"adapter\": null\n    },\n    {\n      \"etiqueta\": \"solo_entrenamiento\",\n      \"descripcion\": \"Adapter entrenado y prompt baseline.\",\n      \"prompt\": \"configuraciones/prompts/baseline.json\",\n      \"prompt_sha256\": \"944ae7f6f52d2052b43be770f891593abfbefb86af088df672687590bfeaf474\",\n      \"adapter\": {\"repo\": \"FranCalveyra/tp-admision\", \"revision\": \"<commit HF de 40 hex>\", \"subcarpeta\": \"final\"}\n    },\n    {\n      \"etiqueta\": \"ambos\",\n      \"descripcion\": \"Adapter entrenado y prompt optimizado.\",\n      \"prompt\": \"<configuraciones/prompts/optimizado.json>\",\n      \"prompt_sha256\": \"<sha256 del prompt optimizado>\",\n      \"adapter\": {\"repo\": \"FranCalveyra/tp-admision\", \"revision\": \"<commit HF de 40 hex>\", \"subcarpeta\": \"final\"}\n    }\n  ]\n}",
       "que_hace": "Plantilla de evaluación con las cuatro configuraciones que pide la consigna: sin entrenar, solo prompt, solo entrenamiento y ambos, en normas original, b y c.",
-      "como_funciona": "- Cada fila combina un `prompt` (con su sha256) y un `adapter` (repo + commit HF) o `null`.\n- `plantilla: true` hace que el runner la rechace hasta completar los `<...>`.\n- Solo existe la fila `sin_entrenar` en `actual.json`: el adapter real no se publicó.",
-      "proposito": "Prepara la comparación contra la referencia de la cátedra (12/15/12 sin entrenar, 25/24/25 con SFT); la fila con adapter quedó pendiente.",
+      "como_funciona": "- Cada fila combina un `prompt` (con su sha256) y un `adapter` (repo + commit HF) o `null`.\n- `plantilla: true` hace que el runner la rechace hasta completar los `<...>`.\n- Las filas reales están en `actual.json`, `solo-prompt.json` y, con el adapter de la entrega, `entrenado-v39.json`.",
+      "proposito": "Fija la comparación contra la referencia de la cátedra (12/15/12 sin entrenar, 25/24/25 con SFT): las cuatro filas se corren con los mismos casos, normas y lote.",
       "interaccion": "La consume el runner de evaluación (`infra/kaggle_evaluacion.py`); `ModeloLocal.cargar` aplica el adapter si la fila lo tiene.",
       "teoria": "Comparar prompting contra fine-tuning y su combinación: el SFT puede hacer que un modelo chico supere a uno sin ajustar."
     },
@@ -391,270 +391,781 @@
       "proposito": "Un solo archivo fuente para personas y agentes; `CLAUDE.md` solo contiene `@AGENTS.md`, así no hay instrucciones divergentes.",
       "interaccion": "Lo leen Claude Code (vía `CLAUDE.md`) y otros agentes al trabajar en el repo; remite a `docs/progreso.md` como bitácora.",
       "teoria": "Memoria del repo para agentes: reglas persistentes que el agente carga en cada sesión."
+    },
+    {
+      "id": "claude-md-puntero",
+      "titulo": "CLAUDE.md apunta a AGENTS.md",
+      "archivo": "CLAUDE.md",
+      "desde": 1,
+      "hasta": 1,
+      "lenguaje": "markdown",
+      "codigo": "@AGENTS.md",
+      "que_hace": "Todo el `CLAUDE.md` del repo es una línea que importa `AGENTS.md`.",
+      "como_funciona": "- Claude Code lee `CLAUDE.md` al abrir el repo.\n- La sintaxis `@AGENTS.md` incluye ese archivo como si estuviera escrito ahí.\n- Así hay una sola fuente de reglas para Claude y para otros agentes.",
+      "proposito": "Evita mantener dos archivos de instrucciones que se contradigan: `AGENTS.md` es el estándar común y `CLAUDE.md` solo lo referencia.",
+      "interaccion": "Lo carga Claude Code al iniciar cada sesión en el repo; el contenido real está en `AGENTS.md`.",
+      "teoria": "Memoria del repo: un archivo de instrucciones que el agente lee siempre, antes de trabajar."
+    },
+    {
+      "id": "jugar-runner",
+      "titulo": "El kit conecta la entrega y juega los casos",
+      "archivo": "admision/correr.py",
+      "desde": 63,
+      "hasta": 93,
+      "lenguaje": "python",
+      "codigo": "def _jugar(entrega, casos, ruta_normas: Path, salida: Path | None = None) -> tuple[list[dict], dict]:\n    if not casos:\n        raise ValueError(\"no hay casos\")\n    tiempos: dict = {\"casos\": len(casos)}\n    with tempfile.TemporaryDirectory(prefix=\"admision-normas-\") as carpeta:\n        # El buscador recibe una copia de las normas en una carpeta que no tiene nada más.\n        copia = Path(carpeta) / \"normas\"\n        shutil.copytree(Path(ruta_normas), copia)\n        t = time.perf_counter()\n        buscador = entrega.construir_buscador(copia)\n        tiempos[\"construir_buscador\"] = _segundos(t)\n        t = time.perf_counter()\n        agente = entrega.construir_agente()\n        tiempos[\"construir_agente\"] = _segundos(t)\n\n        entornos = [Entorno(c, buscador) for c in casos]\n        ultima_llamada: list[float | None] = [None] * len(casos)\n        inicio = time.perf_counter()\n\n        def paso_del_caso(i):\n            def paso(herramienta, argumentos):\n                try:\n                    return entornos[i].paso(herramienta, argumentos)\n                finally:\n                    ultima_llamada[i] = _segundos(inicio)\n            return paso\n\n        vistas = [VistaDelAgente(c.paciente_id, paso_del_caso(i)) for i, c in enumerate(casos)]\n        tiempos[\"error\"] = None\n        try:\n            conversaciones = agente.jugar_lote(vistas)",
+      "que_hace": "Código del kit de la cátedra: arma el buscador y el agente con las fábricas de `entrega.py`, crea un `Entorno` por caso y llama a `jugar_lote`.",
+      "como_funciona": "- Copia las normas a una carpeta temporal aislada y llama `entrega.construir_buscador(copia)`.\n- Llama `entrega.construir_agente()` y mide cuánto tarda cada construcción.\n- Crea `Entorno(c, buscador)` por caso y lo envuelve en una `VistaDelAgente` que solo expone `paciente_id` y `paso`.\n- `agente.jugar_lote(vistas)` devuelve una conversación por caso.",
+      "proposito": "Es el contrato: el agente nunca ve la ficha esperada ni el entorno completo, solo la vista con las cinco herramientas.",
+      "interaccion": "Usa `construir_buscador` y `construir_agente` de `entrega.py`; `jugar_lote` es `AgentePrompt.jugar_lote` (`admision_tp/agente_prompt.py`). Las trazas que devuelve las puntúa `puntuar` (mismo archivo).",
+      "teoria": "Arquitectura agente + entorno: el entorno ejecuta las herramientas y el agente solo decide qué llamar."
+    },
+    {
+      "id": "puntuar-runner",
+      "titulo": "puntuar: los 9 controles caso por caso",
+      "archivo": "admision/correr.py",
+      "desde": 165,
+      "hasta": 184,
+      "lenguaje": "python",
+      "codigo": "def puntuar(trazas: list[dict], esperadas: dict, salida: Path | None = None,\n            tiempos: dict | None = None) -> tuple[list[dict], dict]:\n    \"\"\"Segunda fase: el veredicto de cada traza contra su ficha esperada y el resumen. Si hay `salida`, escribe\n    `resultados.jsonl` y `resumen.json`. Con `tiempos` (lo que escribió jugar), los suma al resumen.\"\"\"\n    if not trazas:\n        raise ValueError(\"no hay trazas\")\n    for t in trazas:\n        if t[\"caso\"] not in esperadas:\n            raise KeyError(f\"no hay ficha esperada para el caso {t['caso']}\")\n    resultados = []\n    for t in trazas:\n        r = comparar(esperadas[t[\"caso\"]], t[\"decision\"], t[\"log\"])\n        r[\"busquedas\"] = sum(x[\"herramienta\"] == \"buscar_normativa\" for x in t[\"log\"])\n        r[\"caracteres_de_contexto\"] = caracteres_de_contexto(t[\"mensajes\"])\n        r[\"segundos\"] = t.get(\"segundos\")\n        resultados.append(r)\n    resumen = resumir(resultados)\n    resumen[\"busquedas_por_caso\"] = round(sum(r[\"busquedas\"] for r in resultados) / len(resultados), 2)\n    resumen[\"caracteres_de_contexto_por_caso\"] = round(\n        sum(r[\"caracteres_de_contexto\"] for r in resultados) / len(resultados))",
+      "que_hace": "Código del kit: compara cada traza con su ficha esperada usando `comparar` y agrega búsquedas y contexto por caso.",
+      "como_funciona": "- Exige una ficha esperada por traza.\n- Para cada traza llama `comparar(esperadas[caso], decision, log)`, que devuelve los 9 controles y `resuelto`.\n- Suma `busquedas` (llamadas a `buscar_normativa`) y `caracteres_de_contexto`.\n- `resumir(resultados)` arma el resumen por control y los casos resueltos.",
+      "proposito": "Separa jugar de puntuar: las esperadas se leen recién después de jugar, así el agente no puede verlas.",
+      "interaccion": "Consume las trazas de `jugar`; lo usan `admision.correr` y `admision_tp/experimentos_prompt.ejecutar_evaluacion_prompt`. Su resumen alimenta las tablas del INFORME.",
+      "teoria": "Medida de performance del agente racional: una métrica fija y externa al agente."
+    },
+    {
+      "id": "entorno-paso",
+      "titulo": "Entorno.paso: el tope de 40 llamadas",
+      "archivo": "admision/entorno.py",
+      "desde": 82,
+      "hasta": 93,
+      "lenguaje": "python",
+      "codigo": "    def paso(self, herramienta: str, argumentos: dict) -> tuple[str, bool]:\n        if self.terminado:\n            return \"El caso ya terminó.\", True\n        try:\n            obs = self._ejecutar(herramienta, argumentos if isinstance(argumentos, dict) else {})\n            ok = True\n        except ValueError as e:\n            obs, ok = f\"Error: {e}\", False\n        self.log.append({\"herramienta\": herramienta, \"argumentos\": argumentos, \"observacion\": obs, \"valida\": ok})\n        if not self.terminado and len(self.log) >= MAX_LLAMADAS:\n            self.terminado = True\n        return obs, self.terminado",
+      "que_hace": "Código del kit: ejecuta una herramienta, la registra en el log y cierra el caso al llegar a `MAX_LLAMADAS` (40).",
+      "como_funciona": "- Si el caso ya terminó, devuelve «El caso ya terminó.».\n- `_ejecutar` corre la herramienta; un `ValueError` vuelve como observación `Error: ...` y no corta el caso.\n- Cada llamada se agrega a `self.log` con `valida`.\n- Con 40 llamadas el caso termina sin ficha.",
+      "proposito": "Pone un límite duro de llamadas para que un agente que se queda en loop no corra para siempre.",
+      "interaccion": "Lo llama la `VistaDelAgente` que recibe `_PartidaPrompt.recibir` (`admision_tp/agente_prompt.py`) con la herramienta y los argumentos del JSON del modelo; `_ejecutar` está en el mismo archivo.",
+      "teoria": "Ciclo agente-entorno con presupuesto: el entorno, no el modelo, impone el máximo de pasos."
+    },
+    {
+      "id": "prompt-procedimiento-v1",
+      "titulo": "El prompt de la entrega: procedimiento-v1",
+      "archivo": "configuraciones/prompts/procedimiento-v1.json",
+      "desde": 1,
+      "hasta": 9,
+      "lenguaje": "json",
+      "codigo": "{\n  \"version\": 1,\n  \"nombre\": \"procedimiento-v1\",\n  \"system_prompt\": \"Sos el agente de admisión de la guardia del Hospital General de Prueba. Para cada paciente que ingresa completás su ficha de admisión siguiendo las normas del hospital. No tomás decisiones clínicas.\\n\\nHerramientas:\\n- leer_triage: Devuelve la nota de triage del paciente: edad, nivel, motivo de consulta, cómo llegó, documento y credenciales presentados, si puede responder preguntas, acompañante y si se lesionó trabajando.\\n  argumentos: {\\\"paciente_id\\\": id del paciente, por ejemplo P-1234}\\n- preguntar: Le pregunta al paciente o a su acompañante por su obra social o prepaga (tema cobertura) o por la ART de su empleador (tema art).\\n  argumentos: {\\\"paciente_id\\\": id del paciente, \\\"a_quien\\\": paciente | acompanante, \\\"tema\\\": cobertura | art}\\n- verificar_afiliacion: Consulta a la entidad si la afiliación está activa.\\n  argumentos: {\\\"entidad\\\": nombre de la entidad, tal como lo informaron, \\\"numero_afiliado\\\": número de afiliado (en una ART, el CUIL)}\\n- buscar_normativa: Busca en las normas del hospital y devuelve las 2 secciones más relevantes.\\n  argumentos: {\\\"consulta\\\": texto libre}\\n- registrar_decision: Registra la ficha de admisión. Termina el caso.\\n  argumentos: {\\\"registro\\\": definitivo | provisorio, \\\"numero_documento\\\": número del documento tal como figura en él, o null, \\\"box_antes_del_registro\\\": true si se ubica al paciente en el box antes de registrarlo, si no false, \\\"circuito\\\": ecg | codigo_acv | codigo_sepsis | ninguno, \\\"plazo_circuito_min\\\": plazo del circuito en minutos desde el ingreso, o null si no hay circuito, \\\"cobertura\\\": obra_social | prepaga | art | sin_cobertura, \\\"entidad_a_notificar\\\": nombre de la entidad a la que se notifica la atención, o null, \\\"aviso_al_voluntariado\\\": true o false, \\\"fundamentos\\\": lista de los códigos de sección que fundamentan la ficha, por ejemplo [\\\"NOR-ADM-01\\\"]}\\n\\nEn cada turno respondé solo con un objeto JSON, sin texto antes ni después:\\n{\\\"herramienta\\\": \\\"<nombre>\\\", \\\"argumentos\\\": {...}}\\nUsá una herramienta por turno. El caso termina cuando llamás a registrar_decision.\\n\\nLas normas que aplican son NOR-ADM-01 a NOR-ADM-03 (registro), NOR-COB-01 a NOR-COB-04 (coberturas) y NOR-TDE-01 a NOR-TDE-04 (circuitos tiempo-dependientes). Buscalas con buscar_normativa antes de decidir.\\n\\nLas normas del hospital contradicen lo habitual y sus valores (niveles, edades, plazos, dígitos) cambian: no decidas de memoria, aplicá lo que dicen las secciones recuperadas.\\n\\nProcedimiento:\\n1. leer_triage.\\n2. Buscá cada tema con una consulta propia, porque cada búsqueda trae pocas secciones:\\n   a. registro: documento presentado y nivel de triage;\\n   b. box antes del registro: nivel de triage y edad del paciente;\\n   c. el circuito del motivo de consulta, su plazo y el ingreso en ambulancia;\\n   d. cobertura: consulta, verificación de afiliación, ART y número de afiliado con terminación reservada.\\n3. Si no presentó credencial, preguntá por la cobertura: al acompañante si el paciente no puede responder; si no hay nadie, no preguntes. Si se lesionó trabajando o en el trayecto, preguntá por la ART.\\n4. Verificá la afiliación que corresponde según las normas antes de decidir la cobertura y la entidad a notificar.\\n5. registrar_decision, aplicando cada sección a los datos del triage.\",\n  \"mensaje_inicial\": \"Ingresó a la guardia el paciente {paciente_id}. Completá su ficha de admisión.\",\n  \"formato_observacion\": \"Resultado de {herramienta}:\\n{observacion}\",\n  \"mensaje_json_invalido\": \"No entendí tu respuesta. Respondé solo con un objeto JSON: {\\\"herramienta\\\": \\\"<nombre>\\\", \\\"argumentos\\\": {...}}\",\n  \"sha256\": \"8c692c2c67850f1448b5f4ecbda6037713110983c41b0e9da933612d2291ecdd\"\n}",
+      "que_hace": "El `PromptSpec` de la entrega: rol, descripción de las cinco herramientas, formato JSON obligatorio, advertencia sobre las normas y un procedimiento paso a paso.",
+      "como_funciona": "- `system_prompt` define el rol («agente de admisión de la guardia», sin decisiones clínicas).\n- Describe cada herramienta con sus `argumentos` en el mismo texto.\n- Pide responder solo con `{\"herramienta\": ..., \"argumentos\": ...}`, una herramienta por turno.\n- «Procedimiento» obliga a buscar cada tema con una consulta propia (registro, box, circuito, cobertura).\n- `mensaje_json_invalido` es la corrección cuando el JSON llega mal; `sha256` fija el contenido.",
+      "proposito": "El paso 2 del procedimiento es lo que lo diferencia del baseline: el agente hacía ~1,3 búsquedas por caso y se le escapaban normas.",
+      "interaccion": "Lo carga `PromptSpec.cargar` desde `entrega.cargar_prompt` (`RUTA_ENTREGA`); `_PartidaPrompt` usa `system_prompt`, `mensaje_inicial`, `formato_observacion` y `mensaje_json_invalido` en cada turno.",
+      "teoria": "Componentes de un prompt (rol, herramientas, formato de salida, instrucciones paso a paso) y salida estructurada en JSON."
+    },
+    {
+      "id": "promptspec-cargar",
+      "titulo": "Cargar un PromptSpec verificando su sha256",
+      "archivo": "admision_tp/prompts.py",
+      "desde": 87,
+      "hasta": 105,
+      "lenguaje": "python",
+      "codigo": "    @classmethod\n    def desde_dict(cls, dato: dict) -> \"PromptSpec\":\n        if not isinstance(dato, dict) or set(dato) != _CAMPOS:\n            raise ValueError(\"configuración de prompt incompleta o con campos desconocidos\")\n        esperado = dato[\"sha256\"]\n        if not isinstance(esperado, str) or not re.fullmatch(r\"[0-9a-f]{64}\", esperado):\n            raise ValueError(\"sha256 de prompt inválido\")\n        prompt = cls(**{k: dato[k] for k in _CAMPOS if k != \"sha256\"})\n        if prompt.sha256 != esperado:\n            raise ValueError(\"el contenido del prompt no coincide con su sha256\")\n        return prompt\n\n    @classmethod\n    def cargar(cls, ruta: Path) -> \"PromptSpec\":\n        try:\n            dato = json.loads(Path(ruta).read_text(encoding=\"utf-8\"))\n        except (OSError, UnicodeError, json.JSONDecodeError):\n            raise ValueError(\"no se pudo leer una configuración de prompt válida\") from None\n        return cls.desde_dict(dato)",
+      "que_hace": "Lee un JSON de prompt, exige exactamente los campos esperados y rechaza el archivo si el sha256 guardado no coincide con el contenido.",
+      "como_funciona": "- `desde_dict` exige `set(dato) == _CAMPOS` (ni faltan ni sobran campos).\n- Valida que `sha256` sea un hex de 64 caracteres.\n- Construye el `PromptSpec` y compara `prompt.sha256` con el guardado.\n- `cargar` envuelve errores de lectura en un `ValueError` claro.",
+      "proposito": "Si alguien edita el texto del prompt sin actualizar el hash, falla al cargar: no se puede reportar un número con un prompt distinto del declarado.",
+      "interaccion": "Lo llaman `entrega.cargar_prompt`, `ejecutar_evaluacion_prompt` y `scripts/medir_contexto.py`; devuelve el `PromptSpec` que usa `AgentePrompt`.",
+      "teoria": "Prompts versionados como artefactos: el hash identifica exactamente qué texto produjo cada resultado."
+    },
+    {
+      "id": "evaluacion-prompt-runner",
+      "titulo": "Evaluar un prompt: guarda, jugar y después puntuar",
+      "archivo": "admision_tp/experimentos_prompt.py",
+      "desde": 244,
+      "hasta": 286,
+      "lenguaje": "python",
+      "codigo": "    config = spec = None\n    hashes_entrada = {}\n    guardas = None\n    try:\n        guardas = _verificar_origen(casos, esperadas, normas, proposito)\n        codigo = _codigo()\n        prompt_bytes = _copiar_archivo(prompt, entradas / \"prompt.json\")\n        config_bytes = _copiar_archivo(configuracion, entradas / \"configuracion.json\")\n        casos_bytes = _copiar_archivo(casos, entradas / \"casos.jsonl\")\n        hashes_entrada.update({\n            \"prompt.json\": _sha(prompt_bytes),\n            \"configuracion.json\": _sha(config_bytes),\n            \"casos.jsonl\": _sha(casos_bytes),\n        })\n        hashes_entrada[\"normas\"] = _copiar_normas(normas, entradas / \"normas\")\n        spec = PromptSpec.cargar(entradas / \"prompt.json\")\n        config = ConfiguracionEvaluacionPrompt.cargar(entradas / \"configuracion.json\")\n        casos_cargados = _cargar_entradas_jsonl(cargar_casos, entradas / \"casos.jsonl\", \"casos\")\n        ids = [caso.id for caso in casos_cargados]\n        if not ids or len(ids) != len(set(ids)):\n            raise ValueError(\"los casos deben tener ids únicos y no estar vacíos\")\n\n        if (modelo_lote is None) != (tokenizer is None):\n            raise ValueError(\"modelo_lote y tokenizer deben inyectarse juntos\")\n        if modelo_lote is None:\n            modelo_lote = _cargar_modelo_real(config)\n            tokenizer = modelo_lote.procesador\n        longitud = medir_longitud_prompt(spec, tokenizer)\n        entrega = _EntregaCandidata(spec, config, modelo_lote)\n\n        # En este punto no existe ningún snapshot de esperadas en la corrida.\n        trazas = jugar(entrega, casos_cargados, entradas / \"normas\", salida,\n                       ruta_casos=entradas / \"casos.jsonl\")\n        tiempos = json.loads((salida / \"tiempos.json\").read_text(encoding=\"utf-8\"))\n\n        # Se lee una sola vez después de jugar; esta copia exacta es la que se puntúa.\n        esperadas_bytes = _copiar_archivo(esperadas, entradas / \"esperadas.jsonl\")\n        hashes_entrada[\"esperadas.jsonl\"] = _sha(esperadas_bytes)\n        esperadas_cargadas = _cargar_entradas_jsonl(\n            cargar_esperadas, entradas / \"esperadas.jsonl\", \"esperadas\")\n        if set(esperadas_cargadas) != set(ids):\n            raise ValueError(\"casos y esperadas deben tener exactamente los mismos ids\")\n        resultados, resumen = puntuar(trazas, esperadas_cargadas, salida, tiempos)",
+      "que_hace": "Corre la evaluación de un prompt candidato: verifica el origen de los datos, copia las entradas con hash, juega los casos y recién después lee las esperadas.",
+      "como_funciona": "- `_verificar_origen` corre antes de copiar nada: si los casos vienen de `practica/`, falla.\n- Copia prompt, configuración, casos y normas a `salida/entradas` con su sha256.\n- `jugar(...)` juega con `_EntregaCandidata` sin que exista ninguna esperada en la corrida.\n- Después copia las esperadas, verifica que los ids coincidan y llama `puntuar`.",
+      "proposito": "Hace imposible optimizar prompts mirando práctica o test: la guarda es código, no una convención.",
+      "interaccion": "Lo invoca `main()` del mismo archivo (CLI `scripts/evaluar_prompts.py`); usa `jugar` y `puntuar` del kit y escribe `manifiesto.json` con `guardas`.",
+      "teoria": "Separación entre conjunto de desarrollo y de evaluación aplicada a elegir prompts."
+    },
+    {
+      "id": "manifiesto-prompt",
+      "titulo": "Manifiesto: qué prompt produjo cada número",
+      "archivo": "admision_tp/experimentos_prompt.py",
+      "desde": 287,
+      "hasta": 308,
+      "lenguaje": "python",
+      "codigo": "        estado = \"completada\" if tiempos.get(\"error\") is None else \"completada_con_error\"\n        # Una corrida con error del agente o de plomería no recibe clave y no se puede rankear.\n        metricas = marcar_comparabilidad(\n            calcular_metricas_candidato(resultados, trazas, longitud),\n            estado=estado, proposito=proposito)\n        (salida / \"metricas.json\").write_bytes(_canonical(metricas))\n\n        manifiesto = {\n            \"version\": 1,\n            \"estado\": estado,\n            \"proposito\": proposito,\n            \"comparable\": metricas[\"comparable\"],\n            \"guardas\": guardas,\n            \"codigo\": codigo,\n            \"prompt\": {\"nombre\": spec.nombre, \"version\": spec.version, \"sha256\": spec.sha256},\n            \"configuracion\": config.como_dict(),\n            \"entradas\": hashes_entrada,\n            \"artefactos\": _hashes_artefactos(salida),\n            \"metricas\": metricas,\n        }\n        (salida / \"manifiesto.json\").write_bytes(_canonical(manifiesto))\n        return manifiesto",
+      "que_hace": "Al final de cada evaluación escribe `manifiesto.json` con el estado, las guardas, el commit, el prompt (nombre, versión y sha256), las entradas y las métricas.",
+      "como_funciona": "- `marcar_comparabilidad` deja como no comparable una corrida con error o de plomería.\n- `\"prompt\"` guarda `spec.sha256` junto al nombre y la versión.\n- `entradas` y `artefactos` guardan los hashes de todo lo que entró y salió.\n- El manifiesto se escribe en JSON canónico.",
+      "proposito": "Cada métrica reportada queda atada a un prompt exacto y a un commit: si el texto cambia, cambia el hash.",
+      "interaccion": "Es la última parte de `ejecutar_evaluacion_prompt`; `seleccion_prompts` y las tablas del informe leen estos manifiestos para comparar candidatos.",
+      "teoria": "Trazabilidad de experimentos con prompts: versionar el prompt igual que el código."
+    },
+    {
+      "id": "medir-contexto-script",
+      "titulo": "Medir el contexto de cada prompt sin GPU",
+      "archivo": "scripts/medir_contexto.py",
+      "desde": 21,
+      "hasta": 41,
+      "lenguaje": "python",
+      "codigo": "def medir(trazas: list[dict], prompts: list[PromptSpec], origen: PromptSpec) -> dict:\n    base = []\n    for numero, traza in enumerate(trazas, 1):\n        if rejugar_traza(traza, origen, origen) != traza[\"mensajes\"]:\n            raise ValueError(f\"traza {numero}: el prompt de origen no reproduce la conversación grabada\")\n        base.append(caracteres_de_contexto(traza[\"mensajes\"]))\n    resultado = {\"casos\": len(trazas), \"origen\": origen.nombre, \"prompts\": {}}\n    for prompt in prompts:\n        conversaciones = [rejugar_traza(traza, prompt, origen) for traza in trazas]\n        valores = [caracteres_de_contexto(c) for c in conversaciones]\n        partes = {parte: sum(desglose(c, prompt)[parte] for c in conversaciones) for parte in PARTES}\n        ahorros = [1 - v / b for v, b in zip(valores, base) if b]\n        resultado[\"prompts\"][prompt.nombre] = {\n            \"sha256\": prompt.sha256,\n            \"caracteres_por_caso\": round(statistics.mean(valores)),\n            \"ahorro_total\": round(1 - sum(valores) / sum(base), 4),\n            \"ahorro_por_caso_min\": round(min(ahorros), 4),\n            \"ahorro_por_caso_max\": round(max(ahorros), 4),\n            \"participacion\": {k: round(v / sum(valores), 4) for k, v in partes.items()},\n        }\n    return resultado",
+      "que_hace": "Rejuega trazas grabadas con distintos `PromptSpec` y calcula caracteres por caso, ahorro y la participación de cada parte del contexto.",
+      "como_funciona": "- Primero verifica que el prompt de origen reproduzca exacto cada conversación (`rejugar_traza`).\n- Para cada prompt rejuega las mismas respuestas y observaciones.\n- `desglose(c, prompt)` reparte los caracteres entre sistema, búsquedas, etc.\n- Devuelve `participacion` por parte y el ahorro mínimo/máximo por caso.",
+      "proposito": "Permite medir cuánto cuesta un prompt sin cargar el modelo: las respuestas son las grabadas, solo cambia el texto inyectado.",
+      "interaccion": "Usa `rejugar_traza` y `desglose` de `admision_tp/contexto.py` y `caracteres_de_contexto` del kit; sus números son los de `docs/informe/optimizacion-prompt.md`.",
+      "teoria": "Qué ocupa la ventana de contexto: medirlo por tipo de mensaje antes de optimizar."
+    },
+    {
+      "id": "modelo-medir-contexto",
+      "titulo": "Medir tokens con el mismo chat template",
+      "archivo": "admision_tp/modelo.py",
+      "desde": 49,
+      "hasta": 60,
+      "lenguaje": "python",
+      "codigo": "    def medir_contexto(self, conversacion: list[dict]) -> tuple[int, int]:\n        \"\"\"Tokens de entrada de una conversación y máximo admitido para que `__call__` no falle.\n\n        Usa el mismo chat template que la generación; con padding a izquierda, el ancho de un\n        lote es el de su conversación más larga, así que si cada una entra, el lote entra.\n        \"\"\"\n        # Como lote de uno, igual que en `__call__`: `input_ids` es siempre una lista por conversación.\n        entradas = self.procesador.apply_chat_template(\n            [conversacion], tokenize=True, add_generation_prompt=True, enable_thinking=False,\n            truncation=False, return_dict=True)\n        limite = self.configuracion.max_contexto - self.configuracion.max_tokens_nuevos\n        return len(entradas[\"input_ids\"][0]), limite",
+      "que_hace": "Cuenta los tokens de entrada de una conversación y devuelve el límite que admite el modelo.",
+      "como_funciona": "- Aplica `apply_chat_template` igual que la generación (`add_generation_prompt=True`, sin truncar).\n- `limite = max_contexto - max_tokens_nuevos`: deja lugar para la respuesta.\n- Devuelve `(tokens, limite)`.",
+      "proposito": "Contar caracteres no alcanza: el corte tiene que medirse en tokens y con la misma plantilla que va a ver el modelo.",
+      "interaccion": "Lo usa `AgentePrompt._activas` (vía `getattr(self.modelo_lote, \"medir_contexto\")`) antes de cada llamada al modelo; los límites vienen de `Configuracion`.",
+      "teoria": "La ventana de contexto se mide en tokens e incluye los que el modelo va a generar."
+    },
+    {
+      "id": "modelo-generar",
+      "titulo": "Generación local por lotes",
+      "archivo": "admision_tp/modelo.py",
+      "desde": 62,
+      "hasta": 92,
+      "lenguaje": "python",
+      "codigo": "    def __call__(self, conversaciones: list[list[dict]]) -> list[str]:\n        if not conversaciones:\n            return []\n        import torch\n\n        respuestas = []\n        for inicio in range(0, len(conversaciones), self.configuracion.lote):\n            lote = conversaciones[inicio:inicio + self.configuracion.lote]\n            entradas = self.procesador.apply_chat_template(\n                lote, tokenize=True, add_generation_prompt=True, enable_thinking=False,\n                padding=True, truncation=False, return_dict=True, return_tensors=\"pt\")\n            ancho = entradas[\"input_ids\"].shape[-1]\n            if ancho + self.configuracion.max_tokens_nuevos > self.configuracion.max_contexto:\n                raise ValueError(\"Contexto excedido: no se recorta la conversación silenciosamente\")\n            medir = self.configuracion.metricas is not None\n            if medir:\n                for gpu in range(torch.cuda.device_count()):\n                    torch.cuda.reset_peak_memory_stats(gpu)\n                inicio_lote = time.perf_counter()\n            entradas = entradas.to(self.modelo.device)\n            with torch.inference_mode():\n                salida = self.modelo.generate(**entradas, do_sample=False,\n                    max_new_tokens=self.configuracion.max_tokens_nuevos)\n            generados = salida[:, ancho:]\n            textos = self.procesador.batch_decode(generados, skip_special_tokens=True)\n            if len(textos) != len(lote):\n                raise RuntimeError(\"El modelo no devolvió una respuesta por conversación\")\n            if medir:\n                self._registrar(torch, entradas, generados, ancho, time.perf_counter() - inicio_lote)\n            respuestas.extend(textos)\n        return respuestas",
+      "que_hace": "Genera la próxima respuesta de varias conversaciones a la vez con Gemma local, en greedy, y devuelve solo el texto nuevo.",
+      "como_funciona": "- Parte las conversaciones en lotes de `configuracion.lote`.\n- `apply_chat_template` con padding y sin truncar; si `ancho + max_tokens_nuevos` excede `max_contexto`, lanza error.\n- `generate(do_sample=False)` bajo `inference_mode`.\n- Recorta los tokens de entrada (`salida[:, ancho:]`) y decodifica.",
+      "proposito": "El modelo no conoce las herramientas: solo devuelve texto. Toda la lógica del agente queda en `AgentePrompt`.",
+      "interaccion": "Lo llama `AgentePrompt.jugar_lote` con las conversaciones activas; las respuestas van a `_PartidaPrompt.recibir`. Lo construye `ModeloLocal.cargar` desde `entrega.construir_agente`.",
+      "teoria": "Inferencia local de un LLM: el mismo cálculo que una API, pero en GPU propia y sin servicios externos."
+    },
+    {
+      "id": "modelo-cargar-adapter",
+      "titulo": "Cargar Gemma y fusionar el adapter LoRA",
+      "archivo": "admision_tp/modelo.py",
+      "desde": 13,
+      "hasta": 47,
+      "lenguaje": "python",
+      "codigo": "    @classmethod\n    def cargar(cls, configuracion: Configuracion):\n        import torch\n\n        if not torch.cuda.is_available():\n            raise RuntimeError(\"El baseline requiere una GPU CUDA; no se carga en CPU\")\n        import transformers\n        from .carga import cargar_solo_texto\n        # Tokenizer, no AutoProcessor: el agente es solo texto, usa el mismo chat template que el\n        # entrenamiento, y el procesador de Gemma 4 exige torchvision por su parte de video.\n        procesador = transformers.AutoTokenizer.from_pretrained(\n            configuracion.modelo, revision=configuracion.revision, padding_side=\"left\")\n        modelo = cargar_solo_texto(transformers, configuracion.modelo, configuracion.revision,\n                                   dtype=getattr(torch, configuracion.dtype),\n                                   device_map=configuracion.device_map)\n        # Sin attn_implementation: transformers elige SDPA donde se soporta. Forzarlo rompía la torre\n        # de audio de Gemma 4 (hoy ya no se carga, pero el default sigue siendo lo correcto).\n        if configuracion.adapter_repo:\n            modelo = cls._fusionar_adapter(modelo, configuracion)\n        modelo.eval()\n        return cls(modelo, procesador, configuracion)\n\n    @staticmethod\n    def _fusionar_adapter(modelo, configuracion: Configuracion):\n        \"\"\"Aplica el LoRA y lo fusiona en memoria: la inferencia no paga capas extra.\"\"\"\n        from peft import PeftConfig, PeftModel\n\n        origen = {\"revision\": configuracion.adapter_revision,\n                  \"subfolder\": configuracion.adapter_subcarpeta or None}\n        config = PeftConfig.from_pretrained(configuracion.adapter_repo, **origen)\n        # `config.revision` es la revisión de la base con la que se entrenó el adapter.\n        if (config.base_model_name_or_path, config.revision) != (configuracion.modelo, configuracion.revision):\n            raise ValueError(\"El adapter fue entrenado sobre otra base o revisión\")\n        peft = PeftModel.from_pretrained(modelo, configuracion.adapter_repo, config=config, **origen)\n        return peft.merge_and_unload()",
+      "que_hace": "Carga Gemma solo texto en GPU y, si la configuración trae un adapter, lo aplica y lo fusiona con los pesos base.",
+      "como_funciona": "- Exige CUDA; carga tokenizer y modelo con revisión fija.\n- Si hay `adapter_repo`, `_fusionar_adapter` lee el `PeftConfig`.\n- Verifica que el adapter se haya entrenado sobre la misma base y revisión.\n- `PeftModel.from_pretrained(...).merge_and_unload()` suma ΔW = BA a los pesos y quita las capas extra.",
+      "proposito": "Fusionar evita pagar capas LoRA en cada paso de inferencia; el chequeo de revisión impide usar un adapter con otra base.",
+      "interaccion": "Lo llama `entrega.construir_agente` (y los runners de evaluación) con `Configuracion.desde_entorno()`; el adapter es el `final` que publica `_ejecutar_cuda` en HF.",
+      "teoria": "LoRA en inferencia: las matrices de bajo rango se pueden sumar a W y el modelo queda del mismo tamaño."
+    },
+    {
+      "id": "comparar-variantes",
+      "titulo": "Comparar todas las variantes de buscador",
+      "archivo": "scripts/comparar_buscadores.py",
+      "desde": 100,
+      "hasta": 122,
+      "lenguaje": "python",
+      "codigo": "def comparar(ruta_normas, ruta_consultas, evidencia_ajustada=False):\n    dataset = cargar_dataset(ruta_consultas)\n    if evidencia_ajustada:\n        dataset = ajustar_evidencia(dataset, ruta_normas)\n    buscadores = {nombre: BuscadorBM25(ruta_normas, nombre) for nombre in VARIANTES}\n    buscadores[\"fusion_lexica\"] = FusionLexica(ruta_normas)\n    buscadores.update({n: BuscadorBM25(ruta_normas, c) for n, c in EXPLORATORIAS.items()})\n    resultados = {nombre: diagnosticar(b, dataset) for nombre, b in buscadores.items()}\n    completos = {n: {x[\"id\"] for x in r[\"consultas\"] if x[\"completa\"]} for n, r in resultados.items()}\n    for nombre, resultado in resultados.items():\n        for referencia in (\"baseline\", \"sin_comunes\"):\n            resultado[f\"ganadas_vs_{referencia}\"] = sorted(completos[nombre] - completos[referencia])\n            resultado[f\"perdidas_vs_{referencia}\"] = sorted(completos[referencia] - completos[nombre])\n    hashes = {p.name: hashlib.sha256(p.read_bytes()).hexdigest()\n              for p in sorted(Path(ruta_normas).iterdir()) if p.is_file()}\n    variantes = {n: vars(c) for n, c in {**VARIANTES, **EXPLORATORIAS}.items()}\n    return {\"configuracion\": {\"variantes_bm25\": variantes, \"evidencia_ajustada\": evidencia_ajustada,\n             \"fusion_k\": 2, \"bm25_k1\": 1.5, \"bm25_b\": 0.75,\n             \"palabras_comunes\": sorted(PALABRAS_COMUNES), \"ngramas\": [3, 5],\n             \"idf\": \"log((1+N)/(1+df))+1\", \"tf\": \"frecuencia cruda\", \"norma\": \"L2\",\n             \"rrf_constante\": 60, \"rrf_pesos\": [1, 1], \"normas_sha256\": hashes,\n             \"consultas_sha256\": hashlib.sha256(Path(ruta_consultas).read_bytes()).hexdigest()},\n            \"resultados\": resultados}",
+      "que_hace": "Arma cada variante de `BuscadorBM25`, la fusión RRF y las exploratorias, las evalúa sobre las mismas consultas y calcula consultas ganadas y perdidas contra `baseline` y `sin_comunes`.",
+      "como_funciona": "- Instancia `BuscadorBM25(ruta_normas, nombre)` por variante y `FusionLexica(ruta_normas)`.\n- `diagnosticar` corre cada buscador sobre el dataset y marca qué evidencia se recuperó.\n- Calcula `ganadas_vs_*` y `perdidas_vs_*` por diferencia de conjuntos.\n- Guarda la configuración (k1, b, RRF con constante 60, hashes de normas y consultas).",
+      "proposito": "Compara caso por caso y no solo promedios; la configuración queda guardada para reproducir el experimento.",
+      "interaccion": "Lo corre `main()` del mismo archivo (`python -m scripts.comparar_buscadores`); las métricas salen de `admision.evaluar_rag.evaluar_buscador` y se resumen en INFORME.md.",
+      "teoria": "Evaluación de la etapa de recuperación por separado, con métricas como recall de evidencia."
+    },
+    {
+      "id": "normas-variables-carpetas",
+      "titulo": "Carpetas de normas con otros valores",
+      "archivo": "admision_tp/normas_variables.py",
+      "desde": 34,
+      "hasta": 78,
+      "lenguaje": "python",
+      "codigo": "def escribir_normas(base: Path, destino: Path, valores: dict[str, int]) -> Path:\n    \"\"\"Copia las secciones de `base` a `destino` (nueva) con `valores` aplicados a sus parámetros.\"\"\"\n    base, destino = Path(base), Path(destino)\n    entradas = parametros_base(base)\n    desconocidos = set(valores) - {p[\"codigo\"] for p in entradas}\n    if desconocidos:\n        raise ValueError(f\"parámetros inexistentes: {sorted(desconocidos)}\")\n    destino.mkdir(parents=True)\n    for archivo in sorted(base.glob(\"NOR-*.md\")):\n        shutil.copyfile(archivo, destino / archivo.name)\n    for entrada in entradas:\n        if entrada[\"codigo\"] in valores:\n            valor = valores[entrada[\"codigo\"]]\n            if type(valor) is not int or valor < 0:\n                raise ValueError(\"los valores de parámetros son enteros no negativos\")\n            entrada[\"valor\"] = valor\n    (destino / \"parametros.yaml\").write_text(\n        yaml.safe_dump({\"parametros\": entradas}, allow_unicode=True, sort_keys=False), encoding=\"utf-8\")\n    cargar_parametros(destino)  # falla aquí si el archivo escrito no es legible por el kit\n    return destino\n\n\nclass CarpetasNormas:\n    \"\"\"Una carpeta por conjunto de valores, creada una sola vez bajo `raiz`, con su buscador.\n\n    `fabrica(ruta)` arma el buscador igual que la entrega (por ejemplo `entrega.construir_buscador`).\n    \"\"\"\n\n    def __init__(self, base: Path, raiz: Path, fabrica):\n        self.base, self.raiz, self.fabrica = Path(base), Path(raiz), fabrica\n        self.originales = {p[\"codigo\"]: p[\"valor\"] for p in parametros_base(self.base)}\n        self._carpetas: dict[tuple, tuple[Path, object]] = {}\n\n    def completar(self, valores: dict[str, int]) -> dict[str, int]:\n        \"\"\"Valores originales con `valores` aplicados encima.\"\"\"\n        return {**self.originales, **valores}\n\n    def obtener(self, valores: dict[str, int]):\n        \"\"\"(ruta, buscador) de la carpeta con esos valores sobre los originales.\"\"\"\n        completos = self.completar(valores)\n        clave = tuple(sorted(completos.items()))\n        if clave not in self._carpetas:\n            ruta = escribir_normas(self.base, self.raiz / f\"normas-{len(self._carpetas):05d}\", completos)\n            self._carpetas[clave] = (ruta, self.fabrica(ruta))\n        return self._carpetas[clave]",
+      "que_hace": "Crea carpetas de normas con los mismos textos y otro `parametros.yaml`, y arma un buscador por carpeta.",
+      "como_funciona": "- `escribir_normas` copia los `NOR-*.md` byte a byte y reescribe solo los valores pedidos.\n- Rechaza parámetros inexistentes o negativos y relee con `cargar_parametros` del kit.\n- `CarpetasNormas.obtener(valores)` crea una carpeta por combinación (una sola vez) y la indexa con `fabrica(ruta)`.",
+      "proposito": "Los números de las normas llegan como datos: generar conversaciones con valores variados enseña a leerlos de la búsqueda en vez de memorizarlos.",
+      "interaccion": "Lo usan `generar_conversaciones.generar_dataset` (con `fabrica_buscador`) y `generar_sinteticos`, que llama `obtener` con valores sorteados.",
+      "teoria": "Datos de entrenamiento diversos: variar lo que no debe memorizarse para que el modelo aprenda el comportamiento."
+    },
+    {
+      "id": "clasificar-tipo",
+      "titulo": "error > ruido > correcta",
+      "archivo": "scripts/clasificar_historial.py",
+      "desde": 474,
+      "hasta": 489,
+      "lenguaje": "python",
+      "codigo": "def clasificar(\n    rows: list[dict[str, str]],\n    parametros: dict[str, int],\n    trazas: dict | None = None,\n) -> tuple[list[dict[str, str]], dict]:\n    costumbres = inferir_costumbres(rows, parametros, trazas)\n    razones = {row[\"id\"]: razones_normativas(row, parametros) for row in rows}\n    ids_ruido = {i for costumbre in costumbres for i in costumbre.get(\"ids_ruido\", [])}\n    salida = []\n    for row in rows:\n        tipo = \"error\" if razones[row[\"id\"]] else \"ruido\" if row[\"id\"] in ids_ruido else \"correcta\"\n        salida.append({\"id\": row[\"id\"], \"tipo\": tipo})\n    return salida, {\n        \"costumbres\": costumbres,\n        \"desvios_por_operador\": desvios_por_operador(costumbres, rows),\n    }",
+      "que_hace": "Clasifica cada fila del historial: error si contradice alguna norma, ruido si se desvía de la costumbre, correcta si no.",
+      "como_funciona": "- `inferir_costumbres` deduce las costumbres del historial y sus `ids_ruido`.\n- `razones_normativas(row, parametros)` lista los campos que no coinciden con lo que exigen las normas.\n- La prioridad es `error` > `ruido` > `correcta`.\n- Devuelve la lista de `{id, tipo}` y el resumen de costumbres.",
+      "proposito": "Un filtro simbólico y auditable: cada fila excluida tiene una razón concreta, en vez de un puntaje de calidad.",
+      "interaccion": "Usa `circuito_esperado`, `plazo_esperado` y `registro_esperado` (mismo archivo); su salida es `historial_clasificado.csv`, que lee `seleccionar_ids`.",
+      "teoria": "Curado de datos con reglas: verificar cada ejemplo contra una fuente de verdad antes de entrenar."
+    },
+    {
+      "id": "lora-aplicar",
+      "titulo": "aplicar_lora: adapter nuevo o retomado",
+      "archivo": "admision_tp/entrenamiento.py",
+      "desde": 171,
+      "hasta": 180,
+      "lenguaje": "python",
+      "codigo": "def aplicar_lora(peft, modelo, config):\n    \"\"\"LoRA nuevo, o el adapter de `adapter_inicial` entrenable (mismo r y módulos con que se publicó).\"\"\"\n    inicial = config.get(\"adapter_inicial\")\n    if inicial is None:\n        return peft.get_peft_model(modelo, peft.LoraConfig(**LORA, revision=config[\"revision\"]))\n    origen = {\"revision\": inicial[\"revision\"], \"subfolder\": inicial[\"subcarpeta\"]}\n    previo = peft.PeftConfig.from_pretrained(inicial[\"repo\"], **origen)\n    if (previo.base_model_name_or_path, previo.revision) != (config[\"modelo\"], config[\"revision\"]):\n        raise ValueError(\"adapter_inicial entrenado sobre otra base o revisión\")\n    return peft.PeftModel.from_pretrained(modelo, inicial[\"repo\"], config=previo, is_trainable=True, **origen)",
+      "que_hace": "Envuelve el modelo con LoRA usando la configuración `LORA`, o retoma un adapter ya publicado para seguir entrenándolo.",
+      "como_funciona": "- Sin `adapter_inicial`: `get_peft_model(modelo, LoraConfig(**LORA))`.\n- Con `adapter_inicial`: lee su `PeftConfig` y verifica base y revisión.\n- `PeftModel.from_pretrained(..., is_trainable=True)` deja entrenables solo las matrices LoRA.",
+      "proposito": "Permitió continuar el adapter `dc41674a` sobre datos nuevos (v39) sin empezar de cero.",
+      "interaccion": "Lo llama `_ejecutar_cuda` (mismo archivo) después de cargar el modelo; usa `LORA` definido arriba en el mismo archivo.",
+      "teoria": "PEFT: se congela el modelo base y solo se entrenan las matrices A y B."
+    },
+    {
+      "id": "perdida-supervisada",
+      "titulo": "Pérdida solo donde hay objetivo",
+      "archivo": "admision_tp/entrenamiento.py",
+      "desde": 142,
+      "hasta": 168,
+      "lenguaje": "python",
+      "codigo": "def perdida_supervisada(torch, modelo, entradas, num_items_in_batch=None):\n    \"\"\"Entropía cruzada causal calculando logits solo donde hay objetivo.\n\n    Equivale a la pérdida del modelo, pero no materializa logits de contexto y padding: con el\n    vocabulario de Gemma (262k) y ~3.300 tokens por conversación, esos logits en fp32 no entran\n    en una T4 (OOM en Kaggle v28). Con una lista, `logits_to_keep` devuelve (lote, n, vocab).\n    \"\"\"\n    posiciones, objetivos = posiciones_supervisadas(entradas[\"labels\"].tolist())\n    logits = modelo(input_ids=entradas[\"input_ids\"], attention_mask=entradas[\"attention_mask\"],\n                    logits_to_keep=posiciones).logits.float()\n    logits = logits.reshape(-1, logits.shape[-1])\n    objetivos = torch.tensor(objetivos, dtype=torch.long, device=logits.device).reshape(-1)\n    if \"pesos\" in entradas:  # Con peso_aviso: suma ponderada sobre la misma normalización.\n        pesos = pesos_de_objetivos(posiciones, entradas[\"pesos\"].tolist())\n        pesos = torch.tensor(pesos, dtype=logits.dtype, device=logits.device).reshape(-1)\n        suma = (torch.nn.functional.cross_entropy(logits, objetivos, ignore_index=-100, reduction=\"none\")\n                * pesos).sum()\n        divisor = (objetivos != -100).sum() if num_items_in_batch is None else num_items_in_batch\n        if torch.is_tensor(divisor):\n            divisor = divisor.to(suma.device)\n        return suma / divisor\n    if num_items_in_batch is None:\n        return torch.nn.functional.cross_entropy(logits, objetivos, ignore_index=-100)\n    suma = torch.nn.functional.cross_entropy(logits, objetivos, ignore_index=-100, reduction=\"sum\")\n    if torch.is_tensor(num_items_in_batch):\n        num_items_in_batch = num_items_in_batch.to(suma.device)\n    return suma / num_items_in_batch",
+      "que_hace": "Calcula la entropía cruzada causal solo en las posiciones con label distinto de −100, sin materializar logits del contexto.",
+      "como_funciona": "- `posiciones_supervisadas` toma las posiciones que predicen un token del asistente.\n- `logits_to_keep=posiciones` pide logits solo ahí.\n- `cross_entropy(..., ignore_index=-100)` ignora lo que no es objetivo.\n- Con `pesos` (aviso) hace una suma ponderada; con `num_items_in_batch` normaliza igual que Transformers.",
+      "proposito": "Con el vocabulario de Gemma (262k) los logits de todo el contexto en fp32 no entraban en una T4 (OOM en v28): calcularlos solo donde hay objetivo lo resolvió.",
+      "interaccion": "La llama `TrainerSupervisado.compute_loss` dentro de `_ejecutar_cuda`; los `labels` vienen de `tokenizar_conversacion`.",
+      "teoria": "La pérdida del SFT: entropía cruzada de próximo token, contada solo en los tokens del asistente."
+    },
+    {
+      "id": "entrenamiento-verifica-mascaras",
+      "titulo": "Antes de entrenar: máscaras reproducibles",
+      "archivo": "admision_tp/entrenamiento.py",
+      "desde": 294,
+      "hasta": 306,
+      "lenguaje": "python",
+      "codigo": "    set_seed(config[\"semilla\"])\n    tokenizer = AutoTokenizer.from_pretrained(config[\"modelo\"], revision=config[\"revision\"])\n    if _sha(tokenizer.chat_template.encode()) != tokens[\"plantilla_sha256\"]:\n        raise ValueError(\"plantilla distinta de la tokenización\")\n    for registro, ejemplo in zip(registros, ejemplos, strict=True):\n        if tokenizar_conversacion(registro, tokenizer, config[\"max_seq_length\"]) != {\n                k: ejemplo[k] for k in (\"input_ids\", \"attention_mask\", \"labels\")}:\n            raise ValueError(\"tokens o máscaras no reproducibles\")\n    if tokenizer.pad_token_id is None:\n        raise ValueError(\"tokenizador sin token de padding\")\n    if config.get(\"peso_aviso\"):  # Antes de cargar pesos: un aviso no encontrado falla barato.\n        ejemplos = [{**x, \"pesos\": pesos_del_aviso(x[\"input_ids\"], x[\"labels\"], tokenizer.decode,\n                                                    config[\"peso_aviso\"])} for x in ejemplos]",
+      "que_hace": "Antes de cargar pesos, retokeniza cada conversación y exige que tokens, máscara y labels coincidan con `tokens.jsonl`.",
+      "como_funciona": "- Compara el sha256 de la plantilla de chat con el de la tokenización.\n- Para cada registro llama `tokenizar_conversacion` y compara `input_ids`, `attention_mask` y `labels`.\n- Si hay `peso_aviso`, calcula los pesos del token del aviso.",
+      "proposito": "Un `tokens.jsonl` alterado o con otra plantilla fallaría acá, barato, y no después de horas de GPU.",
+      "interaccion": "Es el comienzo de `_ejecutar_cuda`; usa `tokenizar_conversacion` de `admision_tp/tokenizacion.py` y `pesos_del_aviso` (mismo archivo).",
+      "teoria": "Datos de demostración confiables: lo que se supervisa tiene que ser exactamente lo que se diseñó."
+    },
+    {
+      "id": "tokenizar-preparacion",
+      "titulo": "Tokenizar todo el dataset",
+      "archivo": "admision_tp/tokenizacion.py",
+      "desde": 82,
+      "hasta": 104,
+      "lenguaje": "python",
+      "codigo": "    with tempfile.TemporaryDirectory(prefix=\".tokens-\", dir=destino.parent) as temporal:\n        carpeta = Path(temporal)\n        snapshot = carpeta / \"conversaciones.jsonl\"\n        snapshot.write_bytes(datos)\n        if validar_archivo(snapshot)[\"errores\"]:\n            raise ValueError(\"dataset inválido\")\n        ejemplos, supervisados = [], 0\n        for linea in datos.decode(\"utf-8\").splitlines():\n            if not linea.strip():\n                continue\n            registro = _json(linea)\n            ejemplo = tokenizar_conversacion(registro, tokenizer, config[\"max_seq_length\"])\n            supervisados += sum(x != -100 for x in ejemplo[\"labels\"])\n            ejemplos.append({\"id\": registro[\"id\"], **ejemplo})\n        contenido = (\"\".join(json.dumps(x, ensure_ascii=False) + \"\\n\" for x in ejemplos)).encode()\n        resultado = {\"version\": 1, \"estado\": \"tokenizada_no_entrenada\", \"codigo\": codigo,\n            \"preparacion_sha256\": _sha(manifiesto_bytes), \"snapshots\": hashes,\n            \"modelo\": config[\"modelo\"], \"revision\": config[\"revision\"],\n            \"plantilla_sha256\": hashlib.sha256(template.encode()).hexdigest(),\n            \"mascara\": \"prefijos_verificados_assistant_con_cierre\", \"enable_thinking\": False,\n            \"max_seq_length\": config[\"max_seq_length\"], \"registros\": len(ejemplos),\n            \"tokens\": sum(len(x[\"input_ids\"]) for x in ejemplos), \"supervisados\": supervisados,\n            \"archivos\": {\"tokens.jsonl\": _sha(contenido)}}",
+      "que_hace": "Valida el snapshot de conversaciones, tokeniza cada una con la máscara assistant-only y escribe `tokens.jsonl` con su manifiesto.",
+      "como_funciona": "- `validar_archivo(snapshot)` revisa el formato de todas las conversaciones.\n- Por línea llama `tokenizar_conversacion` y suma los tokens supervisados (`!= -100`).\n- El manifiesto guarda `plantilla_sha256`, el tipo de máscara, total de tokens y supervisados.",
+      "proposito": "Deja la tokenización como artefacto aparte y verificable: el entrenamiento no tokeniza, solo comprueba.",
+      "interaccion": "Llama a `tokenizar_conversacion` (mismo archivo); lo corre `scripts/tokenizar_entrenamiento.py` y su salida la consume `entrenamiento.cargar_entradas`.",
+      "teoria": "Preparar demostraciones para SFT: el 10 % de los tokens (respuestas del asistente) es lo único supervisado."
+    },
+    {
+      "id": "kaggle-armar-comando",
+      "titulo": "Lanzar el entrenamiento en Kaggle",
+      "archivo": "infra/kaggle_entrenamiento.py",
+      "desde": 77,
+      "hasta": 87,
+      "lenguaje": "python",
+      "codigo": "def armar_comando(preparacion, tokens, salida, ejecucion, online, publicar, checkpoint=None):\n    comando = [sys.executable, \"-m\", \"scripts.entrenar\", \"--preparacion\", str(preparacion),\n               \"--tokens\", str(tokens), \"--salida\", str(salida), \"--precision\", ejecucion[\"precision\"],\n               \"--dispositivos\", ejecucion[\"dispositivos\"], \"--guardar-cada\", str(ejecucion[\"guardar_cada\"])]\n    if online:\n        comando.append(\"--online\")\n    if publicar:\n        comando.append(\"--publicar\")\n    if checkpoint:\n        comando += [\"--reanudar\", str(checkpoint)]\n    return comando",
+      "que_hace": "Arma el comando que corre `scripts.entrenar` en Kaggle con precisión, dispositivos, frecuencia de checkpoints y, si corresponde, W&B, HF y reanudación.",
+      "como_funciona": "- Base: `python -m scripts.entrenar --preparacion ... --tokens ... --salida ...`.\n- `--online` solo si hay clave de W&B; `--publicar` para subir checkpoints a HF.\n- `--reanudar` con el checkpoint bajado de HF.",
+      "proposito": "Separa la infraestructura (Kaggle, secretos, logs) del entrenador: `entrenar()` no sabe dónde corre.",
+      "interaccion": "Lo usa `correr` (mismo archivo), que ejecuta el comando con log y escribe `runner.json`; `scripts/entrenar.py` llama a `admision_tp.entrenamiento.entrenar`.",
+      "teoria": "Fine-tuning local: el entrenamiento corre en GPU propia con checkpoints reanudables."
+    },
+    {
+      "id": "informe-sft-real",
+      "titulo": "Entrenamiento real: 2.900 conversaciones en 2 T4",
+      "archivo": "docs/informe/informe-parte5.md",
+      "desde": 137,
+      "hasta": 162,
+      "lenguaje": "markdown",
+      "codigo": "### 3.1 Entrenamiento real (Kaggle v32 + v33, 2026-11-11/12)\n\nDatos `datos/conversaciones/v3-procedimiento` (prompt `procedimiento-v1`): **2.900 conversaciones, 9.990.837\ntokens (~3.445 por conversación), 1.015.072 supervisados (10,2 %)**, ninguna recortada (`max_seq_length` 8192;\n`manifiesto-tokens.json`). Configuración `configuraciones/sft-ejemplo.json`: 1 época, lr 2e-4, semilla 42,\n`batch_size=1`, acumulación 8, LoRA r=8 en q/v de la atención del modelo de lenguaje. fp16, `device_map=auto`\nen 2 T4, commit `6169241`, W&B `3add2742ddfd4b42`.\n\n| Medida | Valor | Fuente |\n|---|---|---|\n| Pasos de optimización | 363 (2.900 / 8, último paso incompleto) | `trainer_state`, recibos HF |\n| Tiempo por paso | ~85 s en v32; 80,5 s en v33 (5.072 s / 63 pasos) | bitácora; `runner.log` de v33 (`train_runtime`) |\n| Tiempo de cómputo de la época | **~8,1 h** (363 × ~80 s) | cálculo propio |\n| Reloj de pared | v32: cortada por el límite de 8 h de Kaggle en el paso 315; v33: 1 h 31 min (5.445 s de runner) reanudando de checkpoint-300 | `runner.json` |\n| VRAM pico (suma de 2 T4) | **19,97 GB** (12,1 + 7,87); reservada 20,58 GB | `entrenamiento/estado.json` de v33 |\n| Pérdida (supervisada) | 0,44 (paso 1) → ~0,03 (paso 100) → ~0,005 (paso 268) → 0,0044 media final | `runner.log` |\n| Checkpoints | cada 50 pasos, subidos a HF con revisión; `final` = `dc41674a` (adapter de v32+v33; el de la entrega desde 2026-11-13 es el v39, 3.1b) | `publicaciones` en `estado.json` |\n\n- **Casos a la vez al entrenar:** 1 conversación por pasada hacia adelante; 8 por paso de optimización. Con\n  ~3.445 tokens por conversación, la VRAM entra en 2 T4 gracias a calcular logits solo en posiciones supervisadas\n  (con logits completos en fp32, el paso 0 se quedó sin memoria en v28; ver [entrenamiento](entrenamiento-sft.md)).\n- **Interrupción y reanudación:** el corte por tiempo costó los pasos 301–315 (se rehicieron desde checkpoint-300).\n  Para A100 conviene guardar más seguido o medir antes cuánto tarda un paso.\n- **Pérdida baja ≠ agente bueno:** la pérdida media 0,005 no mostró que el modelo nunca aprendió el aviso al\n  voluntariado ([análisis de errores](analisis-errores.md), pasada 7). Hay un segundo entrenamiento corto en\n  curso para eso (v36, 633 conversaciones).",
+      "que_hace": "Reporte del entrenamiento SFT real con los datos curados: tokens, pasos, tiempo, VRAM, pérdida y checkpoints.",
+      "como_funciona": "- 2.900 conversaciones, ~3.445 tokens cada una, 10,2 % supervisados.\n- 1 época, lr 2e-4, acumulación 8, LoRA r=8 en q/v: 363 pasos de ~80 s (~8,1 h).\n- VRAM pico 19,97 GB en 2 T4; Kaggle cortó a las 8 h y se reanudó desde `checkpoint-300`.\n- Advierte que pérdida baja (0,005) no es agente bueno: el aviso al voluntariado no se aprendió.",
+      "proposito": "Muestra con números lo que costó el SFT y por qué hizo falta una segunda pasada (v39) para el aviso.",
+      "interaccion": "Los números salen de `estado.json`, `runner.json` y `runner.log` que escriben `entrenar()` e `infra/kaggle_entrenamiento.correr`.",
+      "teoria": "Fine-tuning con LoRA en hardware modesto y la diferencia entre pérdida de entrenamiento y calidad de la tarea."
+    },
+    {
+      "id": "informe-antes-despues",
+      "titulo": "Antes y después: las cuatro filas",
+      "archivo": "docs/informe/informe-parte5.md",
+      "desde": 176,
+      "hasta": 186,
+      "lenguaje": "markdown",
+      "codigo": "### 3.2 Antes y después (práctica, 50 casos × 3 versiones, T4, lote 4; adapter v39, Kaggle v40)\n\n| Configuración | Resueltos original / b / c | s/caso | Tokens de entrada por caso | Tokens generados por caso | VRAM pico | Ancho máx. |\n|---|---|---:|---:|---:|---:|---:|\n| `sin_entrenar` (baseline, v25) | 10 / 10 / 7 | 15,4–16,1 | ~5.690–5.750 | ~270–271 | 18,12 GB solo texto (19,08 GB con torres en `base-*-l4`, histórico) | 3.072 |\n| `solo_prompt` (procedimiento-v1) | 14 / 16 / 12 | 24,4–26,6 | ~13.650–14.640 | ~322–332 | 19,25–19,64 GB | 4.436 |\n| `solo_entrenamiento` (adapter v39 + baseline) | 17 / 14 / 20 | 27,7–30,2 | ~12.150–14.200 | ~333–338 | 20,25–21,71 GB | 7.636 |\n| **`ambos` (la entrega, adapter v39)** | **36 / 28 / 36** | **27,8–28,8** | **~14.100–14.200** | **~353–355** | **19,94 GB** | **4.395** |\n| `solo_entrenamiento` con el adapter anterior `dc41674a` (v34, historial) | 11 / 13 / 12 | 18,7–19,7 | ~7.860–8.430 | ~286–293 | 18,69–18,91 GB | 4.476 |\n| `ambos` con el adapter anterior `dc41674a` (v34, historial) | 30 / 29 / 33 | 24,7–24,9 | ~13.840 | ~336 | 19,56 GB | 4.160 |\n",
+      "que_hace": "Tabla de la práctica (50 casos × 3 versiones de normas) con las cuatro configuraciones: sin entrenar, solo prompt, solo entrenamiento y ambos.",
+      "como_funciona": "- `sin_entrenar`: 10/10/7; `solo_prompt` (procedimiento-v1): 14/16/12.\n- `solo_entrenamiento` (adapter v39): 17/14/20.\n- `ambos` (la entrega): 36/28/36.\n- Agrega segundos, tokens por caso y VRAM pico de cada fila.",
+      "proposito": "Es la comparación que pide la consigna: separa cuánto aporta el prompt, cuánto el SFT y cuánto la combinación.",
+      "interaccion": "Las filas salen de correr `infra/kaggle_evaluacion.py` con los planes de `configuraciones/evaluacion/`; el adapter lo aplica `ModeloLocal.cargar`.",
+      "teoria": "Prompt, RAG o fine-tuning: combinarlos rinde más que cada uno por separado."
     }
   ],
   "refs": [
     {
       "slug": "introduccion",
       "i": 18,
-      "snippet": "entrega-fabricas"
+      "snippets": [
+        "entrega-fabricas",
+        "jugar-runner",
+        "agente-bucle"
+      ],
+      "nota": "Seguí el recorrido: `entrega.py` arma las piezas, el kit las conecta en `_jugar` y `AgentePrompt` juega cada caso."
     },
     {
       "slug": "introduccion",
       "i": 42,
-      "snippet": "clasificar-historial"
+      "snippets": [
+        "clasificar-historial",
+        "clasificar-tipo",
+        "seleccionar-ids"
+      ],
+      "nota": "Primero se calcula lo que exigen las normas por fila; después `clasificar` decide error, ruido o correcta; `seleccionar_ids` deja pasar solo las correctas."
     },
     {
       "slug": "introduccion",
       "i": 44,
-      "snippet": "sinteticos-variados",
+      "snippets": [
+        "sinteticos-variados",
+        "generar-dataset"
+      ],
       "nota": "Acá se ve la generación: `generar(semilla=12012, ...)` produce los casos que se convierten en conversaciones."
     },
     {
       "slug": "cowork-intro",
       "i": 15,
-      "snippet": "agents-md"
+      "snippets": [
+        "claude-md-puntero",
+        "agents-md"
+      ],
+      "nota": "`CLAUDE.md` es una sola línea que importa `AGENTS.md`: una fuente común para todos los agentes."
     },
     {
       "slug": "modelado-redes-neuronales",
       "i": 17,
-      "snippet": "guarda-practica",
+      "snippets": [
+        "guarda-practica",
+        "evaluacion-prompt-runner"
+      ],
       "nota": "Es la separación entrenamiento/validación/test aplicada a la elección de prompts."
     },
     {
       "slug": "prompting",
       "i": 3,
-      "snippet": "contexto-desglose"
+      "snippets": [
+        "contexto-desglose",
+        "medir-contexto-script",
+        "reparto-contexto-doc"
+      ],
+      "nota": "`desglose` reparte el contexto por tipo de mensaje, `medir_contexto.py` lo agrega por prompt y el doc reporta el 55 % / 25 %."
     },
     {
       "slug": "prompting",
       "i": 4,
-      "snippet": "agente-guarda-contexto"
+      "snippets": [
+        "modelo-medir-contexto",
+        "agente-guarda-contexto",
+        "modelo-generar"
+      ],
+      "nota": "El modelo mide tokens con su chat template; `_activas` corta el caso que no entra, y `__call__` vuelve a negarse a recortar."
     },
     {
       "slug": "prompting",
       "i": 18,
-      "snippet": "guarda-practica"
+      "snippets": [
+        "guarda-practica",
+        "evaluacion-prompt-runner"
+      ]
     },
     {
       "slug": "prompting",
       "i": 27,
-      "snippet": "solo-prompt-practica",
-      "nota": "El componente agregado fue la instrucción paso a paso: buscar cada tema con su propia consulta."
+      "snippets": [
+        "prompt-procedimiento-v1",
+        "solo-prompt-practica"
+      ],
+      "nota": "El componente agregado fue la instrucción paso a paso del «Procedimiento»: buscar cada tema con su propia consulta."
     },
     {
       "slug": "prompting",
       "i": 29,
-      "snippet": "agente-bucle",
-      "nota": "Mirá la rama `obj is None`: ahí entra `mensaje_json_invalido`."
+      "snippets": [
+        "prompt-procedimiento-v1",
+        "agente-bucle"
+      ],
+      "nota": "El formato JSON se pide en el `system_prompt`; en el bucle, la rama `obj is None` agrega `mensaje_json_invalido`."
     },
     {
       "slug": "prompting",
       "i": 46,
-      "snippet": "procedimiento-dev"
+      "snippets": [
+        "prompt-procedimiento-v1",
+        "procedimiento-dev"
+      ],
+      "nota": "El paso 2 del procedimiento multiplica las búsquedas: eso sube el contexto y el tiempo por caso."
     },
     {
       "slug": "prompting",
       "i": 66,
-      "snippet": "promptspec-sha256"
+      "snippets": [
+        "promptspec-sha256",
+        "promptspec-cargar",
+        "entrega-fabricas",
+        "manifiesto-prompt"
+      ],
+      "nota": "El hash se calcula en `PromptSpec`, se verifica al cargar, la entrega carga el prompt validado y cada evaluación lo guarda en su manifiesto."
     },
     {
       "slug": "rag-y-mcp",
       "i": 4,
-      "snippet": "normas-valores"
+      "snippets": [
+        "normas-valores",
+        "bm25-recuperar",
+        "entrega-fabricas"
+      ],
+      "nota": "`cargar_normas` lee la carpeta recibida con su `parametros.yaml`, `BuscadorBM25` indexa esas secciones y `entrega.construir_buscador` le pasa la ruta en cada corrida."
     },
     {
       "slug": "rag-y-mcp",
       "i": 5,
-      "snippet": "normas-valores",
+      "snippets": [
+        "normas-valores",
+        "bm25-recuperar",
+        "entorno-herramientas"
+      ],
       "nota": "Los números cambian en b, c y el test; por eso se leen de `parametros.yaml` en cada corrida en vez de entrenarlos."
     },
     {
       "slug": "rag-y-mcp",
       "i": 12,
-      "snippet": "bm25-tokens-variantes"
+      "snippets": [
+        "bm25-tokens-variantes",
+        "bm25-recuperar"
+      ]
     },
     {
       "slug": "rag-y-mcp",
       "i": 15,
-      "snippet": "bm25-recuperar"
+      "snippets": [
+        "bm25-tokens-variantes",
+        "bm25-recuperar",
+        "entorno-herramientas"
+      ]
     },
     {
       "slug": "rag-y-mcp",
       "i": 25,
-      "snippet": "informe-evaluacion-buscador"
+      "snippets": [
+        "bm25-recuperar",
+        "informe-evaluacion-buscador"
+      ]
     },
     {
       "slug": "rag-y-mcp",
       "i": 30,
-      "snippet": "rrf-fusion-lexica"
+      "snippets": [
+        "rrf-fusion-lexica",
+        "comparar-variantes",
+        "informe-evaluacion-buscador"
+      ],
+      "nota": "`FusionLexica` suma 1/(60 + puesto) de cada ranking; `comparar` la mide junto a las demás variantes y el INFORME la descarta."
     },
     {
       "slug": "rag-y-mcp",
       "i": 39,
-      "snippet": "informe-agente-buscador"
+      "snippets": [
+        "comparar-variantes",
+        "informe-evaluacion-buscador",
+        "informe-agente-buscador"
+      ],
+      "nota": "Primera etapa: `comparar` y `evaluar_rag` miden solo la recuperación. Segunda etapa: el mismo buscador jugado por el agente."
     },
     {
       "slug": "rag-mcp-rapida",
       "i": 3,
-      "snippet": "bm25-tokens-variantes"
+      "snippets": [
+        "bm25-tokens-variantes",
+        "bm25-recuperar"
+      ]
     },
     {
       "slug": "rag-mcp-rapida",
       "i": 5,
-      "snippet": "solo-prompt-practica",
+      "snippets": [
+        "prompt-procedimiento-v1",
+        "agente-bucle",
+        "entorno-herramientas",
+        "solo-prompt-practica"
+      ],
       "nota": "El agente decide cuándo buscar; el prompt solo le indica buscar cada tema por separado."
     },
     {
       "slug": "rag-mcp-rapida",
       "i": 6,
-      "snippet": "rrf-fusion-lexica"
+      "snippets": [
+        "rrf-fusion-lexica",
+        "informe-evaluacion-buscador"
+      ]
     },
     {
       "slug": "rag-mcp-rapida",
       "i": 9,
-      "snippet": "bm25-recuperar",
-      "nota": "El chunk es la sección completa: `cargar_normas` devuelve una `Seccion` por archivo `NOR-*.md`, sin solapamiento."
+      "snippets": [
+        "normas-valores",
+        "bm25-recuperar"
+      ],
+      "nota": "El chunk es la sección completa: `cargar_normas` devuelve una `Seccion` por archivo `NOR-*.md`, sin solapamiento, y el BM25 indexa esas secciones."
     },
     {
       "slug": "transformers-a-fondo",
       "i": 15,
-      "snippet": "lora-config"
+      "snippets": [
+        "lora-config",
+        "lora-aplicar",
+        "trainer-cuda"
+      ],
+      "nota": "LoRA se aplicó a `q_proj`/`v_proj` (las $W_Q$ y $W_V$ de esta lámina). Además del humo, el repo documenta el entrenamiento real (Kaggle v32+v33) y el adapter de la entrega (v39)."
     },
     {
       "slug": "transformers-a-fondo",
       "i": 40,
-      "snippet": "tokenizar-mascara"
+      "snippets": [
+        "tokenizar-mascara",
+        "perdida-supervisada",
+        "trainer-cuda"
+      ],
+      "nota": "Las labels −100 salen de la tokenización; `perdida_supervisada` calcula la entropía cruzada solo donde no hay −100 y el `Trainer` la usa como pérdida."
     },
     {
       "slug": "como-se-entrena-un-llm",
       "i": 2,
-      "snippet": "plantilla-cuatro-filas"
+      "snippets": [
+        "plantilla-cuatro-filas",
+        "modelo-cargar-adapter",
+        "informe-antes-despues"
+      ],
+      "nota": "En el TP4, con el adapter v39 la fila `solo_entrenamiento` dio 17/14/20 y `ambos` (la entrega) 36/28/36, contra 10/10/7 sin entrenar."
     },
     {
       "slug": "como-se-entrena-un-llm",
       "i": 7,
-      "snippet": "clasificar-historial"
+      "snippets": [
+        "clasificar-historial",
+        "clasificar-tipo",
+        "seleccionar-ids"
+      ]
     },
     {
       "slug": "como-se-entrena-un-llm",
       "i": 19,
-      "snippet": "tokenizar-mascara"
+      "snippets": [
+        "tokenizar-mascara",
+        "tokenizar-preparacion",
+        "entrenamiento-verifica-mascaras"
+      ],
+      "nota": "La máscara se calcula en `tokenizar_conversacion`, se aplica a todo el dataset y se vuelve a verificar antes de cargar pesos."
     },
     {
       "slug": "como-se-entrena-un-llm",
       "i": 20,
-      "snippet": "generar-dataset"
+      "snippets": [
+        "seleccionar-ids",
+        "sinteticos-variados",
+        "generar-dataset",
+        "tokenizar-preparacion"
+      ],
+      "nota": "`seleccionar_ids` aporta las 1.600 correctas del historial, `generar_sinteticos` las 500 sintéticas y `generar_dataset` las junta con las 800 de la cátedra."
     },
     {
       "slug": "como-se-entrena-un-llm",
       "i": 22,
-      "snippet": "seleccionar-ids"
+      "snippets": [
+        "clasificar-tipo",
+        "seleccionar-ids",
+        "generar-dataset"
+      ],
+      "nota": "La clasificación marca error y ruido; `seleccionar_ids` solo deja pasar `correcta` y `generar_dataset` usa esa lista."
     },
     {
       "slug": "como-se-entrena-un-llm",
       "i": 29,
-      "snippet": "mission-estrategias",
+      "snippets": [
+        "mission-estrategias"
+      ],
       "nota": "DPO aparece como opción de la consigna; en el repo no hay código de DPO."
     },
     {
       "slug": "como-se-entrena-un-llm",
       "i": 31,
-      "snippet": "mission-estrategias",
-      "nota": "El RL con los 9 controles como recompensa es la tercera opción de la consigna; no se implementó."
+      "snippets": [
+        "mission-estrategias",
+        "comparar-9-controles"
+      ],
+      "nota": "El RL con los 9 controles como recompensa es la tercera opción de la consigna; no se implementó, pero `comparar` ya sería el verificador."
     },
     {
       "slug": "como-se-entrena-un-llm",
       "i": 36,
-      "snippet": "agente-bucle",
-      "nota": "El tope está en la última condición: `self.llamadas >= self.max_llamadas` (40, `MAX_LLAMADAS` del kit)."
+      "snippets": [
+        "entorno-paso",
+        "agente-bucle"
+      ],
+      "nota": "El tope lo impone el entorno (`len(self.log) >= MAX_LLAMADAS`) y el agente lo replica en `self.llamadas >= self.max_llamadas`."
     },
     {
       "slug": "como-se-entrena-un-llm",
       "i": 42,
-      "snippet": "agente-bucle"
+      "snippets": [
+        "prompt-procedimiento-v1",
+        "agente-bucle",
+        "modelo-generar"
+      ],
+      "nota": "El prompt pide JSON, el bucle lo interpreta (o manda la corrección) y `ModeloLocal` genera localmente con Gemma."
     },
     {
       "slug": "como-se-entrena-un-llm",
       "i": 51,
-      "snippet": "lora-config"
+      "snippets": [
+        "lora-config",
+        "lora-aplicar",
+        "modelo-cargar-adapter"
+      ],
+      "nota": "LoRA se define en `LORA`, se aplica al entrenar con `aplicar_lora` y en inferencia se fusiona con `merge_and_unload`."
     },
     {
       "slug": "como-se-entrena-un-llm",
       "i": 52,
-      "snippet": "sinteticos-variados"
+      "snippets": [
+        "normas-valores",
+        "normas-variables-carpetas",
+        "sinteticos-variados",
+        "informe-antes-despues"
+      ],
+      "nota": "Los números van al BM25 vía `parametros.yaml`; las sintéticas varían esos valores para que el SFT aprenda a leerlos; la tabla muestra que combinar prompt y SFT rinde más."
     },
     {
       "slug": "como-se-entrena-un-llm",
       "i": 53,
-      "snippet": "procedimiento-dev",
-      "nota": "Mirá el párrafo «Para #15»: lo que queda es comportamiento y se deja al SFT."
+      "snippets": [
+        "procedimiento-dev",
+        "informe-antes-despues"
+      ],
+      "nota": "Mirá el párrafo «Para #15»: lo que quedaba era comportamiento y se dejó al SFT; la tabla muestra lo que agregó el adapter."
     },
     {
       "slug": "como-se-entrena-un-llm",
       "i": 55,
-      "snippet": "trainer-cuda",
-      "nota": "En el código se ve PEFT con el `Trainer` de transformers (no `SFTTrainer` de TRL); la medición de 15,7 GB está en docs/informe-parte5.md."
+      "snippets": [
+        "kaggle-armar-comando",
+        "trainer-cuda",
+        "informe-humo",
+        "informe-sft-real"
+      ],
+      "nota": "En el código se ve PEFT con el `Trainer` de transformers (no `SFTTrainer` de TRL). El humo midió 15,7 GB; después corrió el entrenamiento real con los datos curados (19,97 GB, ~8 h)."
     },
     {
       "slug": "como-se-entrena-un-llm",
       "i": 56,
-      "snippet": "sinteticos-variados"
+      "snippets": [
+        "normas-variables-carpetas",
+        "sinteticos-variados",
+        "generar-dataset"
+      ]
     },
     {
       "slug": "agentes-y-multiagentes",
       "i": 5,
-      "snippet": "comparar-9-controles"
+      "snippets": [
+        "comparar-9-controles",
+        "puntuar-runner"
+      ],
+      "nota": "`comparar` define los 9 controles y `puntuar` los aplica a cada traza: resuelto solo si los 9 dan bien."
     },
     {
       "slug": "agentes-y-multiagentes",
       "i": 10,
-      "snippet": "entorno-herramientas",
-      "nota": "P = `comparar` (9 controles); A = `preguntar`, `registrar_decision`; S = `leer_triage` y las observaciones."
+      "snippets": [
+        "comparar-9-controles",
+        "entorno-herramientas",
+        "agente-bucle"
+      ],
+      "nota": "P = `comparar` (9 controles); E = `Entorno`; A = `preguntar`, `registrar_decision`; S = `leer_triage` y las observaciones que agrega el bucle."
     },
     {
       "slug": "agentes-y-multiagentes",
       "i": 14,
-      "snippet": "entorno-herramientas",
+      "snippets": [
+        "entorno-herramientas",
+        "agente-bucle"
+      ],
       "nota": "No hay un orden fijo en el código: el modelo elige qué herramienta llamar en cada turno."
     },
     {
       "slug": "agentes-y-multiagentes",
       "i": 17,
-      "snippet": "entorno-herramientas"
+      "snippets": [
+        "prompt-procedimiento-v1",
+        "agente-bucle",
+        "entorno-herramientas"
+      ],
+      "nota": "Las tools se describen en el `system_prompt`, el bucle despacha el JSON del modelo y el entorno las ejecuta."
     },
     {
       "slug": "agentes-y-multiagentes",
       "i": 41,
-      "snippet": "reparto-contexto-doc"
+      "snippets": [
+        "contexto-desglose",
+        "reparto-contexto-doc",
+        "informe-agente-buscador"
+      ]
     },
     {
       "slug": "agentes-y-multiagentes",
       "i": 51,
-      "snippet": "agente-bucle",
-      "nota": "Un solo `AgentePrompt` por caso, con todas las herramientas: no hay subagentes."
+      "snippets": [
+        "entrega-fabricas",
+        "jugar-runner",
+        "agente-bucle"
+      ],
+      "nota": "Una sola fábrica, un solo `AgentePrompt` por caso, con todas las herramientas: no hay subagentes."
     },
     {
       "slug": "redes-generativas-antagonicas",
       "i": 48,
-      "snippet": "seleccionar-ids"
+      "snippets": [
+        "clasificar-tipo",
+        "seleccionar-ids"
+      ]
     },
     {
       "slug": "segmentacion-y-stable-diffusion",
       "i": 75,
-      "snippet": "lora-config",
-      "nota": "La misma idea de LoRA que en Stable Diffusion, aplicada a la atención de un LLM."
+      "snippets": [
+        "lora-config",
+        "lora-aplicar",
+        "informe-sft-real"
+      ],
+      "nota": "La misma idea de LoRA que en Stable Diffusion, aplicada a la atención de un LLM. El entrenamiento real sí corrió (v32+v33, luego v39)."
     },
     {
       "slug": "cierre-magnifica-humanitas",
       "i": 24,
-      "snippet": "informe-humo",
-      "nota": "La infraestructura de SFT corrió solo en humo: la mejora de comportamiento no está demostrada."
+      "snippets": [
+        "tokenizar-mascara",
+        "trainer-cuda",
+        "informe-humo",
+        "informe-sft-real",
+        "informe-antes-despues"
+      ],
+      "nota": "Además del humo, el repo documenta el SFT real y su efecto: `ambos` pasó a 36/28/36 en práctica. Ojo: pérdida baja no garantizó aprender el aviso."
     },
     {
       "slug": "cierre-magnifica-humanitas",
       "i": 44,
-      "snippet": "informe-agente-buscador"
+      "snippets": [
+        "informe-evaluacion-buscador",
+        "informe-agente-buscador"
+      ]
     }
   ]
 }

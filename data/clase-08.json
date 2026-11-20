@@ -189,7 +189,8 @@
        "cnn": "07",
        "i": 35,
        "title": "Entrenamiento e inferencia",
-       "por": "entrenamiento vs inferencia"
+       "por": "entrenamiento vs inferencia",
+       "extra": false
       }
      ],
      "key": false,
@@ -226,6 +227,7 @@
        "texto": "Es el ejemplo de los 14 tests de la parte 4 del TP3 ('the cat sat', d=4), que quedó pendiente.",
        "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
        "code": "tp3-test-atencion-ejemplo-clase",
+       "ncode": 1,
        "nota": "Pendiente: estos tests con 'the cat sat' son los que tenía que pasar `atencion.py`."
       }
      ],
@@ -236,7 +238,8 @@
        "cnn": "07",
        "i": 32,
        "title": "El ciclo de un LLM, token a token",
-       "por": "el ciclo token a token"
+       "por": "el ciclo token a token",
+       "extra": false
       }
      ],
      "key": false,
@@ -318,8 +321,9 @@
        "tp": 4,
        "texto": "En el TP4, LoRA (r=8) se aplicó solo a `q_proj`/`v_proj`, las $W_Q$ y $W_V$ de esta lámina; corrió solo en humo.",
        "tp_titulo": "El agente de admisión de guardia (TP final)",
-       "code": "tp4-lora-config",
-       "nota": ""
+       "code": "tp4-lora-config,tp4-lora-aplicar,tp4-trainer-cuda",
+       "ncode": 3,
+       "nota": "LoRA se aplicó a `q_proj`/`v_proj` (las $W_Q$ y $W_V$ de esta lámina). Además del humo, el repo documenta el entrenamiento real (Kaggle v32+v33) y el adapter de la entrega (v39)."
       }
      ],
      "ver": [],
@@ -391,6 +395,7 @@
        "texto": "Pendiente en el TP3; el plan era `S = QKᵀ/√d_k` y softmax restando el máximo para estabilidad numérica.",
        "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
        "code": "tp3-test-atencion-escala-multicabeza-ln",
+       "ncode": 1,
        "nota": "Pendiente: `test_escala_por_raiz_de_dk` y la estabilidad del softmax fijan el escalado y el truco de restar el máximo."
       }
      ],
@@ -440,6 +445,7 @@
        "texto": "Quedó pendiente (plan: `np.triu(…,1) → −∞`). La parte 5 lo pide: con máscara, 'banco' queda igual en las dos frases.",
        "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
        "code": "tp3-test-atencion-ejemplo-clase",
+       "ncode": 1,
        "nota": "Pendiente: `test_mascara_causal` exige ceros arriba de la diagonal; la parte 5 lo aplica a mano."
       }
      ],
@@ -501,6 +507,7 @@
        "texto": "Es el mismo Dense + ReLU de tu MLP del TP2, pero aplicado token por token con los mismos pesos.",
        "tp_titulo": "¿Cuánto vale esta casa?",
        "code": "tp2-baseline-mlp-32-32",
+       "ncode": 1,
        "nota": "La FFN del Transformer es este mismo bloque Dense + ReLU, aplicado a cada token con los mismos pesos."
       }
      ],
@@ -534,7 +541,8 @@
        "cnn": "04",
        "i": 38,
        "title": "La regla de la cadena",
-       "por": "la regla de la cadena"
+       "por": "la regla de la cadena",
+       "extra": false
       }
      ],
      "key": false,
@@ -561,7 +569,8 @@
        "cnn": "12",
        "i": 33,
        "title": "U-Net: la U y sus atajos",
-       "por": "skip connections en U-Net"
+       "por": "skip connections en U-Net",
+       "extra": false
       }
      ],
      "key": true,
@@ -591,6 +600,7 @@
        "texto": "Pendiente en el TP3; el plan era `layer_norm` sin γ/β, verificada por los tests.",
        "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
        "code": "tp3-test-atencion-escala-multicabeza-ln",
+       "ncode": 1,
        "nota": "Pendiente: `TestLayerNorm` fija layer norm sin γ/β."
       }
      ],
@@ -616,7 +626,8 @@
        "tp": 2,
        "texto": "Misma idea que `MonthSold` en el TP2: seno y coseno para que la posición en el ciclo quede bien codificada.",
        "tp_titulo": "¿Cuánto vale esta casa?",
-       "code": "tp2-month-cyclical",
+       "code": "tp2-month-cyclical,tp2-build-dense-features",
+       "ncode": 2,
        "nota": ""
       }
      ],
@@ -663,7 +674,8 @@
        "cnn": "09",
        "i": 8,
        "title": "Tres perillas y una cuenta",
-       "por": "tres perillas y una cuenta"
+       "por": "tres perillas y una cuenta",
+       "extra": false
       }
      ],
      "key": false,
@@ -768,7 +780,8 @@
        "tp": 3,
        "texto": "Tu BERT promediado sacó CR 0,35 (z=1,56); e5-base, ajustado con pares consulta–pasaje, llegó a 1,00 con k=1 (z=3,94).",
        "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
-       "code": "tp3-informe-por-que-e5",
+       "code": "tp3-encoder-bert-promedio,tp3-encoder-e5-prefijos,tp3-informe-por-que-e5",
+       "ncode": 3,
        "nota": ""
       }
      ],
@@ -779,7 +792,8 @@
        "cnn": "07",
        "i": 4,
        "title": "Por significado: embeddings y similitud",
-       "por": "recuperar por similitud"
+       "por": "recuperar por similitud",
+       "extra": false
       }
      ],
      "key": true,
@@ -811,7 +825,8 @@
        "cnn": "12",
        "i": 7,
        "title": "El sesgo inductivo equivocado",
-       "por": "sesgo inductivo"
+       "por": "sesgo inductivo",
+       "extra": false
       }
      ],
      "key": false,
@@ -845,8 +860,9 @@
        "tp": 3,
        "texto": "En el TP3 combinaste las dos: el encoder e5-base recupera y el decoder deepseek responde como agente.",
        "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
-       "code": "tp3-encoder-e5-prefijos",
-       "nota": "Este es el lado encoder (e5-base recupera); el decoder es deepseek en `hospital/agente/modelo.py`."
+       "code": "tp3-encoder-e5-prefijos,tp3-modelo-llm-openrouter",
+       "ncode": 2,
+       "nota": "El lado encoder (e5-base) recupera y el lado decoder (deepseek, en `modelo.py`) responde como agente."
       }
      ],
      "ver": [],
@@ -923,8 +939,9 @@
        "tp": 4,
        "texto": "En el SFT del TP4 esa pérdida solo cuenta los tokens del asistente (`labels = −100` en el resto).",
        "tp_titulo": "El agente de admisión de guardia (TP final)",
-       "code": "tp4-tokenizar-mascara",
-       "nota": ""
+       "code": "tp4-tokenizar-mascara,tp4-perdida-supervisada,tp4-trainer-cuda",
+       "ncode": 3,
+       "nota": "Las labels −100 salen de la tokenización; `perdida_supervisada` calcula la entropía cruzada solo donde no hay −100 y el `Trainer` la usa como pérdida."
       }
      ],
      "ver": [
@@ -934,7 +951,8 @@
        "cnn": "04",
        "i": 30,
        "title": "Clasificación multiclase: cross-entropy",
-       "por": "cross-entropy multiclase"
+       "por": "cross-entropy multiclase",
+       "extra": false
       }
      ],
      "key": true,
@@ -976,6 +994,7 @@
        "texto": "El ejercicio a mano es la parte 5 del TP3 ('El banco aguanta/presta'), pendiente en tu repo.",
        "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
        "code": "tp3-ejercicio-a-mano",
+       "ncode": 1,
        "nota": ""
       }
      ],
@@ -1416,11 +1435,21 @@
    "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
    "usos": [
     {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "palabra-al-transformer",
+     "i": 27,
+     "title": "Cada token mira a todos",
+     "extra": false,
+     "url": "/clases/07/#d=palabra-al-transformer&s=27"
+    },
+    {
      "clase": 8,
      "cnn": "08",
      "slug": "transformers-a-fondo",
      "i": 11,
      "title": "El ciclo de generación con el transformer abierto",
+     "extra": false,
      "url": "/clases/08/#d=transformers-a-fondo&s=11"
     },
     {
@@ -1429,10 +1458,11 @@
      "slug": "transformers-a-fondo",
      "i": 20,
      "title": "La máscara causal",
+     "extra": false,
      "url": "/clases/08/#d=transformers-a-fondo&s=20"
     }
    ],
-   "nusos": 2
+   "nusos": 3
   },
   {
    "id": "lora-config",
@@ -1445,7 +1475,7 @@
    "que_hace": "Define la configuración LoRA y la política de entrenamiento: rango 8, alfa 16, solo en las proyecciones Q y V de la atención del modelo de lenguaje.",
    "como_funciona": "- `LORA_OBJETIVO` es una regex que solo toma `language_model.layers.N.self_attn.(q_proj|v_proj)`.\n- `LORA` fija `r=8`, `lora_alpha=16`, `dropout=0` y `task_type=CAUSAL_LM`.\n- `POLITICA` guarda checkpoint cada 50 pasos, bf16 y gradient checkpointing.\n- `PRECISIONES` y `DISPOSITIVOS` permiten fp16/`auto` para las T4 de Kaggle.",
    "proposito": "Gemma 4 es multimodal y sus torres de visión/audio también tienen `q_proj`/`v_proj` que PEFT no soporta: la regex las excluye. QLoRA quedó como alternativa no hecha.",
-   "interaccion": "`_ejecutar_cuda` pasa `LoraConfig(**LORA)` a `get_peft_model`; `cargar_entradas` incluye `LORA` en la identidad de la corrida.",
+   "interaccion": "`aplicar_lora` (mismo archivo) pasa `LoraConfig(**LORA)` a `get_peft_model` dentro de `_ejecutar_cuda`; `cargar_entradas` incluye `LORA` en la identidad de la corrida.",
    "teoria": "LoRA agrega matrices de bajo rango a W_Q y W_V: se entrenan pocos parámetros y el modelo base queda congelado.",
    "key": "tp4-lora-config",
    "tp": 4,
@@ -1457,6 +1487,7 @@
      "slug": "transformers-a-fondo",
      "i": 15,
      "title": "Tres proyecciones del mismo vector",
+     "extra": false,
      "url": "/clases/08/#d=transformers-a-fondo&s=15"
     },
     {
@@ -1465,6 +1496,7 @@
      "slug": "como-se-entrena-un-llm",
      "i": 51,
      "title": "Dónde entra el fine-tuning",
+     "extra": false,
      "url": "/clases/09/#d=como-se-entrena-un-llm&s=51"
     },
     {
@@ -1473,10 +1505,114 @@
      "slug": "segmentacion-y-stable-diffusion",
      "i": 75,
      "title": "Lo que el equipo va a encontrar",
+     "extra": false,
      "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=75"
     }
    ],
    "nusos": 3
+  },
+  {
+   "id": "lora-aplicar",
+   "titulo": "aplicar_lora: adapter nuevo o retomado",
+   "archivo": "admision_tp/entrenamiento.py",
+   "desde": 171,
+   "hasta": 180,
+   "lenguaje": "python",
+   "codigo": "def aplicar_lora(peft, modelo, config):\n    \"\"\"LoRA nuevo, o el adapter de `adapter_inicial` entrenable (mismo r y módulos con que se publicó).\"\"\"\n    inicial = config.get(\"adapter_inicial\")\n    if inicial is None:\n        return peft.get_peft_model(modelo, peft.LoraConfig(**LORA, revision=config[\"revision\"]))\n    origen = {\"revision\": inicial[\"revision\"], \"subfolder\": inicial[\"subcarpeta\"]}\n    previo = peft.PeftConfig.from_pretrained(inicial[\"repo\"], **origen)\n    if (previo.base_model_name_or_path, previo.revision) != (config[\"modelo\"], config[\"revision\"]):\n        raise ValueError(\"adapter_inicial entrenado sobre otra base o revisión\")\n    return peft.PeftModel.from_pretrained(modelo, inicial[\"repo\"], config=previo, is_trainable=True, **origen)",
+   "que_hace": "Envuelve el modelo con LoRA usando la configuración `LORA`, o retoma un adapter ya publicado para seguir entrenándolo.",
+   "como_funciona": "- Sin `adapter_inicial`: `get_peft_model(modelo, LoraConfig(**LORA))`.\n- Con `adapter_inicial`: lee su `PeftConfig` y verifica base y revisión.\n- `PeftModel.from_pretrained(..., is_trainable=True)` deja entrenables solo las matrices LoRA.",
+   "proposito": "Permitió continuar el adapter `dc41674a` sobre datos nuevos (v39) sin empezar de cero.",
+   "interaccion": "Lo llama `_ejecutar_cuda` (mismo archivo) después de cargar el modelo; usa `LORA` definido arriba en el mismo archivo.",
+   "teoria": "PEFT: se congela el modelo base y solo se entrenan las matrices A y B.",
+   "key": "tp4-lora-aplicar",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
+     "i": 15,
+     "title": "Tres proyecciones del mismo vector",
+     "extra": false,
+     "url": "/clases/08/#d=transformers-a-fondo&s=15"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 51,
+     "title": "Dónde entra el fine-tuning",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=51"
+    },
+    {
+     "clase": 12,
+     "cnn": "12",
+     "slug": "segmentacion-y-stable-diffusion",
+     "i": 75,
+     "title": "Lo que el equipo va a encontrar",
+     "extra": false,
+     "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=75"
+    }
+   ],
+   "nusos": 3
+  },
+  {
+   "id": "trainer-cuda",
+   "titulo": "Entrenamiento SFT con PEFT y Trainer",
+   "archivo": "admision_tp/entrenamiento.py",
+   "desde": 325,
+   "hasta": 369,
+   "lenguaje": "python",
+   "codigo": "        modelo = cargar_solo_texto(transformers, config[\"modelo\"], config[\"revision\"],\n                                   dtype=getattr(torch, PRECISIONES[ejecucion[\"precision\"]]), **reparto)\n        # Sin attn_implementation: forzar \"sdpa\" rompe la torre de audio de Gemma 4 (ver modelo.py).\n        modelo.config.use_cache = False\n        modelo = aplicar_lora(peft, modelo, config)\n        modelo.enable_input_require_grads()\n\n        class Auditor(TrainerCallback):\n            def on_log(self, args, state, control, logs=None, **kwargs):\n                run.log({**(logs or {}), **_vram(torch), \"trainer_step\": state.global_step})\n\n            def guardar(self, carpeta, nombre):\n                (carpeta / \"corrida.json\").write_bytes(_canonical(auditoria))\n                hashes = {p.name: _sha(p.read_bytes()) for p in carpeta.iterdir()\n                          if p.is_file() and p.name != \"integridad.json\"}\n                (carpeta / \"integridad.json\").write_bytes(_canonical(hashes))\n                if persistir:\n                    persistir()\n                if auditoria[\"publicar\"]:\n                    publicaciones.append(publicar_checkpoint(carpeta, nombre, api, config[\"hf_repo\"], run))\n                    (destino / \"publicaciones.json\").write_bytes(_canonical(publicaciones))\n                    if persistir:\n                        persistir()\n\n            def on_save(self, args, state, control, **kwargs):\n                self.guardar(destino / f\"checkpoint-{state.global_step}\", f\"checkpoint-{state.global_step}\")\n\n        callback = Auditor()\n        args = TrainingArguments(output_dir=str(destino), seed=config[\"semilla\"], data_seed=config[\"semilla\"],\n            learning_rate=config[\"learning_rate\"], num_train_epochs=config[\"epochs\"],\n            per_device_train_batch_size=config[\"batch_size\"],\n            gradient_accumulation_steps=config[\"gradient_accumulation_steps\"],\n            **_politica(ejecucion), save_strategy=\"steps\", logging_steps=1,\n            report_to=\"none\", push_to_hub=False, remove_unused_columns=False)\n        def collator(filas):\n            return {k: torch.tensor(v, dtype=torch.float32 if k == \"pesos\" else torch.long)\n                    for k, v in formar_lote(filas, tokenizer.pad_token_id).items()}\n        class TrainerSupervisado(Trainer):\n            # Misma normalización que la pérdida del modelo (suma / num_items_in_batch con acumulación).\n            def compute_loss(self, model, inputs, return_outputs=False, num_items_in_batch=None):\n                return perdida_supervisada(torch, model, inputs, num_items_in_batch)\n\n        trainer = TrainerSupervisado(model=modelo, args=args, train_dataset=ejemplos,\n                                     data_collator=collator, processing_class=tokenizer, callbacks=[callback])\n        trainer.train(resume_from_checkpoint=str(checkpoint) if checkpoint else None)",
+   "que_hace": "Carga el modelo solo texto, le aplica LoRA, configura el `Trainer` de Hugging Face con un callback que audita y publica checkpoints, y entrena.",
+   "como_funciona": "- `cargar_solo_texto` carga Gemma con la precisión elegida (y `device_map='auto'` para dos GPU).\n- `aplicar_lora(peft, modelo, config)` envuelve el modelo con LoRA (o retoma un adapter publicado) y `enable_input_require_grads` habilita gradient checkpointing.\n- `Auditor` loguea VRAM a W&B y en cada `on_save` escribe `integridad.json` y publica el checkpoint en HF.\n- `TrainingArguments` toma semilla, lr, épocas, batch y acumulación de la config; `collator` usa `formar_lote` (padding con −100).\n- `TrainerSupervisado.compute_loss` reemplaza la pérdida por `perdida_supervisada`, y `trainer.train(resume_from_checkpoint=...)` permite reanudar.",
+   "proposito": "Prioriza auditabilidad y reanudación (Kaggle corta sesiones a las 8 h). Primero se validó con corridas de humo; después entrenó con las 2.900 conversaciones (Kaggle v32+v33) y continuó para el adapter de la entrega (v39).",
+   "interaccion": "Es el cuerpo de `_ejecutar_cuda`, que llama `entrenar()` (mismo archivo) desde `scripts/entrenar.py`, lanzado por `infra/kaggle_entrenamiento.py`. Consume `tokens.jsonl`; el adapter final lo carga `ModeloLocal._fusionar_adapter`.",
+   "teoria": "Fine-tuning supervisado eficiente: SFT con LoRA sobre las demostraciones, con la pérdida solo en tokens del asistente.",
+   "key": "tp4-trainer-cuda",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
+     "i": 15,
+     "title": "Tres proyecciones del mismo vector",
+     "extra": false,
+     "url": "/clases/08/#d=transformers-a-fondo&s=15"
+    },
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
+     "i": 40,
+     "title": "Qué se minimiza",
+     "extra": false,
+     "url": "/clases/08/#d=transformers-a-fondo&s=40"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 55,
+     "title": "Fine-tuning local: el recorrido",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=55"
+    },
+    {
+     "clase": 13,
+     "cnn": "13",
+     "slug": "cierre-magnifica-humanitas",
+     "i": 24,
+     "title": "Repaso: cómo aprende a «portarse bien»",
+     "extra": false,
+     "url": "/clases/13/#d=cierre-magnifica-humanitas&s=24"
+    }
+   ],
+   "nusos": 4
   },
   {
    "id": "test-atencion-escala-multicabeza-ln",
@@ -1501,6 +1637,7 @@
      "slug": "transformers-a-fondo",
      "i": 18,
      "title": "Escalar y repartir: el softmax",
+     "extra": false,
      "url": "/clases/08/#d=transformers-a-fondo&s=18"
     },
     {
@@ -1509,6 +1646,7 @@
      "slug": "transformers-a-fondo",
      "i": 26,
      "title": "Layer norm: mantener los números en rango",
+     "extra": false,
      "url": "/clases/08/#d=transformers-a-fondo&s=26"
     }
    ],
@@ -1537,7 +1675,17 @@
      "slug": "introduccion",
      "i": 26,
      "title": "Redes Neuronales — Estructura y Celda Básica",
+     "extra": false,
      "url": "/clases/01/#d=introduccion&s=26"
+    },
+    {
+     "clase": 3,
+     "cnn": "03",
+     "slug": "intro-redes-neuronales",
+     "i": 8,
+     "title": "La sigmoide: la no linealidad clásica",
+     "extra": false,
+     "url": "/clases/03/#d=intro-redes-neuronales&s=8"
     },
     {
      "clase": 3,
@@ -1545,7 +1693,17 @@
      "slug": "intro-redes-neuronales",
      "i": 9,
      "title": "La capa: el bloque que se repite",
+     "extra": false,
      "url": "/clases/03/#d=intro-redes-neuronales&s=9"
+    },
+    {
+     "clase": 3,
+     "cnn": "03",
+     "slug": "intro-redes-neuronales",
+     "i": 12,
+     "title": "Las dos dimensiones: ancho y profundidad",
+     "extra": false,
+     "url": "/clases/03/#d=intro-redes-neuronales&s=12"
     },
     {
      "clase": 3,
@@ -1553,6 +1711,7 @@
      "slug": "intro-redes-neuronales",
      "i": 24,
      "title": "Sin activación, la red colapsa",
+     "extra": false,
      "url": "/clases/03/#d=intro-redes-neuronales&s=24"
     },
     {
@@ -1561,7 +1720,17 @@
      "slug": "intro-redes-neuronales",
      "i": 25,
      "title": "Las funciones de activación más comunes",
+     "extra": false,
      "url": "/clases/03/#d=intro-redes-neuronales&s=25"
+    },
+    {
+     "clase": 3,
+     "cnn": "03",
+     "slug": "intro-redes-neuronales",
+     "i": 30,
+     "title": "El error: la función de coste",
+     "extra": false,
+     "url": "/clases/03/#d=intro-redes-neuronales&s=30"
     },
     {
      "clase": 4,
@@ -1569,7 +1738,35 @@
      "slug": "modelado-redes-neuronales",
      "i": 22,
      "title": "Un catálogo para elegir sin dudar",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=22"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 43,
+     "title": "El learning rate es el paso",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=43"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 57,
+     "title": "Cuántas capas y cuánto ancho",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=57"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 63,
+     "title": "Los notebooks de la clase",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=63"
     },
     {
      "clase": 8,
@@ -1577,6 +1774,7 @@
      "slug": "transformers-a-fondo",
      "i": 23,
      "title": "La feed-forward: la misma red para cada posición",
+     "extra": false,
      "url": "/clases/08/#d=transformers-a-fondo&s=23"
     },
     {
@@ -1585,10 +1783,38 @@
      "slug": "redes-generativas-antagonicas",
      "i": 23,
      "title": "Discriminador Como red neuronal",
+     "extra": false,
      "url": "/clases/11/#d=redes-generativas-antagonicas&s=23"
+    },
+    {
+     "clase": 11,
+     "cnn": "11",
+     "slug": "redes-generativas-antagonicas",
+     "i": 24,
+     "title": "Función Sigmoid: la activación del Discriminador",
+     "extra": false,
+     "url": "/clases/11/#d=redes-generativas-antagonicas&s=24"
+    },
+    {
+     "clase": 11,
+     "cnn": "11",
+     "slug": "redes-generativas-antagonicas",
+     "i": 29,
+     "title": "Binary cross-entropy: los dos casos del Discriminador",
+     "extra": false,
+     "url": "/clases/11/#d=redes-generativas-antagonicas&s=29"
+    },
+    {
+     "clase": 11,
+     "cnn": "11",
+     "slug": "redes-generativas-antagonicas",
+     "i": 32,
+     "title": "Backpropagation: el procedimiento paso a paso",
+     "extra": false,
+     "url": "/clases/11/#d=redes-generativas-antagonicas&s=32"
     }
    ],
-   "nusos": 7
+   "nusos": 16
   },
   {
    "id": "month-cyclical",
@@ -1608,15 +1834,265 @@
    "tp_titulo": "¿Cuánto vale esta casa?",
    "usos": [
     {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 14,
+     "title": "La tabla de decisiones",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=14"
+    },
+    {
      "clase": 8,
      "cnn": "08",
      "slug": "transformers-a-fondo",
      "i": 27,
      "title": "La fórmula de la posición: senos y cosenos",
+     "extra": false,
      "url": "/clases/08/#d=transformers-a-fondo&s=27"
     }
    ],
-   "nusos": 1
+   "nusos": 2
+  },
+  {
+   "id": "build-dense-features",
+   "titulo": "El vector de entrada: numéricas, flag, mes cíclico y one-hots (celda 26)",
+   "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
+   "desde": 1,
+   "hasta": 34,
+   "lenguaje": "python",
+   "codigo": "def build_dense_features(frame, fill_value, use_state, use_housestyle, use_centralair,\n                          use_salecondition, cyclical_month, district_int=False,\n                          scaler=None, fit_scaler=False):\n    \"\"\"Arma el bloque de features que entra 'directo' a la red (sin pasar por embedding).\n    district_int=True mete a District como un entero plano más -del bloque numérico-\n    en vez de mandarlo por la rama de embedding: es el experimento a propósito de la Pregunta 2.\"\"\"\n    frame = frame.copy()\n    missing_flag = frame['LotFrontage'].isna().to_numpy(dtype=float)\n    frame['LotFrontage'] = frame['LotFrontage'].fillna(fill_value)\n\n    numeric_cols_here = [c for c in NUMERIC_COLS if not (cyclical_month and c == 'MonthSold')]\n    X_num = frame[numeric_cols_here].to_numpy(dtype=float)\n    if district_int:\n        district_col = frame['District'].map(\n            lambda d: district_to_idx.get(d, DISTRICT_OOV_IDX)).to_numpy(dtype=float).reshape(-1, 1)\n        X_num = np.column_stack([X_num, district_col])\n\n    if fit_scaler:\n        scaler = StandardScaler().fit(X_num)\n    X_num_scaled = scaler.transform(X_num)\n\n    blocks = [X_num_scaled, missing_flag.reshape(-1, 1)]\n    if cyclical_month:\n        blocks.append(month_cyclical(frame['MonthSold']))\n    if use_state:\n        blocks.append(state_encoder.transform(frame[['State']]))\n    if use_housestyle:\n        blocks.append(housestyle_encoder.transform(frame[['HouseStyle']]))\n    if use_salecondition:\n        blocks.append(salecondition_encoder.transform(frame[['SaleCondition']]))\n    if use_centralair:\n        blocks.append((frame['CentralAir'] == 'Y').to_numpy(dtype=float).reshape(-1, 1))\n\n    return np.column_stack(blocks), scaler",
+   "que_hace": "Arma el bloque de features \"directo\" de cada casa: numéricas escaladas, flag de faltante, mes sin/cos, one-hots y `CentralAir` 0/1.",
+   "como_funciona": "1. Imputa `LotFrontage` y guarda `missing_flag`.\n2. `numeric_cols_here` excluye `MonthSold` si va cíclico.\n3. Con `district_int=True` agrega District como entero plano (experimento trampa de la Pregunta 2).\n4. `StandardScaler` se ajusta solo si `fit_scaler=True`.\n5. `blocks` concatena según los flags `use_state`, `use_housestyle`, `use_salecondition`, `use_centralair` y `cyclical_month`.",
+   "proposito": "Los flags permiten encender bloques de a uno y medir el aporte de cada uno (criterio del Milestone 3). District queda afuera de este bloque porque va por su propia rama de embedding.",
+   "interaccion": "La llaman `train_categorical_variant` (celda 26) y el Milestone 4 (celda 34). Usa los encoders y `month_cyclical` de la celda 25.",
+   "teoria": "La red solo ve una fila de floats de largo fijo: este es el traductor de casa a vector.",
+   "key": "tp2-build-dense-features",
+   "tp": 2,
+   "tp_titulo": "¿Cuánto vale esta casa?",
+   "usos": [
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 2,
+     "title": "La red ve una fila de números",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=2"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 10,
+     "title": "La pregunta que decide la codificación",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=10"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 12,
+     "title": "Categóricas: one-hot contra embedding",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=12"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 13,
+     "title": "Errores de codificación caros",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=13"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 14,
+     "title": "La tabla de decisiones",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=14"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "palabra-al-transformer",
+     "i": 14,
+     "title": "Tres formas de volver texto en números",
+     "extra": false,
+     "url": "/clases/07/#d=palabra-al-transformer&s=14"
+    },
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
+     "i": 27,
+     "title": "La fórmula de la posición: senos y cosenos",
+     "extra": false,
+     "url": "/clases/08/#d=transformers-a-fondo&s=27"
+    },
+    {
+     "clase": 12,
+     "cnn": "12",
+     "slug": "segmentacion-y-stable-diffusion",
+     "i": 2,
+     "title": "Una red neuronal clásica solo acepta entradas de largo fijo",
+     "extra": false,
+     "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=2"
+    }
+   ],
+   "nusos": 8
+  },
+  {
+   "id": "encoder-bert-promedio",
+   "titulo": "Línea de base: BERT sin ajustar, promedio de tokens",
+   "archivo": "hospital/rag/encoders.py",
+   "desde": 9,
+   "hasta": 37,
+   "lenguaje": "python",
+   "codigo": "def _normalizar(m):\n    return m / np.linalg.norm(m, axis=1, keepdims=True).clip(min=1e-12)\n\n\nclass BertPromedio:\n    \"\"\"Linea de base obligatoria: BERT sin ajustar para similitud, embedding = promedio de los\n    vectores de la ultima capa sobre los tokens reales (se ignora el padding).\"\"\"\n\n    def __init__(self, modelo=\"google-bert/bert-base-multilingual-cased\", lote=16):\n        from transformers import AutoModel, AutoTokenizer\n\n        self.nombre, self.lote = modelo, lote\n        self.tokenizer = AutoTokenizer.from_pretrained(modelo)\n        self.modelo = AutoModel.from_pretrained(modelo).eval()\n\n    def _codificar(self, textos):\n        import torch\n\n        salidas = []\n        with torch.no_grad():\n            for i in range(0, len(textos), self.lote):\n                enc = self.tokenizer(textos[i:i + self.lote], padding=True, truncation=True,\n                                     max_length=512, return_tensors=\"pt\")\n                h = self.modelo(**enc).last_hidden_state\n                m = enc[\"attention_mask\"].unsqueeze(-1).float()\n                salidas.append(((h * m).sum(1) / m.sum(1)).numpy())\n        return _normalizar(np.concatenate(salidas))\n\n    codificar_consultas = codificar_pasajes = _codificar",
+   "que_hace": "Calcula el embedding de un texto como el promedio de los vectores de la última capa de BERT multilingüe, ignorando el padding, y lo normaliza a norma 1.",
+   "como_funciona": "- `_normalizar` divide cada fila por su norma L2.\n- `BertPromedio._codificar` tokeniza en lotes de 16 (`padding=True`, `max_length=512`).\n- Toma `last_hidden_state` (`h`) y la `attention_mask` (`m`) y calcula `(h * m).sum(1) / m.sum(1)`: promedio solo de tokens reales.\n- Consultas y pasajes usan la misma función (`codificar_consultas = codificar_pasajes = _codificar`).",
+   "proposito": "Es la línea de base obligatoria de la consigna. Sirve para mostrar que un encoder no entrenado para similitud no alcanza: sacó CR 0,350 (igual que el recuperador léxico ingenuo) y el fragmento correcto quedaba apenas a z = 1,56 del promedio.",
+   "interaccion": "Lo crea `crear_encoder({\"tipo\": \"bert_promedio\"})`, usado desde `experimentos/correr_recuperacion.py` (clave `bert` de `ENCODERS`). La matriz que devuelve alimenta `Recuperador.matriz`.",
+   "teoria": "Embedding de oración por promedio de tokens: promediar vectores contextuales pierde el orden y BERT no fue entrenado para que el coseno mida significado.",
+   "key": "tp3-encoder-bert-promedio",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "introduccion",
+     "i": 36,
+     "title": "Ejemplos de problemas de representación",
+     "extra": false,
+     "url": "/clases/01/#d=introduccion&s=36"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "palabra-al-transformer",
+     "i": 21,
+     "title": "Promediar una frase pierde el orden",
+     "extra": false,
+     "url": "/clases/07/#d=palabra-al-transformer&s=21"
+    },
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
+     "i": 34,
+     "title": "Del encoder al embedding de oración",
+     "extra": false,
+     "url": "/clases/08/#d=transformers-a-fondo&s=34"
+    },
+    {
+     "clase": 12,
+     "cnn": "12",
+     "slug": "segmentacion-y-stable-diffusion",
+     "i": 52,
+     "title": "Cómo se entrena CLIP",
+     "extra": false,
+     "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=52"
+    }
+   ],
+   "nusos": 4
+  },
+  {
+   "id": "encoder-e5-prefijos",
+   "titulo": "Encoder de oraciones con prefijos query/passage",
+   "archivo": "hospital/rag/encoders.py",
+   "desde": 40,
+   "hasta": 68,
+   "lenguaje": "python",
+   "codigo": "class SentenceTransformerEncoder:\n    \"\"\"Modelos entrenados para embeddings de oraciones (MiniLM, e5, bge-m3). Los e5 piden prefijos.\"\"\"\n\n    def __init__(self, modelo, prefijo_consulta=\"\", prefijo_pasaje=\"\", lote=16):\n        from sentence_transformers import SentenceTransformer\n\n        self.nombre, self.lote = modelo, lote\n        self.prefijo_consulta, self.prefijo_pasaje = prefijo_consulta, prefijo_pasaje\n        self.modelo = SentenceTransformer(modelo, device=\"cpu\")\n\n    def _codificar(self, textos, prefijo):\n        m = self.modelo.encode([prefijo + t for t in textos], batch_size=self.lote,\n                               normalize_embeddings=True, show_progress_bar=False)\n        return np.asarray(m, dtype=np.float32)\n\n    def codificar_consultas(self, textos):\n        return self._codificar(textos, self.prefijo_consulta)\n\n    def codificar_pasajes(self, textos):\n        return self._codificar(textos, self.prefijo_pasaje)\n\n\ndef crear_encoder(cfg):\n    \"\"\"cfg: {\"tipo\": \"bert_promedio\" | \"sentence_transformer\", \"modelo\": ..., \"prefijo_consulta\": ..., \"prefijo_pasaje\": ...}\"\"\"\n    if cfg[\"tipo\"] == \"bert_promedio\":\n        return BertPromedio(cfg[\"modelo\"])\n    if cfg[\"tipo\"] == \"sentence_transformer\":\n        return SentenceTransformerEncoder(cfg[\"modelo\"], cfg.get(\"prefijo_consulta\", \"\"), cfg.get(\"prefijo_pasaje\", \"\"))\n    raise ValueError(f\"tipo de encoder desconocido: {cfg['tipo']}\")",
+   "que_hace": "Envuelve modelos de `sentence-transformers` (MiniLM, e5, bge-m3) con la misma interfaz que BERT y agrega los prefijos que piden los e5. `crear_encoder` elige la clase según la configuración.",
+   "como_funciona": "- `SentenceTransformerEncoder` guarda `prefijo_consulta` y `prefijo_pasaje`.\n- `_codificar(textos, prefijo)` antepone el prefijo a cada texto y llama a `self.modelo.encode(..., normalize_embeddings=True)`.\n- `codificar_consultas` usa el prefijo de consulta (`\"query: \"`) y `codificar_pasajes` el de pasaje (`\"passage: \"`).\n- `crear_encoder(cfg)` despacha por `cfg[\"tipo\"]`.",
+   "proposito": "e5 fue entrenado de forma contrastiva con pares consulta–pasaje y espera esos prefijos; sin ellos se pierde la asimetría pregunta/documento. Ganó e5-base: separó el fragmento correcto a z = 3,94 contra 3,07 de MiniLM (entrenado para paráfrasis).",
+   "interaccion": "`Recuperador.desde_config` lo crea a partir de `config.json` (`intfloat/multilingual-e5-base`, `query: ` / `passage: `). `Recuperador._puntuar` llama a `codificar_consultas` y `_embeddings` a `codificar_pasajes`.",
+   "teoria": "Embeddings de oración entrenados con aprendizaje contrastivo (como CLIP pero texto–texto): consulta y pasaje relevantes quedan cerca en el espacio.",
+   "key": "tp3-encoder-e5-prefijos",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "introduccion",
+     "i": 36,
+     "title": "Ejemplos de problemas de representación",
+     "extra": false,
+     "url": "/clases/01/#d=introduccion&s=36"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 20,
+     "title": "Embeddings: cada texto es un punto",
+     "extra": false,
+     "url": "/clases/06/#d=rag-y-mcp&s=20"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 21,
+     "title": "Coseno: importa el ángulo",
+     "extra": false,
+     "url": "/clases/06/#d=rag-y-mcp&s=21"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 4,
+     "title": "Por significado: embeddings y similitud",
+     "extra": false,
+     "url": "/clases/07/#d=rag-mcp-rapida&s=4"
+    },
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
+     "i": 34,
+     "title": "Del encoder al embedding de oración",
+     "extra": false,
+     "url": "/clases/08/#d=transformers-a-fondo&s=34"
+    },
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
+     "i": 36,
+     "title": "El mapa de la familia",
+     "extra": false,
+     "url": "/clases/08/#d=transformers-a-fondo&s=36"
+    },
+    {
+     "clase": 12,
+     "cnn": "12",
+     "slug": "segmentacion-y-stable-diffusion",
+     "i": 22,
+     "title": "Embeddings más allá del texto",
+     "extra": false,
+     "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=22"
+    },
+    {
+     "clase": 12,
+     "cnn": "12",
+     "slug": "segmentacion-y-stable-diffusion",
+     "i": 51,
+     "title": "CLIP: el puente texto ↔ imagen",
+     "extra": false,
+     "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=51"
+    }
+   ],
+   "nusos": 8
   },
   {
    "id": "informe-por-que-e5",
@@ -1641,7 +2117,17 @@
      "slug": "introduccion",
      "i": 36,
      "title": "Ejemplos de problemas de representación",
+     "extra": false,
      "url": "/clases/01/#d=introduccion&s=36"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "palabra-al-transformer",
+     "i": 21,
+     "title": "Promediar una frase pierde el orden",
+     "extra": false,
+     "url": "/clases/07/#d=palabra-al-transformer&s=21"
     },
     {
      "clase": 8,
@@ -1649,43 +2135,8 @@
      "slug": "transformers-a-fondo",
      "i": 34,
      "title": "Del encoder al embedding de oración",
+     "extra": false,
      "url": "/clases/08/#d=transformers-a-fondo&s=34"
-    }
-   ],
-   "nusos": 2
-  },
-  {
-   "id": "encoder-e5-prefijos",
-   "titulo": "Encoder de oraciones con prefijos query/passage",
-   "archivo": "hospital/rag/encoders.py",
-   "desde": 40,
-   "hasta": 68,
-   "lenguaje": "python",
-   "codigo": "class SentenceTransformerEncoder:\n    \"\"\"Modelos entrenados para embeddings de oraciones (MiniLM, e5, bge-m3). Los e5 piden prefijos.\"\"\"\n\n    def __init__(self, modelo, prefijo_consulta=\"\", prefijo_pasaje=\"\", lote=16):\n        from sentence_transformers import SentenceTransformer\n\n        self.nombre, self.lote = modelo, lote\n        self.prefijo_consulta, self.prefijo_pasaje = prefijo_consulta, prefijo_pasaje\n        self.modelo = SentenceTransformer(modelo, device=\"cpu\")\n\n    def _codificar(self, textos, prefijo):\n        m = self.modelo.encode([prefijo + t for t in textos], batch_size=self.lote,\n                               normalize_embeddings=True, show_progress_bar=False)\n        return np.asarray(m, dtype=np.float32)\n\n    def codificar_consultas(self, textos):\n        return self._codificar(textos, self.prefijo_consulta)\n\n    def codificar_pasajes(self, textos):\n        return self._codificar(textos, self.prefijo_pasaje)\n\n\ndef crear_encoder(cfg):\n    \"\"\"cfg: {\"tipo\": \"bert_promedio\" | \"sentence_transformer\", \"modelo\": ..., \"prefijo_consulta\": ..., \"prefijo_pasaje\": ...}\"\"\"\n    if cfg[\"tipo\"] == \"bert_promedio\":\n        return BertPromedio(cfg[\"modelo\"])\n    if cfg[\"tipo\"] == \"sentence_transformer\":\n        return SentenceTransformerEncoder(cfg[\"modelo\"], cfg.get(\"prefijo_consulta\", \"\"), cfg.get(\"prefijo_pasaje\", \"\"))\n    raise ValueError(f\"tipo de encoder desconocido: {cfg['tipo']}\")",
-   "que_hace": "Envuelve modelos de `sentence-transformers` (MiniLM, e5, bge-m3) con la misma interfaz que BERT y agrega los prefijos que piden los e5. `crear_encoder` elige la clase según la configuración.",
-   "como_funciona": "- `SentenceTransformerEncoder` guarda `prefijo_consulta` y `prefijo_pasaje`.\n- `_codificar(textos, prefijo)` antepone el prefijo a cada texto y llama a `self.modelo.encode(..., normalize_embeddings=True)`.\n- `codificar_consultas` usa el prefijo de consulta (`\"query: \"`) y `codificar_pasajes` el de pasaje (`\"passage: \"`).\n- `crear_encoder(cfg)` despacha por `cfg[\"tipo\"]`.",
-   "proposito": "e5 fue entrenado de forma contrastiva con pares consulta–pasaje y espera esos prefijos; sin ellos se pierde la asimetría pregunta/documento. Ganó e5-base: separó el fragmento correcto a z = 3,94 contra 3,07 de MiniLM (entrenado para paráfrasis).",
-   "interaccion": "`Recuperador.desde_config` lo crea a partir de `config.json` (`intfloat/multilingual-e5-base`, `query: ` / `passage: `). `Recuperador._puntuar` llama a `codificar_consultas` y `_embeddings` a `codificar_pasajes`.",
-   "teoria": "Embeddings de oración entrenados con aprendizaje contrastivo (como CLIP pero texto–texto): consulta y pasaje relevantes quedan cerca en el espacio.",
-   "key": "tp3-encoder-e5-prefijos",
-   "tp": 3,
-   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
-   "usos": [
-    {
-     "clase": 6,
-     "cnn": "06",
-     "slug": "rag-y-mcp",
-     "i": 20,
-     "title": "Embeddings: cada texto es un punto",
-     "url": "/clases/06/#d=rag-y-mcp&s=20"
-    },
-    {
-     "clase": 8,
-     "cnn": "08",
-     "slug": "transformers-a-fondo",
-     "i": 36,
-     "title": "El mapa de la familia",
-     "url": "/clases/08/#d=transformers-a-fondo&s=36"
     },
     {
      "clase": 12,
@@ -1693,6 +2144,7 @@
      "slug": "segmentacion-y-stable-diffusion",
      "i": 22,
      "title": "Embeddings más allá del texto",
+     "extra": false,
      "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=22"
     },
     {
@@ -1701,10 +2153,76 @@
      "slug": "segmentacion-y-stable-diffusion",
      "i": 51,
      "title": "CLIP: el puente texto ↔ imagen",
+     "extra": false,
      "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=51"
     }
    ],
-   "nusos": 4
+   "nusos": 5
+  },
+  {
+   "id": "modelo-llm-openrouter",
+   "titulo": "El LLM: ChatOpenAI contra OpenRouter, temperatura 0",
+   "archivo": "hospital/agente/modelo.py",
+   "desde": 1,
+   "hasta": 33,
+   "lenguaje": "python",
+   "codigo": "\"\"\"El LLM de los agentes: ChatOpenAI de langchain-openai apuntando a OpenRouter.\"\"\"\nimport os\nfrom pathlib import Path\n\nMODELO = \"deepseek/deepseek-v4-flash-0731\"\nPRECIO_ENTRADA = 0.04 / 1e6  # USD por token; solo si OpenRouter no informa el costo\nPRECIO_SALIDA = 0.64 / 1e6\nRAIZ = Path(__file__).resolve().parents[2]\n\n\ndef cargar_env(ruta=RAIZ / \".env\"):\n    \"\"\"Carga VARIABLE=valor de .env sin pisar lo que ya está en el entorno.\"\"\"\n    if Path(ruta).exists():\n        for linea in Path(ruta).read_text(encoding=\"utf-8\").splitlines():\n            if \"=\" in linea and not linea.lstrip().startswith(\"#\"):\n                k, v = linea.split(\"=\", 1)\n                os.environ.setdefault(k.strip(), v.strip().strip(\"'\\\"\"))\n\n\ndef crear_llm():\n    from langchain_openai import ChatOpenAI\n\n    cargar_env()\n    if not os.environ.get(\"OPENROUTER_API_KEY\"):\n        raise SystemExit(\"falta OPENROUTER_API_KEY (en el entorno o en .env)\")\n    return ChatOpenAI(\n        model=MODELO,\n        base_url=\"https://openrouter.ai/api/v1\",\n        api_key=os.environ[\"OPENROUTER_API_KEY\"],\n        temperature=0,\n        max_retries=3,\n        extra_body={\"usage\": {\"include\": True}},  # OpenRouter devuelve el costo de cada llamada\n    )",
+   "que_hace": "Crea el modelo de chat del agente: `deepseek/deepseek-v4-flash-0731` vía OpenRouter con la interfaz `ChatOpenAI`, temperatura 0 y costo informado por llamada.",
+   "como_funciona": "- `PRECIO_ENTRADA` y `PRECIO_SALIDA` (USD por token) sirven de respaldo si OpenRouter no informa el costo.\n- `cargar_env` carga variables de `.env` sin pisar el entorno (la clave nunca está en el código).\n- `crear_llm` corta si falta `OPENROUTER_API_KEY` y devuelve `ChatOpenAI(..., base_url=\"https://openrouter.ai/api/v1\", temperature=0, max_retries=3)`.\n- `extra_body={\"usage\": {\"include\": True}}` pide a OpenRouter el costo de cada llamada.",
+   "proposito": "Temperatura 0 hace que el decodificado elija siempre el token más probable, para que las corridas sean lo más comparables posible (aunque el INFORME muestra que la consulta igual varió entre corridas). OpenRouter permite usar cualquier modelo con la API de OpenAI.",
+   "interaccion": "`agente.py` llama a `crear_llm()` y le pasa el LLM a `correr()`; `corrida._usage` usa los precios de respaldo.",
+   "teoria": "Generación autoregresiva token a token; temperatura 0 = decodificación greedy. Costo = tokens de entrada × precio + tokens de salida × precio.",
+   "key": "tp3-modelo-llm-openrouter",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 5,
+     "cnn": "05",
+     "slug": "prompting",
+     "i": 8,
+     "title": "La fórmula del costo",
+     "extra": false,
+     "url": "/clases/05/#d=prompting&s=8"
+    },
+    {
+     "clase": 5,
+     "cnn": "05",
+     "slug": "prompting",
+     "i": 14,
+     "title": "Limitaciones de los LLM",
+     "extra": false,
+     "url": "/clases/05/#d=prompting&s=14"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "palabra-al-transformer",
+     "i": 32,
+     "title": "El ciclo de un LLM, token a token",
+     "extra": false,
+     "url": "/clases/07/#d=palabra-al-transformer&s=32"
+    },
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
+     "i": 36,
+     "title": "El mapa de la familia",
+     "extra": false,
+     "url": "/clases/08/#d=transformers-a-fondo&s=36"
+    },
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 19,
+     "title": "Una tool en código",
+     "extra": false,
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=19"
+    }
+   ],
+   "nusos": 5
   },
   {
    "id": "tokenizar-mascara",
@@ -1729,6 +2247,7 @@
      "slug": "transformers-a-fondo",
      "i": 40,
      "title": "Qué se minimiza",
+     "extra": false,
      "url": "/clases/08/#d=transformers-a-fondo&s=40"
     },
     {
@@ -1737,10 +2256,49 @@
      "slug": "como-se-entrena-un-llm",
      "i": 19,
      "title": "Datos de demostración",
+     "extra": false,
      "url": "/clases/09/#d=como-se-entrena-un-llm&s=19"
+    },
+    {
+     "clase": 13,
+     "cnn": "13",
+     "slug": "cierre-magnifica-humanitas",
+     "i": 24,
+     "title": "Repaso: cómo aprende a «portarse bien»",
+     "extra": false,
+     "url": "/clases/13/#d=cierre-magnifica-humanitas&s=24"
     }
    ],
-   "nusos": 2
+   "nusos": 3
+  },
+  {
+   "id": "perdida-supervisada",
+   "titulo": "Pérdida solo donde hay objetivo",
+   "archivo": "admision_tp/entrenamiento.py",
+   "desde": 142,
+   "hasta": 168,
+   "lenguaje": "python",
+   "codigo": "def perdida_supervisada(torch, modelo, entradas, num_items_in_batch=None):\n    \"\"\"Entropía cruzada causal calculando logits solo donde hay objetivo.\n\n    Equivale a la pérdida del modelo, pero no materializa logits de contexto y padding: con el\n    vocabulario de Gemma (262k) y ~3.300 tokens por conversación, esos logits en fp32 no entran\n    en una T4 (OOM en Kaggle v28). Con una lista, `logits_to_keep` devuelve (lote, n, vocab).\n    \"\"\"\n    posiciones, objetivos = posiciones_supervisadas(entradas[\"labels\"].tolist())\n    logits = modelo(input_ids=entradas[\"input_ids\"], attention_mask=entradas[\"attention_mask\"],\n                    logits_to_keep=posiciones).logits.float()\n    logits = logits.reshape(-1, logits.shape[-1])\n    objetivos = torch.tensor(objetivos, dtype=torch.long, device=logits.device).reshape(-1)\n    if \"pesos\" in entradas:  # Con peso_aviso: suma ponderada sobre la misma normalización.\n        pesos = pesos_de_objetivos(posiciones, entradas[\"pesos\"].tolist())\n        pesos = torch.tensor(pesos, dtype=logits.dtype, device=logits.device).reshape(-1)\n        suma = (torch.nn.functional.cross_entropy(logits, objetivos, ignore_index=-100, reduction=\"none\")\n                * pesos).sum()\n        divisor = (objetivos != -100).sum() if num_items_in_batch is None else num_items_in_batch\n        if torch.is_tensor(divisor):\n            divisor = divisor.to(suma.device)\n        return suma / divisor\n    if num_items_in_batch is None:\n        return torch.nn.functional.cross_entropy(logits, objetivos, ignore_index=-100)\n    suma = torch.nn.functional.cross_entropy(logits, objetivos, ignore_index=-100, reduction=\"sum\")\n    if torch.is_tensor(num_items_in_batch):\n        num_items_in_batch = num_items_in_batch.to(suma.device)\n    return suma / num_items_in_batch",
+   "que_hace": "Calcula la entropía cruzada causal solo en las posiciones con label distinto de −100, sin materializar logits del contexto.",
+   "como_funciona": "- `posiciones_supervisadas` toma las posiciones que predicen un token del asistente.\n- `logits_to_keep=posiciones` pide logits solo ahí.\n- `cross_entropy(..., ignore_index=-100)` ignora lo que no es objetivo.\n- Con `pesos` (aviso) hace una suma ponderada; con `num_items_in_batch` normaliza igual que Transformers.",
+   "proposito": "Con el vocabulario de Gemma (262k) los logits de todo el contexto en fp32 no entraban en una T4 (OOM en v28): calcularlos solo donde hay objetivo lo resolvió.",
+   "interaccion": "La llama `TrainerSupervisado.compute_loss` dentro de `_ejecutar_cuda`; los `labels` vienen de `tokenizar_conversacion`.",
+   "teoria": "La pérdida del SFT: entropía cruzada de próximo token, contada solo en los tokens del asistente.",
+   "key": "tp4-perdida-supervisada",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
+     "i": 40,
+     "title": "Qué se minimiza",
+     "extra": false,
+     "url": "/clases/08/#d=transformers-a-fondo&s=40"
+    }
+   ],
+   "nusos": 1
   },
   {
    "id": "ejercicio-a-mano",
@@ -1765,6 +2323,7 @@
      "slug": "transformers-a-fondo",
      "i": 42,
      "title": "Un bloque repetido",
+     "extra": false,
      "url": "/clases/08/#d=transformers-a-fondo&s=42"
     }
    ],

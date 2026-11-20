@@ -60,6 +60,7 @@
      "i": 26,
      "title": "Redes Neuronales — Estructura y Celda Básica",
      "texto": "En el TP2 apilaste estas neuronas en un MLP `Dense(32, relu) → Dense(32, relu) → Dense(1, linear)` para predecir `SalePrice`.",
+     "extra": false,
      "url": "/clases/01/#d=introduccion&s=26"
     },
     {
@@ -68,6 +69,7 @@
      "i": 32,
      "title": "Ejemplos de problemas predictivos",
      "texto": "El TP2 fue regresión de precios de casas: el modelo final bajó el MAE en test de 51.411 a 20.844 dólares.",
+     "extra": false,
      "url": "/clases/01/#d=introduccion&s=32"
     },
     {
@@ -76,6 +78,7 @@
      "i": 50,
      "title": "Paradigmas de Aprendizaje",
      "texto": "El TP2 fue supervisado: 1.460 casas con precio, partidas 70/20/10 antes de calcular cualquier estadística.",
+     "extra": false,
      "url": "/clases/01/#d=introduccion&s=50"
     }
    ]
@@ -91,6 +94,7 @@
      "i": 8,
      "title": "La sigmoide: la no linealidad clásica",
      "texto": "El notebook de clase usaba sigmoide para `AboveMedianPrice`; en el TP2 la salida pasó a `Dense(1, linear)` porque predecías dólares.",
+     "extra": false,
      "url": "/clases/03/#d=intro-redes-neuronales&s=8"
     },
     {
@@ -99,6 +103,7 @@
      "i": 9,
      "title": "La capa: el bloque que se repite",
      "texto": "Cada `Dense(32, relu)` del TP2 es este bloque: $W\\cdot x+b$ seguido de ReLU, apilado dos veces antes de la salida.",
+     "extra": false,
      "url": "/clases/03/#d=intro-redes-neuronales&s=9"
     },
     {
@@ -107,6 +112,7 @@
      "i": 12,
      "title": "Las dos dimensiones: ancho y profundidad",
      "texto": "Usaste 32-32 como baseline y 512-512-512 para overfitear a propósito: misma profundidad casi, ancho ×16.",
+     "extra": false,
      "url": "/clases/03/#d=intro-redes-neuronales&s=12"
     },
     {
@@ -115,6 +121,7 @@
      "i": 13,
      "title": "Parámetros contra hiperparámetros",
      "texto": "La red 512-512-512 tenía 550.985 parámetros aprendidos; L2 0,001, dropout 0,3 y patience 15 fueron hiperparámetros elegidos.",
+     "extra": false,
      "url": "/clases/03/#d=intro-redes-neuronales&s=13"
     },
     {
@@ -123,6 +130,7 @@
      "i": 24,
      "title": "Sin activación, la red colapsa",
      "texto": "Por eso tus capas ocultas llevan ReLU: sin ella, `Dense(32)→Dense(32)→Dense(1)` sería una sola regresión lineal.",
+     "extra": false,
      "url": "/clases/03/#d=intro-redes-neuronales&s=24"
     },
     {
@@ -131,6 +139,7 @@
      "i": 25,
      "title": "Las funciones de activación más comunes",
      "texto": "Ocultas con ReLU y salida lineal en todas las variantes del TP2, del baseline 32-32 a la 512-512-512.",
+     "extra": false,
      "url": "/clases/03/#d=intro-redes-neuronales&s=25"
     },
     {
@@ -139,6 +148,7 @@
      "i": 29,
      "title": "Ida y vuelta: forward y backward",
      "texto": "Tu `fit` corre este ciclo: 100 épocas en el baseline y 150 en la red grande (cortó en 76 por early stopping).",
+     "extra": false,
      "url": "/clases/03/#d=intro-redes-neuronales&s=29"
     },
     {
@@ -147,6 +157,7 @@
      "i": 30,
      "title": "El error: la función de coste",
      "texto": "Entrenaste con `loss='mse'`; por eso una sola casa (Wheatfield, error \\$226.171) movió más el RMSE (3,3%) que el MAE (2,3%).",
+     "extra": false,
      "url": "/clases/03/#d=intro-redes-neuronales&s=30"
     },
     {
@@ -155,6 +166,7 @@
      "i": 34,
      "title": "El paso de actualización",
      "texto": "Escalaste `SalePrice` con `StandardScaler` porque con dólares crudos los gradientes eran enormes para el η=0,001 de Adam y no convergía.",
+     "extra": false,
      "url": "/clases/03/#d=intro-redes-neuronales&s=34"
     }
    ]
@@ -170,6 +182,7 @@
      "i": 2,
      "title": "La red ve una fila de números",
      "texto": "La lección central del TP2: con la misma red 32-32, solo cambiar cómo armaste la entrada bajó el MAE 60%.",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=2"
     },
     {
@@ -178,6 +191,7 @@
      "i": 10,
      "title": "La pregunta que decide la codificación",
      "texto": "Tu tabla de decisiones del M1 aplicó esta pregunta columna por columna y detectó las tres trampas: `ListingId`, `MonthSold` y `District`.",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=10"
     },
     {
@@ -186,6 +200,7 @@
      "i": 11,
      "title": "Numéricas: normalizar no es opcional",
      "texto": "Numéricas con `StandardScaler` ajustado solo en train; también escalaste el target `SalePrice` y desescalaste para reportar dólares.",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=11"
     },
     {
@@ -194,6 +209,7 @@
      "i": 12,
      "title": "Categóricas: one-hot contra embedding",
      "texto": "`State` (12) con one-hot y `District` (72) con `Embedding(73, 8)`: el MAE bajó de 51.411 a 30.956 y luego a 25.380.",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=12"
     },
     {
@@ -202,6 +218,7 @@
      "i": 13,
      "title": "Errores de codificación caros",
      "texto": "Las tres trampas del dataset más `LotFrontage`. `District` como entero entrenó sin error pero dio MAE 25.856 vs 20.844 con embedding.",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=13"
     },
     {
@@ -210,6 +227,7 @@
      "i": 14,
      "title": "La tabla de decisiones",
      "texto": "`ListingId` descartado (0 floats), `MonthSold` como seno y coseno (2 floats), `CentralAir` 0/1, `LotFrontage` mediana 70,0 + flag.",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=14"
     },
     {
@@ -218,6 +236,7 @@
      "i": 16,
      "title": "Un dataset, tres trabajos distintos",
      "texto": "Partición 70/20/10 en dos pasos con `random_state=42`: 1022 casas de train, 292 de validación y 146 de test.",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=16"
     },
     {
@@ -226,6 +245,7 @@
      "i": 17,
      "title": "Los tres, lado a lado",
      "texto": "Ojo: comparaste todas las variantes con el MAE de test. En rigor esa elección era trabajo de validación.",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=17"
     },
     {
@@ -234,6 +254,7 @@
      "i": 18,
      "title": "Todo se aprende solo del train",
      "texto": "Scaler, mediana, encoders y mapa de distritos ajustados solo en train. Pero el M5 (preprocesamiento dentro del modelo) quedó pendiente.",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=18"
     },
     {
@@ -242,6 +263,7 @@
      "i": 20,
      "title": "Qué hacer y qué no",
      "texto": "Partiste antes de calcular cualquier estadística y con semilla 42, como pide la regla.",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=20"
     },
     {
@@ -250,6 +272,7 @@
      "i": 22,
      "title": "Un catálogo para elegir sin dudar",
      "texto": "Para dólares usaste `Dense(1, activation='linear')` con MSE, en lugar de la sigmoide + BCE del notebook de clase.",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=22"
     },
     {
@@ -258,6 +281,7 @@
      "i": 28,
      "title": "Regresión: MSE, MAE y Huber",
      "texto": "Sacar la casa de Wheatfield (error \\$226.171) bajó el RMSE 3,3% y el MAE solo 2,3%: el cuadrado pesa más los errores grandes.",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=28"
     },
     {
@@ -266,6 +290,7 @@
      "i": 32,
      "title": "Percentiles: la pinball loss",
      "texto": "El extra P10/P50/P90 con pinball loss quedó pendiente en tu TP2.",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=32"
     },
     {
@@ -274,6 +299,7 @@
      "i": 43,
      "title": "El learning rate es el paso",
      "texto": "Con Adam (η=0,001) y dólares crudos no convergía en 100 épocas; lo resolviste escalando el target.",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=43"
     },
     {
@@ -282,6 +308,7 @@
      "i": 44,
      "title": "Batch y época no son lo mismo",
      "texto": "Con 1022 casas y `batch_size=32`, cada época fueron unos 32 ajustes de pesos.",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=44"
     },
     {
@@ -290,6 +317,7 @@
      "i": 46,
      "title": "La función objetivo",
      "texto": "En la red 512-512-512 usaste L2 con λ=0,001 (`kernel_regularizer`) y Dropout 0,3 entre capas.",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=46"
     },
     {
@@ -298,6 +326,7 @@
      "i": 47,
      "title": "Qué mirar cuando esto se entrena",
      "texto": "Tu 512-512-512 terminó con train 0,0121 y val 0,1273. Con regularización y early stopping (cortó en la época 76), el MAE bajó a 16.538.",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=47"
     },
     {
@@ -306,6 +335,7 @@
      "i": 57,
      "title": "Cuántas capas y cuánto ancho",
      "texto": "La 512-512-512 tenía 550.985 parámetros para 1022 casas (unos 540 por ejemplo) y memorizó. Tu 32-32 era el punto de partida razonable.",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=57"
     },
     {
@@ -314,6 +344,7 @@
      "i": 61,
      "title": "Lo que hay que llevarse",
      "texto": "Tu conclusión fue la misma: el salto no vino de la arquitectura sino de codificar la ubicación (MAE de 51 mil a 21 mil).",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=61"
     },
     {
@@ -322,6 +353,7 @@
      "i": 62,
      "title": "Checklist operativo para la práctica",
      "texto": "La pregunta \"¿puede faltar?\" es tu `LotFrontage`: faltaba en 7%, y esas casas valen 12% menos, así que el flag aporta señal.",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=62"
     },
     {
@@ -330,6 +362,7 @@
      "i": 63,
      "title": "Los notebooks de la clase",
      "texto": "Tu repo partía del notebook de clase `house-prices.ipynb` (clasificador `AboveMedianPrice`) y lo pasó a regresión en dólares.",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=63"
     }
    ]
@@ -345,6 +378,7 @@
      "i": 14,
      "title": "Tres formas de volver texto en números",
      "texto": "En el TP2 elegiste one-hot para `State` (12 valores) y embedding de dimensión 8 para `District` (72): el mismo dilema.",
+     "extra": false,
      "url": "/clases/07/#d=palabra-al-transformer&s=14"
     },
     {
@@ -353,6 +387,7 @@
      "i": 15,
      "title": "De token a vector",
      "texto": "Tu `Embedding(73, 8)` del TP2 es esto: una tabla con un vector aprendido por distrito (72 + 1 para desconocidos).",
+     "extra": false,
      "url": "/clases/07/#d=palabra-al-transformer&s=15"
     }
    ]
@@ -368,6 +403,7 @@
      "i": 23,
      "title": "La feed-forward: la misma red para cada posición",
      "texto": "Es el mismo Dense + ReLU de tu MLP del TP2, pero aplicado token por token con los mismos pesos.",
+     "extra": false,
      "url": "/clases/08/#d=transformers-a-fondo&s=23"
     },
     {
@@ -376,6 +412,7 @@
      "i": 27,
      "title": "La fórmula de la posición: senos y cosenos",
      "texto": "Misma idea que `MonthSold` en el TP2: seno y coseno para que la posición en el ciclo quede bien codificada.",
+     "extra": false,
      "url": "/clases/08/#d=transformers-a-fondo&s=27"
     }
    ]
@@ -391,6 +428,7 @@
      "i": 23,
      "title": "Discriminador Como red neuronal",
      "texto": "En el TP2 cada `Dense` hacía lo mismo ($W\\cdot x+b$ + activación), pero con dos capas ocultas de 32 ReLU y salida lineal.",
+     "extra": false,
      "url": "/clases/11/#d=redes-generativas-antagonicas&s=23"
     },
     {
@@ -399,6 +437,7 @@
      "i": 24,
      "title": "Función Sigmoid: la activación del Discriminador",
      "texto": "En el TP2 la salida fue `Dense(1, linear)`: una sigmoide habría acotado el precio a (0,1). Sirve para probabilidades, como en D.",
+     "extra": false,
      "url": "/clases/11/#d=redes-generativas-antagonicas&s=24"
     },
     {
@@ -407,6 +446,7 @@
      "i": 29,
      "title": "Binary cross-entropy: los dos casos del Discriminador",
      "texto": "El TP2 era regresión: entrenó con MSE (no BCE) y reportó MAE en dólares. BCE es la del clasificador `AboveMedianPrice` del notebook de clase.",
+     "extra": false,
      "url": "/clases/11/#d=redes-generativas-antagonicas&s=29"
     },
     {
@@ -415,6 +455,7 @@
      "i": 32,
      "title": "Backpropagation: el procedimiento paso a paso",
      "texto": "En el TP2 Keras corrió este ciclo con Adam (lr 0,001); escalaron `SalePrice` porque sin escalar los gradientes eran enormes y no convergía.",
+     "extra": false,
      "url": "/clases/11/#d=redes-generativas-antagonicas&s=32"
     },
     {
@@ -423,6 +464,7 @@
      "i": 34,
      "title": "El ciclo completo: Generador y Discriminador juntos",
      "texto": "En el TP2, `batch_size=32` sobre 1022 casas: unos 32 ajustes de pesos por época, con el error promediado en cada lote.",
+     "extra": false,
      "url": "/clases/11/#d=redes-generativas-antagonicas&s=34"
     }
    ]
@@ -438,6 +480,7 @@
      "i": 2,
      "title": "Una red neuronal clásica solo acepta entradas de largo fijo",
      "texto": "Tu TP2 es exactamente este caso: cada casa, un vector fijo (z-score, one-hot, mes sin/cos) entrando a un MLP 32-32-1.",
+     "extra": false,
      "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=2"
     },
     {
@@ -446,6 +489,7 @@
      "i": 4,
      "title": "Cómo se entrena una red densa",
      "texto": "En el TP2 `fit` corrió este ciclo con Adam y `batch_size=32`; con early stopping la red 512-512-512 cortó en la época 76 de 150.",
+     "extra": false,
      "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=4"
     },
     {
@@ -454,6 +498,7 @@
      "i": 22,
      "title": "Embeddings más allá del texto",
      "texto": "En el TP2 `District` (72 valores) pasó por `Embedding(73, 8)`: el MAE bajó de 30.956 a 25.380.",
+     "extra": false,
      "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=22"
     }
    ]
@@ -483,6 +528,7 @@
      "slug": "modelado-redes-neuronales",
      "i": 10,
      "title": "La pregunta que decide la codificación",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=10"
     },
     {
@@ -491,6 +537,7 @@
      "slug": "modelado-redes-neuronales",
      "i": 14,
      "title": "La tabla de decisiones",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=14"
     }
    ],
@@ -519,6 +566,7 @@
      "slug": "introduccion",
      "i": 50,
      "title": "Paradigmas de Aprendizaje",
+     "extra": false,
      "url": "/clases/01/#d=introduccion&s=50"
     },
     {
@@ -527,6 +575,7 @@
      "slug": "modelado-redes-neuronales",
      "i": 16,
      "title": "Un dataset, tres trabajos distintos",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=16"
     },
     {
@@ -535,6 +584,7 @@
      "slug": "modelado-redes-neuronales",
      "i": 20,
      "title": "Qué hacer y qué no",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=20"
     }
    ],
@@ -556,8 +606,18 @@
    "key": "tp2-comparar-imputaciones",
    "tp": 2,
    "tp_titulo": "¿Cuánto vale esta casa?",
-   "usos": [],
-   "nusos": 0
+   "usos": [
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 62,
+     "title": "Checklist operativo para la práctica",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=62"
+    }
+   ],
+   "nusos": 1
   },
   {
    "id": "faltante-informa",
@@ -582,6 +642,7 @@
      "slug": "modelado-redes-neuronales",
      "i": 62,
      "title": "Checklist operativo para la práctica",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=62"
     }
    ],
@@ -610,6 +671,7 @@
      "slug": "intro-redes-neuronales",
      "i": 30,
      "title": "El error: la función de coste",
+     "extra": false,
      "url": "/clases/03/#d=intro-redes-neuronales&s=30"
     },
     {
@@ -618,6 +680,7 @@
      "slug": "modelado-redes-neuronales",
      "i": 28,
      "title": "Regresión: MSE, MAE y Huber",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=28"
     }
    ],
@@ -639,8 +702,18 @@
    "key": "tp2-listingid-adentro",
    "tp": 2,
    "tp_titulo": "¿Cuánto vale esta casa?",
-   "usos": [],
-   "nusos": 0
+   "usos": [
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 13,
+     "title": "Errores de codificación caros",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=13"
+    }
+   ],
+   "nusos": 1
   },
   {
    "id": "encoders-solo-train",
@@ -663,8 +736,18 @@
      "clase": 4,
      "cnn": "04",
      "slug": "modelado-redes-neuronales",
+     "i": 12,
+     "title": "Categóricas: one-hot contra embedding",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=12"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
      "i": 18,
      "title": "Todo se aprende solo del train",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=18"
     },
     {
@@ -673,10 +756,29 @@
      "slug": "palabra-al-transformer",
      "i": 14,
      "title": "Tres formas de volver texto en números",
+     "extra": false,
      "url": "/clases/07/#d=palabra-al-transformer&s=14"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "palabra-al-transformer",
+     "i": 15,
+     "title": "De token a vector",
+     "extra": false,
+     "url": "/clases/07/#d=palabra-al-transformer&s=15"
+    },
+    {
+     "clase": 12,
+     "cnn": "12",
+     "slug": "segmentacion-y-stable-diffusion",
+     "i": 22,
+     "title": "Embeddings más allá del texto",
+     "extra": false,
+     "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=22"
     }
    ],
-   "nusos": 2
+   "nusos": 5
   },
   {
    "id": "build-dense-features",
@@ -696,15 +798,79 @@
    "tp_titulo": "¿Cuánto vale esta casa?",
    "usos": [
     {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 2,
+     "title": "La red ve una fila de números",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=2"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 10,
+     "title": "La pregunta que decide la codificación",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=10"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 12,
+     "title": "Categóricas: one-hot contra embedding",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=12"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 13,
+     "title": "Errores de codificación caros",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=13"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 14,
+     "title": "La tabla de decisiones",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=14"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "palabra-al-transformer",
+     "i": 14,
+     "title": "Tres formas de volver texto en números",
+     "extra": false,
+     "url": "/clases/07/#d=palabra-al-transformer&s=14"
+    },
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
+     "i": 27,
+     "title": "La fórmula de la posición: senos y cosenos",
+     "extra": false,
+     "url": "/clases/08/#d=transformers-a-fondo&s=27"
+    },
+    {
      "clase": 12,
      "cnn": "12",
      "slug": "segmentacion-y-stable-diffusion",
      "i": 2,
      "title": "Una red neuronal clásica solo acepta entradas de largo fijo",
+     "extra": false,
      "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=2"
     }
    ],
-   "nusos": 1
+   "nusos": 8
   },
   {
    "id": "variantes-incrementales",
@@ -729,6 +895,7 @@
      "slug": "introduccion",
      "i": 32,
      "title": "Ejemplos de problemas predictivos",
+     "extra": false,
      "url": "/clases/01/#d=introduccion&s=32"
     },
     {
@@ -737,6 +904,7 @@
      "slug": "modelado-redes-neuronales",
      "i": 2,
      "title": "La red ve una fila de números",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=2"
     },
     {
@@ -745,6 +913,7 @@
      "slug": "modelado-redes-neuronales",
      "i": 17,
      "title": "Los tres, lado a lado",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=17"
     },
     {
@@ -753,10 +922,20 @@
      "slug": "modelado-redes-neuronales",
      "i": 61,
      "title": "Lo que hay que llevarse",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=61"
+    },
+    {
+     "clase": 12,
+     "cnn": "12",
+     "slug": "segmentacion-y-stable-diffusion",
+     "i": 22,
+     "title": "Embeddings más allá del texto",
+     "extra": false,
+     "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=22"
     }
    ],
-   "nusos": 4
+   "nusos": 5
   },
   {
    "id": "district-entero-trampa",
@@ -781,6 +960,7 @@
      "slug": "modelado-redes-neuronales",
      "i": 13,
      "title": "Errores de codificación caros",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=13"
     }
    ],
@@ -804,15 +984,157 @@
    "tp_titulo": "¿Cuánto vale esta casa?",
    "usos": [
     {
+     "clase": 3,
+     "cnn": "03",
+     "slug": "intro-redes-neuronales",
+     "i": 13,
+     "title": "Parámetros contra hiperparámetros",
+     "extra": false,
+     "url": "/clases/03/#d=intro-redes-neuronales&s=13"
+    },
+    {
+     "clase": 3,
+     "cnn": "03",
+     "slug": "intro-redes-neuronales",
+     "i": 29,
+     "title": "Ida y vuelta: forward y backward",
+     "extra": false,
+     "url": "/clases/03/#d=intro-redes-neuronales&s=29"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 46,
+     "title": "La función objetivo",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=46"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 47,
+     "title": "Qué mirar cuando esto se entrena",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=47"
+    },
+    {
      "clase": 12,
      "cnn": "12",
      "slug": "segmentacion-y-stable-diffusion",
      "i": 4,
      "title": "Cómo se entrena una red densa",
+     "extra": false,
+     "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=4"
+    }
+   ],
+   "nusos": 5
+  },
+  {
+   "id": "features-milestone4",
+   "titulo": "Entradas del Milestone 4: mismo vector del modelo completo (celda 34)",
+   "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
+   "desde": 1,
+   "hasta": 17,
+   "lenguaje": "python",
+   "codigo": "from keras.layers import Dropout\nfrom keras import regularizers\nfrom keras.callbacks import EarlyStopping\n\n# Mismo feature set que el modelo completo del Milestone 3 (fit_scaler solo en train).\nX4_train, scaler4 = build_dense_features(df_train, lotfrontage_median, True, True, True, True, True, fit_scaler=True)\nX4_val, _ = build_dense_features(df_val, lotfrontage_median, True, True, True, True, True, scaler=scaler4)\nX4_test, _ = build_dense_features(df_test, lotfrontage_median, True, True, True, True, True, scaler=scaler4)\n\nd4_train, d4_val, d4_test = build_district_idx(df_train), build_district_idx(df_val), build_district_idx(df_test)\n\ny4_train_raw = df_train[TARGET].to_numpy(dtype=float)\ny4_val_raw = df_val[TARGET].to_numpy(dtype=float)\ny4_test_raw = df_test[TARGET].to_numpy(dtype=float)\ny4_scaler = StandardScaler().fit(y4_train_raw.reshape(-1, 1))\ny4_train = y4_scaler.transform(y4_train_raw.reshape(-1, 1)).ravel()\ny4_val = y4_scaler.transform(y4_val_raw.reshape(-1, 1)).ravel()",
+   "que_hace": "Construye una vez los tensores `X4_*` (features densas), `d4_*` (índices de distrito) e `y4_*` (target escalado) que usan la red grande y la regularizada.",
+   "como_funciona": "- Llama a `build_dense_features` con todas las opciones en `True`, ajustando `scaler4` solo con `df_train`.\n- `build_district_idx` convierte cada `District` en el índice que va al `Embedding`.\n- `y4_scaler` se ajusta con el precio de train y transforma train y val.",
+   "proposito": "Fija el mismo conjunto de features del modelo completo del Milestone 3 para que la comparación del Milestone 4 aísle el efecto del tamaño y la regularización.",
+   "interaccion": "Sus salidas las consumen `build_big_model`/`model_overfit.fit` (misma celda), `model_regularized.fit` (celda 37) y la comparación en dólares con `y4_scaler.inverse_transform` (celda 38).",
+   "teoria": "Entrada de largo fijo, ajustada solo en train: el preprocesamiento queda separado de la arquitectura que se está probando.",
+   "key": "tp2-features-milestone4",
+   "tp": 2,
+   "tp_titulo": "¿Cuánto vale esta casa?",
+   "usos": [
+    {
+     "clase": 12,
+     "cnn": "12",
+     "slug": "segmentacion-y-stable-diffusion",
+     "i": 4,
+     "title": "Cómo se entrena una red densa",
+     "extra": false,
      "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=4"
     }
    ],
    "nusos": 1
+  },
+  {
+   "id": "baseline-oficial",
+   "titulo": "El baseline oficial y su curva de pérdida (celda 15)",
+   "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
+   "desde": 1,
+   "hasta": 11,
+   "lenguaje": "python",
+   "codigo": "import matplotlib.pyplot as plt\n\nbaseline = variant_median_flag\n\nplt.plot(baseline['history'].history['loss'])\nplt.plot(baseline['history'].history['val_loss'])\nplt.title('Baseline numérico — pérdida (MSE, target escalado)')\nplt.ylabel('Loss')\nplt.xlabel('Epoch')\nplt.legend(['Train', 'Val'], loc='upper right')\nplt.show()",
+   "que_hace": "Fija `baseline = variant_median_flag` (mediana + indicador) y grafica `loss` contra `val_loss` del historial de entrenamiento.",
+   "como_funciona": "- Toma el diccionario que devolvió `train_and_report` en la celda 11.\n- Lee `history.history['loss']` y `['val_loss']` del objeto que devuelve `model.fit` y los grafica por época.",
+   "proposito": "Deja un único punto de referencia numérico para el resto del notebook y muestra, con la curva, que `val_loss` toca su mínimo temprano.",
+   "interaccion": "`baseline` lo consumen la celda 17 (métricas), la celda 18 (casa con mayor error), la celda 21 (ListingId) y la tabla de la celda 27.",
+   "teoria": "La loss que se minimiza (MSE con target escalado) se mira en train y en validación para detectar cuándo el modelo deja de generalizar.",
+   "key": "tp2-baseline-oficial",
+   "tp": 2,
+   "tp_titulo": "¿Cuánto vale esta casa?",
+   "usos": [
+    {
+     "clase": 3,
+     "cnn": "03",
+     "slug": "intro-redes-neuronales",
+     "i": 30,
+     "title": "El error: la función de coste",
+     "extra": false,
+     "url": "/clases/03/#d=intro-redes-neuronales&s=30"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 28,
+     "title": "Regresión: MSE, MAE y Huber",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=28"
+    }
+   ],
+   "nusos": 2
+  },
+  {
+   "id": "curva-overfit",
+   "titulo": "Curva y diagnóstico de la red sobredimensionada (celda 35)",
+   "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
+   "desde": 1,
+   "hasta": 12,
+   "lenguaje": "python",
+   "codigo": "plt.plot(hist_overfit.history['loss'])\nplt.plot(hist_overfit.history['val_loss'])\nplt.title('Modelo sobredimensionado (sin regularizar) — pérdida')\nplt.ylabel('Loss')\nplt.xlabel('Epoch')\nplt.legend(['Train', 'Val'], loc='upper right')\nplt.show()\n\nmin_val_epoch = int(np.argmin(hist_overfit.history['val_loss']))\nprint(f\"val_loss mínimo en la época {min_val_epoch}: {min(hist_overfit.history['val_loss']):.4f}\")\nprint(f\"val_loss final (época {len(hist_overfit.history['val_loss']) - 1}): {hist_overfit.history['val_loss'][-1]:.4f}\")\nprint(f\"train_loss final: {hist_overfit.history['loss'][-1]:.4f}\")",
+   "que_hace": "Grafica `loss` y `val_loss` de `hist_overfit` e imprime en qué época `val_loss` fue mínima y cómo terminaron ambas pérdidas.",
+   "como_funciona": "- `plt.plot` de las dos series del historial.\n- `np.argmin(hist_overfit.history['val_loss'])` ubica la mejor época de validación.\n- Compara ese mínimo con el `val_loss` final y el `train_loss` final.",
+   "proposito": "Es la evidencia del sobreajuste: el train sigue bajando mientras validación sube, lo que justifica regularizar y cortar antes.",
+   "interaccion": "Lee `hist_overfit` de la celda 34; motiva la celda 37 (L2, Dropout y `EarlyStopping` con `patience=15`), cuyo resultado se compara en la celda 38.",
+   "teoria": "Diagnóstico de overfitting: brecha creciente entre la pérdida de entrenamiento y la de validación.",
+   "key": "tp2-curva-overfit",
+   "tp": 2,
+   "tp_titulo": "¿Cuánto vale esta casa?",
+   "usos": [
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 47,
+     "title": "Qué mirar cuando esto se entrena",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=47"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 57,
+     "title": "Cuántas capas y cuánto ancho",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=57"
+    }
+   ],
+   "nusos": 2
   },
   {
    "id": "comparar-overfit-regularizado",
@@ -837,6 +1159,7 @@
      "slug": "modelado-redes-neuronales",
      "i": 47,
      "title": "Qué mirar cuando esto se entrena",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=47"
     }
    ],
@@ -865,10 +1188,38 @@
      "slug": "modelado-redes-neuronales",
      "i": 11,
      "title": "Numéricas: normalizar no es opcional",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=11"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 18,
+     "title": "Todo se aprende solo del train",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=18"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 20,
+     "title": "Qué hacer y qué no",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=20"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 62,
+     "title": "Checklist operativo para la práctica",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=62"
     }
    ],
-   "nusos": 1
+   "nusos": 4
   },
   {
    "id": "month-cyclical",
@@ -888,15 +1239,25 @@
    "tp_titulo": "¿Cuánto vale esta casa?",
    "usos": [
     {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 14,
+     "title": "La tabla de decisiones",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=14"
+    },
+    {
      "clase": 8,
      "cnn": "08",
      "slug": "transformers-a-fondo",
      "i": 27,
      "title": "La fórmula de la posición: senos y cosenos",
+     "extra": false,
      "url": "/clases/08/#d=transformers-a-fondo&s=27"
     }
    ],
-   "nusos": 1
+   "nusos": 2
   },
   {
    "id": "modelo-grande-512",
@@ -921,6 +1282,7 @@
      "slug": "intro-redes-neuronales",
      "i": 12,
      "title": "Las dos dimensiones: ancho y profundidad",
+     "extra": false,
      "url": "/clases/03/#d=intro-redes-neuronales&s=12"
     },
     {
@@ -929,7 +1291,26 @@
      "slug": "intro-redes-neuronales",
      "i": 13,
      "title": "Parámetros contra hiperparámetros",
+     "extra": false,
      "url": "/clases/03/#d=intro-redes-neuronales&s=13"
+    },
+    {
+     "clase": 3,
+     "cnn": "03",
+     "slug": "intro-redes-neuronales",
+     "i": 25,
+     "title": "Las funciones de activación más comunes",
+     "extra": false,
+     "url": "/clases/03/#d=intro-redes-neuronales&s=25"
+    },
+    {
+     "clase": 3,
+     "cnn": "03",
+     "slug": "intro-redes-neuronales",
+     "i": 29,
+     "title": "Ida y vuelta: forward y backward",
+     "extra": false,
+     "url": "/clases/03/#d=intro-redes-neuronales&s=29"
     },
     {
      "clase": 4,
@@ -937,7 +1318,17 @@
      "slug": "modelado-redes-neuronales",
      "i": 46,
      "title": "La función objetivo",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=46"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 47,
+     "title": "Qué mirar cuando esto se entrena",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=47"
     },
     {
      "clase": 4,
@@ -945,10 +1336,20 @@
      "slug": "modelado-redes-neuronales",
      "i": 57,
      "title": "Cuántas capas y cuánto ancho",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=57"
+    },
+    {
+     "clase": 12,
+     "cnn": "12",
+     "slug": "segmentacion-y-stable-diffusion",
+     "i": 4,
+     "title": "Cómo se entrena una red densa",
+     "extra": false,
+     "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=4"
     }
    ],
-   "nusos": 4
+   "nusos": 8
   },
   {
    "id": "baseline-mlp-32-32",
@@ -973,7 +1374,17 @@
      "slug": "introduccion",
      "i": 26,
      "title": "Redes Neuronales — Estructura y Celda Básica",
+     "extra": false,
      "url": "/clases/01/#d=introduccion&s=26"
+    },
+    {
+     "clase": 3,
+     "cnn": "03",
+     "slug": "intro-redes-neuronales",
+     "i": 8,
+     "title": "La sigmoide: la no linealidad clásica",
+     "extra": false,
+     "url": "/clases/03/#d=intro-redes-neuronales&s=8"
     },
     {
      "clase": 3,
@@ -981,7 +1392,17 @@
      "slug": "intro-redes-neuronales",
      "i": 9,
      "title": "La capa: el bloque que se repite",
+     "extra": false,
      "url": "/clases/03/#d=intro-redes-neuronales&s=9"
+    },
+    {
+     "clase": 3,
+     "cnn": "03",
+     "slug": "intro-redes-neuronales",
+     "i": 12,
+     "title": "Las dos dimensiones: ancho y profundidad",
+     "extra": false,
+     "url": "/clases/03/#d=intro-redes-neuronales&s=12"
     },
     {
      "clase": 3,
@@ -989,6 +1410,7 @@
      "slug": "intro-redes-neuronales",
      "i": 24,
      "title": "Sin activación, la red colapsa",
+     "extra": false,
      "url": "/clases/03/#d=intro-redes-neuronales&s=24"
     },
     {
@@ -997,7 +1419,17 @@
      "slug": "intro-redes-neuronales",
      "i": 25,
      "title": "Las funciones de activación más comunes",
+     "extra": false,
      "url": "/clases/03/#d=intro-redes-neuronales&s=25"
+    },
+    {
+     "clase": 3,
+     "cnn": "03",
+     "slug": "intro-redes-neuronales",
+     "i": 30,
+     "title": "El error: la función de coste",
+     "extra": false,
+     "url": "/clases/03/#d=intro-redes-neuronales&s=30"
     },
     {
      "clase": 4,
@@ -1005,7 +1437,35 @@
      "slug": "modelado-redes-neuronales",
      "i": 22,
      "title": "Un catálogo para elegir sin dudar",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=22"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 43,
+     "title": "El learning rate es el paso",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=43"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 57,
+     "title": "Cuántas capas y cuánto ancho",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=57"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 63,
+     "title": "Los notebooks de la clase",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=63"
     },
     {
      "clase": 8,
@@ -1013,6 +1473,7 @@
      "slug": "transformers-a-fondo",
      "i": 23,
      "title": "La feed-forward: la misma red para cada posición",
+     "extra": false,
      "url": "/clases/08/#d=transformers-a-fondo&s=23"
     },
     {
@@ -1021,10 +1482,38 @@
      "slug": "redes-generativas-antagonicas",
      "i": 23,
      "title": "Discriminador Como red neuronal",
+     "extra": false,
      "url": "/clases/11/#d=redes-generativas-antagonicas&s=23"
+    },
+    {
+     "clase": 11,
+     "cnn": "11",
+     "slug": "redes-generativas-antagonicas",
+     "i": 24,
+     "title": "Función Sigmoid: la activación del Discriminador",
+     "extra": false,
+     "url": "/clases/11/#d=redes-generativas-antagonicas&s=24"
+    },
+    {
+     "clase": 11,
+     "cnn": "11",
+     "slug": "redes-generativas-antagonicas",
+     "i": 29,
+     "title": "Binary cross-entropy: los dos casos del Discriminador",
+     "extra": false,
+     "url": "/clases/11/#d=redes-generativas-antagonicas&s=29"
+    },
+    {
+     "clase": 11,
+     "cnn": "11",
+     "slug": "redes-generativas-antagonicas",
+     "i": 32,
+     "title": "Backpropagation: el procedimiento paso a paso",
+     "extra": false,
+     "url": "/clases/11/#d=redes-generativas-antagonicas&s=32"
     }
    ],
-   "nusos": 7
+   "nusos": 16
   },
   {
    "id": "modelo-embedding-funcional",
@@ -1044,12 +1533,31 @@
    "tp_titulo": "¿Cuánto vale esta casa?",
    "usos": [
     {
+     "clase": 3,
+     "cnn": "03",
+     "slug": "intro-redes-neuronales",
+     "i": 25,
+     "title": "Las funciones de activación más comunes",
+     "extra": false,
+     "url": "/clases/03/#d=intro-redes-neuronales&s=25"
+    },
+    {
      "clase": 4,
      "cnn": "04",
      "slug": "modelado-redes-neuronales",
      "i": 12,
      "title": "Categóricas: one-hot contra embedding",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=12"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "palabra-al-transformer",
+     "i": 14,
+     "title": "Tres formas de volver texto en números",
+     "extra": false,
+     "url": "/clases/07/#d=palabra-al-transformer&s=14"
     },
     {
      "clase": 7,
@@ -1057,7 +1565,17 @@
      "slug": "palabra-al-transformer",
      "i": 15,
      "title": "De token a vector",
+     "extra": false,
      "url": "/clases/07/#d=palabra-al-transformer&s=15"
+    },
+    {
+     "clase": 12,
+     "cnn": "12",
+     "slug": "segmentacion-y-stable-diffusion",
+     "i": 2,
+     "title": "Una red neuronal clásica solo acepta entradas de largo fijo",
+     "extra": false,
+     "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=2"
     },
     {
      "clase": 12,
@@ -1065,10 +1583,11 @@
      "slug": "segmentacion-y-stable-diffusion",
      "i": 22,
      "title": "Embeddings más allá del texto",
+     "extra": false,
      "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=22"
     }
    ],
-   "nusos": 3
+   "nusos": 6
   },
   {
    "id": "train-and-report",
@@ -1088,12 +1607,58 @@
    "tp_titulo": "¿Cuánto vale esta casa?",
    "usos": [
     {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "introduccion",
+     "i": 26,
+     "title": "Redes Neuronales — Estructura y Celda Básica",
+     "extra": false,
+     "url": "/clases/01/#d=introduccion&s=26"
+    },
+    {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "introduccion",
+     "i": 32,
+     "title": "Ejemplos de problemas predictivos",
+     "extra": false,
+     "url": "/clases/01/#d=introduccion&s=32"
+    },
+    {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "introduccion",
+     "i": 50,
+     "title": "Paradigmas de Aprendizaje",
+     "extra": false,
+     "url": "/clases/01/#d=introduccion&s=50"
+    },
+    {
+     "clase": 3,
+     "cnn": "03",
+     "slug": "intro-redes-neuronales",
+     "i": 9,
+     "title": "La capa: el bloque que se repite",
+     "extra": false,
+     "url": "/clases/03/#d=intro-redes-neuronales&s=9"
+    },
+    {
      "clase": 3,
      "cnn": "03",
      "slug": "intro-redes-neuronales",
      "i": 29,
      "title": "Ida y vuelta: forward y backward",
+     "extra": false,
      "url": "/clases/03/#d=intro-redes-neuronales&s=29"
+    },
+    {
+     "clase": 3,
+     "cnn": "03",
+     "slug": "intro-redes-neuronales",
+     "i": 30,
+     "title": "El error: la función de coste",
+     "extra": false,
+     "url": "/clases/03/#d=intro-redes-neuronales&s=30"
     },
     {
      "clase": 3,
@@ -1101,7 +1666,35 @@
      "slug": "intro-redes-neuronales",
      "i": 34,
      "title": "El paso de actualización",
+     "extra": false,
      "url": "/clases/03/#d=intro-redes-neuronales&s=34"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 11,
+     "title": "Numéricas: normalizar no es opcional",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=11"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 16,
+     "title": "Un dataset, tres trabajos distintos",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=16"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 28,
+     "title": "Regresión: MSE, MAE y Huber",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=28"
     },
     {
      "clase": 4,
@@ -1109,6 +1702,7 @@
      "slug": "modelado-redes-neuronales",
      "i": 43,
      "title": "El learning rate es el paso",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=43"
     },
     {
@@ -1117,6 +1711,7 @@
      "slug": "modelado-redes-neuronales",
      "i": 44,
      "title": "Batch y época no son lo mismo",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=44"
     },
     {
@@ -1125,6 +1720,7 @@
      "slug": "redes-generativas-antagonicas",
      "i": 32,
      "title": "Backpropagation: el procedimiento paso a paso",
+     "extra": false,
      "url": "/clases/11/#d=redes-generativas-antagonicas&s=32"
     },
     {
@@ -1133,10 +1729,121 @@
      "slug": "redes-generativas-antagonicas",
      "i": 34,
      "title": "El ciclo completo: Generador y Discriminador juntos",
+     "extra": false,
      "url": "/clases/11/#d=redes-generativas-antagonicas&s=34"
     }
    ],
-   "nusos": 6
+   "nusos": 14
+  },
+  {
+   "id": "train-categorical-variant",
+   "titulo": "Entrenar una variante: features, índices de distrito y fit (celda 26)",
+   "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
+   "desde": 57,
+   "hasta": 93,
+   "lenguaje": "python",
+   "codigo": "def train_categorical_variant(use_state, use_district, use_housestyle, use_centralair,\n                               use_salecondition, cyclical_month, district_int=False, epochs=100):\n    X_dense_train, scaler = build_dense_features(\n        df_train, lotfrontage_median, use_state, use_housestyle, use_centralair,\n        use_salecondition, cyclical_month, district_int, fit_scaler=True)\n    X_dense_val, _ = build_dense_features(\n        df_val, lotfrontage_median, use_state, use_housestyle, use_centralair,\n        use_salecondition, cyclical_month, district_int, scaler=scaler)\n    X_dense_test, _ = build_dense_features(\n        df_test, lotfrontage_median, use_state, use_housestyle, use_centralair,\n        use_salecondition, cyclical_month, district_int, scaler=scaler)\n\n    y_train_raw = df_train[TARGET].to_numpy(dtype=float)\n    y_val_raw = df_val[TARGET].to_numpy(dtype=float)\n    y_test_raw = df_test[TARGET].to_numpy(dtype=float)\n    y_scaler = StandardScaler().fit(y_train_raw.reshape(-1, 1))\n    y_train = y_scaler.transform(y_train_raw.reshape(-1, 1)).ravel()\n    y_val = y_scaler.transform(y_val_raw.reshape(-1, 1)).ravel()\n\n    if use_district:\n        inputs_train = [X_dense_train, build_district_idx(df_train)]\n        inputs_val = [X_dense_val, build_district_idx(df_val)]\n        inputs_test = [X_dense_test, build_district_idx(df_test)]\n    else:\n        inputs_train, inputs_val, inputs_test = X_dense_train, X_dense_val, X_dense_test\n\n    keras.utils.set_random_seed(SEED)\n    model = build_model_categorical(X_dense_train.shape[1], use_district, DISTRICT_VOCAB_SIZE)\n    hist = model.fit(inputs_train, y_train, batch_size=32, epochs=epochs,\n                      validation_data=(inputs_val, y_val), verbose=0)\n\n    y_pred = y_scaler.inverse_transform(model.predict(inputs_test, verbose=0)).ravel()\n    mae = mean_absolute_error(y_test_raw, y_pred)\n    rmse = np.sqrt(mean_squared_error(y_test_raw, y_pred))\n    mape = 100 * mean_absolute_percentage_error(y_test_raw, y_pred)\n    return {'model': model, 'history': hist, 'mae': mae, 'rmse': rmse, 'mape': mape,\n            'y_test': y_test_raw, 'y_pred': y_pred}",
+   "que_hace": "Arma las entradas de train/val/test para una combinación de columnas, construye la red con `build_model_categorical`, la entrena y devuelve MAE, RMSE y MAPE en dólares sobre test.",
+   "como_funciona": "- Llama tres veces a `build_dense_features`: con `fit_scaler=True` en `df_train` y reusando ese `scaler` en `df_val` y `df_test`.\n- Escala `SalePrice` con un `y_scaler` ajustado solo en train.\n- Si `use_district`, cada entrada pasa a ser una lista `[X_dense, build_district_idx(...)]` para las dos ramas del modelo.\n- Fija `SEED`, entrena con `batch_size=32` y desescala las predicciones con `inverse_transform` antes de medir.",
+   "proposito": "Es el banco de pruebas del Milestone 3: el mismo procedimiento para todas las variantes, así la única diferencia entre filas de la tabla es qué columnas entran y cómo se codifican.",
+   "interaccion": "La llaman la celda 27 (`v1_state`, `v2_district`, `v3_full`) y la celda 31 (trampa con `district_int=True`). Consume `build_dense_features`, `build_district_idx` y `build_model_categorical` (misma celda) y los encoders de la celda 25.",
+   "teoria": "Materializa la idea de que la red solo ve una fila de números: la arquitectura queda fija y lo que cambia es la codificación de la entrada.",
+   "key": "tp2-train-categorical-variant",
+   "tp": 2,
+   "tp_titulo": "¿Cuánto vale esta casa?",
+   "usos": [
+    {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "introduccion",
+     "i": 32,
+     "title": "Ejemplos de problemas predictivos",
+     "extra": false,
+     "url": "/clases/01/#d=introduccion&s=32"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 2,
+     "title": "La red ve una fila de números",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=2"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 12,
+     "title": "Categóricas: one-hot contra embedding",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=12"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 13,
+     "title": "Errores de codificación caros",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=13"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 17,
+     "title": "Los tres, lado a lado",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=17"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 18,
+     "title": "Todo se aprende solo del train",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=18"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 61,
+     "title": "Lo que hay que llevarse",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=61"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "palabra-al-transformer",
+     "i": 15,
+     "title": "De token a vector",
+     "extra": false,
+     "url": "/clases/07/#d=palabra-al-transformer&s=15"
+    },
+    {
+     "clase": 12,
+     "cnn": "12",
+     "slug": "segmentacion-y-stable-diffusion",
+     "i": 2,
+     "title": "Una red neuronal clásica solo acepta entradas de largo fijo",
+     "extra": false,
+     "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=2"
+    },
+    {
+     "clase": 12,
+     "cnn": "12",
+     "slug": "segmentacion-y-stable-diffusion",
+     "i": 22,
+     "title": "Embeddings más allá del texto",
+     "extra": false,
+     "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=22"
+    }
+   ],
+   "nusos": 10
   },
   {
    "id": "clase-sigmoide",
@@ -1161,7 +1868,17 @@
      "slug": "intro-redes-neuronales",
      "i": 8,
      "title": "La sigmoide: la no linealidad clásica",
+     "extra": false,
      "url": "/clases/03/#d=intro-redes-neuronales&s=8"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 22,
+     "title": "Un catálogo para elegir sin dudar",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=22"
     },
     {
      "clase": 4,
@@ -1169,6 +1886,7 @@
      "slug": "modelado-redes-neuronales",
      "i": 63,
      "title": "Los notebooks de la clase",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=63"
     },
     {
@@ -1177,10 +1895,11 @@
      "slug": "redes-generativas-antagonicas",
      "i": 24,
      "title": "Función Sigmoid: la activación del Discriminador",
+     "extra": false,
      "url": "/clases/11/#d=redes-generativas-antagonicas&s=24"
     }
    ],
-   "nusos": 3
+   "nusos": 4
   },
   {
    "id": "clase-compile-bce",
@@ -1200,12 +1919,60 @@
    "tp_titulo": "¿Cuánto vale esta casa?",
    "usos": [
     {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 22,
+     "title": "Un catálogo para elegir sin dudar",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=22"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 63,
+     "title": "Los notebooks de la clase",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=63"
+    },
+    {
      "clase": 11,
      "cnn": "11",
      "slug": "redes-generativas-antagonicas",
      "i": 29,
      "title": "Binary cross-entropy: los dos casos del Discriminador",
+     "extra": false,
      "url": "/clases/11/#d=redes-generativas-antagonicas&s=29"
+    }
+   ],
+   "nusos": 3
+  },
+  {
+   "id": "clase-fit",
+   "titulo": "Notebook de clase: fit con lotes de 32 y 100 épocas (house-prices.ipynb, celda 31)",
+   "archivo": "house-prices.ipynb",
+   "desde": 1,
+   "hasta": 3,
+   "lenguaje": "python",
+   "codigo": "hist = model.fit(X_train, Y_train,\n          batch_size=32, epochs=100,\n          validation_data=(X_val, Y_val))",
+   "que_hace": "Entrena el clasificador de clase sobre `X_train`/`Y_train`, con validación en cada época, y guarda el historial en `hist`.",
+   "como_funciona": "`model.fit` recorre los datos en lotes de 32 durante 100 épocas; `validation_data` hace que Keras reporte la pérdida de validación al final de cada época.",
+   "proposito": "Es el ciclo de entrenamiento de referencia de la clase; el TP2 conservó `batch_size=32` y 100 épocas en `train_and_report`.",
+   "interaccion": "Entrena el `model` de la celda 25 compilado en la celda 29; `hist` se grafica más adelante en el mismo notebook.",
+   "teoria": "Forward, cálculo de la loss y backpropagation por lote, repetidos durante varias épocas.",
+   "key": "tp2-clase-fit",
+   "tp": 2,
+   "tp_titulo": "¿Cuánto vale esta casa?",
+   "usos": [
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 63,
+     "title": "Los notebooks de la clase",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=63"
     }
    ],
    "nusos": 1
@@ -1231,12 +1998,22 @@
      "clase": 4,
      "cnn": "04",
      "slug": "modelado-redes-neuronales",
+     "i": 18,
+     "title": "Todo se aprende solo del train",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=18"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
      "i": 32,
      "title": "Percentiles: la pinball loss",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=32"
     }
    ],
-   "nusos": 1
+   "nusos": 2
   }
  ]
 }

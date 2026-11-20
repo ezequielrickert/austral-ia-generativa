@@ -55,8 +55,9 @@
        "tp": 2,
        "texto": "Tu TP2 es exactamente este caso: cada casa, un vector fijo (z-score, one-hot, mes sin/cos) entrando a un MLP 32-32-1.",
        "tp_titulo": "¿Cuánto vale esta casa?",
-       "code": "tp2-build-dense-features",
-       "nota": "Cada casa sale de acá como un vector de largo fijo, condición para entrar a un MLP."
+       "code": "tp2-build-dense-features,tp2-train-categorical-variant,tp2-modelo-embedding-funcional",
+       "ncode": 3,
+       "nota": "Cada casa sale de `build_dense_features` como un vector de largo fijo, y ese largo (`X_dense_train.shape[1]`) define el `Input` del MLP."
       }
      ],
      "ver": [
@@ -66,7 +67,8 @@
        "cnn": "04",
        "i": 2,
        "title": "La red ve una fila de números",
-       "por": "La red ve una fila de números"
+       "por": "La red ve una fila de números",
+       "extra": false
       }
      ],
      "key": false,
@@ -123,7 +125,8 @@
        "tp": 2,
        "texto": "En el TP2 `fit` corrió este ciclo con Adam y `batch_size=32`; con early stopping la red 512-512-512 cortó en la época 76 de 150.",
        "tp_titulo": "¿Cuánto vale esta casa?",
-       "code": "tp2-regularizado-early-stopping",
+       "code": "tp2-features-milestone4,tp2-modelo-grande-512,tp2-regularizado-early-stopping",
+       "ncode": 3,
        "nota": "Este `fit` es el ciclo forward/backward; con early stopping la red cortó en la época 76 de 150."
       }
      ],
@@ -134,7 +137,8 @@
        "cnn": "03",
        "i": 29,
        "title": "Ida y vuelta: forward y backward",
-       "por": "Forward y backward en la clase 3"
+       "por": "Forward y backward en la clase 3",
+       "extra": false
       }
      ],
      "key": true,
@@ -202,7 +206,8 @@
        "cnn": "07",
        "i": 21,
        "title": "Promediar una frase pierde el orden",
-       "por": "Promediar una frase pierde el orden"
+       "por": "Promediar una frase pierde el orden",
+       "extra": false
       }
      ],
      "key": true,
@@ -395,7 +400,8 @@
        "cnn": "07",
        "i": 27,
        "title": "Cada token mira a todos",
-       "por": "Atención: cada token mira a todos"
+       "por": "Atención: cada token mira a todos",
+       "extra": false
       }
      ],
      "key": true,
@@ -572,15 +578,17 @@
        "tp": 2,
        "texto": "En el TP2 `District` (72 valores) pasó por `Embedding(73, 8)`: el MAE bajó de 30.956 a 25.380.",
        "tp_titulo": "¿Cuánto vale esta casa?",
-       "code": "tp2-modelo-embedding-funcional",
+       "code": "tp2-encoders-solo-train,tp2-modelo-embedding-funcional,tp2-train-categorical-variant,tp2-variantes-incrementales",
+       "ncode": 4,
        "nota": ""
       },
       {
        "tp": 3,
        "texto": "En el TP3 usaste embeddings de texto: e5-base con chunking por sección logró Context Recall 0,967 contra 0,350 de BERT promediado.",
        "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
-       "code": "tp3-encoder-e5-prefijos",
-       "nota": ""
+       "code": "tp3-encoder-e5-prefijos,tp3-informe-por-que-e5",
+       "ncode": 2,
+       "nota": "e5-base embebe texto; el informe compara su CR (1,000 con k = 1) contra BERT promediado (0,350)."
       }
      ],
      "ver": [
@@ -590,7 +598,8 @@
        "cnn": "07",
        "i": 16,
        "title": "El espacio de embeddings",
-       "por": "El espacio de embeddings"
+       "por": "El espacio de embeddings",
+       "extra": false
       }
      ],
      "key": false,
@@ -810,7 +819,8 @@
        "cnn": "08",
        "i": 25,
        "title": "Residuales: la salida es la entrada más una corrección",
-       "por": "Residuales: otro atajo en la red"
+       "por": "Residuales: otro atajo en la red",
+       "extra": false
       }
      ],
      "key": true,
@@ -870,7 +880,8 @@
        "cnn": "04",
        "i": 29,
        "title": "Clasificación binaria: BCE",
-       "por": "BCE en la clase de diseño"
+       "por": "BCE en la clase de diseño",
+       "extra": false
       }
      ],
      "key": false,
@@ -937,7 +948,8 @@
        "cnn": "01",
        "i": 46,
        "title": "Modelos Fundacionales",
-       "por": "Modelos fundacionales en la clase 1"
+       "por": "Modelos fundacionales en la clase 1",
+       "extra": false
       }
      ],
      "key": true,
@@ -969,7 +981,8 @@
        "cnn": "08",
        "i": 35,
        "title": "Fuera del texto: ViT",
-       "por": "ViT: transformer sobre parches"
+       "por": "ViT: transformer sobre parches",
+       "extra": false
       }
      ],
      "key": false,
@@ -1101,7 +1114,8 @@
        "cnn": "11",
        "i": 45,
        "title": "Fortaleza 2: Transformación de imágenes (Image Translation)",
-       "por": "Pix2Pix: image translation con GANs"
+       "por": "Pix2Pix: image translation con GANs",
+       "extra": false
       }
      ],
      "key": false,
@@ -1145,7 +1159,8 @@
        "cnn": "11",
        "i": 17,
        "title": "El problema urgente",
-       "por": "El problema original de TiltedTinder"
+       "por": "El problema original de TiltedTinder",
+       "extra": false
       }
      ],
      "key": false,
@@ -1182,7 +1197,8 @@
        "cnn": "11",
        "i": 38,
        "title": "Tipos de GANs: el punto de partida",
-       "por": "Tipos de GANs y sus límites"
+       "por": "Tipos de GANs y sus límites",
+       "extra": false
       }
      ],
      "key": false,
@@ -1262,7 +1278,8 @@
        "tp": 3,
        "texto": "e5-base, el encoder que elegiste en el TP3, también es contrastivo (consulta–pasaje): por eso el fragmento correcto queda a 3,94 desvíos y con BERT crudo a 1,56.",
        "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
-       "code": "tp3-encoder-e5-prefijos",
+       "code": "tp3-encoder-e5-prefijos,tp3-informe-por-que-e5",
+       "ncode": 2,
        "nota": "Como CLIP, e5 se entrenó de forma contrastiva acercando pares (consulta, pasaje)."
       }
      ],
@@ -1273,7 +1290,8 @@
        "cnn": "08",
        "i": 34,
        "title": "Del encoder al embedding de oración",
-       "por": "Del encoder al embedding de oración"
+       "por": "Del encoder al embedding de oración",
+       "extra": false
       }
      ],
      "key": true,
@@ -1307,8 +1325,9 @@
        "tp": 3,
        "texto": "En el TP3 normalizaste los embeddings con L2, así el producto punto es el coseno, igual que en la matriz S de CLIP.",
        "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
-       "code": "tp3-encoder-bert-promedio",
-       "nota": "`_normalizar` divide por la norma L2: después el producto punto es el coseno, como en la matriz S de CLIP."
+       "code": "tp3-encoder-bert-promedio,tp3-recuperador-coseno-exacto",
+       "ncode": 2,
+       "nota": "`_normalizar` divide por la norma L2: después `matriz @ q` es el coseno, como en la matriz S de CLIP."
       }
      ],
      "ver": [
@@ -1318,7 +1337,8 @@
        "cnn": "06",
        "i": 21,
        "title": "Coseno: importa el ángulo",
-       "por": "Coseno: importa el ángulo"
+       "por": "Coseno: importa el ángulo",
+       "extra": false
       }
      ],
      "key": false,
@@ -1390,7 +1410,8 @@
        "cnn": "11",
        "i": 50,
        "title": "Limitaciones (1 de 2): los problemas de entrenamiento",
-       "por": "Mode collapse e inestabilidad en GANs"
+       "por": "Mode collapse e inestabilidad en GANs",
+       "extra": false
       }
      ],
      "key": false,
@@ -1603,7 +1624,8 @@
        "cnn": "11",
        "i": 26,
        "title": "El Generador: el objetivo opuesto",
-       "por": "El z de la GAN: espacio latente"
+       "por": "El z de la GAN: espacio latente",
+       "extra": false
       }
      ],
      "key": false,
@@ -1653,7 +1675,8 @@
        "cnn": "08",
        "i": 31,
        "title": "Encoder y decoder en el paper de 2017",
-       "por": "Encoder-decoder y cross-attention de 2017"
+       "por": "Encoder-decoder y cross-attention de 2017",
+       "extra": false
       }
      ],
      "key": true,
@@ -1690,7 +1713,8 @@
        "cnn": "05",
        "i": 6,
        "title": "Cómo se tokeniza",
-       "por": "Cómo se tokeniza"
+       "por": "Cómo se tokeniza",
+       "extra": false
       }
      ],
      "key": false,
@@ -1814,7 +1838,8 @@
        "cnn": "13",
        "i": 32,
        "title": "Para empezar",
-       "por": "Sesgos como desafío ético"
+       "por": "Sesgos como desafío ético",
+       "extra": false
       }
      ],
      "key": false,
@@ -1906,8 +1931,9 @@
        "tp": 4,
        "texto": "En el TP4 aplicaste LoRA (r=8, α=16, solo `q_proj`/`v_proj`) sobre el LLM, pero solo en corridas de humo: el entrenamiento real quedó pendiente.",
        "tp_titulo": "El agente de admisión de guardia (TP final)",
-       "code": "tp4-lora-config",
-       "nota": "La misma idea de LoRA que en Stable Diffusion, aplicada a la atención de un LLM."
+       "code": "tp4-lora-config,tp4-lora-aplicar,tp4-informe-sft-real",
+       "ncode": 3,
+       "nota": "La misma idea de LoRA que en Stable Diffusion, aplicada a la atención de un LLM. El entrenamiento real sí corrió (v32+v33, luego v39)."
       }
      ],
      "ver": [
@@ -1917,7 +1943,8 @@
        "cnn": "09",
        "i": 55,
        "title": "Fine-tuning local: el recorrido",
-       "por": "Fine-tuning local: el recorrido"
+       "por": "Fine-tuning local: el recorrido",
+       "extra": false
       }
      ],
      "key": false,
@@ -2572,43 +2599,189 @@
    "tp_titulo": "¿Cuánto vale esta casa?",
    "usos": [
     {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 2,
+     "title": "La red ve una fila de números",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=2"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 10,
+     "title": "La pregunta que decide la codificación",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=10"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 12,
+     "title": "Categóricas: one-hot contra embedding",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=12"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 13,
+     "title": "Errores de codificación caros",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=13"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 14,
+     "title": "La tabla de decisiones",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=14"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "palabra-al-transformer",
+     "i": 14,
+     "title": "Tres formas de volver texto en números",
+     "extra": false,
+     "url": "/clases/07/#d=palabra-al-transformer&s=14"
+    },
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
+     "i": 27,
+     "title": "La fórmula de la posición: senos y cosenos",
+     "extra": false,
+     "url": "/clases/08/#d=transformers-a-fondo&s=27"
+    },
+    {
      "clase": 12,
      "cnn": "12",
      "slug": "segmentacion-y-stable-diffusion",
      "i": 2,
      "title": "Una red neuronal clásica solo acepta entradas de largo fijo",
+     "extra": false,
      "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=2"
     }
    ],
-   "nusos": 1
+   "nusos": 8
   },
   {
-   "id": "regularizado-early-stopping",
-   "titulo": "L2 0,001 + Dropout 0,3 + EarlyStopping (celda 37)",
+   "id": "train-categorical-variant",
+   "titulo": "Entrenar una variante: features, índices de distrito y fit (celda 26)",
    "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
-   "desde": 1,
-   "hasta": 11,
+   "desde": 57,
+   "hasta": 93,
    "lenguaje": "python",
-   "codigo": "keras.utils.set_random_seed(SEED)\nmodel_regularized = build_big_model(X4_train.shape[1], DISTRICT_VOCAB_SIZE, l2=0.001, dropout=0.3)\n\nearly_stopping = EarlyStopping(monitor='val_loss', patience=15, restore_best_weights=True)\n\nhist_regularized = model_regularized.fit(\n    [X4_train, d4_train], y4_train, batch_size=32, epochs=150,\n    validation_data=([X4_val, d4_val], y4_val), callbacks=[early_stopping], verbose=0)\n\nprint(f\"Entrenó {len(hist_regularized.history['loss'])} épocas \"\n      f\"(de las 150 posibles) antes de que early stopping cortara.\")",
-   "que_hace": "Entrena la misma red 512-512-512 pero regularizada y con early stopping sobre `val_loss`.",
-   "como_funciona": "- `build_big_model(..., l2=0.001, dropout=0.3)`.\n- `EarlyStopping(monitor='val_loss', patience=15, restore_best_weights=True)` corta si la validación no mejora en 15 épocas y restaura los mejores pesos.\n- `fit` con `batch_size=32`, hasta 150 épocas; imprime cuántas corrió (76).",
-   "proposito": "Combina tres frenos al sobreajuste: L2 achica pesos, dropout apaga neuronas al azar en entrenamiento y early stopping usa la validación para decidir cuándo parar.",
-   "interaccion": "Usa `build_big_model` y los tensores de la celda 34; sus curvas y métricas se comparan con `model_overfit` en la celda 38.",
-   "teoria": "Regularización y lectura de la curva train vs val; ciclo forward/backward por épocas y lotes.",
-   "key": "tp2-regularizado-early-stopping",
+   "codigo": "def train_categorical_variant(use_state, use_district, use_housestyle, use_centralair,\n                               use_salecondition, cyclical_month, district_int=False, epochs=100):\n    X_dense_train, scaler = build_dense_features(\n        df_train, lotfrontage_median, use_state, use_housestyle, use_centralair,\n        use_salecondition, cyclical_month, district_int, fit_scaler=True)\n    X_dense_val, _ = build_dense_features(\n        df_val, lotfrontage_median, use_state, use_housestyle, use_centralair,\n        use_salecondition, cyclical_month, district_int, scaler=scaler)\n    X_dense_test, _ = build_dense_features(\n        df_test, lotfrontage_median, use_state, use_housestyle, use_centralair,\n        use_salecondition, cyclical_month, district_int, scaler=scaler)\n\n    y_train_raw = df_train[TARGET].to_numpy(dtype=float)\n    y_val_raw = df_val[TARGET].to_numpy(dtype=float)\n    y_test_raw = df_test[TARGET].to_numpy(dtype=float)\n    y_scaler = StandardScaler().fit(y_train_raw.reshape(-1, 1))\n    y_train = y_scaler.transform(y_train_raw.reshape(-1, 1)).ravel()\n    y_val = y_scaler.transform(y_val_raw.reshape(-1, 1)).ravel()\n\n    if use_district:\n        inputs_train = [X_dense_train, build_district_idx(df_train)]\n        inputs_val = [X_dense_val, build_district_idx(df_val)]\n        inputs_test = [X_dense_test, build_district_idx(df_test)]\n    else:\n        inputs_train, inputs_val, inputs_test = X_dense_train, X_dense_val, X_dense_test\n\n    keras.utils.set_random_seed(SEED)\n    model = build_model_categorical(X_dense_train.shape[1], use_district, DISTRICT_VOCAB_SIZE)\n    hist = model.fit(inputs_train, y_train, batch_size=32, epochs=epochs,\n                      validation_data=(inputs_val, y_val), verbose=0)\n\n    y_pred = y_scaler.inverse_transform(model.predict(inputs_test, verbose=0)).ravel()\n    mae = mean_absolute_error(y_test_raw, y_pred)\n    rmse = np.sqrt(mean_squared_error(y_test_raw, y_pred))\n    mape = 100 * mean_absolute_percentage_error(y_test_raw, y_pred)\n    return {'model': model, 'history': hist, 'mae': mae, 'rmse': rmse, 'mape': mape,\n            'y_test': y_test_raw, 'y_pred': y_pred}",
+   "que_hace": "Arma las entradas de train/val/test para una combinación de columnas, construye la red con `build_model_categorical`, la entrena y devuelve MAE, RMSE y MAPE en dólares sobre test.",
+   "como_funciona": "- Llama tres veces a `build_dense_features`: con `fit_scaler=True` en `df_train` y reusando ese `scaler` en `df_val` y `df_test`.\n- Escala `SalePrice` con un `y_scaler` ajustado solo en train.\n- Si `use_district`, cada entrada pasa a ser una lista `[X_dense, build_district_idx(...)]` para las dos ramas del modelo.\n- Fija `SEED`, entrena con `batch_size=32` y desescala las predicciones con `inverse_transform` antes de medir.",
+   "proposito": "Es el banco de pruebas del Milestone 3: el mismo procedimiento para todas las variantes, así la única diferencia entre filas de la tabla es qué columnas entran y cómo se codifican.",
+   "interaccion": "La llaman la celda 27 (`v1_state`, `v2_district`, `v3_full`) y la celda 31 (trampa con `district_int=True`). Consume `build_dense_features`, `build_district_idx` y `build_model_categorical` (misma celda) y los encoders de la celda 25.",
+   "teoria": "Materializa la idea de que la red solo ve una fila de números: la arquitectura queda fija y lo que cambia es la codificación de la entrada.",
+   "key": "tp2-train-categorical-variant",
    "tp": 2,
    "tp_titulo": "¿Cuánto vale esta casa?",
    "usos": [
     {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "introduccion",
+     "i": 32,
+     "title": "Ejemplos de problemas predictivos",
+     "extra": false,
+     "url": "/clases/01/#d=introduccion&s=32"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 2,
+     "title": "La red ve una fila de números",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=2"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 12,
+     "title": "Categóricas: one-hot contra embedding",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=12"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 13,
+     "title": "Errores de codificación caros",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=13"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 17,
+     "title": "Los tres, lado a lado",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=17"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 18,
+     "title": "Todo se aprende solo del train",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=18"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 61,
+     "title": "Lo que hay que llevarse",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=61"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "palabra-al-transformer",
+     "i": 15,
+     "title": "De token a vector",
+     "extra": false,
+     "url": "/clases/07/#d=palabra-al-transformer&s=15"
+    },
+    {
      "clase": 12,
      "cnn": "12",
      "slug": "segmentacion-y-stable-diffusion",
-     "i": 4,
-     "title": "Cómo se entrena una red densa",
-     "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=4"
+     "i": 2,
+     "title": "Una red neuronal clásica solo acepta entradas de largo fijo",
+     "extra": false,
+     "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=2"
+    },
+    {
+     "clase": 12,
+     "cnn": "12",
+     "slug": "segmentacion-y-stable-diffusion",
+     "i": 22,
+     "title": "Embeddings más allá del texto",
+     "extra": false,
+     "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=22"
     }
    ],
-   "nusos": 1
+   "nusos": 10
   },
   {
    "id": "modelo-embedding-funcional",
@@ -2628,12 +2801,31 @@
    "tp_titulo": "¿Cuánto vale esta casa?",
    "usos": [
     {
+     "clase": 3,
+     "cnn": "03",
+     "slug": "intro-redes-neuronales",
+     "i": 25,
+     "title": "Las funciones de activación más comunes",
+     "extra": false,
+     "url": "/clases/03/#d=intro-redes-neuronales&s=25"
+    },
+    {
      "clase": 4,
      "cnn": "04",
      "slug": "modelado-redes-neuronales",
      "i": 12,
      "title": "Categóricas: one-hot contra embedding",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=12"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "palabra-al-transformer",
+     "i": 14,
+     "title": "Tres formas de volver texto en números",
+     "extra": false,
+     "url": "/clases/07/#d=palabra-al-transformer&s=14"
     },
     {
      "clase": 7,
@@ -2641,6 +2833,267 @@
      "slug": "palabra-al-transformer",
      "i": 15,
      "title": "De token a vector",
+     "extra": false,
+     "url": "/clases/07/#d=palabra-al-transformer&s=15"
+    },
+    {
+     "clase": 12,
+     "cnn": "12",
+     "slug": "segmentacion-y-stable-diffusion",
+     "i": 2,
+     "title": "Una red neuronal clásica solo acepta entradas de largo fijo",
+     "extra": false,
+     "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=2"
+    },
+    {
+     "clase": 12,
+     "cnn": "12",
+     "slug": "segmentacion-y-stable-diffusion",
+     "i": 22,
+     "title": "Embeddings más allá del texto",
+     "extra": false,
+     "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=22"
+    }
+   ],
+   "nusos": 6
+  },
+  {
+   "id": "features-milestone4",
+   "titulo": "Entradas del Milestone 4: mismo vector del modelo completo (celda 34)",
+   "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
+   "desde": 1,
+   "hasta": 17,
+   "lenguaje": "python",
+   "codigo": "from keras.layers import Dropout\nfrom keras import regularizers\nfrom keras.callbacks import EarlyStopping\n\n# Mismo feature set que el modelo completo del Milestone 3 (fit_scaler solo en train).\nX4_train, scaler4 = build_dense_features(df_train, lotfrontage_median, True, True, True, True, True, fit_scaler=True)\nX4_val, _ = build_dense_features(df_val, lotfrontage_median, True, True, True, True, True, scaler=scaler4)\nX4_test, _ = build_dense_features(df_test, lotfrontage_median, True, True, True, True, True, scaler=scaler4)\n\nd4_train, d4_val, d4_test = build_district_idx(df_train), build_district_idx(df_val), build_district_idx(df_test)\n\ny4_train_raw = df_train[TARGET].to_numpy(dtype=float)\ny4_val_raw = df_val[TARGET].to_numpy(dtype=float)\ny4_test_raw = df_test[TARGET].to_numpy(dtype=float)\ny4_scaler = StandardScaler().fit(y4_train_raw.reshape(-1, 1))\ny4_train = y4_scaler.transform(y4_train_raw.reshape(-1, 1)).ravel()\ny4_val = y4_scaler.transform(y4_val_raw.reshape(-1, 1)).ravel()",
+   "que_hace": "Construye una vez los tensores `X4_*` (features densas), `d4_*` (índices de distrito) e `y4_*` (target escalado) que usan la red grande y la regularizada.",
+   "como_funciona": "- Llama a `build_dense_features` con todas las opciones en `True`, ajustando `scaler4` solo con `df_train`.\n- `build_district_idx` convierte cada `District` en el índice que va al `Embedding`.\n- `y4_scaler` se ajusta con el precio de train y transforma train y val.",
+   "proposito": "Fija el mismo conjunto de features del modelo completo del Milestone 3 para que la comparación del Milestone 4 aísle el efecto del tamaño y la regularización.",
+   "interaccion": "Sus salidas las consumen `build_big_model`/`model_overfit.fit` (misma celda), `model_regularized.fit` (celda 37) y la comparación en dólares con `y4_scaler.inverse_transform` (celda 38).",
+   "teoria": "Entrada de largo fijo, ajustada solo en train: el preprocesamiento queda separado de la arquitectura que se está probando.",
+   "key": "tp2-features-milestone4",
+   "tp": 2,
+   "tp_titulo": "¿Cuánto vale esta casa?",
+   "usos": [
+    {
+     "clase": 12,
+     "cnn": "12",
+     "slug": "segmentacion-y-stable-diffusion",
+     "i": 4,
+     "title": "Cómo se entrena una red densa",
+     "extra": false,
+     "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=4"
+    }
+   ],
+   "nusos": 1
+  },
+  {
+   "id": "modelo-grande-512",
+   "titulo": "Red 512-512-512 sobredimensionada y configurable (celda 34)",
+   "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
+   "desde": 19,
+   "hasta": 42,
+   "lenguaje": "python",
+   "codigo": "def build_big_model(n_dense, district_vocab_size, embed_dim=8, units=(512, 512, 512),\n                     l2=0.0, dropout=0.0):\n    dense_input = Input(shape=(n_dense,), name='dense_features')\n    district_input = Input(shape=(1,), name='district_idx')\n    embed = Embedding(input_dim=district_vocab_size, output_dim=embed_dim, name='district_embedding')(district_input)\n    embed = Flatten()(embed)\n    x = Concatenate()([dense_input, embed])\n    reg = regularizers.l2(l2) if l2 > 0 else None\n    for units_in_layer in units:\n        x = Dense(units_in_layer, activation='relu', kernel_regularizer=reg)(x)\n        if dropout > 0:\n            x = Dropout(dropout)(x)\n    output = Dense(1, activation='linear')(x)\n    model = Model(inputs=[dense_input, district_input], outputs=output)\n    model.compile(optimizer='adam', loss='mse', metrics=['mae'])\n    return model\n\nkeras.utils.set_random_seed(SEED)\nmodel_overfit = build_big_model(X4_train.shape[1], DISTRICT_VOCAB_SIZE)\nprint(f\"Parámetros del modelo sobredimensionado: {model_overfit.count_params():,}\"\n      f\"  (contra {X4_train.shape[0]} casas de entrenamiento)\")\n\nhist_overfit = model_overfit.fit([X4_train, d4_train], y4_train, batch_size=32, epochs=150,\n                                  validation_data=([X4_val, d4_val], y4_val), verbose=0)",
+   "que_hace": "Define `build_big_model` (embedding + capas anchas con L2 y dropout opcionales) y entrena la versión sin regularizar durante 150 épocas.",
+   "como_funciona": "1. Misma entrada doble que el Milestone 3 (`dense_features` + `district_idx` → `Embedding` → `Flatten` → `Concatenate`).\n2. `reg = regularizers.l2(l2)` si `l2 > 0`; se pasa como `kernel_regularizer` a cada `Dense(units_in_layer, relu)`.\n3. Si `dropout > 0` agrega `Dropout(dropout)` tras cada capa.\n4. `model_overfit` usa los defaults (sin L2 ni dropout); `count_params()` imprime 550.985 parámetros contra 1022 casas.\n5. `fit` 150 épocas sin callbacks.",
+   "proposito": "Overfitear a propósito para ver el problema en las curvas: ancho ×16 respecto del 32-32 (unos 540 parámetros por casa). Ancho, L2 y dropout son hiperparámetros que se fijan antes de entrenar.",
+   "interaccion": "Usa `X4_train`/`d4_train` armados al inicio de la celda con `build_dense_features`. La misma función se reutiliza en la celda 37 con `l2=0.001, dropout=0.3`.",
+   "teoria": "Ancho y profundidad, parámetros vs hiperparámetros y la función objetivo $J=\\text{cost}+\\lambda R(w)$.",
+   "key": "tp2-modelo-grande-512",
+   "tp": 2,
+   "tp_titulo": "¿Cuánto vale esta casa?",
+   "usos": [
+    {
+     "clase": 3,
+     "cnn": "03",
+     "slug": "intro-redes-neuronales",
+     "i": 12,
+     "title": "Las dos dimensiones: ancho y profundidad",
+     "extra": false,
+     "url": "/clases/03/#d=intro-redes-neuronales&s=12"
+    },
+    {
+     "clase": 3,
+     "cnn": "03",
+     "slug": "intro-redes-neuronales",
+     "i": 13,
+     "title": "Parámetros contra hiperparámetros",
+     "extra": false,
+     "url": "/clases/03/#d=intro-redes-neuronales&s=13"
+    },
+    {
+     "clase": 3,
+     "cnn": "03",
+     "slug": "intro-redes-neuronales",
+     "i": 25,
+     "title": "Las funciones de activación más comunes",
+     "extra": false,
+     "url": "/clases/03/#d=intro-redes-neuronales&s=25"
+    },
+    {
+     "clase": 3,
+     "cnn": "03",
+     "slug": "intro-redes-neuronales",
+     "i": 29,
+     "title": "Ida y vuelta: forward y backward",
+     "extra": false,
+     "url": "/clases/03/#d=intro-redes-neuronales&s=29"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 46,
+     "title": "La función objetivo",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=46"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 47,
+     "title": "Qué mirar cuando esto se entrena",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=47"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 57,
+     "title": "Cuántas capas y cuánto ancho",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=57"
+    },
+    {
+     "clase": 12,
+     "cnn": "12",
+     "slug": "segmentacion-y-stable-diffusion",
+     "i": 4,
+     "title": "Cómo se entrena una red densa",
+     "extra": false,
+     "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=4"
+    }
+   ],
+   "nusos": 8
+  },
+  {
+   "id": "regularizado-early-stopping",
+   "titulo": "L2 0,001 + Dropout 0,3 + EarlyStopping (celda 37)",
+   "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
+   "desde": 1,
+   "hasta": 11,
+   "lenguaje": "python",
+   "codigo": "keras.utils.set_random_seed(SEED)\nmodel_regularized = build_big_model(X4_train.shape[1], DISTRICT_VOCAB_SIZE, l2=0.001, dropout=0.3)\n\nearly_stopping = EarlyStopping(monitor='val_loss', patience=15, restore_best_weights=True)\n\nhist_regularized = model_regularized.fit(\n    [X4_train, d4_train], y4_train, batch_size=32, epochs=150,\n    validation_data=([X4_val, d4_val], y4_val), callbacks=[early_stopping], verbose=0)\n\nprint(f\"Entrenó {len(hist_regularized.history['loss'])} épocas \"\n      f\"(de las 150 posibles) antes de que early stopping cortara.\")",
+   "que_hace": "Entrena la misma red 512-512-512 pero regularizada y con early stopping sobre `val_loss`.",
+   "como_funciona": "- `build_big_model(..., l2=0.001, dropout=0.3)`.\n- `EarlyStopping(monitor='val_loss', patience=15, restore_best_weights=True)` corta si la validación no mejora en 15 épocas y restaura los mejores pesos.\n- `fit` con `batch_size=32`, hasta 150 épocas; imprime cuántas corrió (76).",
+   "proposito": "Combina tres frenos al sobreajuste: L2 achica pesos, dropout apaga neuronas al azar en entrenamiento y early stopping usa la validación para decidir cuándo parar.",
+   "interaccion": "Usa `build_big_model` y los tensores de la celda 34; sus curvas y métricas se comparan con `model_overfit` en la celda 38.",
+   "teoria": "Regularización y lectura de la curva train vs val; ciclo forward/backward por épocas y lotes.",
+   "key": "tp2-regularizado-early-stopping",
+   "tp": 2,
+   "tp_titulo": "¿Cuánto vale esta casa?",
+   "usos": [
+    {
+     "clase": 3,
+     "cnn": "03",
+     "slug": "intro-redes-neuronales",
+     "i": 13,
+     "title": "Parámetros contra hiperparámetros",
+     "extra": false,
+     "url": "/clases/03/#d=intro-redes-neuronales&s=13"
+    },
+    {
+     "clase": 3,
+     "cnn": "03",
+     "slug": "intro-redes-neuronales",
+     "i": 29,
+     "title": "Ida y vuelta: forward y backward",
+     "extra": false,
+     "url": "/clases/03/#d=intro-redes-neuronales&s=29"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 46,
+     "title": "La función objetivo",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=46"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 47,
+     "title": "Qué mirar cuando esto se entrena",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=47"
+    },
+    {
+     "clase": 12,
+     "cnn": "12",
+     "slug": "segmentacion-y-stable-diffusion",
+     "i": 4,
+     "title": "Cómo se entrena una red densa",
+     "extra": false,
+     "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=4"
+    }
+   ],
+   "nusos": 5
+  },
+  {
+   "id": "encoders-solo-train",
+   "titulo": "One-hot y mapa District→índice ajustados en train (celda 25)",
+   "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
+   "desde": 1,
+   "hasta": 17,
+   "lenguaje": "python",
+   "codigo": "from sklearn.preprocessing import OneHotEncoder\nfrom keras.layers import Embedding, Flatten, Concatenate\nfrom keras.models import Model\n\n# Encoders de one-hot: se AJUSTAN solo con train, igual que el escalador numérico.\nstate_encoder = OneHotEncoder(handle_unknown='ignore', sparse_output=False).fit(df_train[['State']])\nhousestyle_encoder = OneHotEncoder(handle_unknown='ignore', sparse_output=False).fit(df_train[['HouseStyle']])\nsalecondition_encoder = OneHotEncoder(handle_unknown='ignore', sparse_output=False).fit(df_train[['SaleCondition']])\n\n# Mapa de District -> índice entero, para la rama de embedding. Se arma con las\n# categorías vistas en train; una categoría nueva en val/test cae en un índice\n# \"desconocido\" reservado aparte (robustez, aunque en este dataset no llega a usarse).\ndistrict_categories = sorted(df_train['District'].unique())\ndistrict_to_idx = {cat: i for i, cat in enumerate(district_categories)}\nDISTRICT_OOV_IDX = len(district_categories)\nDISTRICT_VOCAB_SIZE = len(district_categories) + 1\nprint(f\"Distritos vistos en train: {len(district_categories)} (+1 índice para desconocidos)\")",
+   "que_hace": "Crea los `OneHotEncoder` de `State`, `HouseStyle` y `SaleCondition` y el diccionario `district_to_idx`, todos ajustados solo con train.",
+   "como_funciona": "1. `OneHotEncoder(handle_unknown='ignore', sparse_output=False).fit(df_train[[...]])` para cada categórica chica.\n2. `district_categories = sorted(df_train['District'].unique())` → 72 distritos vistos en train.\n3. `district_to_idx` asigna un entero 0..71 a cada uno.\n4. `DISTRICT_OOV_IDX = 72` reserva un índice para distritos desconocidos y `DISTRICT_VOCAB_SIZE = 73`.",
+   "proposito": "Igual que el scaler, los encoders y el vocabulario son parte del modelo y se aprenden de train. Para `State` (12) basta one-hot; para `District` (72) se arma el índice que consume el embedding.",
+   "interaccion": "Los usan `build_dense_features` (one-hots) y `build_district_idx` (celda 26), y `DISTRICT_VOCAB_SIZE` fija el tamaño de `Embedding` en las celdas 26 y 34.",
+   "teoria": "One-hot vs embedding según cardinalidad; diccionarios y encoders calculados solo con train para no filtrar información.",
+   "key": "tp2-encoders-solo-train",
+   "tp": 2,
+   "tp_titulo": "¿Cuánto vale esta casa?",
+   "usos": [
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 12,
+     "title": "Categóricas: one-hot contra embedding",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=12"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 18,
+     "title": "Todo se aprende solo del train",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=18"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "palabra-al-transformer",
+     "i": 14,
+     "title": "Tres formas de volver texto en números",
+     "extra": false,
+     "url": "/clases/07/#d=palabra-al-transformer&s=14"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "palabra-al-transformer",
+     "i": 15,
+     "title": "De token a vector",
+     "extra": false,
      "url": "/clases/07/#d=palabra-al-transformer&s=15"
     },
     {
@@ -2649,10 +3102,76 @@
      "slug": "segmentacion-y-stable-diffusion",
      "i": 22,
      "title": "Embeddings más allá del texto",
+     "extra": false,
      "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=22"
     }
    ],
-   "nusos": 3
+   "nusos": 5
+  },
+  {
+   "id": "variantes-incrementales",
+   "titulo": "Aporte incremental de cada bloque de columnas (celda 27)",
+   "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
+   "desde": 1,
+   "hasta": 13,
+   "lenguaje": "python",
+   "codigo": "v1_state = train_categorical_variant(use_state=True, use_district=False, use_housestyle=False,\n                                      use_centralair=False, use_salecondition=False, cyclical_month=False)\nv2_district = train_categorical_variant(use_state=True, use_district=True, use_housestyle=False,\n                                         use_centralair=False, use_salecondition=False, cyclical_month=False)\nv3_full = train_categorical_variant(use_state=True, use_district=True, use_housestyle=True,\n                                     use_centralair=True, use_salecondition=True, cyclical_month=True)\n\nprint(f\"{'Modelo':40} {'MAE':>12} {'RMSE':>12} {'MAPE %':>8}\")\nprint(\"-\" * 76)\nprint(f\"{'Solo numérico (Milestone 2)':40} {baseline['mae']:12,.0f} {baseline['rmse']:12,.0f} {baseline['mape']:8.2f}\")\nprint(f\"{'+ State (one-hot)':40} {v1_state['mae']:12,.0f} {v1_state['rmse']:12,.0f} {v1_state['mape']:8.2f}\")\nprint(f\"{'+ District (embedding)':40} {v2_district['mae']:12,.0f} {v2_district['rmse']:12,.0f} {v2_district['mape']:8.2f}\")\nprint(f\"{'+ resto categóricas + mes cíclico':40} {v3_full['mae']:12,.0f} {v3_full['rmse']:12,.0f} {v3_full['mape']:8.2f}\")",
+   "que_hace": "Entrena tres modelos sumando bloques de a uno y tabula MAE, RMSE y MAPE contra el baseline numérico.",
+   "como_funciona": "- `v1_state`: numéricas + `State` one-hot.\n- `v2_district`: + `District` por embedding.\n- `v3_full`: + `HouseStyle`, `CentralAir`, `SaleCondition` y mes cíclico.\n- Imprime la tabla: MAE $51.411 → $30.956 → $25.380 → $20.844.",
+   "proposito": "Muestra que con la misma red 32-32 la mejora vino de la entrada, no de la arquitectura. Ojo: la comparación se hace con métricas de test; en rigor elegir entre variantes es trabajo de validación.",
+   "interaccion": "Usa `train_categorical_variant` (celda 26) y `baseline` (celda 11). `v3_full` es la referencia para la trampa de District (celda 31) y para el Milestone 4.",
+   "teoria": "El modelo se gana en la entrada y la salida, no en las capas.",
+   "key": "tp2-variantes-incrementales",
+   "tp": 2,
+   "tp_titulo": "¿Cuánto vale esta casa?",
+   "usos": [
+    {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "introduccion",
+     "i": 32,
+     "title": "Ejemplos de problemas predictivos",
+     "extra": false,
+     "url": "/clases/01/#d=introduccion&s=32"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 2,
+     "title": "La red ve una fila de números",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=2"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 17,
+     "title": "Los tres, lado a lado",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=17"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 61,
+     "title": "Lo que hay que llevarse",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=61"
+    },
+    {
+     "clase": 12,
+     "cnn": "12",
+     "slug": "segmentacion-y-stable-diffusion",
+     "i": 22,
+     "title": "Embeddings más allá del texto",
+     "extra": false,
+     "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=22"
+    }
+   ],
+   "nusos": 5
   },
   {
    "id": "encoder-e5-prefijos",
@@ -2672,12 +3191,49 @@
    "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
    "usos": [
     {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "introduccion",
+     "i": 36,
+     "title": "Ejemplos de problemas de representación",
+     "extra": false,
+     "url": "/clases/01/#d=introduccion&s=36"
+    },
+    {
      "clase": 6,
      "cnn": "06",
      "slug": "rag-y-mcp",
      "i": 20,
      "title": "Embeddings: cada texto es un punto",
+     "extra": false,
      "url": "/clases/06/#d=rag-y-mcp&s=20"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 21,
+     "title": "Coseno: importa el ángulo",
+     "extra": false,
+     "url": "/clases/06/#d=rag-y-mcp&s=21"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 4,
+     "title": "Por significado: embeddings y similitud",
+     "extra": false,
+     "url": "/clases/07/#d=rag-mcp-rapida&s=4"
+    },
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
+     "i": 34,
+     "title": "Del encoder al embedding de oración",
+     "extra": false,
+     "url": "/clases/08/#d=transformers-a-fondo&s=34"
     },
     {
      "clase": 8,
@@ -2685,6 +3241,7 @@
      "slug": "transformers-a-fondo",
      "i": 36,
      "title": "El mapa de la familia",
+     "extra": false,
      "url": "/clases/08/#d=transformers-a-fondo&s=36"
     },
     {
@@ -2693,6 +3250,7 @@
      "slug": "segmentacion-y-stable-diffusion",
      "i": 22,
      "title": "Embeddings más allá del texto",
+     "extra": false,
      "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=22"
     },
     {
@@ -2701,10 +3259,76 @@
      "slug": "segmentacion-y-stable-diffusion",
      "i": 51,
      "title": "CLIP: el puente texto ↔ imagen",
+     "extra": false,
      "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=51"
     }
    ],
-   "nusos": 4
+   "nusos": 8
+  },
+  {
+   "id": "informe-por-que-e5",
+   "titulo": "Por qué ganó e5-base (z del fragmento correcto)",
+   "archivo": "INFORME.md",
+   "desde": 47,
+   "hasta": 66,
+   "lenguaje": "markdown",
+   "codigo": "### Por qué ganó e5-base\n\n| Encoder | Mejor CR | CR medio con k = 1 (10 configs) | Coseno medio entre fragmentos | z del fragmento correcto |\n|---|---|---|---|---|\n| BERT multilingüe (promedio) | 0,350 | 0,27 | 0,786 | 1,56 |\n| paraphrase-multilingual-MiniLM-L12-v2 | 0,950 | 0,76 | 0,365 | 3,07 |\n| multilingual-e5-small | 0,950 | 0,80 | 0,842 | 3,94 |\n| **multilingual-e5-base** | **1,000** | **0,85** | 0,830 | 3,94 |\n\n*z del fragmento correcto*: cuántos desvíos estándar está el coseno del fragmento con la evidencia por encima del\npromedio de todos los fragmentos para esa pregunta (secciones con metadatos, promedio sobre las 20 preguntas).\n\n- BERT sin ajustar no fue entrenado para que el coseno mida similitud de significado: el promedio de sus tokens\n  refleja sobre todo la forma superficial del texto, y el fragmento correcto apenas se separa del resto (z = 1,56).\n- Que los vectores estén \"amontonados\" no es el problema en sí: e5 tiene cosenos medios tan altos como BERT (0,83),\n  pero fue entrenado con pares consulta–pasaje (por eso los prefijos `query:` / `passage:`), así que ordena bien dentro\n  de esa franja: el fragmento correcto queda a 3,94 desvíos. MiniLM está entrenado para paráfrasis entre oraciones, no\n  para preguntas contra pasajes, y separa menos (3,07).\n- e5-base y e5-small separan igual en promedio, pero e5-base acierta el primer lugar en más configuraciones (CR medio\n  0,85 contra 0,80) y es el único que llega a 1,00 con k = 1. Corre en CPU en pocos segundos para las 56 secciones.",
+   "que_hace": "Compara los cuatro encoders con el mejor CR, el CR medio con k = 1, el coseno medio entre fragmentos y cuántos desvíos queda el fragmento correcto sobre el promedio.",
+   "como_funciona": "- BERT promediado: CR 0,350 y z = 1,56; el coseno refleja forma superficial, no significado.\n- e5 tiene cosenos medios altos (0,83, «amontonados») pero ordena bien: z = 3,94, porque fue entrenado con pares consulta–pasaje.\n- MiniLM, entrenado para paráfrasis, separa menos (3,07).\n- e5-base gana a e5-small por acertar el primer lugar en más configuraciones.",
+   "proposito": "Explica la elección del encoder con una medida propia (z-score del fragmento correcto) en lugar de quedarse solo con el CR.",
+   "interaccion": "Se apoya en las corridas de `experimentos/recuperacion/` y en las clases `BertPromedio` y `SentenceTransformerEncoder` de `hospital/rag/encoders.py`.",
+   "teoria": "Encoder sin ajustar vs. encoder contrastivo: lo que importa no es la escala absoluta del coseno sino cómo ordena consultas contra pasajes.",
+   "key": "tp3-informe-por-que-e5",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "introduccion",
+     "i": 36,
+     "title": "Ejemplos de problemas de representación",
+     "extra": false,
+     "url": "/clases/01/#d=introduccion&s=36"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "palabra-al-transformer",
+     "i": 21,
+     "title": "Promediar una frase pierde el orden",
+     "extra": false,
+     "url": "/clases/07/#d=palabra-al-transformer&s=21"
+    },
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
+     "i": 34,
+     "title": "Del encoder al embedding de oración",
+     "extra": false,
+     "url": "/clases/08/#d=transformers-a-fondo&s=34"
+    },
+    {
+     "clase": 12,
+     "cnn": "12",
+     "slug": "segmentacion-y-stable-diffusion",
+     "i": 22,
+     "title": "Embeddings más allá del texto",
+     "extra": false,
+     "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=22"
+    },
+    {
+     "clase": 12,
+     "cnn": "12",
+     "slug": "segmentacion-y-stable-diffusion",
+     "i": 51,
+     "title": "CLIP: el puente texto ↔ imagen",
+     "extra": false,
+     "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=51"
+    }
+   ],
+   "nusos": 5
   },
   {
    "id": "encoder-bert-promedio",
@@ -2724,12 +3348,31 @@
    "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
    "usos": [
     {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "introduccion",
+     "i": 36,
+     "title": "Ejemplos de problemas de representación",
+     "extra": false,
+     "url": "/clases/01/#d=introduccion&s=36"
+    },
+    {
      "clase": 7,
      "cnn": "07",
      "slug": "palabra-al-transformer",
      "i": 21,
      "title": "Promediar una frase pierde el orden",
+     "extra": false,
      "url": "/clases/07/#d=palabra-al-transformer&s=21"
+    },
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
+     "i": 34,
+     "title": "Del encoder al embedding de oración",
+     "extra": false,
+     "url": "/clases/08/#d=transformers-a-fondo&s=34"
     },
     {
      "clase": 12,
@@ -2737,10 +3380,103 @@
      "slug": "segmentacion-y-stable-diffusion",
      "i": 52,
      "title": "Cómo se entrena CLIP",
+     "extra": false,
      "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=52"
     }
    ],
-   "nusos": 2
+   "nusos": 4
+  },
+  {
+   "id": "recuperador-coseno-exacto",
+   "titulo": "Búsqueda exacta por coseno (y reranker opcional)",
+   "archivo": "hospital/rag/recuperador.py",
+   "desde": 51,
+   "hasta": 74,
+   "lenguaje": "python",
+   "codigo": "    def _puntuar(self, consulta):\n        \"\"\"[(Fragmento, score)] de todos los fragmentos (o de los candidatos rerankeados), de mayor a menor.\"\"\"\n        q = self.encoder.codificar_consultas([consulta])[0]\n        scores = self.matriz @ q\n        orden = np.argsort(-scores)\n        if self.reranker is None:\n            return [(self.fragmentos[i], float(scores[i])) for i in orden]\n        cand = orden[:self.candidatos]\n        pares = [(consulta, self.fragmentos[i].para_embedding(self.metadatos)) for i in cand]\n        re_scores = self.reranker.predict(pares, show_progress_bar=False)\n        return sorted(((self.fragmentos[i], float(s)) for i, s in zip(cand, re_scores)), key=lambda x: -x[1])\n\n    def puntuar(self, consulta):\n        \"\"\"[(texto, score)] de mayor a menor.\"\"\"\n        return [(f.texto, s) for f, s in self._puntuar(consulta)]\n\n    def buscar_fragmentos(self, consulta, **seleccion):\n        \"\"\"Los Fragmento elegidos (texto literal + documento, título y sección). top_k, umbral y margen se\n        pueden pisar por llamada; si no, se usan los de la configuración.\"\"\"\n        s = {\"top_k\": self.top_k, \"umbral\": self.umbral, \"margen\": self.margen, **seleccion}\n        return seleccionar(self._puntuar(consulta), s[\"top_k\"], s[\"umbral\"], s[\"margen\"])\n\n    def buscar(self, consulta):\n        return [f.texto for f in self.buscar_fragmentos(consulta)]",
+   "que_hace": "Puntúa todos los fragmentos contra la consulta con un producto matricial y los ordena; si hay cross-encoder configurado, rerankea los mejores candidatos.",
+   "como_funciona": "- `q = self.encoder.codificar_consultas([consulta])[0]`: vector de la consulta, ya normalizado.\n- `scores = self.matriz @ q`: como todo tiene norma 1, cada producto punto es el coseno contra los 56 fragmentos.\n- `np.argsort(-scores)` ordena de mayor a menor.\n- Si `self.reranker` no es `None`, toma `orden[:self.candidatos]`, arma pares `(consulta, texto)` y los vuelve a ordenar con `reranker.predict`.\n- `buscar_fragmentos` aplica `seleccionar` con top-k/umbral/margen; `buscar` devuelve solo los textos.",
+   "proposito": "Con 56 secciones, comparar contra todas es instantáneo y exacto, así que no hizo falta un índice aproximado como HNSW. El reranker quedó soportado pero la entrega usa `reranker: null`: no mejoraba sobre e5-base con metadatos.",
+   "interaccion": "`recuperar.py` llama a `buscar()` por pregunta; `hospital/documentos.py` llama a `buscar_fragmentos()` para la tool `buscar_documentos`; `correr_recuperacion.py` usa `puntuar()` una vez por pregunta y prueba varios k/umbral/margen sobre el mismo ranking.",
+   "teoria": "Similitud coseno sobre vectores normalizados y búsqueda exacta (fuerza bruta); el cross-encoder como segunda etapa que lee consulta y pasaje juntos.",
+   "key": "tp3-recuperador-coseno-exacto",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 3,
+     "title": "Recuperar, aumentar, generar",
+     "extra": false,
+     "url": "/clases/06/#d=rag-y-mcp&s=3"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 21,
+     "title": "Coseno: importa el ángulo",
+     "extra": false,
+     "url": "/clases/06/#d=rag-y-mcp&s=21"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 22,
+     "title": "HNSW: no comparar contra todos",
+     "extra": false,
+     "url": "/clases/06/#d=rag-y-mcp&s=22"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 31,
+     "title": "El cross-encoder lee los dos juntos",
+     "extra": false,
+     "url": "/clases/06/#d=rag-y-mcp&s=31"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 2,
+     "title": "RAG en tres pasos",
+     "extra": false,
+     "url": "/clases/07/#d=rag-mcp-rapida&s=2"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 4,
+     "title": "Por significado: embeddings y similitud",
+     "extra": false,
+     "url": "/clases/07/#d=rag-mcp-rapida&s=4"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 11,
+     "title": "Reranking: la segunda etapa",
+     "extra": false,
+     "url": "/clases/07/#d=rag-mcp-rapida&s=11"
+    },
+    {
+     "clase": 12,
+     "cnn": "12",
+     "slug": "segmentacion-y-stable-diffusion",
+     "i": 52,
+     "title": "Cómo se entrena CLIP",
+     "extra": false,
+     "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=52"
+    }
+   ],
+   "nusos": 8
   },
   {
    "id": "lora-config",
@@ -2753,7 +3489,7 @@
    "que_hace": "Define la configuración LoRA y la política de entrenamiento: rango 8, alfa 16, solo en las proyecciones Q y V de la atención del modelo de lenguaje.",
    "como_funciona": "- `LORA_OBJETIVO` es una regex que solo toma `language_model.layers.N.self_attn.(q_proj|v_proj)`.\n- `LORA` fija `r=8`, `lora_alpha=16`, `dropout=0` y `task_type=CAUSAL_LM`.\n- `POLITICA` guarda checkpoint cada 50 pasos, bf16 y gradient checkpointing.\n- `PRECISIONES` y `DISPOSITIVOS` permiten fp16/`auto` para las T4 de Kaggle.",
    "proposito": "Gemma 4 es multimodal y sus torres de visión/audio también tienen `q_proj`/`v_proj` que PEFT no soporta: la regex las excluye. QLoRA quedó como alternativa no hecha.",
-   "interaccion": "`_ejecutar_cuda` pasa `LoraConfig(**LORA)` a `get_peft_model`; `cargar_entradas` incluye `LORA` en la identidad de la corrida.",
+   "interaccion": "`aplicar_lora` (mismo archivo) pasa `LoraConfig(**LORA)` a `get_peft_model` dentro de `_ejecutar_cuda`; `cargar_entradas` incluye `LORA` en la identidad de la corrida.",
    "teoria": "LoRA agrega matrices de bajo rango a W_Q y W_V: se entrenan pocos parámetros y el modelo base queda congelado.",
    "key": "tp4-lora-config",
    "tp": 4,
@@ -2765,6 +3501,7 @@
      "slug": "transformers-a-fondo",
      "i": 15,
      "title": "Tres proyecciones del mismo vector",
+     "extra": false,
      "url": "/clases/08/#d=transformers-a-fondo&s=15"
     },
     {
@@ -2773,6 +3510,7 @@
      "slug": "como-se-entrena-un-llm",
      "i": 51,
      "title": "Dónde entra el fine-tuning",
+     "extra": false,
      "url": "/clases/09/#d=como-se-entrena-un-llm&s=51"
     },
     {
@@ -2781,7 +3519,102 @@
      "slug": "segmentacion-y-stable-diffusion",
      "i": 75,
      "title": "Lo que el equipo va a encontrar",
+     "extra": false,
      "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=75"
+    }
+   ],
+   "nusos": 3
+  },
+  {
+   "id": "lora-aplicar",
+   "titulo": "aplicar_lora: adapter nuevo o retomado",
+   "archivo": "admision_tp/entrenamiento.py",
+   "desde": 171,
+   "hasta": 180,
+   "lenguaje": "python",
+   "codigo": "def aplicar_lora(peft, modelo, config):\n    \"\"\"LoRA nuevo, o el adapter de `adapter_inicial` entrenable (mismo r y módulos con que se publicó).\"\"\"\n    inicial = config.get(\"adapter_inicial\")\n    if inicial is None:\n        return peft.get_peft_model(modelo, peft.LoraConfig(**LORA, revision=config[\"revision\"]))\n    origen = {\"revision\": inicial[\"revision\"], \"subfolder\": inicial[\"subcarpeta\"]}\n    previo = peft.PeftConfig.from_pretrained(inicial[\"repo\"], **origen)\n    if (previo.base_model_name_or_path, previo.revision) != (config[\"modelo\"], config[\"revision\"]):\n        raise ValueError(\"adapter_inicial entrenado sobre otra base o revisión\")\n    return peft.PeftModel.from_pretrained(modelo, inicial[\"repo\"], config=previo, is_trainable=True, **origen)",
+   "que_hace": "Envuelve el modelo con LoRA usando la configuración `LORA`, o retoma un adapter ya publicado para seguir entrenándolo.",
+   "como_funciona": "- Sin `adapter_inicial`: `get_peft_model(modelo, LoraConfig(**LORA))`.\n- Con `adapter_inicial`: lee su `PeftConfig` y verifica base y revisión.\n- `PeftModel.from_pretrained(..., is_trainable=True)` deja entrenables solo las matrices LoRA.",
+   "proposito": "Permitió continuar el adapter `dc41674a` sobre datos nuevos (v39) sin empezar de cero.",
+   "interaccion": "Lo llama `_ejecutar_cuda` (mismo archivo) después de cargar el modelo; usa `LORA` definido arriba en el mismo archivo.",
+   "teoria": "PEFT: se congela el modelo base y solo se entrenan las matrices A y B.",
+   "key": "tp4-lora-aplicar",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
+     "i": 15,
+     "title": "Tres proyecciones del mismo vector",
+     "extra": false,
+     "url": "/clases/08/#d=transformers-a-fondo&s=15"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 51,
+     "title": "Dónde entra el fine-tuning",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=51"
+    },
+    {
+     "clase": 12,
+     "cnn": "12",
+     "slug": "segmentacion-y-stable-diffusion",
+     "i": 75,
+     "title": "Lo que el equipo va a encontrar",
+     "extra": false,
+     "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=75"
+    }
+   ],
+   "nusos": 3
+  },
+  {
+   "id": "informe-sft-real",
+   "titulo": "Entrenamiento real: 2.900 conversaciones en 2 T4",
+   "archivo": "docs/informe/informe-parte5.md",
+   "desde": 137,
+   "hasta": 162,
+   "lenguaje": "markdown",
+   "codigo": "### 3.1 Entrenamiento real (Kaggle v32 + v33, 2026-11-11/12)\n\nDatos `datos/conversaciones/v3-procedimiento` (prompt `procedimiento-v1`): **2.900 conversaciones, 9.990.837\ntokens (~3.445 por conversación), 1.015.072 supervisados (10,2 %)**, ninguna recortada (`max_seq_length` 8192;\n`manifiesto-tokens.json`). Configuración `configuraciones/sft-ejemplo.json`: 1 época, lr 2e-4, semilla 42,\n`batch_size=1`, acumulación 8, LoRA r=8 en q/v de la atención del modelo de lenguaje. fp16, `device_map=auto`\nen 2 T4, commit `6169241`, W&B `3add2742ddfd4b42`.\n\n| Medida | Valor | Fuente |\n|---|---|---|\n| Pasos de optimización | 363 (2.900 / 8, último paso incompleto) | `trainer_state`, recibos HF |\n| Tiempo por paso | ~85 s en v32; 80,5 s en v33 (5.072 s / 63 pasos) | bitácora; `runner.log` de v33 (`train_runtime`) |\n| Tiempo de cómputo de la época | **~8,1 h** (363 × ~80 s) | cálculo propio |\n| Reloj de pared | v32: cortada por el límite de 8 h de Kaggle en el paso 315; v33: 1 h 31 min (5.445 s de runner) reanudando de checkpoint-300 | `runner.json` |\n| VRAM pico (suma de 2 T4) | **19,97 GB** (12,1 + 7,87); reservada 20,58 GB | `entrenamiento/estado.json` de v33 |\n| Pérdida (supervisada) | 0,44 (paso 1) → ~0,03 (paso 100) → ~0,005 (paso 268) → 0,0044 media final | `runner.log` |\n| Checkpoints | cada 50 pasos, subidos a HF con revisión; `final` = `dc41674a` (adapter de v32+v33; el de la entrega desde 2026-11-13 es el v39, 3.1b) | `publicaciones` en `estado.json` |\n\n- **Casos a la vez al entrenar:** 1 conversación por pasada hacia adelante; 8 por paso de optimización. Con\n  ~3.445 tokens por conversación, la VRAM entra en 2 T4 gracias a calcular logits solo en posiciones supervisadas\n  (con logits completos en fp32, el paso 0 se quedó sin memoria en v28; ver [entrenamiento](entrenamiento-sft.md)).\n- **Interrupción y reanudación:** el corte por tiempo costó los pasos 301–315 (se rehicieron desde checkpoint-300).\n  Para A100 conviene guardar más seguido o medir antes cuánto tarda un paso.\n- **Pérdida baja ≠ agente bueno:** la pérdida media 0,005 no mostró que el modelo nunca aprendió el aviso al\n  voluntariado ([análisis de errores](analisis-errores.md), pasada 7). Hay un segundo entrenamiento corto en\n  curso para eso (v36, 633 conversaciones).",
+   "que_hace": "Reporte del entrenamiento SFT real con los datos curados: tokens, pasos, tiempo, VRAM, pérdida y checkpoints.",
+   "como_funciona": "- 2.900 conversaciones, ~3.445 tokens cada una, 10,2 % supervisados.\n- 1 época, lr 2e-4, acumulación 8, LoRA r=8 en q/v: 363 pasos de ~80 s (~8,1 h).\n- VRAM pico 19,97 GB en 2 T4; Kaggle cortó a las 8 h y se reanudó desde `checkpoint-300`.\n- Advierte que pérdida baja (0,005) no es agente bueno: el aviso al voluntariado no se aprendió.",
+   "proposito": "Muestra con números lo que costó el SFT y por qué hizo falta una segunda pasada (v39) para el aviso.",
+   "interaccion": "Los números salen de `estado.json`, `runner.json` y `runner.log` que escriben `entrenar()` e `infra/kaggle_entrenamiento.correr`.",
+   "teoria": "Fine-tuning con LoRA en hardware modesto y la diferencia entre pérdida de entrenamiento y calidad de la tarea.",
+   "key": "tp4-informe-sft-real",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 55,
+     "title": "Fine-tuning local: el recorrido",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=55"
+    },
+    {
+     "clase": 12,
+     "cnn": "12",
+     "slug": "segmentacion-y-stable-diffusion",
+     "i": 75,
+     "title": "Lo que el equipo va a encontrar",
+     "extra": false,
+     "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=75"
+    },
+    {
+     "clase": 13,
+     "cnn": "13",
+     "slug": "cierre-magnifica-humanitas",
+     "i": 24,
+     "title": "Repaso: cómo aprende a «portarse bien»",
+     "extra": false,
+     "url": "/clases/13/#d=cierre-magnifica-humanitas&s=24"
     }
    ],
    "nusos": 3

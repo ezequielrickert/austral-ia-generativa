@@ -27,6 +27,11 @@
   function loadDeck(deck, i) {
     cur.deck = deck; cur.R = null;
     tabs.forEach(function (b) { b.setAttribute("aria-selected", String(b.dataset.deck === deck)); });
+    // Is the open deck part of the course calendar, or a complementary one from the course repo?
+    var kind = document.getElementById("deck-kind"), extra = tabs.some(function (b) { return b.dataset.deck === deck && b.dataset.extra; });
+    kind.className = "pill " + (extra ? "compl" : "sched");
+    kind.textContent = extra ? kind.dataset.kindExtra : kind.dataset.kindSched;
+    kind.title = extra ? "No figura en el calendario de la materia" : "Figura en el calendario de la materia";
     decks.forEach(function (d) { scrubs[d].hidden = d !== deck; indexes[d].hidden = d !== deck; });
     frame.onload = attach;
     frame.src = BASE + "/decks/" + deck + "/index.html" + (S.isDark() ? "?deck-theme=dark" : "");
@@ -50,9 +55,20 @@
       var R = w && w.Reveal;
       if (!R || !R.isReady || !R.isReady()) { if (tries++ < 120) setTimeout(wait, 60); return; }
       cur.R = R;
-      try { R.configure({ hash: false, history: false, fragments: false }); R.slide(cur.i); } catch (e) {}
+      // The deck re-enables fragments on its own (deckAnim after init, its animations toggle).
+      // Fragments are forced visible by the CSS above, so with them on, each arrow press inside
+      // the deck steps an invisible fragment and the slide seems stuck. Keep them off for good.
+      try {
+        var configure = R.configure;
+        R.configure = function (o) { return configure.call(R, Object.assign({}, o, { fragments: false })); };
+        R.configure({ hash: false, history: false }); R.slide(cur.i);
+      } catch (e) {}
       R.on("slidechanged", function (e) { if (e.indexh !== cur.i) show(e.indexh, false); });
-      try { w.document.addEventListener("keydown", function (e) { if (handleKey(e, true)) e.preventDefault(); }, true); } catch (e) {}
+      try { w.document.addEventListener("keydown", function (e) {
+        if (!handleKey(e, true)) return;
+        e.preventDefault();
+        if (e.key === "p" || e.key === "P") e.stopPropagation();   // reveal.js maps P to "previous slide"
+      }, true); } catch (e) {}
     })();
   }
 
@@ -157,6 +173,7 @@
     if (e.key === "t" || e.key === "T") { toggleTp(); return true; }
     if (e.key === "m" || e.key === "M") { toggleStar(); return true; }
     if (e.key === "f" || e.key === "F") { setFocus(!app.classList.contains("focus")); return true; }
+    if (e.key === "p" || e.key === "P") { toggleFullscreen(); return true; }
     return false;
   }
 
@@ -195,6 +212,29 @@
   }
   focusBtn.addEventListener("click", function () { setFocus(!app.classList.contains("focus")); });
   try { if (localStorage.getItem("iagen:focus")) setFocus(true); } catch (e) {}
+
+  // full screen for the whole viewer (slides + notes + TP help), not just the deck. The class
+  // sidebar hides while it lasts and comes back as it was; the remembered focus preference is untouched.
+  var fsBtn = document.getElementById("fs-btn"), docEl = document.documentElement, focusBefore = false;
+  function fsElement() { return document.fullscreenElement || document.webkitFullscreenElement; }
+  function toggleFullscreen() {
+    if (fsElement()) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+    else {
+      var req = docEl.requestFullscreen || docEl.webkitRequestFullscreen;
+      if (req) { var p = req.call(docEl); if (p && p.catch) p.catch(function () {}); }
+    }
+  }
+  function onFullscreen() {
+    var on = !!fsElement();
+    if (on) { focusBefore = app.classList.contains("focus"); app.classList.add("focus"); }
+    else if (!focusBefore) app.classList.remove("focus");
+    docEl.classList.toggle("is-fs", on);
+    try { if (cur.R) cur.R.layout(); } catch (e) {}
+  }
+  fsBtn.addEventListener("click", toggleFullscreen);
+  document.getElementById("fs-exit").addEventListener("click", toggleFullscreen);
+  document.addEventListener("fullscreenchange", onFullscreen);
+  document.addEventListener("webkitfullscreenchange", onFullscreen);
 
   document.getElementById("prev").addEventListener("click", function () { step(-1); });
   document.getElementById("next").addEventListener("click", function () { step(1); });

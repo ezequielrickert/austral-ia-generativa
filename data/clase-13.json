@@ -104,7 +104,8 @@
        "cnn": "10",
        "i": 12,
        "title": "Agente = LLM + planificación + tools",
-       "por": "Agente = LLM + planificación + tools"
+       "por": "Agente = LLM + planificación + tools",
+       "extra": false
       }
      ],
      "key": true,
@@ -136,7 +137,8 @@
        "cnn": "05",
        "i": 68,
        "title": "Benchmarks: qué miden",
-       "por": "Benchmarks: qué miden"
+       "por": "Benchmarks: qué miden",
+       "extra": false
       }
      ],
      "key": false,
@@ -333,8 +335,9 @@
        "tp": 1,
        "texto": "En el TP1, `notas.txt` tenía una credencial de Postgres: se gitignoreó desde el primer commit y se reescribió la historia antes del primer push.",
        "tp_titulo": "Corta, del caos a producción",
-       "code": "tp1-gitignore-secretos",
-       "nota": ""
+       "code": "tp1-gitignore-secretos,tp1-progress-log-0001",
+       "ncode": 2,
+       "nota": "El `.gitignore` excluye `notas.txt`, y el log del primer commit deja escrita esa decisión."
       }
      ],
      "ver": [
@@ -344,7 +347,8 @@
        "cnn": "02",
        "i": 30,
        "title": "Antes de cerrar: cuidados",
-       "por": "Cuidados con agentes de código"
+       "por": "Cuidados con agentes de código",
+       "extra": false
       }
      ],
      "key": false,
@@ -376,7 +380,8 @@
        "cnn": "06",
        "i": 41,
        "title": "El atacante nunca le habla al modelo",
-       "por": "El atacante nunca le habla al modelo"
+       "por": "El atacante nunca le habla al modelo",
+       "extra": false
       }
      ],
      "key": true,
@@ -408,7 +413,8 @@
        "cnn": "06",
        "i": 40,
        "title": "Riesgos de seguridad propios de RAG",
-       "por": "Riesgos de seguridad propios de RAG"
+       "por": "Riesgos de seguridad propios de RAG",
+       "extra": false
       }
      ],
      "key": true,
@@ -496,7 +502,8 @@
        "tp": 1,
        "texto": "En el TP1 el agente creó el repo, provisionó Postgres y deployó vía los MCP de GitHub y Railway: permisos reales sobre tu infraestructura.",
        "tp_titulo": "Corta, del caos a producción",
-       "code": "tp1-server-iniciar",
+       "code": "tp1-readme-deploy,tp1-server-iniciar",
+       "ncode": 2,
        "nota": "El agente, vía MCP, pudo crear la base y setear esta credencial: permisos reales sobre la infraestructura."
       }
      ],
@@ -507,7 +514,8 @@
        "cnn": "06",
        "i": 46,
        "title": "MCP conecta modelos con herramientas",
-       "por": "MCP conecta modelos con herramientas"
+       "por": "MCP conecta modelos con herramientas",
+       "extra": false
       }
      ],
      "key": false,
@@ -534,7 +542,8 @@
        "cnn": "06",
        "i": 42,
        "title": "Cómo se filtra un documento restringido",
-       "por": "Cómo se filtra un documento restringido"
+       "por": "Cómo se filtra un documento restringido",
+       "extra": false
       }
      ],
      "key": true,
@@ -586,8 +595,9 @@
        "tp": 1,
        "texto": "En el TP1 apilaste capas: gitignore, credenciales solo por variables de entorno, la regla en `CLAUDE.md` y push solo al cerrar cada milestone.",
        "tp_titulo": "Corta, del caos a producción",
-       "code": "tp1-claude-md-commits-correr",
-       "nota": "Capa humana: el push a `origin` solo ocurre al cerrar un milestone; se suma a `.gitignore`, variables de entorno y la regla 3 de `CLAUDE.md`."
+       "code": "tp1-gitignore-secretos,tp1-package-json-scripts,tp1-claude-md-reglas,tp1-claude-md-commits-correr",
+       "ncode": 4,
+       "nota": "Cuatro capas: `.gitignore`, credenciales por variable de entorno, la regla 3 de `CLAUDE.md` y el push solo al cerrar un milestone."
       }
      ],
      "ver": [
@@ -597,7 +607,8 @@
        "cnn": "02",
        "i": 29,
        "title": "Antes de cerrar: cuidados",
-       "por": "Cuidados antes de delegar"
+       "por": "Cuidados antes de delegar",
+       "extra": true
       }
      ],
      "key": true,
@@ -631,8 +642,9 @@
        "tp": 4,
        "texto": "En el TP4 planteaste SFT con LoRA y pérdida solo en tokens del asistente para enseñar comportamiento, pero solo se validó en corridas de humo.",
        "tp_titulo": "El agente de admisión de guardia (TP final)",
-       "code": "tp4-informe-humo",
-       "nota": "La infraestructura de SFT corrió solo en humo: la mejora de comportamiento no está demostrada."
+       "code": "tp4-tokenizar-mascara,tp4-trainer-cuda,tp4-informe-humo,tp4-informe-sft-real,tp4-informe-antes-despues",
+       "ncode": 5,
+       "nota": "Además del humo, el repo documenta el SFT real y su efecto: `ambos` pasó a 36/28/36 en práctica. Ojo: pérdida baja no garantizó aprender el aviso."
       }
      ],
      "ver": [
@@ -642,7 +654,8 @@
        "cnn": "09",
        "i": 24,
        "title": "RLHF en dos pasos",
-       "por": "RLHF en dos pasos"
+       "por": "RLHF en dos pasos",
+       "extra": false
       }
      ],
      "key": true,
@@ -671,8 +684,9 @@
        "tp": 3,
        "texto": "En el TP3 el system prompt prohibía agregar datos que no vinieran de las tools y pedía decir cuándo faltaba algo: Faithfulness 5,00 en las 4 corridas.",
        "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
-       "code": "tp3-prompt-sistema",
-       "nota": ""
+       "code": "tp3-prompt-sistema,tp3-bucle-tool-calling",
+       "ncode": 2,
+       "nota": "El prompt prohíbe agregar datos que no vengan de las tools; entra como `SystemMessage` en cada conversación de `responder()`."
       }
      ],
      "ver": [
@@ -682,7 +696,8 @@
        "cnn": "05",
        "i": 15,
        "title": "¿Por qué alucina un modelo?",
-       "por": "¿Por qué alucina un modelo?"
+       "por": "¿Por qué alucina un modelo?",
+       "extra": false
       }
      ],
      "key": false,
@@ -750,7 +765,8 @@
        "cnn": "09",
        "i": 29,
        "title": "Paso 2: optimizar con PPO",
-       "por": "PPO y penalización KL"
+       "por": "PPO y penalización KL",
+       "extra": false
       }
      ],
      "key": true,
@@ -782,7 +798,8 @@
        "cnn": "09",
        "i": 17,
        "title": "Constitutional AI: principios en vez de anotadores",
-       "por": "Constitutional AI en la clase 9"
+       "por": "Constitutional AI en la clase 9",
+       "extra": false
       }
      ],
      "key": false,
@@ -859,8 +876,9 @@
        "tp": 1,
        "texto": "En el TP1 el agente hizo el tipeo, pero la validación la diseñó el equipo: tests, prueba de redeploy (`clicks: 1`) y revisión de diffs.",
        "tp_titulo": "Corta, del caos a producción",
-       "code": "tp1-test-redirect",
-       "nota": ""
+       "code": "tp1-test-redirect,tp1-helpers-repo-memoria,tp1-progress-md-produccion",
+       "ncode": 3,
+       "nota": "La validación del equipo en dos niveles: tests automáticos sobre un repositorio en memoria y la prueba manual del redeploy con `clicks: 1`."
       }
      ],
      "ver": [],
@@ -1089,7 +1107,8 @@
        "tp": 4,
        "texto": "En el TP4, `prefijos` ganaba aislado (55/60 vs 48/60) pero con el agente resolvió 6/50 contra 10/50: mejor métrica aislada no fue mejor agente.",
        "tp_titulo": "El agente de admisión de guardia (TP final)",
-       "code": "tp4-informe-agente-buscador",
+       "code": "tp4-informe-evaluacion-buscador,tp4-informe-agente-buscador",
+       "ncode": 2,
        "nota": ""
       }
      ],
@@ -1100,7 +1119,8 @@
        "cnn": "05",
        "i": 68,
        "title": "Benchmarks: qué miden",
-       "por": "Benchmarks: qué miden"
+       "por": "Benchmarks: qué miden",
+       "extra": false
       }
      ],
      "key": true,
@@ -1135,6 +1155,7 @@
        "texto": "En el TP3 el servidor MCP (FastMCP con 6 tools) quedó diseñado en `PLAN.md` pero pendiente: no existe `servidor_mcp.py`.",
        "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
        "code": "tp3-plan-mcp-pendiente",
+       "ncode": 1,
        "nota": ""
       }
      ],
@@ -1145,7 +1166,8 @@
        "cnn": "06",
        "i": 48,
        "title": "M×N conectores, o M+N piezas",
-       "por": "M×N conectores, o M+N piezas"
+       "por": "M×N conectores, o M+N piezas",
+       "extra": false
       }
      ],
      "key": false,
@@ -1195,7 +1217,8 @@
        "cnn": "09",
        "i": 9,
        "title": "Chinchilla: 20 tokens por parámetro",
-       "por": "Chinchilla: 20 tokens por parámetro"
+       "por": "Chinchilla: 20 tokens por parámetro",
+       "extra": false
       }
      ],
      "key": false,
@@ -1773,6 +1796,7 @@
      "slug": "introduccion",
      "i": 13,
      "title": "Limitaciones de la IA Generativa",
+     "extra": false,
      "url": "/clases/01/#d=introduccion&s=13"
     },
     {
@@ -1781,7 +1805,17 @@
      "slug": "cowork-intro",
      "i": 30,
      "title": "Antes de cerrar: cuidados",
+     "extra": false,
      "url": "/clases/02/#d=cowork-intro&s=30"
+    },
+    {
+     "clase": 2,
+     "cnn": "02",
+     "slug": "cowork-intro",
+     "i": 32,
+     "title": "La historia de Corta",
+     "extra": false,
+     "url": "/clases/02/#d=cowork-intro&s=32"
     },
     {
      "clase": 13,
@@ -1789,10 +1823,150 @@
      "slug": "cierre-magnifica-humanitas",
      "i": 14,
      "title": "Clasificá antes de pegar",
+     "extra": false,
+     "url": "/clases/13/#d=cierre-magnifica-humanitas&s=14"
+    },
+    {
+     "clase": 13,
+     "cnn": "13",
+     "slug": "cierre-magnifica-humanitas",
+     "i": 23,
+     "title": "Defensa en profundidad",
+     "extra": false,
+     "url": "/clases/13/#d=cierre-magnifica-humanitas&s=23"
+    }
+   ],
+   "nusos": 5
+  },
+  {
+   "id": "progress-log-0001",
+   "titulo": "progress_log/: el primer commit documentado",
+   "archivo": "progress_log/0001-a6061b7.md",
+   "desde": 1,
+   "hasta": 21,
+   "lenguaje": "markdown",
+   "codigo": "# 0001 — chore: estado inicial heredado de Corta\n\n- **Commit:** a6061b7f2f3aa89b9b2abccd011e820328a8dad3\n- **Author:** FranCalveyra\n- **Date:** Wed Aug 12 17:23:20 2026 -0300\n\n## Summary\n\nFirst commit of the repo: the Corta project dumped exactly as the previous developer left it,\ndeliberately uncurated. It's a small Express URL shortener: `server.js` is the real entrypoint\n(reads/writes `links.json`, exposes `POST /api/links` and `GET /:codigo`), with `utils.js` for\ncode generation. But it ships alongside dead weight typical of an unmaintained handoff:\n`index_v2_FINAL.js` and `server_OLD.js` (abandoned duplicate/older entrypoints),\n`links_backup_marzo.json` (a stale backup of the link store), `public/estilos_viejos.css` (an\nunused old stylesheet next to the real `public/estilos.css`), a stray `public/logo (1).png`, and\n`test.js` (a manual smoke-test script, not a real test suite). `package.json`/`package-lock.json`\ndeclare the original dependencies (`express`, `axios`, plus two that turn out unused —\n`lodash`, `moment`). Only `node_modules/` (regenerable via `npm install`) and a `notas.txt` that\nheld a plaintext credential were excluded, via a new `.gitignore`. The intent, per the commit\nmessage, is a trace-able starting point: everything from here on is a diff against this exact\ninherited state, duplicates and all.",
+   "que_hace": "Es el log generado para el primer commit (`a6061b7`): quién, cuándo, qué se subió y qué se dejó afuera.",
+   "como_funciona": "- Cabecera con hash completo, autor (`FranCalveyra`) y fecha.\n- «Summary» explica que el commit sube el caos heredado sin curar (`server_OLD.js`, `index_v2_FINAL.js`, backups, `test.js`).\n- Aclara las dos exclusiones: `node_modules/` y `notas.txt` con la credencial en texto plano.\n- El nombre `0001-a6061b7` es la posición en `git log --reverse` + el hash corto.",
+   "proposito": "Da trazabilidad: cada uno de los 21 commits tiene su `.md` con resumen, archivos e impacto, así cualquiera (o el agente) reconstruye por qué se hizo cada cambio sin leer todos los diffs. Este en particular documenta el punto de partida del M1.",
+   "interaccion": "Lo escribió el agente siguiendo `.claude/skills/progress-log/SKILL.md`, a partir de la lista que devuelve `scripts/progress-log-missing.sh` y de `git show`.",
+   "teoria": "Trazabilidad de decisiones, código y pruebas como entregable; el repo con historia completa como evidencia.",
+   "key": "tp1-progress-log-0001",
+   "tp": 1,
+   "tp_titulo": "Corta, del caos a producción",
+   "usos": [
+    {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "introduccion",
+     "i": 17,
+     "title": "Entregables de clase",
+     "extra": false,
+     "url": "/clases/01/#d=introduccion&s=17"
+    },
+    {
+     "clase": 2,
+     "cnn": "02",
+     "slug": "cowork-intro",
+     "i": 18,
+     "title": "Qué es una Skill",
+     "extra": false,
+     "url": "/clases/02/#d=cowork-intro&s=18"
+    },
+    {
+     "clase": 2,
+     "cnn": "02",
+     "slug": "cowork-intro",
+     "i": 32,
+     "title": "La historia de Corta",
+     "extra": false,
+     "url": "/clases/02/#d=cowork-intro&s=32"
+    },
+    {
+     "clase": 13,
+     "cnn": "13",
+     "slug": "cierre-magnifica-humanitas",
+     "i": 14,
+     "title": "Clasificá antes de pegar",
+     "extra": false,
      "url": "/clases/13/#d=cierre-magnifica-humanitas&s=14"
     }
    ],
-   "nusos": 3
+   "nusos": 4
+  },
+  {
+   "id": "readme-deploy",
+   "titulo": "README: configuración y deploy en Railway",
+   "archivo": "README.md",
+   "desde": 30,
+   "hasta": 48,
+   "lenguaje": "markdown",
+   "codigo": "## Configuración\n\n- `DATABASE_URL` (obligatoria): URL de conexión a PostgreSQL. Nunca se versiona su valor real.\n- `PORT` (opcional): puerto HTTP; por defecto `3000`. Railway lo define automáticamente.\n\nAl arrancar, la app crea la tabla `links` si no existe e importa los registros heredados de\n`data/links.json` con `ON CONFLICT DO NOTHING`. A partir de ahí, PostgreSQL es la única fuente de\nverdad. `GET /health` comprueba también que la base esté accesible.\n\n## Deploy en Railway\n\nEl repo incluye `railway.json` con Railpack y healthcheck en `/health`. El servicio web necesita\nuna base PostgreSQL en el mismo proyecto y una variable de referencia:\n\n```text\nDATABASE_URL=${{Postgres.DATABASE_URL}}\n```\n\nLuego se despliega con `railway up` y se genera el dominio público con `railway domain`.",
+   "que_hace": "Documenta las variables de entorno y cómo quedó armado el deploy en Railway.",
+   "como_funciona": "- `DATABASE_URL` obligatoria y nunca versionada; `PORT` lo define Railway.\n- Al arrancar se crea la tabla `links` y se importan los datos heredados con `ON CONFLICT DO NOTHING`.\n- El servicio web referencia la base del mismo proyecto con `DATABASE_URL=${{Postgres.DATABASE_URL}}`.",
+   "proposito": "Deja por escrito el resultado de lo que el agente hizo contra Railway vía MCP (provisionar Postgres, setear la variable de referencia, deployar y generar el dominio). La configuración de los servidores MCP en sí no está versionada en el repo: lo que queda es este resultado y `railway.json`.",
+   "interaccion": "Describe cómo se conectan `railway.json`, `src/server.js` (`iniciar()` lee `DATABASE_URL` y `PORT`) y `src/postgres.js`.",
+   "teoria": "MCP: el servidor expone acciones de un servicio (crear base, variables, deploy) como tools que el agente llama dentro de su loop.",
+   "key": "tp1-readme-deploy",
+   "tp": 1,
+   "tp_titulo": "Corta, del caos a producción",
+   "usos": [
+    {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "claude-desktop-chat",
+     "i": 20,
+     "title": "External connectors: todo pasa por MCP",
+     "extra": true,
+     "url": "/clases/01/#d=claude-desktop-chat&s=20"
+    },
+    {
+     "clase": 2,
+     "cnn": "02",
+     "slug": "cowork-intro",
+     "i": 24,
+     "title": "Qué es MCP",
+     "extra": false,
+     "url": "/clases/02/#d=cowork-intro&s=24"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 46,
+     "title": "MCP conecta modelos con herramientas",
+     "extra": false,
+     "url": "/clases/06/#d=rag-y-mcp&s=46"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 59,
+     "title": "Un agente, varios servidores",
+     "extra": false,
+     "url": "/clases/06/#d=rag-y-mcp&s=59"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 16,
+     "title": "MCP conecta modelos con herramientas",
+     "extra": false,
+     "url": "/clases/07/#d=rag-mcp-rapida&s=16"
+    },
+    {
+     "clase": 13,
+     "cnn": "13",
+     "slug": "cierre-magnifica-humanitas",
+     "i": 20,
+     "title": "Cada conector, una decisión de confianza",
+     "extra": false,
+     "url": "/clases/13/#d=cierre-magnifica-humanitas&s=20"
+    }
+   ],
+   "nusos": 6
   },
   {
    "id": "server-iniciar",
@@ -1814,10 +1988,47 @@
     {
      "clase": 1,
      "cnn": "01",
+     "slug": "introduccion",
+     "i": 13,
+     "title": "Limitaciones de la IA Generativa",
+     "extra": false,
+     "url": "/clases/01/#d=introduccion&s=13"
+    },
+    {
+     "clase": 1,
+     "cnn": "01",
      "slug": "claude-desktop-chat",
      "i": 20,
      "title": "External connectors: todo pasa por MCP",
+     "extra": true,
      "url": "/clases/01/#d=claude-desktop-chat&s=20"
+    },
+    {
+     "clase": 2,
+     "cnn": "02",
+     "slug": "cowork-intro",
+     "i": 4,
+     "title": "Delegar una tarea completa",
+     "extra": false,
+     "url": "/clases/02/#d=cowork-intro&s=4"
+    },
+    {
+     "clase": 2,
+     "cnn": "02",
+     "slug": "cowork-intro",
+     "i": 30,
+     "title": "Antes de cerrar: cuidados",
+     "extra": false,
+     "url": "/clases/02/#d=cowork-intro&s=30"
+    },
+    {
+     "clase": 2,
+     "cnn": "02",
+     "slug": "cowork-intro",
+     "i": 33,
+     "title": "La misión: del caos a producción",
+     "extra": false,
+     "url": "/clases/02/#d=cowork-intro&s=33"
     },
     {
      "clase": 13,
@@ -1825,10 +2036,141 @@
      "slug": "cierre-magnifica-humanitas",
      "i": 20,
      "title": "Cada conector, una decisión de confianza",
+     "extra": false,
      "url": "/clases/13/#d=cierre-magnifica-humanitas&s=20"
     }
    ],
-   "nusos": 2
+   "nusos": 6
+  },
+  {
+   "id": "package-json-scripts",
+   "titulo": "package.json: npm start con .env opcional y npm test",
+   "archivo": "package.json",
+   "desde": 9,
+   "hasta": 12,
+   "lenguaje": "json",
+   "codigo": "  \"scripts\": {\n    \"start\": \"node --env-file-if-exists=.env src/server.js\",\n    \"test\": \"node --test\"\n  },",
+   "que_hace": "Define los dos comandos del proyecto: `npm start` levanta `src/server.js` cargando `.env` solo si existe, y `npm test` corre la suite nativa de Node.",
+   "como_funciona": "- `start` usa `node --env-file-if-exists=.env`: en local toma las variables de un `.env` gitignoreado; en Railway el archivo no existe y las variables vienen del proveedor.\n- `test` es `node --test`, que descubre los `*.test.js` de `tests/` sin dependencias extra.",
+   "proposito": "Saca las credenciales del código: `src/server.js` solo lee `process.env.DATABASE_URL`, y quién la provee (un `.env` local o Railway) queda fuera del repo. `node:test` evita sumar un framework de tests.",
+   "interaccion": "`npm start` ejecuta `iniciar()` de `src/server.js`; `npm test` corre `tests/*.test.js`. `CLAUDE.md` y `README.md` remiten a estos dos comandos.",
+   "teoria": "Separar secretos del código (variables de entorno) y darle al agente un comando único y verificable para validar cada cambio.",
+   "key": "tp1-package-json-scripts",
+   "tp": 1,
+   "tp_titulo": "Corta, del caos a producción",
+   "usos": [
+    {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "introduccion",
+     "i": 13,
+     "title": "Limitaciones de la IA Generativa",
+     "extra": false,
+     "url": "/clases/01/#d=introduccion&s=13"
+    },
+    {
+     "clase": 2,
+     "cnn": "02",
+     "slug": "cowork-intro",
+     "i": 3,
+     "title": "Agentes de código: Claude Code y Codex",
+     "extra": false,
+     "url": "/clases/02/#d=cowork-intro&s=3"
+    },
+    {
+     "clase": 2,
+     "cnn": "02",
+     "slug": "cowork-intro",
+     "i": 30,
+     "title": "Antes de cerrar: cuidados",
+     "extra": false,
+     "url": "/clases/02/#d=cowork-intro&s=30"
+    },
+    {
+     "clase": 13,
+     "cnn": "13",
+     "slug": "cierre-magnifica-humanitas",
+     "i": 23,
+     "title": "Defensa en profundidad",
+     "extra": false,
+     "url": "/clases/13/#d=cierre-magnifica-humanitas&s=23"
+    }
+   ],
+   "nusos": 4
+  },
+  {
+   "id": "claude-md-reglas",
+   "titulo": "CLAUDE.md: reglas no negociables (spec-first, test-first, secretos, MCP)",
+   "archivo": "CLAUDE.md",
+   "desde": 28,
+   "hasta": 51,
+   "lenguaje": "markdown",
+   "codigo": "## Prácticas de trabajo\n\n1. **Documentar el comportamiento esperado antes de tocarlo.** Mantené `docs/SPEC.md` con el\n   comportamiento de cada endpoint y los casos borde relevantes (entradas inválidas, duplicados,\n   recursos inexistentes). Se actualiza cada vez que el entendimiento del sistema cambia — no es\n   un documento que se escribe una vez y se abandona.\n\n2. **Test-first.** Para cada fix o feature: primero el test, después la implementación que lo\n   hace pasar. Commits separados para uno y otro, así queda trazable en `git log`.\n   - Framework: `node:test` (nativo, sin dependencias nuevas). Correr con `npm test`.\n   - Los tests viven en `tests/` (no `test/` — un directorio llamado `test` hace que Node trate\n     cualquier `.js` adentro como archivo de test, incluidos los helpers). Los archivos de test\n     siguen el patrón `*.test.js`.\n   - `manual-check.js` en la raíz es el script manual heredado (requiere el server ya levantado\n     con `npm start`, se corre aparte con `node manual-check.js`); no es parte de la suite de\n     `npm test` — se renombró desde `test.js` porque ese nombre matcheaba el descubrimiento\n     automático de `node --test` y terminaba pegándole a un server real si había uno corriendo.\n\n3. **Nada de secretos versionados.** Ni hardcodeados en código, ni en archivos de texto o JSON\n   commiteados. Credenciales van en variables de entorno (del proveedor de hosting en\n   producción, `.env` gitignoreado en local).\n\n4. **Usar las herramientas de infraestructura disponibles**, no comandos manuales sueltos,\n   cuando el flujo lo soporta (gestión de repo/colaboradores, servicios, bases de datos, deploy).",
+   "que_hace": "Fija las cuatro prácticas de trabajo que el agente tiene que respetar en cualquier tarea dentro del repo.",
+   "como_funciona": "1. **Spec-first**: mantener `docs/SPEC.md` con endpoints y casos borde.\n2. **Test-first**: primero el test, después la implementación, en commits separados; framework `node:test`, tests en `tests/*.test.js` y la explicación de por qué `test.js` pasó a `manual-check.js`.\n3. **Nada de secretos versionados**: credenciales solo en variables de entorno.\n4. **Usar las herramientas de infraestructura disponibles** (los servidores MCP de GitHub y Railway) antes que comandos manuales sueltos.",
+   "proposito": "Convierte decisiones del equipo en reglas que el agente hereda en cada sesión, en vez de repetirlas en cada prompt. La regla 4 es la que empuja al agente a crear repo, base y deploy vía tools MCP; la regla 3 es una capa más de defensa contra filtrar la credencial que venía en `notas.txt`.",
+   "interaccion": "Lo lee el agente al arrancar. Gobierna cómo se escribieron `tests/*.test.js`, `src/server.js` y `src/postgres.js`, y cómo se configuró Railway (`railway.json`, `DATABASE_URL`).",
+   "teoria": "CLAUDE.md como contrato/memoria del repo: reglas duras, cómo testear y convenciones, en un .md versionado que el agente lee siempre.",
+   "key": "tp1-claude-md-reglas",
+   "tp": 1,
+   "tp_titulo": "Corta, del caos a producción",
+   "usos": [
+    {
+     "clase": 2,
+     "cnn": "02",
+     "slug": "cowork-intro",
+     "i": 6,
+     "title": "Dónde se empieza: pararse en una carpeta",
+     "extra": false,
+     "url": "/clases/02/#d=cowork-intro&s=6"
+    },
+    {
+     "clase": 2,
+     "cnn": "02",
+     "slug": "cowork-intro",
+     "i": 15,
+     "title": "CLAUDE.md / AGENTS.md: la memoria del repo",
+     "extra": false,
+     "url": "/clases/02/#d=cowork-intro&s=15"
+    },
+    {
+     "clase": 2,
+     "cnn": "02",
+     "slug": "cowork-intro",
+     "i": 16,
+     "title": "Un ejemplo de CLAUDE.md",
+     "extra": false,
+     "url": "/clases/02/#d=cowork-intro&s=16"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 55,
+     "title": "Conectar un servidor MCP: tres caminos",
+     "extra": false,
+     "url": "/clases/06/#d=rag-y-mcp&s=55"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 21,
+     "title": "Conectar un servidor: los caminos y la configuración",
+     "extra": false,
+     "url": "/clases/07/#d=rag-mcp-rapida&s=21"
+    },
+    {
+     "clase": 13,
+     "cnn": "13",
+     "slug": "cierre-magnifica-humanitas",
+     "i": 23,
+     "title": "Defensa en profundidad",
+     "extra": false,
+     "url": "/clases/13/#d=cierre-magnifica-humanitas&s=23"
+    }
+   ],
+   "nusos": 6
   },
   {
    "id": "claude-md-commits-correr",
@@ -1848,12 +2190,40 @@
    "tp_titulo": "Corta, del caos a producción",
    "usos": [
     {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "introduccion",
+     "i": 17,
+     "title": "Entregables de clase",
+     "extra": false,
+     "url": "/clases/01/#d=introduccion&s=17"
+    },
+    {
      "clase": 2,
      "cnn": "02",
      "slug": "cowork-intro",
      "i": 3,
      "title": "Agentes de código: Claude Code y Codex",
+     "extra": false,
      "url": "/clases/02/#d=cowork-intro&s=3"
+    },
+    {
+     "clase": 2,
+     "cnn": "02",
+     "slug": "cowork-intro",
+     "i": 15,
+     "title": "CLAUDE.md / AGENTS.md: la memoria del repo",
+     "extra": false,
+     "url": "/clases/02/#d=cowork-intro&s=15"
+    },
+    {
+     "clase": 2,
+     "cnn": "02",
+     "slug": "cowork-intro",
+     "i": 16,
+     "title": "Un ejemplo de CLAUDE.md",
+     "extra": false,
+     "url": "/clases/02/#d=cowork-intro&s=16"
     },
     {
      "clase": 13,
@@ -1861,38 +2231,255 @@
      "slug": "cierre-magnifica-humanitas",
      "i": 23,
      "title": "Defensa en profundidad",
+     "extra": false,
      "url": "/clases/13/#d=cierre-magnifica-humanitas&s=23"
     }
    ],
-   "nusos": 2
+   "nusos": 5
   },
   {
-   "id": "informe-humo",
-   "titulo": "Corridas de humo: 15,7 GB de VRAM",
-   "archivo": "docs/informe-parte5.md",
-   "desde": 135,
-   "hasta": 158,
-   "lenguaje": "markdown",
-   "codigo": "| Corrida | Qué hizo | Tiempo del runner | `train_runtime` | Pérdida paso 1 a 8 |\n|---|---|---|---|---|\n| v6 (`humo-entrena-1-v6`) | desde cero, 8 pasos, checkpoint cada 2 | 163 s | 17,4 s (2,18 s/paso) | 2,679 a 2,178 |\n| v7 (`humo-entrena-2-v7`) | reanuda desde `checkpoint-2` bajado de HF | 177 s | 15,8 s (pasos 3 a 8) | pasos 3 a 8 cercanos a v6, no idénticos |\n\nFuentes: `corridas/kaggle/humo-entrena-{1-v6,2-v7}/{runner.json,runner.log,entrenamiento/checkpoint-*/trainer_state.json}`.\nEl tiempo del runner excluye la instalación de dependencias; la carga de pesos tardó ~43 s\n(`runner.log`). La bitácora reporta 7 y 9 min de sesión completa.\n\n- **Casos a la vez al entrenar:** `batch_size=1`, `gradient_accumulation_steps=1`, 2 épocas,\n  `max_seq_length=8192` (`entrenamiento/corrida.json`). O sea, **1 conversación por paso**. Es la\n  configuración del humo, no una decisión de la corrida final.\n- **VRAM de entrenamiento (humo, solo texto): 15,7 GB pico** (9,5 + 6,1 por GPU; 15,8 GB reservada),\n  de `corridas/kaggle/humo-solo-texto/runner.json` (`vram`). Son 4 conversaciones sintéticas cortas con\n  batch 1: **no representa** la corrida real. **PENDIENTE:** el valor con secuencias reales, que el\n  entrenador ya registra en W&B, `estado.json` y `runner.json`.\n- **Checkpoints y publicación:** cada checkpoint se sube a HF con revisión, y la reanudación\n  reprodujo la curva (2,5196/2,4173/2,3468 contra 2,5196/2,4179/2,3464). Pasa en T4, no en A100.\n- **Tiempo total del entrenamiento real: PENDIENTE.** Depende de cuántas conversaciones tenga el\n  dataset final (Eze/Yas), de su largo en tokens y del prompt optimizado (Martu). Fórmula:\n  `pasos_aprox = conversaciones x épocas / (batch_size x acumulación)` (redondeos/último lote y\n  acumulación por época los resuelve Trainer); `tiempo_runner ≈ tiempo_train + carga + verificaciones + subidas`.\n  `train_runtime` y tiempo de runner no son intercambiables, y ninguno incluye necesariamente la sesión completa. El 2,18 s/paso del humo **no** sirve para extrapolar: eran\n  secuencias cortas y sintéticas.",
-   "que_hace": "Reporte de las corridas de humo de entrenamiento en Kaggle: tiempos, reanudación desde HF y VRAM pico.",
-   "como_funciona": "- v6 entrenó 8 pasos y v7 reanudó desde `checkpoint-2` bajado de HF con curva casi igual.\n- VRAM pico 15,7 GB (9,5 + 6,1 en dos T4) con 4 conversaciones sintéticas cortas.\n- Marca como PENDIENTE el tiempo y la VRAM del entrenamiento real con el dataset curado.",
-   "proposito": "Distingue «validado en GPU» (la infraestructura funciona) de «mejora del agente» (no demostrada), como exige AGENTS.md.",
-   "interaccion": "Los números vienen de `corridas/kaggle/humo-*/runner.json` que escribe `infra/kaggle_entrenamiento.correr`.",
-   "teoria": "Recorrido del fine-tuning local: preparar datos, entrenar con checkpoints, medir recursos; acá solo se completó la plomería.",
-   "key": "tp4-informe-humo",
+   "id": "tokenizar-mascara",
+   "titulo": "Máscara assistant-only (labels = −100)",
+   "archivo": "admision_tp/tokenizacion.py",
+   "desde": 12,
+   "hasta": 48,
+   "lenguaje": "python",
+   "codigo": "def tokenizar_conversacion(registro, tokenizer, max_seq_length):\n    \"\"\"Incluye respuesta y cierre del turno; excluye encabezados y todo contexto.\n\n    Solo acepta plantillas/tokenizadores que preserven exactamente sus prefijos.\n    No pide máscaras nativas (Gemma fijado no tiene bloques generation).\n    \"\"\"\n    validar_registro(registro)\n    if type(max_seq_length) is not int or max_seq_length <= 0:\n        raise ValueError(\"max_seq_length requiere entero positivo\")\n    mensajes = registro[\"messages\"]\n\n    def tokens(historia, generar=False):\n        salida = tokenizer.apply_chat_template(\n            historia, tokenize=True, add_generation_prompt=generar,\n            enable_thinking=False, padding=False, truncation=False, return_dict=True)\n        ids = salida[\"input_ids\"]\n        if not isinstance(ids, list) or not ids or any(type(x) is not int or x < 0 for x in ids):\n            raise ValueError(\"tokenizador devolvió IDs inválidos o anidados\")\n        if salida.get(\"attention_mask\", [1] * len(ids)) != [1] * len(ids):\n            raise ValueError(\"tokenización individual no debe contener padding\")\n        return ids\n\n    ids = tokens(mensajes)\n    if len(ids) > max_seq_length:\n        raise ValueError(\"conversación excede max_seq_length; no se recorta\")\n    labels = [-100] * len(ids)\n    for i, mensaje in enumerate(mensajes):\n        if mensaje[\"role\"] != \"assistant\":\n            continue\n        inicio = tokens(mensajes[:i], True)\n        fin = tokens(mensajes[:i + 1])\n        if ids[:len(inicio)] != inicio or ids[:len(fin)] != fin or len(fin) <= len(inicio):\n            raise ValueError(\"plantilla/tokenizador no preserva prefijos; máscara insegura\")\n        labels[len(inicio):len(fin)] = ids[len(inicio):len(fin)]\n    if all(x == -100 for x in labels):\n        raise ValueError(\"conversación sin tokens supervisados\")\n    return {\"input_ids\": ids, \"attention_mask\": [1] * len(ids), \"labels\": labels}",
+   "que_hace": "Tokeniza una conversación con el chat template y deja como objetivo de la pérdida solo los tokens de las respuestas del asistente.",
+   "como_funciona": "- `tokens(historia)` aplica `apply_chat_template` sin truncar ni padding.\n- Si la conversación supera `max_seq_length`, falla: no se recorta.\n- Inicializa `labels = [-100] * len(ids)`.\n- Para cada mensaje `assistant` tokeniza el prefijo con `add_generation_prompt=True` y el prefijo con la respuesta; copia en `labels` solo ese tramo.\n- Verifica que la plantilla preserve prefijos; si no, la máscara sería insegura y lanza error.",
+   "proposito": "La pérdida no cuenta el sistema, el triage ni las observaciones: el modelo aprende a producir acciones JSON, no a repetir el contexto.",
+   "interaccion": "La llama `tokenizar_preparacion` (mismo archivo) y se vuelve a verificar en `entrenamiento._ejecutar_cuda`. Produce `tokens.jsonl`, que consume `entrenamiento.cargar_entradas`.",
+   "teoria": "Pérdida de entropía cruzada de próximo token, enmascarada (−100 se ignora) para entrenar solo sobre las respuestas.",
+   "key": "tp4-tokenizar-mascara",
    "tp": 4,
    "tp_titulo": "El agente de admisión de guardia (TP final)",
    "usos": [
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
+     "i": 40,
+     "title": "Qué se minimiza",
+     "extra": false,
+     "url": "/clases/08/#d=transformers-a-fondo&s=40"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 19,
+     "title": "Datos de demostración",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=19"
+    },
     {
      "clase": 13,
      "cnn": "13",
      "slug": "cierre-magnifica-humanitas",
      "i": 24,
      "title": "Repaso: cómo aprende a «portarse bien»",
+     "extra": false,
      "url": "/clases/13/#d=cierre-magnifica-humanitas&s=24"
     }
    ],
-   "nusos": 1
+   "nusos": 3
+  },
+  {
+   "id": "trainer-cuda",
+   "titulo": "Entrenamiento SFT con PEFT y Trainer",
+   "archivo": "admision_tp/entrenamiento.py",
+   "desde": 325,
+   "hasta": 369,
+   "lenguaje": "python",
+   "codigo": "        modelo = cargar_solo_texto(transformers, config[\"modelo\"], config[\"revision\"],\n                                   dtype=getattr(torch, PRECISIONES[ejecucion[\"precision\"]]), **reparto)\n        # Sin attn_implementation: forzar \"sdpa\" rompe la torre de audio de Gemma 4 (ver modelo.py).\n        modelo.config.use_cache = False\n        modelo = aplicar_lora(peft, modelo, config)\n        modelo.enable_input_require_grads()\n\n        class Auditor(TrainerCallback):\n            def on_log(self, args, state, control, logs=None, **kwargs):\n                run.log({**(logs or {}), **_vram(torch), \"trainer_step\": state.global_step})\n\n            def guardar(self, carpeta, nombre):\n                (carpeta / \"corrida.json\").write_bytes(_canonical(auditoria))\n                hashes = {p.name: _sha(p.read_bytes()) for p in carpeta.iterdir()\n                          if p.is_file() and p.name != \"integridad.json\"}\n                (carpeta / \"integridad.json\").write_bytes(_canonical(hashes))\n                if persistir:\n                    persistir()\n                if auditoria[\"publicar\"]:\n                    publicaciones.append(publicar_checkpoint(carpeta, nombre, api, config[\"hf_repo\"], run))\n                    (destino / \"publicaciones.json\").write_bytes(_canonical(publicaciones))\n                    if persistir:\n                        persistir()\n\n            def on_save(self, args, state, control, **kwargs):\n                self.guardar(destino / f\"checkpoint-{state.global_step}\", f\"checkpoint-{state.global_step}\")\n\n        callback = Auditor()\n        args = TrainingArguments(output_dir=str(destino), seed=config[\"semilla\"], data_seed=config[\"semilla\"],\n            learning_rate=config[\"learning_rate\"], num_train_epochs=config[\"epochs\"],\n            per_device_train_batch_size=config[\"batch_size\"],\n            gradient_accumulation_steps=config[\"gradient_accumulation_steps\"],\n            **_politica(ejecucion), save_strategy=\"steps\", logging_steps=1,\n            report_to=\"none\", push_to_hub=False, remove_unused_columns=False)\n        def collator(filas):\n            return {k: torch.tensor(v, dtype=torch.float32 if k == \"pesos\" else torch.long)\n                    for k, v in formar_lote(filas, tokenizer.pad_token_id).items()}\n        class TrainerSupervisado(Trainer):\n            # Misma normalización que la pérdida del modelo (suma / num_items_in_batch con acumulación).\n            def compute_loss(self, model, inputs, return_outputs=False, num_items_in_batch=None):\n                return perdida_supervisada(torch, model, inputs, num_items_in_batch)\n\n        trainer = TrainerSupervisado(model=modelo, args=args, train_dataset=ejemplos,\n                                     data_collator=collator, processing_class=tokenizer, callbacks=[callback])\n        trainer.train(resume_from_checkpoint=str(checkpoint) if checkpoint else None)",
+   "que_hace": "Carga el modelo solo texto, le aplica LoRA, configura el `Trainer` de Hugging Face con un callback que audita y publica checkpoints, y entrena.",
+   "como_funciona": "- `cargar_solo_texto` carga Gemma con la precisión elegida (y `device_map='auto'` para dos GPU).\n- `aplicar_lora(peft, modelo, config)` envuelve el modelo con LoRA (o retoma un adapter publicado) y `enable_input_require_grads` habilita gradient checkpointing.\n- `Auditor` loguea VRAM a W&B y en cada `on_save` escribe `integridad.json` y publica el checkpoint en HF.\n- `TrainingArguments` toma semilla, lr, épocas, batch y acumulación de la config; `collator` usa `formar_lote` (padding con −100).\n- `TrainerSupervisado.compute_loss` reemplaza la pérdida por `perdida_supervisada`, y `trainer.train(resume_from_checkpoint=...)` permite reanudar.",
+   "proposito": "Prioriza auditabilidad y reanudación (Kaggle corta sesiones a las 8 h). Primero se validó con corridas de humo; después entrenó con las 2.900 conversaciones (Kaggle v32+v33) y continuó para el adapter de la entrega (v39).",
+   "interaccion": "Es el cuerpo de `_ejecutar_cuda`, que llama `entrenar()` (mismo archivo) desde `scripts/entrenar.py`, lanzado por `infra/kaggle_entrenamiento.py`. Consume `tokens.jsonl`; el adapter final lo carga `ModeloLocal._fusionar_adapter`.",
+   "teoria": "Fine-tuning supervisado eficiente: SFT con LoRA sobre las demostraciones, con la pérdida solo en tokens del asistente.",
+   "key": "tp4-trainer-cuda",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
+     "i": 15,
+     "title": "Tres proyecciones del mismo vector",
+     "extra": false,
+     "url": "/clases/08/#d=transformers-a-fondo&s=15"
+    },
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
+     "i": 40,
+     "title": "Qué se minimiza",
+     "extra": false,
+     "url": "/clases/08/#d=transformers-a-fondo&s=40"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 55,
+     "title": "Fine-tuning local: el recorrido",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=55"
+    },
+    {
+     "clase": 13,
+     "cnn": "13",
+     "slug": "cierre-magnifica-humanitas",
+     "i": 24,
+     "title": "Repaso: cómo aprende a «portarse bien»",
+     "extra": false,
+     "url": "/clases/13/#d=cierre-magnifica-humanitas&s=24"
+    }
+   ],
+   "nusos": 4
+  },
+  {
+   "id": "informe-humo",
+   "titulo": "Corridas de humo: 15,7 GB de VRAM",
+   "archivo": "docs/informe/informe-parte5.md",
+   "desde": 214,
+   "hasta": 237,
+   "lenguaje": "markdown",
+   "codigo": "Conversaciones sintéticas de `scripts.datos_humo`: prueban el pipeline, **no** la calidad ni los tiempos del\nentrenamiento real. Kaggle T4 x2, fp16, `device_map=auto`, commit `acc95b2` limpio, LoRA solo en la atención\ndel modelo de lenguaje (r=8, alpha 16), `corrida.json`.\n\n| Corrida | Qué hizo | Tiempo del runner | `train_runtime` | Pérdida paso 1 a 8 |\n|---|---|---|---|---|\n| v6 (`humo-entrena-1-v6`) | desde cero, 8 pasos, checkpoint cada 2 | 163 s | 17,4 s (2,18 s/paso) | 2,679 a 2,178 |\n| v7 (`humo-entrena-2-v7`) | reanuda desde `checkpoint-2` bajado de HF | 177 s | 15,8 s (pasos 3 a 8) | pasos 3 a 8 cercanos a v6, no idénticos |\n\nFuentes: `evaluaciones/recursos/humo-entrena-{1-v6,2-v7}/{runner.json,runner.log,entrenamiento/checkpoint-*/trainer_state.json}`.\nEl tiempo del runner excluye la instalación de dependencias; la carga de pesos tardó ~43 s\n(`runner.log`). La bitácora reporta 7 y 9 min de sesión completa.\n\n- **Casos a la vez al entrenar:** `batch_size=1`, `gradient_accumulation_steps=1`, 2 épocas,\n  `max_seq_length=8192` (`entrenamiento/corrida.json`). O sea, **1 conversación por paso**. Es la\n  configuración del humo, no una decisión de la corrida final.\n- **VRAM de entrenamiento (humo, solo texto): 15,7 GB pico** (9,5 + 6,1 por GPU; 15,8 GB reservada),\n  de `evaluaciones/recursos/humo-solo-texto/runner.json` (`vram`). Son 4 conversaciones sintéticas cortas con\n  batch 1: **no representa** la corrida real. **PENDIENTE:** el valor con secuencias reales, que el\n  entrenador ya registra en W&B, `estado.json` y `runner.json`.\n- **Checkpoints y publicación:** cada checkpoint se sube a HF con revisión, y la reanudación\n  reprodujo la curva (2,5196/2,4173/2,3468 contra 2,5196/2,4179/2,3464). Pasa en T4, no en A100.\n- El 2,18 s/paso del humo **no** servía para extrapolar (secuencias cortas y sintéticas): el real fue ~80 s/paso\n  con 8 conversaciones de ~3.445 tokens (sección 3.1).",
+   "que_hace": "Reporte de las corridas de humo de entrenamiento en Kaggle: tiempos, reanudación desde HF y VRAM pico.",
+   "como_funciona": "- v6 entrenó 8 pasos y v7 reanudó desde `checkpoint-2` bajado de HF con curva casi igual.\n- VRAM pico 15,7 GB (9,5 + 6,1 en dos T4) con 4 conversaciones sintéticas cortas.\n- Aclara que esos 2,18 s/paso no servían para extrapolar: el entrenamiento real (sección 3.1) tardó ~80 s/paso.",
+   "proposito": "Distingue «validado en GPU» (la infraestructura funciona) de «mejora del agente» (no demostrada), como exige AGENTS.md.",
+   "interaccion": "Los números vienen de `evaluaciones/recursos/humo-*/runner.json`, que escribe `infra/kaggle_entrenamiento.correr`. La sección 3.1 del mismo archivo reporta el entrenamiento real.",
+   "teoria": "Recorrido del fine-tuning local: antes de gastar horas de GPU se prueba la plomería (datos, checkpoints, reanudación) con una corrida chica.",
+   "key": "tp4-informe-humo",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 55,
+     "title": "Fine-tuning local: el recorrido",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=55"
+    },
+    {
+     "clase": 13,
+     "cnn": "13",
+     "slug": "cierre-magnifica-humanitas",
+     "i": 24,
+     "title": "Repaso: cómo aprende a «portarse bien»",
+     "extra": false,
+     "url": "/clases/13/#d=cierre-magnifica-humanitas&s=24"
+    }
+   ],
+   "nusos": 2
+  },
+  {
+   "id": "informe-sft-real",
+   "titulo": "Entrenamiento real: 2.900 conversaciones en 2 T4",
+   "archivo": "docs/informe/informe-parte5.md",
+   "desde": 137,
+   "hasta": 162,
+   "lenguaje": "markdown",
+   "codigo": "### 3.1 Entrenamiento real (Kaggle v32 + v33, 2026-11-11/12)\n\nDatos `datos/conversaciones/v3-procedimiento` (prompt `procedimiento-v1`): **2.900 conversaciones, 9.990.837\ntokens (~3.445 por conversación), 1.015.072 supervisados (10,2 %)**, ninguna recortada (`max_seq_length` 8192;\n`manifiesto-tokens.json`). Configuración `configuraciones/sft-ejemplo.json`: 1 época, lr 2e-4, semilla 42,\n`batch_size=1`, acumulación 8, LoRA r=8 en q/v de la atención del modelo de lenguaje. fp16, `device_map=auto`\nen 2 T4, commit `6169241`, W&B `3add2742ddfd4b42`.\n\n| Medida | Valor | Fuente |\n|---|---|---|\n| Pasos de optimización | 363 (2.900 / 8, último paso incompleto) | `trainer_state`, recibos HF |\n| Tiempo por paso | ~85 s en v32; 80,5 s en v33 (5.072 s / 63 pasos) | bitácora; `runner.log` de v33 (`train_runtime`) |\n| Tiempo de cómputo de la época | **~8,1 h** (363 × ~80 s) | cálculo propio |\n| Reloj de pared | v32: cortada por el límite de 8 h de Kaggle en el paso 315; v33: 1 h 31 min (5.445 s de runner) reanudando de checkpoint-300 | `runner.json` |\n| VRAM pico (suma de 2 T4) | **19,97 GB** (12,1 + 7,87); reservada 20,58 GB | `entrenamiento/estado.json` de v33 |\n| Pérdida (supervisada) | 0,44 (paso 1) → ~0,03 (paso 100) → ~0,005 (paso 268) → 0,0044 media final | `runner.log` |\n| Checkpoints | cada 50 pasos, subidos a HF con revisión; `final` = `dc41674a` (adapter de v32+v33; el de la entrega desde 2026-11-13 es el v39, 3.1b) | `publicaciones` en `estado.json` |\n\n- **Casos a la vez al entrenar:** 1 conversación por pasada hacia adelante; 8 por paso de optimización. Con\n  ~3.445 tokens por conversación, la VRAM entra en 2 T4 gracias a calcular logits solo en posiciones supervisadas\n  (con logits completos en fp32, el paso 0 se quedó sin memoria en v28; ver [entrenamiento](entrenamiento-sft.md)).\n- **Interrupción y reanudación:** el corte por tiempo costó los pasos 301–315 (se rehicieron desde checkpoint-300).\n  Para A100 conviene guardar más seguido o medir antes cuánto tarda un paso.\n- **Pérdida baja ≠ agente bueno:** la pérdida media 0,005 no mostró que el modelo nunca aprendió el aviso al\n  voluntariado ([análisis de errores](analisis-errores.md), pasada 7). Hay un segundo entrenamiento corto en\n  curso para eso (v36, 633 conversaciones).",
+   "que_hace": "Reporte del entrenamiento SFT real con los datos curados: tokens, pasos, tiempo, VRAM, pérdida y checkpoints.",
+   "como_funciona": "- 2.900 conversaciones, ~3.445 tokens cada una, 10,2 % supervisados.\n- 1 época, lr 2e-4, acumulación 8, LoRA r=8 en q/v: 363 pasos de ~80 s (~8,1 h).\n- VRAM pico 19,97 GB en 2 T4; Kaggle cortó a las 8 h y se reanudó desde `checkpoint-300`.\n- Advierte que pérdida baja (0,005) no es agente bueno: el aviso al voluntariado no se aprendió.",
+   "proposito": "Muestra con números lo que costó el SFT y por qué hizo falta una segunda pasada (v39) para el aviso.",
+   "interaccion": "Los números salen de `estado.json`, `runner.json` y `runner.log` que escriben `entrenar()` e `infra/kaggle_entrenamiento.correr`.",
+   "teoria": "Fine-tuning con LoRA en hardware modesto y la diferencia entre pérdida de entrenamiento y calidad de la tarea.",
+   "key": "tp4-informe-sft-real",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 55,
+     "title": "Fine-tuning local: el recorrido",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=55"
+    },
+    {
+     "clase": 12,
+     "cnn": "12",
+     "slug": "segmentacion-y-stable-diffusion",
+     "i": 75,
+     "title": "Lo que el equipo va a encontrar",
+     "extra": false,
+     "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=75"
+    },
+    {
+     "clase": 13,
+     "cnn": "13",
+     "slug": "cierre-magnifica-humanitas",
+     "i": 24,
+     "title": "Repaso: cómo aprende a «portarse bien»",
+     "extra": false,
+     "url": "/clases/13/#d=cierre-magnifica-humanitas&s=24"
+    }
+   ],
+   "nusos": 3
+  },
+  {
+   "id": "informe-antes-despues",
+   "titulo": "Antes y después: las cuatro filas",
+   "archivo": "docs/informe/informe-parte5.md",
+   "desde": 176,
+   "hasta": 186,
+   "lenguaje": "markdown",
+   "codigo": "### 3.2 Antes y después (práctica, 50 casos × 3 versiones, T4, lote 4; adapter v39, Kaggle v40)\n\n| Configuración | Resueltos original / b / c | s/caso | Tokens de entrada por caso | Tokens generados por caso | VRAM pico | Ancho máx. |\n|---|---|---:|---:|---:|---:|---:|\n| `sin_entrenar` (baseline, v25) | 10 / 10 / 7 | 15,4–16,1 | ~5.690–5.750 | ~270–271 | 18,12 GB solo texto (19,08 GB con torres en `base-*-l4`, histórico) | 3.072 |\n| `solo_prompt` (procedimiento-v1) | 14 / 16 / 12 | 24,4–26,6 | ~13.650–14.640 | ~322–332 | 19,25–19,64 GB | 4.436 |\n| `solo_entrenamiento` (adapter v39 + baseline) | 17 / 14 / 20 | 27,7–30,2 | ~12.150–14.200 | ~333–338 | 20,25–21,71 GB | 7.636 |\n| **`ambos` (la entrega, adapter v39)** | **36 / 28 / 36** | **27,8–28,8** | **~14.100–14.200** | **~353–355** | **19,94 GB** | **4.395** |\n| `solo_entrenamiento` con el adapter anterior `dc41674a` (v34, historial) | 11 / 13 / 12 | 18,7–19,7 | ~7.860–8.430 | ~286–293 | 18,69–18,91 GB | 4.476 |\n| `ambos` con el adapter anterior `dc41674a` (v34, historial) | 30 / 29 / 33 | 24,7–24,9 | ~13.840 | ~336 | 19,56 GB | 4.160 |\n",
+   "que_hace": "Tabla de la práctica (50 casos × 3 versiones de normas) con las cuatro configuraciones: sin entrenar, solo prompt, solo entrenamiento y ambos.",
+   "como_funciona": "- `sin_entrenar`: 10/10/7; `solo_prompt` (procedimiento-v1): 14/16/12.\n- `solo_entrenamiento` (adapter v39): 17/14/20.\n- `ambos` (la entrega): 36/28/36.\n- Agrega segundos, tokens por caso y VRAM pico de cada fila.",
+   "proposito": "Es la comparación que pide la consigna: separa cuánto aporta el prompt, cuánto el SFT y cuánto la combinación.",
+   "interaccion": "Las filas salen de correr `infra/kaggle_evaluacion.py` con los planes de `configuraciones/evaluacion/`; el adapter lo aplica `ModeloLocal.cargar`.",
+   "teoria": "Prompt, RAG o fine-tuning: combinarlos rinde más que cada uno por separado.",
+   "key": "tp4-informe-antes-despues",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 2,
+     "title": "Un modelo 100 veces más chico gana",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=2"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 52,
+     "title": "Prompt, RAG o fine-tuning",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=52"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 53,
+     "title": "Cuándo vale la pena el fine-tuning",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=53"
+    },
+    {
+     "clase": 13,
+     "cnn": "13",
+     "slug": "cierre-magnifica-humanitas",
+     "i": 24,
+     "title": "Repaso: cómo aprende a «portarse bien»",
+     "extra": false,
+     "url": "/clases/13/#d=cierre-magnifica-humanitas&s=24"
+    }
+   ],
+   "nusos": 4
   },
   {
    "id": "prompt-sistema",
@@ -1917,6 +2504,7 @@
      "slug": "prompting",
      "i": 17,
      "title": "Mitigar alucinaciones: el prompt",
+     "extra": false,
      "url": "/clases/05/#d=prompting&s=17"
     },
     {
@@ -1925,6 +2513,7 @@
      "slug": "rag-y-mcp",
      "i": 2,
      "title": "RAG suma lo que no está en los pesos",
+     "extra": false,
      "url": "/clases/06/#d=rag-y-mcp&s=2"
     },
     {
@@ -1933,10 +2522,175 @@
      "slug": "cierre-magnifica-humanitas",
      "i": 25,
      "title": "De la alucinación al engaño funcional",
+     "extra": false,
      "url": "/clases/13/#d=cierre-magnifica-humanitas&s=25"
     }
    ],
    "nusos": 3
+  },
+  {
+   "id": "bucle-tool-calling",
+   "titulo": "El bucle de tool calling escrito a mano",
+   "archivo": "hospital/agente/bucle.py",
+   "desde": 25,
+   "hasta": 48,
+   "lenguaje": "python",
+   "codigo": "async def _ejecutar(por_nombre, llamada):\n    tool = por_nombre.get(llamada[\"name\"])\n    if tool is None:\n        return ToolMessage(f\"Error: la herramienta '{llamada['name']}' no existe. Herramientas disponibles: \"\n                           f\"{', '.join(sorted(por_nombre))}.\", tool_call_id=llamada[\"id\"], name=llamada[\"name\"])\n    try:\n        return await tool.ainvoke({**llamada, \"type\": \"tool_call\"})\n    except Exception as e:  # el error vuelve al modelo como texto para que pueda corregirse\n        return ToolMessage(f\"Error al ejecutar {llamada['name']}: {e}\", tool_call_id=llamada[\"id\"], name=llamada[\"name\"])\n\n\nasync def responder(llm, tools, pregunta):\n    \"\"\"Devuelve todos los mensajes de la conversación: sistema, pregunta, AIMessage y ToolMessage.\"\"\"\n    llm_con_tools = llm.bind_tools(tools)\n    por_nombre = {t.name: t for t in tools}\n    mensajes = [SystemMessage(PROMPT), HumanMessage(pregunta)]\n    for _ in range(MAX_PASOS):\n        ai = await llm_con_tools.ainvoke(mensajes)\n        mensajes.append(ai)\n        if not ai.tool_calls:\n            break\n        for llamada in ai.tool_calls:\n            mensajes.append(await _ejecutar(por_nombre, llamada))\n    return mensajes",
+   "que_hace": "Implementa el agente: el modelo pide herramientas, se ejecutan, sus resultados vuelven como `ToolMessage` y se repite hasta que responde sin pedir nada o se llega a 6 pasos.",
+   "como_funciona": "- `responder` enlaza las tools con `llm.bind_tools(tools)` y arma `por_nombre`.\n- Arranca con `[SystemMessage(PROMPT), HumanMessage(pregunta)]`.\n- En cada paso: `ai = await llm_con_tools.ainvoke(mensajes)`; si `ai.tool_calls` está vacío, termina.\n- Si no, ejecuta cada llamada con `_ejecutar` y agrega el `ToolMessage` (puede haber varias en paralelo en el mismo paso).\n- `_ejecutar` devuelve un `ToolMessage` de error si la tool no existe o lanza una excepción.",
+   "proposito": "Se escribió a mano, sin LangGraph ni AgentExecutor, para tener todos los mensajes y poder loguearlos. Es agnóstico del origen de las tools: el docstring lo prepara para las de `langchain-mcp-adapters` (parte 3, pendiente).",
+   "interaccion": "Lo llama `correr()` en `hospital/agente/corrida.py` por cada pregunta; devuelve la lista completa de mensajes, que `resumir()` convierte en respuesta, contextos, herramientas y costo. `tests/test_agente.py` lo prueba con un modelo falso.",
+   "teoria": "Agente ReAct / ciclo de vida de una tool: AIMessage con tool_calls → ejecución → ToolMessage → nueva llamada al modelo.",
+   "key": "tp3-bucle-tool-calling",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "introduccion",
+     "i": 62,
+     "title": "El futuro: agentes autónomos e IA multimodal",
+     "extra": false,
+     "url": "/clases/01/#d=introduccion&s=62"
+    },
+    {
+     "clase": 2,
+     "cnn": "02",
+     "slug": "cowork-intro",
+     "i": 25,
+     "title": "Cómo el agente descubre y usa una herramienta",
+     "extra": false,
+     "url": "/clases/02/#d=cowork-intro&s=25"
+    },
+    {
+     "clase": 5,
+     "cnn": "05",
+     "slug": "prompting",
+     "i": 17,
+     "title": "Mitigar alucinaciones: el prompt",
+     "extra": false,
+     "url": "/clases/05/#d=prompting&s=17"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 3,
+     "title": "Recuperar, aumentar, generar",
+     "extra": false,
+     "url": "/clases/06/#d=rag-y-mcp&s=3"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 54,
+     "title": "El ciclo de vida de una herramienta MCP",
+     "extra": false,
+     "url": "/clases/06/#d=rag-y-mcp&s=54"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 57,
+     "title": "Demo: un servidor MCP mínimo",
+     "extra": false,
+     "url": "/clases/06/#d=rag-y-mcp&s=57"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 5,
+     "title": "Como herramienta: el agente decide cuándo buscar",
+     "extra": false,
+     "url": "/clases/07/#d=rag-mcp-rapida&s=5"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 19,
+     "title": "Herramienta hardcodeada o servidor aparte",
+     "extra": false,
+     "url": "/clases/07/#d=rag-mcp-rapida&s=19"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 20,
+     "title": "El ciclo de vida de una herramienta",
+     "extra": false,
+     "url": "/clases/07/#d=rag-mcp-rapida&s=20"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 25,
+     "title": "Cuatro principios de diseño",
+     "extra": false,
+     "url": "/clases/07/#d=rag-mcp-rapida&s=25"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 36,
+     "title": "El circuito con un agente",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=36"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 49,
+     "title": "MCP: lo que aprende el modelo",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=49"
+    },
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 14,
+     "title": "Workflow o agente",
+     "extra": false,
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=14"
+    },
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 19,
+     "title": "Una tool en código",
+     "extra": false,
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=19"
+    },
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 26,
+     "title": "ReAct en LangGraph",
+     "extra": false,
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=26"
+    },
+    {
+     "clase": 13,
+     "cnn": "13",
+     "slug": "cierre-magnifica-humanitas",
+     "i": 25,
+     "title": "De la alucinación al engaño funcional",
+     "extra": false,
+     "url": "/clases/13/#d=cierre-magnifica-humanitas&s=25"
+    }
+   ],
+   "nusos": 16
   },
   {
    "id": "test-redirect",
@@ -1956,28 +2710,188 @@
    "tp_titulo": "Corta, del caos a producción",
    "usos": [
     {
+     "clase": 2,
+     "cnn": "02",
+     "slug": "cowork-intro",
+     "i": 11,
+     "title": "El conocimiento del proyecto en .md",
+     "extra": false,
+     "url": "/clases/02/#d=cowork-intro&s=11"
+    },
+    {
+     "clase": 2,
+     "cnn": "02",
+     "slug": "cowork-intro",
+     "i": 29,
+     "title": "El nuevo rol: Diseñar, delegar y revisar",
+     "extra": false,
+     "url": "/clases/02/#d=cowork-intro&s=29"
+    },
+    {
      "clase": 13,
      "cnn": "13",
      "slug": "cierre-magnifica-humanitas",
      "i": 33,
      "title": "La potencia del centauro",
+     "extra": false,
      "url": "/clases/13/#d=cierre-magnifica-humanitas&s=33"
     }
    ],
-   "nusos": 1
+   "nusos": 3
+  },
+  {
+   "id": "helpers-repo-memoria",
+   "titulo": "tests/helpers.js: repositorio en memoria para crearApp",
+   "archivo": "tests/helpers.js",
+   "desde": 1,
+   "hasta": 28,
+   "lenguaje": "javascript",
+   "codigo": "// Repositorio en memoria para probar la app sin depender de PostgreSQL.\nfunction iniciarServerDeTest(linksIniciales) {\n  const links = structuredClone(linksIniciales || []);\n  const repositorio = {\n    async crear(link) {\n      if (links.some(function (l) { return l.codigo === link.codigo; })) {\n        return false;\n      }\n      links.push(structuredClone(link));\n      return true;\n    },\n    async buscar(codigo) {\n      const link = links.find(function (l) { return l.codigo === codigo; });\n      return link ? structuredClone(link) : null;\n    },\n    async incrementarClicks(codigo) {\n      const link = links.find(function (l) { return l.codigo === codigo; });\n      if (!link) return null;\n      link.clicks += 1;\n      return structuredClone(link);\n    },\n    async verificarConexion() {\n      return true;\n    }\n  };\n  const { crearApp } = require('../src/server');\n  const app = crearApp(repositorio);",
+   "que_hace": "Arma un repositorio en memoria con la misma interfaz que el de Postgres y levanta la app real con `crearApp` para los tests.",
+   "como_funciona": "- `iniciarServerDeTest(linksIniciales)` clona los datos iniciales en `links`.\n- `repositorio` implementa `crear` (devuelve `false` si el código ya existe), `buscar`, `incrementarClicks` y `verificarConexion`.\n- Importa `crearApp` de `src/server.js` y le inyecta ese repositorio; después escucha en un puerto libre (`listen(0)`).",
+   "proposito": "Permite probar las rutas HTTP reales sin una base PostgreSQL. Funciona porque `crearApp(repositorio)` recibe la persistencia por parámetro en vez de crearla adentro.",
+   "interaccion": "Lo usan `tests/redirect.test.js`, `tests/collision.test.js`, `tests/stats.test.js` y `tests/health.test.js`. Devuelve `baseUrl`, `leerDB()` para mirar el estado y `cerrar()`.",
+   "teoria": "Verificación diseñada por el equipo: el entorno de prueba aísla la lógica para que cada vuelta del agente se valide rápido con `npm test`.",
+   "key": "tp1-helpers-repo-memoria",
+   "tp": 1,
+   "tp_titulo": "Corta, del caos a producción",
+   "usos": [
+    {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "introduccion",
+     "i": 12,
+     "title": "Transformación en Ingeniería de Software",
+     "extra": false,
+     "url": "/clases/01/#d=introduccion&s=12"
+    },
+    {
+     "clase": 13,
+     "cnn": "13",
+     "slug": "cierre-magnifica-humanitas",
+     "i": 33,
+     "title": "La potencia del centauro",
+     "extra": false,
+     "url": "/clases/13/#d=cierre-magnifica-humanitas&s=33"
+    }
+   ],
+   "nusos": 2
+  },
+  {
+   "id": "progress-md-produccion",
+   "titulo": "PROGRESS.md: Milestone 5 y la prueba de redeploy",
+   "archivo": "docs/PROGRESS.md",
+   "desde": 46,
+   "hasta": 58,
+   "lenguaje": "markdown",
+   "codigo": "## Milestone 5 — Producción\n\n**Estado: hecho.**\n\n- [x] Deploy en Railway (servicio `corta` + PostgreSQL) disponible en\n      `https://corta-production-7bc5.up.railway.app`.\n- [x] Persistencia migrada de JSON a PostgreSQL, con incremento atómico de clicks y migración\n      inicial no destructiva de los datos heredados.\n- [x] Variables de entorno para credenciales, sin secretos en el código (`DATABASE_URL`).\n- [x] Configuración de Railway versionada (`railway.json`), puerto dinámico y healthcheck de app +\n      base de datos en `GET /health`.\n- [x] Persistencia verificada end-to-end: se creó el link `v4v`, se registró una redirección,\n      se forzó un redeploy y luego se confirmó que seguía existiendo con `clicks: 1`.",
+   "que_hace": "Registra el cierre del Milestone 5: deploy en Railway, migración a PostgreSQL, credenciales por variable de entorno y la prueba de persistencia con el link `v4v`.",
+   "como_funciona": "- Lista cada requisito de producción como checkbox hecho.\n- La última viñeta documenta la verificación end-to-end: crear `v4v`, redirigir una vez, forzar un redeploy y confirmar `clicks: 1`.",
+   "proposito": "La evidencia de que la migración funcionó no es un test unitario sino una prueba contra producción, y queda escrita para la próxima sesión y para la defensa.",
+   "interaccion": "Lo actualiza el agente al cerrar el milestone, como pide `CLAUDE.md`. Resume lo que implementan `src/postgres.js`, `src/server.js` (`iniciar()`) y `railway.json`.",
+   "teoria": "Validación humana del trabajo del agente: una prueba diseñada por el equipo que verifica el comportamiento real, no solo el código.",
+   "key": "tp1-progress-md-produccion",
+   "tp": 1,
+   "tp_titulo": "Corta, del caos a producción",
+   "usos": [
+    {
+     "clase": 2,
+     "cnn": "02",
+     "slug": "cowork-intro",
+     "i": 33,
+     "title": "La misión: del caos a producción",
+     "extra": false,
+     "url": "/clases/02/#d=cowork-intro&s=33"
+    },
+    {
+     "clase": 13,
+     "cnn": "13",
+     "slug": "cierre-magnifica-humanitas",
+     "i": 33,
+     "title": "La potencia del centauro",
+     "extra": false,
+     "url": "/clases/13/#d=cierre-magnifica-humanitas&s=33"
+    }
+   ],
+   "nusos": 2
+  },
+  {
+   "id": "informe-evaluacion-buscador",
+   "titulo": "Evaluación aparte del buscador (INFORME)",
+   "archivo": "INFORME.md",
+   "desde": 310,
+   "hasta": 350,
+   "lenguaje": "markdown",
+   "codigo": "| Buscador | Secciones por búsqueda | Completas | Recall de evidencia | Precisión | Tokens/consulta |\n|---|---|---:|---:|---:|---:|\n| Referencia BM25 de la cátedra | 2 | 51/60 | 0,875 | 0,492 | 580 |\n| **`baseline` (entrega)** | 2 | 48/60 | 0,817 | 0,467 | 618 |\n| `sin_comunes` | 2 | 50/60 | 0,850 | 0,483 | 591 |\n| `prefijos` | 1 a 3 (umbral 0,6) | **55/60** | **0,933** | **0,686** | **549** |\n| BM25 con 4 secciones (comparación) | 4 | 57/60 | 0,950 | 0,271 | 1.270 |\n\n- **`baseline`** queda por debajo de la referencia. Las consultas coloquiales tienen recall 0,25 porque dependen de\n  compartir palabras.\n- **`sin_comunes`** quita una lista fija de palabras comunes, pero conserva `no`, `sin`, `ni` y los números. Gana\n  d022, d026 y d028 y pierde d011 contra `baseline`.\n- **`prefijos`** recorta cada palabra a sus primeras 4 letras y trae hasta 3 secciones. Descarta las que puntúan\n  menos de 0,6 × la primera.\n  - Supera a la referencia en las cuatro métricas.\n  - Gana 9 consultas y pierde 2 (d027 y d052, por colisiones de prefijo).\n  - El recall de las consultas coloquiales es 0,75.\n\n**Pasadas que no se adoptaron.** El script de exploración mide 68 configuraciones (las entradas de `INTENTOS` en\n`scripts/explorar_buscadores.py`, incluidas `baseline` y `sin_comunes`). Se reproducen con\n`python -m scripts.explorar_buscadores --salida <carpeta nueva>`; la tabla completa está en\n[buscador baseline](docs/informe/buscador-baseline.md#exploración-descartada).\n\n| Familia | Mejor resultado | Por qué se descartó |\n|---|---|---|\n| Fragmentos por párrafo (top 2–5) | 39–46/60, 0,683–0,792, 176–389 tokens | Pierde el contexto de la sección |\n| Fragmentos por párrafo con stop + prefijo 4 (top 4–5) | 49/60, 0,833, 291–341 tokens | Menos tokens, pero menos recall que la referencia |\n| Sección recortada a los párrafos con coincidencia | 51/60, 0,867, 535 tokens | Pierde evidencia de párrafos sin palabras de la consulta |\n| Otros stemmers (plurales, sufijos, prefijo 5 o 6) | 51/60, 0,867 | Peores que prefijo 4 |\n| Título con más peso, ajustes de k1/b | 49–51/60 | Ganancia de 1 consulta como mucho |\n| Peso 0,25 para palabras comunes | 49/60, 0,833, 605 tokens | Pierde d011 igual que `sin_comunes` y gana menos |\n| Fusión BM25 + n-gramas de caracteres (RRF) | 48/60, 0,817, 612 tokens | No supera a `sin_comunes` |\n| `prefijos` sin umbral (k=3) | 56/60, 0,942, 895 tokens | +45 % de tokens por 1 consulta |\n| `prefijos` con umbral 0,4 / 0,5 / 0,7 / 0,8 | 56 / 55 / 53 / 52 de 60 | 0,6 es el codo entre recall y tokens |\n\n**Límites de esta evaluación:**\n\n- Prefijo, umbral y k se eligieron con estas mismas 60 consultas: son números de desarrollo.\n- Con normas b y c cambian solo los valores, y las tres variantes dan lo mismo que con original.\n- Densos, híbridos y rerankers quedaron fuera porque requieren descargas no autorizadas.\n- Siguen sin resolverse d030 (pecho ↔ dolor torácico) y d023 (abuela ↔ edad), que necesitan sinónimos.",
+   "que_hace": "Tabla de `admision.evaluar_rag` sobre 60 consultas de desarrollo: referencia de la cátedra, `baseline`, `sin_comunes` y `prefijos`, más las familias descartadas.",
+   "como_funciona": "- Compara completas, recall de evidencia, precisión y tokens por consulta.\n- `baseline` queda en 48/60 contra 51/60 de la referencia; `prefijos` llega a 55/60 y recall 0,933; traer 4 secciones da 57/60 pero duplica los tokens.\n- Explica la variante `prefijos` (prefijo de 4 letras, umbral 0,6, hasta 3 secciones).\n- Lista lo descartado (párrafos, stemmers, RRF) y lo que queda sin resolver: sinónimos como «pecho» ↔ «dolor torácico».",
+   "proposito": "Documenta la decisión de quedarse con un buscador léxico local y sus límites: no une sinónimos, cosa que un buscador denso sí haría pero requería descargas.",
+   "interaccion": "Los números salen de `python -m admision.evaluar_rag --entrega entrega.py ...` con `BUSCADOR_VARIANTE`; la configuración vive en `admision_tp/buscador.py`.",
+   "teoria": "Elegir entre búsqueda léxica y semántica: BM25 es exacto y barato pero falla con sinónimos; los embeddings los unen.",
+   "key": "tp4-informe-evaluacion-buscador",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 25,
+     "title": "Cuándo conviene cada estrategia",
+     "extra": false,
+     "url": "/clases/06/#d=rag-y-mcp&s=25"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 30,
+     "title": "RRF fusiona sumando posiciones",
+     "extra": false,
+     "url": "/clases/06/#d=rag-y-mcp&s=30"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 39,
+     "title": "Evaluar las dos etapas por separado",
+     "extra": false,
+     "url": "/clases/06/#d=rag-y-mcp&s=39"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 6,
+     "title": "En producción se usan las dos",
+     "extra": false,
+     "url": "/clases/07/#d=rag-mcp-rapida&s=6"
+    },
+    {
+     "clase": 13,
+     "cnn": "13",
+     "slug": "cierre-magnifica-humanitas",
+     "i": 44,
+     "title": "Evaluar es el nuevo cuello de botella",
+     "extra": false,
+     "url": "/clases/13/#d=cierre-magnifica-humanitas&s=44"
+    }
+   ],
+   "nusos": 5
   },
   {
    "id": "informe-agente-buscador",
    "titulo": "Mejor buscador aislado ≠ mejor agente",
    "archivo": "INFORME.md",
-   "desde": 288,
-   "hasta": 320,
+   "desde": 372,
+   "hasta": 401,
    "lenguaje": "markdown",
-   "codigo": "| Métrica | `baseline` | `prefijos` |\n|---|---:|---:|\n| Casos resueltos | **10/50** | 6/50 |\n| Parcial medio | **0,831** | 0,796 |\n| registro / box / circuito / plazo | 0,76 / 0,72 / 0,98 / 0,92 | 0,62 / 0,68 / 0,94 / 0,84 |\n| cobertura / entidad / aviso / verificación | 0,80 / 0,82 / 0,72 / 0,76 | 0,78 / 0,82 / 0,72 / 0,76 |\n| Llamadas / búsquedas por caso | 4,9 / 1,34 | 5,0 / 1,40 |\n| Caracteres de contexto por caso | 19.954 | 20.689 |\n| Segundos por caso (T4, lote 4) | 15,2 | 15,7 |\n\n`baseline` reproduce exactamente la corrida anterior del modelo sin entrenar (10/50, 0,831; commit `a89f5b9`).\nPor caso, `prefijos` gana 3 (pev-005, 019, 037) y pierde 7 (pev-010, 012, 017, 021, 024, 049, 050); con 10\ncasos discordantes la prueba de signos da p≈0,34, así que la diferencia **no es concluyente**, pero tampoco\nhay señal de mejora.\n\n**Por qué el mejor recall no ayudó.** `baseline` devuelve siempre 2 secciones; `prefijos` devolvió 1 en 30\nbúsquedas, 3 en 26 y 2 en 14. Con 3 suele sumar secciones parecidas de otras áreas (por ejemplo NOR-DER-01 o\nNOR-GUA-02), justamente las que no deciden la ficha. Por eso el contexto por caso subió 3,7 % en vez de bajar\ncomo en la evaluación separada, y cambió el recorrido del agente (en pev-021 nunca buscó el circuito). Es lo\nque muestran las trazas, no una causa probada.\n\n**Costo de contexto.** Con las dos variantes el agente hace pocas búsquedas (1,3–1,4 por caso) y cada caso usa\nunos 20.000 caracteres de contexto (~5.000 tokens a 4 caracteres por token). `prefijos` trae menos tokens por\nconsulta en `evaluar_rag` (549 contra 618) pero más contexto por caso con el agente. El costo de GPU de la\ncomparación fue 2.968 s de sesión T4 (≈ 49,5 min, ~20 min de instalación de dependencias); tiempos T4 **no\ncomparables** con la A100-40GB de la entrega.\n\n### Decisión\n\nEl default de la entrega sigue siendo `baseline` (`entrega.py` no cambia): es el que mejor resolvió con el\nagente y el que se usó para generar las conversaciones de entrenamiento. `prefijos` queda documentado y\nseleccionable como resultado negativo: mejora la evaluación separada pero no al agente sin entrenar. Si\nalcanzan tiempo y cuota, se repetirá la comparación con el modelo entrenado.",
+   "codigo": "| Métrica | `baseline` | `prefijos` |\n|---|---:|---:|\n| Casos resueltos | **10/50** | 6/50 |\n| Parcial medio | **0,831** | 0,796 |\n| registro / box / circuito / plazo | 0,76 / 0,72 / 0,98 / 0,92 | 0,62 / 0,68 / 0,94 / 0,84 |\n| cobertura / entidad / aviso / verificación | 0,80 / 0,82 / 0,72 / 0,76 | 0,78 / 0,82 / 0,72 / 0,76 |\n| Llamadas / búsquedas por caso | 4,9 / 1,34 | 5,0 / 1,40 |\n| Caracteres de contexto por caso | 19.954 | 20.689 |\n| Segundos por caso (T4, lote 4; v25 / v41) | 16,07 | 16,09 |\n\n- **No es concluyente:** `prefijos` gana 3 casos (pev-005, pev-019, pev-037) y pierde 7 (pev-010, 012, 017,\n  021, 024, 049 y 050); con 10 casos discordantes, la prueba de signos da\n  p≈0,34. Tampoco hay señal de mejora.\n- **Por qué el mejor recall no ayudó.** `baseline` devuelve siempre 2 secciones. `prefijos` devolvió 1 sección en 30\n  búsquedas, 3 en 26 y 2 en 14.\n  - Con 3 secciones suele sumar secciones de otras áreas que no deciden la ficha.\n  - El contexto por caso subió 3,7 %.\n  - Es lo que muestran las trazas, no una causa probada.\n- **Costo de GPU:** la comparación usó 2.968 s de sesión T4.\n\n**Pasada 2: con el prompt elegido (Kaggle v26, dev de 40 casos).** `procedimiento-v1` con `prefijos` cae a 4/40,\ncontra 9/40 con `baseline` (Parte 3).\n\n**Decisión.** El default sigue siendo `baseline` por tres motivos:\n\n- Es el que mejor resolvió con el agente.\n- Generó las conversaciones de entrenamiento.\n- El adapter aprendió a usarlo.\n\n`prefijos` queda seleccionable como resultado negativo: mejora la evaluación separada, pero no al agente.",
    "que_hace": "Compara `baseline` y `prefijos` jugando los 50 casos de práctica con Gemma sin entrenar: `baseline` resuelve 10/50 y `prefijos` 6/50.",
-   "como_funciona": "- Tabla por control, llamadas, contexto y segundos por caso.\n- Por caso: `prefijos` gana 3 y pierde 7 (prueba de signos p≈0,34, no concluyente).\n- Explica por qué: `prefijos` trae 1 o 3 secciones y con 3 suma secciones parecidas que no deciden la ficha; el contexto por caso sube 3,7 %.\n- Decisión: el default sigue siendo `baseline`.",
+   "como_funciona": "- Tabla por control, llamadas, contexto y segundos por caso.\n- Por caso: `prefijos` gana 3 y pierde 7 (prueba de signos p≈0,34, no concluyente).\n- Explica por qué: `prefijos` trae 1 o 3 secciones y con 3 suma secciones de otras áreas que no deciden la ficha; el contexto por caso sube 3,7 %.\n- Con `procedimiento-v1` pasa lo mismo (4/40 contra 9/40).\n- Decisión: el default sigue siendo `baseline` (mejor con el agente, generó las conversaciones de entrenamiento y el adapter aprendió a usarlo).",
    "proposito": "Materializa la regla de que el buscador vale por lo que rinde el agente con él, no por su métrica aislada; `prefijos` queda como resultado negativo documentado.",
-   "interaccion": "Los datos vienen de `infra/kaggle_baseline.py` con `BUSCADOR_VARIANTE` y se puntúan con `admision.correr puntuar`; la decisión deja `entrega.construir_buscador` en `baseline`.",
+   "interaccion": "Los datos vienen de `infra/kaggle_evaluacion.py` con el plan `configuraciones/evaluacion/buscador-prefijos.json` y se tabulan con `scripts.tabla_evaluacion`; los controles los puntúa `admision.correr.puntuar`. La decisión deja `entrega.construir_buscador` en `baseline`.",
    "teoria": "Evaluar las dos etapas de un RAG por separado y juntas: mejor recuperación aislada no garantiza mejor respuesta final.",
    "key": "tp4-informe-agente-buscador",
    "tp": 4,
@@ -1989,7 +2903,17 @@
      "slug": "rag-y-mcp",
      "i": 39,
      "title": "Evaluar las dos etapas por separado",
+     "extra": false,
      "url": "/clases/06/#d=rag-y-mcp&s=39"
+    },
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 41,
+     "title": "El contexto se degrada",
+     "extra": false,
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=41"
     },
     {
      "clase": 13,
@@ -1997,10 +2921,11 @@
      "slug": "cierre-magnifica-humanitas",
      "i": 44,
      "title": "Evaluar es el nuevo cuello de botella",
+     "extra": false,
      "url": "/clases/13/#d=cierre-magnifica-humanitas&s=44"
     }
    ],
-   "nusos": 2
+   "nusos": 3
   },
   {
    "id": "plan-mcp-pendiente",
@@ -2025,6 +2950,7 @@
      "slug": "claude-desktop-chat",
      "i": 21,
      "title": "Agregar un external connector",
+     "extra": true,
      "url": "/clases/01/#d=claude-desktop-chat&s=21"
     },
     {
@@ -2033,6 +2959,7 @@
      "slug": "rag-y-mcp",
      "i": 53,
      "title": "El servidor separa herramienta y agente",
+     "extra": false,
      "url": "/clases/06/#d=rag-y-mcp&s=53"
     },
     {
@@ -2041,7 +2968,17 @@
      "slug": "rag-y-mcp",
      "i": 54,
      "title": "El ciclo de vida de una herramienta MCP",
+     "extra": false,
      "url": "/clases/06/#d=rag-y-mcp&s=54"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 57,
+     "title": "Demo: un servidor MCP mínimo",
+     "extra": false,
+     "url": "/clases/06/#d=rag-y-mcp&s=57"
     },
     {
      "clase": 7,
@@ -2049,6 +2986,7 @@
      "slug": "rag-mcp-rapida",
      "i": 16,
      "title": "MCP conecta modelos con herramientas",
+     "extra": false,
      "url": "/clases/07/#d=rag-mcp-rapida&s=16"
     },
     {
@@ -2057,6 +2995,7 @@
      "slug": "rag-mcp-rapida",
      "i": 18,
      "title": "JSON-RPC 2.0: la capa de mensajes",
+     "extra": false,
      "url": "/clases/07/#d=rag-mcp-rapida&s=18"
     },
     {
@@ -2065,6 +3004,7 @@
      "slug": "como-se-entrena-un-llm",
      "i": 47,
      "title": "MCP: host, cliente y servidor",
+     "extra": false,
      "url": "/clases/09/#d=como-se-entrena-un-llm&s=47"
     },
     {
@@ -2073,10 +3013,11 @@
      "slug": "cierre-magnifica-humanitas",
      "i": 45,
      "title": "Hacia un Internet de Agentes",
+     "extra": false,
      "url": "/clases/13/#d=cierre-magnifica-humanitas&s=45"
     }
    ],
-   "nusos": 7
+   "nusos": 8
   }
  ]
 }

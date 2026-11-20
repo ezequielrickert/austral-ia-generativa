@@ -293,268 +293,495 @@
    "proposito": "Es diseño, no código: el notebook termina en el Milestone 4. Hoy el scaler, la mediana y los encoders viven sueltos en celdas (celdas 10 y 25), justo lo que el M5 pide cerrar.",
    "interaccion": "Para implementarlo habría que envolver `prepare_numeric_split`/`build_dense_features`, los encoders y `district_to_idx` en capas de preprocesamiento del modelo, y cambiar la salida a 3 neuronas con pinball.",
    "teoria": "La loss define qué aprende la red (media, mediana o percentil); el modelo no son solo los pesos."
+  },
+  {
+   "id": "train-categorical-variant",
+   "titulo": "Entrenar una variante: features, índices de distrito y fit (celda 26)",
+   "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
+   "desde": 57,
+   "hasta": 93,
+   "lenguaje": "python",
+   "codigo": "def train_categorical_variant(use_state, use_district, use_housestyle, use_centralair,\n                               use_salecondition, cyclical_month, district_int=False, epochs=100):\n    X_dense_train, scaler = build_dense_features(\n        df_train, lotfrontage_median, use_state, use_housestyle, use_centralair,\n        use_salecondition, cyclical_month, district_int, fit_scaler=True)\n    X_dense_val, _ = build_dense_features(\n        df_val, lotfrontage_median, use_state, use_housestyle, use_centralair,\n        use_salecondition, cyclical_month, district_int, scaler=scaler)\n    X_dense_test, _ = build_dense_features(\n        df_test, lotfrontage_median, use_state, use_housestyle, use_centralair,\n        use_salecondition, cyclical_month, district_int, scaler=scaler)\n\n    y_train_raw = df_train[TARGET].to_numpy(dtype=float)\n    y_val_raw = df_val[TARGET].to_numpy(dtype=float)\n    y_test_raw = df_test[TARGET].to_numpy(dtype=float)\n    y_scaler = StandardScaler().fit(y_train_raw.reshape(-1, 1))\n    y_train = y_scaler.transform(y_train_raw.reshape(-1, 1)).ravel()\n    y_val = y_scaler.transform(y_val_raw.reshape(-1, 1)).ravel()\n\n    if use_district:\n        inputs_train = [X_dense_train, build_district_idx(df_train)]\n        inputs_val = [X_dense_val, build_district_idx(df_val)]\n        inputs_test = [X_dense_test, build_district_idx(df_test)]\n    else:\n        inputs_train, inputs_val, inputs_test = X_dense_train, X_dense_val, X_dense_test\n\n    keras.utils.set_random_seed(SEED)\n    model = build_model_categorical(X_dense_train.shape[1], use_district, DISTRICT_VOCAB_SIZE)\n    hist = model.fit(inputs_train, y_train, batch_size=32, epochs=epochs,\n                      validation_data=(inputs_val, y_val), verbose=0)\n\n    y_pred = y_scaler.inverse_transform(model.predict(inputs_test, verbose=0)).ravel()\n    mae = mean_absolute_error(y_test_raw, y_pred)\n    rmse = np.sqrt(mean_squared_error(y_test_raw, y_pred))\n    mape = 100 * mean_absolute_percentage_error(y_test_raw, y_pred)\n    return {'model': model, 'history': hist, 'mae': mae, 'rmse': rmse, 'mape': mape,\n            'y_test': y_test_raw, 'y_pred': y_pred}",
+   "que_hace": "Arma las entradas de train/val/test para una combinación de columnas, construye la red con `build_model_categorical`, la entrena y devuelve MAE, RMSE y MAPE en dólares sobre test.",
+   "como_funciona": "- Llama tres veces a `build_dense_features`: con `fit_scaler=True` en `df_train` y reusando ese `scaler` en `df_val` y `df_test`.\n- Escala `SalePrice` con un `y_scaler` ajustado solo en train.\n- Si `use_district`, cada entrada pasa a ser una lista `[X_dense, build_district_idx(...)]` para las dos ramas del modelo.\n- Fija `SEED`, entrena con `batch_size=32` y desescala las predicciones con `inverse_transform` antes de medir.",
+   "proposito": "Es el banco de pruebas del Milestone 3: el mismo procedimiento para todas las variantes, así la única diferencia entre filas de la tabla es qué columnas entran y cómo se codifican.",
+   "interaccion": "La llaman la celda 27 (`v1_state`, `v2_district`, `v3_full`) y la celda 31 (trampa con `district_int=True`). Consume `build_dense_features`, `build_district_idx` y `build_model_categorical` (misma celda) y los encoders de la celda 25.",
+   "teoria": "Materializa la idea de que la red solo ve una fila de números: la arquitectura queda fija y lo que cambia es la codificación de la entrada."
+  },
+  {
+   "id": "features-milestone4",
+   "titulo": "Entradas del Milestone 4: mismo vector del modelo completo (celda 34)",
+   "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
+   "desde": 1,
+   "hasta": 17,
+   "lenguaje": "python",
+   "codigo": "from keras.layers import Dropout\nfrom keras import regularizers\nfrom keras.callbacks import EarlyStopping\n\n# Mismo feature set que el modelo completo del Milestone 3 (fit_scaler solo en train).\nX4_train, scaler4 = build_dense_features(df_train, lotfrontage_median, True, True, True, True, True, fit_scaler=True)\nX4_val, _ = build_dense_features(df_val, lotfrontage_median, True, True, True, True, True, scaler=scaler4)\nX4_test, _ = build_dense_features(df_test, lotfrontage_median, True, True, True, True, True, scaler=scaler4)\n\nd4_train, d4_val, d4_test = build_district_idx(df_train), build_district_idx(df_val), build_district_idx(df_test)\n\ny4_train_raw = df_train[TARGET].to_numpy(dtype=float)\ny4_val_raw = df_val[TARGET].to_numpy(dtype=float)\ny4_test_raw = df_test[TARGET].to_numpy(dtype=float)\ny4_scaler = StandardScaler().fit(y4_train_raw.reshape(-1, 1))\ny4_train = y4_scaler.transform(y4_train_raw.reshape(-1, 1)).ravel()\ny4_val = y4_scaler.transform(y4_val_raw.reshape(-1, 1)).ravel()",
+   "que_hace": "Construye una vez los tensores `X4_*` (features densas), `d4_*` (índices de distrito) e `y4_*` (target escalado) que usan la red grande y la regularizada.",
+   "como_funciona": "- Llama a `build_dense_features` con todas las opciones en `True`, ajustando `scaler4` solo con `df_train`.\n- `build_district_idx` convierte cada `District` en el índice que va al `Embedding`.\n- `y4_scaler` se ajusta con el precio de train y transforma train y val.",
+   "proposito": "Fija el mismo conjunto de features del modelo completo del Milestone 3 para que la comparación del Milestone 4 aísle el efecto del tamaño y la regularización.",
+   "interaccion": "Sus salidas las consumen `build_big_model`/`model_overfit.fit` (misma celda), `model_regularized.fit` (celda 37) y la comparación en dólares con `y4_scaler.inverse_transform` (celda 38).",
+   "teoria": "Entrada de largo fijo, ajustada solo en train: el preprocesamiento queda separado de la arquitectura que se está probando."
+  },
+  {
+   "id": "baseline-oficial",
+   "titulo": "El baseline oficial y su curva de pérdida (celda 15)",
+   "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
+   "desde": 1,
+   "hasta": 11,
+   "lenguaje": "python",
+   "codigo": "import matplotlib.pyplot as plt\n\nbaseline = variant_median_flag\n\nplt.plot(baseline['history'].history['loss'])\nplt.plot(baseline['history'].history['val_loss'])\nplt.title('Baseline numérico — pérdida (MSE, target escalado)')\nplt.ylabel('Loss')\nplt.xlabel('Epoch')\nplt.legend(['Train', 'Val'], loc='upper right')\nplt.show()",
+   "que_hace": "Fija `baseline = variant_median_flag` (mediana + indicador) y grafica `loss` contra `val_loss` del historial de entrenamiento.",
+   "como_funciona": "- Toma el diccionario que devolvió `train_and_report` en la celda 11.\n- Lee `history.history['loss']` y `['val_loss']` del objeto que devuelve `model.fit` y los grafica por época.",
+   "proposito": "Deja un único punto de referencia numérico para el resto del notebook y muestra, con la curva, que `val_loss` toca su mínimo temprano.",
+   "interaccion": "`baseline` lo consumen la celda 17 (métricas), la celda 18 (casa con mayor error), la celda 21 (ListingId) y la tabla de la celda 27.",
+   "teoria": "La loss que se minimiza (MSE con target escalado) se mira en train y en validación para detectar cuándo el modelo deja de generalizar."
+  },
+  {
+   "id": "curva-overfit",
+   "titulo": "Curva y diagnóstico de la red sobredimensionada (celda 35)",
+   "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
+   "desde": 1,
+   "hasta": 12,
+   "lenguaje": "python",
+   "codigo": "plt.plot(hist_overfit.history['loss'])\nplt.plot(hist_overfit.history['val_loss'])\nplt.title('Modelo sobredimensionado (sin regularizar) — pérdida')\nplt.ylabel('Loss')\nplt.xlabel('Epoch')\nplt.legend(['Train', 'Val'], loc='upper right')\nplt.show()\n\nmin_val_epoch = int(np.argmin(hist_overfit.history['val_loss']))\nprint(f\"val_loss mínimo en la época {min_val_epoch}: {min(hist_overfit.history['val_loss']):.4f}\")\nprint(f\"val_loss final (época {len(hist_overfit.history['val_loss']) - 1}): {hist_overfit.history['val_loss'][-1]:.4f}\")\nprint(f\"train_loss final: {hist_overfit.history['loss'][-1]:.4f}\")",
+   "que_hace": "Grafica `loss` y `val_loss` de `hist_overfit` e imprime en qué época `val_loss` fue mínima y cómo terminaron ambas pérdidas.",
+   "como_funciona": "- `plt.plot` de las dos series del historial.\n- `np.argmin(hist_overfit.history['val_loss'])` ubica la mejor época de validación.\n- Compara ese mínimo con el `val_loss` final y el `train_loss` final.",
+   "proposito": "Es la evidencia del sobreajuste: el train sigue bajando mientras validación sube, lo que justifica regularizar y cortar antes.",
+   "interaccion": "Lee `hist_overfit` de la celda 34; motiva la celda 37 (L2, Dropout y `EarlyStopping` con `patience=15`), cuyo resultado se compara en la celda 38.",
+   "teoria": "Diagnóstico de overfitting: brecha creciente entre la pérdida de entrenamiento y la de validación."
+  },
+  {
+   "id": "clase-fit",
+   "titulo": "Notebook de clase: fit con lotes de 32 y 100 épocas (house-prices.ipynb, celda 31)",
+   "archivo": "house-prices.ipynb",
+   "desde": 1,
+   "hasta": 3,
+   "lenguaje": "python",
+   "codigo": "hist = model.fit(X_train, Y_train,\n          batch_size=32, epochs=100,\n          validation_data=(X_val, Y_val))",
+   "que_hace": "Entrena el clasificador de clase sobre `X_train`/`Y_train`, con validación en cada época, y guarda el historial en `hist`.",
+   "como_funciona": "`model.fit` recorre los datos en lotes de 32 durante 100 épocas; `validation_data` hace que Keras reporte la pérdida de validación al final de cada época.",
+   "proposito": "Es el ciclo de entrenamiento de referencia de la clase; el TP2 conservó `batch_size=32` y 100 épocas en `train_and_report`.",
+   "interaccion": "Entrena el `model` de la celda 25 compilado en la celda 29; `hist` se grafica más adelante en el mismo notebook.",
+   "teoria": "Forward, cálculo de la loss y backpropagation por lote, repetidos durante varias épocas."
   }
  ],
  "refs": [
   {
    "slug": "introduccion",
    "i": 26,
-   "snippet": "baseline-mlp-32-32",
-   "nota": "Cada `Dense(32, relu)` es una capa de estas neuronas: $z=W\\cdot x+b$ y luego ReLU."
+   "snippets": [
+    "baseline-mlp-32-32",
+    "train-and-report"
+   ],
+   "nota": "Cada `Dense(32, relu)` es una capa de estas neuronas: $z=W\\cdot x+b$ y luego ReLU; `train_and_report` es quien construye y entrena esa red."
   },
   {
    "slug": "introduccion",
    "i": 32,
-   "snippet": "variantes-incrementales",
-   "nota": "El problema es de regresión: la tabla muestra el MAE en dólares bajando de 51.411 a 20.844."
+   "snippets": [
+    "train-and-report",
+    "train-categorical-variant",
+    "variantes-incrementales"
+   ],
+   "nota": "Regresión: las dos funciones de entrenamiento desescalan y miden el MAE en dólares, y la tabla final lo muestra bajando de 51.411 a 20.844."
   },
   {
    "slug": "introduccion",
    "i": 50,
-   "snippet": "split-70-20-10",
+   "snippets": [
+    "split-70-20-10",
+    "train-and-report"
+   ],
    "nota": "Supervisado: cada casa trae su `SalePrice` como etiqueta, y se parte antes de mirar estadísticas."
   },
   {
    "slug": "intro-redes-neuronales",
    "i": 8,
-   "snippet": "clase-sigmoide",
-   "nota": "Esta sigmoide del notebook de clase es la que el TP2 reemplazó por una salida lineal."
+   "snippets": [
+    "clase-sigmoide",
+    "baseline-mlp-32-32"
+   ],
+   "nota": "Esta sigmoide del notebook de clase es la que el TP2 reemplazó por una salida lineal (paso 2)."
   },
   {
    "slug": "intro-redes-neuronales",
    "i": 9,
-   "snippet": "baseline-mlp-32-32"
+   "snippets": [
+    "baseline-mlp-32-32",
+    "train-and-report"
+   ]
   },
   {
    "slug": "intro-redes-neuronales",
    "i": 12,
-   "snippet": "modelo-grande-512",
-   "nota": "Comparalo con el 32-32 de la celda 10: `units=(512, 512, 512)` es ancho ×16 con casi la misma profundidad."
+   "snippets": [
+    "baseline-mlp-32-32",
+    "modelo-grande-512"
+   ],
+   "nota": "Compará los dos pasos: `units=(512, 512, 512)` es ancho ×16 con casi la misma profundidad que el 32-32."
   },
   {
    "slug": "intro-redes-neuronales",
    "i": 13,
-   "snippet": "modelo-grande-512",
-   "nota": "`count_params()` cuenta los 550.985 parámetros aprendidos; `units`, `l2` y `dropout` son hiperparámetros que se fijan al llamar la función."
+   "snippets": [
+    "modelo-grande-512",
+    "regularizado-early-stopping"
+   ],
+   "nota": "`count_params()` cuenta los 550.985 parámetros aprendidos; `l2=0.001`, `dropout=0.3` y `patience=15` son hiperparámetros que se fijan en la celda 37."
   },
   {
    "slug": "intro-redes-neuronales",
    "i": 24,
-   "snippet": "baseline-mlp-32-32",
+   "snippets": [
+    "baseline-mlp-32-32"
+   ],
    "nota": "Sin `activation='relu'` las dos `Dense(32)` colapsarían en una sola transformación lineal."
   },
   {
    "slug": "intro-redes-neuronales",
    "i": 25,
-   "snippet": "baseline-mlp-32-32"
+   "snippets": [
+    "baseline-mlp-32-32",
+    "modelo-embedding-funcional",
+    "modelo-grande-512"
+   ],
+   "nota": "Las tres arquitecturas del TP repiten el patrón: ocultas con ReLU y `Dense(1, activation='linear')` a la salida."
   },
   {
    "slug": "intro-redes-neuronales",
    "i": 29,
-   "snippet": "train-and-report",
-   "nota": "`model.fit(..., epochs=epochs)` es el ciclo forward/backward; cada época recorre las 1022 casas de train."
+   "snippets": [
+    "train-and-report",
+    "modelo-grande-512",
+    "regularizado-early-stopping"
+   ],
+   "nota": "Cada `fit` es el ciclo forward/backward: 100 épocas en el baseline, 150 en la red grande y corte en la 76 con early stopping."
   },
   {
    "slug": "intro-redes-neuronales",
    "i": 30,
-   "snippet": "casa-peor-mae-rmse",
-   "nota": "Se entrenó con `loss='mse'`; esta celda muestra cómo una sola casa pesa más en la métrica cuadrática."
+   "snippets": [
+    "baseline-mlp-32-32",
+    "train-and-report",
+    "baseline-oficial",
+    "casa-peor-mae-rmse"
+   ],
+   "nota": "Se entrenó con `loss='mse'`; el último paso muestra cómo una sola casa pesa más en la métrica cuadrática."
   },
   {
    "slug": "intro-redes-neuronales",
    "i": 34,
-   "snippet": "train-and-report",
+   "snippets": [
+    "train-and-report"
+   ],
    "nota": "Mirá el comentario sobre `y_scaler`: escalar el target fue la forma de que el paso de Adam alcanzara."
   },
   {
    "slug": "modelado-redes-neuronales",
    "i": 2,
-   "snippet": "variantes-incrementales",
-   "nota": "Mismo tronco 32-32 en todas las filas: solo cambia la fila de floats que entra."
+   "snippets": [
+    "build-dense-features",
+    "train-categorical-variant",
+    "variantes-incrementales"
+   ],
+   "nota": "Mismo tronco 32-32 en todas las filas: solo cambia la fila de floats que arma `build_dense_features`."
   },
   {
    "slug": "modelado-redes-neuronales",
    "i": 10,
-   "snippet": "tabla-decisiones",
-   "nota": "La tercera columna de la tabla es literalmente esta pregunta, aplicada a cada variable."
+   "snippets": [
+    "tabla-decisiones",
+    "build-dense-features"
+   ],
+   "nota": "La tercera columna de la tabla es literalmente esta pregunta; `build_dense_features` traduce cada respuesta a columnas."
   },
   {
    "slug": "modelado-redes-neuronales",
    "i": 11,
-   "snippet": "prepare-numeric-split",
-   "nota": "El target también se escala con un `StandardScaler` de train en `train_and_report` (misma celda 10)."
+   "snippets": [
+    "prepare-numeric-split",
+    "train-and-report"
+   ],
+   "nota": "El target también se escala con un `StandardScaler` de train dentro de `train_and_report` (paso 2)."
   },
   {
    "slug": "modelado-redes-neuronales",
    "i": 12,
-   "snippet": "modelo-embedding-funcional",
-   "nota": "`State` va por one-hot dentro de `build_dense_features`; `District` va por esta rama `Embedding`."
+   "snippets": [
+    "encoders-solo-train",
+    "build-dense-features",
+    "modelo-embedding-funcional",
+    "train-categorical-variant"
+   ],
+   "nota": "`State` va por one-hot dentro de `build_dense_features`; `District` va por la rama `Embedding`, y `train_categorical_variant` une las dos entradas."
   },
   {
    "slug": "modelado-redes-neuronales",
    "i": 13,
-   "snippet": "district-entero-trampa",
-   "nota": "Este es el error \"código como número\" hecho a propósito; los otros tres están en la tabla de decisiones."
+   "snippets": [
+    "build-dense-features",
+    "train-categorical-variant",
+    "district-entero-trampa",
+    "listingid-adentro"
+   ],
+   "nota": "`district_int=True` es el error \"código como número\" hecho a propósito; el último paso prueba la otra trampa, `ListingId` como feature."
   },
   {
    "slug": "modelado-redes-neuronales",
    "i": 14,
-   "snippet": "tabla-decisiones"
+   "snippets": [
+    "tabla-decisiones",
+    "month-cyclical",
+    "build-dense-features"
+   ]
   },
   {
    "slug": "modelado-redes-neuronales",
    "i": 16,
-   "snippet": "split-70-20-10"
+   "snippets": [
+    "split-70-20-10",
+    "train-and-report"
+   ]
   },
   {
    "slug": "modelado-redes-neuronales",
    "i": 17,
-   "snippet": "variantes-incrementales",
-   "nota": "Ojo para la defensa: esta tabla elige entre variantes con métricas de test; en rigor eso le tocaba a validación."
+   "snippets": [
+    "train-categorical-variant",
+    "variantes-incrementales"
+   ],
+   "nota": "Ojo para la defensa: las métricas salen de `X_dense_test`, así que la tabla elige entre variantes con test; en rigor eso le tocaba a validación."
   },
   {
    "slug": "modelado-redes-neuronales",
    "i": 18,
-   "snippet": "encoders-solo-train",
-   "nota": "Todo se ajusta con `df_train`, pero queda suelto en celdas: el M5 (empaquetarlo con el modelo) quedó pendiente."
+   "snippets": [
+    "prepare-numeric-split",
+    "encoders-solo-train",
+    "train-categorical-variant",
+    "mision-m5-pinball"
+   ],
+   "nota": "Mediana, scaler y encoders se ajustan con `df_train`, pero quedan sueltos en celdas: el M5 (empaquetarlos con el modelo) quedó pendiente."
   },
   {
    "slug": "modelado-redes-neuronales",
    "i": 20,
-   "snippet": "split-70-20-10",
-   "nota": "El comentario de la línea 9 enuncia la regla: partir antes de cualquier estadística, con `SEED = 42`."
+   "snippets": [
+    "split-70-20-10",
+    "prepare-numeric-split"
+   ],
+   "nota": "El comentario de la línea 9 enuncia la regla: partir antes de cualquier estadística, con `SEED = 42`; recién después se calcula la mediana de train."
   },
   {
    "slug": "modelado-redes-neuronales",
    "i": 22,
-   "snippet": "baseline-mlp-32-32",
-   "nota": "Fila \"real\" del catálogo: `Dense(1, activation='linear')` + `loss='mse'`."
+   "snippets": [
+    "clase-sigmoide",
+    "clase-compile-bce",
+    "baseline-mlp-32-32"
+   ],
+   "nota": "Fila \"binaria\" del catálogo en el notebook de clase y fila \"real\" en el TP2: `Dense(1, activation='linear')` + `loss='mse'`."
   },
   {
    "slug": "modelado-redes-neuronales",
    "i": 28,
-   "snippet": "casa-peor-mae-rmse"
+   "snippets": [
+    "train-and-report",
+    "baseline-oficial",
+    "casa-peor-mae-rmse"
+   ]
   },
   {
    "slug": "modelado-redes-neuronales",
    "i": 32,
-   "snippet": "mision-m5-pinball",
+   "snippets": [
+    "mision-m5-pinball"
+   ],
    "nota": "El extra con pinball loss no se implementó; esto es la consigna, no código del grupo."
   },
   {
    "slug": "modelado-redes-neuronales",
    "i": 43,
-   "snippet": "train-and-report",
-   "nota": "En vez de tocar η, el grupo escaló el target para que los gradientes fueran de tamaño razonable."
+   "snippets": [
+    "baseline-mlp-32-32",
+    "train-and-report"
+   ],
+   "nota": "`optimizer='adam'` usa η=0,001 por defecto; en vez de tocarlo, el grupo escaló el target para que los gradientes fueran de tamaño razonable."
   },
   {
    "slug": "modelado-redes-neuronales",
    "i": 44,
-   "snippet": "train-and-report",
+   "snippets": [
+    "train-and-report"
+   ],
    "nota": "`batch_size=32` con 1022 casas da unos 32 ajustes de pesos por época."
   },
   {
    "slug": "modelado-redes-neuronales",
    "i": 46,
-   "snippet": "modelo-grande-512",
+   "snippets": [
+    "modelo-grande-512",
+    "regularizado-early-stopping"
+   ],
    "nota": "`kernel_regularizer=reg` suma $\\lambda\\sum w^2$ a la loss y `Dropout(dropout)` apaga neuronas al entrenar; la celda 37 los activa con 0,001 y 0,3."
   },
   {
    "slug": "modelado-redes-neuronales",
    "i": 47,
-   "snippet": "comparar-overfit-regularizado",
+   "snippets": [
+    "modelo-grande-512",
+    "curva-overfit",
+    "regularizado-early-stopping",
+    "comparar-overfit-regularizado"
+   ],
    "nota": "Train 0,0121 vs val 0,1273 es el patrón de overfitting; el regularizado corta en la época 76 y baja el MAE a 16.538."
   },
   {
    "slug": "modelado-redes-neuronales",
    "i": 57,
-   "snippet": "modelo-grande-512"
+   "snippets": [
+    "baseline-mlp-32-32",
+    "modelo-grande-512",
+    "curva-overfit"
+   ]
   },
   {
    "slug": "modelado-redes-neuronales",
    "i": 61,
-   "snippet": "variantes-incrementales"
+   "snippets": [
+    "train-categorical-variant",
+    "variantes-incrementales"
+   ]
   },
   {
    "slug": "modelado-redes-neuronales",
    "i": 62,
-   "snippet": "faltante-informa"
+   "snippets": [
+    "faltante-informa",
+    "prepare-numeric-split",
+    "comparar-imputaciones"
+   ],
+   "nota": "La correlación justifica el `add_indicator=True`, y la comparación de imputaciones lo pone a prueba."
   },
   {
    "slug": "modelado-redes-neuronales",
    "i": 63,
-   "snippet": "clase-sigmoide",
-   "nota": "Este es el notebook de clase del que partió el repo, antes de pasar a regresión."
+   "snippets": [
+    "clase-sigmoide",
+    "clase-compile-bce",
+    "clase-fit",
+    "baseline-mlp-32-32"
+   ],
+   "nota": "Los tres primeros pasos son el notebook de clase; el último es cómo quedó en el TP2 al pasar a regresión."
   },
   {
    "slug": "palabra-al-transformer",
    "i": 14,
-   "snippet": "encoders-solo-train",
+   "snippets": [
+    "encoders-solo-train",
+    "build-dense-features",
+    "modelo-embedding-funcional"
+   ],
    "nota": "One-hot para `State` (12) acá; para `District` (72) se arma el índice que va al embedding."
   },
   {
    "slug": "palabra-al-transformer",
    "i": 15,
-   "snippet": "modelo-embedding-funcional",
+   "snippets": [
+    "encoders-solo-train",
+    "modelo-embedding-funcional",
+    "train-categorical-variant"
+   ],
    "nota": "Cada distrito es un \"token\": `Embedding(73, 8)` guarda un vector aprendido por distrito más uno para desconocidos."
   },
   {
    "slug": "transformers-a-fondo",
    "i": 23,
-   "snippet": "baseline-mlp-32-32",
+   "snippets": [
+    "baseline-mlp-32-32"
+   ],
    "nota": "La FFN del Transformer es este mismo bloque Dense + ReLU, aplicado a cada token con los mismos pesos."
   },
   {
    "slug": "transformers-a-fondo",
    "i": 27,
-   "snippet": "month-cyclical"
+   "snippets": [
+    "month-cyclical",
+    "build-dense-features"
+   ]
   },
   {
    "slug": "redes-generativas-antagonicas",
    "i": 23,
-   "snippet": "baseline-mlp-32-32",
+   "snippets": [
+    "baseline-mlp-32-32"
+   ],
    "nota": "El discriminador es una sola neurona; acá hay dos capas ocultas de 32 antes de la salida."
   },
   {
    "slug": "redes-generativas-antagonicas",
    "i": 24,
-   "snippet": "clase-sigmoide",
+   "snippets": [
+    "clase-sigmoide",
+    "baseline-mlp-32-32"
+   ],
    "nota": "La sigmoide sirve para probabilidades (como en D o en este clasificador de clase), no para un precio."
   },
   {
    "slug": "redes-generativas-antagonicas",
    "i": 29,
-   "snippet": "clase-compile-bce",
-   "nota": "BCE es la loss del clasificador de clase; el TP2 la cambió por MSE."
+   "snippets": [
+    "clase-compile-bce",
+    "baseline-mlp-32-32"
+   ],
+   "nota": "BCE es la loss del clasificador de clase; el TP2 la cambió por MSE (paso 2)."
   },
   {
    "slug": "redes-generativas-antagonicas",
    "i": 32,
-   "snippet": "train-and-report",
-   "nota": "Keras hace los cuatro pasos de backprop dentro de `model.fit`; Adam aplica la actualización."
+   "snippets": [
+    "baseline-mlp-32-32",
+    "train-and-report"
+   ],
+   "nota": "Keras hace los cuatro pasos de backprop dentro de `model.fit`; Adam (compilado en el paso 1) aplica la actualización."
   },
   {
    "slug": "redes-generativas-antagonicas",
    "i": 34,
-   "snippet": "train-and-report",
+   "snippets": [
+    "train-and-report"
+   ],
    "nota": "`batch_size=32`: el error se promedia por lote y cada lote produce un ajuste."
   },
   {
    "slug": "segmentacion-y-stable-diffusion",
    "i": 2,
-   "snippet": "build-dense-features",
-   "nota": "Cada casa sale de acá como un vector de largo fijo, condición para entrar a un MLP."
+   "snippets": [
+    "build-dense-features",
+    "train-categorical-variant",
+    "modelo-embedding-funcional"
+   ],
+   "nota": "Cada casa sale de `build_dense_features` como un vector de largo fijo, y ese largo (`X_dense_train.shape[1]`) define el `Input` del MLP."
   },
   {
    "slug": "segmentacion-y-stable-diffusion",
    "i": 4,
-   "snippet": "regularizado-early-stopping",
+   "snippets": [
+    "features-milestone4",
+    "modelo-grande-512",
+    "regularizado-early-stopping"
+   ],
    "nota": "Este `fit` es el ciclo forward/backward; con early stopping la red cortó en la época 76 de 150."
   },
   {
    "slug": "segmentacion-y-stable-diffusion",
    "i": 22,
-   "snippet": "modelo-embedding-funcional"
+   "snippets": [
+    "encoders-solo-train",
+    "modelo-embedding-funcional",
+    "train-categorical-variant",
+    "variantes-incrementales"
+   ]
   }
  ]
 }

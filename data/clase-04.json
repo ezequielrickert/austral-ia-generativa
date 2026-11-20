@@ -50,8 +50,9 @@
        "tp": 2,
        "texto": "La lección central del TP2: con la misma red 32-32, solo cambiar cómo armaste la entrada bajó el MAE 60%.",
        "tp_titulo": "¿Cuánto vale esta casa?",
-       "code": "tp2-variantes-incrementales",
-       "nota": "Mismo tronco 32-32 en todas las filas: solo cambia la fila de floats que entra."
+       "code": "tp2-build-dense-features,tp2-train-categorical-variant,tp2-variantes-incrementales",
+       "ncode": 3,
+       "nota": "Mismo tronco 32-32 en todas las filas: solo cambia la fila de floats que arma `build_dense_features`."
       }
      ],
      "ver": [],
@@ -84,7 +85,8 @@
        "cnn": "12",
        "i": 2,
        "title": "Una red neuronal clásica solo acepta entradas de largo fijo",
-       "por": "Por qué el MLP no sirve para imágenes"
+       "por": "Por qué el MLP no sirve para imágenes",
+       "extra": false
       }
      ],
      "key": false,
@@ -116,7 +118,8 @@
        "cnn": "03",
        "i": 11,
        "title": "Apilar capas: qué es una red profunda",
-       "por": "Capas ocultas, de la clase 3"
+       "por": "Capas ocultas, de la clase 3",
+       "extra": false
       }
      ],
      "key": false,
@@ -148,7 +151,8 @@
        "cnn": "03",
        "i": 24,
        "title": "Sin activación, la red colapsa",
-       "por": "Demostración del colapso lineal"
+       "por": "Demostración del colapso lineal",
+       "extra": false
       }
      ],
      "key": false,
@@ -198,7 +202,8 @@
        "cnn": "12",
        "i": 3,
        "title": "Una red neuronal clásica solo acepta entradas de largo fijo",
-       "por": "Entradas de largo fijo"
+       "por": "Entradas de largo fijo",
+       "extra": false
       }
      ],
      "key": false,
@@ -257,8 +262,9 @@
        "tp": 2,
        "texto": "Tu tabla de decisiones del M1 aplicó esta pregunta columna por columna y detectó las tres trampas: `ListingId`, `MonthSold` y `District`.",
        "tp_titulo": "¿Cuánto vale esta casa?",
-       "code": "tp2-tabla-decisiones",
-       "nota": "La tercera columna de la tabla es literalmente esta pregunta, aplicada a cada variable."
+       "code": "tp2-tabla-decisiones,tp2-build-dense-features",
+       "ncode": 2,
+       "nota": "La tercera columna de la tabla es literalmente esta pregunta; `build_dense_features` traduce cada respuesta a columnas."
       }
      ],
      "ver": [],
@@ -283,8 +289,9 @@
        "tp": 2,
        "texto": "Numéricas con `StandardScaler` ajustado solo en train; también escalaste el target `SalePrice` y desescalaste para reportar dólares.",
        "tp_titulo": "¿Cuánto vale esta casa?",
-       "code": "tp2-prepare-numeric-split",
-       "nota": "El target también se escala con un `StandardScaler` de train en `train_and_report` (misma celda 10)."
+       "code": "tp2-prepare-numeric-split,tp2-train-and-report",
+       "ncode": 2,
+       "nota": "El target también se escala con un `StandardScaler` de train dentro de `train_and_report` (paso 2)."
       }
      ],
      "ver": [],
@@ -314,8 +321,9 @@
        "tp": 2,
        "texto": "`State` (12) con one-hot y `District` (72) con `Embedding(73, 8)`: el MAE bajó de 51.411 a 30.956 y luego a 25.380.",
        "tp_titulo": "¿Cuánto vale esta casa?",
-       "code": "tp2-modelo-embedding-funcional",
-       "nota": "`State` va por one-hot dentro de `build_dense_features`; `District` va por esta rama `Embedding`."
+       "code": "tp2-encoders-solo-train,tp2-build-dense-features,tp2-modelo-embedding-funcional,tp2-train-categorical-variant",
+       "ncode": 4,
+       "nota": "`State` va por one-hot dentro de `build_dense_features`; `District` va por la rama `Embedding`, y `train_categorical_variant` une las dos entradas."
       }
      ],
      "ver": [
@@ -325,7 +333,8 @@
        "cnn": "07",
        "i": 16,
        "title": "El espacio de embeddings",
-       "por": "Embeddings de palabras"
+       "por": "Embeddings de palabras",
+       "extra": false
       }
      ],
      "key": true,
@@ -354,8 +363,9 @@
        "tp": 2,
        "texto": "Las tres trampas del dataset más `LotFrontage`. `District` como entero entrenó sin error pero dio MAE 25.856 vs 20.844 con embedding.",
        "tp_titulo": "¿Cuánto vale esta casa?",
-       "code": "tp2-district-entero-trampa",
-       "nota": "Este es el error \"código como número\" hecho a propósito; los otros tres están en la tabla de decisiones."
+       "code": "tp2-build-dense-features,tp2-train-categorical-variant,tp2-district-entero-trampa,tp2-listingid-adentro",
+       "ncode": 4,
+       "nota": "`district_int=True` es el error \"código como número\" hecho a propósito; el último paso prueba la otra trampa, `ListingId` como feature."
       }
      ],
      "ver": [],
@@ -390,7 +400,8 @@
        "tp": 2,
        "texto": "`ListingId` descartado (0 floats), `MonthSold` como seno y coseno (2 floats), `CentralAir` 0/1, `LotFrontage` mediana 70,0 + flag.",
        "tp_titulo": "¿Cuánto vale esta casa?",
-       "code": "tp2-tabla-decisiones",
+       "code": "tp2-tabla-decisiones,tp2-month-cyclical,tp2-build-dense-features",
+       "ncode": 3,
        "nota": ""
       }
      ],
@@ -428,7 +439,8 @@
        "tp": 2,
        "texto": "Partición 70/20/10 en dos pasos con `random_state=42`: 1022 casas de train, 292 de validación y 146 de test.",
        "tp_titulo": "¿Cuánto vale esta casa?",
-       "code": "tp2-split-70-20-10",
+       "code": "tp2-split-70-20-10,tp2-train-and-report",
+       "ncode": 2,
        "nota": ""
       }
      ],
@@ -454,14 +466,16 @@
        "tp": 2,
        "texto": "Ojo: comparaste todas las variantes con el MAE de test. En rigor esa elección era trabajo de validación.",
        "tp_titulo": "¿Cuánto vale esta casa?",
-       "code": "tp2-variantes-incrementales",
-       "nota": "Ojo para la defensa: esta tabla elige entre variantes con métricas de test; en rigor eso le tocaba a validación."
+       "code": "tp2-train-categorical-variant,tp2-variantes-incrementales",
+       "ncode": 2,
+       "nota": "Ojo para la defensa: las métricas salen de `X_dense_test`, así que la tabla elige entre variantes con test; en rigor eso le tocaba a validación."
       },
       {
        "tp": 4,
        "texto": "Lo hiciste bien: prompts elegidos en un prompt-dev propio y el set de práctica solo para reportar.",
        "tp_titulo": "El agente de admisión de guardia (TP final)",
-       "code": "tp4-guarda-practica",
+       "code": "tp4-guarda-practica,tp4-evaluacion-prompt-runner",
+       "ncode": 2,
        "nota": "Es la separación entrenamiento/validación/test aplicada a la elección de prompts."
       }
      ],
@@ -472,7 +486,8 @@
        "cnn": "09",
        "i": 3,
        "title": "Tres etapas, cuatro conjuntos de datos",
-       "por": "Conjuntos de datos en un LLM"
+       "por": "Conjuntos de datos en un LLM",
+       "extra": false
       }
      ],
      "key": true,
@@ -501,8 +516,9 @@
        "tp": 2,
        "texto": "Scaler, mediana, encoders y mapa de distritos ajustados solo en train. Pero el M5 (preprocesamiento dentro del modelo) quedó pendiente.",
        "tp_titulo": "¿Cuánto vale esta casa?",
-       "code": "tp2-encoders-solo-train",
-       "nota": "Todo se ajusta con `df_train`, pero queda suelto en celdas: el M5 (empaquetarlo con el modelo) quedó pendiente."
+       "code": "tp2-prepare-numeric-split,tp2-encoders-solo-train,tp2-train-categorical-variant,tp2-mision-m5-pinball",
+       "ncode": 4,
+       "nota": "Mediana, scaler y encoders se ajustan con `df_train`, pero quedan sueltos en celdas: el M5 (empaquetarlos con el modelo) quedó pendiente."
       }
      ],
      "ver": [],
@@ -535,7 +551,8 @@
        "cnn": "09",
        "i": 7,
        "title": "C4: cómo Google depuró Common Crawl",
-       "por": "Deduplicación a escala (C4)"
+       "por": "Deduplicación a escala (C4)",
+       "extra": false
       }
      ],
      "key": false,
@@ -564,8 +581,9 @@
        "tp": 2,
        "texto": "Partiste antes de calcular cualquier estadística y con semilla 42, como pide la regla.",
        "tp_titulo": "¿Cuánto vale esta casa?",
-       "code": "tp2-split-70-20-10",
-       "nota": "El comentario de la línea 9 enuncia la regla: partir antes de cualquier estadística, con `SEED = 42`."
+       "code": "tp2-split-70-20-10,tp2-prepare-numeric-split",
+       "ncode": 2,
+       "nota": "El comentario de la línea 9 enuncia la regla: partir antes de cualquier estadística, con `SEED = 42`; recién después se calcula la mediana de train."
       }
      ],
      "ver": [],
@@ -612,8 +630,9 @@
        "tp": 2,
        "texto": "Para dólares usaste `Dense(1, activation='linear')` con MSE, en lugar de la sigmoide + BCE del notebook de clase.",
        "tp_titulo": "¿Cuánto vale esta casa?",
-       "code": "tp2-baseline-mlp-32-32",
-       "nota": "Fila \"real\" del catálogo: `Dense(1, activation='linear')` + `loss='mse'`."
+       "code": "tp2-clase-sigmoide,tp2-clase-compile-bce,tp2-baseline-mlp-32-32",
+       "ncode": 3,
+       "nota": "Fila \"binaria\" del catálogo en el notebook de clase y fila \"real\" en el TP2: `Dense(1, activation='linear')` + `loss='mse'`."
       }
      ],
      "ver": [],
@@ -704,7 +723,8 @@
        "cnn": "01",
        "i": 24,
        "title": "¿Qué es la Inteligencia Artificial?",
-       "por": "Definición de IA en C1"
+       "por": "Definición de IA en C1",
+       "extra": false
       }
      ],
      "key": false,
@@ -756,7 +776,8 @@
        "tp": 2,
        "texto": "Sacar la casa de Wheatfield (error \\$226.171) bajó el RMSE 3,3% y el MAE solo 2,3%: el cuadrado pesa más los errores grandes.",
        "tp_titulo": "¿Cuánto vale esta casa?",
-       "code": "tp2-casa-peor-mae-rmse",
+       "code": "tp2-train-and-report,tp2-baseline-oficial,tp2-casa-peor-mae-rmse",
+       "ncode": 3,
        "nota": ""
       }
      ],
@@ -790,7 +811,8 @@
        "cnn": "11",
        "i": 29,
        "title": "Binary cross-entropy: los dos casos del Discriminador",
-       "por": "BCE en el discriminador"
+       "por": "BCE en el discriminador",
+       "extra": false
       }
      ],
      "key": false,
@@ -861,6 +883,7 @@
        "texto": "El extra P10/P50/P90 con pinball loss quedó pendiente en tu TP2.",
        "tp_titulo": "¿Cuánto vale esta casa?",
        "code": "tp2-mision-m5-pinball",
+       "ncode": 1,
        "nota": "El extra con pinball loss no se implementó; esto es la consigna, no código del grupo."
       }
      ],
@@ -942,7 +965,8 @@
        "cnn": "03",
        "i": 29,
        "title": "Ida y vuelta: forward y backward",
-       "por": "Forward y backward, en C3"
+       "por": "Forward y backward, en C3",
+       "extra": false
       }
      ],
      "key": false,
@@ -974,7 +998,8 @@
        "cnn": "03",
        "i": 30,
        "title": "El error: la función de coste",
-       "por": "La pérdida L2, en C3"
+       "por": "La pérdida L2, en C3",
+       "extra": false
       }
      ],
      "key": false,
@@ -1001,7 +1026,8 @@
        "cnn": "03",
        "i": 31,
        "title": "La regla de la cadena",
-       "por": "La misma regla, en C3"
+       "por": "La misma regla, en C3",
+       "extra": false
       }
      ],
      "key": false,
@@ -1074,7 +1100,8 @@
        "cnn": "03",
        "i": 33,
        "title": "Capa oculta: propagar el delta hacia atrás",
-       "por": "Propagar el delta hacia atrás"
+       "por": "Propagar el delta hacia atrás",
+       "extra": false
       }
      ],
      "key": false,
@@ -1116,8 +1143,9 @@
        "tp": 2,
        "texto": "Con Adam (η=0,001) y dólares crudos no convergía en 100 épocas; lo resolviste escalando el target.",
        "tp_titulo": "¿Cuánto vale esta casa?",
-       "code": "tp2-train-and-report",
-       "nota": "En vez de tocar η, el grupo escaló el target para que los gradientes fueran de tamaño razonable."
+       "code": "tp2-baseline-mlp-32-32,tp2-train-and-report",
+       "ncode": 2,
+       "nota": "`optimizer='adam'` usa η=0,001 por defecto; en vez de tocarlo, el grupo escaló el target para que los gradientes fueran de tamaño razonable."
       }
      ],
      "ver": [],
@@ -1148,6 +1176,7 @@
        "texto": "Con 1022 casas y `batch_size=32`, cada época fueron unos 32 ajustes de pesos.",
        "tp_titulo": "¿Cuánto vale esta casa?",
        "code": "tp2-train-and-report",
+       "ncode": 1,
        "nota": "`batch_size=32` con 1022 casas da unos 32 ajustes de pesos por época."
       }
      ],
@@ -1206,7 +1235,8 @@
        "tp": 2,
        "texto": "En la red 512-512-512 usaste L2 con λ=0,001 (`kernel_regularizer`) y Dropout 0,3 entre capas.",
        "tp_titulo": "¿Cuánto vale esta casa?",
-       "code": "tp2-modelo-grande-512",
+       "code": "tp2-modelo-grande-512,tp2-regularizado-early-stopping",
+       "ncode": 2,
        "nota": "`kernel_regularizer=reg` suma $\\lambda\\sum w^2$ a la loss y `Dropout(dropout)` apaga neuronas al entrenar; la celda 37 los activa con 0,001 y 0,3."
       }
      ],
@@ -1242,7 +1272,8 @@
        "tp": 2,
        "texto": "Tu 512-512-512 terminó con train 0,0121 y val 0,1273. Con regularización y early stopping (cortó en la época 76), el MAE bajó a 16.538.",
        "tp_titulo": "¿Cuánto vale esta casa?",
-       "code": "tp2-comparar-overfit-regularizado",
+       "code": "tp2-modelo-grande-512,tp2-curva-overfit,tp2-regularizado-early-stopping,tp2-comparar-overfit-regularizado",
+       "ncode": 4,
        "nota": "Train 0,0121 vs val 0,1273 es el patrón de overfitting; el regularizado corta en la época 76 y baja el MAE a 16.538."
       }
      ],
@@ -1253,7 +1284,8 @@
        "cnn": "08",
        "i": 24,
        "title": "El problema de apilar: el gradiente se pierde",
-       "por": "El gradiente se pierde al apilar"
+       "por": "El gradiente se pierde al apilar",
+       "extra": false
       }
      ],
      "key": true,
@@ -1333,7 +1365,8 @@
        "cnn": "06",
        "i": 39,
        "title": "Evaluar las dos etapas por separado",
-       "por": "Recall aplicado a recuperación"
+       "por": "Recall aplicado a recuperación",
+       "extra": false
       }
      ],
      "key": true,
@@ -1451,7 +1484,8 @@
        "tp": 2,
        "texto": "La 512-512-512 tenía 550.985 parámetros para 1022 casas (unos 540 por ejemplo) y memorizó. Tu 32-32 era el punto de partida razonable.",
        "tp_titulo": "¿Cuánto vale esta casa?",
-       "code": "tp2-modelo-grande-512",
+       "code": "tp2-baseline-mlp-32-32,tp2-modelo-grande-512,tp2-curva-overfit",
+       "ncode": 3,
        "nota": ""
       }
      ],
@@ -1462,7 +1496,8 @@
        "cnn": "09",
        "i": 9,
        "title": "Chinchilla: 20 tokens por parámetro",
-       "por": "Chinchilla: parámetros contra datos"
+       "por": "Chinchilla: parámetros contra datos",
+       "extra": false
       }
      ],
      "key": false,
@@ -1494,7 +1529,8 @@
        "cnn": "03",
        "i": 25,
        "title": "Las funciones de activación más comunes",
-       "por": "Tabla de activaciones en C3"
+       "por": "Tabla de activaciones en C3",
+       "extra": false
       }
      ],
      "key": false,
@@ -1526,7 +1562,8 @@
        "cnn": "08",
        "i": 26,
        "title": "Layer norm: mantener los números en rango",
-       "por": "Layer norm mantiene el rango"
+       "por": "Layer norm mantiene el rango",
+       "extra": false
       }
      ],
      "key": false,
@@ -1572,7 +1609,8 @@
        "tp": 2,
        "texto": "Tu conclusión fue la misma: el salto no vino de la arquitectura sino de codificar la ubicación (MAE de 51 mil a 21 mil).",
        "tp_titulo": "¿Cuánto vale esta casa?",
-       "code": "tp2-variantes-incrementales",
+       "code": "tp2-train-categorical-variant,tp2-variantes-incrementales",
+       "ncode": 2,
        "nota": ""
       }
      ],
@@ -1608,8 +1646,9 @@
        "tp": 2,
        "texto": "La pregunta \"¿puede faltar?\" es tu `LotFrontage`: faltaba en 7%, y esas casas valen 12% menos, así que el flag aporta señal.",
        "tp_titulo": "¿Cuánto vale esta casa?",
-       "code": "tp2-faltante-informa",
-       "nota": ""
+       "code": "tp2-faltante-informa,tp2-prepare-numeric-split,tp2-comparar-imputaciones",
+       "ncode": 3,
+       "nota": "La correlación justifica el `add_indicator=True`, y la comparación de imputaciones lo pone a prueba."
       }
      ],
      "ver": [],
@@ -1639,8 +1678,9 @@
        "tp": 2,
        "texto": "Tu repo partía del notebook de clase `house-prices.ipynb` (clasificador `AboveMedianPrice`) y lo pasó a regresión en dólares.",
        "tp_titulo": "¿Cuánto vale esta casa?",
-       "code": "tp2-clase-sigmoide",
-       "nota": "Este es el notebook de clase del que partió el repo, antes de pasar a regresión."
+       "code": "tp2-clase-sigmoide,tp2-clase-compile-bce,tp2-clase-fit,tp2-baseline-mlp-32-32",
+       "ncode": 4,
+       "nota": "Los tres primeros pasos son el notebook de clase; el último es cómo quedó en el TP2 al pasar a regresión."
       }
      ],
      "ver": [],
@@ -2144,6 +2184,208 @@
  "next": "05",
  "snippets": [
   {
+   "id": "build-dense-features",
+   "titulo": "El vector de entrada: numéricas, flag, mes cíclico y one-hots (celda 26)",
+   "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
+   "desde": 1,
+   "hasta": 34,
+   "lenguaje": "python",
+   "codigo": "def build_dense_features(frame, fill_value, use_state, use_housestyle, use_centralair,\n                          use_salecondition, cyclical_month, district_int=False,\n                          scaler=None, fit_scaler=False):\n    \"\"\"Arma el bloque de features que entra 'directo' a la red (sin pasar por embedding).\n    district_int=True mete a District como un entero plano más -del bloque numérico-\n    en vez de mandarlo por la rama de embedding: es el experimento a propósito de la Pregunta 2.\"\"\"\n    frame = frame.copy()\n    missing_flag = frame['LotFrontage'].isna().to_numpy(dtype=float)\n    frame['LotFrontage'] = frame['LotFrontage'].fillna(fill_value)\n\n    numeric_cols_here = [c for c in NUMERIC_COLS if not (cyclical_month and c == 'MonthSold')]\n    X_num = frame[numeric_cols_here].to_numpy(dtype=float)\n    if district_int:\n        district_col = frame['District'].map(\n            lambda d: district_to_idx.get(d, DISTRICT_OOV_IDX)).to_numpy(dtype=float).reshape(-1, 1)\n        X_num = np.column_stack([X_num, district_col])\n\n    if fit_scaler:\n        scaler = StandardScaler().fit(X_num)\n    X_num_scaled = scaler.transform(X_num)\n\n    blocks = [X_num_scaled, missing_flag.reshape(-1, 1)]\n    if cyclical_month:\n        blocks.append(month_cyclical(frame['MonthSold']))\n    if use_state:\n        blocks.append(state_encoder.transform(frame[['State']]))\n    if use_housestyle:\n        blocks.append(housestyle_encoder.transform(frame[['HouseStyle']]))\n    if use_salecondition:\n        blocks.append(salecondition_encoder.transform(frame[['SaleCondition']]))\n    if use_centralair:\n        blocks.append((frame['CentralAir'] == 'Y').to_numpy(dtype=float).reshape(-1, 1))\n\n    return np.column_stack(blocks), scaler",
+   "que_hace": "Arma el bloque de features \"directo\" de cada casa: numéricas escaladas, flag de faltante, mes sin/cos, one-hots y `CentralAir` 0/1.",
+   "como_funciona": "1. Imputa `LotFrontage` y guarda `missing_flag`.\n2. `numeric_cols_here` excluye `MonthSold` si va cíclico.\n3. Con `district_int=True` agrega District como entero plano (experimento trampa de la Pregunta 2).\n4. `StandardScaler` se ajusta solo si `fit_scaler=True`.\n5. `blocks` concatena según los flags `use_state`, `use_housestyle`, `use_salecondition`, `use_centralair` y `cyclical_month`.",
+   "proposito": "Los flags permiten encender bloques de a uno y medir el aporte de cada uno (criterio del Milestone 3). District queda afuera de este bloque porque va por su propia rama de embedding.",
+   "interaccion": "La llaman `train_categorical_variant` (celda 26) y el Milestone 4 (celda 34). Usa los encoders y `month_cyclical` de la celda 25.",
+   "teoria": "La red solo ve una fila de floats de largo fijo: este es el traductor de casa a vector.",
+   "key": "tp2-build-dense-features",
+   "tp": 2,
+   "tp_titulo": "¿Cuánto vale esta casa?",
+   "usos": [
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 2,
+     "title": "La red ve una fila de números",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=2"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 10,
+     "title": "La pregunta que decide la codificación",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=10"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 12,
+     "title": "Categóricas: one-hot contra embedding",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=12"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 13,
+     "title": "Errores de codificación caros",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=13"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 14,
+     "title": "La tabla de decisiones",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=14"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "palabra-al-transformer",
+     "i": 14,
+     "title": "Tres formas de volver texto en números",
+     "extra": false,
+     "url": "/clases/07/#d=palabra-al-transformer&s=14"
+    },
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
+     "i": 27,
+     "title": "La fórmula de la posición: senos y cosenos",
+     "extra": false,
+     "url": "/clases/08/#d=transformers-a-fondo&s=27"
+    },
+    {
+     "clase": 12,
+     "cnn": "12",
+     "slug": "segmentacion-y-stable-diffusion",
+     "i": 2,
+     "title": "Una red neuronal clásica solo acepta entradas de largo fijo",
+     "extra": false,
+     "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=2"
+    }
+   ],
+   "nusos": 8
+  },
+  {
+   "id": "train-categorical-variant",
+   "titulo": "Entrenar una variante: features, índices de distrito y fit (celda 26)",
+   "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
+   "desde": 57,
+   "hasta": 93,
+   "lenguaje": "python",
+   "codigo": "def train_categorical_variant(use_state, use_district, use_housestyle, use_centralair,\n                               use_salecondition, cyclical_month, district_int=False, epochs=100):\n    X_dense_train, scaler = build_dense_features(\n        df_train, lotfrontage_median, use_state, use_housestyle, use_centralair,\n        use_salecondition, cyclical_month, district_int, fit_scaler=True)\n    X_dense_val, _ = build_dense_features(\n        df_val, lotfrontage_median, use_state, use_housestyle, use_centralair,\n        use_salecondition, cyclical_month, district_int, scaler=scaler)\n    X_dense_test, _ = build_dense_features(\n        df_test, lotfrontage_median, use_state, use_housestyle, use_centralair,\n        use_salecondition, cyclical_month, district_int, scaler=scaler)\n\n    y_train_raw = df_train[TARGET].to_numpy(dtype=float)\n    y_val_raw = df_val[TARGET].to_numpy(dtype=float)\n    y_test_raw = df_test[TARGET].to_numpy(dtype=float)\n    y_scaler = StandardScaler().fit(y_train_raw.reshape(-1, 1))\n    y_train = y_scaler.transform(y_train_raw.reshape(-1, 1)).ravel()\n    y_val = y_scaler.transform(y_val_raw.reshape(-1, 1)).ravel()\n\n    if use_district:\n        inputs_train = [X_dense_train, build_district_idx(df_train)]\n        inputs_val = [X_dense_val, build_district_idx(df_val)]\n        inputs_test = [X_dense_test, build_district_idx(df_test)]\n    else:\n        inputs_train, inputs_val, inputs_test = X_dense_train, X_dense_val, X_dense_test\n\n    keras.utils.set_random_seed(SEED)\n    model = build_model_categorical(X_dense_train.shape[1], use_district, DISTRICT_VOCAB_SIZE)\n    hist = model.fit(inputs_train, y_train, batch_size=32, epochs=epochs,\n                      validation_data=(inputs_val, y_val), verbose=0)\n\n    y_pred = y_scaler.inverse_transform(model.predict(inputs_test, verbose=0)).ravel()\n    mae = mean_absolute_error(y_test_raw, y_pred)\n    rmse = np.sqrt(mean_squared_error(y_test_raw, y_pred))\n    mape = 100 * mean_absolute_percentage_error(y_test_raw, y_pred)\n    return {'model': model, 'history': hist, 'mae': mae, 'rmse': rmse, 'mape': mape,\n            'y_test': y_test_raw, 'y_pred': y_pred}",
+   "que_hace": "Arma las entradas de train/val/test para una combinación de columnas, construye la red con `build_model_categorical`, la entrena y devuelve MAE, RMSE y MAPE en dólares sobre test.",
+   "como_funciona": "- Llama tres veces a `build_dense_features`: con `fit_scaler=True` en `df_train` y reusando ese `scaler` en `df_val` y `df_test`.\n- Escala `SalePrice` con un `y_scaler` ajustado solo en train.\n- Si `use_district`, cada entrada pasa a ser una lista `[X_dense, build_district_idx(...)]` para las dos ramas del modelo.\n- Fija `SEED`, entrena con `batch_size=32` y desescala las predicciones con `inverse_transform` antes de medir.",
+   "proposito": "Es el banco de pruebas del Milestone 3: el mismo procedimiento para todas las variantes, así la única diferencia entre filas de la tabla es qué columnas entran y cómo se codifican.",
+   "interaccion": "La llaman la celda 27 (`v1_state`, `v2_district`, `v3_full`) y la celda 31 (trampa con `district_int=True`). Consume `build_dense_features`, `build_district_idx` y `build_model_categorical` (misma celda) y los encoders de la celda 25.",
+   "teoria": "Materializa la idea de que la red solo ve una fila de números: la arquitectura queda fija y lo que cambia es la codificación de la entrada.",
+   "key": "tp2-train-categorical-variant",
+   "tp": 2,
+   "tp_titulo": "¿Cuánto vale esta casa?",
+   "usos": [
+    {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "introduccion",
+     "i": 32,
+     "title": "Ejemplos de problemas predictivos",
+     "extra": false,
+     "url": "/clases/01/#d=introduccion&s=32"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 2,
+     "title": "La red ve una fila de números",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=2"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 12,
+     "title": "Categóricas: one-hot contra embedding",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=12"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 13,
+     "title": "Errores de codificación caros",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=13"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 17,
+     "title": "Los tres, lado a lado",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=17"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 18,
+     "title": "Todo se aprende solo del train",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=18"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 61,
+     "title": "Lo que hay que llevarse",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=61"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "palabra-al-transformer",
+     "i": 15,
+     "title": "De token a vector",
+     "extra": false,
+     "url": "/clases/07/#d=palabra-al-transformer&s=15"
+    },
+    {
+     "clase": 12,
+     "cnn": "12",
+     "slug": "segmentacion-y-stable-diffusion",
+     "i": 2,
+     "title": "Una red neuronal clásica solo acepta entradas de largo fijo",
+     "extra": false,
+     "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=2"
+    },
+    {
+     "clase": 12,
+     "cnn": "12",
+     "slug": "segmentacion-y-stable-diffusion",
+     "i": 22,
+     "title": "Embeddings más allá del texto",
+     "extra": false,
+     "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=22"
+    }
+   ],
+   "nusos": 10
+  },
+  {
    "id": "variantes-incrementales",
    "titulo": "Aporte incremental de cada bloque de columnas (celda 27)",
    "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
@@ -2166,6 +2408,7 @@
      "slug": "introduccion",
      "i": 32,
      "title": "Ejemplos de problemas predictivos",
+     "extra": false,
      "url": "/clases/01/#d=introduccion&s=32"
     },
     {
@@ -2174,6 +2417,7 @@
      "slug": "modelado-redes-neuronales",
      "i": 2,
      "title": "La red ve una fila de números",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=2"
     },
     {
@@ -2182,6 +2426,7 @@
      "slug": "modelado-redes-neuronales",
      "i": 17,
      "title": "Los tres, lado a lado",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=17"
     },
     {
@@ -2190,10 +2435,20 @@
      "slug": "modelado-redes-neuronales",
      "i": 61,
      "title": "Lo que hay que llevarse",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=61"
+    },
+    {
+     "clase": 12,
+     "cnn": "12",
+     "slug": "segmentacion-y-stable-diffusion",
+     "i": 22,
+     "title": "Embeddings más allá del texto",
+     "extra": false,
+     "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=22"
     }
    ],
-   "nusos": 4
+   "nusos": 5
   },
   {
    "id": "tabla-decisiones",
@@ -2218,6 +2473,7 @@
      "slug": "modelado-redes-neuronales",
      "i": 10,
      "title": "La pregunta que decide la codificación",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=10"
     },
     {
@@ -2226,6 +2482,7 @@
      "slug": "modelado-redes-neuronales",
      "i": 14,
      "title": "La tabla de decisiones",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=14"
     }
    ],
@@ -2254,10 +2511,249 @@
      "slug": "modelado-redes-neuronales",
      "i": 11,
      "title": "Numéricas: normalizar no es opcional",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=11"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 18,
+     "title": "Todo se aprende solo del train",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=18"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 20,
+     "title": "Qué hacer y qué no",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=20"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 62,
+     "title": "Checklist operativo para la práctica",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=62"
     }
    ],
-   "nusos": 1
+   "nusos": 4
+  },
+  {
+   "id": "train-and-report",
+   "titulo": "Escalado del target, fit y desescalado a dólares (celda 10)",
+   "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
+   "desde": 43,
+   "hasta": 68,
+   "lenguaje": "python",
+   "codigo": "def train_and_report(fill_value, add_indicator, epochs=100, verbose=0):\n    X_train, y_train_raw, scaler = prepare_numeric_split(df_train, fill_value, add_indicator, fit_scaler=True)\n    X_val, y_val_raw, _ = prepare_numeric_split(df_val, fill_value, add_indicator, scaler=scaler)\n    X_test, y_test_raw, _ = prepare_numeric_split(df_test, fill_value, add_indicator, scaler=scaler)\n\n    # SalePrice va de ~50 mil a ~1,6 millones: sin escalar el target, el gradiente\n    # tiene que moverse en un rango enorme y la red no converge en 100 épocas.\n    # Escalamos y TAMBIÉN ajustando el scaler solo con train, y deshacemos el\n    # escalado sobre las predicciones para reportar todo en dólares.\n    y_scaler = StandardScaler().fit(y_train_raw.reshape(-1, 1))\n    y_train = y_scaler.transform(y_train_raw.reshape(-1, 1)).ravel()\n    y_val = y_scaler.transform(y_val_raw.reshape(-1, 1)).ravel()\n\n    keras.utils.set_random_seed(SEED)\n    model = build_baseline_model(X_train.shape[1])\n    hist = model.fit(X_train, y_train, batch_size=32, epochs=epochs,\n                      validation_data=(X_val, y_val), verbose=verbose)\n\n    y_pred_scaled = model.predict(X_test, verbose=0).ravel()\n    y_pred = y_scaler.inverse_transform(y_pred_scaled.reshape(-1, 1)).ravel()\n    mae = mean_absolute_error(y_test_raw, y_pred)\n    rmse = np.sqrt(mean_squared_error(y_test_raw, y_pred))\n    mape = 100 * mean_absolute_percentage_error(y_test_raw, y_pred)\n    return {'model': model, 'history': hist, 'scaler': scaler, 'y_scaler': y_scaler,\n            'mae': mae, 'rmse': rmse, 'mape': mape,\n            'X_test': X_test, 'y_test': y_test_raw, 'y_pred': y_pred}",
+   "que_hace": "Entrena una variante del baseline de punta a punta: prepara los tres splits, escala `SalePrice`, corre `fit` y reporta MAE, RMSE y MAPE en dólares.",
+   "como_funciona": "1. Llama a `prepare_numeric_split` para train/val/test.\n2. `y_scaler = StandardScaler().fit(y_train_raw...)`: el target también se z-normaliza con estadísticas de train.\n3. `keras.utils.set_random_seed(SEED)` y `build_baseline_model`.\n4. `model.fit(..., batch_size=32, epochs=epochs, validation_data=(X_val, y_val))`: forward + backward por lotes durante 100 épocas.\n5. `y_scaler.inverse_transform` vuelve las predicciones a dólares y calcula `mae`, `rmse`, `mape`.",
+   "proposito": "El comentario lo dice: con `SalePrice` crudo (50 mil a 1,6 millones) los gradientes eran enormes para el paso de Adam y no convergía en 100 épocas; escalar el target lo resolvió sin tocar el learning rate.",
+   "interaccion": "La llama la celda 11 con tres imputaciones; el resultado `variant_median_flag` pasa a ser `baseline` (celdas 15, 17, 18) y la referencia del Milestone 3.",
+   "teoria": "Paso de actualización $w\\leftarrow w-\\eta\\,\\partial E/\\partial w$: la escala del target condiciona el tamaño del gradiente; épocas y batches del ciclo de entrenamiento.",
+   "key": "tp2-train-and-report",
+   "tp": 2,
+   "tp_titulo": "¿Cuánto vale esta casa?",
+   "usos": [
+    {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "introduccion",
+     "i": 26,
+     "title": "Redes Neuronales — Estructura y Celda Básica",
+     "extra": false,
+     "url": "/clases/01/#d=introduccion&s=26"
+    },
+    {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "introduccion",
+     "i": 32,
+     "title": "Ejemplos de problemas predictivos",
+     "extra": false,
+     "url": "/clases/01/#d=introduccion&s=32"
+    },
+    {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "introduccion",
+     "i": 50,
+     "title": "Paradigmas de Aprendizaje",
+     "extra": false,
+     "url": "/clases/01/#d=introduccion&s=50"
+    },
+    {
+     "clase": 3,
+     "cnn": "03",
+     "slug": "intro-redes-neuronales",
+     "i": 9,
+     "title": "La capa: el bloque que se repite",
+     "extra": false,
+     "url": "/clases/03/#d=intro-redes-neuronales&s=9"
+    },
+    {
+     "clase": 3,
+     "cnn": "03",
+     "slug": "intro-redes-neuronales",
+     "i": 29,
+     "title": "Ida y vuelta: forward y backward",
+     "extra": false,
+     "url": "/clases/03/#d=intro-redes-neuronales&s=29"
+    },
+    {
+     "clase": 3,
+     "cnn": "03",
+     "slug": "intro-redes-neuronales",
+     "i": 30,
+     "title": "El error: la función de coste",
+     "extra": false,
+     "url": "/clases/03/#d=intro-redes-neuronales&s=30"
+    },
+    {
+     "clase": 3,
+     "cnn": "03",
+     "slug": "intro-redes-neuronales",
+     "i": 34,
+     "title": "El paso de actualización",
+     "extra": false,
+     "url": "/clases/03/#d=intro-redes-neuronales&s=34"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 11,
+     "title": "Numéricas: normalizar no es opcional",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=11"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 16,
+     "title": "Un dataset, tres trabajos distintos",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=16"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 28,
+     "title": "Regresión: MSE, MAE y Huber",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=28"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 43,
+     "title": "El learning rate es el paso",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=43"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 44,
+     "title": "Batch y época no son lo mismo",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=44"
+    },
+    {
+     "clase": 11,
+     "cnn": "11",
+     "slug": "redes-generativas-antagonicas",
+     "i": 32,
+     "title": "Backpropagation: el procedimiento paso a paso",
+     "extra": false,
+     "url": "/clases/11/#d=redes-generativas-antagonicas&s=32"
+    },
+    {
+     "clase": 11,
+     "cnn": "11",
+     "slug": "redes-generativas-antagonicas",
+     "i": 34,
+     "title": "El ciclo completo: Generador y Discriminador juntos",
+     "extra": false,
+     "url": "/clases/11/#d=redes-generativas-antagonicas&s=34"
+    }
+   ],
+   "nusos": 14
+  },
+  {
+   "id": "encoders-solo-train",
+   "titulo": "One-hot y mapa District→índice ajustados en train (celda 25)",
+   "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
+   "desde": 1,
+   "hasta": 17,
+   "lenguaje": "python",
+   "codigo": "from sklearn.preprocessing import OneHotEncoder\nfrom keras.layers import Embedding, Flatten, Concatenate\nfrom keras.models import Model\n\n# Encoders de one-hot: se AJUSTAN solo con train, igual que el escalador numérico.\nstate_encoder = OneHotEncoder(handle_unknown='ignore', sparse_output=False).fit(df_train[['State']])\nhousestyle_encoder = OneHotEncoder(handle_unknown='ignore', sparse_output=False).fit(df_train[['HouseStyle']])\nsalecondition_encoder = OneHotEncoder(handle_unknown='ignore', sparse_output=False).fit(df_train[['SaleCondition']])\n\n# Mapa de District -> índice entero, para la rama de embedding. Se arma con las\n# categorías vistas en train; una categoría nueva en val/test cae en un índice\n# \"desconocido\" reservado aparte (robustez, aunque en este dataset no llega a usarse).\ndistrict_categories = sorted(df_train['District'].unique())\ndistrict_to_idx = {cat: i for i, cat in enumerate(district_categories)}\nDISTRICT_OOV_IDX = len(district_categories)\nDISTRICT_VOCAB_SIZE = len(district_categories) + 1\nprint(f\"Distritos vistos en train: {len(district_categories)} (+1 índice para desconocidos)\")",
+   "que_hace": "Crea los `OneHotEncoder` de `State`, `HouseStyle` y `SaleCondition` y el diccionario `district_to_idx`, todos ajustados solo con train.",
+   "como_funciona": "1. `OneHotEncoder(handle_unknown='ignore', sparse_output=False).fit(df_train[[...]])` para cada categórica chica.\n2. `district_categories = sorted(df_train['District'].unique())` → 72 distritos vistos en train.\n3. `district_to_idx` asigna un entero 0..71 a cada uno.\n4. `DISTRICT_OOV_IDX = 72` reserva un índice para distritos desconocidos y `DISTRICT_VOCAB_SIZE = 73`.",
+   "proposito": "Igual que el scaler, los encoders y el vocabulario son parte del modelo y se aprenden de train. Para `State` (12) basta one-hot; para `District` (72) se arma el índice que consume el embedding.",
+   "interaccion": "Los usan `build_dense_features` (one-hots) y `build_district_idx` (celda 26), y `DISTRICT_VOCAB_SIZE` fija el tamaño de `Embedding` en las celdas 26 y 34.",
+   "teoria": "One-hot vs embedding según cardinalidad; diccionarios y encoders calculados solo con train para no filtrar información.",
+   "key": "tp2-encoders-solo-train",
+   "tp": 2,
+   "tp_titulo": "¿Cuánto vale esta casa?",
+   "usos": [
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 12,
+     "title": "Categóricas: one-hot contra embedding",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=12"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 18,
+     "title": "Todo se aprende solo del train",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=18"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "palabra-al-transformer",
+     "i": 14,
+     "title": "Tres formas de volver texto en números",
+     "extra": false,
+     "url": "/clases/07/#d=palabra-al-transformer&s=14"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "palabra-al-transformer",
+     "i": 15,
+     "title": "De token a vector",
+     "extra": false,
+     "url": "/clases/07/#d=palabra-al-transformer&s=15"
+    },
+    {
+     "clase": 12,
+     "cnn": "12",
+     "slug": "segmentacion-y-stable-diffusion",
+     "i": 22,
+     "title": "Embeddings más allá del texto",
+     "extra": false,
+     "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=22"
+    }
+   ],
+   "nusos": 5
   },
   {
    "id": "modelo-embedding-funcional",
@@ -2277,12 +2773,31 @@
    "tp_titulo": "¿Cuánto vale esta casa?",
    "usos": [
     {
+     "clase": 3,
+     "cnn": "03",
+     "slug": "intro-redes-neuronales",
+     "i": 25,
+     "title": "Las funciones de activación más comunes",
+     "extra": false,
+     "url": "/clases/03/#d=intro-redes-neuronales&s=25"
+    },
+    {
      "clase": 4,
      "cnn": "04",
      "slug": "modelado-redes-neuronales",
      "i": 12,
      "title": "Categóricas: one-hot contra embedding",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=12"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "palabra-al-transformer",
+     "i": 14,
+     "title": "Tres formas de volver texto en números",
+     "extra": false,
+     "url": "/clases/07/#d=palabra-al-transformer&s=14"
     },
     {
      "clase": 7,
@@ -2290,7 +2805,17 @@
      "slug": "palabra-al-transformer",
      "i": 15,
      "title": "De token a vector",
+     "extra": false,
      "url": "/clases/07/#d=palabra-al-transformer&s=15"
+    },
+    {
+     "clase": 12,
+     "cnn": "12",
+     "slug": "segmentacion-y-stable-diffusion",
+     "i": 2,
+     "title": "Una red neuronal clásica solo acepta entradas de largo fijo",
+     "extra": false,
+     "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=2"
     },
     {
      "clase": 12,
@@ -2298,10 +2823,11 @@
      "slug": "segmentacion-y-stable-diffusion",
      "i": 22,
      "title": "Embeddings más allá del texto",
+     "extra": false,
      "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=22"
     }
    ],
-   "nusos": 3
+   "nusos": 6
   },
   {
    "id": "district-entero-trampa",
@@ -2326,10 +2852,78 @@
      "slug": "modelado-redes-neuronales",
      "i": 13,
      "title": "Errores de codificación caros",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=13"
     }
    ],
    "nusos": 1
+  },
+  {
+   "id": "listingid-adentro",
+   "titulo": "Entrenar con ListingId adentro (celda 21)",
+   "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
+   "desde": 1,
+   "hasta": 35,
+   "lenguaje": "python",
+   "codigo": "FEATURES_CON_ID = ['ListingId'] + NUMERIC_COLS\n\ndef prepare_with_listingid(frame, scaler=None, fit_scaler=False):\n    frame = frame.copy()\n    missing_flag = frame['LotFrontage'].isna().to_numpy(dtype=float)\n    frame['LotFrontage'] = frame['LotFrontage'].fillna(lotfrontage_median)\n    X_num = frame[FEATURES_CON_ID].to_numpy(dtype=float)\n    if fit_scaler:\n        scaler = StandardScaler().fit(X_num)\n    X = np.column_stack([scaler.transform(X_num), missing_flag])\n    y = frame[TARGET].to_numpy(dtype=float)\n    return X, y, scaler\n\nX_train_id, y_train_id_raw, scaler_id = prepare_with_listingid(df_train, fit_scaler=True)\nX_val_id, y_val_id_raw, _ = prepare_with_listingid(df_val, scaler=scaler_id)\nX_test_id, y_test_id_raw, _ = prepare_with_listingid(df_test, scaler=scaler_id)\n\ny_scaler_id = StandardScaler().fit(y_train_id_raw.reshape(-1, 1))\ny_train_id = y_scaler_id.transform(y_train_id_raw.reshape(-1, 1)).ravel()\ny_val_id = y_scaler_id.transform(y_val_id_raw.reshape(-1, 1)).ravel()\n\nkeras.utils.set_random_seed(SEED)\nmodel_con_id = build_baseline_model(X_train_id.shape[1])\nhist_con_id = model_con_id.fit(X_train_id, y_train_id, batch_size=32, epochs=100,\n                                validation_data=(X_val_id, y_val_id), verbose=0)\n\ny_pred_id = y_scaler_id.inverse_transform(\n    model_con_id.predict(X_test_id, verbose=0)).ravel()\nmae_id = mean_absolute_error(y_test_id_raw, y_pred_id)\n\n# Comparamos la brecha train/val de loss (MSE, target escalado) de los últimos 10 epochs\ngap_baseline = (np.mean(baseline['history'].history['val_loss'][-10:])\n                - np.mean(baseline['history'].history['loss'][-10:]))\ngap_con_id = (np.mean(hist_con_id.history['val_loss'][-10:])\n              - np.mean(hist_con_id.history['loss'][-10:]))",
+   "que_hace": "Repite el baseline agregando `ListingId` como feature y compara MAE y la brecha train/val contra el baseline sin ella.",
+   "como_funciona": "- `FEATURES_CON_ID` antepone `ListingId` a `NUMERIC_COLS`.\n- `prepare_with_listingid` replica la imputación + scaler de train.\n- Entrena `build_baseline_model` igual que el baseline (100 épocas, batch 32).\n- `gap_baseline` y `gap_con_id` promedian `val_loss - loss` de las últimas 10 épocas.",
+   "proposito": "Responde la Pregunta 3: el MAE casi no cambia ($51.131 vs $51.411), pero el ID único es un número de carga sin significado y solo invita a memorizar. Se lo descarta en la tabla de decisiones.",
+   "interaccion": "Reusa `build_baseline_model`, `lotfrontage_median` y `baseline` de la celda 10/11; las curvas se grafican en la celda 22.",
+   "teoria": "Error de codificación caro: ID único como feature.",
+   "key": "tp2-listingid-adentro",
+   "tp": 2,
+   "tp_titulo": "¿Cuánto vale esta casa?",
+   "usos": [
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 13,
+     "title": "Errores de codificación caros",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=13"
+    }
+   ],
+   "nusos": 1
+  },
+  {
+   "id": "month-cyclical",
+   "titulo": "MonthSold como seno y coseno (celda 25)",
+   "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
+   "desde": 19,
+   "hasta": 22,
+   "lenguaje": "python",
+   "codigo": "def month_cyclical(month_series):\n    \"\"\"MonthSold (1-12) -> (seno, coseno): la codificación cíclica correcta.\"\"\"\n    radians = 2 * np.pi * month_series.to_numpy(dtype=float) / 12\n    return np.column_stack([np.sin(radians), np.cos(radians)])",
+   "que_hace": "Convierte el mes de venta (1–12) en dos columnas: seno y coseno del ángulo del mes en el ciclo anual.",
+   "como_funciona": "- `radians = 2 * np.pi * month / 12` ubica cada mes sobre un círculo.\n- `np.sin(radians)` y `np.cos(radians)` dan las dos coordenadas.\n- Devuelve una matriz de 2 columnas (2 floats por casa).",
+   "proposito": "Resuelve la trampa 2: como entero, diciembre (12) y enero (1) estarían a 11 de distancia; en el círculo quedan vecinos. Hace falta seno y coseno juntos para que cada mes tenga un punto único.",
+   "interaccion": "La llama `build_dense_features` (celda 26) cuando `cyclical_month=True`, que además saca `MonthSold` de las numéricas.",
+   "teoria": "Codificación cíclica con senos y cosenos, la misma idea que el positional encoding del Transformer.",
+   "key": "tp2-month-cyclical",
+   "tp": 2,
+   "tp_titulo": "¿Cuánto vale esta casa?",
+   "usos": [
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 14,
+     "title": "La tabla de decisiones",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=14"
+    },
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
+     "i": 27,
+     "title": "La fórmula de la posición: senos y cosenos",
+     "extra": false,
+     "url": "/clases/08/#d=transformers-a-fondo&s=27"
+    }
+   ],
+   "nusos": 2
   },
   {
    "id": "split-70-20-10",
@@ -2354,6 +2948,7 @@
      "slug": "introduccion",
      "i": 50,
      "title": "Paradigmas de Aprendizaje",
+     "extra": false,
      "url": "/clases/01/#d=introduccion&s=50"
     },
     {
@@ -2362,6 +2957,7 @@
      "slug": "modelado-redes-neuronales",
      "i": 16,
      "title": "Un dataset, tres trabajos distintos",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=16"
     },
     {
@@ -2370,6 +2966,7 @@
      "slug": "modelado-redes-neuronales",
      "i": 20,
      "title": "Qué hacer y qué no",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=20"
     }
    ],
@@ -2379,14 +2976,14 @@
    "id": "guarda-practica",
    "titulo": "Guarda: nunca optimizar con práctica",
    "archivo": "admision_tp/experimentos_prompt.py",
-   "desde": 135,
-   "hasta": 158,
+   "desde": 149,
+   "hasta": 172,
    "lenguaje": "python",
    "codigo": "def _verificar_origen(casos, esperadas, normas, proposito) -> dict:\n    \"\"\"Guardas previas a copiar cualquier entrada; devuelve qué se verificó.\n\n    Las rutas se resuelven (incluidos symlinks) antes de comparar con ``practica/``. El\n    chequeo del kit se corre sobre las rutas ORIGINALES: la copia en ``salida/entradas``\n    nunca tiene esperadas al lado y por eso no lo dispararía.\n    \"\"\"\n    if proposito not in PROPOSITOS:\n        raise ValueError(f\"propósito inválido; usar uno de {', '.join(PROPOSITOS)}\")\n    practica = _PRACTICA.resolve()\n    en_practica = []\n    for nombre, ruta in ((\"casos\", casos), (\"esperadas\", esperadas)):\n        resuelta = Path(ruta).resolve()\n        if resuelta == practica or practica in resuelta.parents:\n            en_practica.append(nombre)\n    if proposito == \"plomeria\":\n        # Solo plomería puede usar práctica; la copia aislada sigue revisada por `jugar`.\n        return {\"datos_practica\": en_practica, \"esperadas_al_alcance\": \"omitida_plomeria\"}\n    if en_practica:\n        raise ValueError(\n            f\"{' y '.join(en_practica)} dentro de practica/: nunca se evalúan ni optimizan prompts \"\n            \"con práctica; para probar solo la plomería usar --solo-plomeria\")\n    revisar_que_no_haya_esperadas(Path(normas), Path(casos))\n    return {\"datos_practica\": [], \"esperadas_al_alcance\": \"verificada_en_origen\"}",
    "que_hace": "Antes de una corrida de evaluación de prompts, rechaza casos o esperadas que estén dentro de `practica/` y verifica que no haya respuestas esperadas al alcance del agente.",
    "como_funciona": "- Valida `proposito` (`evaluacion` o `plomeria`).\n- Resuelve rutas (incluidos symlinks) y comprueba si caen bajo `_PRACTICA`.\n- En `plomeria` (solo probar que el pipeline anda) lo permite y lo registra.\n- En `evaluacion` lanza `ValueError` si hay práctica y corre `revisar_que_no_haya_esperadas` del kit sobre las rutas originales.",
    "proposito": "Materializa la decisión de elegir prompts en un conjunto prompt-dev propio y dejar la práctica solo para reportar una vez, para no sobreajustar al conjunto de evaluación.",
-   "interaccion": "La llama el runner de evaluación de prompts antes de copiar entradas; el resultado queda en el manifiesto (`guardas`). Sus métricas pasan por `evaluacion_prompts.calcular_metricas_candidato`.",
+   "interaccion": "La llama `ejecutar_evaluacion_prompt` (mismo archivo) antes de copiar cualquier entrada; el resultado queda en el manifiesto (`guardas`). Sus métricas pasan por `evaluacion_prompts.calcular_metricas_candidato`.",
    "teoria": "Separación de conjuntos: desarrollo para elegir, evaluación solo para medir; usar el test para elegir infla los resultados.",
    "key": "tp4-guarda-practica",
    "tp": 4,
@@ -2398,6 +2995,7 @@
      "slug": "modelado-redes-neuronales",
      "i": 17,
      "title": "Los tres, lado a lado",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=17"
     },
     {
@@ -2406,155 +3004,46 @@
      "slug": "prompting",
      "i": 18,
      "title": "Mitigar alucinaciones: el proceso",
+     "extra": false,
      "url": "/clases/05/#d=prompting&s=18"
     }
    ],
    "nusos": 2
   },
   {
-   "id": "encoders-solo-train",
-   "titulo": "One-hot y mapa District→índice ajustados en train (celda 25)",
-   "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
-   "desde": 1,
-   "hasta": 17,
+   "id": "evaluacion-prompt-runner",
+   "titulo": "Evaluar un prompt: guarda, jugar y después puntuar",
+   "archivo": "admision_tp/experimentos_prompt.py",
+   "desde": 244,
+   "hasta": 286,
    "lenguaje": "python",
-   "codigo": "from sklearn.preprocessing import OneHotEncoder\nfrom keras.layers import Embedding, Flatten, Concatenate\nfrom keras.models import Model\n\n# Encoders de one-hot: se AJUSTAN solo con train, igual que el escalador numérico.\nstate_encoder = OneHotEncoder(handle_unknown='ignore', sparse_output=False).fit(df_train[['State']])\nhousestyle_encoder = OneHotEncoder(handle_unknown='ignore', sparse_output=False).fit(df_train[['HouseStyle']])\nsalecondition_encoder = OneHotEncoder(handle_unknown='ignore', sparse_output=False).fit(df_train[['SaleCondition']])\n\n# Mapa de District -> índice entero, para la rama de embedding. Se arma con las\n# categorías vistas en train; una categoría nueva en val/test cae en un índice\n# \"desconocido\" reservado aparte (robustez, aunque en este dataset no llega a usarse).\ndistrict_categories = sorted(df_train['District'].unique())\ndistrict_to_idx = {cat: i for i, cat in enumerate(district_categories)}\nDISTRICT_OOV_IDX = len(district_categories)\nDISTRICT_VOCAB_SIZE = len(district_categories) + 1\nprint(f\"Distritos vistos en train: {len(district_categories)} (+1 índice para desconocidos)\")",
-   "que_hace": "Crea los `OneHotEncoder` de `State`, `HouseStyle` y `SaleCondition` y el diccionario `district_to_idx`, todos ajustados solo con train.",
-   "como_funciona": "1. `OneHotEncoder(handle_unknown='ignore', sparse_output=False).fit(df_train[[...]])` para cada categórica chica.\n2. `district_categories = sorted(df_train['District'].unique())` → 72 distritos vistos en train.\n3. `district_to_idx` asigna un entero 0..71 a cada uno.\n4. `DISTRICT_OOV_IDX = 72` reserva un índice para distritos desconocidos y `DISTRICT_VOCAB_SIZE = 73`.",
-   "proposito": "Igual que el scaler, los encoders y el vocabulario son parte del modelo y se aprenden de train. Para `State` (12) basta one-hot; para `District` (72) se arma el índice que consume el embedding.",
-   "interaccion": "Los usan `build_dense_features` (one-hots) y `build_district_idx` (celda 26), y `DISTRICT_VOCAB_SIZE` fija el tamaño de `Embedding` en las celdas 26 y 34.",
-   "teoria": "One-hot vs embedding según cardinalidad; diccionarios y encoders calculados solo con train para no filtrar información.",
-   "key": "tp2-encoders-solo-train",
-   "tp": 2,
-   "tp_titulo": "¿Cuánto vale esta casa?",
+   "codigo": "    config = spec = None\n    hashes_entrada = {}\n    guardas = None\n    try:\n        guardas = _verificar_origen(casos, esperadas, normas, proposito)\n        codigo = _codigo()\n        prompt_bytes = _copiar_archivo(prompt, entradas / \"prompt.json\")\n        config_bytes = _copiar_archivo(configuracion, entradas / \"configuracion.json\")\n        casos_bytes = _copiar_archivo(casos, entradas / \"casos.jsonl\")\n        hashes_entrada.update({\n            \"prompt.json\": _sha(prompt_bytes),\n            \"configuracion.json\": _sha(config_bytes),\n            \"casos.jsonl\": _sha(casos_bytes),\n        })\n        hashes_entrada[\"normas\"] = _copiar_normas(normas, entradas / \"normas\")\n        spec = PromptSpec.cargar(entradas / \"prompt.json\")\n        config = ConfiguracionEvaluacionPrompt.cargar(entradas / \"configuracion.json\")\n        casos_cargados = _cargar_entradas_jsonl(cargar_casos, entradas / \"casos.jsonl\", \"casos\")\n        ids = [caso.id for caso in casos_cargados]\n        if not ids or len(ids) != len(set(ids)):\n            raise ValueError(\"los casos deben tener ids únicos y no estar vacíos\")\n\n        if (modelo_lote is None) != (tokenizer is None):\n            raise ValueError(\"modelo_lote y tokenizer deben inyectarse juntos\")\n        if modelo_lote is None:\n            modelo_lote = _cargar_modelo_real(config)\n            tokenizer = modelo_lote.procesador\n        longitud = medir_longitud_prompt(spec, tokenizer)\n        entrega = _EntregaCandidata(spec, config, modelo_lote)\n\n        # En este punto no existe ningún snapshot de esperadas en la corrida.\n        trazas = jugar(entrega, casos_cargados, entradas / \"normas\", salida,\n                       ruta_casos=entradas / \"casos.jsonl\")\n        tiempos = json.loads((salida / \"tiempos.json\").read_text(encoding=\"utf-8\"))\n\n        # Se lee una sola vez después de jugar; esta copia exacta es la que se puntúa.\n        esperadas_bytes = _copiar_archivo(esperadas, entradas / \"esperadas.jsonl\")\n        hashes_entrada[\"esperadas.jsonl\"] = _sha(esperadas_bytes)\n        esperadas_cargadas = _cargar_entradas_jsonl(\n            cargar_esperadas, entradas / \"esperadas.jsonl\", \"esperadas\")\n        if set(esperadas_cargadas) != set(ids):\n            raise ValueError(\"casos y esperadas deben tener exactamente los mismos ids\")\n        resultados, resumen = puntuar(trazas, esperadas_cargadas, salida, tiempos)",
+   "que_hace": "Corre la evaluación de un prompt candidato: verifica el origen de los datos, copia las entradas con hash, juega los casos y recién después lee las esperadas.",
+   "como_funciona": "- `_verificar_origen` corre antes de copiar nada: si los casos vienen de `practica/`, falla.\n- Copia prompt, configuración, casos y normas a `salida/entradas` con su sha256.\n- `jugar(...)` juega con `_EntregaCandidata` sin que exista ninguna esperada en la corrida.\n- Después copia las esperadas, verifica que los ids coincidan y llama `puntuar`.",
+   "proposito": "Hace imposible optimizar prompts mirando práctica o test: la guarda es código, no una convención.",
+   "interaccion": "Lo invoca `main()` del mismo archivo (CLI `scripts/evaluar_prompts.py`); usa `jugar` y `puntuar` del kit y escribe `manifiesto.json` con `guardas`.",
+   "teoria": "Separación entre conjunto de desarrollo y de evaluación aplicada a elegir prompts.",
+   "key": "tp4-evaluacion-prompt-runner",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
    "usos": [
     {
      "clase": 4,
      "cnn": "04",
      "slug": "modelado-redes-neuronales",
+     "i": 17,
+     "title": "Los tres, lado a lado",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=17"
+    },
+    {
+     "clase": 5,
+     "cnn": "05",
+     "slug": "prompting",
      "i": 18,
-     "title": "Todo se aprende solo del train",
-     "url": "/clases/04/#d=modelado-redes-neuronales&s=18"
-    },
-    {
-     "clase": 7,
-     "cnn": "07",
-     "slug": "palabra-al-transformer",
-     "i": 14,
-     "title": "Tres formas de volver texto en números",
-     "url": "/clases/07/#d=palabra-al-transformer&s=14"
-    }
-   ],
-   "nusos": 2
-  },
-  {
-   "id": "baseline-mlp-32-32",
-   "titulo": "MLP baseline Dense(32)→Dense(32)→Dense(1, linear) (celda 10)",
-   "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
-   "desde": 31,
-   "hasta": 41,
-   "lenguaje": "python",
-   "codigo": "def build_baseline_model(n_features):\n    model = Sequential([\n        Input(shape=(n_features,)),\n        Dense(32, activation='relu'),\n        Dense(32, activation='relu'),\n        Dense(1, activation='linear'),\n    ])\n    # Salida real -> activación lineal + loss de regresión (mse). 'accuracy' no aplica acá:\n    # no hay clases que acertar, hay una distancia en dólares que minimizar.\n    model.compile(optimizer='adam', loss='mse', metrics=['mae'])\n    return model",
-   "que_hace": "Construye y compila el MLP del baseline numérico: dos capas ocultas de 32 ReLU y una salida lineal para predecir un real.",
-   "como_funciona": "- `Input(shape=(n_features,))` recibe la fila de floats (13 numéricas + flag).\n- Cada `Dense(32, activation='relu')` calcula $W\\cdot x+b$ y aplica ReLU.\n- `Dense(1, activation='linear')` devuelve un número sin acotar (el precio escalado).\n- `compile(optimizer='adam', loss='mse', metrics=['mae'])`: el comentario explica por qué `accuracy` no aplica.",
-   "proposito": "Pasar de la sigmoide + BCE del notebook de clase a lineal + MSE es el cambio central de la misión: la tarea (predecir dólares) fija la salida y la loss.",
-   "interaccion": "La usan `train_and_report` (celda 10) y el experimento con `ListingId` (celda 21). En el Milestone 3, `build_model_categorical` repite el mismo tronco 32-32-1 con la API funcional.",
-   "teoria": "Neurona/capa = combinación lineal + no linealidad; ReLU en ocultas y salida lineal + MSE para regresión.",
-   "key": "tp2-baseline-mlp-32-32",
-   "tp": 2,
-   "tp_titulo": "¿Cuánto vale esta casa?",
-   "usos": [
-    {
-     "clase": 1,
-     "cnn": "01",
-     "slug": "introduccion",
-     "i": 26,
-     "title": "Redes Neuronales — Estructura y Celda Básica",
-     "url": "/clases/01/#d=introduccion&s=26"
-    },
-    {
-     "clase": 3,
-     "cnn": "03",
-     "slug": "intro-redes-neuronales",
-     "i": 9,
-     "title": "La capa: el bloque que se repite",
-     "url": "/clases/03/#d=intro-redes-neuronales&s=9"
-    },
-    {
-     "clase": 3,
-     "cnn": "03",
-     "slug": "intro-redes-neuronales",
-     "i": 24,
-     "title": "Sin activación, la red colapsa",
-     "url": "/clases/03/#d=intro-redes-neuronales&s=24"
-    },
-    {
-     "clase": 3,
-     "cnn": "03",
-     "slug": "intro-redes-neuronales",
-     "i": 25,
-     "title": "Las funciones de activación más comunes",
-     "url": "/clases/03/#d=intro-redes-neuronales&s=25"
-    },
-    {
-     "clase": 4,
-     "cnn": "04",
-     "slug": "modelado-redes-neuronales",
-     "i": 22,
-     "title": "Un catálogo para elegir sin dudar",
-     "url": "/clases/04/#d=modelado-redes-neuronales&s=22"
-    },
-    {
-     "clase": 8,
-     "cnn": "08",
-     "slug": "transformers-a-fondo",
-     "i": 23,
-     "title": "La feed-forward: la misma red para cada posición",
-     "url": "/clases/08/#d=transformers-a-fondo&s=23"
-    },
-    {
-     "clase": 11,
-     "cnn": "11",
-     "slug": "redes-generativas-antagonicas",
-     "i": 23,
-     "title": "Discriminador Como red neuronal",
-     "url": "/clases/11/#d=redes-generativas-antagonicas&s=23"
-    }
-   ],
-   "nusos": 7
-  },
-  {
-   "id": "casa-peor-mae-rmse",
-   "titulo": "La casa que más separa MAE de RMSE (celda 18)",
-   "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
-   "desde": 1,
-   "hasta": 22,
-   "lenguaje": "python",
-   "codigo": "# ¿Qué casa de test separa más al MAE del RMSE?\n# RMSE castiga el CUADRADO del error: una sola casa con un error enorme mueve el\n# RMSE mucho más de lo que mueve al MAE. La buscamos como la de mayor error absoluto.\nerrores_abs = np.abs(baseline['y_test'] - baseline['y_pred'])\nidx_peor = np.argmax(errores_abs)\n\ndf_test_reset = df_test.reset_index(drop=False)\ncasa_peor = df_test_reset.iloc[idx_peor]\n\nprint(\"Casa con el mayor error absoluto del conjunto de prueba:\")\nprint(casa_peor[['ListingId', 'SalePrice'] + NUMERIC_COLS + ['State', 'District', 'HouseStyle']])\nprint(f\"\\nPrecio real:      ${baseline['y_test'][idx_peor]:,.0f}\")\nprint(f\"Precio predicho:  ${baseline['y_pred'][idx_peor]:,.0f}\")\nprint(f\"Error absoluto:   ${errores_abs[idx_peor]:,.0f}\")\n\n# Cuánto mueve esta única casa al RMSE, comparado con cuánto mueve al MAE\nmae_sin_esa_casa = np.mean(np.delete(errores_abs, idx_peor))\nrmse_sin_esa_casa = np.sqrt(np.mean(np.delete(errores_abs, idx_peor) ** 2))\nprint(f\"\\nMAE  con esa casa: ${baseline['mae']:,.0f}   |  MAE  sin esa casa: ${mae_sin_esa_casa:,.0f}\"\n      f\"   ({100 * (1 - mae_sin_esa_casa / baseline['mae']):.1f}% menos)\")\nprint(f\"RMSE con esa casa: ${baseline['rmse']:,.0f}   |  RMSE sin esa casa: ${rmse_sin_esa_casa:,.0f}\"\n      f\"   ({100 * (1 - rmse_sin_esa_casa / baseline['rmse']):.1f}% menos)\")",
-   "que_hace": "Busca la casa de test con mayor error absoluto y mide cuánto cambian el MAE y el RMSE si se la saca.",
-   "como_funciona": "1. `errores_abs = |y_test - y_pred|` sobre el baseline.\n2. `idx_peor = np.argmax(errores_abs)` y se imprime la fila (fue Wheatfield, error $226.171).\n3. `mae_sin_esa_casa` y `rmse_sin_esa_casa` recalculan sin esa fila con `np.delete`.\n4. Imprime el porcentaje que baja cada métrica (RMSE 3,3% vs MAE 2,3%).",
-   "proposito": "Responde la Pregunta 1 con evidencia: el cuadrado del RMSE pesa desproporcionadamente un error grande. Se eligió reportar MAE a la inmobiliaria y usar RMSE como alarma interna.",
-   "interaccion": "Consume `baseline['y_test']` y `baseline['y_pred']` producidos por `train_and_report`; la interpretación está en la celda 19.",
-   "teoria": "MSE/RMSE castigan al cuadrado y MAE es lineal: la loss elegida cambia cuánto pesa un outlier.",
-   "key": "tp2-casa-peor-mae-rmse",
-   "tp": 2,
-   "tp_titulo": "¿Cuánto vale esta casa?",
-   "usos": [
-    {
-     "clase": 3,
-     "cnn": "03",
-     "slug": "intro-redes-neuronales",
-     "i": 30,
-     "title": "El error: la función de coste",
-     "url": "/clases/03/#d=intro-redes-neuronales&s=30"
-    },
-    {
-     "clase": 4,
-     "cnn": "04",
-     "slug": "modelado-redes-neuronales",
-     "i": 28,
-     "title": "Regresión: MSE, MAE y Huber",
-     "url": "/clases/04/#d=modelado-redes-neuronales&s=28"
+     "title": "Mitigar alucinaciones: el proceso",
+     "extra": false,
+     "url": "/clases/05/#d=prompting&s=18"
     }
    ],
    "nusos": 2
@@ -2580,27 +3069,37 @@
      "clase": 4,
      "cnn": "04",
      "slug": "modelado-redes-neuronales",
+     "i": 18,
+     "title": "Todo se aprende solo del train",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=18"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
      "i": 32,
      "title": "Percentiles: la pinball loss",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=32"
     }
    ],
-   "nusos": 1
+   "nusos": 2
   },
   {
-   "id": "train-and-report",
-   "titulo": "Escalado del target, fit y desescalado a dólares (celda 10)",
-   "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
-   "desde": 43,
-   "hasta": 68,
+   "id": "clase-sigmoide",
+   "titulo": "Notebook de clase: Dense(1, sigmoid) para AboveMedianPrice (house-prices.ipynb, celda 25)",
+   "archivo": "house-prices.ipynb",
+   "desde": 1,
+   "hasta": 5,
    "lenguaje": "python",
-   "codigo": "def train_and_report(fill_value, add_indicator, epochs=100, verbose=0):\n    X_train, y_train_raw, scaler = prepare_numeric_split(df_train, fill_value, add_indicator, fit_scaler=True)\n    X_val, y_val_raw, _ = prepare_numeric_split(df_val, fill_value, add_indicator, scaler=scaler)\n    X_test, y_test_raw, _ = prepare_numeric_split(df_test, fill_value, add_indicator, scaler=scaler)\n\n    # SalePrice va de ~50 mil a ~1,6 millones: sin escalar el target, el gradiente\n    # tiene que moverse en un rango enorme y la red no converge en 100 épocas.\n    # Escalamos y TAMBIÉN ajustando el scaler solo con train, y deshacemos el\n    # escalado sobre las predicciones para reportar todo en dólares.\n    y_scaler = StandardScaler().fit(y_train_raw.reshape(-1, 1))\n    y_train = y_scaler.transform(y_train_raw.reshape(-1, 1)).ravel()\n    y_val = y_scaler.transform(y_val_raw.reshape(-1, 1)).ravel()\n\n    keras.utils.set_random_seed(SEED)\n    model = build_baseline_model(X_train.shape[1])\n    hist = model.fit(X_train, y_train, batch_size=32, epochs=epochs,\n                      validation_data=(X_val, y_val), verbose=verbose)\n\n    y_pred_scaled = model.predict(X_test, verbose=0).ravel()\n    y_pred = y_scaler.inverse_transform(y_pred_scaled.reshape(-1, 1)).ravel()\n    mae = mean_absolute_error(y_test_raw, y_pred)\n    rmse = np.sqrt(mean_squared_error(y_test_raw, y_pred))\n    mape = 100 * mean_absolute_percentage_error(y_test_raw, y_pred)\n    return {'model': model, 'history': hist, 'scaler': scaler, 'y_scaler': y_scaler,\n            'mae': mae, 'rmse': rmse, 'mape': mape,\n            'X_test': X_test, 'y_test': y_test_raw, 'y_pred': y_pred}",
-   "que_hace": "Entrena una variante del baseline de punta a punta: prepara los tres splits, escala `SalePrice`, corre `fit` y reporta MAE, RMSE y MAPE en dólares.",
-   "como_funciona": "1. Llama a `prepare_numeric_split` para train/val/test.\n2. `y_scaler = StandardScaler().fit(y_train_raw...)`: el target también se z-normaliza con estadísticas de train.\n3. `keras.utils.set_random_seed(SEED)` y `build_baseline_model`.\n4. `model.fit(..., batch_size=32, epochs=epochs, validation_data=(X_val, y_val))`: forward + backward por lotes durante 100 épocas.\n5. `y_scaler.inverse_transform` vuelve las predicciones a dólares y calcula `mae`, `rmse`, `mape`.",
-   "proposito": "El comentario lo dice: con `SalePrice` crudo (50 mil a 1,6 millones) los gradientes eran enormes para el paso de Adam y no convergía en 100 épocas; escalar el target lo resolvió sin tocar el learning rate.",
-   "interaccion": "La llama la celda 11 con tres imputaciones; el resultado `variant_median_flag` pasa a ser `baseline` (celdas 15, 17, 18) y la referencia del Milestone 3.",
-   "teoria": "Paso de actualización $w\\leftarrow w-\\eta\\,\\partial E/\\partial w$: la escala del target condiciona el tamaño del gradiente; épocas y batches del ciclo de entrenamiento.",
-   "key": "tp2-train-and-report",
+   "codigo": "model = Sequential([\n    Dense(32, activation='relu', input_shape=(10,)),\n    Dense(32, activation='relu'),\n    Dense(1, activation='sigmoid'),\n])",
+   "que_hace": "Es el modelo del notebook de clase del que partió el TP: el mismo 32-32 pero con una neurona sigmoide de salida.",
+   "como_funciona": "- `Dense(32, relu, input_shape=(10,))` y `Dense(32, relu)` sobre las 10 numéricas escaladas con MinMax.\n- `Dense(1, activation='sigmoid')` devuelve una probabilidad en (0,1) de estar sobre la mediana.",
+   "proposito": "Muestra el punto de partida: en el TP2 solo la salida cambió a `linear`, porque una sigmoide acotaría el precio a (0,1).",
+   "interaccion": "En el notebook de clase lo compila la celda 29 con BCE; en el TP2 lo reemplaza `build_baseline_model` (celda 10 del notebook del grupo).",
+   "teoria": "Sigmoide como activación de salida para probabilidades; el catálogo salida ↔ tarea.",
+   "key": "tp2-clase-sigmoide",
    "tp": 2,
    "tp_titulo": "¿Cuánto vale esta casa?",
    "usos": [
@@ -2608,17 +3107,176 @@
      "clase": 3,
      "cnn": "03",
      "slug": "intro-redes-neuronales",
+     "i": 8,
+     "title": "La sigmoide: la no linealidad clásica",
+     "extra": false,
+     "url": "/clases/03/#d=intro-redes-neuronales&s=8"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 22,
+     "title": "Un catálogo para elegir sin dudar",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=22"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 63,
+     "title": "Los notebooks de la clase",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=63"
+    },
+    {
+     "clase": 11,
+     "cnn": "11",
+     "slug": "redes-generativas-antagonicas",
+     "i": 24,
+     "title": "Función Sigmoid: la activación del Discriminador",
+     "extra": false,
+     "url": "/clases/11/#d=redes-generativas-antagonicas&s=24"
+    }
+   ],
+   "nusos": 4
+  },
+  {
+   "id": "clase-compile-bce",
+   "titulo": "Notebook de clase: SGD + binary_crossentropy + accuracy (house-prices.ipynb, celda 29)",
+   "archivo": "house-prices.ipynb",
+   "desde": 1,
+   "hasta": 3,
+   "lenguaje": "python",
+   "codigo": "model.compile(optimizer='sgd',\n              loss='binary_crossentropy',\n              metrics=['accuracy'])",
+   "que_hace": "Compila el clasificador de clase con BCE y accuracy.",
+   "como_funciona": "- `optimizer='sgd'`.\n- `loss='binary_crossentropy'`: la pérdida natural para una salida sigmoide 0/1.\n- `metrics=['accuracy']`.",
+   "proposito": "Es el contraste directo con el TP2, que pasó a `adam` + `mse` + `mae` porque el objetivo es un real en dólares, donde accuracy no significa nada.",
+   "interaccion": "Se aplica al `model` de la celda 25 del notebook de clase y lo entrena la celda 31.",
+   "teoria": "Binary cross-entropy para clasificación binaria vs MSE para regresión.",
+   "key": "tp2-clase-compile-bce",
+   "tp": 2,
+   "tp_titulo": "¿Cuánto vale esta casa?",
+   "usos": [
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 22,
+     "title": "Un catálogo para elegir sin dudar",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=22"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 63,
+     "title": "Los notebooks de la clase",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=63"
+    },
+    {
+     "clase": 11,
+     "cnn": "11",
+     "slug": "redes-generativas-antagonicas",
      "i": 29,
-     "title": "Ida y vuelta: forward y backward",
-     "url": "/clases/03/#d=intro-redes-neuronales&s=29"
+     "title": "Binary cross-entropy: los dos casos del Discriminador",
+     "extra": false,
+     "url": "/clases/11/#d=redes-generativas-antagonicas&s=29"
+    }
+   ],
+   "nusos": 3
+  },
+  {
+   "id": "baseline-mlp-32-32",
+   "titulo": "MLP baseline Dense(32)→Dense(32)→Dense(1, linear) (celda 10)",
+   "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
+   "desde": 31,
+   "hasta": 41,
+   "lenguaje": "python",
+   "codigo": "def build_baseline_model(n_features):\n    model = Sequential([\n        Input(shape=(n_features,)),\n        Dense(32, activation='relu'),\n        Dense(32, activation='relu'),\n        Dense(1, activation='linear'),\n    ])\n    # Salida real -> activación lineal + loss de regresión (mse). 'accuracy' no aplica acá:\n    # no hay clases que acertar, hay una distancia en dólares que minimizar.\n    model.compile(optimizer='adam', loss='mse', metrics=['mae'])\n    return model",
+   "que_hace": "Construye y compila el MLP del baseline numérico: dos capas ocultas de 32 ReLU y una salida lineal para predecir un real.",
+   "como_funciona": "- `Input(shape=(n_features,))` recibe la fila de floats (13 numéricas + flag).\n- Cada `Dense(32, activation='relu')` calcula $W\\cdot x+b$ y aplica ReLU.\n- `Dense(1, activation='linear')` devuelve un número sin acotar (el precio escalado).\n- `compile(optimizer='adam', loss='mse', metrics=['mae'])`: el comentario explica por qué `accuracy` no aplica.",
+   "proposito": "Pasar de la sigmoide + BCE del notebook de clase a lineal + MSE es el cambio central de la misión: la tarea (predecir dólares) fija la salida y la loss.",
+   "interaccion": "La usan `train_and_report` (celda 10) y el experimento con `ListingId` (celda 21). En el Milestone 3, `build_model_categorical` repite el mismo tronco 32-32-1 con la API funcional.",
+   "teoria": "Neurona/capa = combinación lineal + no linealidad; ReLU en ocultas y salida lineal + MSE para regresión.",
+   "key": "tp2-baseline-mlp-32-32",
+   "tp": 2,
+   "tp_titulo": "¿Cuánto vale esta casa?",
+   "usos": [
+    {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "introduccion",
+     "i": 26,
+     "title": "Redes Neuronales — Estructura y Celda Básica",
+     "extra": false,
+     "url": "/clases/01/#d=introduccion&s=26"
     },
     {
      "clase": 3,
      "cnn": "03",
      "slug": "intro-redes-neuronales",
-     "i": 34,
-     "title": "El paso de actualización",
-     "url": "/clases/03/#d=intro-redes-neuronales&s=34"
+     "i": 8,
+     "title": "La sigmoide: la no linealidad clásica",
+     "extra": false,
+     "url": "/clases/03/#d=intro-redes-neuronales&s=8"
+    },
+    {
+     "clase": 3,
+     "cnn": "03",
+     "slug": "intro-redes-neuronales",
+     "i": 9,
+     "title": "La capa: el bloque que se repite",
+     "extra": false,
+     "url": "/clases/03/#d=intro-redes-neuronales&s=9"
+    },
+    {
+     "clase": 3,
+     "cnn": "03",
+     "slug": "intro-redes-neuronales",
+     "i": 12,
+     "title": "Las dos dimensiones: ancho y profundidad",
+     "extra": false,
+     "url": "/clases/03/#d=intro-redes-neuronales&s=12"
+    },
+    {
+     "clase": 3,
+     "cnn": "03",
+     "slug": "intro-redes-neuronales",
+     "i": 24,
+     "title": "Sin activación, la red colapsa",
+     "extra": false,
+     "url": "/clases/03/#d=intro-redes-neuronales&s=24"
+    },
+    {
+     "clase": 3,
+     "cnn": "03",
+     "slug": "intro-redes-neuronales",
+     "i": 25,
+     "title": "Las funciones de activación más comunes",
+     "extra": false,
+     "url": "/clases/03/#d=intro-redes-neuronales&s=25"
+    },
+    {
+     "clase": 3,
+     "cnn": "03",
+     "slug": "intro-redes-neuronales",
+     "i": 30,
+     "title": "El error: la función de coste",
+     "extra": false,
+     "url": "/clases/03/#d=intro-redes-neuronales&s=30"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 22,
+     "title": "Un catálogo para elegir sin dudar",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=22"
     },
     {
      "clase": 4,
@@ -2626,15 +3284,62 @@
      "slug": "modelado-redes-neuronales",
      "i": 43,
      "title": "El learning rate es el paso",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=43"
     },
     {
      "clase": 4,
      "cnn": "04",
      "slug": "modelado-redes-neuronales",
-     "i": 44,
-     "title": "Batch y época no son lo mismo",
-     "url": "/clases/04/#d=modelado-redes-neuronales&s=44"
+     "i": 57,
+     "title": "Cuántas capas y cuánto ancho",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=57"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 63,
+     "title": "Los notebooks de la clase",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=63"
+    },
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
+     "i": 23,
+     "title": "La feed-forward: la misma red para cada posición",
+     "extra": false,
+     "url": "/clases/08/#d=transformers-a-fondo&s=23"
+    },
+    {
+     "clase": 11,
+     "cnn": "11",
+     "slug": "redes-generativas-antagonicas",
+     "i": 23,
+     "title": "Discriminador Como red neuronal",
+     "extra": false,
+     "url": "/clases/11/#d=redes-generativas-antagonicas&s=23"
+    },
+    {
+     "clase": 11,
+     "cnn": "11",
+     "slug": "redes-generativas-antagonicas",
+     "i": 24,
+     "title": "Función Sigmoid: la activación del Discriminador",
+     "extra": false,
+     "url": "/clases/11/#d=redes-generativas-antagonicas&s=24"
+    },
+    {
+     "clase": 11,
+     "cnn": "11",
+     "slug": "redes-generativas-antagonicas",
+     "i": 29,
+     "title": "Binary cross-entropy: los dos casos del Discriminador",
+     "extra": false,
+     "url": "/clases/11/#d=redes-generativas-antagonicas&s=29"
     },
     {
      "clase": 11,
@@ -2642,18 +3347,87 @@
      "slug": "redes-generativas-antagonicas",
      "i": 32,
      "title": "Backpropagation: el procedimiento paso a paso",
+     "extra": false,
      "url": "/clases/11/#d=redes-generativas-antagonicas&s=32"
-    },
-    {
-     "clase": 11,
-     "cnn": "11",
-     "slug": "redes-generativas-antagonicas",
-     "i": 34,
-     "title": "El ciclo completo: Generador y Discriminador juntos",
-     "url": "/clases/11/#d=redes-generativas-antagonicas&s=34"
     }
    ],
-   "nusos": 6
+   "nusos": 16
+  },
+  {
+   "id": "baseline-oficial",
+   "titulo": "El baseline oficial y su curva de pérdida (celda 15)",
+   "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
+   "desde": 1,
+   "hasta": 11,
+   "lenguaje": "python",
+   "codigo": "import matplotlib.pyplot as plt\n\nbaseline = variant_median_flag\n\nplt.plot(baseline['history'].history['loss'])\nplt.plot(baseline['history'].history['val_loss'])\nplt.title('Baseline numérico — pérdida (MSE, target escalado)')\nplt.ylabel('Loss')\nplt.xlabel('Epoch')\nplt.legend(['Train', 'Val'], loc='upper right')\nplt.show()",
+   "que_hace": "Fija `baseline = variant_median_flag` (mediana + indicador) y grafica `loss` contra `val_loss` del historial de entrenamiento.",
+   "como_funciona": "- Toma el diccionario que devolvió `train_and_report` en la celda 11.\n- Lee `history.history['loss']` y `['val_loss']` del objeto que devuelve `model.fit` y los grafica por época.",
+   "proposito": "Deja un único punto de referencia numérico para el resto del notebook y muestra, con la curva, que `val_loss` toca su mínimo temprano.",
+   "interaccion": "`baseline` lo consumen la celda 17 (métricas), la celda 18 (casa con mayor error), la celda 21 (ListingId) y la tabla de la celda 27.",
+   "teoria": "La loss que se minimiza (MSE con target escalado) se mira en train y en validación para detectar cuándo el modelo deja de generalizar.",
+   "key": "tp2-baseline-oficial",
+   "tp": 2,
+   "tp_titulo": "¿Cuánto vale esta casa?",
+   "usos": [
+    {
+     "clase": 3,
+     "cnn": "03",
+     "slug": "intro-redes-neuronales",
+     "i": 30,
+     "title": "El error: la función de coste",
+     "extra": false,
+     "url": "/clases/03/#d=intro-redes-neuronales&s=30"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 28,
+     "title": "Regresión: MSE, MAE y Huber",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=28"
+    }
+   ],
+   "nusos": 2
+  },
+  {
+   "id": "casa-peor-mae-rmse",
+   "titulo": "La casa que más separa MAE de RMSE (celda 18)",
+   "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
+   "desde": 1,
+   "hasta": 22,
+   "lenguaje": "python",
+   "codigo": "# ¿Qué casa de test separa más al MAE del RMSE?\n# RMSE castiga el CUADRADO del error: una sola casa con un error enorme mueve el\n# RMSE mucho más de lo que mueve al MAE. La buscamos como la de mayor error absoluto.\nerrores_abs = np.abs(baseline['y_test'] - baseline['y_pred'])\nidx_peor = np.argmax(errores_abs)\n\ndf_test_reset = df_test.reset_index(drop=False)\ncasa_peor = df_test_reset.iloc[idx_peor]\n\nprint(\"Casa con el mayor error absoluto del conjunto de prueba:\")\nprint(casa_peor[['ListingId', 'SalePrice'] + NUMERIC_COLS + ['State', 'District', 'HouseStyle']])\nprint(f\"\\nPrecio real:      ${baseline['y_test'][idx_peor]:,.0f}\")\nprint(f\"Precio predicho:  ${baseline['y_pred'][idx_peor]:,.0f}\")\nprint(f\"Error absoluto:   ${errores_abs[idx_peor]:,.0f}\")\n\n# Cuánto mueve esta única casa al RMSE, comparado con cuánto mueve al MAE\nmae_sin_esa_casa = np.mean(np.delete(errores_abs, idx_peor))\nrmse_sin_esa_casa = np.sqrt(np.mean(np.delete(errores_abs, idx_peor) ** 2))\nprint(f\"\\nMAE  con esa casa: ${baseline['mae']:,.0f}   |  MAE  sin esa casa: ${mae_sin_esa_casa:,.0f}\"\n      f\"   ({100 * (1 - mae_sin_esa_casa / baseline['mae']):.1f}% menos)\")\nprint(f\"RMSE con esa casa: ${baseline['rmse']:,.0f}   |  RMSE sin esa casa: ${rmse_sin_esa_casa:,.0f}\"\n      f\"   ({100 * (1 - rmse_sin_esa_casa / baseline['rmse']):.1f}% menos)\")",
+   "que_hace": "Busca la casa de test con mayor error absoluto y mide cuánto cambian el MAE y el RMSE si se la saca.",
+   "como_funciona": "1. `errores_abs = |y_test - y_pred|` sobre el baseline.\n2. `idx_peor = np.argmax(errores_abs)` y se imprime la fila (fue Wheatfield, error $226.171).\n3. `mae_sin_esa_casa` y `rmse_sin_esa_casa` recalculan sin esa fila con `np.delete`.\n4. Imprime el porcentaje que baja cada métrica (RMSE 3,3% vs MAE 2,3%).",
+   "proposito": "Responde la Pregunta 1 con evidencia: el cuadrado del RMSE pesa desproporcionadamente un error grande. Se eligió reportar MAE a la inmobiliaria y usar RMSE como alarma interna.",
+   "interaccion": "Consume `baseline['y_test']` y `baseline['y_pred']` producidos por `train_and_report`; la interpretación está en la celda 19.",
+   "teoria": "MSE/RMSE castigan al cuadrado y MAE es lineal: la loss elegida cambia cuánto pesa un outlier.",
+   "key": "tp2-casa-peor-mae-rmse",
+   "tp": 2,
+   "tp_titulo": "¿Cuánto vale esta casa?",
+   "usos": [
+    {
+     "clase": 3,
+     "cnn": "03",
+     "slug": "intro-redes-neuronales",
+     "i": 30,
+     "title": "El error: la función de coste",
+     "extra": false,
+     "url": "/clases/03/#d=intro-redes-neuronales&s=30"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 28,
+     "title": "Regresión: MSE, MAE y Huber",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=28"
+    }
+   ],
+   "nusos": 2
   },
   {
    "id": "modelo-grande-512",
@@ -2678,6 +3452,7 @@
      "slug": "intro-redes-neuronales",
      "i": 12,
      "title": "Las dos dimensiones: ancho y profundidad",
+     "extra": false,
      "url": "/clases/03/#d=intro-redes-neuronales&s=12"
     },
     {
@@ -2686,7 +3461,26 @@
      "slug": "intro-redes-neuronales",
      "i": 13,
      "title": "Parámetros contra hiperparámetros",
+     "extra": false,
      "url": "/clases/03/#d=intro-redes-neuronales&s=13"
+    },
+    {
+     "clase": 3,
+     "cnn": "03",
+     "slug": "intro-redes-neuronales",
+     "i": 25,
+     "title": "Las funciones de activación más comunes",
+     "extra": false,
+     "url": "/clases/03/#d=intro-redes-neuronales&s=25"
+    },
+    {
+     "clase": 3,
+     "cnn": "03",
+     "slug": "intro-redes-neuronales",
+     "i": 29,
+     "title": "Ida y vuelta: forward y backward",
+     "extra": false,
+     "url": "/clases/03/#d=intro-redes-neuronales&s=29"
     },
     {
      "clase": 4,
@@ -2694,7 +3488,17 @@
      "slug": "modelado-redes-neuronales",
      "i": 46,
      "title": "La función objetivo",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=46"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 47,
+     "title": "Qué mirar cuando esto se entrena",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=47"
     },
     {
      "clase": 4,
@@ -2702,10 +3506,123 @@
      "slug": "modelado-redes-neuronales",
      "i": 57,
      "title": "Cuántas capas y cuánto ancho",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=57"
+    },
+    {
+     "clase": 12,
+     "cnn": "12",
+     "slug": "segmentacion-y-stable-diffusion",
+     "i": 4,
+     "title": "Cómo se entrena una red densa",
+     "extra": false,
+     "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=4"
+    }
+   ],
+   "nusos": 8
+  },
+  {
+   "id": "regularizado-early-stopping",
+   "titulo": "L2 0,001 + Dropout 0,3 + EarlyStopping (celda 37)",
+   "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
+   "desde": 1,
+   "hasta": 11,
+   "lenguaje": "python",
+   "codigo": "keras.utils.set_random_seed(SEED)\nmodel_regularized = build_big_model(X4_train.shape[1], DISTRICT_VOCAB_SIZE, l2=0.001, dropout=0.3)\n\nearly_stopping = EarlyStopping(monitor='val_loss', patience=15, restore_best_weights=True)\n\nhist_regularized = model_regularized.fit(\n    [X4_train, d4_train], y4_train, batch_size=32, epochs=150,\n    validation_data=([X4_val, d4_val], y4_val), callbacks=[early_stopping], verbose=0)\n\nprint(f\"Entrenó {len(hist_regularized.history['loss'])} épocas \"\n      f\"(de las 150 posibles) antes de que early stopping cortara.\")",
+   "que_hace": "Entrena la misma red 512-512-512 pero regularizada y con early stopping sobre `val_loss`.",
+   "como_funciona": "- `build_big_model(..., l2=0.001, dropout=0.3)`.\n- `EarlyStopping(monitor='val_loss', patience=15, restore_best_weights=True)` corta si la validación no mejora en 15 épocas y restaura los mejores pesos.\n- `fit` con `batch_size=32`, hasta 150 épocas; imprime cuántas corrió (76).",
+   "proposito": "Combina tres frenos al sobreajuste: L2 achica pesos, dropout apaga neuronas al azar en entrenamiento y early stopping usa la validación para decidir cuándo parar.",
+   "interaccion": "Usa `build_big_model` y los tensores de la celda 34; sus curvas y métricas se comparan con `model_overfit` en la celda 38.",
+   "teoria": "Regularización y lectura de la curva train vs val; ciclo forward/backward por épocas y lotes.",
+   "key": "tp2-regularizado-early-stopping",
+   "tp": 2,
+   "tp_titulo": "¿Cuánto vale esta casa?",
+   "usos": [
+    {
+     "clase": 3,
+     "cnn": "03",
+     "slug": "intro-redes-neuronales",
+     "i": 13,
+     "title": "Parámetros contra hiperparámetros",
+     "extra": false,
+     "url": "/clases/03/#d=intro-redes-neuronales&s=13"
+    },
+    {
+     "clase": 3,
+     "cnn": "03",
+     "slug": "intro-redes-neuronales",
+     "i": 29,
+     "title": "Ida y vuelta: forward y backward",
+     "extra": false,
+     "url": "/clases/03/#d=intro-redes-neuronales&s=29"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 46,
+     "title": "La función objetivo",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=46"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 47,
+     "title": "Qué mirar cuando esto se entrena",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=47"
+    },
+    {
+     "clase": 12,
+     "cnn": "12",
+     "slug": "segmentacion-y-stable-diffusion",
+     "i": 4,
+     "title": "Cómo se entrena una red densa",
+     "extra": false,
+     "url": "/clases/12/#d=segmentacion-y-stable-diffusion&s=4"
+    }
+   ],
+   "nusos": 5
+  },
+  {
+   "id": "curva-overfit",
+   "titulo": "Curva y diagnóstico de la red sobredimensionada (celda 35)",
+   "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
+   "desde": 1,
+   "hasta": 12,
+   "lenguaje": "python",
+   "codigo": "plt.plot(hist_overfit.history['loss'])\nplt.plot(hist_overfit.history['val_loss'])\nplt.title('Modelo sobredimensionado (sin regularizar) — pérdida')\nplt.ylabel('Loss')\nplt.xlabel('Epoch')\nplt.legend(['Train', 'Val'], loc='upper right')\nplt.show()\n\nmin_val_epoch = int(np.argmin(hist_overfit.history['val_loss']))\nprint(f\"val_loss mínimo en la época {min_val_epoch}: {min(hist_overfit.history['val_loss']):.4f}\")\nprint(f\"val_loss final (época {len(hist_overfit.history['val_loss']) - 1}): {hist_overfit.history['val_loss'][-1]:.4f}\")\nprint(f\"train_loss final: {hist_overfit.history['loss'][-1]:.4f}\")",
+   "que_hace": "Grafica `loss` y `val_loss` de `hist_overfit` e imprime en qué época `val_loss` fue mínima y cómo terminaron ambas pérdidas.",
+   "como_funciona": "- `plt.plot` de las dos series del historial.\n- `np.argmin(hist_overfit.history['val_loss'])` ubica la mejor época de validación.\n- Compara ese mínimo con el `val_loss` final y el `train_loss` final.",
+   "proposito": "Es la evidencia del sobreajuste: el train sigue bajando mientras validación sube, lo que justifica regularizar y cortar antes.",
+   "interaccion": "Lee `hist_overfit` de la celda 34; motiva la celda 37 (L2, Dropout y `EarlyStopping` con `patience=15`), cuyo resultado se compara en la celda 38.",
+   "teoria": "Diagnóstico de overfitting: brecha creciente entre la pérdida de entrenamiento y la de validación.",
+   "key": "tp2-curva-overfit",
+   "tp": 2,
+   "tp_titulo": "¿Cuánto vale esta casa?",
+   "usos": [
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 47,
+     "title": "Qué mirar cuando esto se entrena",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=47"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 57,
+     "title": "Cuántas capas y cuánto ancho",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=57"
     }
    ],
-   "nusos": 4
+   "nusos": 2
   },
   {
    "id": "comparar-overfit-regularizado",
@@ -2730,6 +3647,7 @@
      "slug": "modelado-redes-neuronales",
      "i": 47,
      "title": "Qué mirar cuando esto se entrena",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=47"
     }
    ],
@@ -2758,54 +3676,69 @@
      "slug": "modelado-redes-neuronales",
      "i": 62,
      "title": "Checklist operativo para la práctica",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=62"
     }
    ],
    "nusos": 1
   },
   {
-   "id": "clase-sigmoide",
-   "titulo": "Notebook de clase: Dense(1, sigmoid) para AboveMedianPrice (house-prices.ipynb, celda 25)",
-   "archivo": "house-prices.ipynb",
+   "id": "comparar-imputaciones",
+   "titulo": "Mediana + flag vs mediana vs cero (celda 11)",
+   "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
    "desde": 1,
-   "hasta": 5,
+   "hasta": 10,
    "lenguaje": "python",
-   "codigo": "model = Sequential([\n    Dense(32, activation='relu', input_shape=(10,)),\n    Dense(32, activation='relu'),\n    Dense(1, activation='sigmoid'),\n])",
-   "que_hace": "Es el modelo del notebook de clase del que partió el TP: el mismo 32-32 pero con una neurona sigmoide de salida.",
-   "como_funciona": "- `Dense(32, relu, input_shape=(10,))` y `Dense(32, relu)` sobre las 10 numéricas escaladas con MinMax.\n- `Dense(1, activation='sigmoid')` devuelve una probabilidad en (0,1) de estar sobre la mediana.",
-   "proposito": "Muestra el punto de partida: en el TP2 solo la salida cambió a `linear`, porque una sigmoide acotaría el precio a (0,1).",
-   "interaccion": "En el notebook de clase lo compila la celda 29 con BCE; en el TP2 lo reemplaza `build_baseline_model` (celda 10 del notebook del grupo).",
-   "teoria": "Sigmoide como activación de salida para probabilidades; el catálogo salida ↔ tarea.",
-   "key": "tp2-clase-sigmoide",
+   "codigo": "variant_median_flag = train_and_report(lotfrontage_median, add_indicator=True)\nvariant_median_noflag = train_and_report(lotfrontage_median, add_indicator=False)\nvariant_zero_noflag = train_and_report(0.0, add_indicator=False)\n\nprint(f\"{'Variante':28} {'MAE':>12} {'RMSE':>12} {'MAPE %':>8}\")\nprint(\"-\" * 64)\nfor name, r in [('Mediana + indicador', variant_median_flag),\n                ('Mediana sin indicador', variant_median_noflag),\n                ('Cero sin indicador', variant_zero_noflag)]:\n    print(f\"{name:28} {r['mae']:12,.0f} {r['rmse']:12,.0f} {r['mape']:8.2f}\")",
+   "que_hace": "Entrena tres variantes del baseline que solo difieren en cómo se completa `LotFrontage` y las compara en MAE, RMSE y MAPE.",
+   "como_funciona": "- `variant_median_flag`: mediana de train + indicador.\n- `variant_median_noflag`: mediana sin indicador.\n- `variant_zero_noflag`: rellena con `0.0`.\n- Imprime una tabla con las tres métricas de test.",
+   "proposito": "Responde la Pregunta 4: rellenar con 0 le dice a la red \"lote sin frente\", un valor fuera de la distribución. La variante elegida como baseline oficial fue mediana + indicador.",
+   "interaccion": "Usa `train_and_report` y `lotfrontage_median` (celda 10). Su salida `variant_median_flag` se reusa como `baseline` en las celdas siguientes.",
+   "teoria": "Error de codificación caro: faltante rellenado con 0.",
+   "key": "tp2-comparar-imputaciones",
    "tp": 2,
    "tp_titulo": "¿Cuánto vale esta casa?",
    "usos": [
     {
-     "clase": 3,
-     "cnn": "03",
-     "slug": "intro-redes-neuronales",
-     "i": 8,
-     "title": "La sigmoide: la no linealidad clásica",
-     "url": "/clases/03/#d=intro-redes-neuronales&s=8"
-    },
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 62,
+     "title": "Checklist operativo para la práctica",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=62"
+    }
+   ],
+   "nusos": 1
+  },
+  {
+   "id": "clase-fit",
+   "titulo": "Notebook de clase: fit con lotes de 32 y 100 épocas (house-prices.ipynb, celda 31)",
+   "archivo": "house-prices.ipynb",
+   "desde": 1,
+   "hasta": 3,
+   "lenguaje": "python",
+   "codigo": "hist = model.fit(X_train, Y_train,\n          batch_size=32, epochs=100,\n          validation_data=(X_val, Y_val))",
+   "que_hace": "Entrena el clasificador de clase sobre `X_train`/`Y_train`, con validación en cada época, y guarda el historial en `hist`.",
+   "como_funciona": "`model.fit` recorre los datos en lotes de 32 durante 100 épocas; `validation_data` hace que Keras reporte la pérdida de validación al final de cada época.",
+   "proposito": "Es el ciclo de entrenamiento de referencia de la clase; el TP2 conservó `batch_size=32` y 100 épocas en `train_and_report`.",
+   "interaccion": "Entrena el `model` de la celda 25 compilado en la celda 29; `hist` se grafica más adelante en el mismo notebook.",
+   "teoria": "Forward, cálculo de la loss y backpropagation por lote, repetidos durante varias épocas.",
+   "key": "tp2-clase-fit",
+   "tp": 2,
+   "tp_titulo": "¿Cuánto vale esta casa?",
+   "usos": [
     {
      "clase": 4,
      "cnn": "04",
      "slug": "modelado-redes-neuronales",
      "i": 63,
      "title": "Los notebooks de la clase",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=63"
-    },
-    {
-     "clase": 11,
-     "cnn": "11",
-     "slug": "redes-generativas-antagonicas",
-     "i": 24,
-     "title": "Función Sigmoid: la activación del Discriminador",
-     "url": "/clases/11/#d=redes-generativas-antagonicas&s=24"
     }
    ],
-   "nusos": 3
+   "nusos": 1
   }
  ]
 }

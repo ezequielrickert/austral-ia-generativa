@@ -83,8 +83,9 @@
        "tp": 4,
        "texto": "En el TP4 mediste el reparto del contexto por caso: el prompt de sistema era el 55 % y las búsquedas el 25 %.",
        "tp_titulo": "El agente de admisión de guardia (TP final)",
-       "code": "tp4-contexto-desglose",
-       "nota": ""
+       "code": "tp4-contexto-desglose,tp4-medir-contexto-script,tp4-reparto-contexto-doc",
+       "ncode": 3,
+       "nota": "`desglose` reparte el contexto por tipo de mensaje, `medir_contexto.py` lo agrega por prompt y el doc reporta el 55 % / 25 %."
       }
      ],
      "ver": [
@@ -94,7 +95,8 @@
        "cnn": "10",
        "i": 41,
        "title": "El contexto se degrada",
-       "por": "El contexto se degrada (context rot)"
+       "por": "El contexto se degrada (context rot)",
+       "extra": false
       }
      ],
      "key": false,
@@ -123,8 +125,9 @@
        "tp": 4,
        "texto": "El agente del TP4 corta un caso si no entra en la ventana, en vez de recortar en silencio.",
        "tp_titulo": "El agente de admisión de guardia (TP final)",
-       "code": "tp4-agente-guarda-contexto",
-       "nota": ""
+       "code": "tp4-modelo-medir-contexto,tp4-agente-guarda-contexto,tp4-modelo-generar",
+       "ncode": 3,
+       "nota": "El modelo mide tokens con su chat template; `_activas` corta el caso que no entra, y `__call__` vuelve a negarse a recortar."
       }
      ],
      "ver": [
@@ -134,7 +137,8 @@
        "cnn": "02",
        "i": 12,
        "title": "El manejo del contexto",
-       "por": "Manejo del contexto en agentes"
+       "por": "Manejo del contexto en agentes",
+       "extra": false
       }
      ],
      "key": true,
@@ -189,7 +193,8 @@
        "cnn": "07",
        "i": 10,
        "title": "Los modelos no leen letras",
-       "por": "Los modelos no leen letras"
+       "por": "Los modelos no leen letras",
+       "extra": false
       }
      ],
      "key": false,
@@ -241,8 +246,9 @@
        "tp": 3,
        "texto": "Tus logs del TP3 registraban tokens y costo por llamada: ~USD 0,0015 por corrida del agente contra ~0,017 del juez (más de 10×).",
        "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
-       "code": "tp3-corrida-usage-resumen",
-       "nota": "Costo = tokens de entrada × precio de entrada + tokens de salida × precio de salida, calculado por llamada."
+       "code": "tp3-modelo-llm-openrouter,tp3-corrida-usage-resumen,tp3-corrida-log-md",
+       "ncode": 3,
+       "nota": "Los precios de respaldo están en `modelo.py`; `_usage` aplica tokens de entrada × precio de entrada + tokens de salida × precio de salida por llamada (si OpenRouter no informa el costo) y el log lo deja escrito."
       }
      ],
      "ver": [],
@@ -275,7 +281,8 @@
        "cnn": "08",
        "i": 11,
        "title": "El ciclo de generación con el transformer abierto",
-       "por": "Ciclo de generación del transformer"
+       "por": "Ciclo de generación del transformer",
+       "extra": false
       }
      ],
      "key": true,
@@ -386,8 +393,9 @@
        "tp": 3,
        "texto": "En el TP3 usaste temperatura 0 y aun así concluiste que, con 12 preguntas y una corrida, una pregunta de diferencia era ruido.",
        "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
-       "code": "tp3-informe-a11",
-       "nota": "Mirá el último párrafo: aun con temperatura 0 la consulta varió entre corridas."
+       "code": "tp3-modelo-llm-openrouter,tp3-informe-a11",
+       "ncode": 2,
+       "nota": "`temperature=0` se fija en `modelo.py`; mirá el último párrafo del informe: aun así la consulta varió entre corridas."
       }
      ],
      "ver": [],
@@ -420,7 +428,8 @@
        "cnn": "01",
        "i": 13,
        "title": "Limitaciones de la IA Generativa",
-       "por": "Limitaciones de la IA generativa"
+       "por": "Limitaciones de la IA generativa",
+       "extra": false
       }
      ],
      "key": false,
@@ -477,8 +486,9 @@
        "tp": 3,
        "texto": "El prompt del TP3 obligaba a usar solo datos de las herramientas y decir cuando faltaban: Faithfulness 5,00 en las 4 corridas.",
        "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
-       "code": "tp3-prompt-sistema",
-       "nota": ""
+       "code": "tp3-prompt-sistema,tp3-bucle-tool-calling",
+       "ncode": 2,
+       "nota": "El prompt se define como `PROMPT` y entra como `SystemMessage` al principio de cada conversación en `responder()`."
       }
      ],
      "ver": [
@@ -488,7 +498,8 @@
        "cnn": "06",
        "i": 2,
        "title": "RAG suma lo que no está en los pesos",
-       "por": "RAG: lo que no está en los pesos"
+       "por": "RAG: lo que no está en los pesos",
+       "extra": false
       }
      ],
      "key": true,
@@ -517,7 +528,8 @@
        "tp": 4,
        "texto": "En el TP4 elegiste prompts en un prompt-dev propio y dejaste práctica solo para reportar, para no sobreajustar al conjunto de evaluación.",
        "tp_titulo": "El agente de admisión de guardia (TP final)",
-       "code": "tp4-guarda-practica",
+       "code": "tp4-guarda-practica,tp4-evaluacion-prompt-runner",
+       "ncode": 2,
        "nota": ""
       }
      ],
@@ -528,7 +540,8 @@
        "cnn": "04",
        "i": 16,
        "title": "Un dataset, tres trabajos distintos",
-       "por": "Train, validación y test"
+       "por": "Train, validación y test",
+       "extra": false
       }
      ],
      "key": true,
@@ -719,8 +732,9 @@
        "tp": 4,
        "texto": "Tu prompt procedimiento-v1 del TP4 agregó instrucciones paso a paso (buscar cada tema por separado): de 10/10/7 a 14/16/12 casos resueltos.",
        "tp_titulo": "El agente de admisión de guardia (TP final)",
-       "code": "tp4-solo-prompt-practica",
-       "nota": "El componente agregado fue la instrucción paso a paso: buscar cada tema con su propia consulta."
+       "code": "tp4-prompt-procedimiento-v1,tp4-solo-prompt-practica",
+       "ncode": 2,
+       "nota": "El componente agregado fue la instrucción paso a paso del «Procedimiento»: buscar cada tema con su propia consulta."
       }
      ],
      "ver": [],
@@ -753,7 +767,8 @@
        "cnn": "02",
        "i": 16,
        "title": "Un ejemplo de CLAUDE.md",
-       "por": "Un ejemplo de CLAUDE.md"
+       "por": "Un ejemplo de CLAUDE.md",
+       "extra": false
       }
      ],
      "key": false,
@@ -777,8 +792,9 @@
        "tp": 4,
        "texto": "El agente del TP4 responde con acciones JSON y tiene un mensaje de corrección cuando el JSON llega inválido.",
        "tp_titulo": "El agente de admisión de guardia (TP final)",
-       "code": "tp4-agente-bucle",
-       "nota": "Mirá la rama `obj is None`: ahí entra `mensaje_json_invalido`."
+       "code": "tp4-prompt-procedimiento-v1,tp4-agente-bucle",
+       "ncode": 2,
+       "nota": "El formato JSON se pide en el `system_prompt`; en el bucle, la rama `obj is None` agrega `mensaje_json_invalido`."
       }
      ],
      "ver": [
@@ -788,7 +804,8 @@
        "cnn": "09",
        "i": 41,
        "title": "Calcular: de los tokens al JSON",
-       "por": "De los tokens al JSON"
+       "por": "De los tokens al JSON",
+       "extra": false
       }
      ],
      "key": true,
@@ -820,7 +837,8 @@
        "cnn": "13",
        "i": 15,
        "title": "Para el modelo, todo es texto",
-       "por": "Para el modelo, todo es texto"
+       "por": "Para el modelo, todo es texto",
+       "extra": false
       }
      ],
      "key": false,
@@ -864,7 +882,8 @@
        "cnn": "09",
        "i": 52,
        "title": "Prompt, RAG o fine-tuning",
-       "por": "Prompt, RAG o fine-tuning"
+       "por": "Prompt, RAG o fine-tuning",
+       "extra": false
       }
      ],
      "key": true,
@@ -894,6 +913,7 @@
        "texto": "En el TP3 sacaste del ejemplo de la descripción la pregunta A01 de dev, para no filtrar el conjunto de evaluación al sistema.",
        "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
        "code": "tp3-descripciones-tools",
+       "ncode": 1,
        "nota": "Fijate el ejemplo de `consulta` ('cómo es una consulta por telemedicina'): reemplazó a la pregunta A01 de dev para no filtrar la evaluación."
       }
      ],
@@ -1108,7 +1128,8 @@
        "cnn": "10",
        "i": 14,
        "title": "Workflow o agente",
-       "por": "Workflow o agente"
+       "por": "Workflow o agente",
+       "extra": false
       }
      ],
      "key": false,
@@ -1193,8 +1214,9 @@
        "tp": 4,
        "texto": "procedimiento-v1 del TP4 mejoró los casos resueltos, pero subió el contexto ~2,6× (~52 mil caracteres por caso) y de ~16 a ~25 s por caso.",
        "tp_titulo": "El agente de admisión de guardia (TP final)",
-       "code": "tp4-procedimiento-dev",
-       "nota": ""
+       "code": "tp4-prompt-procedimiento-v1,tp4-procedimiento-dev",
+       "ncode": 2,
+       "nota": "El paso 2 del procedimiento multiplica las búsquedas: eso sube el contexto y el tiempo por caso."
       }
      ],
      "ver": [],
@@ -1227,7 +1249,8 @@
        "cnn": "08",
        "i": 20,
        "title": "La máscara causal",
-       "por": "La máscara causal"
+       "por": "La máscara causal",
+       "extra": false
       }
      ],
      "key": true,
@@ -1348,7 +1371,8 @@
        "cnn": "09",
        "i": 31,
        "title": "RL con verificador: el proceso",
-       "por": "RL con verificador: el proceso"
+       "por": "RL con verificador: el proceso",
+       "extra": false
       }
      ],
      "key": true,
@@ -1515,7 +1539,8 @@
        "cnn": "02",
        "i": 4,
        "title": "Delegar una tarea completa",
-       "por": "Delegar una tarea completa"
+       "por": "Delegar una tarea completa",
+       "extra": false
       }
      ],
      "key": false,
@@ -1547,7 +1572,8 @@
        "cnn": "06",
        "i": 19,
        "title": "Encontrar por significado",
-       "por": "Encontrar por significado"
+       "por": "Encontrar por significado",
+       "extra": false
       }
      ],
      "key": false,
@@ -1625,7 +1651,8 @@
        "cnn": "13",
        "i": 35,
        "title": "El riesgo del deskilling",
-       "por": "El riesgo del deskilling"
+       "por": "El riesgo del deskilling",
+       "extra": false
       }
      ],
      "key": false,
@@ -1654,8 +1681,9 @@
        "tp": 4,
        "texto": "En el TP4 versionaste los prompts en un PromptSpec con sha256: cada número reportado dice qué prompt lo produjo.",
        "tp_titulo": "El agente de admisión de guardia (TP final)",
-       "code": "tp4-promptspec-sha256",
-       "nota": ""
+       "code": "tp4-promptspec-sha256,tp4-promptspec-cargar,tp4-entrega-fabricas,tp4-manifiesto-prompt",
+       "ncode": 4,
+       "nota": "El hash se calcula en `PromptSpec`, se verifica al cargar, la entrega carga el prompt validado y cada evaluación lo guarda en su manifiesto."
       }
      ],
      "ver": [],
@@ -1706,7 +1734,8 @@
        "cnn": "13",
        "i": 5,
        "title": "El ritmo: los benchmarks se agotan",
-       "por": "Los benchmarks se agotan"
+       "por": "Los benchmarks se agotan",
+       "extra": false
       }
      ],
      "key": false,
@@ -2328,7 +2357,113 @@
      "slug": "prompting",
      "i": 3,
      "title": "¿Qué se guarda en un prompt?",
+     "extra": false,
      "url": "/clases/05/#d=prompting&s=3"
+    },
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 41,
+     "title": "El contexto se degrada",
+     "extra": false,
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=41"
+    }
+   ],
+   "nusos": 2
+  },
+  {
+   "id": "medir-contexto-script",
+   "titulo": "Medir el contexto de cada prompt sin GPU",
+   "archivo": "scripts/medir_contexto.py",
+   "desde": 21,
+   "hasta": 41,
+   "lenguaje": "python",
+   "codigo": "def medir(trazas: list[dict], prompts: list[PromptSpec], origen: PromptSpec) -> dict:\n    base = []\n    for numero, traza in enumerate(trazas, 1):\n        if rejugar_traza(traza, origen, origen) != traza[\"mensajes\"]:\n            raise ValueError(f\"traza {numero}: el prompt de origen no reproduce la conversación grabada\")\n        base.append(caracteres_de_contexto(traza[\"mensajes\"]))\n    resultado = {\"casos\": len(trazas), \"origen\": origen.nombre, \"prompts\": {}}\n    for prompt in prompts:\n        conversaciones = [rejugar_traza(traza, prompt, origen) for traza in trazas]\n        valores = [caracteres_de_contexto(c) for c in conversaciones]\n        partes = {parte: sum(desglose(c, prompt)[parte] for c in conversaciones) for parte in PARTES}\n        ahorros = [1 - v / b for v, b in zip(valores, base) if b]\n        resultado[\"prompts\"][prompt.nombre] = {\n            \"sha256\": prompt.sha256,\n            \"caracteres_por_caso\": round(statistics.mean(valores)),\n            \"ahorro_total\": round(1 - sum(valores) / sum(base), 4),\n            \"ahorro_por_caso_min\": round(min(ahorros), 4),\n            \"ahorro_por_caso_max\": round(max(ahorros), 4),\n            \"participacion\": {k: round(v / sum(valores), 4) for k, v in partes.items()},\n        }\n    return resultado",
+   "que_hace": "Rejuega trazas grabadas con distintos `PromptSpec` y calcula caracteres por caso, ahorro y la participación de cada parte del contexto.",
+   "como_funciona": "- Primero verifica que el prompt de origen reproduzca exacto cada conversación (`rejugar_traza`).\n- Para cada prompt rejuega las mismas respuestas y observaciones.\n- `desglose(c, prompt)` reparte los caracteres entre sistema, búsquedas, etc.\n- Devuelve `participacion` por parte y el ahorro mínimo/máximo por caso.",
+   "proposito": "Permite medir cuánto cuesta un prompt sin cargar el modelo: las respuestas son las grabadas, solo cambia el texto inyectado.",
+   "interaccion": "Usa `rejugar_traza` y `desglose` de `admision_tp/contexto.py` y `caracteres_de_contexto` del kit; sus números son los de `docs/informe/optimizacion-prompt.md`.",
+   "teoria": "Qué ocupa la ventana de contexto: medirlo por tipo de mensaje antes de optimizar.",
+   "key": "tp4-medir-contexto-script",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 5,
+     "cnn": "05",
+     "slug": "prompting",
+     "i": 3,
+     "title": "¿Qué se guarda en un prompt?",
+     "extra": false,
+     "url": "/clases/05/#d=prompting&s=3"
+    }
+   ],
+   "nusos": 1
+  },
+  {
+   "id": "reparto-contexto-doc",
+   "titulo": "Reparto medido: sistema 55 %, búsquedas 25 %",
+   "archivo": "docs/informe/optimizacion-prompt.md",
+   "desde": 338,
+   "hasta": 366,
+   "lenguaje": "markdown",
+   "codigo": "**Dónde está el contexto.** `python -m scripts.medir_contexto --trazas <trazas.jsonl> --prompt <spec>`\nrejuega trazas ya jugadas con otro `PromptSpec` (mismas respuestas y observaciones) y reparte\n`caracteres_de_contexto` del kit por tipo de mensaje. Antes de comparar, exige que el prompt de\norigen reproduzca exactamente cada conversación grabada. Sobre las 100 trazas v22 (Kaggle T4,\nGemma sin entrenar, 50 casos × buscadores `baseline` y `prefijos`; artefactos locales no versionados):\n\n| Parte | `baseline` | `prefijos` |\n|---|---:|---:|\n| Mensaje de sistema | 55,0 % | 54,2 % |\n| Búsquedas | 24,8 % | 25,7 % |\n| Otras observaciones | 13,4 % | 13,3 % |\n| Respuestas del modelo | 5,0 % | 5,1 % |\n| Mensaje inicial | 1,8 % | 1,7 % |\n| Caracteres por caso | 19.954 | 20.689 |\n\nEl mensaje de sistema (2.232 caracteres) se reenvía en cada turno: es la palanca principal. Con\nlos ~5 turnos medios de v22 (máximo 8), cada 100 caracteres menos de sistema ahorran ~2,5 % por caso.\n\nCandidatos de formato que controla el agente (ahorro total sobre `caracteres_de_contexto`, mismas trazas):\n\n| Candidato | `baseline` | `prefijos` | Decisión |\n|---|---:|---:|---|\n| `{herramienta}:\\n{observacion}` | 0,67 % | 0,67 % | No adoptado: sin pérdida, pero no justifica regenerar #8 |\n| `[{herramienta}]\\n{observacion}` | 0,62 % | 0,62 % | No adoptado: ídem |\n| `{observacion}` sin herramienta | 1,43 % | 1,45 % | No adoptado: exige relajar `PromptSpec` y debilita la validación herramienta/observación de #8 |\n| Unir líneas en blanco de las observaciones | 0,10 % | 0,10 % | No adoptado: cambia la presentación del buscador (#6) |\n| Reemplazar secciones ya mostradas por una referencia | 0,05 % | 0,79 % | No adoptado: cambia la presentación del buscador (#6) |\n\nSupuesto: el modelo responde lo mismo con el formato nuevo; la medición es de formato, no de conducta.",
+   "que_hace": "Resultado de `scripts.medir_contexto` sobre 100 trazas: qué porcentaje del contexto ocupa cada parte con `baseline` y `prefijos`.",
+   "como_funciona": "- Tabla: mensaje de sistema 55,0 %, búsquedas 24,8 %, otras observaciones 13,4 %, respuestas 5 %.\n- El sistema (2.232 caracteres) se reenvía en cada turno: cada 100 caracteres menos ahorran ~2,5 % por caso.\n- Candidatos de formato de observación ahorran menos de 1,5 % y no se adoptaron.",
+   "proposito": "Justifica dónde optimizar: no en el formato de las observaciones sino en el mensaje de sistema.",
+   "interaccion": "Las cifras salen de `admision_tp/contexto.desglose`; la conclusión orienta el trabajo de prompts (#13) y el contrato con `PromptSpec`.",
+   "teoria": "El contexto se degrada y se encarece con su tamaño: medir su composición es el primer paso para recortarlo.",
+   "key": "tp4-reparto-contexto-doc",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 5,
+     "cnn": "05",
+     "slug": "prompting",
+     "i": 3,
+     "title": "¿Qué se guarda en un prompt?",
+     "extra": false,
+     "url": "/clases/05/#d=prompting&s=3"
+    },
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 41,
+     "title": "El contexto se degrada",
+     "extra": false,
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=41"
+    }
+   ],
+   "nusos": 2
+  },
+  {
+   "id": "modelo-medir-contexto",
+   "titulo": "Medir tokens con el mismo chat template",
+   "archivo": "admision_tp/modelo.py",
+   "desde": 49,
+   "hasta": 60,
+   "lenguaje": "python",
+   "codigo": "    def medir_contexto(self, conversacion: list[dict]) -> tuple[int, int]:\n        \"\"\"Tokens de entrada de una conversación y máximo admitido para que `__call__` no falle.\n\n        Usa el mismo chat template que la generación; con padding a izquierda, el ancho de un\n        lote es el de su conversación más larga, así que si cada una entra, el lote entra.\n        \"\"\"\n        # Como lote de uno, igual que en `__call__`: `input_ids` es siempre una lista por conversación.\n        entradas = self.procesador.apply_chat_template(\n            [conversacion], tokenize=True, add_generation_prompt=True, enable_thinking=False,\n            truncation=False, return_dict=True)\n        limite = self.configuracion.max_contexto - self.configuracion.max_tokens_nuevos\n        return len(entradas[\"input_ids\"][0]), limite",
+   "que_hace": "Cuenta los tokens de entrada de una conversación y devuelve el límite que admite el modelo.",
+   "como_funciona": "- Aplica `apply_chat_template` igual que la generación (`add_generation_prompt=True`, sin truncar).\n- `limite = max_contexto - max_tokens_nuevos`: deja lugar para la respuesta.\n- Devuelve `(tokens, limite)`.",
+   "proposito": "Contar caracteres no alcanza: el corte tiene que medirse en tokens y con la misma plantilla que va a ver el modelo.",
+   "interaccion": "Lo usa `AgentePrompt._activas` (vía `getattr(self.modelo_lote, \"medir_contexto\")`) antes de cada llamada al modelo; los límites vienen de `Configuracion`.",
+   "teoria": "La ventana de contexto se mide en tokens e incluye los que el modelo va a generar.",
+   "key": "tp4-modelo-medir-contexto",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 5,
+     "cnn": "05",
+     "slug": "prompting",
+     "i": 4,
+     "title": "Ventana de contexto",
+     "extra": false,
+     "url": "/clases/05/#d=prompting&s=4"
     }
    ],
    "nusos": 1
@@ -2356,10 +2491,114 @@
      "slug": "prompting",
      "i": 4,
      "title": "Ventana de contexto",
+     "extra": false,
      "url": "/clases/05/#d=prompting&s=4"
     }
    ],
    "nusos": 1
+  },
+  {
+   "id": "modelo-generar",
+   "titulo": "Generación local por lotes",
+   "archivo": "admision_tp/modelo.py",
+   "desde": 62,
+   "hasta": 92,
+   "lenguaje": "python",
+   "codigo": "    def __call__(self, conversaciones: list[list[dict]]) -> list[str]:\n        if not conversaciones:\n            return []\n        import torch\n\n        respuestas = []\n        for inicio in range(0, len(conversaciones), self.configuracion.lote):\n            lote = conversaciones[inicio:inicio + self.configuracion.lote]\n            entradas = self.procesador.apply_chat_template(\n                lote, tokenize=True, add_generation_prompt=True, enable_thinking=False,\n                padding=True, truncation=False, return_dict=True, return_tensors=\"pt\")\n            ancho = entradas[\"input_ids\"].shape[-1]\n            if ancho + self.configuracion.max_tokens_nuevos > self.configuracion.max_contexto:\n                raise ValueError(\"Contexto excedido: no se recorta la conversación silenciosamente\")\n            medir = self.configuracion.metricas is not None\n            if medir:\n                for gpu in range(torch.cuda.device_count()):\n                    torch.cuda.reset_peak_memory_stats(gpu)\n                inicio_lote = time.perf_counter()\n            entradas = entradas.to(self.modelo.device)\n            with torch.inference_mode():\n                salida = self.modelo.generate(**entradas, do_sample=False,\n                    max_new_tokens=self.configuracion.max_tokens_nuevos)\n            generados = salida[:, ancho:]\n            textos = self.procesador.batch_decode(generados, skip_special_tokens=True)\n            if len(textos) != len(lote):\n                raise RuntimeError(\"El modelo no devolvió una respuesta por conversación\")\n            if medir:\n                self._registrar(torch, entradas, generados, ancho, time.perf_counter() - inicio_lote)\n            respuestas.extend(textos)\n        return respuestas",
+   "que_hace": "Genera la próxima respuesta de varias conversaciones a la vez con Gemma local, en greedy, y devuelve solo el texto nuevo.",
+   "como_funciona": "- Parte las conversaciones en lotes de `configuracion.lote`.\n- `apply_chat_template` con padding y sin truncar; si `ancho + max_tokens_nuevos` excede `max_contexto`, lanza error.\n- `generate(do_sample=False)` bajo `inference_mode`.\n- Recorta los tokens de entrada (`salida[:, ancho:]`) y decodifica.",
+   "proposito": "El modelo no conoce las herramientas: solo devuelve texto. Toda la lógica del agente queda en `AgentePrompt`.",
+   "interaccion": "Lo llama `AgentePrompt.jugar_lote` con las conversaciones activas; las respuestas van a `_PartidaPrompt.recibir`. Lo construye `ModeloLocal.cargar` desde `entrega.construir_agente`.",
+   "teoria": "Inferencia local de un LLM: el mismo cálculo que una API, pero en GPU propia y sin servicios externos.",
+   "key": "tp4-modelo-generar",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 5,
+     "cnn": "05",
+     "slug": "prompting",
+     "i": 4,
+     "title": "Ventana de contexto",
+     "extra": false,
+     "url": "/clases/05/#d=prompting&s=4"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 42,
+     "title": "Calcular: la misma cuenta por la API",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=42"
+    }
+   ],
+   "nusos": 2
+  },
+  {
+   "id": "modelo-llm-openrouter",
+   "titulo": "El LLM: ChatOpenAI contra OpenRouter, temperatura 0",
+   "archivo": "hospital/agente/modelo.py",
+   "desde": 1,
+   "hasta": 33,
+   "lenguaje": "python",
+   "codigo": "\"\"\"El LLM de los agentes: ChatOpenAI de langchain-openai apuntando a OpenRouter.\"\"\"\nimport os\nfrom pathlib import Path\n\nMODELO = \"deepseek/deepseek-v4-flash-0731\"\nPRECIO_ENTRADA = 0.04 / 1e6  # USD por token; solo si OpenRouter no informa el costo\nPRECIO_SALIDA = 0.64 / 1e6\nRAIZ = Path(__file__).resolve().parents[2]\n\n\ndef cargar_env(ruta=RAIZ / \".env\"):\n    \"\"\"Carga VARIABLE=valor de .env sin pisar lo que ya está en el entorno.\"\"\"\n    if Path(ruta).exists():\n        for linea in Path(ruta).read_text(encoding=\"utf-8\").splitlines():\n            if \"=\" in linea and not linea.lstrip().startswith(\"#\"):\n                k, v = linea.split(\"=\", 1)\n                os.environ.setdefault(k.strip(), v.strip().strip(\"'\\\"\"))\n\n\ndef crear_llm():\n    from langchain_openai import ChatOpenAI\n\n    cargar_env()\n    if not os.environ.get(\"OPENROUTER_API_KEY\"):\n        raise SystemExit(\"falta OPENROUTER_API_KEY (en el entorno o en .env)\")\n    return ChatOpenAI(\n        model=MODELO,\n        base_url=\"https://openrouter.ai/api/v1\",\n        api_key=os.environ[\"OPENROUTER_API_KEY\"],\n        temperature=0,\n        max_retries=3,\n        extra_body={\"usage\": {\"include\": True}},  # OpenRouter devuelve el costo de cada llamada\n    )",
+   "que_hace": "Crea el modelo de chat del agente: `deepseek/deepseek-v4-flash-0731` vía OpenRouter con la interfaz `ChatOpenAI`, temperatura 0 y costo informado por llamada.",
+   "como_funciona": "- `PRECIO_ENTRADA` y `PRECIO_SALIDA` (USD por token) sirven de respaldo si OpenRouter no informa el costo.\n- `cargar_env` carga variables de `.env` sin pisar el entorno (la clave nunca está en el código).\n- `crear_llm` corta si falta `OPENROUTER_API_KEY` y devuelve `ChatOpenAI(..., base_url=\"https://openrouter.ai/api/v1\", temperature=0, max_retries=3)`.\n- `extra_body={\"usage\": {\"include\": True}}` pide a OpenRouter el costo de cada llamada.",
+   "proposito": "Temperatura 0 hace que el decodificado elija siempre el token más probable, para que las corridas sean lo más comparables posible (aunque el INFORME muestra que la consulta igual varió entre corridas). OpenRouter permite usar cualquier modelo con la API de OpenAI.",
+   "interaccion": "`agente.py` llama a `crear_llm()` y le pasa el LLM a `correr()`; `corrida._usage` usa los precios de respaldo.",
+   "teoria": "Generación autoregresiva token a token; temperatura 0 = decodificación greedy. Costo = tokens de entrada × precio + tokens de salida × precio.",
+   "key": "tp3-modelo-llm-openrouter",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 5,
+     "cnn": "05",
+     "slug": "prompting",
+     "i": 8,
+     "title": "La fórmula del costo",
+     "extra": false,
+     "url": "/clases/05/#d=prompting&s=8"
+    },
+    {
+     "clase": 5,
+     "cnn": "05",
+     "slug": "prompting",
+     "i": 14,
+     "title": "Limitaciones de los LLM",
+     "extra": false,
+     "url": "/clases/05/#d=prompting&s=14"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "palabra-al-transformer",
+     "i": 32,
+     "title": "El ciclo de un LLM, token a token",
+     "extra": false,
+     "url": "/clases/07/#d=palabra-al-transformer&s=32"
+    },
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
+     "i": 36,
+     "title": "El mapa de la familia",
+     "extra": false,
+     "url": "/clases/08/#d=transformers-a-fondo&s=36"
+    },
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 19,
+     "title": "Una tool en código",
+     "extra": false,
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=19"
+    }
+   ],
+   "nusos": 5
   },
   {
    "id": "corrida-usage-resumen",
@@ -2384,10 +2623,76 @@
      "slug": "prompting",
      "i": 8,
      "title": "La fórmula del costo",
+     "extra": false,
      "url": "/clases/05/#d=prompting&s=8"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 69,
+     "title": "Analítica en producción",
+     "extra": false,
+     "url": "/clases/06/#d=rag-y-mcp&s=69"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 29,
+     "title": "Analítica en producción",
+     "extra": false,
+     "url": "/clases/07/#d=rag-mcp-rapida&s=29"
     }
    ],
-   "nusos": 1
+   "nusos": 3
+  },
+  {
+   "id": "corrida-log-md",
+   "titulo": "El log .md de cada corrida",
+   "archivo": "hospital/agente/corrida.py",
+   "desde": 70,
+   "hasta": 95,
+   "lenguaje": "python",
+   "codigo": "def _log_pregunta(p, mensajes, r, segundos, error):\n    out = [f\"## {p['id']}: {p['pregunta']}\", \"\"]\n    if error:\n        out += [f\"**Error:** `{error}`\", \"\"]\n    resultados = {m.tool_call_id: m for m in mensajes if isinstance(m, ToolMessage)}\n    paso = 0\n    for m in mensajes:\n        if not isinstance(m, AIMessage):\n            continue\n        u = r[\"llamadas_modelo\"][paso]\n        paso += 1\n        costo = f\"USD {u['costo']:.6f}\" + (\" (estimado)\" if u[\"costo_estimado\"] else \"\")\n        out += [f\"### Llamada al modelo {paso}\", \"\",\n                f\"- Tokens: entrada {u['tokens_entrada']} (cache {u['tokens_cache']}), \"\n                f\"salida {u['tokens_salida']} (razonamiento {u['tokens_razonamiento']})\",\n                f\"- Costo: {costo}\", f\"- Generación: `{u['id']}`\", \"\"]\n        if texto(m.content).strip():\n            out += [\"Texto del modelo:\", \"\", \"> \" + texto(m.content).strip().replace(\"\\n\", \"\\n> \"), \"\"]\n        for c in m.tool_calls:\n            res = resultados.get(c[\"id\"])\n            out += [f\"**Herramienta** `{c['name']}` con argumentos `{json.dumps(c['args'], ensure_ascii=False)}`\", \"\",\n                    \"```\", texto(res.content) if res else \"(sin resultado)\", \"```\", \"\"]\n    out += [\"**Respuesta final:**\", \"\", r[\"respuesta\"] or \"(vacía)\", \"\",\n            f\"_Herramientas: {', '.join(r['herramientas']) or 'ninguna'} · llamadas al modelo: {len(r['llamadas_modelo'])} · \"\n            f\"tokens {r['tokens_entrada']} / {r['tokens_salida']} · USD {r['costo']:.6f} · {segundos:.1f} s_\", \"\"]\n    return out",
+   "que_hace": "Escribe, por pregunta, cada llamada al modelo con tokens, costo e id de generación, cada herramienta con sus argumentos y su resultado completo, y la respuesta final.",
+   "como_funciona": "- Indexa los `ToolMessage` por `tool_call_id` para emparejar cada llamada con su resultado.\n- Por cada `AIMessage` agrega «Llamada al modelo N» con tokens (cache y razonamiento), costo y `Generación`.\n- Si el modelo escribió texto, lo cita; por cada `tool_call` escribe nombre, argumentos JSON y el resultado en un bloque de código.\n- Cierra con la respuesta final y una línea de totales (tools, llamadas, tokens, USD, segundos).",
+   "proposito": "Es la analítica de la corrida: gracias a este log se diagnosticó A11 (la consulta que redactó el modelo no traía la sección correcta) sin adivinar.",
+   "interaccion": "Lo llama `correr()`, que junta las secciones con una cabecera de totales y lo guarda en `experimentos/corridas/agente_<fecha>.md`.",
+   "teoria": "Observabilidad en producción: registrar llamadas, argumentos, resultados, tokens y costo para depurar y controlar gasto.",
+   "key": "tp3-corrida-log-md",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 5,
+     "cnn": "05",
+     "slug": "prompting",
+     "i": 8,
+     "title": "La fórmula del costo",
+     "extra": false,
+     "url": "/clases/05/#d=prompting&s=8"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 69,
+     "title": "Analítica en producción",
+     "extra": false,
+     "url": "/clases/06/#d=rag-y-mcp&s=69"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 29,
+     "title": "Analítica en producción",
+     "extra": false,
+     "url": "/clases/07/#d=rag-mcp-rapida&s=29"
+    }
+   ],
+   "nusos": 3
   },
   {
    "id": "informe-a11",
@@ -2412,6 +2717,7 @@
      "slug": "prompting",
      "i": 14,
      "title": "Limitaciones de los LLM",
+     "extra": false,
      "url": "/clases/05/#d=prompting&s=14"
     },
     {
@@ -2420,6 +2726,7 @@
      "slug": "rag-y-mcp",
      "i": 29,
      "title": "Tres síntomas de que falta una etapa",
+     "extra": false,
      "url": "/clases/06/#d=rag-y-mcp&s=29"
     },
     {
@@ -2428,10 +2735,20 @@
      "slug": "rag-mcp-rapida",
      "i": 31,
      "title": "Poco y bien elegido",
+     "extra": false,
      "url": "/clases/07/#d=rag-mcp-rapida&s=31"
+    },
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 20,
+     "title": "Principios para diseñar tools",
+     "extra": false,
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=20"
     }
    ],
-   "nusos": 3
+   "nusos": 4
   },
   {
    "id": "prompt-sistema",
@@ -2456,6 +2773,7 @@
      "slug": "prompting",
      "i": 17,
      "title": "Mitigar alucinaciones: el prompt",
+     "extra": false,
      "url": "/clases/05/#d=prompting&s=17"
     },
     {
@@ -2464,6 +2782,7 @@
      "slug": "rag-y-mcp",
      "i": 2,
      "title": "RAG suma lo que no está en los pesos",
+     "extra": false,
      "url": "/clases/06/#d=rag-y-mcp&s=2"
     },
     {
@@ -2472,23 +2791,188 @@
      "slug": "cierre-magnifica-humanitas",
      "i": 25,
      "title": "De la alucinación al engaño funcional",
+     "extra": false,
      "url": "/clases/13/#d=cierre-magnifica-humanitas&s=25"
     }
    ],
    "nusos": 3
   },
   {
+   "id": "bucle-tool-calling",
+   "titulo": "El bucle de tool calling escrito a mano",
+   "archivo": "hospital/agente/bucle.py",
+   "desde": 25,
+   "hasta": 48,
+   "lenguaje": "python",
+   "codigo": "async def _ejecutar(por_nombre, llamada):\n    tool = por_nombre.get(llamada[\"name\"])\n    if tool is None:\n        return ToolMessage(f\"Error: la herramienta '{llamada['name']}' no existe. Herramientas disponibles: \"\n                           f\"{', '.join(sorted(por_nombre))}.\", tool_call_id=llamada[\"id\"], name=llamada[\"name\"])\n    try:\n        return await tool.ainvoke({**llamada, \"type\": \"tool_call\"})\n    except Exception as e:  # el error vuelve al modelo como texto para que pueda corregirse\n        return ToolMessage(f\"Error al ejecutar {llamada['name']}: {e}\", tool_call_id=llamada[\"id\"], name=llamada[\"name\"])\n\n\nasync def responder(llm, tools, pregunta):\n    \"\"\"Devuelve todos los mensajes de la conversación: sistema, pregunta, AIMessage y ToolMessage.\"\"\"\n    llm_con_tools = llm.bind_tools(tools)\n    por_nombre = {t.name: t for t in tools}\n    mensajes = [SystemMessage(PROMPT), HumanMessage(pregunta)]\n    for _ in range(MAX_PASOS):\n        ai = await llm_con_tools.ainvoke(mensajes)\n        mensajes.append(ai)\n        if not ai.tool_calls:\n            break\n        for llamada in ai.tool_calls:\n            mensajes.append(await _ejecutar(por_nombre, llamada))\n    return mensajes",
+   "que_hace": "Implementa el agente: el modelo pide herramientas, se ejecutan, sus resultados vuelven como `ToolMessage` y se repite hasta que responde sin pedir nada o se llega a 6 pasos.",
+   "como_funciona": "- `responder` enlaza las tools con `llm.bind_tools(tools)` y arma `por_nombre`.\n- Arranca con `[SystemMessage(PROMPT), HumanMessage(pregunta)]`.\n- En cada paso: `ai = await llm_con_tools.ainvoke(mensajes)`; si `ai.tool_calls` está vacío, termina.\n- Si no, ejecuta cada llamada con `_ejecutar` y agrega el `ToolMessage` (puede haber varias en paralelo en el mismo paso).\n- `_ejecutar` devuelve un `ToolMessage` de error si la tool no existe o lanza una excepción.",
+   "proposito": "Se escribió a mano, sin LangGraph ni AgentExecutor, para tener todos los mensajes y poder loguearlos. Es agnóstico del origen de las tools: el docstring lo prepara para las de `langchain-mcp-adapters` (parte 3, pendiente).",
+   "interaccion": "Lo llama `correr()` en `hospital/agente/corrida.py` por cada pregunta; devuelve la lista completa de mensajes, que `resumir()` convierte en respuesta, contextos, herramientas y costo. `tests/test_agente.py` lo prueba con un modelo falso.",
+   "teoria": "Agente ReAct / ciclo de vida de una tool: AIMessage con tool_calls → ejecución → ToolMessage → nueva llamada al modelo.",
+   "key": "tp3-bucle-tool-calling",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "introduccion",
+     "i": 62,
+     "title": "El futuro: agentes autónomos e IA multimodal",
+     "extra": false,
+     "url": "/clases/01/#d=introduccion&s=62"
+    },
+    {
+     "clase": 2,
+     "cnn": "02",
+     "slug": "cowork-intro",
+     "i": 25,
+     "title": "Cómo el agente descubre y usa una herramienta",
+     "extra": false,
+     "url": "/clases/02/#d=cowork-intro&s=25"
+    },
+    {
+     "clase": 5,
+     "cnn": "05",
+     "slug": "prompting",
+     "i": 17,
+     "title": "Mitigar alucinaciones: el prompt",
+     "extra": false,
+     "url": "/clases/05/#d=prompting&s=17"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 3,
+     "title": "Recuperar, aumentar, generar",
+     "extra": false,
+     "url": "/clases/06/#d=rag-y-mcp&s=3"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 54,
+     "title": "El ciclo de vida de una herramienta MCP",
+     "extra": false,
+     "url": "/clases/06/#d=rag-y-mcp&s=54"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 57,
+     "title": "Demo: un servidor MCP mínimo",
+     "extra": false,
+     "url": "/clases/06/#d=rag-y-mcp&s=57"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 5,
+     "title": "Como herramienta: el agente decide cuándo buscar",
+     "extra": false,
+     "url": "/clases/07/#d=rag-mcp-rapida&s=5"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 19,
+     "title": "Herramienta hardcodeada o servidor aparte",
+     "extra": false,
+     "url": "/clases/07/#d=rag-mcp-rapida&s=19"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 20,
+     "title": "El ciclo de vida de una herramienta",
+     "extra": false,
+     "url": "/clases/07/#d=rag-mcp-rapida&s=20"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 25,
+     "title": "Cuatro principios de diseño",
+     "extra": false,
+     "url": "/clases/07/#d=rag-mcp-rapida&s=25"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 36,
+     "title": "El circuito con un agente",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=36"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 49,
+     "title": "MCP: lo que aprende el modelo",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=49"
+    },
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 14,
+     "title": "Workflow o agente",
+     "extra": false,
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=14"
+    },
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 19,
+     "title": "Una tool en código",
+     "extra": false,
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=19"
+    },
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 26,
+     "title": "ReAct en LangGraph",
+     "extra": false,
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=26"
+    },
+    {
+     "clase": 13,
+     "cnn": "13",
+     "slug": "cierre-magnifica-humanitas",
+     "i": 25,
+     "title": "De la alucinación al engaño funcional",
+     "extra": false,
+     "url": "/clases/13/#d=cierre-magnifica-humanitas&s=25"
+    }
+   ],
+   "nusos": 16
+  },
+  {
    "id": "guarda-practica",
    "titulo": "Guarda: nunca optimizar con práctica",
    "archivo": "admision_tp/experimentos_prompt.py",
-   "desde": 135,
-   "hasta": 158,
+   "desde": 149,
+   "hasta": 172,
    "lenguaje": "python",
    "codigo": "def _verificar_origen(casos, esperadas, normas, proposito) -> dict:\n    \"\"\"Guardas previas a copiar cualquier entrada; devuelve qué se verificó.\n\n    Las rutas se resuelven (incluidos symlinks) antes de comparar con ``practica/``. El\n    chequeo del kit se corre sobre las rutas ORIGINALES: la copia en ``salida/entradas``\n    nunca tiene esperadas al lado y por eso no lo dispararía.\n    \"\"\"\n    if proposito not in PROPOSITOS:\n        raise ValueError(f\"propósito inválido; usar uno de {', '.join(PROPOSITOS)}\")\n    practica = _PRACTICA.resolve()\n    en_practica = []\n    for nombre, ruta in ((\"casos\", casos), (\"esperadas\", esperadas)):\n        resuelta = Path(ruta).resolve()\n        if resuelta == practica or practica in resuelta.parents:\n            en_practica.append(nombre)\n    if proposito == \"plomeria\":\n        # Solo plomería puede usar práctica; la copia aislada sigue revisada por `jugar`.\n        return {\"datos_practica\": en_practica, \"esperadas_al_alcance\": \"omitida_plomeria\"}\n    if en_practica:\n        raise ValueError(\n            f\"{' y '.join(en_practica)} dentro de practica/: nunca se evalúan ni optimizan prompts \"\n            \"con práctica; para probar solo la plomería usar --solo-plomeria\")\n    revisar_que_no_haya_esperadas(Path(normas), Path(casos))\n    return {\"datos_practica\": [], \"esperadas_al_alcance\": \"verificada_en_origen\"}",
    "que_hace": "Antes de una corrida de evaluación de prompts, rechaza casos o esperadas que estén dentro de `practica/` y verifica que no haya respuestas esperadas al alcance del agente.",
    "como_funciona": "- Valida `proposito` (`evaluacion` o `plomeria`).\n- Resuelve rutas (incluidos symlinks) y comprueba si caen bajo `_PRACTICA`.\n- En `plomeria` (solo probar que el pipeline anda) lo permite y lo registra.\n- En `evaluacion` lanza `ValueError` si hay práctica y corre `revisar_que_no_haya_esperadas` del kit sobre las rutas originales.",
    "proposito": "Materializa la decisión de elegir prompts en un conjunto prompt-dev propio y dejar la práctica solo para reportar una vez, para no sobreajustar al conjunto de evaluación.",
-   "interaccion": "La llama el runner de evaluación de prompts antes de copiar entradas; el resultado queda en el manifiesto (`guardas`). Sus métricas pasan por `evaluacion_prompts.calcular_metricas_candidato`.",
+   "interaccion": "La llama `ejecutar_evaluacion_prompt` (mismo archivo) antes de copiar cualquier entrada; el resultado queda en el manifiesto (`guardas`). Sus métricas pasan por `evaluacion_prompts.calcular_metricas_candidato`.",
    "teoria": "Separación de conjuntos: desarrollo para elegir, evaluación solo para medir; usar el test para elegir infla los resultados.",
    "key": "tp4-guarda-practica",
    "tp": 4,
@@ -2500,6 +2984,7 @@
      "slug": "modelado-redes-neuronales",
      "i": 17,
      "title": "Los tres, lado a lado",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=17"
     },
     {
@@ -2508,15 +2993,128 @@
      "slug": "prompting",
      "i": 18,
      "title": "Mitigar alucinaciones: el proceso",
+     "extra": false,
      "url": "/clases/05/#d=prompting&s=18"
     }
    ],
    "nusos": 2
   },
   {
+   "id": "evaluacion-prompt-runner",
+   "titulo": "Evaluar un prompt: guarda, jugar y después puntuar",
+   "archivo": "admision_tp/experimentos_prompt.py",
+   "desde": 244,
+   "hasta": 286,
+   "lenguaje": "python",
+   "codigo": "    config = spec = None\n    hashes_entrada = {}\n    guardas = None\n    try:\n        guardas = _verificar_origen(casos, esperadas, normas, proposito)\n        codigo = _codigo()\n        prompt_bytes = _copiar_archivo(prompt, entradas / \"prompt.json\")\n        config_bytes = _copiar_archivo(configuracion, entradas / \"configuracion.json\")\n        casos_bytes = _copiar_archivo(casos, entradas / \"casos.jsonl\")\n        hashes_entrada.update({\n            \"prompt.json\": _sha(prompt_bytes),\n            \"configuracion.json\": _sha(config_bytes),\n            \"casos.jsonl\": _sha(casos_bytes),\n        })\n        hashes_entrada[\"normas\"] = _copiar_normas(normas, entradas / \"normas\")\n        spec = PromptSpec.cargar(entradas / \"prompt.json\")\n        config = ConfiguracionEvaluacionPrompt.cargar(entradas / \"configuracion.json\")\n        casos_cargados = _cargar_entradas_jsonl(cargar_casos, entradas / \"casos.jsonl\", \"casos\")\n        ids = [caso.id for caso in casos_cargados]\n        if not ids or len(ids) != len(set(ids)):\n            raise ValueError(\"los casos deben tener ids únicos y no estar vacíos\")\n\n        if (modelo_lote is None) != (tokenizer is None):\n            raise ValueError(\"modelo_lote y tokenizer deben inyectarse juntos\")\n        if modelo_lote is None:\n            modelo_lote = _cargar_modelo_real(config)\n            tokenizer = modelo_lote.procesador\n        longitud = medir_longitud_prompt(spec, tokenizer)\n        entrega = _EntregaCandidata(spec, config, modelo_lote)\n\n        # En este punto no existe ningún snapshot de esperadas en la corrida.\n        trazas = jugar(entrega, casos_cargados, entradas / \"normas\", salida,\n                       ruta_casos=entradas / \"casos.jsonl\")\n        tiempos = json.loads((salida / \"tiempos.json\").read_text(encoding=\"utf-8\"))\n\n        # Se lee una sola vez después de jugar; esta copia exacta es la que se puntúa.\n        esperadas_bytes = _copiar_archivo(esperadas, entradas / \"esperadas.jsonl\")\n        hashes_entrada[\"esperadas.jsonl\"] = _sha(esperadas_bytes)\n        esperadas_cargadas = _cargar_entradas_jsonl(\n            cargar_esperadas, entradas / \"esperadas.jsonl\", \"esperadas\")\n        if set(esperadas_cargadas) != set(ids):\n            raise ValueError(\"casos y esperadas deben tener exactamente los mismos ids\")\n        resultados, resumen = puntuar(trazas, esperadas_cargadas, salida, tiempos)",
+   "que_hace": "Corre la evaluación de un prompt candidato: verifica el origen de los datos, copia las entradas con hash, juega los casos y recién después lee las esperadas.",
+   "como_funciona": "- `_verificar_origen` corre antes de copiar nada: si los casos vienen de `practica/`, falla.\n- Copia prompt, configuración, casos y normas a `salida/entradas` con su sha256.\n- `jugar(...)` juega con `_EntregaCandidata` sin que exista ninguna esperada en la corrida.\n- Después copia las esperadas, verifica que los ids coincidan y llama `puntuar`.",
+   "proposito": "Hace imposible optimizar prompts mirando práctica o test: la guarda es código, no una convención.",
+   "interaccion": "Lo invoca `main()` del mismo archivo (CLI `scripts/evaluar_prompts.py`); usa `jugar` y `puntuar` del kit y escribe `manifiesto.json` con `guardas`.",
+   "teoria": "Separación entre conjunto de desarrollo y de evaluación aplicada a elegir prompts.",
+   "key": "tp4-evaluacion-prompt-runner",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 17,
+     "title": "Los tres, lado a lado",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=17"
+    },
+    {
+     "clase": 5,
+     "cnn": "05",
+     "slug": "prompting",
+     "i": 18,
+     "title": "Mitigar alucinaciones: el proceso",
+     "extra": false,
+     "url": "/clases/05/#d=prompting&s=18"
+    }
+   ],
+   "nusos": 2
+  },
+  {
+   "id": "prompt-procedimiento-v1",
+   "titulo": "El prompt de la entrega: procedimiento-v1",
+   "archivo": "configuraciones/prompts/procedimiento-v1.json",
+   "desde": 1,
+   "hasta": 9,
+   "lenguaje": "json",
+   "codigo": "{\n  \"version\": 1,\n  \"nombre\": \"procedimiento-v1\",\n  \"system_prompt\": \"Sos el agente de admisión de la guardia del Hospital General de Prueba. Para cada paciente que ingresa completás su ficha de admisión siguiendo las normas del hospital. No tomás decisiones clínicas.\\n\\nHerramientas:\\n- leer_triage: Devuelve la nota de triage del paciente: edad, nivel, motivo de consulta, cómo llegó, documento y credenciales presentados, si puede responder preguntas, acompañante y si se lesionó trabajando.\\n  argumentos: {\\\"paciente_id\\\": id del paciente, por ejemplo P-1234}\\n- preguntar: Le pregunta al paciente o a su acompañante por su obra social o prepaga (tema cobertura) o por la ART de su empleador (tema art).\\n  argumentos: {\\\"paciente_id\\\": id del paciente, \\\"a_quien\\\": paciente | acompanante, \\\"tema\\\": cobertura | art}\\n- verificar_afiliacion: Consulta a la entidad si la afiliación está activa.\\n  argumentos: {\\\"entidad\\\": nombre de la entidad, tal como lo informaron, \\\"numero_afiliado\\\": número de afiliado (en una ART, el CUIL)}\\n- buscar_normativa: Busca en las normas del hospital y devuelve las 2 secciones más relevantes.\\n  argumentos: {\\\"consulta\\\": texto libre}\\n- registrar_decision: Registra la ficha de admisión. Termina el caso.\\n  argumentos: {\\\"registro\\\": definitivo | provisorio, \\\"numero_documento\\\": número del documento tal como figura en él, o null, \\\"box_antes_del_registro\\\": true si se ubica al paciente en el box antes de registrarlo, si no false, \\\"circuito\\\": ecg | codigo_acv | codigo_sepsis | ninguno, \\\"plazo_circuito_min\\\": plazo del circuito en minutos desde el ingreso, o null si no hay circuito, \\\"cobertura\\\": obra_social | prepaga | art | sin_cobertura, \\\"entidad_a_notificar\\\": nombre de la entidad a la que se notifica la atención, o null, \\\"aviso_al_voluntariado\\\": true o false, \\\"fundamentos\\\": lista de los códigos de sección que fundamentan la ficha, por ejemplo [\\\"NOR-ADM-01\\\"]}\\n\\nEn cada turno respondé solo con un objeto JSON, sin texto antes ni después:\\n{\\\"herramienta\\\": \\\"<nombre>\\\", \\\"argumentos\\\": {...}}\\nUsá una herramienta por turno. El caso termina cuando llamás a registrar_decision.\\n\\nLas normas que aplican son NOR-ADM-01 a NOR-ADM-03 (registro), NOR-COB-01 a NOR-COB-04 (coberturas) y NOR-TDE-01 a NOR-TDE-04 (circuitos tiempo-dependientes). Buscalas con buscar_normativa antes de decidir.\\n\\nLas normas del hospital contradicen lo habitual y sus valores (niveles, edades, plazos, dígitos) cambian: no decidas de memoria, aplicá lo que dicen las secciones recuperadas.\\n\\nProcedimiento:\\n1. leer_triage.\\n2. Buscá cada tema con una consulta propia, porque cada búsqueda trae pocas secciones:\\n   a. registro: documento presentado y nivel de triage;\\n   b. box antes del registro: nivel de triage y edad del paciente;\\n   c. el circuito del motivo de consulta, su plazo y el ingreso en ambulancia;\\n   d. cobertura: consulta, verificación de afiliación, ART y número de afiliado con terminación reservada.\\n3. Si no presentó credencial, preguntá por la cobertura: al acompañante si el paciente no puede responder; si no hay nadie, no preguntes. Si se lesionó trabajando o en el trayecto, preguntá por la ART.\\n4. Verificá la afiliación que corresponde según las normas antes de decidir la cobertura y la entidad a notificar.\\n5. registrar_decision, aplicando cada sección a los datos del triage.\",\n  \"mensaje_inicial\": \"Ingresó a la guardia el paciente {paciente_id}. Completá su ficha de admisión.\",\n  \"formato_observacion\": \"Resultado de {herramienta}:\\n{observacion}\",\n  \"mensaje_json_invalido\": \"No entendí tu respuesta. Respondé solo con un objeto JSON: {\\\"herramienta\\\": \\\"<nombre>\\\", \\\"argumentos\\\": {...}}\",\n  \"sha256\": \"8c692c2c67850f1448b5f4ecbda6037713110983c41b0e9da933612d2291ecdd\"\n}",
+   "que_hace": "El `PromptSpec` de la entrega: rol, descripción de las cinco herramientas, formato JSON obligatorio, advertencia sobre las normas y un procedimiento paso a paso.",
+   "como_funciona": "- `system_prompt` define el rol («agente de admisión de la guardia», sin decisiones clínicas).\n- Describe cada herramienta con sus `argumentos` en el mismo texto.\n- Pide responder solo con `{\"herramienta\": ..., \"argumentos\": ...}`, una herramienta por turno.\n- «Procedimiento» obliga a buscar cada tema con una consulta propia (registro, box, circuito, cobertura).\n- `mensaje_json_invalido` es la corrección cuando el JSON llega mal; `sha256` fija el contenido.",
+   "proposito": "El paso 2 del procedimiento es lo que lo diferencia del baseline: el agente hacía ~1,3 búsquedas por caso y se le escapaban normas.",
+   "interaccion": "Lo carga `PromptSpec.cargar` desde `entrega.cargar_prompt` (`RUTA_ENTREGA`); `_PartidaPrompt` usa `system_prompt`, `mensaje_inicial`, `formato_observacion` y `mensaje_json_invalido` en cada turno.",
+   "teoria": "Componentes de un prompt (rol, herramientas, formato de salida, instrucciones paso a paso) y salida estructurada en JSON.",
+   "key": "tp4-prompt-procedimiento-v1",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 5,
+     "cnn": "05",
+     "slug": "prompting",
+     "i": 27,
+     "title": "Los 6 componentes",
+     "extra": false,
+     "url": "/clases/05/#d=prompting&s=27"
+    },
+    {
+     "clase": 5,
+     "cnn": "05",
+     "slug": "prompting",
+     "i": 29,
+     "title": "Salidas estructuradas: JSON Schema",
+     "extra": false,
+     "url": "/clases/05/#d=prompting&s=29"
+    },
+    {
+     "clase": 5,
+     "cnn": "05",
+     "slug": "prompting",
+     "i": 46,
+     "title": "¿Por qué tardan más?",
+     "extra": false,
+     "url": "/clases/05/#d=prompting&s=46"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 5,
+     "title": "Como herramienta: el agente decide cuándo buscar",
+     "extra": false,
+     "url": "/clases/07/#d=rag-mcp-rapida&s=5"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 42,
+     "title": "Calcular: la misma cuenta por la API",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=42"
+    },
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 17,
+     "title": "Qué es una tool",
+     "extra": false,
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=17"
+    }
+   ],
+   "nusos": 6
+  },
+  {
    "id": "solo-prompt-practica",
    "titulo": "Fila solo_prompt en práctica: 10/10/7 → 14/16/12",
-   "archivo": "docs/analisis-errores.md",
+   "archivo": "docs/informe/analisis-errores.md",
    "desde": 204,
    "hasta": 228,
    "lenguaje": "markdown",
@@ -2536,6 +3134,7 @@
      "slug": "prompting",
      "i": 27,
      "title": "Los 6 componentes",
+     "extra": false,
      "url": "/clases/05/#d=prompting&s=27"
     },
     {
@@ -2544,6 +3143,7 @@
      "slug": "rag-mcp-rapida",
      "i": 5,
      "title": "Como herramienta: el agente decide cuándo buscar",
+     "extra": false,
      "url": "/clases/07/#d=rag-mcp-rapida&s=5"
     }
    ],
@@ -2567,12 +3167,31 @@
    "tp_titulo": "El agente de admisión de guardia (TP final)",
    "usos": [
     {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "introduccion",
+     "i": 18,
+     "title": "Trabajo final",
+     "extra": false,
+     "url": "/clases/01/#d=introduccion&s=18"
+    },
+    {
      "clase": 5,
      "cnn": "05",
      "slug": "prompting",
      "i": 29,
      "title": "Salidas estructuradas: JSON Schema",
+     "extra": false,
      "url": "/clases/05/#d=prompting&s=29"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 5,
+     "title": "Como herramienta: el agente decide cuándo buscar",
+     "extra": false,
+     "url": "/clases/07/#d=rag-mcp-rapida&s=5"
     },
     {
      "clase": 9,
@@ -2580,6 +3199,7 @@
      "slug": "como-se-entrena-un-llm",
      "i": 36,
      "title": "El circuito con un agente",
+     "extra": false,
      "url": "/clases/09/#d=como-se-entrena-un-llm&s=36"
     },
     {
@@ -2588,7 +3208,35 @@
      "slug": "como-se-entrena-un-llm",
      "i": 42,
      "title": "Calcular: la misma cuenta por la API",
+     "extra": false,
      "url": "/clases/09/#d=como-se-entrena-un-llm&s=42"
+    },
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 10,
+     "title": "Dos agentes, una descripción PEAS",
+     "extra": false,
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=10"
+    },
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 14,
+     "title": "Workflow o agente",
+     "extra": false,
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=14"
+    },
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 17,
+     "title": "Qué es una tool",
+     "extra": false,
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=17"
     },
     {
      "clase": 10,
@@ -2596,10 +3244,11 @@
      "slug": "agentes-y-multiagentes",
      "i": 51,
      "title": "Primero, un solo agente",
+     "extra": false,
      "url": "/clases/10/#d=agentes-y-multiagentes&s=51"
     }
    ],
-   "nusos": 4
+   "nusos": 9
   },
   {
    "id": "descripciones-tools",
@@ -2624,6 +3273,7 @@
      "slug": "cowork-intro",
      "i": 25,
      "title": "Cómo el agente descubre y usa una herramienta",
+     "extra": false,
      "url": "/clases/02/#d=cowork-intro&s=25"
     },
     {
@@ -2632,6 +3282,7 @@
      "slug": "prompting",
      "i": 33,
      "title": "Zero-shot vs. few-shot",
+     "extra": false,
      "url": "/clases/05/#d=prompting&s=33"
     },
     {
@@ -2640,7 +3291,17 @@
      "slug": "rag-y-mcp",
      "i": 10,
      "title": "Las fuentes ponen el techo de calidad",
+     "extra": false,
      "url": "/clases/06/#d=rag-y-mcp&s=10"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 29,
+     "title": "Tres síntomas de que falta una etapa",
+     "extra": false,
+     "url": "/clases/06/#d=rag-y-mcp&s=29"
     },
     {
      "clase": 6,
@@ -2648,6 +3309,7 @@
      "slug": "rag-y-mcp",
      "i": 63,
      "title": "Cuatro principios de diseño",
+     "extra": false,
      "url": "/clases/06/#d=rag-y-mcp&s=63"
     },
     {
@@ -2656,7 +3318,17 @@
      "slug": "rag-y-mcp",
      "i": 68,
      "title": "La descripción dice cuándo NO usarla",
+     "extra": false,
      "url": "/clases/06/#d=rag-y-mcp&s=68"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 25,
+     "title": "Cuatro principios de diseño",
+     "extra": false,
+     "url": "/clases/07/#d=rag-mcp-rapida&s=25"
     },
     {
      "clase": 7,
@@ -2664,7 +3336,17 @@
      "slug": "rag-mcp-rapida",
      "i": 28,
      "title": "La descripción dice cuándo NO usarla",
+     "extra": false,
      "url": "/clases/07/#d=rag-mcp-rapida&s=28"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 31,
+     "title": "Poco y bien elegido",
+     "extra": false,
+     "url": "/clases/07/#d=rag-mcp-rapida&s=31"
     },
     {
      "clase": 9,
@@ -2672,6 +3354,7 @@
      "slug": "como-se-entrena-un-llm",
      "i": 48,
      "title": "MCP: una herramienta es una definición",
+     "extra": false,
      "url": "/clases/09/#d=como-se-entrena-un-llm&s=48"
     },
     {
@@ -2680,15 +3363,16 @@
      "slug": "agentes-y-multiagentes",
      "i": 20,
      "title": "Principios para diseñar tools",
+     "extra": false,
      "url": "/clases/10/#d=agentes-y-multiagentes&s=20"
     }
    ],
-   "nusos": 8
+   "nusos": 11
   },
   {
    "id": "procedimiento-dev",
    "titulo": "procedimiento-v1 contra baseline en prompt-dev",
-   "archivo": "docs/analisis-errores.md",
+   "archivo": "docs/informe/analisis-errores.md",
    "desde": 171,
    "hasta": 202,
    "lenguaje": "markdown",
@@ -2708,6 +3392,7 @@
      "slug": "prompting",
      "i": 46,
      "title": "¿Por qué tardan más?",
+     "extra": false,
      "url": "/clases/05/#d=prompting&s=46"
     },
     {
@@ -2716,6 +3401,7 @@
      "slug": "como-se-entrena-un-llm",
      "i": 53,
      "title": "Cuándo vale la pena el fine-tuning",
+     "extra": false,
      "url": "/clases/09/#d=como-se-entrena-un-llm&s=53"
     }
    ],
@@ -2725,8 +3411,8 @@
    "id": "promptspec-sha256",
    "titulo": "PromptSpec: prompt versionado con sha256",
    "archivo": "admision_tp/prompts.py",
-   "desde": 29,
-   "hasta": 72,
+   "desde": 31,
+   "hasta": 74,
    "lenguaje": "python",
    "codigo": "@dataclass(frozen=True)\nclass PromptSpec:\n    \"\"\"Todo texto configurable que el coordinador agrega a la conversación.\n\n    El hash cubre la versión del formato y los cuatro textos que afectan al modelo.\n    `nombre` es una etiqueta humana y no modifica la identidad del contenido.\n    \"\"\"\n\n    version: int\n    nombre: str\n    system_prompt: str\n    mensaje_inicial: str\n    formato_observacion: str\n    mensaje_json_invalido: str\n\n    def __post_init__(self):\n        if type(self.version) is not int or self.version <= 0:\n            raise ValueError(\"version requiere un entero positivo\")\n        if not isinstance(self.nombre, str) or not re.fullmatch(r\"[a-z0-9][a-z0-9._-]*\", self.nombre):\n            raise ValueError(\"nombre de prompt inválido\")\n        textos = (self.system_prompt, self.mensaje_inicial,\n                  self.formato_observacion, self.mensaje_json_invalido)\n        if any(not isinstance(texto, str) or not texto.strip() for texto in textos):\n            raise ValueError(\"los textos del prompt no pueden estar vacíos\")\n        if _placeholders(self.mensaje_inicial) != {\"paciente_id\"}:\n            raise ValueError(\"mensaje_inicial requiere únicamente {paciente_id}\")\n        if _placeholders(self.formato_observacion) != {\"herramienta\", \"observacion\"}:\n            raise ValueError(\"formato_observacion requiere {herramienta} y {observacion}\")\n\n    def _contenido(self) -> dict:\n        return {\n            \"version\": self.version,\n            \"system_prompt\": self.system_prompt,\n            \"mensaje_inicial\": self.mensaje_inicial,\n            \"formato_observacion\": self.formato_observacion,\n            \"mensaje_json_invalido\": self.mensaje_json_invalido,\n        }\n\n    @property\n    def sha256(self) -> str:\n        contenido = json.dumps(\n            self._contenido(), ensure_ascii=False, sort_keys=True, separators=(\",\", \":\")\n        ).encode(\"utf-8\")\n        return hashlib.sha256(contenido).hexdigest()",
    "que_hace": "Dataclass inmutable con todos los textos que el agente le manda al modelo y un hash sha256 que identifica su contenido.",
@@ -2744,6 +3430,121 @@
      "slug": "prompting",
      "i": 66,
      "title": "Mitigaciones que funcionan",
+     "extra": false,
+     "url": "/clases/05/#d=prompting&s=66"
+    }
+   ],
+   "nusos": 1
+  },
+  {
+   "id": "promptspec-cargar",
+   "titulo": "Cargar un PromptSpec verificando su sha256",
+   "archivo": "admision_tp/prompts.py",
+   "desde": 87,
+   "hasta": 105,
+   "lenguaje": "python",
+   "codigo": "    @classmethod\n    def desde_dict(cls, dato: dict) -> \"PromptSpec\":\n        if not isinstance(dato, dict) or set(dato) != _CAMPOS:\n            raise ValueError(\"configuración de prompt incompleta o con campos desconocidos\")\n        esperado = dato[\"sha256\"]\n        if not isinstance(esperado, str) or not re.fullmatch(r\"[0-9a-f]{64}\", esperado):\n            raise ValueError(\"sha256 de prompt inválido\")\n        prompt = cls(**{k: dato[k] for k in _CAMPOS if k != \"sha256\"})\n        if prompt.sha256 != esperado:\n            raise ValueError(\"el contenido del prompt no coincide con su sha256\")\n        return prompt\n\n    @classmethod\n    def cargar(cls, ruta: Path) -> \"PromptSpec\":\n        try:\n            dato = json.loads(Path(ruta).read_text(encoding=\"utf-8\"))\n        except (OSError, UnicodeError, json.JSONDecodeError):\n            raise ValueError(\"no se pudo leer una configuración de prompt válida\") from None\n        return cls.desde_dict(dato)",
+   "que_hace": "Lee un JSON de prompt, exige exactamente los campos esperados y rechaza el archivo si el sha256 guardado no coincide con el contenido.",
+   "como_funciona": "- `desde_dict` exige `set(dato) == _CAMPOS` (ni faltan ni sobran campos).\n- Valida que `sha256` sea un hex de 64 caracteres.\n- Construye el `PromptSpec` y compara `prompt.sha256` con el guardado.\n- `cargar` envuelve errores de lectura en un `ValueError` claro.",
+   "proposito": "Si alguien edita el texto del prompt sin actualizar el hash, falla al cargar: no se puede reportar un número con un prompt distinto del declarado.",
+   "interaccion": "Lo llaman `entrega.cargar_prompt`, `ejecutar_evaluacion_prompt` y `scripts/medir_contexto.py`; devuelve el `PromptSpec` que usa `AgentePrompt`.",
+   "teoria": "Prompts versionados como artefactos: el hash identifica exactamente qué texto produjo cada resultado.",
+   "key": "tp4-promptspec-cargar",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 5,
+     "cnn": "05",
+     "slug": "prompting",
+     "i": 66,
+     "title": "Mitigaciones que funcionan",
+     "extra": false,
+     "url": "/clases/05/#d=prompting&s=66"
+    }
+   ],
+   "nusos": 1
+  },
+  {
+   "id": "entrega-fabricas",
+   "titulo": "Puntos de entrada de la entrega",
+   "archivo": "entrega.py",
+   "desde": 1,
+   "hasta": 26,
+   "lenguaje": "python",
+   "codigo": "\"\"\"Puntos de entrada de la entrega.\"\"\"\n\nfrom pathlib import Path\nimport os\n\nfrom admision_tp.buscador import BuscadorBM25\nfrom admision_tp.prompts import RAIZ, RUTA_ENTREGA, PromptSpec\n\n\ndef construir_buscador(ruta_normas: Path) -> BuscadorBM25:\n    return BuscadorBM25(ruta_normas, variante=os.getenv(\"BUSCADOR_VARIANTE\", \"baseline\"))\n\n\ndef cargar_prompt() -> PromptSpec:\n    \"\"\"PromptSpec de `PROMPT_SPEC` (relativa a la raíz del repo) o el de la entrega; valida su sha256.\"\"\"\n    ruta = Path(os.getenv(\"PROMPT_SPEC\") or RUTA_ENTREGA)\n    return PromptSpec.cargar(ruta if ruta.is_absolute() else RAIZ / ruta)\n\n\ndef construir_agente():\n    from admision_tp.agente_prompt import AgentePrompt\n    from admision_tp.configuracion import Configuracion\n    from admision_tp.modelo import ModeloLocal\n\n    prompt = cargar_prompt()  # antes de cargar el modelo: un prompt inválido falla sin usar la GPU\n    return AgentePrompt(ModeloLocal.cargar(Configuracion.desde_entorno()), prompt)",
+   "que_hace": "Conecta las tres piezas que exige el kit de la cátedra: el buscador BM25 propio, el prompt versionado y el agente que corre Gemma local.",
+   "como_funciona": "- `construir_buscador(ruta_normas)` arma un `BuscadorBM25` con la carpeta de normas recibida y la variante de `BUSCADOR_VARIANTE` (default `baseline`).\n- `cargar_prompt()` lee el `PromptSpec` de `PROMPT_SPEC` o, si no hay, el de la entrega (`RUTA_ENTREGA`, `procedimiento-v1`) y valida su sha256.\n- `construir_agente()` carga primero el prompt (si es inválido falla sin tocar la GPU) y después `ModeloLocal` con `Configuracion.desde_entorno()`, y devuelve un `AgentePrompt`.\n- Los imports pesados están adentro de la función para que importar `entrega.py` no cargue torch.",
+   "proposito": "Es el contrato con la cátedra: separa buscador, prompt y modelo para poder cambiar cada uno por variable de entorno sin tocar código. Las dependencias pesadas son lazy, como pide AGENTS.md.",
+   "interaccion": "Lo llaman `admision.contrato.cargar_entrega` y los runners (`admision.correr`, `admision.evaluar_rag`). Alimenta al `Entorno` del kit (buscador para `buscar_normativa`) y al ciclo de `admision_tp/agente_prompt.py`.",
+   "teoria": "Es la arquitectura completa del trabajo final: un agente con herramientas, RAG léxico sobre normas y prompt optimizado/versionado.",
+   "key": "tp4-entrega-fabricas",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "introduccion",
+     "i": 18,
+     "title": "Trabajo final",
+     "extra": false,
+     "url": "/clases/01/#d=introduccion&s=18"
+    },
+    {
+     "clase": 5,
+     "cnn": "05",
+     "slug": "prompting",
+     "i": 66,
+     "title": "Mitigaciones que funcionan",
+     "extra": false,
+     "url": "/clases/05/#d=prompting&s=66"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 4,
+     "title": "Antes de consultar hay que indexar",
+     "extra": false,
+     "url": "/clases/06/#d=rag-y-mcp&s=4"
+    },
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 51,
+     "title": "Primero, un solo agente",
+     "extra": false,
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=51"
+    }
+   ],
+   "nusos": 4
+  },
+  {
+   "id": "manifiesto-prompt",
+   "titulo": "Manifiesto: qué prompt produjo cada número",
+   "archivo": "admision_tp/experimentos_prompt.py",
+   "desde": 287,
+   "hasta": 308,
+   "lenguaje": "python",
+   "codigo": "        estado = \"completada\" if tiempos.get(\"error\") is None else \"completada_con_error\"\n        # Una corrida con error del agente o de plomería no recibe clave y no se puede rankear.\n        metricas = marcar_comparabilidad(\n            calcular_metricas_candidato(resultados, trazas, longitud),\n            estado=estado, proposito=proposito)\n        (salida / \"metricas.json\").write_bytes(_canonical(metricas))\n\n        manifiesto = {\n            \"version\": 1,\n            \"estado\": estado,\n            \"proposito\": proposito,\n            \"comparable\": metricas[\"comparable\"],\n            \"guardas\": guardas,\n            \"codigo\": codigo,\n            \"prompt\": {\"nombre\": spec.nombre, \"version\": spec.version, \"sha256\": spec.sha256},\n            \"configuracion\": config.como_dict(),\n            \"entradas\": hashes_entrada,\n            \"artefactos\": _hashes_artefactos(salida),\n            \"metricas\": metricas,\n        }\n        (salida / \"manifiesto.json\").write_bytes(_canonical(manifiesto))\n        return manifiesto",
+   "que_hace": "Al final de cada evaluación escribe `manifiesto.json` con el estado, las guardas, el commit, el prompt (nombre, versión y sha256), las entradas y las métricas.",
+   "como_funciona": "- `marcar_comparabilidad` deja como no comparable una corrida con error o de plomería.\n- `\"prompt\"` guarda `spec.sha256` junto al nombre y la versión.\n- `entradas` y `artefactos` guardan los hashes de todo lo que entró y salió.\n- El manifiesto se escribe en JSON canónico.",
+   "proposito": "Cada métrica reportada queda atada a un prompt exacto y a un commit: si el texto cambia, cambia el hash.",
+   "interaccion": "Es la última parte de `ejecutar_evaluacion_prompt`; `seleccion_prompts` y las tablas del informe leen estos manifiestos para comparar candidatos.",
+   "teoria": "Trazabilidad de experimentos con prompts: versionar el prompt igual que el código.",
+   "key": "tp4-manifiesto-prompt",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 5,
+     "cnn": "05",
+     "slug": "prompting",
+     "i": 66,
+     "title": "Mitigaciones que funcionan",
+     "extra": false,
      "url": "/clases/05/#d=prompting&s=66"
     }
    ],

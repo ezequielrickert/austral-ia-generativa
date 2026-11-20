@@ -24,7 +24,7 @@
     document.getElementById('n').textContent = keys.length;
     document.getElementById('clear').hidden = !keys.length;
     if (!keys.length) { list.innerHTML = '<div class="empty">Todavía no marcaste ninguna diapositiva. En el visor de una clase, apretá <kbd>m</kbd> o el botón Marcar.</div>'; return; }
-    var rows = keys.map(function (k) { var p = k.split('#'); var e = idx[k] || {}; return { k: k, d: p[0], i: +p[1], c: e.c || st.seenClass[p[0]] || 0, t: e.t || ('Diapositiva ' + p[1]), x: e.x || '' }; })
+    var rows = keys.map(function (k) { var p = k.split('#'); var e = idx[k] || {}; return { k: k, d: p[0], i: +p[1], c: e.c || st.seenClass[p[0]] || 0, t: e.t || ('Diapositiva ' + p[1]), x: e.x || '', e: !!e.e }; })
       .sort(function (a, b) { return a.c - b.c || a.i - b.i; });
     var html = '', cur = null;
     rows.forEach(function (r) {
@@ -33,7 +33,7 @@
     });
     list.innerHTML = html + '</div>';
     var items = list.querySelectorAll('.row-item');
-    rows.forEach(function (r, j) { items[j].querySelector('.t').textContent = r.t; items[j].querySelector('.d').textContent = r.x.split(' ').slice(0, 30).join(' '); });
+    rows.forEach(function (r, j) { items[j].querySelector('.t').textContent = r.t; if (r.e) items[j].querySelector('.t').insertAdjacentHTML('beforeend', ' <span class="pill compl" title="Presentación complementaria: no figura en el calendario">Compl.</span>');items[j].querySelector('.d').textContent = r.x.split(' ').slice(0, 30).join(' '); });
   }
   fetch(SITE_BASE + '/data/search.json').then(function (r) { return r.json(); }).then(function (d) {
     var idx = {}; d.forEach(function (e) { if (e.d) idx[e.d + '#' + e.i] = e; }); draw(idx);

@@ -81,7 +81,8 @@
        "cnn": "01",
        "i": 60,
        "title": "Modelos Discriminativos vs Generativos",
-       "por": "La misma distinción en la clase 1"
+       "por": "La misma distinción en la clase 1",
+       "extra": false
       }
      ],
      "key": true,
@@ -540,6 +541,7 @@
        "texto": "En el TP2 cada `Dense` hacía lo mismo ($W\\cdot x+b$ + activación), pero con dos capas ocultas de 32 ReLU y salida lineal.",
        "tp_titulo": "¿Cuánto vale esta casa?",
        "code": "tp2-baseline-mlp-32-32",
+       "ncode": 1,
        "nota": "El discriminador es una sola neurona; acá hay dos capas ocultas de 32 antes de la salida."
       }
      ],
@@ -550,7 +552,8 @@
        "cnn": "03",
        "i": 7,
        "title": "La neurona: primero, una combinación lineal",
-       "por": "La neurona como combinación lineal"
+       "por": "La neurona como combinación lineal",
+       "extra": false
       }
      ],
      "key": true,
@@ -579,7 +582,8 @@
        "tp": 2,
        "texto": "En el TP2 la salida fue `Dense(1, linear)`: una sigmoide habría acotado el precio a (0,1). Sirve para probabilidades, como en D.",
        "tp_titulo": "¿Cuánto vale esta casa?",
-       "code": "tp2-clase-sigmoide",
+       "code": "tp2-clase-sigmoide,tp2-baseline-mlp-32-32",
+       "ncode": 2,
        "nota": "La sigmoide sirve para probabilidades (como en D o en este clasificador de clase), no para un precio."
       }
      ],
@@ -590,7 +594,8 @@
        "cnn": "03",
        "i": 8,
        "title": "La sigmoide: la no linealidad clásica",
-       "por": "La sigmoide en la clase 3"
+       "por": "La sigmoide en la clase 3",
+       "extra": false
       }
      ],
      "key": true,
@@ -650,7 +655,8 @@
        "cnn": "12",
        "i": 31,
        "title": "FCN por dentro",
-       "por": "Convoluciones transpuestas para subir resolución"
+       "por": "Convoluciones transpuestas para subir resolución",
+       "extra": false
       }
      ],
      "key": true,
@@ -725,8 +731,9 @@
        "tp": 2,
        "texto": "El TP2 era regresión: entrenó con MSE (no BCE) y reportó MAE en dólares. BCE es la del clasificador `AboveMedianPrice` del notebook de clase.",
        "tp_titulo": "¿Cuánto vale esta casa?",
-       "code": "tp2-clase-compile-bce",
-       "nota": "BCE es la loss del clasificador de clase; el TP2 la cambió por MSE."
+       "code": "tp2-clase-compile-bce,tp2-baseline-mlp-32-32",
+       "ncode": 2,
+       "nota": "BCE es la loss del clasificador de clase; el TP2 la cambió por MSE (paso 2)."
       }
      ],
      "ver": [
@@ -736,7 +743,8 @@
        "cnn": "04",
        "i": 29,
        "title": "Clasificación binaria: BCE",
-       "por": "BCE en la clase de diseño"
+       "por": "BCE en la clase de diseño",
+       "extra": false
       }
      ],
      "key": true,
@@ -816,8 +824,9 @@
        "tp": 2,
        "texto": "En el TP2 Keras corrió este ciclo con Adam (lr 0,001); escalaron `SalePrice` porque sin escalar los gradientes eran enormes y no convergía.",
        "tp_titulo": "¿Cuánto vale esta casa?",
-       "code": "tp2-train-and-report",
-       "nota": "Keras hace los cuatro pasos de backprop dentro de `model.fit`; Adam aplica la actualización."
+       "code": "tp2-baseline-mlp-32-32,tp2-train-and-report",
+       "ncode": 2,
+       "nota": "Keras hace los cuatro pasos de backprop dentro de `model.fit`; Adam (compilado en el paso 1) aplica la actualización."
       }
      ],
      "ver": [
@@ -827,7 +836,8 @@
        "cnn": "03",
        "i": 34,
        "title": "El paso de actualización",
-       "por": "El paso de actualización"
+       "por": "El paso de actualización",
+       "extra": false
       }
      ],
      "key": true,
@@ -885,6 +895,7 @@
        "texto": "En el TP2, `batch_size=32` sobre 1022 casas: unos 32 ajustes de pesos por época, con el error promediado en cada lote.",
        "tp_titulo": "¿Cuánto vale esta casa?",
        "code": "tp2-train-and-report",
+       "ncode": 1,
        "nota": "`batch_size=32`: el error se promedia por lote y cada lote produce un ajuste."
       }
      ],
@@ -895,7 +906,8 @@
        "cnn": "04",
        "i": 44,
        "title": "Batch y época no son lo mismo",
-       "por": "Batch y época no son lo mismo"
+       "por": "Batch y época no son lo mismo",
+       "extra": false
       }
      ],
      "key": true,
@@ -950,7 +962,8 @@
        "cnn": "03",
        "i": 31,
        "title": "La regla de la cadena",
-       "por": "La regla de la cadena"
+       "por": "La regla de la cadena",
+       "extra": false
       }
      ],
      "key": false,
@@ -999,7 +1012,8 @@
        "cnn": "12",
        "i": 53,
        "title": "La idea de condición",
-       "por": "La condición: de etiqueta a texto"
+       "por": "La condición: de etiqueta a texto",
+       "extra": false
       }
      ],
      "key": true,
@@ -1169,7 +1183,8 @@
        "cnn": "12",
        "i": 45,
        "title": "U-Net es modular: adelanto",
-       "por": "U-Net también hace image-to-image"
+       "por": "U-Net también hace image-to-image",
+       "extra": false
       }
      ],
      "key": true,
@@ -1249,7 +1264,8 @@
        "tp": 4,
        "texto": "En el TP4 sacaron del SFT las 240 filas con error y las 160 de ruido: el modelo copia lo que ve, igual que una GAN.",
        "tp_titulo": "El agente de admisión de guardia (TP final)",
-       "code": "tp4-seleccionar-ids",
+       "code": "tp4-clasificar-tipo,tp4-seleccionar-ids",
+       "ncode": 2,
        "nota": ""
       }
      ],
@@ -1295,7 +1311,8 @@
        "cnn": "12",
        "i": 56,
        "title": "La idea de difusión: agregar y quitar ruido",
-       "por": "Difusión: sin mode collapse"
+       "por": "Difusión: sin mode collapse",
+       "extra": false
       }
      ],
      "key": true,
@@ -1327,7 +1344,8 @@
        "cnn": "13",
        "i": 32,
        "title": "Para empezar",
-       "por": "Sesgos como desafío ético"
+       "por": "Sesgos como desafío ético",
+       "extra": false
       }
      ],
      "key": false,
@@ -1798,7 +1816,17 @@
      "slug": "introduccion",
      "i": 26,
      "title": "Redes Neuronales — Estructura y Celda Básica",
+     "extra": false,
      "url": "/clases/01/#d=introduccion&s=26"
+    },
+    {
+     "clase": 3,
+     "cnn": "03",
+     "slug": "intro-redes-neuronales",
+     "i": 8,
+     "title": "La sigmoide: la no linealidad clásica",
+     "extra": false,
+     "url": "/clases/03/#d=intro-redes-neuronales&s=8"
     },
     {
      "clase": 3,
@@ -1806,7 +1834,17 @@
      "slug": "intro-redes-neuronales",
      "i": 9,
      "title": "La capa: el bloque que se repite",
+     "extra": false,
      "url": "/clases/03/#d=intro-redes-neuronales&s=9"
+    },
+    {
+     "clase": 3,
+     "cnn": "03",
+     "slug": "intro-redes-neuronales",
+     "i": 12,
+     "title": "Las dos dimensiones: ancho y profundidad",
+     "extra": false,
+     "url": "/clases/03/#d=intro-redes-neuronales&s=12"
     },
     {
      "clase": 3,
@@ -1814,6 +1852,7 @@
      "slug": "intro-redes-neuronales",
      "i": 24,
      "title": "Sin activación, la red colapsa",
+     "extra": false,
      "url": "/clases/03/#d=intro-redes-neuronales&s=24"
     },
     {
@@ -1822,7 +1861,17 @@
      "slug": "intro-redes-neuronales",
      "i": 25,
      "title": "Las funciones de activación más comunes",
+     "extra": false,
      "url": "/clases/03/#d=intro-redes-neuronales&s=25"
+    },
+    {
+     "clase": 3,
+     "cnn": "03",
+     "slug": "intro-redes-neuronales",
+     "i": 30,
+     "title": "El error: la función de coste",
+     "extra": false,
+     "url": "/clases/03/#d=intro-redes-neuronales&s=30"
     },
     {
      "clase": 4,
@@ -1830,7 +1879,35 @@
      "slug": "modelado-redes-neuronales",
      "i": 22,
      "title": "Un catálogo para elegir sin dudar",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=22"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 43,
+     "title": "El learning rate es el paso",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=43"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 57,
+     "title": "Cuántas capas y cuánto ancho",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=57"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 63,
+     "title": "Los notebooks de la clase",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=63"
     },
     {
      "clase": 8,
@@ -1838,6 +1915,7 @@
      "slug": "transformers-a-fondo",
      "i": 23,
      "title": "La feed-forward: la misma red para cada posición",
+     "extra": false,
      "url": "/clases/08/#d=transformers-a-fondo&s=23"
     },
     {
@@ -1846,10 +1924,38 @@
      "slug": "redes-generativas-antagonicas",
      "i": 23,
      "title": "Discriminador Como red neuronal",
+     "extra": false,
      "url": "/clases/11/#d=redes-generativas-antagonicas&s=23"
+    },
+    {
+     "clase": 11,
+     "cnn": "11",
+     "slug": "redes-generativas-antagonicas",
+     "i": 24,
+     "title": "Función Sigmoid: la activación del Discriminador",
+     "extra": false,
+     "url": "/clases/11/#d=redes-generativas-antagonicas&s=24"
+    },
+    {
+     "clase": 11,
+     "cnn": "11",
+     "slug": "redes-generativas-antagonicas",
+     "i": 29,
+     "title": "Binary cross-entropy: los dos casos del Discriminador",
+     "extra": false,
+     "url": "/clases/11/#d=redes-generativas-antagonicas&s=29"
+    },
+    {
+     "clase": 11,
+     "cnn": "11",
+     "slug": "redes-generativas-antagonicas",
+     "i": 32,
+     "title": "Backpropagation: el procedimiento paso a paso",
+     "extra": false,
+     "url": "/clases/11/#d=redes-generativas-antagonicas&s=32"
     }
    ],
-   "nusos": 7
+   "nusos": 16
   },
   {
    "id": "clase-sigmoide",
@@ -1874,7 +1980,17 @@
      "slug": "intro-redes-neuronales",
      "i": 8,
      "title": "La sigmoide: la no linealidad clásica",
+     "extra": false,
      "url": "/clases/03/#d=intro-redes-neuronales&s=8"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 22,
+     "title": "Un catálogo para elegir sin dudar",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=22"
     },
     {
      "clase": 4,
@@ -1882,6 +1998,7 @@
      "slug": "modelado-redes-neuronales",
      "i": 63,
      "title": "Los notebooks de la clase",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=63"
     },
     {
@@ -1890,10 +2007,11 @@
      "slug": "redes-generativas-antagonicas",
      "i": 24,
      "title": "Función Sigmoid: la activación del Discriminador",
+     "extra": false,
      "url": "/clases/11/#d=redes-generativas-antagonicas&s=24"
     }
    ],
-   "nusos": 3
+   "nusos": 4
   },
   {
    "id": "clase-compile-bce",
@@ -1913,15 +2031,34 @@
    "tp_titulo": "¿Cuánto vale esta casa?",
    "usos": [
     {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 22,
+     "title": "Un catálogo para elegir sin dudar",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=22"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 63,
+     "title": "Los notebooks de la clase",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=63"
+    },
+    {
      "clase": 11,
      "cnn": "11",
      "slug": "redes-generativas-antagonicas",
      "i": 29,
      "title": "Binary cross-entropy: los dos casos del Discriminador",
+     "extra": false,
      "url": "/clases/11/#d=redes-generativas-antagonicas&s=29"
     }
    ],
-   "nusos": 1
+   "nusos": 3
   },
   {
    "id": "train-and-report",
@@ -1941,12 +2078,58 @@
    "tp_titulo": "¿Cuánto vale esta casa?",
    "usos": [
     {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "introduccion",
+     "i": 26,
+     "title": "Redes Neuronales — Estructura y Celda Básica",
+     "extra": false,
+     "url": "/clases/01/#d=introduccion&s=26"
+    },
+    {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "introduccion",
+     "i": 32,
+     "title": "Ejemplos de problemas predictivos",
+     "extra": false,
+     "url": "/clases/01/#d=introduccion&s=32"
+    },
+    {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "introduccion",
+     "i": 50,
+     "title": "Paradigmas de Aprendizaje",
+     "extra": false,
+     "url": "/clases/01/#d=introduccion&s=50"
+    },
+    {
+     "clase": 3,
+     "cnn": "03",
+     "slug": "intro-redes-neuronales",
+     "i": 9,
+     "title": "La capa: el bloque que se repite",
+     "extra": false,
+     "url": "/clases/03/#d=intro-redes-neuronales&s=9"
+    },
+    {
      "clase": 3,
      "cnn": "03",
      "slug": "intro-redes-neuronales",
      "i": 29,
      "title": "Ida y vuelta: forward y backward",
+     "extra": false,
      "url": "/clases/03/#d=intro-redes-neuronales&s=29"
+    },
+    {
+     "clase": 3,
+     "cnn": "03",
+     "slug": "intro-redes-neuronales",
+     "i": 30,
+     "title": "El error: la función de coste",
+     "extra": false,
+     "url": "/clases/03/#d=intro-redes-neuronales&s=30"
     },
     {
      "clase": 3,
@@ -1954,7 +2137,35 @@
      "slug": "intro-redes-neuronales",
      "i": 34,
      "title": "El paso de actualización",
+     "extra": false,
      "url": "/clases/03/#d=intro-redes-neuronales&s=34"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 11,
+     "title": "Numéricas: normalizar no es opcional",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=11"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 16,
+     "title": "Un dataset, tres trabajos distintos",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=16"
+    },
+    {
+     "clase": 4,
+     "cnn": "04",
+     "slug": "modelado-redes-neuronales",
+     "i": 28,
+     "title": "Regresión: MSE, MAE y Huber",
+     "extra": false,
+     "url": "/clases/04/#d=modelado-redes-neuronales&s=28"
     },
     {
      "clase": 4,
@@ -1962,6 +2173,7 @@
      "slug": "modelado-redes-neuronales",
      "i": 43,
      "title": "El learning rate es el paso",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=43"
     },
     {
@@ -1970,6 +2182,7 @@
      "slug": "modelado-redes-neuronales",
      "i": 44,
      "title": "Batch y época no son lo mismo",
+     "extra": false,
      "url": "/clases/04/#d=modelado-redes-neuronales&s=44"
     },
     {
@@ -1978,6 +2191,7 @@
      "slug": "redes-generativas-antagonicas",
      "i": 32,
      "title": "Backpropagation: el procedimiento paso a paso",
+     "extra": false,
      "url": "/clases/11/#d=redes-generativas-antagonicas&s=32"
     },
     {
@@ -1986,10 +2200,67 @@
      "slug": "redes-generativas-antagonicas",
      "i": 34,
      "title": "El ciclo completo: Generador y Discriminador juntos",
+     "extra": false,
      "url": "/clases/11/#d=redes-generativas-antagonicas&s=34"
     }
    ],
-   "nusos": 6
+   "nusos": 14
+  },
+  {
+   "id": "clasificar-tipo",
+   "titulo": "error > ruido > correcta",
+   "archivo": "scripts/clasificar_historial.py",
+   "desde": 474,
+   "hasta": 489,
+   "lenguaje": "python",
+   "codigo": "def clasificar(\n    rows: list[dict[str, str]],\n    parametros: dict[str, int],\n    trazas: dict | None = None,\n) -> tuple[list[dict[str, str]], dict]:\n    costumbres = inferir_costumbres(rows, parametros, trazas)\n    razones = {row[\"id\"]: razones_normativas(row, parametros) for row in rows}\n    ids_ruido = {i for costumbre in costumbres for i in costumbre.get(\"ids_ruido\", [])}\n    salida = []\n    for row in rows:\n        tipo = \"error\" if razones[row[\"id\"]] else \"ruido\" if row[\"id\"] in ids_ruido else \"correcta\"\n        salida.append({\"id\": row[\"id\"], \"tipo\": tipo})\n    return salida, {\n        \"costumbres\": costumbres,\n        \"desvios_por_operador\": desvios_por_operador(costumbres, rows),\n    }",
+   "que_hace": "Clasifica cada fila del historial: error si contradice alguna norma, ruido si se desvía de la costumbre, correcta si no.",
+   "como_funciona": "- `inferir_costumbres` deduce las costumbres del historial y sus `ids_ruido`.\n- `razones_normativas(row, parametros)` lista los campos que no coinciden con lo que exigen las normas.\n- La prioridad es `error` > `ruido` > `correcta`.\n- Devuelve la lista de `{id, tipo}` y el resumen de costumbres.",
+   "proposito": "Un filtro simbólico y auditable: cada fila excluida tiene una razón concreta, en vez de un puntaje de calidad.",
+   "interaccion": "Usa `circuito_esperado`, `plazo_esperado` y `registro_esperado` (mismo archivo); su salida es `historial_clasificado.csv`, que lee `seleccionar_ids`.",
+   "teoria": "Curado de datos con reglas: verificar cada ejemplo contra una fuente de verdad antes de entrenar.",
+   "key": "tp4-clasificar-tipo",
+   "tp": 4,
+   "tp_titulo": "El agente de admisión de guardia (TP final)",
+   "usos": [
+    {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "introduccion",
+     "i": 42,
+     "title": "Ejemplos de problemas de razonamiento simbólico",
+     "extra": false,
+     "url": "/clases/01/#d=introduccion&s=42"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 7,
+     "title": "C4: cómo Google depuró Common Crawl",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=7"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 22,
+     "title": "Quiz: ¿qué aprende el SFT?",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=22"
+    },
+    {
+     "clase": 11,
+     "cnn": "11",
+     "slug": "redes-generativas-antagonicas",
+     "i": 48,
+     "title": "El dataset importa: lo que le das es lo que obtenés",
+     "extra": false,
+     "url": "/clases/11/#d=redes-generativas-antagonicas&s=48"
+    }
+   ],
+   "nusos": 4
   },
   {
    "id": "seleccionar-ids",
@@ -2009,11 +2280,39 @@
    "tp_titulo": "El agente de admisión de guardia (TP final)",
    "usos": [
     {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "introduccion",
+     "i": 42,
+     "title": "Ejemplos de problemas de razonamiento simbólico",
+     "extra": false,
+     "url": "/clases/01/#d=introduccion&s=42"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 7,
+     "title": "C4: cómo Google depuró Common Crawl",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=7"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 20,
+     "title": "Un dataset de SFT",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=20"
+    },
+    {
      "clase": 9,
      "cnn": "09",
      "slug": "como-se-entrena-un-llm",
      "i": 22,
      "title": "Quiz: ¿qué aprende el SFT?",
+     "extra": false,
      "url": "/clases/09/#d=como-se-entrena-un-llm&s=22"
     },
     {
@@ -2022,10 +2321,11 @@
      "slug": "redes-generativas-antagonicas",
      "i": 48,
      "title": "El dataset importa: lo que le das es lo que obtenés",
+     "extra": false,
      "url": "/clases/11/#d=redes-generativas-antagonicas&s=48"
     }
    ],
-   "nusos": 2
+   "nusos": 5
   }
  ]
 }

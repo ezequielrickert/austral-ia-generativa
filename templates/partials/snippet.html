@@ -12,7 +12,7 @@
       <section><span class="section-label">Cómo se conecta</span><div class="prose">{{ sn.interaccion | markdown | safe }}</div></section>
       {% if sn.teoria %}<section><span class="section-label">Teoría que aplica</span><div class="prose">{{ sn.teoria | markdown | safe }}</div></section>{% endif %}
       <section class="usos"><span class="section-label">Diapositivas que lo usan · {{ sn.nusos }}</span>
-        <div class="related">{% for u in sn.usos %}<a href="{{ config.base_url }}{{ u.url }}"><span class="ref">{{ u.cnn }}·{{ u.i }}</span><span class="t">{{ u.title }}</span></a>{% endfor %}</div>
+        <div class="related">{% for u in sn.usos %}<a href="{{ config.base_url }}{{ u.url }}"><span class="ref">{{ u.cnn }}·{{ u.i }}</span><span class="t">{{ u.title }}{% if u.extra %} <span class="pill compl" title="Presentación complementaria: no figura en el calendario">Compl.</span>{% endif %}</span></a>{% endfor %}</div>
       </section>
     </div>
   </div>

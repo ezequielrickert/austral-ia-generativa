@@ -79,11 +79,34 @@
     if (window.hljs) { try { window.hljs.highlightElement(codeEl); } catch (e) {} }
     else if (tries < 40) setTimeout(function () { highlight(codeEl, tries + 1); }, 150);
   }
-  function openCode(key, nota) {
-    var tpl = document.getElementById("sn-" + key);
-    if (!tpl || !dlg) return;
+  // `keys` is one snippet key or a comma-separated chain ("tp3-a,tp3-b"): the definition, where it
+  // is wired and where it is used. A chain gets a strip of numbered steps to move between files.
+  function openCode(keys, nota) {
+    var list = String(keys).split(",").filter(function (k) { return document.getElementById("sn-" + k); });
+    if (!list.length || !dlg) return;
+    showCode(list, 0, nota);
+    if (!dlg.open) dlg.showModal();
+  }
+  function showCode(list, at, nota) {
+    var key = list[at], tpl = document.getElementById("sn-" + key);
     var body = document.getElementById("code-dlg-body");
     body.innerHTML = "";
+    if (list.length > 1) {
+      var strip = document.createElement("nav");
+      strip.className = "code-chain"; strip.setAttribute("aria-label", "Fragmentos relacionados");
+      list.forEach(function (k, j) {
+        var t = document.getElementById("sn-" + k), b = document.createElement("button");
+        b.type = "button"; b.className = "chain-step"; b.setAttribute("aria-current", String(j === at));
+        b.title = t.dataset.title;
+        b.innerHTML = '<span class="n mono"></span><span class="f mono"></span><span class="t"></span>';
+        b.children[0].textContent = j + 1;
+        b.children[1].textContent = t.dataset.file.split("/").pop();
+        b.children[2].textContent = t.dataset.title;
+        b.onclick = function () { showCode(list, j, nota); };
+        strip.appendChild(b);
+      });
+      body.appendChild(strip);
+    }
     body.appendChild(tpl.content.cloneNode(true));
     document.getElementById("code-dlg-title").textContent = tpl.dataset.title;
     document.getElementById("code-dlg-tp").textContent = "TP" + tpl.dataset.tp;
@@ -101,7 +124,6 @@
       ns.firstChild.appendChild(document.createTextNode(nota));
     }
     renderMath(body);
-    if (!dlg.open) dlg.showModal();
     body.querySelector(".code-scroll").scrollTop = 0;
   }
   window.Study.openCode = openCode;
@@ -139,7 +161,7 @@
       index = d.map(function (e) {
         var url = e.g ? BASE + "/glosario/#" + e.g : BASE + "/clases/" + pad(e.c) + "/#d=" + e.d + "&s=" + e.i;
         var sub = e.g ? "Glosario · clase " + pad(e.c) : "Clase " + pad(e.c) + " · diapositiva " + e.i;
-        return { t: e.t || "(sin título)", nt: norm(e.t), nx: norm(e.x), url: url, sub: sub, g: !!e.g };
+        return { t: e.t || "(sin título)", nt: norm(e.t), nx: norm(e.x), url: url, sub: sub + (e.e ? " · complementaria" : ""), g: !!e.g };
       });
       return index;
     });

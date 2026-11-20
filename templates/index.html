@@ -32,7 +32,8 @@
         <tr data-href="{{ config.base_url }}/clases/{{ c.nn }}/">
           <td class="mono faint">{{ c.nn }}</td>
           <td class="muted num">{{ c.fecha }}</td>
-          <td><a class="title" href="{{ config.base_url }}/clases/{{ c.nn }}/">{{ c.titulo }}</a></td>
+          <td><a class="title" href="{{ config.base_url }}/clases/{{ c.nn }}/">{{ c.titulo }}</a>
+            <div class="deck-list">{% for d in c.decks %}<span class="{% if d.extra %}is-extra{% endif %}">{{ d.tab }} {% if d.extra %}<span class="pill compl" title="No figura en el calendario de la materia">Compl.</span>{% else %}<span class="pill sched" title="Figura en el calendario de la materia">Calendario</span>{% endif %}</span>{% endfor %}</div></td>
           <td class="r num muted">{{ c.slides }}</td>
           <td class="r num muted">{{ c.key }}</td>
           <td><div class="pills">{% for t in c.tps %}<span class="pill tp">TP{{ t }}</span>{% endfor %}</div></td>

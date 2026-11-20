@@ -12,10 +12,11 @@
   <div class="ph-actions">
     {% if c.multi %}
     <div class="seg" role="tablist" aria-label="Presentaciones de la clase">
-      {% for d in c.decks %}<button role="tab" data-deck="{{ d.slug }}" aria-selected="{% if loop.first %}true{% else %}false{% endif %}" title="{% if d.extra %}Complementaria: no figura en el calendario de la materia{% else %}{{ d.titulo }}{% endif %}">{{ d.tab }}{% if d.extra %}<span class="pill" style="height:18px;font-size:10.5px">Complementaria</span>{% endif %}</button>{% endfor %}
+      {% for d in c.decks %}<button role="tab" data-deck="{{ d.slug }}" data-extra="{% if d.extra %}1{% endif %}" aria-selected="{% if loop.first %}true{% else %}false{% endif %}" title="{% if d.extra %}Complementaria: no figura en el calendario de la materia{% else %}{{ d.titulo }} · en el calendario{% endif %}">{{ d.tab }}{% if d.extra %}<span class="pill compl">Compl.</span>{% endif %}</button>{% endfor %}
     </div>
     {% endif %}
     <button class="btn icon" id="focus-btn" aria-pressed="false" title="Modo foco: ocultar el menú (f)" aria-label="Modo foco"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg></button>
+    <button class="btn icon" id="fs-btn" title="Pantalla completa: diapositivas, notas y TPs (p)" aria-label="Pantalla completa"><svg class="i" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
     <a class="btn" href="{{ config.base_url }}/practica/#c{{ c.num }}">Practicar</a>
     <a class="btn icon {% if not c.prev %}disabled{% endif %}" {% if c.prev %}href="{{ config.base_url }}/clases/{{ c.prev }}/"{% endif %} aria-label="Clase anterior" title="Clase anterior"><svg class="i" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></a>
     <a class="btn icon {% if not c.next %}disabled{% endif %}" {% if c.next %}href="{{ config.base_url }}/clases/{{ c.next }}/"{% endif %} aria-label="Clase siguiente" title="Clase siguiente"><svg class="i" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></a>
@@ -26,12 +27,13 @@
 <div class="viewer">
   <section class="card stage-card">
     <div class="card-header">
-      <span class="card-sub" id="sec-name">&nbsp;</span>
+      <span class="deck-kind">{% set d0 = c.decks | first %}<span class="pill {% if d0.extra %}compl{% else %}sched{% endif %}" id="deck-kind" data-kind-sched="Calendario" data-kind-extra="Complementaria" title="{% if d0.extra %}No figura{% else %}Figura{% endif %} en el calendario de la materia">{% if d0.extra %}Complementaria{% else %}Calendario{% endif %}</span><span class="card-sub" id="sec-name">&nbsp;</span></span>
       <div class="seg" id="filter" aria-label="Filtrar diapositivas">
         <button aria-pressed="true" data-f="all">Todas<span class="fc mono" data-fc="all"></span></button>
         <button aria-pressed="false" data-f="key"><span class="bar"></span>Clave<span class="fc mono" data-fc="key"></span></button>
         <button aria-pressed="false" data-f="tp"><span class="dot"></span>En TPs<span class="fc mono" data-fc="tp"></span></button>
       </div>
+      <button class="btn icon sm ghost" id="fs-exit" title="Salir de pantalla completa (p o Esc)" aria-label="Salir de pantalla completa"><svg class="i" viewBox="0 0 24 24"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg></button>
     </div>
     <div class="stage" id="stage">
       <iframe id="deck-frame" title="Diapositivas de la clase" allow="autoplay; fullscreen"></iframe>
@@ -75,11 +77,11 @@
           {% endif %}
           {% if s.ver %}
           <div class="card-section related"><span class="section-label">Relacionadas</span>
-            <div>{% for v in s.ver %}<a href="{{ config.base_url }}{{ v.url }}"><span class="ref">{{ v.cnn }}·{{ v.i }}</span><span><span class="t">{{ v.title }}</span>{% if v.por and v.por != v.title %}<small>{{ v.por }}</small>{% endif %}</span></a>{% endfor %}</div>
+            <div>{% for v in s.ver %}<a href="{{ config.base_url }}{{ v.url }}"><span class="ref">{{ v.cnn }}·{{ v.i }}</span><span><span class="t">{{ v.title }}{% if v.extra %} <span class="pill compl" title="Presentación complementaria: no figura en el calendario">Compl.</span>{% endif %}</span>{% if v.por and v.por != v.title %}<small>{{ v.por }}</small>{% endif %}</span></a>{% endfor %}</div>
           </div>
           {% endif %}
           {% if s.tp %}
-          <template class="tp-data">{% for t in s.tp %}<div class="tp-ref" data-tp="{{ t.tp }}"><a href="{{ config.base_url }}/tp/{{ t.tp }}/">TP{{ t.tp }} · {{ t.tp_titulo }}</a><span>{{ t.texto | markdown(inline=true) | safe }}</span>{% if t.code %}<button class="btn sm code-btn" data-code="{{ t.code }}" data-nota="{{ t.nota }}"><svg class="i" viewBox="0 0 24 24"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></svg>Ver en el código</button>{% endif %}</div>{% endfor %}</template>
+          <template class="tp-data">{% for t in s.tp %}<div class="tp-ref" data-tp="{{ t.tp }}"><a href="{{ config.base_url }}/tp/{{ t.tp }}/">TP{{ t.tp }} · {{ t.tp_titulo }}</a><span>{{ t.texto | markdown(inline=true) | safe }}</span>{% if t.code %}<button class="btn sm code-btn" data-code="{{ t.code }}" data-nota="{{ t.nota }}"><svg class="i" viewBox="0 0 24 24"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></svg>Ver en el código{% if t.ncode > 1 %} · {{ t.ncode }} fragmentos{% endif %}</button>{% endif %}</div>{% endfor %}</template>
           {% endif %}
         </article>
         {% endfor %}
@@ -107,7 +109,7 @@
 
     <div class="card-footer side-foot">
       <button class="btn sm" id="star" title="Marcar para repasar (m)"><svg class="i" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg><span>Marcar</span></button>
-      <span class="hints"><kbd>←</kbd><kbd>→</kbd> <kbd>t</kbd> <kbd>m</kbd></span>
+      <span class="hints"><kbd>←</kbd><kbd>→</kbd> <kbd>t</kbd> <kbd>m</kbd> <kbd>p</kbd></span>
     </div>
   </aside>
 </div>
@@ -115,4 +117,4 @@
 </div>
 {% for sn in c.snippets %}{% include "partials/snippet.html" %}{% endfor %}
 {% endblock content %}
-{% block scripts %}<script src="{{ get_url(path='js/viewer.js') }}"></script>{% endblock scripts %}
+{% block scripts %}<script src="{{ get_url(path='js/viewer.js', cachebust=true) }}"></script>{% endblock scripts %}

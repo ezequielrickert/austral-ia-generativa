@@ -47,7 +47,7 @@
         <div class="row-group" style="position:static"><span>Diapositivas donde aparece</span><span class="mono">{{ k.nrefs }}</span></div>
         {% if k.refs %}
         <div class="rows">
-          {% for r in k.refs %}<a class="row-item" href="{{ config.base_url }}{{ r.url }}"><span class="ref">{{ r.cnn }}·{{ r.i }}</span><span class="t">{{ r.title }}</span></a>{% endfor %}
+          {% for r in k.refs %}<a class="row-item" href="{{ config.base_url }}{{ r.url }}"><span class="ref">{{ r.cnn }}·{{ r.i }}</span><span class="t">{{ r.title }}{% if r.extra %} <span class="pill compl" title="Presentación complementaria: no figura en el calendario">Compl.</span>{% endif %}</span></a>{% endfor %}
         </div>
         {% if k.more %}<div class="empty" style="padding:12px">y {{ k.more }} más (usá el buscador)</div>{% endif %}
         {% else %}<div class="empty">No aparece como palabra clave en ninguna diapositiva.</div>{% endif %}
