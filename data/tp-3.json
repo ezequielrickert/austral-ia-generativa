@@ -3,8 +3,8 @@
  "titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
  "repo": "rag-mcp-transfomers",
  "consigna": "El Hospital Provincial **Arroyo Claro** (ficticio) quiere un asistente para pacientes y familiares. La información vive en dos lugares: **documentos** que casi no cambian (20 Markdown de normas y procedimientos) y una **API** con el estado del día (camas, guardia, turnos, farmacia, espera). Como el hospital es inventado, el modelo solo contesta bien si **recupera**. Todo en Python, entrega el 9 de octubre de 2026.\n\n| Parte | Qué pide | Puntos |\n|---|---|---|\n| 1. RAG vectorial | `recuperar.py`: chunking + embeddings con un **transformer encoder** + coseno. Comparar ≥3 encoders, uno obligatorio: **BERT sin ajustar** (promedio de la última capa) como línea de base. Tabla de experimentos con un `.eval.json` por fila. Métrica: **Context Relevance** = media armónica de recall y precision de evidencia (un léxico ingenuo saca 0,35). | 25 |\n| 2. Agente con dos fuentes | Tool calling sobre `deepseek/deepseek-v4-flash-0731` (OpenRouter) con 6 herramientas de nombre fijo (`buscar_documentos`, `consultar_camas`, `consultar_guardia`, `consultar_turnos`, `consultar_farmacia`, `consultar_espera`). Juez `gemini-3.7-flash` puntúa 1–5 Context Relevance, Answer Faithfulness y Answer Relevance, más el **ruteo**. Sin log `.md` por corrida, vale cero. | 30 |\n| 3. MCP | Las mismas 6 tools en `servidor_mcp.py` (FastMCP del SDK oficial, stdio), un cliente que las descubra con `tools/list` y las llame con `tools/call`, capturas del MCP Inspector y comparación de métricas/costo con la parte 2. | 15 |\n| 4. Atención en NumPy | `softmax`, `atencion`, `autoatencion` (máscara causal), `multicabeza`, `layer_norm`; 14 tests (\"the cat sat\", d = 4). | 15 |\n| 5. Bloque a mano | \"El banco aguanta\" / \"El banco presta\" por un bloque completo, con y sin máscara, **justificando cada operación**, sin IA. | 15 |\n\nLas preguntas `dev` son para tunear; la cátedra evalúa con un **test oculto**, así que sobreajustar a dev se paga.",
- "que_hicimos": "El grupo trabajó con la metodología de la clase 2: `CLAUDE.md`, `SPEC.md`, un `PLAN.md` paso a paso (\"implementá el paso N\"), TDD con pytest (`tests/`) y commits convencionales. El código compartido vive en el paquete `hospital/` y los scripts de la raíz (`recuperar.py`, `agente.py`) son CLIs finos.\n\n**Parte 1 — RAG vectorial (`hospital/rag/`).**\n- `chunking.py` implementa las **tres estrategias de la clase**: longitud fija con solapamiento (ventanas de 40/10 y 80/20 *palabras*, sin cruzar secciones), semántico (párrafo y oración) y **estructural** (una sección `##` por fragmento). Regla de oro: cada fragmento es un **substring literal** del corpus, porque el evaluador busca la evidencia como texto.\n- **Metadatos como texto buscable**: \"Título > Sección: \" se antepone *solo al texto que se embebe*; el fragmento devuelto sigue literal.\n- `encoders.py`: `BertPromedio` (mean pooling de la última capa enmascarando padding) y `SentenceTransformerEncoder` (MiniLM, e5-small, e5-base con prefijos `query: ` / `passage: `). Todo normalizado L2, así el producto punto **es** el coseno.\n- `recuperador.py`: coseno contra la matriz de fragmentos, caché de embeddings, soporte opcional de cross-encoder, y una función `seleccionar` con **top-k, umbral absoluto y margen relativo al mejor**.\n- Grilla de **98 configuraciones** (4 encoders × 5 chunkings × metadatos × k, más umbrales y márgenes), cada una con su `.jsonl`, `.config.json` y `.eval.json` en `experimentos/recuperacion/`.\n- Configuración congelada en `hospital/rag/config.json`: **e5-base + estructural + metadatos + top-2 con margen 0,005**.\n\n**Parte 2 — Agente (`hospital/agente/`).** LangChain **sin LangGraph**: `ChatOpenAI` apuntando a OpenRouter (temperatura 0), tools enlazadas con `bind_tools` y un **bucle explícito** de tool calling (máx. 6 llamadas al modelo): el modelo pide tools, se ejecutan, vuelven como `ToolMessage`, y se repite hasta que responde sin pedir nada. Los errores de una tool vuelven al modelo como texto para que se corrija. Las **descripciones** de las tools (`descripciones.py`) dicen qué fuente consultan, para qué sirven, **qué NO tienen** y los valores válidos del parámetro, y se comparten con el futuro servidor MCP para que la comparación sea justa. `buscar_documentos` antepone `[Documento > Sección]` a cada fragmento. Cada corrida deja un log `.md` con tokens (entrada, caché, salida, razonamiento), costo e id de generación por llamada, y cada tool con argumentos y resultado completo. Se hicieron **4 corridas** iterando sobre la selección de fragmentos y la descripción de `buscar_documentos`.\n\n**Partes 3, 4 y 5.** En el estado actual del repo están **pendientes**: el `INFORME.md` las marca \"_Pendiente_\" y no existen `servidor_mcp.py`, `agente_mcp.py` ni `atencion.py`. Sí está el diseño en `PLAN.md`: FastMCP con las 6 tools reusando `api_cliente`, `documentos` y `descripciones` (logs a stderr porque stdout es el protocolo), cliente con `MultiServerMCPClient` de `langchain-mcp-adapters` reusando el mismo bucle `responder`, y la atención en NumPy guiada por los 14 tests (`S = QKᵀ/√d_k`, máscara `np.triu(…,1) → −∞`, softmax restando el máximo, layer norm sin γ/β). El bucle de la parte 2 ya se escribió agnóstico de dónde vienen las tools para poder reusarlo con MCP.",
- "resultados": "**Parte 1 (recuperación, 20 preguntas dev).** Configuración entregada: e5-base, estructural, metadatos, top-2 con margen 0,005 → **CR 0,967** (recall 1,000, precision 0,950, MRR 1,000, k medio 1,10). Línea de base BERT: **0,350** en su mejor configuración (igual al léxico ingenuo). La entrega casi triplica la línea de base.\n\n| Encoder | Mejor CR | CR medio con k=1 | Coseno medio entre fragmentos | z del fragmento correcto |\n|---|---|---|---|---|\n| BERT multilingüe (promedio) | 0,350 | 0,27 | 0,786 | 1,56 |\n| paraphrase-multilingual-MiniLM-L12-v2 | 0,950 | 0,76 | 0,365 | 3,07 |\n| multilingual-e5-small | 0,950 | 0,80 | 0,842 | 3,94 |\n| **multilingual-e5-base** | **1,000** | **0,85** | 0,830 | 3,94 |\n\nHallazgos: con **k = 3 ningún encoder pasa de 0,515** (cada pregunta tiene una sola evidencia, así que un fragmento extra baja la precisión); los **metadatos** mejoran a los cuatro encoders con chunking estructural y k=1 (BERT 0,25→0,35, MiniLM 0,70→0,90, e5-small 0,80→0,95, e5-base 0,85→1,00); el chunking **por oración** es el peor para todos. k=1 da 1,000 en dev, pero se entregó top-2 con margen porque en R01 y R15 los dos primeros estaban casi empatados (0,001 y 0,003 de diferencia): se resignan 0,033 en dev para cubrir empates en test. Un umbral absoluto de 0,88 daba 0,983 en dev pero no protege esos casos.\n\n**Parte 2 (agente, 12 preguntas dev).**\n\n| # | Cambio | Ruteo | CR | F | AR | Costo agente (USD) | Costo juez (USD) |\n|---|---|---|---|---|---|---|---|\n| 1 | inicial, selección de la parte 1 | 1,00 | 4,917 | 5,00 | 4,917 | 0,001405 | 0,01667 |\n| 2 | siempre 3 fragmentos | 1,00 | 4,417 | 5,00 | 5,000 | 0,001464 | 0,02141 |\n| 3 | hasta 3, margen 0,02 | 1,00 | 4,833 | 5,00 | 4,917 | 0,001439 | 0,01797 |\n| **4** | selección de la parte 1 + descripción \"con las palabras del paciente, una búsqueda por tema\" | **1,00** | **5,000** | **5,00** | **5,000** | **0,001458** | 0,01744 |\n\nCada corrida: 24 llamadas al modelo (2 por pregunta), ~40 mil tokens de entrada y ~2,3 mil de salida; en las mixtas (A10–A12) el modelo pide las dos tools **en paralelo**. El juez cuesta **más de 10 veces** que el agente. Conclusión clave: el fallo de A11 no era *cuántos* fragmentos sino **la consulta** que redactaba el modelo. Con 12 preguntas y una corrida por configuración, una pregunta de diferencia está dentro del ruido; lo robusto es ruteo 1,00 y fidelidad 5,00 en las 4 corridas.\n\n**Partes 3–5:** sin resultados en el repo (pendientes).",
+ "que_hicimos": "El grupo trabajó con la metodología de la clase 2: `CLAUDE.md`, `SPEC.md`, un `PLAN.md` paso a paso (\"implementá el paso N\"), TDD con pytest (`tests/`) y commits convencionales. El código compartido vive en el paquete `hospital/` y los scripts de la raíz (`recuperar.py`, `agente.py`) son CLIs finos.\n\n**Parte 1 — RAG vectorial (`hospital/rag/`).**\n- `chunking.py` implementa las **tres estrategias de la clase**: longitud fija con solapamiento (ventanas de 40/10 y 80/20 *palabras*, sin cruzar secciones), semántico (párrafo y oración) y **estructural** (una sección `##` por fragmento). Regla de oro: cada fragmento es un **substring literal** del corpus, porque el evaluador busca la evidencia como texto.\n- **Metadatos como texto buscable**: \"Título > Sección: \" se antepone *solo al texto que se embebe*; el fragmento devuelto sigue literal.\n- `encoders.py`: `BertPromedio` (mean pooling de la última capa enmascarando padding) y `SentenceTransformerEncoder` (MiniLM, e5-small, e5-base con prefijos `query: ` / `passage: `). Todo normalizado L2, así el producto punto **es** el coseno.\n- `recuperador.py`: coseno contra la matriz de fragmentos, caché de embeddings, soporte opcional de cross-encoder, y una función `seleccionar` con **top-k, umbral absoluto y margen relativo al mejor**.\n- Grilla de **98 configuraciones** (4 encoders × 5 chunkings × metadatos × k, más umbrales y márgenes), cada una con su `.jsonl`, `.config.json` y `.eval.json` en `experimentos/recuperacion/`.\n- Configuración congelada en `hospital/rag/config.json`: **e5-base + estructural + metadatos + top-2 con margen 0,005**.\n\n**Parte 2 — Agente (`hospital/agente/`).** LangChain **sin LangGraph**: `ChatOpenAI` apuntando a OpenRouter (temperatura 0), tools enlazadas con `bind_tools` y un **bucle explícito** de tool calling (máx. 6 llamadas al modelo): el modelo pide tools, se ejecutan, vuelven como `ToolMessage`, y se repite hasta que responde sin pedir nada. Los errores de una tool vuelven al modelo como texto para que se corrija. Las **descripciones** de las tools (`descripciones.py`) dicen qué fuente consultan, para qué sirven, **qué NO tienen** y los valores válidos del parámetro, y se comparten con el servidor MCP de la parte 3 para que la comparación sea justa. `buscar_documentos` antepone `[Documento > Sección]` a cada fragmento. Cada corrida deja un log `.md` con tokens (entrada, caché, salida, razonamiento), costo e id de generación por llamada, y cada tool con argumentos y resultado completo. Se hicieron **4 corridas** iterando sobre la selección de fragmentos y la descripción de `buscar_documentos`.\n\n**Parte 3 — Servidor MCP.** `servidor_mcp.py` expone las **6 tools** con `FastMCP` (SDK oficial `mcp`) por **stdio**; cada función delega en los mismos `documentos` y `api_cliente` de la parte 2 y usa la descripción compartida de `descripciones.py`. No imprime nada en stdout porque ese canal es del protocolo. `agente_mcp.py` arma el cliente con `MultiServerMCPClient` de `langchain-mcp-adapters`: `load_mcp_tools` descubre las tools con **`tools/list`** (y valida que estén las 6), cada invocación es un **`tools/call`**, y entran al **mismo bucle** `correr` de la parte 2 sin cambios. La sesión MCP queda abierta toda la corrida para no reiniciar el servidor ni recargar el encoder en cada llamada. Además lo conectaron con **MCP Inspector**, que listó las 6 tools y las invocó una por una (7 capturas en `experimentos/inspector/`).\n\n**Parte 4 — Atención en NumPy (`atencion.py`).** `softmax` restando el máximo de cada fila (estable con valores grandes), `atencion(Q, K, V, mascara)` con `Q Kᵀ/√d_k` y máscara causal `np.triu(…, k=1) → −∞` que devuelve `A V` y `A`, `autoatencion` (proyecta X con `Wq`, `Wk`, `Wv`), `multicabeza` (concatena las cabezas y proyecta con `Wo`) y `layer_norm` sin γ/β. Pasan los **14 tests** de la cátedra.\n\n**Parte 5 — Bloque de transformer a mano.** Pasaron \"El banco aguanta ___\" y \"El banco presta ___\" por un bloque completo en papel (embeddings + posición, Q/K/V, afinidades, escala, máscara, softmax, mezcla, residual, layer norm, FFN, residual, layer norm y predicción); el escaneo está en `a_mano/Punto5_a_mano.pdf` y las conclusiones en el `INFORME.md`.\n\n**Después de la entrega de la parte 3**, un commit (\"Corrección A11\") agregó a `buscar_documentos` una regla fija: si la consulta contiene \"llevar\" o \"document\", trae **top-3 sin margen**. No hay una corrida nueva que la evalúe ni se menciona en el informe.",
+ "resultados": "**Parte 1 (recuperación, 20 preguntas dev).** Configuración entregada: e5-base, estructural, metadatos, top-2 con margen 0,005 → **CR 0,967** (recall 1,000, precision 0,950, MRR 1,000, k medio 1,10). Línea de base BERT: **0,350** en su mejor configuración (igual al léxico ingenuo). La entrega casi triplica la línea de base.\n\n| Encoder | Mejor CR | CR medio con k=1 | Coseno medio entre fragmentos | z del fragmento correcto |\n|---|---|---|---|---|\n| BERT multilingüe (promedio) | 0,350 | 0,27 | 0,786 | 1,56 |\n| paraphrase-multilingual-MiniLM-L12-v2 | 0,950 | 0,76 | 0,365 | 3,07 |\n| multilingual-e5-small | 0,950 | 0,80 | 0,842 | 3,94 |\n| **multilingual-e5-base** | **1,000** | **0,85** | 0,830 | 3,94 |\n\nHallazgos: con **k = 3 ningún encoder pasa de 0,515** (cada pregunta tiene una sola evidencia, así que un fragmento extra baja la precisión); los **metadatos** mejoran a los cuatro encoders con chunking estructural y k=1 (BERT 0,25→0,35, MiniLM 0,70→0,90, e5-small 0,80→0,95, e5-base 0,85→1,00); el chunking **por oración** es el peor para todos. k=1 da 1,000 en dev, pero se entregó top-2 con margen porque en R01 y R15 los dos primeros estaban casi empatados (0,001 y 0,003 de diferencia): se resignan 0,033 en dev para cubrir empates en test. Un umbral absoluto de 0,88 daba 0,983 en dev pero no protege esos casos.\n\n**Parte 2 (agente, 12 preguntas dev).**\n\n| # | Cambio | Ruteo | CR | F | AR | Costo agente (USD) | Costo juez (USD) |\n|---|---|---|---|---|---|---|---|\n| 1 | inicial, selección de la parte 1 | 1,00 | 4,917 | 5,00 | 4,917 | 0,001405 | 0,01667 |\n| 2 | siempre 3 fragmentos | 1,00 | 4,417 | 5,00 | 5,000 | 0,001464 | 0,02141 |\n| 3 | hasta 3, margen 0,02 | 1,00 | 4,833 | 5,00 | 4,917 | 0,001439 | 0,01797 |\n| **4** | selección de la parte 1 + descripción \"con las palabras del paciente, una búsqueda por tema\" | **1,00** | **5,000** | **5,00** | **5,000** | **0,001458** | 0,01744 |\n\nCada corrida: 24 llamadas al modelo (2 por pregunta), ~40 mil tokens de entrada y ~2,3 mil de salida; en las mixtas (A10–A12) el modelo pide las dos tools **en paralelo**. El juez cuesta **más de 10 veces** que el agente. Conclusión clave: el fallo de A11 no era *cuántos* fragmentos sino **la consulta** que redactaba el modelo. Con 12 preguntas y una corrida por configuración, una pregunta de diferencia está dentro del ruido; lo robusto es ruteo 1,00 y fidelidad 5,00 en las 4 corridas.\n\n**Parte 3 (agente por MCP, mismas 12 preguntas).**\n\n| Agente | Ruteo | CR | F | AR | Costo agente (USD) | Costo juez (USD) |\n|---|---|---|---|---|---|---|\n| Parte 2 (corrida 4, tools de LangChain) | 1,00 | 5,000 | 5,00 | 5,000 | 0,001458 | 0,01744 |\n| Parte 3 (tools por MCP) | 1,00 | 4,833 | 5,00 | 4,917 | 0,003524 | 0,02002 |\n\nLas dos rutean bien las 12 preguntas y mantienen fidelidad 5,00. La diferencia es **A11**: por MCP la primera búsqueda trajo «Llegada» y la segunda cómo pedir el turno, sin la lista de documentación (CR 3 y AR 4 en esa pregunta), con una llamada extra al modelo (25 contra 24). El informe aclara que con una corrida por versión no se puede atribuir la diferencia al transporte MCP. Costo total medido de las partes 2 y 3: **USD 0,042442** (0,004982 agente + 0,03746 juez).\n\n**Parte 4:** `python3 atencion/test_atencion.py atencion.py` → **14 tests, OK** (softmax estable, escala √d_k, máscara causal, formas, permutación de filas, multicabeza e invariantes de layer norm).\n\n**Parte 5:** con máscara causal (decoder), la fila de \"banco\" en LN(Z) es **idéntica** en las dos frases, y la última posición predice **\"peso\" (59,6%)** para \"aguanta\" y **\"dinero\" (59,6%)** para \"presta\". Sin máscara (encoder), el vector de \"banco\" **cambia** según el verbo. Los números coinciden con lo que da su `atencion.py` con los mismos datos.",
  "decisiones": [
   {
    "decision": "Encoder `intfloat/multilingual-e5-base` con prefijos `query: ` / `passage: `.",
@@ -24,7 +24,7 @@
   },
   {
    "decision": "Agente con LangChain y un bucle de tool calling escrito a mano (sin LangGraph ni AgentExecutor).",
-   "por_que": "Control total y trazabilidad: cada AIMessage y ToolMessage queda en el log. El bucle no depende del origen de las tools, así sirve igual para las `@tool` de la parte 2 y las que cargaría `langchain-mcp-adapters` en la parte 3."
+   "por_que": "Control total y trazabilidad: cada AIMessage y ToolMessage queda en el log. El bucle no depende del origen de las tools, así sirve igual para las `@tool` de la parte 2 y las que carga `langchain-mcp-adapters` en la parte 3: `agente_mcp.py` le pasa las tools MCP al mismo `correr` sin tocarlo."
   },
   {
    "decision": "Descripciones de tools que dicen cuándo usarlas, qué NO tienen y los valores válidos del parámetro, compartidas entre parte 2 y 3.",
@@ -41,6 +41,14 @@
   {
    "decision": "Prompt de sistema que obliga a responder solo con datos de las herramientas y a decir cuando algo no está.",
    "por_que": "El hospital es inventado: cualquier dato del modelo es alucinación. Resultado: Faithfulness 5,00 en todas las corridas."
+  },
+  {
+   "decision": "Servidor MCP con FastMCP por stdio que reusa `documentos`, `api_cliente` y `descripciones.py`, y un cliente que mantiene una sola sesión abierta.",
+   "por_que": "Si el servidor reescribiera las tools o las descripciones, la comparación con la parte 2 no mediría el transporte sino otro sistema. Una sola sesión evita levantar el proceso y recargar e5-base en cada `tools/call`. El cliente valida que `tools/list` devuelva exactamente las 6 tools antes de correr."
+  },
+  {
+   "decision": "Después de la entrega, forzar top-3 sin margen en `buscar_documentos` cuando la consulta contiene «llevar» o «document» (commit «Corrección A11»).",
+   "por_que": "El commit se llama «Corrección A11» y llega después de la corrida MCP, donde A11 volvió a fallar porque la sección «Qué llevar a la primera consulta» no aparecía; el repo no lo explica, pero esa es la lectura más probable. La regla la trae siempre para ese tipo de consulta."
   }
  ],
  "nrefs": 69,
@@ -55,7 +63,7 @@
      "slug": "claude-desktop-chat",
      "i": 21,
      "title": "Agregar un external connector",
-     "texto": "En el TP3 tu servidor MCP propio (FastMCP, `servidor_mcp.py`) quedó pendiente: solo está diseñado en `PLAN.md`.",
+     "texto": "En el TP3 armaste tu propio servidor MCP (FastMCP, `servidor_mcp.py`) y lo probaste con MCP Inspector por stdio: listó las 6 tools y respondió cada llamada.",
      "extra": true,
      "url": "/clases/01/#d=claude-desktop-chat&s=21"
     },
@@ -202,7 +210,7 @@
      "slug": "rag-y-mcp",
      "i": 29,
      "title": "Tres síntomas de que falta una etapa",
-     "texto": "Fue tu A11 del TP3: la sección correcta quedaba tercera. Lo arreglaste reescribiendo la descripción de la tool, sin rerankear.",
+     "texto": "Fue tu A11 del TP3: la sección correcta quedaba tercera. Primero lo arreglaste con la descripción de la tool; después sumaron top-3 cuando la consulta dice «llevar» o «document».",
      "extra": false,
      "url": "/clases/06/#d=rag-y-mcp&s=29"
     },
@@ -265,7 +273,7 @@
      "slug": "rag-y-mcp",
      "i": 53,
      "title": "El servidor separa herramienta y agente",
-     "texto": "Quedó pendiente en el TP3: el PLAN.md diseña FastMCP por stdio, con logs a stderr porque stdout es el canal del protocolo.",
+     "texto": "`servidor_mcp.py` corre FastMCP por stdio y no imprime nada en stdout, porque ese canal es del protocolo.",
      "extra": false,
      "url": "/clases/06/#d=rag-y-mcp&s=53"
     },
@@ -274,7 +282,7 @@
      "slug": "rag-y-mcp",
      "i": 54,
      "title": "El ciclo de vida de una herramienta MCP",
-     "texto": "Pendiente en el TP3: el cliente con MultiServerMCPClient que descubre con tools/list y llama con tools/call no se implementó.",
+     "texto": "`agente_mcp.py` arma el cliente con `MultiServerMCPClient`: descubre con tools/list (y valida que estén las 6) y llama con tools/call.",
      "extra": false,
      "url": "/clases/06/#d=rag-y-mcp&s=54"
     },
@@ -283,7 +291,7 @@
      "slug": "rag-y-mcp",
      "i": 57,
      "title": "Demo: un servidor MCP mínimo",
-     "texto": "El bucle del TP3 quedó agnóstico del origen de las tools para reusarlo con MCP, pero la parte 3 quedó pendiente.",
+     "texto": "El bucle del TP3 era agnóstico del origen de las tools: en la parte 3 recibió las tools MCP sin cambios. Ruteo 1,00 y F 5,00; CR bajó a 4,833 por A11.",
      "extra": false,
      "url": "/clases/06/#d=rag-y-mcp&s=57"
     },
@@ -344,7 +352,7 @@
      "slug": "palabra-al-transformer",
      "i": 27,
      "title": "Cada token mira a todos",
-     "texto": "La parte 4 del TP3 (atención en NumPy) quedó pendiente: el plan era `softmax`, `atencion` y `autoatencion` guiados por 14 tests.",
+     "texto": "En la parte 4 del TP3 implementaste `softmax`, `atencion`, `autoatencion`, `multicabeza` y `layer_norm` solo con NumPy: pasaron los 14 tests de la cátedra.",
      "extra": false,
      "url": "/clases/07/#d=palabra-al-transformer&s=27"
     },
@@ -443,7 +451,7 @@
      "slug": "rag-mcp-rapida",
      "i": 16,
      "title": "MCP conecta modelos con herramientas",
-     "texto": "En el TP3 esta parte quedó pendiente: no existe `servidor_mcp.py`; el diseño en PLAN.md usa FastMCP reusando `descripciones.py`.",
+     "texto": "`servidor_mcp.py`: FastMCP por stdio con las 6 tools; cada una delega en `documentos`/`api_cliente` y usa la descripción compartida de `descripciones.py`.",
      "extra": false,
      "url": "/clases/07/#d=rag-mcp-rapida&s=16"
     },
@@ -452,7 +460,7 @@
      "slug": "rag-mcp-rapida",
      "i": 18,
      "title": "JSON-RPC 2.0: la capa de mensajes",
-     "texto": "Pendiente: el cliente con `langchain-mcp-adapters` iba a descubrir con `tools/list` y llamar con `tools/call` sobre stdio.",
+     "texto": "`agente_mcp.py` usa `MultiServerMCPClient`: `load_mcp_tools` descubre con `tools/list` y cada invocación es un `tools/call` por stdio, con la sesión abierta toda la corrida.",
      "extra": false,
      "url": "/clases/07/#d=rag-mcp-rapida&s=18"
     },
@@ -461,7 +469,7 @@
      "slug": "rag-mcp-rapida",
      "i": 19,
      "title": "Herramienta hardcodeada o servidor aparte",
-     "texto": "Tus 6 tools son `@tool` de LangChain (hardcodeadas); el bucle `responder` ya es agnóstico para enchufarlas por MCP.",
+     "texto": "En la parte 2 las 6 tools eran `@tool` de LangChain; en la parte 3 llegan por MCP y entran al mismo bucle `correr` sin cambiarlo.",
      "extra": false,
      "url": "/clases/07/#d=rag-mcp-rapida&s=19"
     },
@@ -531,7 +539,7 @@
      "slug": "transformers-a-fondo",
      "i": 11,
      "title": "El ciclo de generación con el transformer abierto",
-     "texto": "Es el ejemplo de los 14 tests de la parte 4 del TP3 ('the cat sat', d=4), que quedó pendiente.",
+     "texto": "Es el ejemplo de los 14 tests de la parte 4 del TP3 ('the cat sat', d=4); tu `atencion.py` los pasó todos.",
      "extra": false,
      "url": "/clases/08/#d=transformers-a-fondo&s=11"
     },
@@ -540,7 +548,7 @@
      "slug": "transformers-a-fondo",
      "i": 18,
      "title": "Escalar y repartir: el softmax",
-     "texto": "Pendiente en el TP3; el plan era `S = QKᵀ/√d_k` y softmax restando el máximo para estabilidad numérica.",
+     "texto": "Tu `atencion` calcula `Q @ K.T / np.sqrt(d_k)`, y `softmax` resta el máximo de cada fila antes de exponenciar para que sea estable.",
      "extra": false,
      "url": "/clases/08/#d=transformers-a-fondo&s=18"
     },
@@ -549,7 +557,7 @@
      "slug": "transformers-a-fondo",
      "i": 20,
      "title": "La máscara causal",
-     "texto": "Quedó pendiente (plan: `np.triu(…,1) → −∞`). La parte 5 lo pide: con máscara, 'banco' queda igual en las dos frases.",
+     "texto": "Tu máscara pone −∞ con `np.triu(…, k=1)` antes del softmax. En la parte 5, con máscara, 'banco' quedó igual en las dos frases.",
      "extra": false,
      "url": "/clases/08/#d=transformers-a-fondo&s=20"
     },
@@ -558,7 +566,7 @@
      "slug": "transformers-a-fondo",
      "i": 26,
      "title": "Layer norm: mantener los números en rango",
-     "texto": "Pendiente en el TP3; el plan era `layer_norm` sin γ/β, verificada por los tests.",
+     "texto": "Tu `layer_norm` lleva cada fila a media 0 y varianza 1, sin γ ni β, y pasó los tests de invariantes.",
      "extra": false,
      "url": "/clases/08/#d=transformers-a-fondo&s=26"
     },
@@ -585,7 +593,7 @@
      "slug": "transformers-a-fondo",
      "i": 42,
      "title": "Un bloque repetido",
-     "texto": "El ejercicio a mano es la parte 5 del TP3 ('El banco aguanta/presta'), pendiente en tu repo.",
+     "texto": "Es la parte 5 del TP3, resuelta a mano (`a_mano/Punto5_a_mano.pdf`): con máscara, el modelo predice 'peso' y 'dinero' con 59,6% cada una.",
      "extra": false,
      "url": "/clases/08/#d=transformers-a-fondo&s=42"
     }
@@ -610,7 +618,7 @@
      "slug": "como-se-entrena-un-llm",
      "i": 47,
      "title": "MCP: host, cliente y servidor",
-     "texto": "El servidor MCP del TP3 (FastMCP, 6 tools) quedó pendiente: solo está diseñado en `PLAN.md`.",
+     "texto": "El servidor MCP del TP3 (FastMCP, 6 tools, stdio) reusa las mismas descripciones; con MCP el agente mantuvo ruteo 1,00 y Faithfulness 5,00.",
      "extra": false,
      "url": "/clases/09/#d=como-se-entrena-un-llm&s=47"
     },
@@ -662,7 +670,7 @@
      "slug": "agentes-y-multiagentes",
      "i": 20,
      "title": "Principios para diseñar tools",
-     "texto": "Arreglaste A11 cambiando la descripción de `buscar_documentos` («con las palabras del paciente, una búsqueda por tema»): CR 5,000.",
+     "texto": "Arreglaste A11 cambiando la descripción de `buscar_documentos` («con las palabras del paciente, una búsqueda por tema»): CR 5,000. Después sumaron una regla fija: si la consulta dice «llevar», top-3.",
      "extra": false,
      "url": "/clases/10/#d=agentes-y-multiagentes&s=20"
     },
@@ -730,7 +738,7 @@
      "slug": "cierre-magnifica-humanitas",
      "i": 45,
      "title": "Hacia un Internet de Agentes",
-     "texto": "En el TP3 el servidor MCP (FastMCP con 6 tools) quedó diseñado en `PLAN.md` pero pendiente: no existe `servidor_mcp.py`.",
+     "texto": "En el TP3 el servidor MCP (`servidor_mcp.py`, FastMCP por stdio) expone las 6 tools reusando `descripciones.py`; MCP Inspector las listó y las invocó una por una.",
      "extra": false,
      "url": "/clases/13/#d=cierre-magnifica-humanitas&s=45"
     }
@@ -907,7 +915,7 @@
    "codigo": "### Dónde falló el agente y qué se cambió\n\n**A11** (\"Necesito turno con cardiología, ¿cuál es el primero y qué tengo que llevar?\") fue la única pregunta con\nproblemas en la corrida 1 (CR 4, AR 4). El log muestra que el ruteo estuvo bien: llamó a `consultar_turnos` y a\n`buscar_documentos`. Pero buscó *\"requisitos y documentación para turno en consultorios externos de cardiología\"*, y el\nrecuperador devolvió solo la sección \"Cómo se pide un turno\", que menciona la derivación. La sección \"Qué llevar a la\nprimera consulta\" (DNI, credencial, derivación, estudios previos) quedó tercera, a 0,018 del primero y fuera del\nmargen de 0,005. La respuesta fue fiel a lo que recibió (F 5), pero incompleta.\n\nPrimero se probó darle más fragmentos al agente, porque la métrica de la parte 1 castiga cada fragmento extra y la del\njuez no tanto:\n\n- Con **top-3 fijo** (corrida 2), A11 sube a 5, pero el ruido baja el CR de A01–A04 y A12 (3 y 4): el juez penaliza\n  los fragmentos que no hacen falta. El promedio de CR cae a 4,417.\n- Con **margen 0,02** (corrida 3), el resto vuelve a 5. Pero A11 falla otra vez (CR 3), porque el modelo redactó la\n  consulta de otra forma y la sección correcta ya no quedaba cerca del primero.\n\nEl problema no era la cantidad de fragmentos sino la consulta. Buscar \"requisitos y documentación\" no se parece al\nencabezado \"Qué llevar a la primera consulta\"; buscar con las palabras del paciente (\"qué tengo que llevar\") sí. Por\neso en la corrida 4 se volvió a la selección de la parte 1 y se cambió la descripción de `buscar_documentos`: la\nconsulta va \"con las mismas palabras que usó el paciente\" y, si la pregunta toca varios temas, se hace una búsqueda por\ntema. En A11 el modelo buscó *\"qué llevar a un turno de cardiología…\"*, recibió la sección correcta y contestó completo.\n\nEn el mismo cambio se reemplazó el ejemplo de la descripción (\"horario de visita de los abuelos en neonatología\"), que\nera literalmente la pregunta A01 de dev, por uno que no aparece en ninguna pregunta dev (\"cómo es una consulta por\ntelemedicina\"). Así se evita ajustar el agente a las preguntas dev.\n\n**Límites de esta medición.** Son 12 preguntas y una corrida por configuración. El modelo redacta la consulta distinto\nen cada corrida aun con temperatura 0: en A11, con la misma descripción, las corridas 1 a 3 buscaron \"…consultorios\nexternos de cardiología\", \"…consultorios externos cardiología\" y \"…consultorios externos\" a secas. Así que una\ndiferencia de una pregunta entre corridas está dentro del ruido. Lo que se sostiene en las cuatro corridas es el ruteo\n(1,00 siempre) y la fidelidad (5,00 siempre): el agente no inventó datos en ninguna respuesta.",
    "que_hace": "Analiza la única pregunta que falló (A11, turno de cardiología y qué llevar), las dos soluciones que no funcionaron y la que sí, más los límites de la medición.",
    "como_funciona": "- El ruteo estaba bien, pero el modelo buscó «requisitos y documentación…» y la sección «Qué llevar a la primera consulta» quedó tercera, fuera del margen.\n- Top-3 fijo la arreglaba pero el ruido bajó el CR general a 4,417; margen 0,02 falló por otra redacción de la consulta.\n- Solución: la descripción de `buscar_documentos` pide usar las palabras del paciente y una búsqueda por tema.\n- Se sacó del ejemplo la pregunta A01 de dev.\n- Con 12 preguntas y una corrida, una pregunta de diferencia es ruido.",
-   "proposito": "Muestra que se corrigió el síntoma «la sección correcta queda tercera» mejorando la consulta (descripción de la tool) en vez de agregar un reranker o más contexto.",
+   "proposito": "Muestra que se corrigió el síntoma «la sección correcta queda tercera» mejorando la consulta (descripción de la tool) en vez de agregar un reranker o más contexto. Ojo: después de la corrida MCP se agregó además una regla por palabra clave en `buscar_documentos` (top-3 sin margen si la consulta dice «llevar» o «document»); este informe no la menciona y no se evaluó con una corrida nueva.",
    "interaccion": "Se apoya en los logs de `experimentos/corridas/` y explica el texto final de `BUSCAR_DOCUMENTOS` en `hospital/descripciones.py`.",
    "teoria": "Diagnóstico de RAG: cuando falta una etapa (consulta mal formulada) más contexto mete ruido; y la variabilidad del LLM aun con temperatura 0.",
    "key": "tp3-informe-a11",
@@ -954,19 +962,19 @@
    "nusos": 4
   },
   {
-   "id": "plan-mcp-pendiente",
-   "titulo": "Diseño del servidor y cliente MCP (pendiente)",
-   "archivo": "PLAN.md",
-   "desde": 155,
-   "hasta": 171,
+   "id": "informe-mcp-comparacion",
+   "titulo": "Parte 3 en el informe: verificación y comparación con la parte 2",
+   "archivo": "INFORME.md",
+   "desde": 249,
+   "hasta": 282,
    "lenguaje": "markdown",
-   "codigo": "## Step 3 — Part 3: MCP server + LangChain MCP client (15 pts)\nDepends on Step 2.\n\n**3.1 `servidor_mcp.py`** — `mcp.server.fastmcp.FastMCP(\"hospital\")`, 6 `@mcp.tool(name=..., description=DESCRIPCIONES[...])`\nwrapping `hospital.api_cliente` and `Recuperador`; `mcp.run()` (stdio). Nothing on stdout except the protocol (logs → stderr);\nwarm up the retriever at startup so the first call doesn’t time out.\n\n**3.2 `agente_mcp.py`** — **no API/retriever code of its own**: `MultiServerMCPClient({\"hospital\": {\"command\": sys.executable, \"args\": [\"servidor_mcp.py\"], \"transport\": \"stdio\"}})`,\n`tools = await client.get_tools()` (tools/list; log the discovered names), then reuse `responder` + `correr(..., etiqueta=\"mcp\")`\nwith the same LLM and prompt.\n\n**3.3 Inspector** (manual, user) — `npx @modelcontextprotocol/inspector python3 servidor_mcp.py`, call all 6 tools, save screenshots to `experimentos/inspector/`.\n\n**3.4 Compare** — run benchmark → `respuestas_mcp.jsonl` + log + eval. `experimentos/comparar_agentes.py` prints a table\n(ruteo, CR, F, AR, agent cost from log totals, judge cost) for Part 2 vs 3. INFORME §3: table + explanation of any difference from the logs (e.g. tool-result formatting, nondeterminism).\n\n**Done when:** `python3 agente_mcp.py --preguntas datos/preguntas_agente_dev.jsonl --salida respuestas_mcp.jsonl` works with the API running, `grep -E \"urllib|Recuperador|localhost\" agente_mcp.py` is empty, 6 inspector screenshots exist.",
-   "que_hace": "Es el diseño, no código: la parte 3 quedó pendiente y no existen `servidor_mcp.py` ni `agente_mcp.py`. El PLAN describe un servidor FastMCP por stdio con las 6 tools y un cliente LangChain con `MultiServerMCPClient`.",
-   "como_funciona": "- 3.1: `FastMCP(\"hospital\")` con 6 `@mcp.tool(name=..., description=DESCRIPCIONES[...])` que envuelven `api_cliente` y el recuperador; `mcp.run()` por stdio; logs a stderr porque stdout es el canal del protocolo.\n- 3.2: `agente_mcp.py` sin código propio de API: `MultiServerMCPClient` lanza el servidor, `get_tools()` descubre las tools (tools/list) y se reusa `responder` y `correr`.\n- 3.3: probar con MCP Inspector.\n- 3.4: comparar parte 2 vs. parte 3.",
-   "proposito": "Separa herramienta y agente: el mismo set de tools podría usarlo cualquier host MCP. Reusar `descripciones.py` y el bucle agnóstico haría justa la comparación. Quedó pendiente en la entrega.",
-   "interaccion": "Se apoyaría en `hospital/descripciones.py`, `hospital/api_cliente.py`, `hospital/documentos.py`, `hospital/agente/bucle.py` y `corrida.py` (que ya normaliza bloques de contenido MCP en `texto()`).",
-   "teoria": "Arquitectura MCP: host, cliente y servidor; descubrimiento con tools/list y ejecución con tools/call sobre JSON-RPC 2.0 por stdio.",
-   "key": "tp3-plan-mcp-pendiente",
+   "codigo": "## 3. Servidor MCP\n\n### Implementación y verificación\n\nLas seis herramientas de la parte 2 se exponen desde `servidor_mcp.py` con el SDK oficial `mcp` y transporte stdio. Sus\nfunciones delegan a los mismos módulos de documentos y API; las descripciones compartidas viven en\n`hospital/descripciones.py`. `agente_mcp.py` descubre las tools con `tools/list`, las convierte a tools de LangChain con\n`langchain-mcp-adapters` y sus invocaciones usan `tools/call`. La sesión MCP queda abierta durante toda la corrida para\nevitar reiniciar el servidor y recargar el encoder por cada llamada.\n\nSe verificó el descubrimiento de las seis herramientas y una llamada a cada una. Las cinco herramientas de la API\ndevolvieron JSON del hospital y `buscar_documentos` devolvió fragmentos del corpus. MCP Inspector se conectó por stdio\nal servidor. El registro de la corrida está en\n`experimentos/corridas/agente_mcp_20261001-200728.md`; las respuestas y evaluación están en `respuestas_mcp.jsonl` y\n`respuestas_mcp.jsonl.eval.json`. El Inspector se conectó, listó las seis herramientas y permitió invocar cada una\ncon éxito. Las siete capturas PNG (listado y seis resultados) están en `experimentos/inspector/`.\nPara apuntar a la API local en el puerto alternativo, se inició Inspector con\n`npx @modelcontextprotocol/inspector -e HOSPITAL_API=http://127.0.0.1:18765 .venv/bin/python servidor_mcp.py`;\nla opción `-e` pasa explícitamente esa variable al proceso MCP.\n\n### Comparación con la parte 2\n\n| Agente | Ruteo | Relevancia del contexto | Fidelidad | Pertinencia de respuesta | Costo agente (USD) | Costo juez (USD) |\n|---|---:|---:|---:|---:|---:|---:|\n| Parte 2 (`agente_20260929-105719`) | 1,000 | 5,000 | 5,000 | 5,000 | 0,001458 | 0,01744 |\n| Parte 3 (`agente_mcp_20261001-200728`) | 1,000 | 4,833 | 5,000 | 4,917 | 0,003524 | 0,02002 |\n\nLas dos corridas enrutan correctamente las 12 preguntas y mantienen fidelidad perfecta. La diferencia está en A11:\nla parte 2 recuperó «Qué llevar a la primera consulta» con DNI, credencial, derivación y estudios previos. En la corrida\nMCP, la primera búsqueda devolvió «Llegada» y la segunda una sección sobre cómo pedir el turno; faltó la lista de\ndocumentación. El juez bajó la relevancia del contexto a 3 y la pertinencia de la respuesta a 4 para esa pregunta.\nEsto coincide con los logs: el agente MCP hizo una llamada adicional al modelo en A11 (25 en total frente a 24 en la\nparte 2) y entregó contexto menos pertinente. Por eso sus costos de agente y juez también fueron algo mayores; una\ncorrida por versión no alcanza para atribuir la diferencia al transporte MCP por sí solo.",
+   "que_hace": "Cuenta cómo se verificó el servidor MCP (las seis tools listadas e invocadas, también desde MCP Inspector) y compara la corrida MCP con la mejor corrida de la parte 2.",
+   "como_funciona": "- Implementación: `servidor_mcp.py` con el SDK `mcp` por stdio; `agente_mcp.py` descubre con `tools/list` e invoca con `tools/call` vía `langchain-mcp-adapters`.\n- Tabla: ruteo 1,000 en las dos; CR 5,000 → 4,833; F 5,000 en las dos; AR 5,000 → 4,917; costo del agente USD 0,001458 → 0,003524 y del juez 0,01744 → 0,02002.\n- La diferencia está en A11: vía MCP no llegó la sección «Qué llevar a la primera consulta» (CR 3, AR 4) y hubo una llamada extra al modelo.\n- Con una corrida por versión no alcanza para atribuirle la diferencia al transporte MCP.",
+   "proposito": "Muestra que pasar las tools a un servidor aparte no cambió el ruteo ni la fidelidad; la única pregunta que empeoró fue A11, por la redacción de la consulta y no por MCP en sí.",
+   "interaccion": "Resume `experimentos/corridas/agente_mcp_20261001-200728.md`, `respuestas_mcp.jsonl.eval.json` y las capturas de `experimentos/inspector/`; la fila de la parte 2 sale de la corrida 4 (`agente_20260929-105719`).",
+   "teoria": "Evaluar un agente por etapas (ruteo, CR, F, AR) y medir costo; MCP cambia dónde viven las tools, no lo que el modelo decide.",
+   "key": "tp3-informe-mcp-comparacion",
    "tp": 3,
    "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
    "usos": [
@@ -983,46 +991,10 @@
      "clase": 6,
      "cnn": "06",
      "slug": "rag-y-mcp",
-     "i": 53,
-     "title": "El servidor separa herramienta y agente",
-     "extra": false,
-     "url": "/clases/06/#d=rag-y-mcp&s=53"
-    },
-    {
-     "clase": 6,
-     "cnn": "06",
-     "slug": "rag-y-mcp",
-     "i": 54,
-     "title": "El ciclo de vida de una herramienta MCP",
-     "extra": false,
-     "url": "/clases/06/#d=rag-y-mcp&s=54"
-    },
-    {
-     "clase": 6,
-     "cnn": "06",
-     "slug": "rag-y-mcp",
      "i": 57,
      "title": "Demo: un servidor MCP mínimo",
      "extra": false,
      "url": "/clases/06/#d=rag-y-mcp&s=57"
-    },
-    {
-     "clase": 7,
-     "cnn": "07",
-     "slug": "rag-mcp-rapida",
-     "i": 16,
-     "title": "MCP conecta modelos con herramientas",
-     "extra": false,
-     "url": "/clases/07/#d=rag-mcp-rapida&s=16"
-    },
-    {
-     "clase": 7,
-     "cnn": "07",
-     "slug": "rag-mcp-rapida",
-     "i": 18,
-     "title": "JSON-RPC 2.0: la capa de mensajes",
-     "extra": false,
-     "url": "/clases/07/#d=rag-mcp-rapida&s=18"
     },
     {
      "clase": 9,
@@ -1043,22 +1015,22 @@
      "url": "/clases/13/#d=cierre-magnifica-humanitas&s=45"
     }
    ],
-   "nusos": 8
+   "nusos": 4
   },
   {
-   "id": "plan-atencion-pendiente",
-   "titulo": "Diseño de la atención en NumPy (pendiente)",
-   "archivo": "PLAN.md",
-   "desde": 175,
-   "hasta": 184,
+   "id": "informe-atencion",
+   "titulo": "Parte 4 en el informe: las cinco funciones y los 14 tests",
+   "archivo": "INFORME.md",
+   "desde": 284,
+   "hasta": 310,
    "lenguaje": "markdown",
-   "codigo": "## Step 4 — Part 4: attention in NumPy (`atencion.py`, 15 pts)\nIndependent. TDD against the given tests (red → green per function):\n- `softmax(M)`: subtract row max, exp, normalize over last axis.\n- `atencion(Q, K, V, mascara=False)`: `S = Q Kᵀ / √d_k`; if mask, `np.triu(ones, 1)` → `-inf`; `A = softmax(S)`; return `(A V, A)`.\n- `autoatencion(X, Wq, Wk, Wv, mascara)`: project then `atencion`.\n- `multicabeza(X, cabezas, Wo, mascara)`: concat head outputs on axis 1, `@ Wo`.\n- `layer_norm(x, eps=1e-5)`: `(x - mean) / sqrt(var + eps)` per row, no γ/β.\nNumPy only. INFORME §4 short.\n\n**Done when:** `python3 atencion/test_atencion.py atencion.py` → 14 tests OK (test file untouched).",
-   "que_hace": "Es el diseño, no código: `atencion.py` no existe en el repo. El PLAN fija las cinco funciones que había que implementar con TDD contra los tests de la cátedra.",
-   "como_funciona": "- `softmax(M)`: restar el máximo de la fila, exponenciar y normalizar.\n- `atencion(Q, K, V, mascara)`: `S = Q Kᵀ / √d_k`; con máscara, `np.triu(ones, 1)` → `-inf`; `A = softmax(S)`; devuelve `(A V, A)`.\n- `autoatencion`: proyecta X con Wq, Wk, Wv y llama a `atencion`.\n- `multicabeza`: concatena las cabezas y multiplica por `Wo`.\n- `layer_norm`: `(x - media) / sqrt(var + eps)` por fila, sin γ/β.",
-   "proposito": "Traduce la clase de transformers a operaciones de matrices. Restar el máximo evita overflow en `exp`; escalar por √d_k evita que el softmax se sature. Quedó pendiente.",
-   "interaccion": "Se validaría con `python3 atencion/test_atencion.py atencion.py` (14 tests) y la parte 5 lo usaría para verificar las cuentas a mano.",
-   "teoria": "Atención escalada por producto punto, máscara causal, multi-cabeza y layer norm.",
-   "key": "tp3-plan-atencion-pendiente",
+   "codigo": "## 4. Atención en NumPy\n\nLa implementación está en `atencion.py` y usa únicamente NumPy. Se implementaron las\ncinco operaciones pedidas:\n\n- `softmax(M)`: calcula el softmax sobre el último eje. Antes de aplicar la exponencial\n  resta el máximo de cada fila, de modo que también sea estable con valores grandes.\n- `atencion(Q, K, V, mascara=False)`: calcula los puntajes `Q K^T / sqrt(d_k)`, aplica\n  opcionalmente la máscara causal poniendo `-inf` sobre la diagonal superior, y\n  devuelve tanto `A V` como la matriz de pesos `A`.\n- `autoatencion(X, Wq, Wk, Wv, mascara=False)`: proyecta la entrada en consultas,\n  claves y valores, y reutiliza la atención anterior.\n- `multicabeza(X, cabezas, Wo, mascara=False)`: ejecuta cada cabeza, concatena sus\n  salidas y aplica la proyección final `Wo`.\n- `layer_norm(x, eps=1e-5)`: normaliza cada fila a media aproximadamente cero y\n  varianza aproximadamente uno, sin parámetros aprendidos `gamma` ni `beta`.\n\nLa verificación se hizo con:\n\n```bash\npython3 atencion/test_atencion.py atencion.py\n```\n\nEl resultado fue **14 tests ejecutados, 14 aprobados (`OK`)**. Se comprobaron el\nsoftmax estable, la escala por `sqrt(d_k)`, la máscara causal, las formas de las\nsalidas, la permutación de filas, la concatenación de múltiples cabezas y las\ninvariantes de `layer_norm`.",
+   "que_hace": "Resume qué hace cada función de `atencion.py` y cómo se verificó.",
+   "como_funciona": "- Lista `softmax`, `atencion`, `autoatencion`, `multicabeza` y `layer_norm` con su detalle clave (restar el máximo, escala √d_k, `-inf` arriba de la diagonal, concatenar y `Wo`, sin γ/β).\n- Verificación: `python3 atencion/test_atencion.py atencion.py` → 14 tests, 14 aprobados (`OK`).",
+   "proposito": "Deja por escrito que la implementación usa solo NumPy y pasa todos los tests de la cátedra sin modificarlos.",
+   "interaccion": "Describe `atencion.py` y el resultado de `atencion/test_atencion.py`.",
+   "teoria": "Los componentes del bloque transformer: atención escalada, máscara causal, multicabeza y layer norm.",
+   "key": "tp3-informe-atencion",
    "tp": 3,
    "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
    "usos": [
@@ -1075,17 +1047,55 @@
    "nusos": 1
   },
   {
+   "id": "informe-parte5",
+   "titulo": "Parte 5 en el informe: 'peso' y 'dinero', con y sin máscara",
+   "archivo": "INFORME.md",
+   "desde": 312,
+   "hasta": 335,
+   "lenguaje": "markdown",
+   "codigo": "## 5. Bloque de transformer a mano\n\nSe procesaron manualmente las frases **“El banco aguanta ___”** y **“El banco presta ___”** mediante un bloque Transformer completo. Para cada frase se calcularon los embeddings de palabra y posición, las proyecciones Q, K y V, los puntajes de atención, softmax, mezcla de valores, conexiones residuales, layer normalization, feed-forward y la predicción final.\n\nResultados con máscara causal\n\nEn la configuración tipo decoder, la representación de **“banco”** es la misma en ambas frases, ya que la máscara causal impide que este token vea las palabras posteriores (“aguanta” o “presta”).\n\nSin embargo, la representación de la última palabra sí incorpora el contexto anterior y permite obtener predicciones diferentes:\n\n- **“El banco aguanta ___” → “peso”**, con una probabilidad aproximada de **59,6 %**.\n- **“El banco presta ___” → “dinero”**, con una probabilidad aproximada de **59,6 %**.\n\nComparación sin máscara\n\nAl eliminar la máscara causal, como en un encoder, cada token puede atender a toda la oración. Por este motivo, la representación de **“banco”** cambia según aparezca junto a “aguanta” o a “presta”. Esto muestra cómo la atención permite contextualizar una palabra ambigua utilizando las palabras que la rodean.\n\nConclusión\n\nLa parte con máscara causal se asemeja al funcionamiento de un modelo decoder como GPT, que predice el siguiente token sin utilizar información futura. La atención sin máscara se asemeja a un encoder como BERT, donde cada palabra puede utilizar información de toda la secuencia.\n\nLos embeddings de posición también son importantes porque incorporan información sobre el orden de las palabras. Si se eliminaran, el modelo perdería parte de la información necesaria para distinguir frases en las que el orden modifica el significado.\n\nEl desarrollo completo de las operaciones y sus justificaciones se encuentra escaneado en la carpeta `a_mano/`.",
+   "que_hace": "Resume el bloque de transformer resuelto a mano para «El banco aguanta ___» y «El banco presta ___», con y sin máscara causal.",
+   "como_funciona": "- Se hicieron a mano embeddings + posición, Q/K/V, puntajes, softmax, mezcla, residuales, layer norm, feed-forward y predicción.\n- Con máscara (decoder): «banco» queda igual en las dos frases porque no ve la palabra siguiente; la última palabra sí junta contexto: «peso» y «dinero», con ~59,6 % cada una.\n- Sin máscara (encoder): «banco» cambia según «aguanta» o «presta».\n- Conclusión: con máscara se parece a GPT, sin máscara a BERT; sin embeddings de posición se pierde el orden.",
+   "proposito": "Conecta las cuentas a mano con la teoría: qué hace la máscara causal y por qué la misma atención da un decoder o un encoder. El desarrollo completo está en `a_mano/Punto5_a_mano.pdf` (hojas escaneadas).",
+   "interaccion": "Responde la consigna de `a_mano/ejercicio.md`; son las mismas operaciones que implementan `atencion` y `layer_norm` en `atencion.py`.",
+   "teoria": "Un bloque transformer completo (atención, residual, layer norm, FFN) y la diferencia decoder (máscara causal) vs. encoder (bidireccional).",
+   "key": "tp3-informe-parte5",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
+     "i": 20,
+     "title": "La máscara causal",
+     "extra": false,
+     "url": "/clases/08/#d=transformers-a-fondo&s=20"
+    },
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
+     "i": 42,
+     "title": "Un bloque repetido",
+     "extra": false,
+     "url": "/clases/08/#d=transformers-a-fondo&s=42"
+    }
+   ],
+   "nusos": 2
+  },
+  {
    "id": "ejercicio-a-mano",
-   "titulo": "Parte 5: el bloque de transformer a mano (pendiente)",
+   "titulo": "Parte 5: la consigna del bloque de transformer a mano",
    "archivo": "a_mano/ejercicio.md",
    "desde": 63,
    "hasta": 93,
    "lenguaje": "markdown",
    "codigo": "## Parte A: el bloque completo como decoder (con máscara causal)\n\nPara cada una de las dos frases:\n\n1. **Entrada.** X = E + P, una fila por token.\n2. **Proyecciones.** Q = X Wq, K = X Wk, V = X Wv.\n3. **Afinidades.** S = Q Kᵀ.\n4. **Escala.** S / √d, con d = 4.\n5. **Máscara causal.** Poner −∞ donde un token mira a uno posterior.\n6. **Matriz de atención.** A = softmax por fila.\n7. **Mezcla.** A V, y después la proyección de salida (A V) Wo.\n8. **Residual.** Z = X + (A V) Wo.\n9. **Layer norm.** LN(Z), fila por fila (media y varianza de cada fila; ε despreciable).\n10. **Feed-forward.** FFN = ReLU(LN(Z) W1) W2.\n11. **Residual.** H = Z + FFN.\n12. **Layer norm final.** LN(H).\n13. **Predicción.** Con la última fila de LN(H), logits = fila · Wout (un valor por palabra del vocabulario) y softmax sobre esos seis valores. ¿Qué palabra completa la frase, y con qué probabilidad?\n\n## Parte B: la misma atención sin máscara (encoder)\n\nPara cada frase, repitan los pasos 5 a 9 sin la máscara causal y anoten la fila de \"banco\" en LN(Z).\n\n## Preguntas\n\nContesten en la misma hoja, en dos o tres líneas cada una:\n\n1. Comparen la fila de \"banco\" en LN(Z) entre las dos frases en la parte A y en la parte B. ¿En cuál de las dos partes el vector de \"banco\" cambia según la frase? ¿Por qué?\n2. En la parte A, ¿cómo \"sabe\" el modelo si tiene que predecir \"peso\" o \"dinero\", si el vector de \"banco\" es el mismo en las dos frases?\n3. La predicción de la parte A y la que resultaría de la parte B para la última posición, ¿son iguales o distintas? Expliquen por qué con lo que hace la máscara.\n4. ¿Qué modelo de la clase se parece a la parte A y cuál a la parte B? ¿Para qué se usa cada uno?\n5. Si P fuera todo ceros, ¿qué cambiaría en los resultados de este ejercicio? ¿Y en una frase donde el orden de las palabras cambie el sentido?",
-   "que_hace": "Es la consigna de la cátedra para la parte 5, que quedó pendiente en el repo: pasar «El banco aguanta» y «El banco presta» por un bloque completo, con y sin máscara causal.",
+   "que_hace": "Es la consigna de la cátedra para la parte 5: pasar «El banco aguanta» y «El banco presta» por un bloque completo, con y sin máscara causal. Las cuentas están en `a_mano/Punto5_a_mano.pdf` (hojas escaneadas) y el resumen en la sección 5 del INFORME.",
    "como_funciona": "- Parte A (decoder): X = E + P, proyecciones Q/K/V, S = QKᵀ, escala por √d, máscara causal, softmax, A V y Wo, residual, layer norm, FFN con ReLU, residual, layer norm final y predicción con Wout.\n- Parte B (encoder): la misma atención sin máscara, mirando la fila de «banco».\n- Las preguntas comparan cómo cambia «banco» según el contexto y qué hace la máscara.",
-   "proposito": "Obliga a hacer a mano cada operación del bloque para entender qué aporta cada una. Por regla del TP se resuelve sin IA; no hay hojas escaneadas en el repo.",
-   "interaccion": "Usa los datos del mismo archivo (embeddings, posiciones y pesos); el PLAN preveía verificar las cuentas con `atencion.py` desde `a_mano/verificar.py`, que tampoco existe.",
+   "proposito": "Obliga a hacer a mano cada operación del bloque para entender qué aporta cada una. Por regla del TP se resolvió sin IA, en papel.",
+   "interaccion": "Usa los datos del mismo archivo (embeddings, posiciones y pesos); lo que dio está resumido en la sección 5 de `INFORME.md` (snippet siguiente).",
    "teoria": "Un bloque de transformer completo: atención, residuales, layer norm y feed-forward; diferencia entre decoder (máscara causal) y encoder (bidireccional).",
    "key": "tp3-ejercicio-a-mano",
    "tp": 3,
@@ -1113,7 +1123,7 @@
    "codigo": "def main():\n    ap = argparse.ArgumentParser()\n    ap.add_argument(\"--preguntas\", required=True)\n    ap.add_argument(\"--salida\", required=True)\n    a = ap.parse_args()\n\n    preguntas = [json.loads(l) for l in Path(a.preguntas).read_text(encoding=\"utf-8\").splitlines() if l.strip()]\n    llm = crear_llm()\n    obtener_recuperador()  # carga el encoder antes de empezar, para no sumar ese tiempo a la primera pregunta\n    log = asyncio.run(correr(llm, HERRAMIENTAS, preguntas, a.salida, \"agente\"))\n    print(f\"respuestas en {a.salida}, log en {log}\")",
    "que_hace": "Arma el agente de la parte 2: lee las preguntas, crea el LLM, precarga el recuperador y corre todas las preguntas con las seis tools.",
    "como_funciona": "- Lee `--preguntas` (un JSON por línea) y `--salida`.\n- `llm = crear_llm()` crea el `ChatOpenAI` contra OpenRouter.\n- `obtener_recuperador()` carga el encoder antes de empezar, para no sumar ese tiempo a la primera pregunta.\n- `asyncio.run(correr(llm, HERRAMIENTAS, preguntas, a.salida, \"agente\"))` corre la corrida y devuelve la ruta del log.",
-   "proposito": "Es la única pieza que conecta las partes: el modelo (`modelo.py`), las tools hardcodeadas (`herramientas.py`) y el bucle (`corrida.py` → `bucle.py`). Cambiar el origen de las tools (por ejemplo, un cliente MCP) solo cambiaría lo que se le pasa a `correr`.",
+   "proposito": "Es la única pieza que conecta las partes: el modelo (`modelo.py`), las tools hardcodeadas (`herramientas.py`) y el bucle (`corrida.py` → `bucle.py`). Cambiar el origen de las tools solo cambia lo que se le pasa a `correr`: es lo que hace `agente_mcp.py` con las tools del servidor MCP.",
    "interaccion": "Se ejecuta con `python3 agente.py --preguntas datos/preguntas_agente_dev.jsonl --salida respuestas.jsonl`. Le pasa `HERRAMIENTAS` y el LLM a `correr()` en `hospital/agente/corrida.py`.",
    "teoria": "Un agente es modelo + herramientas + bucle; acá las herramientas viven en el mismo proceso (hardcodeadas), no en un servidor aparte.",
    "key": "tp3-agente-main",
@@ -1169,19 +1179,84 @@
    "nusos": 5
   },
   {
-   "id": "test-atencion-ejemplo-clase",
-   "titulo": "Tests de la cátedra: 'the cat sat', softmax y máscara",
-   "archivo": "atencion/test_atencion.py",
-   "desde": 23,
-   "hasta": 61,
+   "id": "agente-mcp-cliente",
+   "titulo": "Cliente MCP: descubrir las tools y reusar el mismo agente",
+   "archivo": "agente_mcp.py",
+   "desde": 9,
+   "hasta": 34,
    "lenguaje": "python",
-   "codigo": "X = np.array([[1, 0, 1, 0], [0, 2, 0, 1], [1, 1, 1, 1]], float)\nWQ = np.eye(4)\nWK = np.array([[0, 1, 0, 0], [1, 0, 0, 0], [0, 0, 0, 1], [0, 0, 1, 0]], float)\nWV = np.array([[1, 0], [0, 1], [1, 0], [0, 1]], float)\n\n\nclass TestSoftmax(unittest.TestCase):\n    def test_filas_suman_uno(self):\n        M = np.array([[1.5, 0, 1.5], [3, -2, 0.5]])\n        np.testing.assert_allclose(at.softmax(M).sum(-1), 1)\n\n    def test_valor_de_la_clase(self):\n        np.testing.assert_allclose(at.softmax(np.array([[1.5, 0, 1.5]])), [[0.4498, 0.1004, 0.4498]], atol=1e-3)\n\n    def test_estable_con_numeros_grandes(self):\n        s = at.softmax(np.array([[1000.0, 1000.0]]))\n        self.assertTrue(np.all(np.isfinite(s)))\n        np.testing.assert_allclose(s, [[0.5, 0.5]])\n\n\nclass TestAtencion(unittest.TestCase):\n    def test_matriz_de_atencion(self):\n        _, A = at.autoatencion(X, WQ, WK, WV)\n        np.testing.assert_allclose(A, [[0.1220, 0.5465, 0.3315], [0.4498, 0.1004, 0.4498], [0.1863, 0.3072, 0.5065]], atol=1e-3)\n\n    def test_salida(self):\n        out, _ = at.autoatencion(X, WQ, WK, WV)\n        np.testing.assert_allclose(out, [[0.9069, 2.3026], [1.7993, 1.2007], [1.3856, 1.9345]], atol=1e-3)\n\n    def test_formas_con_n_distinto_de_d(self):\n        out, A = at.autoatencion(X, WQ, WK, WV)\n        self.assertEqual(A.shape, (3, 3))\n        self.assertEqual(out.shape, (3, 2))\n\n    def test_mascara_causal(self):\n        out, A = at.autoatencion(X, WQ, WK, WV, mascara=True)\n        np.testing.assert_allclose(np.triu(A, 1), 0, atol=1e-12)\n        np.testing.assert_allclose(A.sum(-1), 1)\n        np.testing.assert_allclose(out, [[2, 0], [1.6351, 0.5474], [1.3856, 1.9345]], atol=1e-3)",
-   "que_hace": "Tests provistos por la cátedra para la parte 4 (pendiente): definen el ejemplo de clase ('the cat sat', d = 4) y los valores esperados de softmax, matriz de atención, salida y máscara causal.",
-   "como_funciona": "- `X` son 3 tokens de dimensión 4; `WQ` es la identidad, `WK` permuta dimensiones y `WV` proyecta a 2.\n- `TestSoftmax`: filas que suman 1, el valor de clase `[0.4498, 0.1004, 0.4498]` y estabilidad con `[1000, 1000]`.\n- `test_matriz_de_atencion` y `test_salida`: la `A` 3×3 y la salida 3×2 esperadas.\n- `test_mascara_causal`: el triángulo superior de `A` es 0 y la primera fila solo mira a sí misma (`[2, 0]`).",
-   "proposito": "Es la especificación ejecutable de lo que `atencion.py` tenía que cumplir; el archivo no se puede modificar. La implementación no existe todavía.",
-   "interaccion": "Carga dinámicamente el `atencion.py` que se le pase por argumento y llama a `softmax` y `autoatencion`; el PLAN (paso 4) lo usa como guía de TDD.",
-   "teoria": "Cada token mira a todos: A = softmax(QKᵀ/√d_k) y salida = A V; con máscara causal un token no ve los posteriores.",
-   "key": "tp3-test-atencion-ejemplo-clase",
+   "codigo": "from langchain_mcp_adapters.client import MultiServerMCPClient\nfrom langchain_mcp_adapters.tools import load_mcp_tools\n\nfrom hospital.agente.corrida import correr\nfrom hospital.agente.modelo import crear_llm\n\nRAIZ = Path(__file__).resolve().parent\n\n\nasync def ejecutar(preguntas, salida):\n    cliente = MultiServerMCPClient({\n        \"hospital\": {\n            \"transport\": \"stdio\",\n            \"command\": sys.executable,\n            \"args\": [str(RAIZ / \"servidor_mcp.py\")],\n            \"env\": {\"HOSPITAL_API\": os.environ.get(\"HOSPITAL_API\", \"http://localhost:8765\")},\n        }\n    })\n    async with cliente.session(\"hospital\") as sesion:\n        tools = await load_mcp_tools(sesion)  # tools/list; ainvoke realiza tools/call\n        nombres = {t.name for t in tools}\n        requeridas = {\"buscar_documentos\", \"consultar_camas\", \"consultar_guardia\", \"consultar_turnos\",\n                      \"consultar_farmacia\", \"consultar_espera\"}\n        if nombres != requeridas:\n            raise RuntimeError(f\"Herramientas MCP inesperadas: {sorted(nombres)}\")\n        return await correr(crear_llm(), tools, preguntas, salida, \"agente_mcp\")",
+   "que_hace": "Arma el agente de la parte 3: lanza el servidor MCP, descubre sus tools, verifica que sean las seis y corre el benchmark con el mismo bucle de la parte 2.",
+   "como_funciona": "- `MultiServerMCPClient` describe cómo lanzar el servidor: `sys.executable servidor_mcp.py` por `stdio`, pasándole `HOSPITAL_API`.\n- `async with cliente.session(\"hospital\") as sesion` abre una sola sesión para toda la corrida.\n- `load_mcp_tools(sesion)` hace el `tools/list` y convierte cada tool MCP en una tool de LangChain; cuando el bucle la invoca (`ainvoke`) se manda un `tools/call`.\n- Compara `nombres` con `requeridas` y corta con `RuntimeError` si no están exactamente las seis.\n- `correr(crear_llm(), tools, preguntas, salida, \"agente_mcp\")` reusa la corrida de la parte 2.",
+   "proposito": "El agente no tiene código propio de API ni de recuperación: todo llega por MCP. Mantener la sesión abierta evita reiniciar el servidor y recargar e5-base en cada llamada (lo dice el INFORME).",
+   "interaccion": "Se ejecuta con `python3 agente_mcp.py --preguntas ... --salida respuestas_mcp.jsonl`; lanza `servidor_mcp.py` y le pasa las tools a `correr()` de `hospital/agente/corrida.py`, que llama a `responder()` de `bucle.py`. Dejó el log `experimentos/corridas/agente_mcp_20261001-200728.md`.",
+   "teoria": "Cliente MCP dentro del host: descubrimiento (tools/list) y ejecución (tools/call) por JSON-RPC 2.0; la herramienta vive en un proceso aparte, no hardcodeada en el agente.",
+   "key": "tp3-agente-mcp-cliente",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 54,
+     "title": "El ciclo de vida de una herramienta MCP",
+     "extra": false,
+     "url": "/clases/06/#d=rag-y-mcp&s=54"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 57,
+     "title": "Demo: un servidor MCP mínimo",
+     "extra": false,
+     "url": "/clases/06/#d=rag-y-mcp&s=57"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 18,
+     "title": "JSON-RPC 2.0: la capa de mensajes",
+     "extra": false,
+     "url": "/clases/07/#d=rag-mcp-rapida&s=18"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 19,
+     "title": "Herramienta hardcodeada o servidor aparte",
+     "extra": false,
+     "url": "/clases/07/#d=rag-mcp-rapida&s=19"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 47,
+     "title": "MCP: host, cliente y servidor",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=47"
+    }
+   ],
+   "nusos": 5
+  },
+  {
+   "id": "atencion-softmax-mascara",
+   "titulo": "softmax estable y atención escalada con máscara causal",
+   "archivo": "atencion.py",
+   "desde": 6,
+   "hasta": 34,
+   "lenguaje": "python",
+   "codigo": "def softmax(M):\n    \"\"\"Calcula softmax de cada fila, de forma numéricamente estable.\"\"\"\n    M = np.asarray(M)\n    maximo = np.max(M, axis=-1, keepdims=True)\n    exp = np.exp(M - maximo)\n    return exp / np.sum(exp, axis=-1, keepdims=True)\n\n\ndef atencion(Q, K, V, mascara=False):\n    \"\"\"Calcula atención de producto punto escalado.\n\n    Devuelve tanto la salida ponderada por los valores como la matriz de\n    pesos de atención.\n    \"\"\"\n    Q = np.asarray(Q)\n    K = np.asarray(K)\n    V = np.asarray(V)\n    d_k = Q.shape[-1]\n    puntajes = Q @ K.T / np.sqrt(d_k)\n\n    if mascara:\n        puntajes = np.where(\n            np.triu(np.ones(puntajes.shape, dtype=bool), k=1),\n            -np.inf,\n            puntajes,\n        )\n\n    A = softmax(puntajes)\n    return A @ V, A",
+   "que_hace": "Implementa con NumPy el softmax por fila y la atención de producto punto escalado, con máscara causal opcional; devuelve la salida y la matriz de pesos.",
+   "como_funciona": "- `softmax` resta `maximo` (el máximo de cada fila, `keepdims=True`) antes de `np.exp`, y divide por la suma de la fila.\n- `atencion` calcula `puntajes = Q @ K.T / np.sqrt(d_k)` con `d_k = Q.shape[-1]`.\n- Si `mascara`, `np.triu(np.ones(...), k=1)` marca lo que está arriba de la diagonal (tokens posteriores) y `np.where` les pone `-np.inf`.\n- `A = softmax(puntajes)`: los `-inf` quedan en peso 0. Devuelve `A @ V, A`.",
+   "proposito": "Restar el máximo no cambia el resultado pero evita overflow en `exp` (el test con `[1000, 1000]`). Dividir por √d_k evita que productos grandes saturen el softmax. Devolver `A` permite verificar la matriz contra los valores del ejemplo de clase.",
+   "interaccion": "La usa `autoatencion` (mismo archivo) y la prueban `TestSoftmax`, `test_matriz_de_atencion`, `test_mascara_causal` y `test_escala_por_raiz_de_dk` de `atencion/test_atencion.py`.",
+   "teoria": "Atención: A = softmax(QKᵀ/√d_k), salida = A V; la máscara causal (−∞ antes del softmax) impide que un token mire a los siguientes, como en un decoder.",
+   "key": "tp3-atencion-softmax-mascara",
    "tp": 3,
    "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
    "usos": [
@@ -1207,13 +1282,118 @@
      "clase": 8,
      "cnn": "08",
      "slug": "transformers-a-fondo",
+     "i": 18,
+     "title": "Escalar y repartir: el softmax",
+     "extra": false,
+     "url": "/clases/08/#d=transformers-a-fondo&s=18"
+    },
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
      "i": 20,
      "title": "La máscara causal",
      "extra": false,
      "url": "/clases/08/#d=transformers-a-fondo&s=20"
     }
    ],
-   "nusos": 3
+   "nusos": 4
+  },
+  {
+   "id": "atencion-autoatencion-multicabeza",
+   "titulo": "Autoatención y atención multicabeza",
+   "archivo": "atencion.py",
+   "desde": 37,
+   "hasta": 51,
+   "lenguaje": "python",
+   "codigo": "def autoatencion(X, Wq, Wk, Wv, mascara=False):\n    \"\"\"Proyecta X a consultas, claves y valores y aplica atención.\"\"\"\n    X = np.asarray(X)\n    Q = X @ np.asarray(Wq)\n    K = X @ np.asarray(Wk)\n    V = X @ np.asarray(Wv)\n    return atencion(Q, K, V, mascara=mascara)\n\n\ndef multicabeza(X, cabezas, Wo, mascara=False):\n    \"\"\"Concatena las salidas de varias cabezas y las proyecta con ``Wo``.\"\"\"\n    salidas = [autoatencion(X, Wq, Wk, Wv, mascara=mascara)[0]\n               for Wq, Wk, Wv in cabezas]\n    concatenada = np.concatenate(salidas, axis=-1)\n    return concatenada @ np.asarray(Wo)",
+   "que_hace": "`autoatencion` saca Q, K y V de la misma entrada X; `multicabeza` corre varias cabezas, concatena sus salidas y las proyecta con `Wo`.",
+   "como_funciona": "- `autoatencion`: `Q = X @ Wq`, `K = X @ Wk`, `V = X @ Wv` y llama a `atencion(Q, K, V, mascara=mascara)`.\n- `multicabeza`: para cada `(Wq, Wk, Wv)` en `cabezas` toma solo la salida (`[0]`) de `autoatencion`.\n- `np.concatenate(salidas, axis=-1)` pega las cabezas una al lado de la otra.\n- `concatenada @ Wo` proyecta a la dimensión de salida.",
+   "proposito": "Cada token mira a todos los de la misma frase (autoatención); varias cabezas con pesos distintos pueden captar relaciones distintas y `Wo` las combina.",
+   "interaccion": "Llama a `atencion` del mismo archivo; las prueban `test_salida`, `test_permutar_filas_permuta_la_salida` y `TestMulticabeza` de `atencion/test_atencion.py`.",
+   "teoria": "Self-attention y multi-head attention: proyecciones Q/K/V aprendidas, cabezas en paralelo, concatenación y proyección de salida.",
+   "key": "tp3-atencion-autoatencion-multicabeza",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "palabra-al-transformer",
+     "i": 27,
+     "title": "Cada token mira a todos",
+     "extra": false,
+     "url": "/clases/07/#d=palabra-al-transformer&s=27"
+    }
+   ],
+   "nusos": 1
+  },
+  {
+   "id": "atencion-layer-norm",
+   "titulo": "Layer norm sin γ ni β",
+   "archivo": "atencion.py",
+   "desde": 54,
+   "hasta": 59,
+   "lenguaje": "python",
+   "codigo": "def layer_norm(x, eps=1e-5):\n    \"\"\"Normaliza cada fila a media cero y varianza aproximadamente uno.\"\"\"\n    x = np.asarray(x)\n    media = np.mean(x, axis=-1, keepdims=True)\n    varianza = np.mean((x - media) ** 2, axis=-1, keepdims=True)\n    return (x - media) / np.sqrt(varianza + eps)",
+   "que_hace": "Normaliza cada fila (cada token) a media 0 y varianza aproximadamente 1.",
+   "como_funciona": "- `media` y `varianza` se calculan sobre el último eje con `keepdims=True`.\n- Devuelve `(x - media) / np.sqrt(varianza + eps)`; `eps = 1e-5` evita dividir por cero.\n- No tiene los parámetros aprendidos γ y β.",
+   "proposito": "Mantiene los números en rango entre capas, token por token. La consigna la pide sin γ/β, así que es solo la normalización.",
+   "interaccion": "La prueba `TestLayerNorm` de `atencion/test_atencion.py` (`[2, 0, 1, 1]` → `[1.414, -1.414, 0, 0]`, invariancia a escala y corrimiento). Es el mismo LN que la parte 5 calcula a mano.",
+   "teoria": "Layer normalization: normaliza por token (no por batch) después de cada residual del bloque transformer.",
+   "key": "tp3-atencion-layer-norm",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
+     "i": 26,
+     "title": "Layer norm: mantener los números en rango",
+     "extra": false,
+     "url": "/clases/08/#d=transformers-a-fondo&s=26"
+    }
+   ],
+   "nusos": 1
+  },
+  {
+   "id": "test-atencion-ejemplo-clase",
+   "titulo": "Tests de la cátedra: 'the cat sat', softmax y máscara",
+   "archivo": "atencion/test_atencion.py",
+   "desde": 23,
+   "hasta": 61,
+   "lenguaje": "python",
+   "codigo": "X = np.array([[1, 0, 1, 0], [0, 2, 0, 1], [1, 1, 1, 1]], float)\nWQ = np.eye(4)\nWK = np.array([[0, 1, 0, 0], [1, 0, 0, 0], [0, 0, 0, 1], [0, 0, 1, 0]], float)\nWV = np.array([[1, 0], [0, 1], [1, 0], [0, 1]], float)\n\n\nclass TestSoftmax(unittest.TestCase):\n    def test_filas_suman_uno(self):\n        M = np.array([[1.5, 0, 1.5], [3, -2, 0.5]])\n        np.testing.assert_allclose(at.softmax(M).sum(-1), 1)\n\n    def test_valor_de_la_clase(self):\n        np.testing.assert_allclose(at.softmax(np.array([[1.5, 0, 1.5]])), [[0.4498, 0.1004, 0.4498]], atol=1e-3)\n\n    def test_estable_con_numeros_grandes(self):\n        s = at.softmax(np.array([[1000.0, 1000.0]]))\n        self.assertTrue(np.all(np.isfinite(s)))\n        np.testing.assert_allclose(s, [[0.5, 0.5]])\n\n\nclass TestAtencion(unittest.TestCase):\n    def test_matriz_de_atencion(self):\n        _, A = at.autoatencion(X, WQ, WK, WV)\n        np.testing.assert_allclose(A, [[0.1220, 0.5465, 0.3315], [0.4498, 0.1004, 0.4498], [0.1863, 0.3072, 0.5065]], atol=1e-3)\n\n    def test_salida(self):\n        out, _ = at.autoatencion(X, WQ, WK, WV)\n        np.testing.assert_allclose(out, [[0.9069, 2.3026], [1.7993, 1.2007], [1.3856, 1.9345]], atol=1e-3)\n\n    def test_formas_con_n_distinto_de_d(self):\n        out, A = at.autoatencion(X, WQ, WK, WV)\n        self.assertEqual(A.shape, (3, 3))\n        self.assertEqual(out.shape, (3, 2))\n\n    def test_mascara_causal(self):\n        out, A = at.autoatencion(X, WQ, WK, WV, mascara=True)\n        np.testing.assert_allclose(np.triu(A, 1), 0, atol=1e-12)\n        np.testing.assert_allclose(A.sum(-1), 1)\n        np.testing.assert_allclose(out, [[2, 0], [1.6351, 0.5474], [1.3856, 1.9345]], atol=1e-3)",
+   "que_hace": "Tests provistos por la cátedra para la parte 4: definen el ejemplo de clase ('the cat sat', d = 4) y los valores esperados de softmax, matriz de atención, salida y máscara causal.",
+   "como_funciona": "- `X` son 3 tokens de dimensión 4; `WQ` es la identidad, `WK` permuta dimensiones y `WV` proyecta a 2.\n- `TestSoftmax`: filas que suman 1, el valor de clase `[0.4498, 0.1004, 0.4498]` y estabilidad con `[1000, 1000]`.\n- `test_matriz_de_atencion` y `test_salida`: la `A` 3×3 y la salida 3×2 esperadas.\n- `test_mascara_causal`: el triángulo superior de `A` es 0 y la primera fila solo mira a sí misma (`[2, 0]`).",
+   "proposito": "Es la especificación ejecutable de lo que `atencion.py` tenía que cumplir; el archivo no se puede modificar. El `atencion.py` de la parte 4 pasa los 14 tests.",
+   "interaccion": "Carga dinámicamente el `atencion.py` que se le pase por argumento y llama a `softmax` y `autoatencion`; se corre con `python3 atencion/test_atencion.py atencion.py`.",
+   "teoria": "Cada token mira a todos: A = softmax(QKᵀ/√d_k) y salida = A V; con máscara causal un token no ve los posteriores.",
+   "key": "tp3-test-atencion-ejemplo-clase",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
+     "i": 11,
+     "title": "El ciclo de generación con el transformer abierto",
+     "extra": false,
+     "url": "/clases/08/#d=transformers-a-fondo&s=11"
+    },
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
+     "i": 20,
+     "title": "La máscara causal",
+     "extra": false,
+     "url": "/clases/08/#d=transformers-a-fondo&s=20"
+    }
+   ],
+   "nusos": 2
   },
   {
    "id": "test-atencion-escala-multicabeza-ln",
@@ -1223,10 +1403,10 @@
    "hasta": 101,
    "lenguaje": "python",
    "codigo": "    def test_permutar_filas_permuta_la_salida(self):\n        perm = [2, 0, 1]\n        out, _ = at.autoatencion(X, WQ, WK, WV)\n        out_p, _ = at.autoatencion(X[perm], WQ, WK, WV)\n        np.testing.assert_allclose(out_p, out[perm], atol=1e-9)\n\n    def test_escala_por_raiz_de_dk(self):\n        Q = np.array([[1.0, 0, 0, 0]]); K = np.array([[4.0, 0, 0, 0], [0, 0, 0, 0]]); V = np.eye(2)\n        _, A = at.atencion(Q, K, V)\n        np.testing.assert_allclose(A, [[np.exp(2) / (np.exp(2) + 1), 1 / (np.exp(2) + 1)]], atol=1e-6)\n\n\nclass TestMulticabeza(unittest.TestCase):\n    def test_una_cabeza_con_wo_identidad_es_autoatencion(self):\n        out1, _ = at.autoatencion(X, WQ, WK, WV)\n        outm = at.multicabeza(X, [(WQ, WK, WV)], np.eye(2))\n        np.testing.assert_allclose(outm, out1, atol=1e-9)\n\n    def test_dos_cabezas_concatenan_y_proyectan(self):\n        c1 = (WQ[:, :2], WK[:, :2], WV[:, :1]); c2 = (WQ[:, 2:], WK[:, 2:], WV[:, 1:])\n        Wo = np.array([[1.0, 2.0], [0.0, 1.0]])\n        esperado = np.concatenate([at.autoatencion(X, *c1)[0], at.autoatencion(X, *c2)[0]], axis=1) @ Wo\n        np.testing.assert_allclose(at.multicabeza(X, [c1, c2], Wo), esperado, atol=1e-9)\n        self.assertEqual(at.multicabeza(X, [c1, c2], Wo).shape, (3, 2))\n\n\nclass TestLayerNorm(unittest.TestCase):\n    def test_valor_de_la_clase(self):\n        np.testing.assert_allclose(at.layer_norm(np.array([[2.0, 0, 1, 1]])), [[1.4142, -1.4142, 0, 0]], atol=1e-3)\n\n    def test_invariante_a_escala_y_corrimiento(self):\n        x = np.array([[2.0, 0, 1, 1]])\n        np.testing.assert_allclose(at.layer_norm(2 * x), at.layer_norm(x), atol=1e-4)\n        np.testing.assert_allclose(at.layer_norm(x + 10), at.layer_norm(x), atol=1e-4)\n\n    def test_por_fila(self):\n        y = at.layer_norm(np.array([[1.0, 0, 1, 0], [0, 20, 0, 10], [300, 0, 100, 200]]))\n        np.testing.assert_allclose(y.mean(-1), 0, atol=1e-6)\n        np.testing.assert_allclose(y.var(-1), 1, atol=1e-3)",
-   "que_hace": "Resto de los tests de la parte 4 (pendiente): permutar la entrada permuta la salida, la escala por √d_k, multicabeza y layer norm.",
+   "que_hace": "Resto de los tests de la parte 4: permutar la entrada permuta la salida, la escala por √d_k, multicabeza y layer norm.",
    "como_funciona": "- `test_permutar_filas_permuta_la_salida`: sin posiciones, la atención es equivariante a permutaciones.\n- `test_escala_por_raiz_de_dk`: con d_k = 4, un producto de 4 se escala a 2 antes del softmax.\n- `TestMulticabeza`: una cabeza con `Wo` identidad es autoatención; dos cabezas se concatenan y se proyectan con `Wo`.\n- `TestLayerNorm`: `[2, 0, 1, 1]` → `[1.414, -1.414, 0, 0]`, invariancia a escala y corrimiento, media 0 y varianza 1 por fila.",
-   "proposito": "Fija propiedades que hay que entender para el final (por qué hacen falta posiciones, por qué se escala, qué normaliza layer norm). La implementación quedó pendiente.",
-   "interaccion": "Igual que los anteriores: se corre con `python3 atencion/test_atencion.py atencion.py` contra el `atencion.py` que faltaba escribir.",
+   "proposito": "Fija propiedades que hay que entender para el final (por qué hacen falta posiciones, por qué se escala, qué normaliza layer norm). `atencion.py` los pasa.",
+   "interaccion": "Igual que los anteriores: se corre con `python3 atencion/test_atencion.py atencion.py` contra `atencion.py`: 14 tests, `OK`.",
    "teoria": "Escalado del softmax, atención multi-cabeza, layer norm y que la atención por sí sola no conoce el orden.",
    "key": "tp3-test-atencion-escala-multicabeza-ln",
    "tp": 3,
@@ -1471,6 +1651,44 @@
    "nusos": 4
   },
   {
+   "id": "log-a11-mcp",
+   "titulo": "Log real: A11 vía MCP, sin la sección «Qué llevar»",
+   "archivo": "experimentos/corridas/agente_mcp_20261001-200728.md",
+   "desde": 339,
+   "hasta": 376,
+   "lenguaje": "markdown",
+   "codigo": "## A11: Necesito turno con cardiología, ¿cuál es el primero y qué tengo que llevar?\n\n### Llamada al modelo 1\n\n- Tokens: entrada 1574 (cache 1536), salida 165 (razonamiento 73)\n- Costo: USD 0.000228\n- Generación: `gen-1790896107-4HRVkA1OcNUCBvVIh546`\n\n**Herramienta** `consultar_turnos` con argumentos `{\"especialidad\": \"cardiologia\"}`\n\n```\n{\"especialidad\": \"cardiologia\", \"fecha\": \"2026-10-05\", \"datos\": [\"2026-10-14 09:30\", \"2026-10-14 10:00\", \"2026-10-16 15:00\"]}\n```\n\n**Herramienta** `buscar_documentos` con argumentos `{\"consulta\": \"qué llevar a un turno de cardiología en consultorios externos\"}`\n\n```\n[Turnos en consultorios externos > Llegada]\nSe recomienda llegar 15 minutos antes para hacer la admisión. Pasados 20 minutos de la hora del turno, el profesional puede atender a otro paciente y el turno se reprograma.\n```\n\n### Llamada al modelo 2\n\n- Tokens: entrada 1807 (cache 1536), salida 154 (razonamiento 89)\n- Costo: USD 0.000217\n- Generación: `gen-1790896109-PYRKhfvKndwV1EO060Xl`\n\n**Herramienta** `buscar_documentos` con argumentos `{\"consulta\": \"requisitos documentación para turno en consultorios externos\"}`\n\n```\n[Turnos en consultorios externos > Llegada]\nSe recomienda llegar 15 minutos antes para hacer la admisión. Pasados 20 minutos de la hora del turno, el profesional puede atender a otro paciente y el turno se reprograma.\n\n---\n\n[Turnos en consultorios externos > Cómo se pide un turno]\nLos turnos se piden por la web del hospital, por WhatsApp al 11 5010-2200 o por teléfono al 0800-555-2710, de lunes a viernes de 7:00 a 19:00. Para la primera consulta con un especialista se necesita la derivación del médico de cabecera.\n```",
+   "que_hace": "Muestra la pregunta A11 en la corrida MCP: dos búsquedas en documentos que no traen la sección con lo que hay que llevar.",
+   "como_funciona": "- Llamada 1: `consultar_turnos` con `cardiologia` y `buscar_documentos` con «qué llevar a un turno de cardiología en consultorios externos», en paralelo.\n- Esa búsqueda devuelve solo «Llegada».\n- Llamada 2: el modelo reintenta con «requisitos documentación para turno…» y recibe «Llegada» y «Cómo se pide un turno».\n- Nunca llega «Qué llevar a la primera consulta» (DNI, credencial, estudios previos).",
+   "proposito": "Es la evidencia de por qué la corrida MCP bajó CR a 4,833: la sección correcta quedó fuera del top-2 con margen. Es el síntoma que después motivó la regla por palabra clave de `buscar_documentos` (commit «Corrección A11»), que no se volvió a evaluar.",
+   "interaccion": "Lo escribió `_log_pregunta` de `hospital/agente/corrida.py` durante `agente_mcp.py`; el INFORME (sección 3) lo cita para explicar la diferencia con la parte 2.",
+   "teoria": "Diagnóstico de RAG: el ruteo y la generación están bien, pero la recuperación no trae el fragmento que hace falta.",
+   "key": "tp3-log-a11-mcp",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 29,
+     "title": "Tres síntomas de que falta una etapa",
+     "extra": false,
+     "url": "/clases/06/#d=rag-y-mcp&s=29"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 57,
+     "title": "Demo: un servidor MCP mínimo",
+     "extra": false,
+     "url": "/clases/06/#d=rag-y-mcp&s=57"
+    }
+   ],
+   "nusos": 2
+  },
+  {
    "id": "prompt-sistema",
    "titulo": "Prompt de sistema: solo datos de las herramientas",
    "archivo": "hospital/agente/bucle.py",
@@ -1481,7 +1699,7 @@
    "que_hace": "Fija el tope de pasos del bucle y el prompt de sistema del agente del hospital.",
    "como_funciona": "- `MAX_PASOS = 6` limita las llamadas al modelo por pregunta.\n- El prompt dice que el modelo no sabe nada del hospital y que todo sale de las herramientas.\n- Rutea: normas y procedimientos → `buscar_documentos`; estado de hoy → la tool de la API; preguntas mixtas → cada parte con su fuente.\n- Pide reintentar ante errores con opciones válidas, usar solo datos de los resultados y decir si falta algo.",
    "proposito": "Es la mitigación de alucinaciones por prompt: el hospital es ficticio, así que todo dato no recuperado sería inventado. Resultado: Faithfulness 5,00 en las 4 corridas. Es zero-shot: el único ejemplo (camas + acompañantes) ilustra el patrón mixto sin copiar preguntas de dev.",
-   "interaccion": "Lo usa `responder()` en el mismo archivo como `SystemMessage(PROMPT)`; aplica igual a las tools de LangChain y a las que cargaría el cliente MCP.",
+   "interaccion": "Lo usa `responder()` en el mismo archivo como `SystemMessage(PROMPT)`; aplica igual a las tools de LangChain y a las que carga `agente_mcp.py` desde el servidor MCP.",
    "teoria": "Grounding: restringir la respuesta al contexto recuperado y admitir cuando falta información.",
    "key": "tp3-prompt-sistema",
    "tp": 3,
@@ -1527,8 +1745,8 @@
    "codigo": "async def _ejecutar(por_nombre, llamada):\n    tool = por_nombre.get(llamada[\"name\"])\n    if tool is None:\n        return ToolMessage(f\"Error: la herramienta '{llamada['name']}' no existe. Herramientas disponibles: \"\n                           f\"{', '.join(sorted(por_nombre))}.\", tool_call_id=llamada[\"id\"], name=llamada[\"name\"])\n    try:\n        return await tool.ainvoke({**llamada, \"type\": \"tool_call\"})\n    except Exception as e:  # el error vuelve al modelo como texto para que pueda corregirse\n        return ToolMessage(f\"Error al ejecutar {llamada['name']}: {e}\", tool_call_id=llamada[\"id\"], name=llamada[\"name\"])\n\n\nasync def responder(llm, tools, pregunta):\n    \"\"\"Devuelve todos los mensajes de la conversación: sistema, pregunta, AIMessage y ToolMessage.\"\"\"\n    llm_con_tools = llm.bind_tools(tools)\n    por_nombre = {t.name: t for t in tools}\n    mensajes = [SystemMessage(PROMPT), HumanMessage(pregunta)]\n    for _ in range(MAX_PASOS):\n        ai = await llm_con_tools.ainvoke(mensajes)\n        mensajes.append(ai)\n        if not ai.tool_calls:\n            break\n        for llamada in ai.tool_calls:\n            mensajes.append(await _ejecutar(por_nombre, llamada))\n    return mensajes",
    "que_hace": "Implementa el agente: el modelo pide herramientas, se ejecutan, sus resultados vuelven como `ToolMessage` y se repite hasta que responde sin pedir nada o se llega a 6 pasos.",
    "como_funciona": "- `responder` enlaza las tools con `llm.bind_tools(tools)` y arma `por_nombre`.\n- Arranca con `[SystemMessage(PROMPT), HumanMessage(pregunta)]`.\n- En cada paso: `ai = await llm_con_tools.ainvoke(mensajes)`; si `ai.tool_calls` está vacío, termina.\n- Si no, ejecuta cada llamada con `_ejecutar` y agrega el `ToolMessage` (puede haber varias en paralelo en el mismo paso).\n- `_ejecutar` devuelve un `ToolMessage` de error si la tool no existe o lanza una excepción.",
-   "proposito": "Se escribió a mano, sin LangGraph ni AgentExecutor, para tener todos los mensajes y poder loguearlos. Es agnóstico del origen de las tools: el docstring lo prepara para las de `langchain-mcp-adapters` (parte 3, pendiente).",
-   "interaccion": "Lo llama `correr()` en `hospital/agente/corrida.py` por cada pregunta; devuelve la lista completa de mensajes, que `resumir()` convierte en respuesta, contextos, herramientas y costo. `tests/test_agente.py` lo prueba con un modelo falso.",
+   "proposito": "Se escribió a mano, sin LangGraph ni AgentExecutor, para tener todos los mensajes y poder loguearlos. Es agnóstico del origen de las tools: sirvió sin cambios para las `@tool` de la parte 2 y para las que carga `langchain-mcp-adapters` en la parte 3.",
+   "interaccion": "Lo llama `correr()` en `hospital/agente/corrida.py` por cada pregunta (desde `agente.py` y desde `agente_mcp.py`); devuelve la lista completa de mensajes, que `resumir()` convierte en respuesta, contextos, herramientas y costo. `tests/test_agente.py` lo prueba con un modelo falso.",
    "teoria": "Agente ReAct / ciclo de vida de una tool: AIMessage con tool_calls → ejecución → ToolMessage → nueva llamada al modelo.",
    "key": "tp3-bucle-tool-calling",
    "tp": 3,
@@ -1578,15 +1796,6 @@
      "title": "El ciclo de vida de una herramienta MCP",
      "extra": false,
      "url": "/clases/06/#d=rag-y-mcp&s=54"
-    },
-    {
-     "clase": 6,
-     "cnn": "06",
-     "slug": "rag-y-mcp",
-     "i": 57,
-     "title": "Demo: un servidor MCP mínimo",
-     "extra": false,
-     "url": "/clases/06/#d=rag-y-mcp&s=57"
     },
     {
      "clase": 7,
@@ -1679,7 +1888,7 @@
      "url": "/clases/13/#d=cierre-magnifica-humanitas&s=25"
     }
    ],
-   "nusos": 16
+   "nusos": 15
   },
   {
    "id": "corrida-usage-resumen",
@@ -1785,8 +1994,8 @@
    "codigo": "async def correr(llm, tools, preguntas, salida, etiqueta, carpeta_log=CORRIDAS):\n    \"\"\"Corre todas las preguntas y devuelve la ruta del log .md.\"\"\"\n    inicio = datetime.now()\n    filas, secciones = [], []\n    for p in preguntas:\n        t0, error, mensajes = time.monotonic(), None, []\n        try:\n            mensajes = await responder(llm, tools, p[\"pregunta\"])\n        except Exception as e:  # una pregunta que falla no corta la corrida; queda en el log\n            error = f\"{type(e).__name__}: {e}\"\n        r = resumir(mensajes)\n        seg = time.monotonic() - t0\n        filas.append((p, r))\n        secciones += _log_pregunta(p, mensajes, r, seg, error)\n        print(f\"{p['id']}  {', '.join(r['herramientas']) or '-':45s} USD {r['costo']:.5f}  {seg:4.1f}s\"\n              + (f\"  ERROR {error}\" if error else \"\"), flush=True)\n\n    Path(salida).write_text(\"\".join(\n        json.dumps({\"id\": p[\"id\"], \"respuesta\": r[\"respuesta\"], \"contextos\": r[\"contextos\"],\n                    \"herramientas\": r[\"herramientas\"]}, ensure_ascii=False) + \"\\n\" for p, r in filas), encoding=\"utf-8\")",
    "que_hace": "Pasa cada pregunta por el bucle del agente, resume la conversación y escribe `respuestas.jsonl` en el formato del evaluador.",
    "como_funciona": "- Por cada pregunta llama a `responder(llm, tools, p[\"pregunta\"])` y mide el tiempo.\n- Si la pregunta falla, guarda el error y sigue con la próxima.\n- `resumir(mensajes)` extrae respuesta, contextos (los `ToolMessage`), herramientas usadas, tokens y costo.\n- `_log_pregunta` arma la sección del log `.md`; al final escribe una línea JSON por pregunta con `id`, `respuesta`, `contextos` y `herramientas`.",
-   "proposito": "Separa el bucle (una conversación) de la corrida (el benchmark completo): así el bucle se puede probar solo y la misma corrida serviría para el agente MCP planeado.",
-   "interaccion": "La llama `agente.py` con `HERRAMIENTAS` y el LLM de `crear_llm()`. Llama a `responder()` de `hospital/agente/bucle.py`; el `respuestas.jsonl` que escribe lo lee `evaluar/evaluar.py agente`. `tests/test_agente.py` la prueba con un modelo falso.",
+   "proposito": "Separa el bucle (una conversación) de la corrida (el benchmark completo): así el bucle se puede probar solo y la misma corrida sirve para el agente MCP (`agente_mcp.py` llama a `correr` con la etiqueta `agente_mcp`).",
+   "interaccion": "La llaman `agente.py` con `HERRAMIENTAS` y `agente_mcp.py` con las tools MCP, los dos con el LLM de `crear_llm()`. Llama a `responder()` de `hospital/agente/bucle.py`; el `respuestas.jsonl` que escribe lo lee `evaluar/evaluar.py agente`. `tests/test_agente.py` la prueba con un modelo falso.",
    "teoria": "El circuito de un agente medido de punta a punta: cada pregunta es una conversación completa con sus llamadas a tools, que después se evalúa.",
    "key": "tp3-corrida-correr",
    "tp": 3,
@@ -1945,7 +2154,7 @@
    "que_hace": "Define el texto que lee el modelo para decidir qué herramienta llamar: `buscar_documentos` para normas fijas y las de la API para el estado de hoy.",
    "como_funciona": "- `BUSCAR_DOCUMENTOS` lista los temas de los documentos y aclara que NO tiene el estado de hoy; pide buscar «con las mismas palabras que usó el paciente» y hacer una búsqueda por tema.\n- `CONSULTAR_CAMAS`, `CONSULTAR_GUARDIA` y `CONSULTAR_TURNOS` dicen que son el estado de HOY y enumeran los valores válidos del parámetro.\n- `CONSULTAR_TURNOS` agrega: «No dice qué hay que llevar al turno: eso está en los documentos».",
    "proposito": "El ruteo depende solo de estas descripciones, así que separan norma (documentos) de estado (API) y dicen cuándo NO usar cada tool: ruteo 1,00 en las 4 corridas. La frase de las palabras del paciente arregló A11, y el ejemplo de consulta se cambió por uno de telemedicina para no filtrar la pregunta A01 de dev.",
-   "interaccion": "Las importa `hospital/herramientas.py` a través del diccionario `DESCRIPCIONES`; el PLAN prevé que el servidor MCP use exactamente los mismos textos para que la comparación parte 2 vs. parte 3 sea justa.",
+   "interaccion": "Las importan `hospital/herramientas.py` (parte 2) y `servidor_mcp.py` (parte 3) a través del diccionario `DESCRIPCIONES`: los dos agentes ven exactamente los mismos textos, así la comparación parte 2 vs. parte 3 es justa.",
    "teoria": "Diseño de herramientas: la descripción es la interfaz para el modelo (qué hace, cuándo usarla, cuándo no, parámetros válidos).",
    "key": "tp3-descripciones-tools",
    "tp": 3,
@@ -2064,7 +2273,7 @@
    "que_hace": "Completa las descripciones de las dos tools de la API que faltan y arma el diccionario nombre → descripción con las seis herramientas.",
    "como_funciona": "- `CONSULTAR_FARMACIA` aclara que no dice cómo retirar el medicamento («eso está en los documentos») y lista los siete medicamentos válidos.\n- `CONSULTAR_ESPERA` no recibe parámetros y aclara que los tiempos máximos de la norma de triage están en los documentos.\n- `DESCRIPCIONES` mapea los seis nombres exactos que exige el evaluador.",
    "proposito": "Mantiene en un único lugar el contrato de las tools, sin depender de LangChain, para reusarlo en la parte 2 y en la parte 3 (MCP). Con solo 6 tools bien descritas no hizo falta routing jerárquico.",
-   "interaccion": "`hospital/herramientas.py` toma `DESCRIPCIONES[nombre]` para cada `@tool`; `tests/test_agente.py` verifica que las descripciones de las tools coincidan con este diccionario.",
+   "interaccion": "`hospital/herramientas.py` toma `DESCRIPCIONES[nombre]` para cada `@tool` y `servidor_mcp.py` lo mismo para cada `@mcp.tool`; `tests/test_agente.py` verifica que las descripciones de las tools coincidan con este diccionario.",
    "teoria": "Pocas herramientas bien elegidas y con descripciones que marcan límites entre fuentes reducen errores de selección.",
    "key": "tp3-descripciones-api-y-registro",
    "tp": 3,
@@ -2132,14 +2341,14 @@
    "titulo": "buscar_documentos: fragmentos con su fuente",
    "archivo": "hospital/documentos.py",
    "desde": 10,
-   "hasta": 27,
+   "hasta": 34,
    "lenguaje": "python",
-   "codigo": "import json\n\nfrom hospital.rag.recuperador import CONFIG, obtener_recuperador\n\nSEPARADOR = \"\\n\\n---\\n\\n\"\n\n\ndef seleccion_agente():\n    return json.loads(CONFIG.read_text(encoding=\"utf-8\")).get(\"agente\", {})\n\n\ndef buscar_documentos(consulta):\n    \"\"\"Fragmentos elegidos, cada uno con su fuente '[Documento > Sección]' arriba del texto literal.\"\"\"\n    bloques = []\n    for f in obtener_recuperador().buscar_fragmentos(consulta, **seleccion_agente()):\n        fuente = f\"{f.titulo} > {f.seccion}\" if f.seccion else f.titulo\n        bloques.append(f\"[{fuente}]\\n{f.texto}\")\n    return SEPARADOR.join(bloques) or \"No se encontraron documentos para esa consulta.\"",
-   "que_hace": "Es la parte «recuperar» del RAG vista desde el agente: busca con el recuperador de la parte 1 y devuelve cada fragmento con su origen `[Documento > Sección]`.",
-   "como_funciona": "- `seleccion_agente()` lee una clave opcional `agente` de `config.json` para pisar top-k/umbral/margen (la entrega no la define).\n- `obtener_recuperador().buscar_fragmentos(consulta, ...)` trae los `Fragmento`.\n- Para cada uno arma `\"[{titulo} > {seccion}]\\n{texto}\"`.\n- Los une con `SEPARADOR` (`---`) o devuelve «No se encontraron documentos…».",
-   "proposito": "Anteponer la fuente le dice al modelo de dónde sale cada dato. En las corridas 2 y 3 se probó darle más fragmentos al agente; empeoró el CR y se volvió a la selección de la parte 1.",
-   "interaccion": "La llama la tool `buscar_documentos` de `hospital/herramientas.py`; su salida vuelve al modelo como `ToolMessage` y queda en `contextos` para el juez.",
-   "teoria": "Recuperar → aumentar: los fragmentos recuperados entran al contexto del LLM como resultado de una herramienta.",
+   "codigo": "import json\n\nfrom hospital.rag.recuperador import CONFIG, obtener_recuperador\n\nSEPARADOR = \"\\n\\n---\\n\\n\"\n\n\ndef seleccion_agente():\n    return json.loads(CONFIG.read_text(encoding=\"utf-8\")).get(\"agente\", {})\n\n\ndef buscar_documentos(consulta):\n    \"\"\"Fragmentos elegidos, cada uno con su fuente '[Documento > Sección]' arriba del texto literal.\"\"\"\n    seleccion = seleccion_agente()\n    # En consultas sobre documentacion o que llevar, la seccion especifica puede\n    # quedar tercera cuando la pregunta tambien menciona el tipo de turno.\n    # La configuracion de la Parte 1 permanece sin cambios.\n    consulta_normalizada = consulta.casefold()\n    if \"llevar\" in consulta_normalizada or \"document\" in consulta_normalizada:\n        seleccion = {**seleccion, \"top_k\": max(seleccion.get(\"top_k\", 2), 3), \"margen\": None}\n    bloques = []\n    for f in obtener_recuperador().buscar_fragmentos(consulta, **seleccion):\n        fuente = f\"{f.titulo} > {f.seccion}\" if f.seccion else f.titulo\n        bloques.append(f\"[{fuente}]\\n{f.texto}\")\n    return SEPARADOR.join(bloques) or \"No se encontraron documentos para esa consulta.\"",
+   "que_hace": "Es la parte «recuperar» del RAG vista desde el agente: busca con el recuperador de la parte 1 y devuelve cada fragmento con su origen `[Documento > Sección]`. Desde el commit «Corrección A11» tiene además una regla por palabra clave para las consultas sobre qué llevar o qué documentación hace falta.",
+   "como_funciona": "- `seleccion_agente()` lee una clave opcional `agente` de `config.json` para pisar top-k/umbral/margen; la entrega no la define, así que vale la selección de la parte 1 (top-2, margen 0,005).\n- Regla agregada después: pasa la consulta a minúsculas con `casefold()` y, si contiene «llevar» o «document», usa `top_k = max(top_k, 3)` y `margen: None`, o sea, al menos tres fragmentos y sin corte relativo al mejor.\n- `obtener_recuperador().buscar_fragmentos(consulta, **seleccion)` trae los `Fragmento`.\n- Para cada uno arma `\"[{titulo} > {seccion}]\\n{texto}\"` y los une con `SEPARADOR` (`---`), o devuelve «No se encontraron documentos…».",
+   "proposito": "Anteponer la fuente le dice al modelo de dónde sale cada dato. La regla de «llevar»/«document» es un parche por palabra clave para A11 (la sección «Qué llevar a la primera consulta» quedaba tercera): se agregó en el commit 2d50248, después de la corrida MCP, no hay una corrida nueva que la evalúe y el INFORME no la menciona. En la corrida 2, top-3 para todas las preguntas había metido ruido; esta regla lo limita a las consultas con esas palabras.",
+   "interaccion": "La llaman la tool `buscar_documentos` de `hospital/herramientas.py` (parte 2) y la de `servidor_mcp.py` (parte 3); su salida vuelve al modelo como `ToolMessage` y queda en `contextos` para el juez. El corte final lo hace `seleccionar` en `hospital/rag/recuperador.py`.",
+   "teoria": "Recuperar → aumentar: los fragmentos recuperados entran al contexto del LLM como resultado de una herramienta. La regla es un ajuste de top-k según la consulta, no un reranker.",
    "key": "tp3-documentos-buscar",
    "tp": 3,
    "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
@@ -2161,6 +2370,15 @@
      "title": "Las fuentes ponen el techo de calidad",
      "extra": false,
      "url": "/clases/06/#d=rag-y-mcp&s=10"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 29,
+     "title": "Tres síntomas de que falta una etapa",
+     "extra": false,
+     "url": "/clases/06/#d=rag-y-mcp&s=29"
     },
     {
      "clase": 6,
@@ -2188,9 +2406,27 @@
      "title": "Metadatos: filtrar antes de buscar",
      "extra": false,
      "url": "/clases/07/#d=rag-mcp-rapida&s=10"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 31,
+     "title": "Poco y bien elegido",
+     "extra": false,
+     "url": "/clases/07/#d=rag-mcp-rapida&s=31"
+    },
+    {
+     "clase": 10,
+     "cnn": "10",
+     "slug": "agentes-y-multiagentes",
+     "i": 20,
+     "title": "Principios para diseñar tools",
+     "extra": false,
+     "url": "/clases/10/#d=agentes-y-multiagentes&s=20"
     }
    ],
-   "nusos": 5
+   "nusos": 8
   },
   {
    "id": "herramientas-langchain",
@@ -2202,7 +2438,7 @@
    "codigo": "\"\"\"Las seis herramientas de la parte 2 como tools de LangChain. Los nombres son los que exige el evaluador y\nlas descripciones salen de hospital/descripciones.py (las mismas que usa el servidor MCP).\"\"\"\nfrom langchain_core.tools import tool\n\nfrom hospital import api_cliente, documentos\nfrom hospital.descripciones import DESCRIPCIONES\n\n\n@tool(\"buscar_documentos\", description=DESCRIPCIONES[\"buscar_documentos\"])\ndef buscar_documentos(consulta: str) -> str:\n    return documentos.buscar_documentos(consulta)\n\n\n@tool(\"consultar_camas\", description=DESCRIPCIONES[\"consultar_camas\"])\ndef consultar_camas(sector: str) -> str:\n    return api_cliente.camas(sector)\n\n\n@tool(\"consultar_guardia\", description=DESCRIPCIONES[\"consultar_guardia\"])\ndef consultar_guardia(especialidad: str) -> str:\n    return api_cliente.guardia(especialidad)\n\n\n@tool(\"consultar_turnos\", description=DESCRIPCIONES[\"consultar_turnos\"])\ndef consultar_turnos(especialidad: str) -> str:\n    return api_cliente.turnos(especialidad)\n\n\n@tool(\"consultar_farmacia\", description=DESCRIPCIONES[\"consultar_farmacia\"])\ndef consultar_farmacia(medicamento: str) -> str:\n    return api_cliente.farmacia(medicamento)\n\n\n@tool(\"consultar_espera\", description=DESCRIPCIONES[\"consultar_espera\"])\ndef consultar_espera() -> str:\n    return api_cliente.espera()\n\n\nHERRAMIENTAS = [buscar_documentos, consultar_camas, consultar_guardia, consultar_turnos, consultar_farmacia,\n                consultar_espera]",
    "que_hace": "Envuelve las funciones planas del hospital como herramientas de LangChain con los nombres que exige el evaluador y las descripciones compartidas.",
    "como_funciona": "- Cada función lleva `@tool(nombre, description=DESCRIPCIONES[nombre])`; LangChain arma el esquema JSON del parámetro a partir de la firma (`consulta: str`, `sector: str`, ...).\n- `buscar_documentos` delega en `documentos.buscar_documentos`; las otras cinco en `api_cliente`.\n- `consultar_espera()` no tiene parámetros.\n- `HERRAMIENTAS` es la lista que se le pasa al agente.",
-   "proposito": "Son herramientas «hardcodeadas» en el proceso del agente. La lógica real vive en módulos sin LangChain para que el servidor MCP planificado pueda publicar las mismas funciones sin duplicar código.",
+   "proposito": "Son herramientas «hardcodeadas» en el proceso del agente. La lógica real vive en módulos sin LangChain para que `servidor_mcp.py` publique las mismas funciones sin duplicar código.",
    "interaccion": "`agente.py` pasa `HERRAMIENTAS` a `correr()`, que las entrega a `responder()` en `hospital/agente/bucle.py`, donde se enlazan con `bind_tools`.",
    "teoria": "Una tool en código: nombre, descripción y esquema de parámetros que el modelo ve; tool calling con LangChain.",
    "key": "tp3-herramientas-langchain",
@@ -2264,15 +2500,6 @@
      "url": "/clases/07/#d=rag-mcp-rapida&s=26"
     },
     {
-     "clase": 9,
-     "cnn": "09",
-     "slug": "como-se-entrena-un-llm",
-     "i": 48,
-     "title": "MCP: una herramienta es una definición",
-     "extra": false,
-     "url": "/clases/09/#d=como-se-entrena-un-llm&s=48"
-    },
-    {
      "clase": 10,
      "cnn": "10",
      "slug": "agentes-y-multiagentes",
@@ -2282,7 +2509,7 @@
      "url": "/clases/10/#d=agentes-y-multiagentes&s=19"
     }
    ],
-   "nusos": 8
+   "nusos": 7
   },
   {
    "id": "fragmento-con-metadatos",
@@ -2817,7 +3044,7 @@
    "que_hace": "Construye el recuperador leyendo `config.json` (encoder, chunking, metadatos, selección y reranker opcional) y expone una instancia única cacheada.",
    "como_funciona": "- `desde_config` acepta un dict o una ruta y lee el JSON.\n- Si `cfg[\"reranker\"]` existe, carga un `CrossEncoder`; si es `null`, queda `None`.\n- Carga el corpus con `cargar_corpus`, crea el encoder con `crear_encoder` y pasa estrategia, metadatos, `top_k`, `umbral`, `margen`.\n- `obtener_recuperador` está decorado con `@lru_cache(maxsize=1)`: el modelo se carga una sola vez por proceso.",
    "proposito": "La consigna pide que la configuración ganadora quede fija para que la cátedra corra `recuperar.py` sobre test. Centralizarla en un JSON evita que el agente y el script de la parte 1 diverjan, y el singleton evita recargar e5-base en cada llamada.",
-   "interaccion": "`recuperar.py`, `agente.py` (para precalentar) y `hospital/documentos.py` llaman a `obtener_recuperador()`; el docstring anticipa que también lo iba a usar el servidor MCP.",
+   "interaccion": "`recuperar.py`, `agente.py` (para precalentar) y `hospital/documentos.py` llaman a `obtener_recuperador()`; a través de `documentos.py` también lo usa el servidor MCP (`servidor_mcp.py`).",
    "teoria": "Pipeline RAG completo (indexar, recuperar) parametrizado; el cross-encoder como etapa opcional que la entrega no activó.",
    "key": "tp3-recuperador-desde-config",
    "tp": 3,
@@ -2843,6 +3070,107 @@
     }
    ],
    "nusos": 2
+  },
+  {
+   "id": "servidor-mcp-fastmcp",
+   "titulo": "Servidor MCP: FastMCP por stdio con las seis tools",
+   "archivo": "servidor_mcp.py",
+   "desde": 1,
+   "hasta": 45,
+   "lenguaje": "python",
+   "codigo": "\"\"\"Servidor MCP stdio con las seis herramientas del hospital.\n\nEjecutable por MCP Inspector (python3 servidor_mcp.py) o por agente_mcp.py.\nNo imprimir en stdout: stdio transport reserva ese canal para el protocolo.\n\"\"\"\nfrom mcp.server.fastmcp import FastMCP\n\nfrom hospital import api_cliente, documentos\nfrom hospital.descripciones import DESCRIPCIONES\n\nmcp = FastMCP(\"hospital-arroyo-claro\")\n\n\n@mcp.tool(description=DESCRIPCIONES[\"buscar_documentos\"])\ndef buscar_documentos(consulta: str) -> str:\n    return documentos.buscar_documentos(consulta)\n\n\n@mcp.tool(description=DESCRIPCIONES[\"consultar_camas\"])\ndef consultar_camas(sector: str) -> str:\n    return api_cliente.camas(sector)\n\n\n@mcp.tool(description=DESCRIPCIONES[\"consultar_guardia\"])\ndef consultar_guardia(especialidad: str) -> str:\n    return api_cliente.guardia(especialidad)\n\n\n@mcp.tool(description=DESCRIPCIONES[\"consultar_turnos\"])\ndef consultar_turnos(especialidad: str) -> str:\n    return api_cliente.turnos(especialidad)\n\n\n@mcp.tool(description=DESCRIPCIONES[\"consultar_farmacia\"])\ndef consultar_farmacia(medicamento: str) -> str:\n    return api_cliente.farmacia(medicamento)\n\n\n@mcp.tool(description=DESCRIPCIONES[\"consultar_espera\"])\ndef consultar_espera() -> str:\n    return api_cliente.espera()\n\n\nif __name__ == \"__main__\":\n    mcp.run(transport=\"stdio\")",
+   "que_hace": "Publica las seis herramientas del hospital como un servidor MCP que se comunica por stdio.",
+   "como_funciona": "- `mcp = FastMCP(\"hospital-arroyo-claro\")` crea el servidor.\n- Cada función lleva `@mcp.tool(description=DESCRIPCIONES[...])`: el nombre sale de la función y el esquema del parámetro, de la firma (`consulta: str`, `sector: str`, ...).\n- Los cuerpos solo delegan: `documentos.buscar_documentos` y `api_cliente.camas/guardia/turnos/farmacia/espera`.\n- `mcp.run(transport=\"stdio\")` atiende el protocolo por stdin/stdout; el docstring avisa que no hay que imprimir nada en stdout porque ese canal es del protocolo.",
+   "proposito": "Separa herramienta y agente: el mismo set de tools lo puede usar cualquier host MCP (MCP Inspector, `agente_mcp.py`). No tiene lógica propia: reusa `documentos.py`, `api_cliente.py` y `descripciones.py`, así la comparación con la parte 2 cambia solo el transporte.",
+   "interaccion": "Lo lanza como subproceso `agente_mcp.py` (vía `MultiServerMCPClient`) o MCP Inspector (`npx @modelcontextprotocol/inspector ... servidor_mcp.py`, capturas en `experimentos/inspector/`). La URL de la API llega por la variable `HOSPITAL_API`.",
+   "teoria": "Servidor MCP: expone herramientas (nombre + descripción + esquema) que el cliente descubre con tools/list y ejecuta con tools/call, sobre JSON-RPC 2.0 por stdio.",
+   "key": "tp3-servidor-mcp-fastmcp",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "claude-desktop-chat",
+     "i": 21,
+     "title": "Agregar un external connector",
+     "extra": true,
+     "url": "/clases/01/#d=claude-desktop-chat&s=21"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 53,
+     "title": "El servidor separa herramienta y agente",
+     "extra": false,
+     "url": "/clases/06/#d=rag-y-mcp&s=53"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 54,
+     "title": "El ciclo de vida de una herramienta MCP",
+     "extra": false,
+     "url": "/clases/06/#d=rag-y-mcp&s=54"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 57,
+     "title": "Demo: un servidor MCP mínimo",
+     "extra": false,
+     "url": "/clases/06/#d=rag-y-mcp&s=57"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 16,
+     "title": "MCP conecta modelos con herramientas",
+     "extra": false,
+     "url": "/clases/07/#d=rag-mcp-rapida&s=16"
+    },
+    {
+     "clase": 7,
+     "cnn": "07",
+     "slug": "rag-mcp-rapida",
+     "i": 18,
+     "title": "JSON-RPC 2.0: la capa de mensajes",
+     "extra": false,
+     "url": "/clases/07/#d=rag-mcp-rapida&s=18"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 47,
+     "title": "MCP: host, cliente y servidor",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=47"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 48,
+     "title": "MCP: una herramienta es una definición",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=48"
+    },
+    {
+     "clase": 13,
+     "cnn": "13",
+     "slug": "cierre-magnifica-humanitas",
+     "i": 45,
+     "title": "Hacia un Internet de Agentes",
+     "extra": false,
+     "url": "/clases/13/#d=cierre-magnifica-humanitas&s=45"
+    }
+   ],
+   "nusos": 9
   }
  ]
 }

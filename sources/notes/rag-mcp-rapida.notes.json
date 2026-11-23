@@ -282,7 +282,7 @@
   "tp": [
    {
     "tp": 3,
-    "texto": "En el TP3 esta parte quedó pendiente: no existe `servidor_mcp.py`; el diseño en PLAN.md usa FastMCP reusando `descripciones.py`."
+    "texto": "`servidor_mcp.py`: FastMCP por stdio con las 6 tools; cada una delega en `documentos`/`api_cliente` y usa la descripción compartida de `descripciones.py`."
    },
    {
     "tp": 1,
@@ -315,7 +315,7 @@
   "tp": [
    {
     "tp": 3,
-    "texto": "Pendiente: el cliente con `langchain-mcp-adapters` iba a descubrir con `tools/list` y llamar con `tools/call` sobre stdio."
+    "texto": "`agente_mcp.py` usa `MultiServerMCPClient`: `load_mcp_tools` descubre con `tools/list` y cada invocación es un `tools/call` por stdio, con la sesión abierta toda la corrida."
    }
   ],
   "clave_examen": true
@@ -330,7 +330,7 @@
   "tp": [
    {
     "tp": 3,
-    "texto": "Tus 6 tools son `@tool` de LangChain (hardcodeadas); el bucle `responder` ya es agnóstico para enchufarlas por MCP."
+    "texto": "En la parte 2 las 6 tools eran `@tool` de LangChain; en la parte 3 llegan por MCP y entran al mismo bucle `correr` sin cambiarlo."
    }
   ],
   "clave_examen": false

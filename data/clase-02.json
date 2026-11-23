@@ -3355,7 +3355,7 @@
    "que_hace": "Define el texto que lee el modelo para decidir qué herramienta llamar: `buscar_documentos` para normas fijas y las de la API para el estado de hoy.",
    "como_funciona": "- `BUSCAR_DOCUMENTOS` lista los temas de los documentos y aclara que NO tiene el estado de hoy; pide buscar «con las mismas palabras que usó el paciente» y hacer una búsqueda por tema.\n- `CONSULTAR_CAMAS`, `CONSULTAR_GUARDIA` y `CONSULTAR_TURNOS` dicen que son el estado de HOY y enumeran los valores válidos del parámetro.\n- `CONSULTAR_TURNOS` agrega: «No dice qué hay que llevar al turno: eso está en los documentos».",
    "proposito": "El ruteo depende solo de estas descripciones, así que separan norma (documentos) de estado (API) y dicen cuándo NO usar cada tool: ruteo 1,00 en las 4 corridas. La frase de las palabras del paciente arregló A11, y el ejemplo de consulta se cambió por uno de telemedicina para no filtrar la pregunta A01 de dev.",
-   "interaccion": "Las importa `hospital/herramientas.py` a través del diccionario `DESCRIPCIONES`; el PLAN prevé que el servidor MCP use exactamente los mismos textos para que la comparación parte 2 vs. parte 3 sea justa.",
+   "interaccion": "Las importan `hospital/herramientas.py` (parte 2) y `servidor_mcp.py` (parte 3) a través del diccionario `DESCRIPCIONES`: los dos agentes ven exactamente los mismos textos, así la comparación parte 2 vs. parte 3 es justa.",
    "teoria": "Diseño de herramientas: la descripción es la interfaz para el modelo (qué hace, cuándo usarla, cuándo no, parámetros válidos).",
    "key": "tp3-descripciones-tools",
    "tp": 3,
@@ -3474,7 +3474,7 @@
    "que_hace": "Completa las descripciones de las dos tools de la API que faltan y arma el diccionario nombre → descripción con las seis herramientas.",
    "como_funciona": "- `CONSULTAR_FARMACIA` aclara que no dice cómo retirar el medicamento («eso está en los documentos») y lista los siete medicamentos válidos.\n- `CONSULTAR_ESPERA` no recibe parámetros y aclara que los tiempos máximos de la norma de triage están en los documentos.\n- `DESCRIPCIONES` mapea los seis nombres exactos que exige el evaluador.",
    "proposito": "Mantiene en un único lugar el contrato de las tools, sin depender de LangChain, para reusarlo en la parte 2 y en la parte 3 (MCP). Con solo 6 tools bien descritas no hizo falta routing jerárquico.",
-   "interaccion": "`hospital/herramientas.py` toma `DESCRIPCIONES[nombre]` para cada `@tool`; `tests/test_agente.py` verifica que las descripciones de las tools coincidan con este diccionario.",
+   "interaccion": "`hospital/herramientas.py` toma `DESCRIPCIONES[nombre]` para cada `@tool` y `servidor_mcp.py` lo mismo para cada `@mcp.tool`; `tests/test_agente.py` verifica que las descripciones de las tools coincidan con este diccionario.",
    "teoria": "Pocas herramientas bien elegidas y con descripciones que marcan límites entre fuentes reducen errores de selección.",
    "key": "tp3-descripciones-api-y-registro",
    "tp": 3,
@@ -3547,7 +3547,7 @@
    "codigo": "\"\"\"Las seis herramientas de la parte 2 como tools de LangChain. Los nombres son los que exige el evaluador y\nlas descripciones salen de hospital/descripciones.py (las mismas que usa el servidor MCP).\"\"\"\nfrom langchain_core.tools import tool\n\nfrom hospital import api_cliente, documentos\nfrom hospital.descripciones import DESCRIPCIONES\n\n\n@tool(\"buscar_documentos\", description=DESCRIPCIONES[\"buscar_documentos\"])\ndef buscar_documentos(consulta: str) -> str:\n    return documentos.buscar_documentos(consulta)\n\n\n@tool(\"consultar_camas\", description=DESCRIPCIONES[\"consultar_camas\"])\ndef consultar_camas(sector: str) -> str:\n    return api_cliente.camas(sector)\n\n\n@tool(\"consultar_guardia\", description=DESCRIPCIONES[\"consultar_guardia\"])\ndef consultar_guardia(especialidad: str) -> str:\n    return api_cliente.guardia(especialidad)\n\n\n@tool(\"consultar_turnos\", description=DESCRIPCIONES[\"consultar_turnos\"])\ndef consultar_turnos(especialidad: str) -> str:\n    return api_cliente.turnos(especialidad)\n\n\n@tool(\"consultar_farmacia\", description=DESCRIPCIONES[\"consultar_farmacia\"])\ndef consultar_farmacia(medicamento: str) -> str:\n    return api_cliente.farmacia(medicamento)\n\n\n@tool(\"consultar_espera\", description=DESCRIPCIONES[\"consultar_espera\"])\ndef consultar_espera() -> str:\n    return api_cliente.espera()\n\n\nHERRAMIENTAS = [buscar_documentos, consultar_camas, consultar_guardia, consultar_turnos, consultar_farmacia,\n                consultar_espera]",
    "que_hace": "Envuelve las funciones planas del hospital como herramientas de LangChain con los nombres que exige el evaluador y las descripciones compartidas.",
    "como_funciona": "- Cada función lleva `@tool(nombre, description=DESCRIPCIONES[nombre])`; LangChain arma el esquema JSON del parámetro a partir de la firma (`consulta: str`, `sector: str`, ...).\n- `buscar_documentos` delega en `documentos.buscar_documentos`; las otras cinco en `api_cliente`.\n- `consultar_espera()` no tiene parámetros.\n- `HERRAMIENTAS` es la lista que se le pasa al agente.",
-   "proposito": "Son herramientas «hardcodeadas» en el proceso del agente. La lógica real vive en módulos sin LangChain para que el servidor MCP planificado pueda publicar las mismas funciones sin duplicar código.",
+   "proposito": "Son herramientas «hardcodeadas» en el proceso del agente. La lógica real vive en módulos sin LangChain para que `servidor_mcp.py` publique las mismas funciones sin duplicar código.",
    "interaccion": "`agente.py` pasa `HERRAMIENTAS` a `correr()`, que las entrega a `responder()` en `hospital/agente/bucle.py`, donde se enlazan con `bind_tools`.",
    "teoria": "Una tool en código: nombre, descripción y esquema de parámetros que el modelo ve; tool calling con LangChain.",
    "key": "tp3-herramientas-langchain",
@@ -3609,15 +3609,6 @@
      "url": "/clases/07/#d=rag-mcp-rapida&s=26"
     },
     {
-     "clase": 9,
-     "cnn": "09",
-     "slug": "como-se-entrena-un-llm",
-     "i": 48,
-     "title": "MCP: una herramienta es una definición",
-     "extra": false,
-     "url": "/clases/09/#d=como-se-entrena-un-llm&s=48"
-    },
-    {
      "clase": 10,
      "cnn": "10",
      "slug": "agentes-y-multiagentes",
@@ -3627,7 +3618,7 @@
      "url": "/clases/10/#d=agentes-y-multiagentes&s=19"
     }
    ],
-   "nusos": 8
+   "nusos": 7
   },
   {
    "id": "bucle-tool-calling",
@@ -3639,8 +3630,8 @@
    "codigo": "async def _ejecutar(por_nombre, llamada):\n    tool = por_nombre.get(llamada[\"name\"])\n    if tool is None:\n        return ToolMessage(f\"Error: la herramienta '{llamada['name']}' no existe. Herramientas disponibles: \"\n                           f\"{', '.join(sorted(por_nombre))}.\", tool_call_id=llamada[\"id\"], name=llamada[\"name\"])\n    try:\n        return await tool.ainvoke({**llamada, \"type\": \"tool_call\"})\n    except Exception as e:  # el error vuelve al modelo como texto para que pueda corregirse\n        return ToolMessage(f\"Error al ejecutar {llamada['name']}: {e}\", tool_call_id=llamada[\"id\"], name=llamada[\"name\"])\n\n\nasync def responder(llm, tools, pregunta):\n    \"\"\"Devuelve todos los mensajes de la conversación: sistema, pregunta, AIMessage y ToolMessage.\"\"\"\n    llm_con_tools = llm.bind_tools(tools)\n    por_nombre = {t.name: t for t in tools}\n    mensajes = [SystemMessage(PROMPT), HumanMessage(pregunta)]\n    for _ in range(MAX_PASOS):\n        ai = await llm_con_tools.ainvoke(mensajes)\n        mensajes.append(ai)\n        if not ai.tool_calls:\n            break\n        for llamada in ai.tool_calls:\n            mensajes.append(await _ejecutar(por_nombre, llamada))\n    return mensajes",
    "que_hace": "Implementa el agente: el modelo pide herramientas, se ejecutan, sus resultados vuelven como `ToolMessage` y se repite hasta que responde sin pedir nada o se llega a 6 pasos.",
    "como_funciona": "- `responder` enlaza las tools con `llm.bind_tools(tools)` y arma `por_nombre`.\n- Arranca con `[SystemMessage(PROMPT), HumanMessage(pregunta)]`.\n- En cada paso: `ai = await llm_con_tools.ainvoke(mensajes)`; si `ai.tool_calls` está vacío, termina.\n- Si no, ejecuta cada llamada con `_ejecutar` y agrega el `ToolMessage` (puede haber varias en paralelo en el mismo paso).\n- `_ejecutar` devuelve un `ToolMessage` de error si la tool no existe o lanza una excepción.",
-   "proposito": "Se escribió a mano, sin LangGraph ni AgentExecutor, para tener todos los mensajes y poder loguearlos. Es agnóstico del origen de las tools: el docstring lo prepara para las de `langchain-mcp-adapters` (parte 3, pendiente).",
-   "interaccion": "Lo llama `correr()` en `hospital/agente/corrida.py` por cada pregunta; devuelve la lista completa de mensajes, que `resumir()` convierte en respuesta, contextos, herramientas y costo. `tests/test_agente.py` lo prueba con un modelo falso.",
+   "proposito": "Se escribió a mano, sin LangGraph ni AgentExecutor, para tener todos los mensajes y poder loguearlos. Es agnóstico del origen de las tools: sirvió sin cambios para las `@tool` de la parte 2 y para las que carga `langchain-mcp-adapters` en la parte 3.",
+   "interaccion": "Lo llama `correr()` en `hospital/agente/corrida.py` por cada pregunta (desde `agente.py` y desde `agente_mcp.py`); devuelve la lista completa de mensajes, que `resumir()` convierte en respuesta, contextos, herramientas y costo. `tests/test_agente.py` lo prueba con un modelo falso.",
    "teoria": "Agente ReAct / ciclo de vida de una tool: AIMessage con tool_calls → ejecución → ToolMessage → nueva llamada al modelo.",
    "key": "tp3-bucle-tool-calling",
    "tp": 3,
@@ -3690,15 +3681,6 @@
      "title": "El ciclo de vida de una herramienta MCP",
      "extra": false,
      "url": "/clases/06/#d=rag-y-mcp&s=54"
-    },
-    {
-     "clase": 6,
-     "cnn": "06",
-     "slug": "rag-y-mcp",
-     "i": 57,
-     "title": "Demo: un servidor MCP mínimo",
-     "extra": false,
-     "url": "/clases/06/#d=rag-y-mcp&s=57"
     },
     {
      "clase": 7,
@@ -3791,7 +3773,7 @@
      "url": "/clases/13/#d=cierre-magnifica-humanitas&s=25"
     }
    ],
-   "nusos": 16
+   "nusos": 15
   },
   {
    "id": "gitignore-secretos",

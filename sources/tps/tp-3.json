@@ -1,432 +1,516 @@
 {
- "num": 3,
- "titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
- "repo": "rag-mcp-transfomers",
- "consigna": "El Hospital Provincial **Arroyo Claro** (ficticio) quiere un asistente para pacientes y familiares. La información vive en dos lugares: **documentos** que casi no cambian (20 Markdown de normas y procedimientos) y una **API** con el estado del día (camas, guardia, turnos, farmacia, espera). Como el hospital es inventado, el modelo solo contesta bien si **recupera**. Todo en Python, entrega el 9 de octubre de 2026.\n\n| Parte | Qué pide | Puntos |\n|---|---|---|\n| 1. RAG vectorial | `recuperar.py`: chunking + embeddings con un **transformer encoder** + coseno. Comparar ≥3 encoders, uno obligatorio: **BERT sin ajustar** (promedio de la última capa) como línea de base. Tabla de experimentos con un `.eval.json` por fila. Métrica: **Context Relevance** = media armónica de recall y precision de evidencia (un léxico ingenuo saca 0,35). | 25 |\n| 2. Agente con dos fuentes | Tool calling sobre `deepseek/deepseek-v4-flash-0731` (OpenRouter) con 6 herramientas de nombre fijo (`buscar_documentos`, `consultar_camas`, `consultar_guardia`, `consultar_turnos`, `consultar_farmacia`, `consultar_espera`). Juez `gemini-3.7-flash` puntúa 1–5 Context Relevance, Answer Faithfulness y Answer Relevance, más el **ruteo**. Sin log `.md` por corrida, vale cero. | 30 |\n| 3. MCP | Las mismas 6 tools en `servidor_mcp.py` (FastMCP del SDK oficial, stdio), un cliente que las descubra con `tools/list` y las llame con `tools/call`, capturas del MCP Inspector y comparación de métricas/costo con la parte 2. | 15 |\n| 4. Atención en NumPy | `softmax`, `atencion`, `autoatencion` (máscara causal), `multicabeza`, `layer_norm`; 14 tests (\"the cat sat\", d = 4). | 15 |\n| 5. Bloque a mano | \"El banco aguanta\" / \"El banco presta\" por un bloque completo, con y sin máscara, **justificando cada operación**, sin IA. | 15 |\n\nLas preguntas `dev` son para tunear; la cátedra evalúa con un **test oculto**, así que sobreajustar a dev se paga.",
- "que_hicimos": "El grupo trabajó con la metodología de la clase 2: `CLAUDE.md`, `SPEC.md`, un `PLAN.md` paso a paso (\"implementá el paso N\"), TDD con pytest (`tests/`) y commits convencionales. El código compartido vive en el paquete `hospital/` y los scripts de la raíz (`recuperar.py`, `agente.py`) son CLIs finos.\n\n**Parte 1 — RAG vectorial (`hospital/rag/`).**\n- `chunking.py` implementa las **tres estrategias de la clase**: longitud fija con solapamiento (ventanas de 40/10 y 80/20 *palabras*, sin cruzar secciones), semántico (párrafo y oración) y **estructural** (una sección `##` por fragmento). Regla de oro: cada fragmento es un **substring literal** del corpus, porque el evaluador busca la evidencia como texto.\n- **Metadatos como texto buscable**: \"Título > Sección: \" se antepone *solo al texto que se embebe*; el fragmento devuelto sigue literal.\n- `encoders.py`: `BertPromedio` (mean pooling de la última capa enmascarando padding) y `SentenceTransformerEncoder` (MiniLM, e5-small, e5-base con prefijos `query: ` / `passage: `). Todo normalizado L2, así el producto punto **es** el coseno.\n- `recuperador.py`: coseno contra la matriz de fragmentos, caché de embeddings, soporte opcional de cross-encoder, y una función `seleccionar` con **top-k, umbral absoluto y margen relativo al mejor**.\n- Grilla de **98 configuraciones** (4 encoders × 5 chunkings × metadatos × k, más umbrales y márgenes), cada una con su `.jsonl`, `.config.json` y `.eval.json` en `experimentos/recuperacion/`.\n- Configuración congelada en `hospital/rag/config.json`: **e5-base + estructural + metadatos + top-2 con margen 0,005**.\n\n**Parte 2 — Agente (`hospital/agente/`).** LangChain **sin LangGraph**: `ChatOpenAI` apuntando a OpenRouter (temperatura 0), tools enlazadas con `bind_tools` y un **bucle explícito** de tool calling (máx. 6 llamadas al modelo): el modelo pide tools, se ejecutan, vuelven como `ToolMessage`, y se repite hasta que responde sin pedir nada. Los errores de una tool vuelven al modelo como texto para que se corrija. Las **descripciones** de las tools (`descripciones.py`) dicen qué fuente consultan, para qué sirven, **qué NO tienen** y los valores válidos del parámetro, y se comparten con el futuro servidor MCP para que la comparación sea justa. `buscar_documentos` antepone `[Documento > Sección]` a cada fragmento. Cada corrida deja un log `.md` con tokens (entrada, caché, salida, razonamiento), costo e id de generación por llamada, y cada tool con argumentos y resultado completo. Se hicieron **4 corridas** iterando sobre la selección de fragmentos y la descripción de `buscar_documentos`.\n\n**Partes 3, 4 y 5.** En el estado actual del repo están **pendientes**: el `INFORME.md` las marca \"_Pendiente_\" y no existen `servidor_mcp.py`, `agente_mcp.py` ni `atencion.py`. Sí está el diseño en `PLAN.md`: FastMCP con las 6 tools reusando `api_cliente`, `documentos` y `descripciones` (logs a stderr porque stdout es el protocolo), cliente con `MultiServerMCPClient` de `langchain-mcp-adapters` reusando el mismo bucle `responder`, y la atención en NumPy guiada por los 14 tests (`S = QKᵀ/√d_k`, máscara `np.triu(…,1) → −∞`, softmax restando el máximo, layer norm sin γ/β). El bucle de la parte 2 ya se escribió agnóstico de dónde vienen las tools para poder reusarlo con MCP.",
- "arquitectura": "flowchart LR\n  P[Pregunta del paciente] --> AG[Agente LangChain bucle explicito deepseek-v4-flash]\n  AG -->|tool call| BD[buscar_documentos]\n  AG -->|tool call| API[consultar_camas guardia turnos farmacia espera]\n  BD --> REC[Recuperador e5-base]\n  REC --> IDX[Fragmentos por seccion con Titulo y Seccion antepuestos]\n  IDX --> COS[Coseno top-2 con margen 0.005]\n  API --> H[API del hospital localhost 8765]\n  COS -->|ToolMessage| AG\n  H -->|JSON| AG\n  AG --> R[Respuesta mas contextos mas log md]\n  R --> J[Juez gemini CR F AR y ruteo]",
- "resultados": "**Parte 1 (recuperación, 20 preguntas dev).** Configuración entregada: e5-base, estructural, metadatos, top-2 con margen 0,005 → **CR 0,967** (recall 1,000, precision 0,950, MRR 1,000, k medio 1,10). Línea de base BERT: **0,350** en su mejor configuración (igual al léxico ingenuo). La entrega casi triplica la línea de base.\n\n| Encoder | Mejor CR | CR medio con k=1 | Coseno medio entre fragmentos | z del fragmento correcto |\n|---|---|---|---|---|\n| BERT multilingüe (promedio) | 0,350 | 0,27 | 0,786 | 1,56 |\n| paraphrase-multilingual-MiniLM-L12-v2 | 0,950 | 0,76 | 0,365 | 3,07 |\n| multilingual-e5-small | 0,950 | 0,80 | 0,842 | 3,94 |\n| **multilingual-e5-base** | **1,000** | **0,85** | 0,830 | 3,94 |\n\nHallazgos: con **k = 3 ningún encoder pasa de 0,515** (cada pregunta tiene una sola evidencia, así que un fragmento extra baja la precisión); los **metadatos** mejoran a los cuatro encoders con chunking estructural y k=1 (BERT 0,25→0,35, MiniLM 0,70→0,90, e5-small 0,80→0,95, e5-base 0,85→1,00); el chunking **por oración** es el peor para todos. k=1 da 1,000 en dev, pero se entregó top-2 con margen porque en R01 y R15 los dos primeros estaban casi empatados (0,001 y 0,003 de diferencia): se resignan 0,033 en dev para cubrir empates en test. Un umbral absoluto de 0,88 daba 0,983 en dev pero no protege esos casos.\n\n**Parte 2 (agente, 12 preguntas dev).**\n\n| # | Cambio | Ruteo | CR | F | AR | Costo agente (USD) | Costo juez (USD) |\n|---|---|---|---|---|---|---|---|\n| 1 | inicial, selección de la parte 1 | 1,00 | 4,917 | 5,00 | 4,917 | 0,001405 | 0,01667 |\n| 2 | siempre 3 fragmentos | 1,00 | 4,417 | 5,00 | 5,000 | 0,001464 | 0,02141 |\n| 3 | hasta 3, margen 0,02 | 1,00 | 4,833 | 5,00 | 4,917 | 0,001439 | 0,01797 |\n| **4** | selección de la parte 1 + descripción \"con las palabras del paciente, una búsqueda por tema\" | **1,00** | **5,000** | **5,00** | **5,000** | **0,001458** | 0,01744 |\n\nCada corrida: 24 llamadas al modelo (2 por pregunta), ~40 mil tokens de entrada y ~2,3 mil de salida; en las mixtas (A10–A12) el modelo pide las dos tools **en paralelo**. El juez cuesta **más de 10 veces** que el agente. Conclusión clave: el fallo de A11 no era *cuántos* fragmentos sino **la consulta** que redactaba el modelo. Con 12 preguntas y una corrida por configuración, una pregunta de diferencia está dentro del ruido; lo robusto es ruteo 1,00 y fidelidad 5,00 en las 4 corridas.\n\n**Partes 3–5:** sin resultados en el repo (pendientes).",
- "decisiones": [
-  {
-   "decision": "Encoder `intfloat/multilingual-e5-base` con prefijos `query: ` / `passage: `.",
-   "por_que": "Mejor CR (1,000 con k=1) y mejor CR medio (0,85). Fue entrenado contrastivamente con pares consulta–pasaje: aunque sus cosenos están tan 'amontonados' como los de BERT (media 0,83), ordena bien dentro de esa franja (el correcto queda a 3,94 desvíos).",
-   "alternativas": "BERT promediado (0,35, z=1,56: no fue entrenado para que el coseno mida significado), MiniLM de paráfrasis (0,95, entrenado oración–oración, no pregunta–pasaje), e5-small (0,95, más rápido). bge-m3 sería otra opción más pesada.",
-   "clases": [
-    6,
-    8
-   ],
-   "conceptos": [
-    "embedding",
-    "similitud-coseno",
-    "transformer"
-   ]
-  },
-  {
-   "decision": "Chunking estructural: una sección `##` por fragmento.",
-   "por_que": "Empata arriba con ventanas de 80 palabras, respeta la jerarquía del documento y entrega fragmentos completos (útil para el agente, p. ej. toda la preparación de la colonoscopía). Las secciones miden 223 caracteres de media.",
-   "alternativas": "Ventanas de 800–1000 caracteres (las de la clase) juntarían 4–5 temas por fragmento en este corpus; por oración corta el contexto que el encoder necesita (el peor para todos los encoders).",
-   "clases": [
-    6,
-    7
-   ],
-   "conceptos": [
-    "chunking"
-   ]
-  },
-  {
-   "decision": "Anteponer 'Título > Sección' al texto que se embebe, devolviendo el fragmento literal.",
-   "por_que": "Muchas secciones no nombran su tema ('La unidad tiene dos franjas de visita…'): el tema está en el encabezado. Mejoró a los 4 encoders (e5-base 0,85→1,00 con k=1). El fragmento devuelto no cambia porque el evaluador busca la evidencia como substring.",
-   "alternativas": "Usar los metadatos solo como filtro previo, o embeber un resumen del documento; ambas también vistas en clase.",
-   "clases": [
-    7
-   ],
-   "conceptos": [
-    "chunking",
-    "embedding"
-   ]
-  },
-  {
-   "decision": "Selección top-2 con margen relativo 0,005 en vez de top-1 o umbral absoluto.",
-   "por_que": "Con k=1 un empate mal resuelto vale 0; devolver los dos vale 0,667. El margen solo agrega el segundo cuando está casi empatado con el primero (k medio 1,10). Cuesta 0,033 en dev y protege el test oculto.",
-   "alternativas": "Umbral absoluto 0,88 (0,983 en dev) depende demasiado de la distribución de cosenos de e5 (el mejor va de 0,82 a 0,91) y no cubre los empates; top-3 fijo baja la precisión a ~0,33.",
-   "clases": [
-    7,
-    4
-   ],
-   "conceptos": [
-    "recall-at-k",
-    "precision-recall",
-    "overfitting"
-   ]
-  },
-  {
-   "decision": "Agente con LangChain y un bucle de tool calling escrito a mano (sin LangGraph ni AgentExecutor).",
-   "por_que": "Control total y trazabilidad: cada AIMessage y ToolMessage queda en el log. El bucle no depende del origen de las tools, así sirve igual para las `@tool` de la parte 2 y las que cargaría `langchain-mcp-adapters` en la parte 3.",
-   "alternativas": "SDK de agentes de OpenAI (recomendado en la consigna, con MCPServerStdio nativo) o el agente ReAct de LangGraph; menos código pero menos visibilidad del ciclo.",
-   "clases": [
-    10,
-    7
-   ],
-   "conceptos": [
-    "agente",
-    "tool-calling",
-    "react"
-   ]
-  },
-  {
-   "decision": "Descripciones de tools que dicen cuándo usarlas, qué NO tienen y los valores válidos del parámetro, compartidas entre parte 2 y 3.",
-   "por_que": "El modelo elige herramientas por coincidencia de patrones sobre las descripciones. Separar norma (documentos) de estado de hoy (API) dio ruteo 1,00 en las 4 corridas.",
-   "alternativas": "Descripciones mínimas o un routing jerárquico (domain + action); con 6 tools no hacía falta.",
-   "clases": [
-    7,
-    10
-   ],
-   "conceptos": [
-    "tool-calling",
-    "mcp"
-   ]
-  },
-  {
-   "decision": "Arreglar A11 cambiando la descripción de `buscar_documentos` ('con las mismas palabras que usó el paciente; una búsqueda por tema') en lugar de traer más fragmentos.",
-   "por_que": "Top-3 fijo arregló A11 pero el ruido bajó CR a 4,417; margen 0,02 volvió a fallar A11. El problema era la consulta ('requisitos y documentación' no se parece a 'Qué llevar a la primera consulta').",
-   "alternativas": "Reranking con cross-encoder o query rewriting/HyDE; más costo y latencia.",
-   "clases": [
-    7,
-    6
-   ],
-   "conceptos": [
-    "rag",
-    "evals",
-    "reranking"
-   ]
-  },
-  {
-   "decision": "Quitar del ejemplo de la descripción la pregunta A01 de dev ('abuelos en neonatología') y usar 'consulta por telemedicina'.",
-   "por_que": "Evitar sobreajustar el agente al conjunto dev, que no es el de evaluación.",
-   "alternativas": "Dejarlo: probablemente mejora dev y no dice nada del test oculto (fuga de datos de evaluación al sistema).",
-   "clases": [
-    4,
-    5
-   ],
-   "conceptos": [
-    "data-leakage",
-    "few-shot",
-    "overfitting"
-   ]
-  },
-  {
-   "decision": "Prompt de sistema que obliga a responder solo con datos de las herramientas y a decir cuando algo no está.",
-   "por_que": "El hospital es inventado: cualquier dato del modelo es alucinación. Resultado: Faithfulness 5,00 en todas las corridas.",
-   "alternativas": "Prompt sin restricciones: respuestas 'razonables' pero inventadas, que el juez castiga aunque sean correctas.",
-   "clases": [
-    5
-   ],
-   "conceptos": [
-    "system-prompt",
-    "alucinacion"
-   ]
-  }
- ],
- "evidencia": [
-  {
-   "archivo": "hospital/rag/encoders.py",
-   "lenguaje": "python",
-   "fragmento": "def _codificar(self, textos):\n    import torch\n\n    salidas = []\n    with torch.no_grad():\n        for i in range(0, len(textos), self.lote):\n            enc = self.tokenizer(textos[i:i + self.lote], padding=True, truncation=True,\n                                 max_length=512, return_tensors=\"pt\")\n            h = self.modelo(**enc).last_hidden_state\n            m = enc[\"attention_mask\"].unsqueeze(-1).float()\n            salidas.append(((h * m).sum(1) / m.sum(1)).numpy())\n    return _normalizar(np.concatenate(salidas))",
-   "explicacion": "Línea de base obligatoria: BERT sin ajustar, embedding = promedio (mean pooling) de los vectores de la última capa, ignorando el padding con la attention mask. Es exactamente lo que Sentence-BERT mostró que no alcanza (STS 54,8 contra 61,3 de GloVe promediado): BERT crudo no aprendió que el coseno mida similitud. Por eso sacó 0,35.",
-   "clases": [
-    8,
-    6
-   ],
-   "conceptos": [
-    "embedding",
-    "transformer",
-    "similitud-coseno"
-   ]
-  },
-  {
-   "archivo": "hospital/rag/chunking.py",
-   "lenguaje": "python",
-   "fragmento": "def para_embedding(self, metadatos=False):\n    if not metadatos:\n        return self.texto\n    encabezado = f\"{self.titulo} > {self.seccion}\" if self.seccion else self.titulo\n    return f\"{encabezado}: {self.texto}\"\n...\ndef fragmentar(docs, estrategia, palabras=60, solapamiento=15):\n    \"\"\"estrategia: 'seccion' | 'parrafo' | 'oracion' | 'ventana'\"\"\"\n    for doc in docs:\n        for seccion, texto in _secciones(doc):\n            if estrategia == \"seccion\":\n                piezas = [texto]\n            elif estrategia == \"parrafo\":\n                piezas = _parrafos(texto)\n            ...",
-   "explicacion": "Las tres estrategias de chunking de la clase (longitud fija, semántico, estructural) y los metadatos como texto buscable: el encabezado se antepone solo a lo que se embebe, así 'el vector sabe de qué documento viene' sin romper el fragmento literal.",
-   "clases": [
-    6,
-    7
-   ],
-   "conceptos": [
-    "chunking",
-    "embedding"
-   ]
-  },
-  {
-   "archivo": "hospital/rag/recuperador.py",
-   "lenguaje": "python",
-   "fragmento": "def seleccionar(puntuados, top_k=3, umbral=None, margen=None):\n    \"\"\"puntuados: [(texto, score)] ordenado de mayor a menor. Siempre devuelve al menos el mejor.\"\"\"\n    if not puntuados:\n        return []\n    mejor = puntuados[0][1]\n    elegidos = [t for t, s in puntuados[:top_k]\n                if (umbral is None or s >= umbral) and (margen is None or s >= mejor - margen)]\n    return elegidos or [puntuados[0][0]]\n\ndef _puntuar(self, consulta):\n    q = self.encoder.codificar_consultas([consulta])[0]\n    scores = self.matriz @ q   # vectores normalizados: producto punto = coseno",
-   "explicacion": "Las dos perillas de la clase 7 (top-k y similitud mínima) más una tercera: margen relativo al mejor. Como los embeddings están normalizados L2, `matriz @ q` es el coseno contra todos los fragmentos (búsqueda exacta; con 56 secciones no hace falta HNSW).",
-   "clases": [
-    7,
-    6
-   ],
-   "conceptos": [
-    "similitud-coseno",
-    "recall-at-k",
-    "base-vectorial"
-   ]
-  },
-  {
-   "archivo": "hospital/rag/config.json",
-   "lenguaje": "json",
-   "fragmento": "{\n \"encoder\": {\"tipo\": \"sentence_transformer\", \"modelo\": \"intfloat/multilingual-e5-base\",\n             \"prefijo_consulta\": \"query: \", \"prefijo_pasaje\": \"passage: \"},\n \"chunking\": {\"estrategia\": \"seccion\"},\n \"metadatos\": true,\n \"top_k\": 2,\n \"umbral\": null,\n \"margen\": 0.005,\n \"reranker\": null\n}",
-   "explicacion": "La configuración ganadora queda fija en un archivo, como pide la consigna, para que la cátedra corra `recuperar.py` sobre el test oculto sin tocar nada. Los prefijos asimétricos query/passage son parte del entrenamiento contrastivo de e5.",
-   "clases": [
-    6,
-    8
-   ],
-   "conceptos": [
-    "rag",
-    "embedding"
-   ]
-  },
-  {
-   "archivo": "hospital/agente/bucle.py",
-   "lenguaje": "python",
-   "fragmento": "async def responder(llm, tools, pregunta):\n    llm_con_tools = llm.bind_tools(tools)\n    por_nombre = {t.name: t for t in tools}\n    mensajes = [SystemMessage(PROMPT), HumanMessage(pregunta)]\n    for _ in range(MAX_PASOS):\n        ai = await llm_con_tools.ainvoke(mensajes)\n        mensajes.append(ai)\n        if not ai.tool_calls:\n            break\n        for llamada in ai.tool_calls:\n            mensajes.append(await _ejecutar(por_nombre, llamada))\n    return mensajes",
-   "explicacion": "El ciclo del agente basado en LLM: el modelo decide (tool_calls), el programa ejecuta, la observación vuelve al contexto como ToolMessage, y se repite hasta que el modelo responde sin pedir tools o se agota MAX_PASOS=6. Es el esquema ReAct (razonar-actuar-observar) sin texto de 'Thought' explícito, usando function calling nativo.",
-   "clases": [
-    10,
-    7
-   ],
-   "conceptos": [
-    "agente",
-    "tool-calling",
-    "react",
-    "function-calling"
-   ]
-  },
-  {
-   "archivo": "hospital/descripciones.py",
-   "lenguaje": "python",
-   "fragmento": "CONSULTAR_TURNOS = (\n    \"Próximos turnos disponibles (fecha y hora) con una especialidad en consultorios externos. Usala para saber \"\n    \"cuándo es el primer turno libre. No dice qué hay que llevar al turno: eso está en los documentos. \"\n    \"especialidad: una de cardiologia, dermatologia, traumatologia, psicologia, gastroenterologia, \"\n    \"obstetricia, kinesiologia.\"\n)",
-   "explicacion": "Diseño de herramientas de la clase 7: 'la descripción dice cuándo NO usarla'. Cada tool declara su fuente, su caso de uso, lo que no tiene y los valores válidos del parámetro. Es lo que lee el modelo para rutear (ruteo 1,00).",
-   "clases": [
-    7,
-    10
-   ],
-   "conceptos": [
-    "tool-calling",
-    "mcp"
-   ]
-  },
-  {
-   "archivo": "hospital/agente/bucle.py",
-   "lenguaje": "python",
-   "fragmento": "Al responder:\n- Usá solo datos que aparezcan en los resultados de las herramientas. No agregues horarios,\n  nombres, cantidades ni requisitos que no estén ahí, aunque te parezcan razonables.\n- Si la información no está, decilo en vez de suponer.\n- Respondé en español, en pocas oraciones, contestando todo lo que se preguntó.",
-   "explicacion": "Mitigación de alucinaciones desde el prompt (clase 5): restringir la respuesta a la evidencia y habilitar el 'no sé'. Se refleja en Answer Faithfulness 5,00 en las cuatro corridas.",
-   "clases": [
-    5
-   ],
-   "conceptos": [
-    "system-prompt",
-    "alucinacion"
-   ]
-  }
- ],
- "relaciones": [
-  {
-   "clase": 5,
-   "conceptos": [
-    "system-prompt",
-    "alucinacion",
-    "costo-por-token"
-   ],
-   "como_se_aplico": "El prompt de sistema prohíbe agregar datos que no vengan de las herramientas y pide decir cuando algo falta (Faithfulness 5,00). El log registra tokens de entrada, caché, salida y razonamiento y el costo de cada llamada: ~USD 0,0015 por corrida del agente contra ~0,017 del juez."
-  },
-  {
-   "clase": 6,
-   "conceptos": [
-    "rag",
-    "embedding",
-    "similitud-coseno",
-    "chunking",
-    "bm25",
-    "reranking"
-   ],
-   "como_se_aplico": "Es el pipeline indexar → recuperar → aumentar → generar de la clase 6, con búsqueda por significado (embeddings y coseno). La consigna compara contra un recuperador léxico ingenuo (0,35, como BM25 sin refinamientos); el código deja preparado un cross-encoder para reranking pero no se usó en la entrega."
-  },
-  {
-   "clase": 7,
-   "conceptos": [
-    "recall-at-k",
-    "chunking",
-    "mcp",
-    "tool-calling",
-    "evals"
-   ],
-   "como_se_aplico": "Top-k, similitud mínima, chunking y metadatos son exactamente 'los hiperparámetros de RAG' de la clase 7, y se calibraron contra Context Relevance. Las tres métricas del juez (CR, Faithfulness, Answer Relevance) son 'evaluar las dos etapas por separado'. La parte 3 (MCP con FastMCP, tools/list y tools/call sobre JSON-RPC por stdio) quedó diseñada en PLAN.md pero no implementada."
-  },
-  {
-   "clase": 8,
-   "conceptos": [
-    "transformer",
-    "embedding",
-    "atencion",
-    "self-attention",
-    "query-key-value"
-   ],
-   "como_se_aplico": "La comparación BERT crudo vs. e5/MiniLM reproduce 'del encoder al embedding de oración': promediar tokens de BERT sin ajustar no da similitud semántica (Sentence-BERT). Las partes 4 y 5 (atención en NumPy y bloque a mano 'El banco aguanta/presta') son el contenido de esta clase, pendientes en el repo."
-  },
-  {
-   "clase": 10,
-   "conceptos": [
-    "agente",
-    "react",
-    "tool-calling"
-   ],
-   "como_se_aplico": "El agente es LLM + herramientas + un bucle: decide, actúa, observa. En las preguntas mixtas (A10–A12) el modelo pide dos tools en paralelo en el mismo paso, y los errores de tool vuelven como observación para que se corrija."
-  },
-  {
-   "clase": 4,
-   "conceptos": [
-    "overfitting",
-    "particion-train-val-test",
-    "data-leakage"
-   ],
-   "como_se_aplico": "Dev vs. test oculto funciona como validación vs. test: el grupo eligió top-2 con margen (peor en dev) para robustez en test, y sacó la pregunta A01 del ejemplo de la descripción para no filtrar dev en el sistema."
-  }
- ],
- "preguntas_defensa": [
-  {
-   "q": "¿Por qué BERT sin ajustar sacó 0,35 si es un transformer encoder igual que e5?",
-   "a": "Porque nunca fue entrenado para que el coseno entre sus vectores mida similitud de significado. Su objetivo es MLM; el promedio de sus tokens refleja la forma superficial del texto. Sentence-BERT lo midió: promediar BERT da 54,8 en STS, menos que GloVe (61,3). e5 agrega un ajuste contrastivo con pares consulta–pasaje. En el TP se ve en el z del fragmento correcto: 1,56 en BERT contra 3,94 en e5."
-  },
-  {
-   "q": "e5 tiene cosenos medios tan altos como BERT (0,83 vs 0,79). ¿Entonces no está 'amontonado' igual?",
-   "a": "Sí, pero lo importante es el orden relativo, no el valor absoluto. Dentro de esa franja estrecha e5 separa el fragmento correcto 3,94 desvíos por encima de la media; BERT solo 1,56. Por eso un umbral absoluto depende del modelo y del corpus ('un 0,7 no significa lo mismo en dos sistemas') y el grupo usó un margen relativo al mejor."
-  },
-  {
-   "q": "¿Por qué con k = 3 ningún encoder supera 0,515 de Context Relevance?",
-   "a": "Cada pregunta dev tiene una sola frase de evidencia. Con 3 fragmentos, aunque el recall sea 1, la precisión cae a 1/3, y la media armónica 2·1·(1/3)/(1+1/3) = 0,5. La métrica castiga los dos extremos: pocos fragmentos pierden evidencia, muchos bajan la precisión."
-  },
-  {
-   "q": "Si k = 1 daba 1,000 en dev, ¿por qué entregaron top-2 con margen 0,005 (0,967)?",
-   "a": "Porque dev no es el test. En R01 y R15 el primer y segundo fragmento diferían en 0,001 y 0,003 de coseno: en test un empate así es una moneda al aire. Con k=1 un error vale 0; con los dos, 0,667. El margen agrega el segundo solo en empates (k medio 1,10). Es elegir robustez sobre sobreajustar a dev."
-  },
-  {
-   "q": "¿Qué aportan los metadatos y por qué no rompen la métrica?",
-   "a": "Se antepone 'Título > Sección' al texto que se embebe, porque muchas secciones no nombran su tema. Mejoró a los 4 encoders (e5-base 0,85→1,00 con k=1). El fragmento devuelto sigue siendo literal, porque el evaluador busca la evidencia como substring; los metadatos solo cambian el vector."
-  },
-  {
-   "q": "¿Cómo decide el agente qué herramienta usar y cómo lo midieron?",
-   "a": "El modelo lee las descripciones de las tools (function calling) y elige por coincidencia con la pregunta. Por eso cada descripción dice su fuente, cuándo usarla, qué NO tiene y los valores válidos. Se mide con el ruteo (proporción de tools esperadas usadas), que dio 1,00 en las cuatro corridas; en preguntas mixtas pidió dos tools en paralelo."
-  },
-  {
-   "q": "¿Por qué falló A11 y cómo lo arreglaron?",
-   "a": "El ruteo estuvo bien, pero el modelo buscó 'requisitos y documentación para turno…' y la sección 'Qué llevar a la primera consulta' quedó tercera, fuera del margen. Más fragmentos (top-3) arreglaba A11 pero el juez castigó el ruido en otras (CR 4,417). La solución fue la consulta: la descripción pide usar las palabras del paciente y una búsqueda por tema. Corrida 4: 5/5/5."
-  },
-  {
-   "q": "¿Qué miden Context Relevance, Answer Faithfulness y Answer Relevance y por qué separarlas?",
-   "a": "CR mide la recuperación (¿trajo lo necesario sin ruido?); Faithfulness, si cada afirmación está respaldada por los contextos (un dato inventado la baja aunque sea cierto); Answer Relevance, si contesta lo preguntado completo. Separarlas dice qué etapa falló: si CR es bajo, tocar el prompt de generación no mueve el resultado."
-  },
-  {
-   "q": "¿Qué cambiaría al pasar las herramientas a un servidor MCP y qué esperarían en las métricas?",
-   "a": "Las tools pasan a un proceso aparte (FastMCP, stdio, JSON-RPC 2.0); el cliente las descubre con tools/list y las llama con tools/call. Resuelve el problema M×N → M+N y deja las tools en un solo lugar. Con las mismas descripciones y el mismo modelo, las métricas deberían ser parecidas; las diferencias vendrían del formato de los resultados (bloques de contenido MCP) o del no-determinismo del modelo. En este repo esa parte quedó pendiente."
-  },
-  {
-   "q": "¿Por qué el costo del juez es 10 veces el del agente?",
-   "a": "El agente usa deepseek-v4-flash (USD 0,04/0,64 por millón) y ~40 mil tokens de entrada por corrida (~USD 0,0015). El juez usa gemini-3.7-flash (0,75/3,75), casi 20 veces más caro por token de entrada, y lee pregunta, contextos y respuesta para tres métricas (~USD 0,017)."
-  },
-  {
-   "q": "En la parte 5, ¿por qué en la parte A el vector de 'banco' es igual en las dos frases y en la B no?",
-   "a": "Con máscara causal (decoder), 'banco' (posición 1) solo mira a 'El' y a sí mismo, que son iguales en ambas frases; su representación no puede depender del verbo que viene después. Sin máscara (encoder, tipo BERT), 'banco' también atiende a 'aguanta' o 'presta', y su vector se contextualiza. En el decoder la desambiguación aparece en la última posición, que sí ve todo lo anterior."
-  }
- ],
- "quiz": [
-  {
-   "q": "La consigna exige como línea de base BERT sin ajustar con el promedio de la última capa. ¿Qué predice la teoría de Sentence-BERT sobre ese embedding?",
-   "opciones": [
-    "Que es el mejor posible porque BERT es bidireccional",
-    "Que rinde mal para similitud: promediar BERT crudo es peor que promediar GloVe",
-    "Que rinde igual que el vector [CLS]",
-    "Que solo falla en inglés"
-   ],
-   "correcta": 1,
-   "explicacion": "Sentence-BERT midió STS 54,8 para el promedio de BERT, 29,2 para [CLS] y 61,3 para GloVe promediado. Sin ajuste para similitud, el coseno no refleja significado. En el TP: 0,35."
-  },
-  {
-   "q": "Una pregunta tiene una sola evidencia y el recuperador devuelve 2 fragmentos, uno con la evidencia. ¿Cuánto vale su context_relevance?",
-   "opciones": [
-    "0,5",
-    "0,667",
-    "0,75",
-    "1,0"
-   ],
-   "correcta": 1,
-   "explicacion": "Recall 1, precision 1/2. Media armónica: 2·1·0,5/(1+0,5) = 0,667. Es el número que el grupo usa para justificar el margen."
-  },
-  {
-   "q": "¿Por qué un umbral absoluto de similitud (por ejemplo 0,88) es frágil?",
-   "opciones": [
-    "Porque el coseno puede ser mayor que 1",
-    "Porque su valor depende del modelo de embeddings y de la distribución de similitudes del corpus",
-    "Porque siempre devuelve k fragmentos",
-    "Porque el umbral solo sirve con BM25"
-   ],
-   "correcta": 1,
-   "explicacion": "Un 0,7 no significa lo mismo en dos sistemas: con e5 el mejor coseno va de 0,82 a 0,91 según la pregunta. Hay que calibrarlo; un margen relativo al mejor se adapta a cada pregunta."
-  },
-  {
-   "q": "Anteponer 'Título > Sección' al fragmento antes de embeber es un ejemplo de…",
-   "opciones": [
-    "Reranking",
-    "Metadatos como texto buscable",
-    "Fine-tuning del encoder",
-    "Solapamiento de chunks"
-   ],
-   "correcta": 1,
-   "explicacion": "La clase 7 lo presenta así: el título y la ruta de sección se pegan adelante antes de calcular el embedding para que el vector sepa de qué documento viene (idea afín al contextual retrieval)."
-  },
-  {
-   "q": "En el agente, un ToolMessage es…",
-   "opciones": [
-    "El mensaje de sistema con las descripciones",
-    "El pedido del modelo para llamar una tool",
-    "El resultado de ejecutar la tool, que vuelve al contexto del modelo",
-    "La respuesta final al paciente"
-   ],
-   "correcta": 2,
-   "explicacion": "El modelo emite tool_calls dentro de un AIMessage; el programa ejecuta y devuelve el resultado como ToolMessage; el ciclo sigue hasta que el modelo responde sin pedir tools."
-  },
-  {
-   "q": "¿Qué problema resuelve MCP según la clase 7?",
-   "opciones": [
-    "Que los LLM alucinen menos",
-    "Pasar de M×N integraciones a M+N, con descubrimiento estándar de capacidades (tools/list)",
-    "Reemplazar a HTTP como transporte",
-    "Entrenar al modelo para usar herramientas"
-   ],
-   "correcta": 1,
-   "explicacion": "MCP es un protocolo sobre JSON-RPC 2.0, agnóstico del transporte (stdio, HTTP streaming), que agrega descubrimiento de herramientas y sesión con estado. No cambia el modelo."
-  },
-  {
-   "q": "Faithfulness fue 5,00 en las cuatro corridas. ¿Qué significa?",
-   "opciones": [
-    "Que todas las respuestas eran completas",
-    "Que las tools elegidas eran las correctas",
-    "Que cada afirmación de la respuesta estaba respaldada por los contextos recibidos",
-    "Que la recuperación no trajo ruido"
-   ],
-   "correcta": 2,
-   "explicacion": "Faithfulness mide respaldo en el contexto (no inventar). Completitud es Answer Relevance; elegir bien las tools es el ruteo; el ruido es Context Relevance."
-  },
-  {
-   "q": "En la atención con máscara causal, ¿qué valor se pone en las posiciones futuras antes del softmax?",
-   "opciones": [
-    "0",
-    "1",
-    "−∞",
-    "El promedio de la fila"
-   ],
-   "correcta": 2,
-   "explicacion": "Con −∞, exp(−∞) = 0 y esas posiciones reciben peso cero tras el softmax, así cada token solo mira a los anteriores y a sí mismo. Poner 0 en el puntaje no anula el peso (exp(0)=1)."
-  }
- ]
+  "num": 3,
+  "titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+  "repo": "rag-mcp-transfomers",
+  "consigna": "El Hospital Provincial **Arroyo Claro** (ficticio) quiere un asistente para pacientes y familiares. La información vive en dos lugares: **documentos** que casi no cambian (20 Markdown de normas y procedimientos) y una **API** con el estado del día (camas, guardia, turnos, farmacia, espera). Como el hospital es inventado, el modelo solo contesta bien si **recupera**. Todo en Python, entrega el 9 de octubre de 2026.\n\n| Parte | Qué pide | Puntos |\n|---|---|---|\n| 1. RAG vectorial | `recuperar.py`: chunking + embeddings con un **transformer encoder** + coseno. Comparar ≥3 encoders, uno obligatorio: **BERT sin ajustar** (promedio de la última capa) como línea de base. Tabla de experimentos con un `.eval.json` por fila. Métrica: **Context Relevance** = media armónica de recall y precision de evidencia (un léxico ingenuo saca 0,35). | 25 |\n| 2. Agente con dos fuentes | Tool calling sobre `deepseek/deepseek-v4-flash-0731` (OpenRouter) con 6 herramientas de nombre fijo (`buscar_documentos`, `consultar_camas`, `consultar_guardia`, `consultar_turnos`, `consultar_farmacia`, `consultar_espera`). Juez `gemini-3.7-flash` puntúa 1–5 Context Relevance, Answer Faithfulness y Answer Relevance, más el **ruteo**. Sin log `.md` por corrida, vale cero. | 30 |\n| 3. MCP | Las mismas 6 tools en `servidor_mcp.py` (FastMCP del SDK oficial, stdio), un cliente que las descubra con `tools/list` y las llame con `tools/call`, capturas del MCP Inspector y comparación de métricas/costo con la parte 2. | 15 |\n| 4. Atención en NumPy | `softmax`, `atencion`, `autoatencion` (máscara causal), `multicabeza`, `layer_norm`; 14 tests (\"the cat sat\", d = 4). | 15 |\n| 5. Bloque a mano | \"El banco aguanta\" / \"El banco presta\" por un bloque completo, con y sin máscara, **justificando cada operación**, sin IA. | 15 |\n\nLas preguntas `dev` son para tunear; la cátedra evalúa con un **test oculto**, así que sobreajustar a dev se paga.",
+  "que_hicimos": "El grupo trabajó con la metodología de la clase 2: `CLAUDE.md`, `SPEC.md`, un `PLAN.md` paso a paso (\"implementá el paso N\"), TDD con pytest (`tests/`) y commits convencionales. El código compartido vive en el paquete `hospital/` y los scripts de la raíz (`recuperar.py`, `agente.py`) son CLIs finos.\n\n**Parte 1 — RAG vectorial (`hospital/rag/`).**\n- `chunking.py` implementa las **tres estrategias de la clase**: longitud fija con solapamiento (ventanas de 40/10 y 80/20 *palabras*, sin cruzar secciones), semántico (párrafo y oración) y **estructural** (una sección `##` por fragmento). Regla de oro: cada fragmento es un **substring literal** del corpus, porque el evaluador busca la evidencia como texto.\n- **Metadatos como texto buscable**: \"Título > Sección: \" se antepone *solo al texto que se embebe*; el fragmento devuelto sigue literal.\n- `encoders.py`: `BertPromedio` (mean pooling de la última capa enmascarando padding) y `SentenceTransformerEncoder` (MiniLM, e5-small, e5-base con prefijos `query: ` / `passage: `). Todo normalizado L2, así el producto punto **es** el coseno.\n- `recuperador.py`: coseno contra la matriz de fragmentos, caché de embeddings, soporte opcional de cross-encoder, y una función `seleccionar` con **top-k, umbral absoluto y margen relativo al mejor**.\n- Grilla de **98 configuraciones** (4 encoders × 5 chunkings × metadatos × k, más umbrales y márgenes), cada una con su `.jsonl`, `.config.json` y `.eval.json` en `experimentos/recuperacion/`.\n- Configuración congelada en `hospital/rag/config.json`: **e5-base + estructural + metadatos + top-2 con margen 0,005**.\n\n**Parte 2 — Agente (`hospital/agente/`).** LangChain **sin LangGraph**: `ChatOpenAI` apuntando a OpenRouter (temperatura 0), tools enlazadas con `bind_tools` y un **bucle explícito** de tool calling (máx. 6 llamadas al modelo): el modelo pide tools, se ejecutan, vuelven como `ToolMessage`, y se repite hasta que responde sin pedir nada. Los errores de una tool vuelven al modelo como texto para que se corrija. Las **descripciones** de las tools (`descripciones.py`) dicen qué fuente consultan, para qué sirven, **qué NO tienen** y los valores válidos del parámetro, y se comparten con el servidor MCP de la parte 3 para que la comparación sea justa. `buscar_documentos` antepone `[Documento > Sección]` a cada fragmento. Cada corrida deja un log `.md` con tokens (entrada, caché, salida, razonamiento), costo e id de generación por llamada, y cada tool con argumentos y resultado completo. Se hicieron **4 corridas** iterando sobre la selección de fragmentos y la descripción de `buscar_documentos`.\n\n**Parte 3 — Servidor MCP.** `servidor_mcp.py` expone las **6 tools** con `FastMCP` (SDK oficial `mcp`) por **stdio**; cada función delega en los mismos `documentos` y `api_cliente` de la parte 2 y usa la descripción compartida de `descripciones.py`. No imprime nada en stdout porque ese canal es del protocolo. `agente_mcp.py` arma el cliente con `MultiServerMCPClient` de `langchain-mcp-adapters`: `load_mcp_tools` descubre las tools con **`tools/list`** (y valida que estén las 6), cada invocación es un **`tools/call`**, y entran al **mismo bucle** `correr` de la parte 2 sin cambios. La sesión MCP queda abierta toda la corrida para no reiniciar el servidor ni recargar el encoder en cada llamada. Además lo conectaron con **MCP Inspector**, que listó las 6 tools y las invocó una por una (7 capturas en `experimentos/inspector/`).\n\n**Parte 4 — Atención en NumPy (`atencion.py`).** `softmax` restando el máximo de cada fila (estable con valores grandes), `atencion(Q, K, V, mascara)` con `Q Kᵀ/√d_k` y máscara causal `np.triu(…, k=1) → −∞` que devuelve `A V` y `A`, `autoatencion` (proyecta X con `Wq`, `Wk`, `Wv`), `multicabeza` (concatena las cabezas y proyecta con `Wo`) y `layer_norm` sin γ/β. Pasan los **14 tests** de la cátedra.\n\n**Parte 5 — Bloque de transformer a mano.** Pasaron \"El banco aguanta ___\" y \"El banco presta ___\" por un bloque completo en papel (embeddings + posición, Q/K/V, afinidades, escala, máscara, softmax, mezcla, residual, layer norm, FFN, residual, layer norm y predicción); el escaneo está en `a_mano/Punto5_a_mano.pdf` y las conclusiones en el `INFORME.md`.\n\n**Después de la entrega de la parte 3**, un commit (\"Corrección A11\") agregó a `buscar_documentos` una regla fija: si la consulta contiene \"llevar\" o \"document\", trae **top-3 sin margen**. No hay una corrida nueva que la evalúe ni se menciona en el informe.",
+  "arquitectura": "flowchart LR\n  P[Pregunta del paciente] --> AG[Agente LangChain bucle explicito deepseek-v4-flash]\n  AG -->|parte 2: tool call| TL[Tools de LangChain]\n  AG -->|parte 3: tools/list y tools/call por stdio| MCP[servidor_mcp.py FastMCP]\n  TL --> BD[buscar_documentos]\n  TL --> API[consultar_camas guardia turnos farmacia espera]\n  MCP --> BD\n  MCP --> API\n  BD --> REC[Recuperador e5-base]\n  REC --> IDX[Fragmentos por seccion con Titulo y Seccion antepuestos]\n  IDX --> COS[Coseno top-2 con margen 0.005]\n  API --> H[API del hospital localhost 8765]\n  COS -->|ToolMessage| AG\n  H -->|JSON| AG\n  AG --> R[Respuesta mas contextos mas log md]\n  R --> J[Juez gemini CR F AR y ruteo]\n  X[Parte 4: atencion.py NumPy] --> T[14 tests de la catedra]\n  X --> B[Parte 5: bloque a mano El banco aguanta o presta]",
+  "resultados": "**Parte 1 (recuperación, 20 preguntas dev).** Configuración entregada: e5-base, estructural, metadatos, top-2 con margen 0,005 → **CR 0,967** (recall 1,000, precision 0,950, MRR 1,000, k medio 1,10). Línea de base BERT: **0,350** en su mejor configuración (igual al léxico ingenuo). La entrega casi triplica la línea de base.\n\n| Encoder | Mejor CR | CR medio con k=1 | Coseno medio entre fragmentos | z del fragmento correcto |\n|---|---|---|---|---|\n| BERT multilingüe (promedio) | 0,350 | 0,27 | 0,786 | 1,56 |\n| paraphrase-multilingual-MiniLM-L12-v2 | 0,950 | 0,76 | 0,365 | 3,07 |\n| multilingual-e5-small | 0,950 | 0,80 | 0,842 | 3,94 |\n| **multilingual-e5-base** | **1,000** | **0,85** | 0,830 | 3,94 |\n\nHallazgos: con **k = 3 ningún encoder pasa de 0,515** (cada pregunta tiene una sola evidencia, así que un fragmento extra baja la precisión); los **metadatos** mejoran a los cuatro encoders con chunking estructural y k=1 (BERT 0,25→0,35, MiniLM 0,70→0,90, e5-small 0,80→0,95, e5-base 0,85→1,00); el chunking **por oración** es el peor para todos. k=1 da 1,000 en dev, pero se entregó top-2 con margen porque en R01 y R15 los dos primeros estaban casi empatados (0,001 y 0,003 de diferencia): se resignan 0,033 en dev para cubrir empates en test. Un umbral absoluto de 0,88 daba 0,983 en dev pero no protege esos casos.\n\n**Parte 2 (agente, 12 preguntas dev).**\n\n| # | Cambio | Ruteo | CR | F | AR | Costo agente (USD) | Costo juez (USD) |\n|---|---|---|---|---|---|---|---|\n| 1 | inicial, selección de la parte 1 | 1,00 | 4,917 | 5,00 | 4,917 | 0,001405 | 0,01667 |\n| 2 | siempre 3 fragmentos | 1,00 | 4,417 | 5,00 | 5,000 | 0,001464 | 0,02141 |\n| 3 | hasta 3, margen 0,02 | 1,00 | 4,833 | 5,00 | 4,917 | 0,001439 | 0,01797 |\n| **4** | selección de la parte 1 + descripción \"con las palabras del paciente, una búsqueda por tema\" | **1,00** | **5,000** | **5,00** | **5,000** | **0,001458** | 0,01744 |\n\nCada corrida: 24 llamadas al modelo (2 por pregunta), ~40 mil tokens de entrada y ~2,3 mil de salida; en las mixtas (A10–A12) el modelo pide las dos tools **en paralelo**. El juez cuesta **más de 10 veces** que el agente. Conclusión clave: el fallo de A11 no era *cuántos* fragmentos sino **la consulta** que redactaba el modelo. Con 12 preguntas y una corrida por configuración, una pregunta de diferencia está dentro del ruido; lo robusto es ruteo 1,00 y fidelidad 5,00 en las 4 corridas.\n\n**Parte 3 (agente por MCP, mismas 12 preguntas).**\n\n| Agente | Ruteo | CR | F | AR | Costo agente (USD) | Costo juez (USD) |\n|---|---|---|---|---|---|---|\n| Parte 2 (corrida 4, tools de LangChain) | 1,00 | 5,000 | 5,00 | 5,000 | 0,001458 | 0,01744 |\n| Parte 3 (tools por MCP) | 1,00 | 4,833 | 5,00 | 4,917 | 0,003524 | 0,02002 |\n\nLas dos rutean bien las 12 preguntas y mantienen fidelidad 5,00. La diferencia es **A11**: por MCP la primera búsqueda trajo «Llegada» y la segunda cómo pedir el turno, sin la lista de documentación (CR 3 y AR 4 en esa pregunta), con una llamada extra al modelo (25 contra 24). El informe aclara que con una corrida por versión no se puede atribuir la diferencia al transporte MCP. Costo total medido de las partes 2 y 3: **USD 0,042442** (0,004982 agente + 0,03746 juez).\n\n**Parte 4:** `python3 atencion/test_atencion.py atencion.py` → **14 tests, OK** (softmax estable, escala √d_k, máscara causal, formas, permutación de filas, multicabeza e invariantes de layer norm).\n\n**Parte 5:** con máscara causal (decoder), la fila de \"banco\" en LN(Z) es **idéntica** en las dos frases, y la última posición predice **\"peso\" (59,6%)** para \"aguanta\" y **\"dinero\" (59,6%)** para \"presta\". Sin máscara (encoder), el vector de \"banco\" **cambia** según el verbo. Los números coinciden con lo que da su `atencion.py` con los mismos datos.",
+  "decisiones": [
+    {
+      "decision": "Encoder `intfloat/multilingual-e5-base` con prefijos `query: ` / `passage: `.",
+      "por_que": "Mejor CR (1,000 con k=1) y mejor CR medio (0,85). Fue entrenado contrastivamente con pares consulta–pasaje: aunque sus cosenos están tan 'amontonados' como los de BERT (media 0,83), ordena bien dentro de esa franja (el correcto queda a 3,94 desvíos).",
+      "alternativas": "BERT promediado (0,35, z=1,56: no fue entrenado para que el coseno mida significado), MiniLM de paráfrasis (0,95, entrenado oración–oración, no pregunta–pasaje), e5-small (0,95, más rápido). bge-m3 sería otra opción más pesada.",
+      "clases": [
+        6,
+        8
+      ],
+      "conceptos": [
+        "embedding",
+        "similitud-coseno",
+        "transformer"
+      ]
+    },
+    {
+      "decision": "Chunking estructural: una sección `##` por fragmento.",
+      "por_que": "Empata arriba con ventanas de 80 palabras, respeta la jerarquía del documento y entrega fragmentos completos (útil para el agente, p. ej. toda la preparación de la colonoscopía). Las secciones miden 223 caracteres de media.",
+      "alternativas": "Ventanas de 800–1000 caracteres (las de la clase) juntarían 4–5 temas por fragmento en este corpus; por oración corta el contexto que el encoder necesita (el peor para todos los encoders).",
+      "clases": [
+        6,
+        7
+      ],
+      "conceptos": [
+        "chunking"
+      ]
+    },
+    {
+      "decision": "Anteponer 'Título > Sección' al texto que se embebe, devolviendo el fragmento literal.",
+      "por_que": "Muchas secciones no nombran su tema ('La unidad tiene dos franjas de visita…'): el tema está en el encabezado. Mejoró a los 4 encoders (e5-base 0,85→1,00 con k=1). El fragmento devuelto no cambia porque el evaluador busca la evidencia como substring.",
+      "alternativas": "Usar los metadatos solo como filtro previo, o embeber un resumen del documento; ambas también vistas en clase.",
+      "clases": [
+        7
+      ],
+      "conceptos": [
+        "chunking",
+        "embedding"
+      ]
+    },
+    {
+      "decision": "Selección top-2 con margen relativo 0,005 en vez de top-1 o umbral absoluto.",
+      "por_que": "Con k=1 un empate mal resuelto vale 0; devolver los dos vale 0,667. El margen solo agrega el segundo cuando está casi empatado con el primero (k medio 1,10). Cuesta 0,033 en dev y protege el test oculto.",
+      "alternativas": "Umbral absoluto 0,88 (0,983 en dev) depende demasiado de la distribución de cosenos de e5 (el mejor va de 0,82 a 0,91) y no cubre los empates; top-3 fijo baja la precisión a ~0,33.",
+      "clases": [
+        7,
+        4
+      ],
+      "conceptos": [
+        "recall-at-k",
+        "precision-recall",
+        "overfitting"
+      ]
+    },
+    {
+      "decision": "Agente con LangChain y un bucle de tool calling escrito a mano (sin LangGraph ni AgentExecutor).",
+      "por_que": "Control total y trazabilidad: cada AIMessage y ToolMessage queda en el log. El bucle no depende del origen de las tools, así sirve igual para las `@tool` de la parte 2 y las que carga `langchain-mcp-adapters` en la parte 3: `agente_mcp.py` le pasa las tools MCP al mismo `correr` sin tocarlo.",
+      "alternativas": "SDK de agentes de OpenAI (recomendado en la consigna, con MCPServerStdio nativo) o el agente ReAct de LangGraph; menos código pero menos visibilidad del ciclo.",
+      "clases": [
+        10,
+        7
+      ],
+      "conceptos": [
+        "agente",
+        "tool-calling",
+        "react"
+      ]
+    },
+    {
+      "decision": "Descripciones de tools que dicen cuándo usarlas, qué NO tienen y los valores válidos del parámetro, compartidas entre parte 2 y 3.",
+      "por_que": "El modelo elige herramientas por coincidencia de patrones sobre las descripciones. Separar norma (documentos) de estado de hoy (API) dio ruteo 1,00 en las 4 corridas.",
+      "alternativas": "Descripciones mínimas o un routing jerárquico (domain + action); con 6 tools no hacía falta.",
+      "clases": [
+        7,
+        10
+      ],
+      "conceptos": [
+        "tool-calling",
+        "mcp"
+      ]
+    },
+    {
+      "decision": "Arreglar A11 cambiando la descripción de `buscar_documentos` ('con las mismas palabras que usó el paciente; una búsqueda por tema') en lugar de traer más fragmentos.",
+      "por_que": "Top-3 fijo arregló A11 pero el ruido bajó CR a 4,417; margen 0,02 volvió a fallar A11. El problema era la consulta ('requisitos y documentación' no se parece a 'Qué llevar a la primera consulta').",
+      "alternativas": "Reranking con cross-encoder o query rewriting/HyDE; más costo y latencia.",
+      "clases": [
+        7,
+        6
+      ],
+      "conceptos": [
+        "rag",
+        "evals",
+        "reranking"
+      ]
+    },
+    {
+      "decision": "Quitar del ejemplo de la descripción la pregunta A01 de dev ('abuelos en neonatología') y usar 'consulta por telemedicina'.",
+      "por_que": "Evitar sobreajustar el agente al conjunto dev, que no es el de evaluación.",
+      "alternativas": "Dejarlo: probablemente mejora dev y no dice nada del test oculto (fuga de datos de evaluación al sistema).",
+      "clases": [
+        4,
+        5
+      ],
+      "conceptos": [
+        "data-leakage",
+        "few-shot",
+        "overfitting"
+      ]
+    },
+    {
+      "decision": "Prompt de sistema que obliga a responder solo con datos de las herramientas y a decir cuando algo no está.",
+      "por_que": "El hospital es inventado: cualquier dato del modelo es alucinación. Resultado: Faithfulness 5,00 en todas las corridas.",
+      "alternativas": "Prompt sin restricciones: respuestas 'razonables' pero inventadas, que el juez castiga aunque sean correctas.",
+      "clases": [
+        5
+      ],
+      "conceptos": [
+        "system-prompt",
+        "alucinacion"
+      ]
+    },
+    {
+      "decision": "Servidor MCP con FastMCP por stdio que reusa `documentos`, `api_cliente` y `descripciones.py`, y un cliente que mantiene una sola sesión abierta.",
+      "por_que": "Si el servidor reescribiera las tools o las descripciones, la comparación con la parte 2 no mediría el transporte sino otro sistema. Una sola sesión evita levantar el proceso y recargar e5-base en cada `tools/call`. El cliente valida que `tools/list` devuelva exactamente las 6 tools antes de correr.",
+      "alternativas": "Transporte HTTP streaming (otro proceso escuchando en un puerto), abrir una sesión por llamada (más simple, mucho más lento) o el `MCPServerStdio` del SDK de agentes de OpenAI.",
+      "clases": [
+        6,
+        7
+      ],
+      "conceptos": [
+        "mcp"
+      ]
+    },
+    {
+      "decision": "Después de la entrega, forzar top-3 sin margen en `buscar_documentos` cuando la consulta contiene «llevar» o «document» (commit «Corrección A11»).",
+      "por_que": "El commit se llama «Corrección A11» y llega después de la corrida MCP, donde A11 volvió a fallar porque la sección «Qué llevar a la primera consulta» no aparecía; el repo no lo explica, pero esa es la lectura más probable. La regla la trae siempre para ese tipo de consulta.",
+      "alternativas": "Lo que el propio informe había mostrado en la parte 2: mejorar la consulta (la descripción de la tool) en vez de traer más fragmentos; top-3 fijo bajó el CR de otras preguntas. La regla por palabra clave está ajustada a una pregunta de dev y no tiene corrida que la evalúe.",
+      "clases": [
+        6,
+        7
+      ],
+      "conceptos": [
+        "rag"
+      ]
+    }
+  ],
+  "evidencia": [
+    {
+      "archivo": "hospital/rag/encoders.py",
+      "lenguaje": "python",
+      "fragmento": "def _codificar(self, textos):\n    import torch\n\n    salidas = []\n    with torch.no_grad():\n        for i in range(0, len(textos), self.lote):\n            enc = self.tokenizer(textos[i:i + self.lote], padding=True, truncation=True,\n                                 max_length=512, return_tensors=\"pt\")\n            h = self.modelo(**enc).last_hidden_state\n            m = enc[\"attention_mask\"].unsqueeze(-1).float()\n            salidas.append(((h * m).sum(1) / m.sum(1)).numpy())\n    return _normalizar(np.concatenate(salidas))",
+      "explicacion": "Línea de base obligatoria: BERT sin ajustar, embedding = promedio (mean pooling) de los vectores de la última capa, ignorando el padding con la attention mask. Es exactamente lo que Sentence-BERT mostró que no alcanza (STS 54,8 contra 61,3 de GloVe promediado): BERT crudo no aprendió que el coseno mida similitud. Por eso sacó 0,35.",
+      "clases": [
+        8,
+        6
+      ],
+      "conceptos": [
+        "embedding",
+        "transformer",
+        "similitud-coseno"
+      ]
+    },
+    {
+      "archivo": "hospital/rag/chunking.py",
+      "lenguaje": "python",
+      "fragmento": "def para_embedding(self, metadatos=False):\n    if not metadatos:\n        return self.texto\n    encabezado = f\"{self.titulo} > {self.seccion}\" if self.seccion else self.titulo\n    return f\"{encabezado}: {self.texto}\"\n...\ndef fragmentar(docs, estrategia, palabras=60, solapamiento=15):\n    \"\"\"estrategia: 'seccion' | 'parrafo' | 'oracion' | 'ventana'\"\"\"\n    for doc in docs:\n        for seccion, texto in _secciones(doc):\n            if estrategia == \"seccion\":\n                piezas = [texto]\n            elif estrategia == \"parrafo\":\n                piezas = _parrafos(texto)\n            ...",
+      "explicacion": "Las tres estrategias de chunking de la clase (longitud fija, semántico, estructural) y los metadatos como texto buscable: el encabezado se antepone solo a lo que se embebe, así 'el vector sabe de qué documento viene' sin romper el fragmento literal.",
+      "clases": [
+        6,
+        7
+      ],
+      "conceptos": [
+        "chunking",
+        "embedding"
+      ]
+    },
+    {
+      "archivo": "hospital/rag/recuperador.py",
+      "lenguaje": "python",
+      "fragmento": "def seleccionar(puntuados, top_k=3, umbral=None, margen=None):\n    \"\"\"puntuados: [(texto, score)] ordenado de mayor a menor. Siempre devuelve al menos el mejor.\"\"\"\n    if not puntuados:\n        return []\n    mejor = puntuados[0][1]\n    elegidos = [t for t, s in puntuados[:top_k]\n                if (umbral is None or s >= umbral) and (margen is None or s >= mejor - margen)]\n    return elegidos or [puntuados[0][0]]\n\ndef _puntuar(self, consulta):\n    q = self.encoder.codificar_consultas([consulta])[0]\n    scores = self.matriz @ q   # vectores normalizados: producto punto = coseno",
+      "explicacion": "Las dos perillas de la clase 7 (top-k y similitud mínima) más una tercera: margen relativo al mejor. Como los embeddings están normalizados L2, `matriz @ q` es el coseno contra todos los fragmentos (búsqueda exacta; con 56 secciones no hace falta HNSW).",
+      "clases": [
+        7,
+        6
+      ],
+      "conceptos": [
+        "similitud-coseno",
+        "recall-at-k",
+        "base-vectorial"
+      ]
+    },
+    {
+      "archivo": "hospital/rag/config.json",
+      "lenguaje": "json",
+      "fragmento": "{\n \"encoder\": {\"tipo\": \"sentence_transformer\", \"modelo\": \"intfloat/multilingual-e5-base\",\n             \"prefijo_consulta\": \"query: \", \"prefijo_pasaje\": \"passage: \"},\n \"chunking\": {\"estrategia\": \"seccion\"},\n \"metadatos\": true,\n \"top_k\": 2,\n \"umbral\": null,\n \"margen\": 0.005,\n \"reranker\": null\n}",
+      "explicacion": "La configuración ganadora queda fija en un archivo, como pide la consigna, para que la cátedra corra `recuperar.py` sobre el test oculto sin tocar nada. Los prefijos asimétricos query/passage son parte del entrenamiento contrastivo de e5.",
+      "clases": [
+        6,
+        8
+      ],
+      "conceptos": [
+        "rag",
+        "embedding"
+      ]
+    },
+    {
+      "archivo": "hospital/agente/bucle.py",
+      "lenguaje": "python",
+      "fragmento": "async def responder(llm, tools, pregunta):\n    llm_con_tools = llm.bind_tools(tools)\n    por_nombre = {t.name: t for t in tools}\n    mensajes = [SystemMessage(PROMPT), HumanMessage(pregunta)]\n    for _ in range(MAX_PASOS):\n        ai = await llm_con_tools.ainvoke(mensajes)\n        mensajes.append(ai)\n        if not ai.tool_calls:\n            break\n        for llamada in ai.tool_calls:\n            mensajes.append(await _ejecutar(por_nombre, llamada))\n    return mensajes",
+      "explicacion": "El ciclo del agente basado en LLM: el modelo decide (tool_calls), el programa ejecuta, la observación vuelve al contexto como ToolMessage, y se repite hasta que el modelo responde sin pedir tools o se agota MAX_PASOS=6. Es el esquema ReAct (razonar-actuar-observar) sin texto de 'Thought' explícito, usando function calling nativo.",
+      "clases": [
+        10,
+        7
+      ],
+      "conceptos": [
+        "agente",
+        "tool-calling",
+        "react",
+        "function-calling"
+      ]
+    },
+    {
+      "archivo": "hospital/descripciones.py",
+      "lenguaje": "python",
+      "fragmento": "CONSULTAR_TURNOS = (\n    \"Próximos turnos disponibles (fecha y hora) con una especialidad en consultorios externos. Usala para saber \"\n    \"cuándo es el primer turno libre. No dice qué hay que llevar al turno: eso está en los documentos. \"\n    \"especialidad: una de cardiologia, dermatologia, traumatologia, psicologia, gastroenterologia, \"\n    \"obstetricia, kinesiologia.\"\n)",
+      "explicacion": "Diseño de herramientas de la clase 7: 'la descripción dice cuándo NO usarla'. Cada tool declara su fuente, su caso de uso, lo que no tiene y los valores válidos del parámetro. Es lo que lee el modelo para rutear (ruteo 1,00).",
+      "clases": [
+        7,
+        10
+      ],
+      "conceptos": [
+        "tool-calling",
+        "mcp"
+      ]
+    },
+    {
+      "archivo": "hospital/agente/bucle.py",
+      "lenguaje": "python",
+      "fragmento": "Al responder:\n- Usá solo datos que aparezcan en los resultados de las herramientas. No agregues horarios,\n  nombres, cantidades ni requisitos que no estén ahí, aunque te parezcan razonables.\n- Si la información no está, decilo en vez de suponer.\n- Respondé en español, en pocas oraciones, contestando todo lo que se preguntó.",
+      "explicacion": "Mitigación de alucinaciones desde el prompt (clase 5): restringir la respuesta a la evidencia y habilitar el 'no sé'. Se refleja en Answer Faithfulness 5,00 en las cuatro corridas.",
+      "clases": [
+        5
+      ],
+      "conceptos": [
+        "system-prompt",
+        "alucinacion"
+      ]
+    },
+    {
+      "archivo": "servidor_mcp.py",
+      "lenguaje": "python",
+      "clases": [
+        6,
+        7
+      ],
+      "conceptos": [
+        "mcp"
+      ],
+      "fragmento": "mcp = FastMCP(\"hospital-arroyo-claro\")\n\n\n@mcp.tool(description=DESCRIPCIONES[\"buscar_documentos\"])\ndef buscar_documentos(consulta: str) -> str:\n    return documentos.buscar_documentos(consulta)\n# … las otras cinco tools, igual\n\nif __name__ == \"__main__\":\n    mcp.run(transport=\"stdio\")",
+      "explicacion": "El servidor MCP de la parte 3: cada tool es una función decorada con `@mcp.tool` que delega en el mismo código de la parte 2 y usa la misma descripción. Con stdio el cliente lanza el proceso y habla JSON-RPC por stdin/stdout, por eso el servidor no puede imprimir nada en stdout."
+    },
+    {
+      "archivo": "agente_mcp.py",
+      "lenguaje": "python",
+      "clases": [
+        6,
+        7
+      ],
+      "conceptos": [
+        "mcp"
+      ],
+      "fragmento": "    async with cliente.session(\"hospital\") as sesion:\n        tools = await load_mcp_tools(sesion)  # tools/list; ainvoke realiza tools/call\n        nombres = {t.name for t in tools}\n        requeridas = {\"buscar_documentos\", \"consultar_camas\", \"consultar_guardia\", \"consultar_turnos\",\n                      \"consultar_farmacia\", \"consultar_espera\"}\n        if nombres != requeridas:\n            raise RuntimeError(f\"Herramientas MCP inesperadas: {sorted(nombres)}\")\n        return await correr(crear_llm(), tools, preguntas, salida, \"agente_mcp\")",
+      "explicacion": "El cliente: descubre las tools con `tools/list`, las convierte en tools de LangChain y las pasa al mismo bucle `correr` de la parte 2. El agente no sabe que las tools viven en otro proceso; ese es el punto de MCP (M×N → M+N)."
+    },
+    {
+      "archivo": "atencion.py",
+      "lenguaje": "python",
+      "clases": [
+        7,
+        8
+      ],
+      "conceptos": [
+        "atencion",
+        "mascara-causal",
+        "softmax"
+      ],
+      "fragmento": "def softmax(M):\n    \"\"\"Calcula softmax de cada fila, de forma numéricamente estable.\"\"\"\n    M = np.asarray(M)\n    maximo = np.max(M, axis=-1, keepdims=True)\n    exp = np.exp(M - maximo)\n    return exp / np.sum(exp, axis=-1, keepdims=True)\n\n\ndef atencion(Q, K, V, mascara=False):\n    # …\n    d_k = Q.shape[-1]\n    puntajes = Q @ K.T / np.sqrt(d_k)\n\n    if mascara:\n        puntajes = np.where(\n            np.triu(np.ones(puntajes.shape, dtype=bool), k=1),\n            -np.inf,\n            puntajes,\n        )\n\n    A = softmax(puntajes)\n    return A @ V, A",
+      "explicacion": "La fórmula de la clase, `softmax(QKᵀ/√d_k)V`, en NumPy. Restar el máximo no cambia el softmax pero evita desbordes de `exp`; la máscara pone −∞ arriba de la diagonal para que cada token solo mire a los anteriores (después del softmax esos pesos dan 0). Pasa los 14 tests de la cátedra."
+    }
+  ],
+  "relaciones": [
+    {
+      "clase": 5,
+      "conceptos": [
+        "system-prompt",
+        "alucinacion",
+        "costo-por-token"
+      ],
+      "como_se_aplico": "El prompt de sistema prohíbe agregar datos que no vengan de las herramientas y pide decir cuando algo falta (Faithfulness 5,00). El log registra tokens de entrada, caché, salida y razonamiento y el costo de cada llamada: ~USD 0,0015 por corrida del agente contra ~0,017 del juez."
+    },
+    {
+      "clase": 6,
+      "conceptos": [
+        "rag",
+        "embedding",
+        "similitud-coseno",
+        "chunking",
+        "bm25",
+        "reranking"
+      ],
+      "como_se_aplico": "Es el pipeline indexar → recuperar → aumentar → generar de la clase 6, con búsqueda por significado (embeddings y coseno). La consigna compara contra un recuperador léxico ingenuo (0,35, como BM25 sin refinamientos); el código deja preparado un cross-encoder para reranking pero no se usó en la entrega."
+    },
+    {
+      "clase": 7,
+      "conceptos": [
+        "recall-at-k",
+        "chunking",
+        "mcp",
+        "tool-calling",
+        "evals"
+      ],
+      "como_se_aplico": "Top-k, similitud mínima, chunking y metadatos son exactamente 'los hiperparámetros de RAG' de la clase 7, y se calibraron contra Context Relevance. Las tres métricas del juez (CR, Faithfulness, Answer Relevance) son 'evaluar las dos etapas por separado'. La parte 3 es MCP tal como lo presenta la clase: servidor FastMCP por stdio, descubrimiento con tools/list e invocación con tools/call sobre JSON-RPC, y el mismo agente consumiendo las tools sin saber dónde viven."
+    },
+    {
+      "clase": 8,
+      "conceptos": [
+        "transformer",
+        "embedding",
+        "atencion",
+        "self-attention",
+        "query-key-value"
+      ],
+      "como_se_aplico": "La comparación BERT crudo vs. e5/MiniLM reproduce 'del encoder al embedding de oración': promediar tokens de BERT sin ajustar no da similitud semántica (Sentence-BERT). Las partes 4 y 5 son el contenido de esta clase: `atencion.py` implementa softmax estable, atención escalada con máscara causal, multicabeza y layer norm (14 tests OK), y el bloque a mano muestra que con máscara 'banco' no cambia entre frases pero sin máscara sí."
+    },
+    {
+      "clase": 10,
+      "conceptos": [
+        "agente",
+        "react",
+        "tool-calling"
+      ],
+      "como_se_aplico": "El agente es LLM + herramientas + un bucle: decide, actúa, observa. En las preguntas mixtas (A10–A12) el modelo pide dos tools en paralelo en el mismo paso, y los errores de tool vuelven como observación para que se corrija."
+    },
+    {
+      "clase": 4,
+      "conceptos": [
+        "overfitting",
+        "particion-train-val-test",
+        "data-leakage"
+      ],
+      "como_se_aplico": "Dev vs. test oculto funciona como validación vs. test: el grupo eligió top-2 con margen (peor en dev) para robustez en test, y sacó la pregunta A01 del ejemplo de la descripción para no filtrar dev en el sistema."
+    }
+  ],
+  "preguntas_defensa": [
+    {
+      "q": "¿Por qué BERT sin ajustar sacó 0,35 si es un transformer encoder igual que e5?",
+      "a": "Porque nunca fue entrenado para que el coseno entre sus vectores mida similitud de significado. Su objetivo es MLM; el promedio de sus tokens refleja la forma superficial del texto. Sentence-BERT lo midió: promediar BERT da 54,8 en STS, menos que GloVe (61,3). e5 agrega un ajuste contrastivo con pares consulta–pasaje. En el TP se ve en el z del fragmento correcto: 1,56 en BERT contra 3,94 en e5."
+    },
+    {
+      "q": "e5 tiene cosenos medios tan altos como BERT (0,83 vs 0,79). ¿Entonces no está 'amontonado' igual?",
+      "a": "Sí, pero lo importante es el orden relativo, no el valor absoluto. Dentro de esa franja estrecha e5 separa el fragmento correcto 3,94 desvíos por encima de la media; BERT solo 1,56. Por eso un umbral absoluto depende del modelo y del corpus ('un 0,7 no significa lo mismo en dos sistemas') y el grupo usó un margen relativo al mejor."
+    },
+    {
+      "q": "¿Por qué con k = 3 ningún encoder supera 0,515 de Context Relevance?",
+      "a": "Cada pregunta dev tiene una sola frase de evidencia. Con 3 fragmentos, aunque el recall sea 1, la precisión cae a 1/3, y la media armónica 2·1·(1/3)/(1+1/3) = 0,5. La métrica castiga los dos extremos: pocos fragmentos pierden evidencia, muchos bajan la precisión."
+    },
+    {
+      "q": "Si k = 1 daba 1,000 en dev, ¿por qué entregaron top-2 con margen 0,005 (0,967)?",
+      "a": "Porque dev no es el test. En R01 y R15 el primer y segundo fragmento diferían en 0,001 y 0,003 de coseno: en test un empate así es una moneda al aire. Con k=1 un error vale 0; con los dos, 0,667. El margen agrega el segundo solo en empates (k medio 1,10). Es elegir robustez sobre sobreajustar a dev."
+    },
+    {
+      "q": "¿Qué aportan los metadatos y por qué no rompen la métrica?",
+      "a": "Se antepone 'Título > Sección' al texto que se embebe, porque muchas secciones no nombran su tema. Mejoró a los 4 encoders (e5-base 0,85→1,00 con k=1). El fragmento devuelto sigue siendo literal, porque el evaluador busca la evidencia como substring; los metadatos solo cambian el vector."
+    },
+    {
+      "q": "¿Cómo decide el agente qué herramienta usar y cómo lo midieron?",
+      "a": "El modelo lee las descripciones de las tools (function calling) y elige por coincidencia con la pregunta. Por eso cada descripción dice su fuente, cuándo usarla, qué NO tiene y los valores válidos. Se mide con el ruteo (proporción de tools esperadas usadas), que dio 1,00 en las cuatro corridas; en preguntas mixtas pidió dos tools en paralelo."
+    },
+    {
+      "q": "¿Por qué falló A11 y cómo lo arreglaron?",
+      "a": "El ruteo estuvo bien, pero el modelo buscó 'requisitos y documentación para turno…' y la sección 'Qué llevar a la primera consulta' quedó tercera, fuera del margen. Más fragmentos (top-3) arreglaba A11 pero el juez castigó el ruido en otras (CR 4,417). La solución fue la consulta: la descripción pide usar las palabras del paciente y una búsqueda por tema. Corrida 4: 5/5/5."
+    },
+    {
+      "q": "¿Qué miden Context Relevance, Answer Faithfulness y Answer Relevance y por qué separarlas?",
+      "a": "CR mide la recuperación (¿trajo lo necesario sin ruido?); Faithfulness, si cada afirmación está respaldada por los contextos (un dato inventado la baja aunque sea cierto); Answer Relevance, si contesta lo preguntado completo. Separarlas dice qué etapa falló: si CR es bajo, tocar el prompt de generación no mueve el resultado."
+    },
+    {
+      "q": "¿Qué cambió al pasar las herramientas a un servidor MCP y qué pasó con las métricas?",
+      "a": "Las tools pasaron a un proceso aparte (`servidor_mcp.py`, FastMCP por stdio, JSON-RPC 2.0); el cliente las descubre con tools/list y las llama con tools/call, y el bucle del agente no cambió. Resuelve el problema M×N → M+N y deja las tools en un solo lugar. Con las mismas descripciones y el mismo modelo, ruteo (1,00) y fidelidad (5,00) quedaron iguales; CR bajó de 5,000 a 4,833 y AR a 4,917 solo por A11, donde la búsqueda no trajo la lista de documentación. Con una corrida por versión eso es no-determinismo, no un efecto demostrado del transporte. El costo del agente subió (0,003524 vs 0,001458 USD)."
+    },
+    {
+      "q": "¿Por qué el costo del juez es 10 veces el del agente?",
+      "a": "El agente usa deepseek-v4-flash (USD 0,04/0,64 por millón) y ~40 mil tokens de entrada por corrida (~USD 0,0015). El juez usa gemini-3.7-flash (0,75/3,75), casi 20 veces más caro por token de entrada, y lee pregunta, contextos y respuesta para tres métricas (~USD 0,017)."
+    },
+    {
+      "q": "En la parte 5, ¿por qué en la parte A el vector de 'banco' es igual en las dos frases y en la B no?",
+      "a": "Con máscara causal (decoder), 'banco' (posición 1) solo mira a 'El' y a sí mismo, que son iguales en ambas frases; su representación no puede depender del verbo que viene después. Sin máscara (encoder, tipo BERT), 'banco' también atiende a 'aguanta' o 'presta', y su vector se contextualiza. En el decoder la desambiguación aparece en la última posición, que sí ve todo lo anterior."
+    },
+    {
+      "q": "Después de la corrida MCP agregaron top-3 cuando la consulta dice «llevar». ¿Qué le diría un evaluador?",
+      "a": "Que es una regla ajustada a una sola pregunta de dev (A11) y que no se volvió a correr la evaluación, así que no hay evidencia de que mejore ni de que no empeore otras preguntas. Además contradice la conclusión del propio informe en la parte 2: top-3 fijo arreglaba A11 pero el ruido bajaba el CR del resto, y lo robusto era mejorar la consulta. Lo honesto es correr el benchmark con la regla y reportarlo, o sacarla."
+    },
+    {
+      "q": "En su `atencion.py`, ¿por qué restan el máximo antes del softmax y cómo funciona la máscara?",
+      "a": "Porque `exp` de un número grande desborda; restar el máximo de la fila no cambia el resultado (se cancela al normalizar) y deja todos los exponentes ≤ 0. La máscara pone −∞ en los puntajes de arriba de la diagonal (`np.triu(…, k=1)`): después del softmax esos pesos valen 0, así que cada token solo mezcla los valores de él mismo y los anteriores. Es lo que en la parte 5 deja a 'banco' igual en las dos frases."
+    }
+  ],
+  "quiz": [
+    {
+      "q": "La consigna exige como línea de base BERT sin ajustar con el promedio de la última capa. ¿Qué predice la teoría de Sentence-BERT sobre ese embedding?",
+      "opciones": [
+        "Que es el mejor posible porque BERT es bidireccional",
+        "Que rinde mal para similitud: promediar BERT crudo es peor que promediar GloVe",
+        "Que rinde igual que el vector [CLS]",
+        "Que solo falla en inglés"
+      ],
+      "correcta": 1,
+      "explicacion": "Sentence-BERT midió STS 54,8 para el promedio de BERT, 29,2 para [CLS] y 61,3 para GloVe promediado. Sin ajuste para similitud, el coseno no refleja significado. En el TP: 0,35."
+    },
+    {
+      "q": "Una pregunta tiene una sola evidencia y el recuperador devuelve 2 fragmentos, uno con la evidencia. ¿Cuánto vale su context_relevance?",
+      "opciones": [
+        "0,5",
+        "0,667",
+        "0,75",
+        "1,0"
+      ],
+      "correcta": 1,
+      "explicacion": "Recall 1, precision 1/2. Media armónica: 2·1·0,5/(1+0,5) = 0,667. Es el número que el grupo usa para justificar el margen."
+    },
+    {
+      "q": "¿Por qué un umbral absoluto de similitud (por ejemplo 0,88) es frágil?",
+      "opciones": [
+        "Porque el coseno puede ser mayor que 1",
+        "Porque su valor depende del modelo de embeddings y de la distribución de similitudes del corpus",
+        "Porque siempre devuelve k fragmentos",
+        "Porque el umbral solo sirve con BM25"
+      ],
+      "correcta": 1,
+      "explicacion": "Un 0,7 no significa lo mismo en dos sistemas: con e5 el mejor coseno va de 0,82 a 0,91 según la pregunta. Hay que calibrarlo; un margen relativo al mejor se adapta a cada pregunta."
+    },
+    {
+      "q": "Anteponer 'Título > Sección' al fragmento antes de embeber es un ejemplo de…",
+      "opciones": [
+        "Reranking",
+        "Metadatos como texto buscable",
+        "Fine-tuning del encoder",
+        "Solapamiento de chunks"
+      ],
+      "correcta": 1,
+      "explicacion": "La clase 7 lo presenta así: el título y la ruta de sección se pegan adelante antes de calcular el embedding para que el vector sepa de qué documento viene (idea afín al contextual retrieval)."
+    },
+    {
+      "q": "En el agente, un ToolMessage es…",
+      "opciones": [
+        "El mensaje de sistema con las descripciones",
+        "El pedido del modelo para llamar una tool",
+        "El resultado de ejecutar la tool, que vuelve al contexto del modelo",
+        "La respuesta final al paciente"
+      ],
+      "correcta": 2,
+      "explicacion": "El modelo emite tool_calls dentro de un AIMessage; el programa ejecuta y devuelve el resultado como ToolMessage; el ciclo sigue hasta que el modelo responde sin pedir tools."
+    },
+    {
+      "q": "¿Qué problema resuelve MCP según la clase 7?",
+      "opciones": [
+        "Que los LLM alucinen menos",
+        "Pasar de M×N integraciones a M+N, con descubrimiento estándar de capacidades (tools/list)",
+        "Reemplazar a HTTP como transporte",
+        "Entrenar al modelo para usar herramientas"
+      ],
+      "correcta": 1,
+      "explicacion": "MCP es un protocolo sobre JSON-RPC 2.0, agnóstico del transporte (stdio, HTTP streaming), que agrega descubrimiento de herramientas y sesión con estado. No cambia el modelo."
+    },
+    {
+      "q": "Faithfulness fue 5,00 en las cuatro corridas. ¿Qué significa?",
+      "opciones": [
+        "Que todas las respuestas eran completas",
+        "Que las tools elegidas eran las correctas",
+        "Que cada afirmación de la respuesta estaba respaldada por los contextos recibidos",
+        "Que la recuperación no trajo ruido"
+      ],
+      "correcta": 2,
+      "explicacion": "Faithfulness mide respaldo en el contexto (no inventar). Completitud es Answer Relevance; elegir bien las tools es el ruteo; el ruido es Context Relevance."
+    },
+    {
+      "q": "En la atención con máscara causal, ¿qué valor se pone en las posiciones futuras antes del softmax?",
+      "opciones": [
+        "0",
+        "1",
+        "−∞",
+        "El promedio de la fila"
+      ],
+      "correcta": 2,
+      "explicacion": "Con −∞, exp(−∞) = 0 y esas posiciones reciben peso cero tras el softmax, así cada token solo mira a los anteriores y a sí mismo. Poner 0 en el puntaje no anula el peso (exp(0)=1)."
+    },
+    {
+      "q": "En la parte 5 del TP3, con máscara causal, ¿por qué el vector de 'banco' es idéntico en 'El banco aguanta' y 'El banco presta'?",
+      "opciones": [
+        "Porque los embeddings de 'aguanta' y 'presta' son iguales",
+        "Porque 'banco' solo puede atender a 'El' y a sí mismo, que son iguales en las dos frases",
+        "Porque layer norm borra las diferencias",
+        "Porque Wq y Wv son la identidad"
+      ],
+      "correcta": 1,
+      "explicacion": "La máscara impide mirar posiciones posteriores. La diferencia entre las frases aparece en la última posición, que sí ve todo: ahí el modelo predice 'peso' o 'dinero' (59,6% cada una)."
+    }
+  ]
 }

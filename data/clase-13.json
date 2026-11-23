@@ -1152,11 +1152,11 @@
      "tp": [
       {
        "tp": 3,
-       "texto": "En el TP3 el servidor MCP (FastMCP con 6 tools) quedó diseñado en `PLAN.md` pero pendiente: no existe `servidor_mcp.py`.",
+       "texto": "En el TP3 el servidor MCP (`servidor_mcp.py`, FastMCP por stdio) expone las 6 tools reusando `descripciones.py`; MCP Inspector las listó y las invocó una por una.",
        "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
-       "code": "tp3-plan-mcp-pendiente",
-       "ncode": 1,
-       "nota": ""
+       "code": "tp3-servidor-mcp-fastmcp,tp3-informe-mcp-comparacion",
+       "ncode": 2,
+       "nota": "Un servidor MCP deja que cualquier agente use tus tools sin tocarlo: MCP Inspector las listó y las invocó una por una."
       }
      ],
      "ver": [
@@ -2492,7 +2492,7 @@
    "que_hace": "Fija el tope de pasos del bucle y el prompt de sistema del agente del hospital.",
    "como_funciona": "- `MAX_PASOS = 6` limita las llamadas al modelo por pregunta.\n- El prompt dice que el modelo no sabe nada del hospital y que todo sale de las herramientas.\n- Rutea: normas y procedimientos → `buscar_documentos`; estado de hoy → la tool de la API; preguntas mixtas → cada parte con su fuente.\n- Pide reintentar ante errores con opciones válidas, usar solo datos de los resultados y decir si falta algo.",
    "proposito": "Es la mitigación de alucinaciones por prompt: el hospital es ficticio, así que todo dato no recuperado sería inventado. Resultado: Faithfulness 5,00 en las 4 corridas. Es zero-shot: el único ejemplo (camas + acompañantes) ilustra el patrón mixto sin copiar preguntas de dev.",
-   "interaccion": "Lo usa `responder()` en el mismo archivo como `SystemMessage(PROMPT)`; aplica igual a las tools de LangChain y a las que cargaría el cliente MCP.",
+   "interaccion": "Lo usa `responder()` en el mismo archivo como `SystemMessage(PROMPT)`; aplica igual a las tools de LangChain y a las que carga `agente_mcp.py` desde el servidor MCP.",
    "teoria": "Grounding: restringir la respuesta al contexto recuperado y admitir cuando falta información.",
    "key": "tp3-prompt-sistema",
    "tp": 3,
@@ -2538,8 +2538,8 @@
    "codigo": "async def _ejecutar(por_nombre, llamada):\n    tool = por_nombre.get(llamada[\"name\"])\n    if tool is None:\n        return ToolMessage(f\"Error: la herramienta '{llamada['name']}' no existe. Herramientas disponibles: \"\n                           f\"{', '.join(sorted(por_nombre))}.\", tool_call_id=llamada[\"id\"], name=llamada[\"name\"])\n    try:\n        return await tool.ainvoke({**llamada, \"type\": \"tool_call\"})\n    except Exception as e:  # el error vuelve al modelo como texto para que pueda corregirse\n        return ToolMessage(f\"Error al ejecutar {llamada['name']}: {e}\", tool_call_id=llamada[\"id\"], name=llamada[\"name\"])\n\n\nasync def responder(llm, tools, pregunta):\n    \"\"\"Devuelve todos los mensajes de la conversación: sistema, pregunta, AIMessage y ToolMessage.\"\"\"\n    llm_con_tools = llm.bind_tools(tools)\n    por_nombre = {t.name: t for t in tools}\n    mensajes = [SystemMessage(PROMPT), HumanMessage(pregunta)]\n    for _ in range(MAX_PASOS):\n        ai = await llm_con_tools.ainvoke(mensajes)\n        mensajes.append(ai)\n        if not ai.tool_calls:\n            break\n        for llamada in ai.tool_calls:\n            mensajes.append(await _ejecutar(por_nombre, llamada))\n    return mensajes",
    "que_hace": "Implementa el agente: el modelo pide herramientas, se ejecutan, sus resultados vuelven como `ToolMessage` y se repite hasta que responde sin pedir nada o se llega a 6 pasos.",
    "como_funciona": "- `responder` enlaza las tools con `llm.bind_tools(tools)` y arma `por_nombre`.\n- Arranca con `[SystemMessage(PROMPT), HumanMessage(pregunta)]`.\n- En cada paso: `ai = await llm_con_tools.ainvoke(mensajes)`; si `ai.tool_calls` está vacío, termina.\n- Si no, ejecuta cada llamada con `_ejecutar` y agrega el `ToolMessage` (puede haber varias en paralelo en el mismo paso).\n- `_ejecutar` devuelve un `ToolMessage` de error si la tool no existe o lanza una excepción.",
-   "proposito": "Se escribió a mano, sin LangGraph ni AgentExecutor, para tener todos los mensajes y poder loguearlos. Es agnóstico del origen de las tools: el docstring lo prepara para las de `langchain-mcp-adapters` (parte 3, pendiente).",
-   "interaccion": "Lo llama `correr()` en `hospital/agente/corrida.py` por cada pregunta; devuelve la lista completa de mensajes, que `resumir()` convierte en respuesta, contextos, herramientas y costo. `tests/test_agente.py` lo prueba con un modelo falso.",
+   "proposito": "Se escribió a mano, sin LangGraph ni AgentExecutor, para tener todos los mensajes y poder loguearlos. Es agnóstico del origen de las tools: sirvió sin cambios para las `@tool` de la parte 2 y para las que carga `langchain-mcp-adapters` en la parte 3.",
+   "interaccion": "Lo llama `correr()` en `hospital/agente/corrida.py` por cada pregunta (desde `agente.py` y desde `agente_mcp.py`); devuelve la lista completa de mensajes, que `resumir()` convierte en respuesta, contextos, herramientas y costo. `tests/test_agente.py` lo prueba con un modelo falso.",
    "teoria": "Agente ReAct / ciclo de vida de una tool: AIMessage con tool_calls → ejecución → ToolMessage → nueva llamada al modelo.",
    "key": "tp3-bucle-tool-calling",
    "tp": 3,
@@ -2589,15 +2589,6 @@
      "title": "El ciclo de vida de una herramienta MCP",
      "extra": false,
      "url": "/clases/06/#d=rag-y-mcp&s=54"
-    },
-    {
-     "clase": 6,
-     "cnn": "06",
-     "slug": "rag-y-mcp",
-     "i": 57,
-     "title": "Demo: un servidor MCP mínimo",
-     "extra": false,
-     "url": "/clases/06/#d=rag-y-mcp&s=57"
     },
     {
      "clase": 7,
@@ -2690,7 +2681,7 @@
      "url": "/clases/13/#d=cierre-magnifica-humanitas&s=25"
     }
    ],
-   "nusos": 16
+   "nusos": 15
   },
   {
    "id": "test-redirect",
@@ -2928,19 +2919,19 @@
    "nusos": 3
   },
   {
-   "id": "plan-mcp-pendiente",
-   "titulo": "Diseño del servidor y cliente MCP (pendiente)",
-   "archivo": "PLAN.md",
-   "desde": 155,
-   "hasta": 171,
-   "lenguaje": "markdown",
-   "codigo": "## Step 3 — Part 3: MCP server + LangChain MCP client (15 pts)\nDepends on Step 2.\n\n**3.1 `servidor_mcp.py`** — `mcp.server.fastmcp.FastMCP(\"hospital\")`, 6 `@mcp.tool(name=..., description=DESCRIPCIONES[...])`\nwrapping `hospital.api_cliente` and `Recuperador`; `mcp.run()` (stdio). Nothing on stdout except the protocol (logs → stderr);\nwarm up the retriever at startup so the first call doesn’t time out.\n\n**3.2 `agente_mcp.py`** — **no API/retriever code of its own**: `MultiServerMCPClient({\"hospital\": {\"command\": sys.executable, \"args\": [\"servidor_mcp.py\"], \"transport\": \"stdio\"}})`,\n`tools = await client.get_tools()` (tools/list; log the discovered names), then reuse `responder` + `correr(..., etiqueta=\"mcp\")`\nwith the same LLM and prompt.\n\n**3.3 Inspector** (manual, user) — `npx @modelcontextprotocol/inspector python3 servidor_mcp.py`, call all 6 tools, save screenshots to `experimentos/inspector/`.\n\n**3.4 Compare** — run benchmark → `respuestas_mcp.jsonl` + log + eval. `experimentos/comparar_agentes.py` prints a table\n(ruteo, CR, F, AR, agent cost from log totals, judge cost) for Part 2 vs 3. INFORME §3: table + explanation of any difference from the logs (e.g. tool-result formatting, nondeterminism).\n\n**Done when:** `python3 agente_mcp.py --preguntas datos/preguntas_agente_dev.jsonl --salida respuestas_mcp.jsonl` works with the API running, `grep -E \"urllib|Recuperador|localhost\" agente_mcp.py` is empty, 6 inspector screenshots exist.",
-   "que_hace": "Es el diseño, no código: la parte 3 quedó pendiente y no existen `servidor_mcp.py` ni `agente_mcp.py`. El PLAN describe un servidor FastMCP por stdio con las 6 tools y un cliente LangChain con `MultiServerMCPClient`.",
-   "como_funciona": "- 3.1: `FastMCP(\"hospital\")` con 6 `@mcp.tool(name=..., description=DESCRIPCIONES[...])` que envuelven `api_cliente` y el recuperador; `mcp.run()` por stdio; logs a stderr porque stdout es el canal del protocolo.\n- 3.2: `agente_mcp.py` sin código propio de API: `MultiServerMCPClient` lanza el servidor, `get_tools()` descubre las tools (tools/list) y se reusa `responder` y `correr`.\n- 3.3: probar con MCP Inspector.\n- 3.4: comparar parte 2 vs. parte 3.",
-   "proposito": "Separa herramienta y agente: el mismo set de tools podría usarlo cualquier host MCP. Reusar `descripciones.py` y el bucle agnóstico haría justa la comparación. Quedó pendiente en la entrega.",
-   "interaccion": "Se apoyaría en `hospital/descripciones.py`, `hospital/api_cliente.py`, `hospital/documentos.py`, `hospital/agente/bucle.py` y `corrida.py` (que ya normaliza bloques de contenido MCP en `texto()`).",
-   "teoria": "Arquitectura MCP: host, cliente y servidor; descubrimiento con tools/list y ejecución con tools/call sobre JSON-RPC 2.0 por stdio.",
-   "key": "tp3-plan-mcp-pendiente",
+   "id": "servidor-mcp-fastmcp",
+   "titulo": "Servidor MCP: FastMCP por stdio con las seis tools",
+   "archivo": "servidor_mcp.py",
+   "desde": 1,
+   "hasta": 45,
+   "lenguaje": "python",
+   "codigo": "\"\"\"Servidor MCP stdio con las seis herramientas del hospital.\n\nEjecutable por MCP Inspector (python3 servidor_mcp.py) o por agente_mcp.py.\nNo imprimir en stdout: stdio transport reserva ese canal para el protocolo.\n\"\"\"\nfrom mcp.server.fastmcp import FastMCP\n\nfrom hospital import api_cliente, documentos\nfrom hospital.descripciones import DESCRIPCIONES\n\nmcp = FastMCP(\"hospital-arroyo-claro\")\n\n\n@mcp.tool(description=DESCRIPCIONES[\"buscar_documentos\"])\ndef buscar_documentos(consulta: str) -> str:\n    return documentos.buscar_documentos(consulta)\n\n\n@mcp.tool(description=DESCRIPCIONES[\"consultar_camas\"])\ndef consultar_camas(sector: str) -> str:\n    return api_cliente.camas(sector)\n\n\n@mcp.tool(description=DESCRIPCIONES[\"consultar_guardia\"])\ndef consultar_guardia(especialidad: str) -> str:\n    return api_cliente.guardia(especialidad)\n\n\n@mcp.tool(description=DESCRIPCIONES[\"consultar_turnos\"])\ndef consultar_turnos(especialidad: str) -> str:\n    return api_cliente.turnos(especialidad)\n\n\n@mcp.tool(description=DESCRIPCIONES[\"consultar_farmacia\"])\ndef consultar_farmacia(medicamento: str) -> str:\n    return api_cliente.farmacia(medicamento)\n\n\n@mcp.tool(description=DESCRIPCIONES[\"consultar_espera\"])\ndef consultar_espera() -> str:\n    return api_cliente.espera()\n\n\nif __name__ == \"__main__\":\n    mcp.run(transport=\"stdio\")",
+   "que_hace": "Publica las seis herramientas del hospital como un servidor MCP que se comunica por stdio.",
+   "como_funciona": "- `mcp = FastMCP(\"hospital-arroyo-claro\")` crea el servidor.\n- Cada función lleva `@mcp.tool(description=DESCRIPCIONES[...])`: el nombre sale de la función y el esquema del parámetro, de la firma (`consulta: str`, `sector: str`, ...).\n- Los cuerpos solo delegan: `documentos.buscar_documentos` y `api_cliente.camas/guardia/turnos/farmacia/espera`.\n- `mcp.run(transport=\"stdio\")` atiende el protocolo por stdin/stdout; el docstring avisa que no hay que imprimir nada en stdout porque ese canal es del protocolo.",
+   "proposito": "Separa herramienta y agente: el mismo set de tools lo puede usar cualquier host MCP (MCP Inspector, `agente_mcp.py`). No tiene lógica propia: reusa `documentos.py`, `api_cliente.py` y `descripciones.py`, así la comparación con la parte 2 cambia solo el transporte.",
+   "interaccion": "Lo lanza como subproceso `agente_mcp.py` (vía `MultiServerMCPClient`) o MCP Inspector (`npx @modelcontextprotocol/inspector ... servidor_mcp.py`, capturas en `experimentos/inspector/`). La URL de la API llega por la variable `HOSPITAL_API`.",
+   "teoria": "Servidor MCP: expone herramientas (nombre + descripción + esquema) que el cliente descubre con tools/list y ejecuta con tools/call, sobre JSON-RPC 2.0 por stdio.",
+   "key": "tp3-servidor-mcp-fastmcp",
    "tp": 3,
    "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
    "usos": [
@@ -3008,6 +2999,15 @@
      "url": "/clases/09/#d=como-se-entrena-un-llm&s=47"
     },
     {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 48,
+     "title": "MCP: una herramienta es una definición",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=48"
+    },
+    {
      "clase": 13,
      "cnn": "13",
      "slug": "cierre-magnifica-humanitas",
@@ -3017,7 +3017,63 @@
      "url": "/clases/13/#d=cierre-magnifica-humanitas&s=45"
     }
    ],
-   "nusos": 8
+   "nusos": 9
+  },
+  {
+   "id": "informe-mcp-comparacion",
+   "titulo": "Parte 3 en el informe: verificación y comparación con la parte 2",
+   "archivo": "INFORME.md",
+   "desde": 249,
+   "hasta": 282,
+   "lenguaje": "markdown",
+   "codigo": "## 3. Servidor MCP\n\n### Implementación y verificación\n\nLas seis herramientas de la parte 2 se exponen desde `servidor_mcp.py` con el SDK oficial `mcp` y transporte stdio. Sus\nfunciones delegan a los mismos módulos de documentos y API; las descripciones compartidas viven en\n`hospital/descripciones.py`. `agente_mcp.py` descubre las tools con `tools/list`, las convierte a tools de LangChain con\n`langchain-mcp-adapters` y sus invocaciones usan `tools/call`. La sesión MCP queda abierta durante toda la corrida para\nevitar reiniciar el servidor y recargar el encoder por cada llamada.\n\nSe verificó el descubrimiento de las seis herramientas y una llamada a cada una. Las cinco herramientas de la API\ndevolvieron JSON del hospital y `buscar_documentos` devolvió fragmentos del corpus. MCP Inspector se conectó por stdio\nal servidor. El registro de la corrida está en\n`experimentos/corridas/agente_mcp_20261001-200728.md`; las respuestas y evaluación están en `respuestas_mcp.jsonl` y\n`respuestas_mcp.jsonl.eval.json`. El Inspector se conectó, listó las seis herramientas y permitió invocar cada una\ncon éxito. Las siete capturas PNG (listado y seis resultados) están en `experimentos/inspector/`.\nPara apuntar a la API local en el puerto alternativo, se inició Inspector con\n`npx @modelcontextprotocol/inspector -e HOSPITAL_API=http://127.0.0.1:18765 .venv/bin/python servidor_mcp.py`;\nla opción `-e` pasa explícitamente esa variable al proceso MCP.\n\n### Comparación con la parte 2\n\n| Agente | Ruteo | Relevancia del contexto | Fidelidad | Pertinencia de respuesta | Costo agente (USD) | Costo juez (USD) |\n|---|---:|---:|---:|---:|---:|---:|\n| Parte 2 (`agente_20260929-105719`) | 1,000 | 5,000 | 5,000 | 5,000 | 0,001458 | 0,01744 |\n| Parte 3 (`agente_mcp_20261001-200728`) | 1,000 | 4,833 | 5,000 | 4,917 | 0,003524 | 0,02002 |\n\nLas dos corridas enrutan correctamente las 12 preguntas y mantienen fidelidad perfecta. La diferencia está en A11:\nla parte 2 recuperó «Qué llevar a la primera consulta» con DNI, credencial, derivación y estudios previos. En la corrida\nMCP, la primera búsqueda devolvió «Llegada» y la segunda una sección sobre cómo pedir el turno; faltó la lista de\ndocumentación. El juez bajó la relevancia del contexto a 3 y la pertinencia de la respuesta a 4 para esa pregunta.\nEsto coincide con los logs: el agente MCP hizo una llamada adicional al modelo en A11 (25 en total frente a 24 en la\nparte 2) y entregó contexto menos pertinente. Por eso sus costos de agente y juez también fueron algo mayores; una\ncorrida por versión no alcanza para atribuir la diferencia al transporte MCP por sí solo.",
+   "que_hace": "Cuenta cómo se verificó el servidor MCP (las seis tools listadas e invocadas, también desde MCP Inspector) y compara la corrida MCP con la mejor corrida de la parte 2.",
+   "como_funciona": "- Implementación: `servidor_mcp.py` con el SDK `mcp` por stdio; `agente_mcp.py` descubre con `tools/list` e invoca con `tools/call` vía `langchain-mcp-adapters`.\n- Tabla: ruteo 1,000 en las dos; CR 5,000 → 4,833; F 5,000 en las dos; AR 5,000 → 4,917; costo del agente USD 0,001458 → 0,003524 y del juez 0,01744 → 0,02002.\n- La diferencia está en A11: vía MCP no llegó la sección «Qué llevar a la primera consulta» (CR 3, AR 4) y hubo una llamada extra al modelo.\n- Con una corrida por versión no alcanza para atribuirle la diferencia al transporte MCP.",
+   "proposito": "Muestra que pasar las tools a un servidor aparte no cambió el ruteo ni la fidelidad; la única pregunta que empeoró fue A11, por la redacción de la consulta y no por MCP en sí.",
+   "interaccion": "Resume `experimentos/corridas/agente_mcp_20261001-200728.md`, `respuestas_mcp.jsonl.eval.json` y las capturas de `experimentos/inspector/`; la fila de la parte 2 sale de la corrida 4 (`agente_20260929-105719`).",
+   "teoria": "Evaluar un agente por etapas (ruteo, CR, F, AR) y medir costo; MCP cambia dónde viven las tools, no lo que el modelo decide.",
+   "key": "tp3-informe-mcp-comparacion",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 1,
+     "cnn": "01",
+     "slug": "claude-desktop-chat",
+     "i": 21,
+     "title": "Agregar un external connector",
+     "extra": true,
+     "url": "/clases/01/#d=claude-desktop-chat&s=21"
+    },
+    {
+     "clase": 6,
+     "cnn": "06",
+     "slug": "rag-y-mcp",
+     "i": 57,
+     "title": "Demo: un servidor MCP mínimo",
+     "extra": false,
+     "url": "/clases/06/#d=rag-y-mcp&s=57"
+    },
+    {
+     "clase": 9,
+     "cnn": "09",
+     "slug": "como-se-entrena-un-llm",
+     "i": 47,
+     "title": "MCP: host, cliente y servidor",
+     "extra": false,
+     "url": "/clases/09/#d=como-se-entrena-un-llm&s=47"
+    },
+    {
+     "clase": 13,
+     "cnn": "13",
+     "slug": "cierre-magnifica-humanitas",
+     "i": 45,
+     "title": "Hacia un Internet de Agentes",
+     "extra": false,
+     "url": "/clases/13/#d=cierre-magnifica-humanitas&s=45"
+    }
+   ],
+   "nusos": 4
   }
  ]
 }

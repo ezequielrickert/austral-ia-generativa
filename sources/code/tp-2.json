@@ -7,11 +7,11 @@
    "desde": 1,
    "hasta": 24,
    "lenguaje": "markdown",
-   "codigo": "### Tabla de decisiones\n\n| Columna | Qué es | Qué significa la resta entre dos valores | Cardinalidad | ¿Puede faltar? | ¿Disponible al predecir? | Codificación elegida | Motivo |\n|---|---|---|---|---|---|---|---|\n| `ListingId` | Identificador correlativo de la fila | Nada: es un número de carga, no una magnitud | 1460 (todos únicos) | No | Sí, pero no debe usarse | **Se descarta**, no entra como feature | Es un índice, no información de la casa. Si entra, la red puede \"memorizar\" el orden de carga en vez de aprender patrones — **trampa 1** (ver Pregunta 3) |\n| `LotArea` | Superficie del lote (pies²) | Diferencia real de superficie | Continua, muchos valores | No | Sí | Numérica, escalada | Magnitud continua, la escala favorece el entrenamiento |\n| `OverallQual` | Calidad general de material/acabado (1–10) | Un punto más de calidad | 10 | No | Sí | Numérica, escalada | Ordinal con paso uniforme, se puede tratar como continua |\n| `OverallCond` | Condición general (1–9) | Un punto más de condición | 9 | No | Sí | Numérica, escalada | Ídem `OverallQual` |\n| `TotalBsmtSF` | Superficie de sótano (pies²) | Diferencia real de superficie | Continua | No | Sí | Numérica, escalada | Magnitud continua |\n| `FullBath` | Baños completos sobre nivel de suelo | Un baño completo más | 4 | No | Sí | Numérica, escalada | Conteo, la resta es significativa |\n| `HalfBath` | Medios baños sobre nivel de suelo | Un medio baño más | 3 | No | Sí | Numérica, escalada | Conteo |\n| `BedroomAbvGr` | Dormitorios sobre nivel de suelo | Un dormitorio más | 8 | No | Sí | Numérica, escalada | Conteo |\n| `TotRmsAbvGrd` | Habitaciones totales sobre nivel de suelo | Una habitación más | 12 | No | Sí | Numérica, escalada | Conteo |\n| `Fireplaces` | Chimeneas | Una chimenea más | 4 | No | Sí | Numérica, escalada | Conteo |\n| `GarageArea` | Superficie de garage (pies²) | Diferencia real de superficie | Continua | No | Sí | Numérica, escalada | Magnitud continua |\n| `YearBuilt` | Año de construcción | Antigüedad relativa entre dos casas | Continua (años) | No | Sí | Numérica, escalada | El año ya es lineal en el tiempo, no hace falta transformarlo |\n| `LotFrontage` | Frente del lote (pies) | Diferencia real de frente | Continua | **Sí, ~7%** | Sí (cuando está) | Numérica escalada + imputación por mediana del conjunto de entrenamiento + indicador binario de faltante | Falta de forma no trivial; comparamos contra imputar con 0 y probamos si el faltante en sí informa (Milestone 2, Pregunta 4) |\n| `MonthSold` | Mes de venta (1–12) | Nada lineal: diciembre y enero están a un mes de distancia, no a once | 12 | No | Sí | Seno/coseno (codificación cíclica) | Es una variable **cíclica** — **trampa 2**: tratarla como entero plano le asigna una distancia falsa a los meses que están en los extremos del año |\n| `State` | Estado donde está la casa | Nada, es nominal | 12 | No | Sí | One-hot | Cardinalidad baja/moderada, sin orden natural — el one-hot no le impone ninguna relación entre estados |\n| `District` | Distrito dentro del estado | Nada, es nominal | 72 | No | Sí | Embedding aprendido | Cardinalidad alta — un one-hot de 72 columnas es viable pero disperso; el embedding aprende una representación densa. Si se codifica como entero 0–71 la red asume un orden y una distancia entre distritos que no existen — **trampa 3** (ver Pregunta 2) |\n| `HouseStyle` | Estilo arquitectónico de la casa | Nada, es nominal | 6 | No | Sí | One-hot | Cardinalidad baja, sin orden |\n| `CentralAir` | Tiene aire acondicionado central (Y/N) | Nada, es binaria | 2 | No | Sí | Binaria 0/1 | Dos categorías, mapeo directo sin necesidad de one-hot |\n| `SaleCondition` | Condición de la venta (normal, embargo, etc.) | Nada, es nominal | 5 | No | Sí | One-hot | Cardinalidad baja, sin orden natural entre condiciones |\n| `SalePrice` | Precio de venta (dólares) | Diferencia real de precio | Continua | No | — (es el target) | Salida de la red, no se codifica como entrada | Es lo que queremos predecir: define la capa de salida (activación lineal) y la loss de regresión |",
+   "codigo": "### Tabla de decisiones\n\n| Columna | Qué es | Qué significa la resta entre dos valores | Cardinalidad | ¿Puede faltar? | ¿Disponible al predecir? | Codificación elegida | Motivo |\n|---|---|---|---|---|---|---|---|\n| `ListingId` | Identificador correlativo de la fila | Nada: es un número de carga, no una magnitud | 1460 (todos únicos) | No | Sí, pero no debe usarse | **Se descarta**, no entra como feature | Es un índice, no información de la casa. Si entra, la red puede \"memorizar\" el orden de carga en vez de aprender patrones — **trampa 1** (ver Pregunta 3) |\n| `LotArea` | Superficie del lote (pies²) | Diferencia real de superficie | Continua, muchos valores | No | Sí | Numérica, escalada | Magnitud continua, la escala favorece el entrenamiento |\n| `OverallQual` | Calidad general de material/acabado (1–10) | Un punto más de calidad | 10 | No | Sí | Numérica, escalada | Ordinal con paso uniforme, se puede tratar como continua |\n| `OverallCond` | Condición general (1–9) | Un punto más de condición | 9 | No | Sí | Numérica, escalada | Ídem `OverallQual` |\n| `TotalBsmtSF` | Superficie de sótano (pies²) | Diferencia real de superficie | Continua | No | Sí | Numérica, escalada | Magnitud continua |\n| `FullBath` | Baños completos sobre nivel de suelo | Un baño completo más | 4 | No | Sí | Numérica, escalada | Conteo, la resta es significativa |\n| `HalfBath` | Medios baños sobre nivel de suelo | Un medio baño más | 3 | No | Sí | Numérica, escalada | Conteo |\n| `BedroomAbvGr` | Dormitorios sobre nivel de suelo | Un dormitorio más | 8 | No | Sí | Numérica, escalada | Conteo |\n| `TotRmsAbvGrd` | Habitaciones totales sobre nivel de suelo | Una habitación más | 12 | No | Sí | Numérica, escalada | Conteo |\n| `Fireplaces` | Chimeneas | Una chimenea más | 4 | No | Sí | Numérica, escalada | Conteo |\n| `GarageArea` | Superficie de garage (pies²) | Diferencia real de superficie | Continua | No | Sí | Numérica, escalada | Magnitud continua |\n| `YearBuilt` | Año de construcción | Antigüedad relativa entre dos casas | Continua (años) | No | Sí | Numérica, escalada | El año ya es lineal en el tiempo, no hace falta transformarlo |\n| `LotFrontage` | Frente del lote (pies) | Diferencia real de frente | Continua | **Sí, ~7%** | Sí (cuando está) | Numérica escalada + imputación por mediana del conjunto de entrenamiento, sin indicador de faltante | La comparación del Milestone 2 mostró que agregar el indicador no mejora las métricas; usamos la mediana porque es un valor plausible y evitamos representar un dato desconocido como frente cero (Pregunta 4) |\n| `MonthSold` | Mes de venta (1–12) | Nada lineal: diciembre y enero están a un mes de distancia, no a once | 12 | No | Sí | Seno/coseno (codificación cíclica) | Es una variable **cíclica** — **trampa 2**: tratarla como entero plano le asigna una distancia falsa a los meses que están en los extremos del año |\n| `State` | Estado donde está la casa | Nada, es nominal | 12 | No | Sí | One-hot | Cardinalidad baja/moderada, sin orden natural — el one-hot no le impone ninguna relación entre estados |\n| `District` | Distrito dentro del estado | Nada, es nominal | 72 | No | Sí | Embedding aprendido | Cardinalidad alta — un one-hot de 72 columnas es viable pero disperso; el embedding aprende una representación densa. Si se codifica como entero 0–71 la red asume un orden y una distancia entre distritos que no existen — **trampa 3** (ver Pregunta 2) |\n| `HouseStyle` | Estilo arquitectónico de la casa | Nada, es nominal | 6 | No | Sí | One-hot | Cardinalidad baja, sin orden |\n| `CentralAir` | Tiene aire acondicionado central (Y/N) | Nada, es binaria | 2 | No | Sí | Binaria 0/1 | Dos categorías, mapeo directo sin necesidad de one-hot |\n| `SaleCondition` | Condición de la venta (normal, embargo, etc.) | Nada, es nominal | 5 | No | Sí | One-hot | Cardinalidad baja, sin orden natural entre condiciones |\n| `SalePrice` | Precio de venta (dólares) | Diferencia real de precio | Continua | No | — (es el target) | Salida de la red, no se codifica como entrada | Es lo que queremos predecir: define la capa de salida (activación lineal) y la loss de regresión |",
    "que_hace": "Es la tabla del Milestone 1: una fila por columna del CSV con qué es, qué significa la resta, cardinalidad, si puede faltar y la codificación elegida.",
-   "como_funciona": "- Cada fila responde la pregunta clave de la clase 4: **¿qué significa la resta entre dos valores?**\n- `ListingId`: la resta no significa nada → se descarta (trampa 1).\n- `MonthSold`: diciembre y enero están a un mes, no a once → seno/coseno (trampa 2).\n- `District`: nominal de 72 valores → embedding, nunca entero 0–71 (trampa 3).\n- `LotFrontage`: puede faltar (~7%) → mediana de train + indicador; `State`/`HouseStyle`/`SaleCondition` one-hot y `CentralAir` 0/1.",
-   "proposito": "Materializa la regla de que el checklist va antes que la red: un error de codificación no tira error, entrena igual. Por eso se decidió todo por escrito antes de entrenar.",
-   "interaccion": "Es celda de markdown (no código), pero gobierna todo el notebook: `NUMERIC_COLS` (celda 8), `prepare_numeric_split` (celda 10) y `build_dense_features` / `month_cyclical` (celdas 25-26) implementan cada fila.",
+   "como_funciona": "- Cada fila responde la pregunta clave de la clase 4: **¿qué significa la resta entre dos valores?**\n- `ListingId`: la resta no significa nada → se descarta (trampa 1).\n- `MonthSold`: diciembre y enero están a un mes, no a once → seno/coseno (trampa 2).\n- `District`: nominal de 72 valores → embedding, nunca entero 0–71 (trampa 3).\n- `LotFrontage`: puede faltar (~7%) → mediana de train **sin** indicador de faltante; `State`/`HouseStyle`/`SaleCondition` one-hot y `CentralAir` 0/1.",
+   "proposito": "Materializa la regla de que el checklist va antes que la red: un error de codificación no tira error, entrena igual. La fila de `LotFrontage` se actualizó con la evidencia del Milestone 2 (el indicador no mejoró las métricas, por eso quedó afuera).",
+   "interaccion": "Es celda de markdown (no código), pero gobierna todo el notebook: `NUMERIC_COLS` (celda 8), `prepare_numeric_split` (celda 14) y `month_cyclical` / `build_dense_features` (celdas 34-35) implementan cada fila.",
    "teoria": "La tabla de decisiones de la clase 4: tipo de variable → codificación → cuántos floats entran a la red."
   },
   {
@@ -24,111 +24,125 @@
    "codigo": "from sklearn.model_selection import train_test_split\n\nNUMERIC_COLS = ['LotArea', 'OverallQual', 'OverallCond', 'TotalBsmtSF', 'FullBath',\n                'HalfBath', 'BedroomAbvGr', 'TotRmsAbvGrd', 'Fireplaces', 'GarageArea',\n                'YearBuilt', 'LotFrontage', 'MonthSold']\nTARGET = 'SalePrice'\nSEED = 42\n\n# Partimos el dataset ANTES de calcular cualquier estadística (mediana, media, desvío).\n# 70% train / 20% validation / 10% test.\ndf_train, df_val_test = train_test_split(df, test_size=0.3, random_state=SEED)\ndf_val, df_test = train_test_split(df_val_test, test_size=1/3, random_state=SEED)\n\nprint(f\"train: {df_train.shape}, val: {df_val.shape}, test: {df_test.shape}\")",
    "que_hace": "Define las columnas numéricas del baseline y parte el dataset en train/validación/test (70/20/10) con semilla fija.",
    "como_funciona": "1. `NUMERIC_COLS` lista las 13 numéricas (incluye `LotFrontage` y `MonthSold` crudo para el baseline).\n2. Primer `train_test_split` con `test_size=0.3` separa `df_train` (70%) de `df_val_test`.\n3. Segundo split con `test_size=1/3` sobre ese 30% da `df_val` (20%) y `df_test` (10%).\n4. `random_state=SEED` (42) hace la partición reproducible; imprime 1022 / 292 / 146 filas.",
-   "proposito": "Partir primero, antes de calcular medianas o medias, es lo que evita data leakage. A diferencia del notebook de clase (split 70/15/15 sin semilla y sobre `X_scale` ya escalado), acá se parte el DataFrame crudo.",
-   "interaccion": "Produce `df_train`, `df_val` y `df_test`, que consumen `prepare_numeric_split` (celda 10), `build_dense_features` (celda 26) y los encoders de la celda 25.",
+   "proposito": "Partir primero, antes de calcular medianas o medias, es lo que evita data leakage (el comentario de la línea 9 lo enuncia). A diferencia del notebook de clase (split 70/15/15 sin semilla y sobre `X_scale` ya escalado), acá se parte el DataFrame crudo.",
+   "interaccion": "Produce `df_train`, `df_val` y `df_test`, que consumen `prepare_numeric_split` (celda 14), los encoders (celda 34), `build_dense_features` (celda 35) y hasta los valores por defecto del M5 (`HOUSE_DEFAULTS`, celda 50).",
    "teoria": "Train ajusta, validación decide, test mide: tres porciones con tres trabajos y una semilla fija."
   },
   {
    "id": "prepare-numeric-split",
-   "titulo": "Imputación de LotFrontage y StandardScaler ajustado en train (celda 10)",
+   "titulo": "Imputación de LotFrontage y StandardScaler ajustado en train (celda 14)",
    "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
    "desde": 14,
-   "hasta": 29,
+   "hasta": 48,
    "lenguaje": "python",
-   "codigo": "lotfrontage_median = df_train['LotFrontage'].median()\nprint(f\"Mediana de LotFrontage en train: {lotfrontage_median}\")\n\ndef prepare_numeric_split(frame, fill_value, add_indicator, scaler=None, fit_scaler=False):\n    \"\"\"Imputa LotFrontage, arma el indicador de faltante y escala con un scaler\n    que se AJUSTA una sola vez (sobre train) y se reutiliza para las demás partes.\"\"\"\n    frame = frame.copy()\n    missing_flag = frame['LotFrontage'].isna().to_numpy(dtype=float)\n    frame['LotFrontage'] = frame['LotFrontage'].fillna(fill_value)\n    X_num = frame[NUMERIC_COLS].to_numpy(dtype=float)\n    if fit_scaler:\n        scaler = StandardScaler().fit(X_num)\n    X_num_scaled = scaler.transform(X_num)\n    X = np.column_stack([X_num_scaled, missing_flag]) if add_indicator else X_num_scaled\n    y = frame[TARGET].to_numpy(dtype=float)\n    return X, y, scaler",
-   "que_hace": "Calcula la mediana de `LotFrontage` solo en train y define `prepare_numeric_split`, que imputa, arma el flag de faltante y escala con un scaler ajustado una sola vez.",
-   "como_funciona": "1. `lotfrontage_median = df_train[...].median()`: la mediana sale de train (dio 70,0).\n2. `missing_flag` guarda 1.0 donde faltaba el dato **antes** de rellenar.\n3. `fillna(fill_value)` imputa; `X_num` toma las `NUMERIC_COLS`.\n4. Si `fit_scaler=True` crea `StandardScaler().fit(X_num)` (z-score); si no, reutiliza el `scaler` recibido.\n5. Con `add_indicator` concatena el flag como columna extra; devuelve `X`, `y` y el scaler.",
-   "proposito": "Materializa que μ, σ y la mediana se aprenden solo de train y viajan a val/test. El parámetro `fill_value` permite comparar mediana contra 0 (Pregunta 4).",
-   "interaccion": "La llama `train_and_report` tres veces (train con `fit_scaler=True`, val y test con `scaler=scaler`). Alimenta al baseline del Milestone 2.",
-   "teoria": "Normalización z-score $(x-\\mu)/\\sigma$ ajustada solo con train; imputación sin leakage y faltante como señal."
+   "codigo": "lotfrontage_median = df_train['LotFrontage'].median()\nprint(f\"Mediana de LotFrontage en train: {lotfrontage_median}\")\n\ndef fit_lotarea_imputer(frame, n_groups=5):\n    \"\"\"Ajusta en train los cortes de LotArea y la mediana de\n    LotFrontage dentro de cada grupo.\"\"\"\n    _, bins = pd.qcut(frame['LotArea'], q=n_groups, retbins=True, duplicates='drop')\n    bins = bins.copy()\n    bins[0], bins[-1] = -np.inf, np.inf\n    groups = pd.cut(frame['LotArea'], bins=bins, labels=False, include_lowest=True)\n    medians = frame.assign(_LotAreaGroup=groups).groupby('_LotAreaGroup', observed=False)['LotFrontage'].median()\n    return {'bins': bins, 'medians': medians, 'fallback': frame['LotFrontage'].median()}\n\ndef impute_lotfrontage_by_lotarea(frame, imputer):\n    groups = pd.cut(frame['LotArea'], bins=imputer['bins'], labels=False, include_lowest=True)\n    group_values = groups.map(imputer['medians'])\n    fill_values = group_values.fillna(imputer['fallback'])\n    return frame['LotFrontage'].fillna(fill_values)\n\ndef prepare_numeric_split(frame, fill_value, add_indicator, scaler=None, fit_scaler=False, lotarea_imputer=None):\n    \"\"\"Imputa LotFrontage, arma el indicador de faltante y escala con un scaler\n    que se AJUSTA una sola vez (sobre train) y se reutiliza para las demás partes.\"\"\"\n    frame = frame.copy()\n    missing_flag = frame['LotFrontage'].isna().to_numpy(dtype=float)\n    if lotarea_imputer is None:\n        frame['LotFrontage'] = frame['LotFrontage'].fillna(fill_value)\n    else:\n        frame['LotFrontage'] = impute_lotfrontage_by_lotarea(frame, lotarea_imputer)\n    X_num = frame[NUMERIC_COLS].to_numpy(dtype=float)\n    if fit_scaler:\n        scaler = StandardScaler().fit(X_num)\n    X_num_scaled = scaler.transform(X_num)\n    X = np.column_stack([X_num_scaled, missing_flag]) if add_indicator else X_num_scaled\n    y = frame[TARGET].to_numpy(dtype=float)\n    return X, y, scaler",
+   "que_hace": "Calcula la mediana de `LotFrontage` en train, define un imputador alternativo por grupos de `LotArea` y la función `prepare_numeric_split`, que imputa, arma el flag opcional y escala con un scaler ajustado una sola vez.",
+   "como_funciona": "1. `lotfrontage_median = df_train[...].median()`: la mediana global sale de train (dio 70,0).\n2. `fit_lotarea_imputer` corta `LotArea` en 5 quintiles de train (`pd.qcut`) y guarda la mediana de `LotFrontage` de cada grupo; `impute_lotfrontage_by_lotarea` rellena cada faltante con la mediana de su grupo.\n3. En `prepare_numeric_split`, `missing_flag` guarda 1.0 donde faltaba el dato **antes** de rellenar; luego imputa con `fill_value` o, si llega `lotarea_imputer`, por grupos.\n4. Si `fit_scaler=True` crea `StandardScaler().fit(X_num)` (z-score); si no, reutiliza el `scaler` recibido.\n5. Con `add_indicator` concatena el flag como columna extra; devuelve `X`, `y` y el scaler.",
+   "proposito": "Materializa que μ, σ, la mediana y hasta los cortes de `LotArea` se aprenden solo de train y viajan a val/test. Los parámetros `fill_value`, `add_indicator` y `lotarea_imputer` existen para comparar imputaciones (Pregunta 4); la ganadora fue la mediana global **sin** indicador.",
+   "interaccion": "La llama `train_and_report` (misma celda) tres veces: train con `fit_scaler=True`, val y test con `scaler=scaler`. El imputador se ajusta en la celda 16 y se compara en la tabla de cinco variantes de esa celda.",
+   "teoria": "Normalización z-score $(x-\\mu)/\\sigma$ ajustada solo con train; imputación sin leakage y la pregunta de si el faltante es señal."
   },
   {
    "id": "baseline-mlp-32-32",
-   "titulo": "MLP baseline Dense(32)→Dense(32)→Dense(1, linear) (celda 10)",
+   "titulo": "MLP baseline Dense(32)→Dense(32)→Dense(1, linear) (celda 14)",
    "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
-   "desde": 31,
-   "hasta": 41,
+   "desde": 50,
+   "hasta": 60,
    "lenguaje": "python",
    "codigo": "def build_baseline_model(n_features):\n    model = Sequential([\n        Input(shape=(n_features,)),\n        Dense(32, activation='relu'),\n        Dense(32, activation='relu'),\n        Dense(1, activation='linear'),\n    ])\n    # Salida real -> activación lineal + loss de regresión (mse). 'accuracy' no aplica acá:\n    # no hay clases que acertar, hay una distancia en dólares que minimizar.\n    model.compile(optimizer='adam', loss='mse', metrics=['mae'])\n    return model",
    "que_hace": "Construye y compila el MLP del baseline numérico: dos capas ocultas de 32 ReLU y una salida lineal para predecir un real.",
-   "como_funciona": "- `Input(shape=(n_features,))` recibe la fila de floats (13 numéricas + flag).\n- Cada `Dense(32, activation='relu')` calcula $W\\cdot x+b$ y aplica ReLU.\n- `Dense(1, activation='linear')` devuelve un número sin acotar (el precio escalado).\n- `compile(optimizer='adam', loss='mse', metrics=['mae'])`: el comentario explica por qué `accuracy` no aplica.",
+   "como_funciona": "- `Input(shape=(n_features,))` recibe la fila de floats (las 13 numéricas; 14 en las variantes con flag).\n- Cada `Dense(32, activation='relu')` calcula $W\\cdot x+b$ y aplica ReLU.\n- `Dense(1, activation='linear')` devuelve un número sin acotar (el precio escalado).\n- `compile(optimizer='adam', loss='mse', metrics=['mae'])`: el comentario explica por qué `accuracy` no aplica.",
    "proposito": "Pasar de la sigmoide + BCE del notebook de clase a lineal + MSE es el cambio central de la misión: la tarea (predecir dólares) fija la salida y la loss.",
-   "interaccion": "La usan `train_and_report` (celda 10) y el experimento con `ListingId` (celda 21). En el Milestone 3, `build_model_categorical` repite el mismo tronco 32-32-1 con la API funcional.",
+   "interaccion": "La usan `train_and_report` (misma celda) y el experimento con `ListingId` (celda 30). En el Milestone 3, `build_model_categorical` repite el mismo tronco 32-32-1 con la API funcional.",
    "teoria": "Neurona/capa = combinación lineal + no linealidad; ReLU en ocultas y salida lineal + MSE para regresión."
   },
   {
    "id": "train-and-report",
-   "titulo": "Escalado del target, fit y desescalado a dólares (celda 10)",
+   "titulo": "Escalado del target, fit y desescalado a dólares (celda 14)",
    "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
-   "desde": 43,
-   "hasta": 68,
+   "desde": 62,
+   "hasta": 87,
    "lenguaje": "python",
-   "codigo": "def train_and_report(fill_value, add_indicator, epochs=100, verbose=0):\n    X_train, y_train_raw, scaler = prepare_numeric_split(df_train, fill_value, add_indicator, fit_scaler=True)\n    X_val, y_val_raw, _ = prepare_numeric_split(df_val, fill_value, add_indicator, scaler=scaler)\n    X_test, y_test_raw, _ = prepare_numeric_split(df_test, fill_value, add_indicator, scaler=scaler)\n\n    # SalePrice va de ~50 mil a ~1,6 millones: sin escalar el target, el gradiente\n    # tiene que moverse en un rango enorme y la red no converge en 100 épocas.\n    # Escalamos y TAMBIÉN ajustando el scaler solo con train, y deshacemos el\n    # escalado sobre las predicciones para reportar todo en dólares.\n    y_scaler = StandardScaler().fit(y_train_raw.reshape(-1, 1))\n    y_train = y_scaler.transform(y_train_raw.reshape(-1, 1)).ravel()\n    y_val = y_scaler.transform(y_val_raw.reshape(-1, 1)).ravel()\n\n    keras.utils.set_random_seed(SEED)\n    model = build_baseline_model(X_train.shape[1])\n    hist = model.fit(X_train, y_train, batch_size=32, epochs=epochs,\n                      validation_data=(X_val, y_val), verbose=verbose)\n\n    y_pred_scaled = model.predict(X_test, verbose=0).ravel()\n    y_pred = y_scaler.inverse_transform(y_pred_scaled.reshape(-1, 1)).ravel()\n    mae = mean_absolute_error(y_test_raw, y_pred)\n    rmse = np.sqrt(mean_squared_error(y_test_raw, y_pred))\n    mape = 100 * mean_absolute_percentage_error(y_test_raw, y_pred)\n    return {'model': model, 'history': hist, 'scaler': scaler, 'y_scaler': y_scaler,\n            'mae': mae, 'rmse': rmse, 'mape': mape,\n            'X_test': X_test, 'y_test': y_test_raw, 'y_pred': y_pred}",
+   "codigo": "def train_and_report(fill_value, add_indicator, epochs=100, verbose=0, lotarea_imputer=None):\n    X_train, y_train_raw, scaler = prepare_numeric_split(df_train, fill_value, add_indicator, fit_scaler=True, lotarea_imputer=lotarea_imputer)\n    X_val, y_val_raw, _ = prepare_numeric_split(df_val, fill_value, add_indicator, scaler=scaler, lotarea_imputer=lotarea_imputer)\n    X_test, y_test_raw, _ = prepare_numeric_split(df_test, fill_value, add_indicator, scaler=scaler, lotarea_imputer=lotarea_imputer)\n\n    # SalePrice va de ~50 mil a ~1,6 millones: sin escalar el target, el gradiente\n    # tiene que moverse en un rango enorme y la red no converge en 100 épocas.\n    # Escalamos y TAMBIÉN ajustando el scaler solo con train, y deshacemos el\n    # escalado sobre las predicciones para reportar todo en dólares.\n    y_scaler = StandardScaler().fit(y_train_raw.reshape(-1, 1))\n    y_train = y_scaler.transform(y_train_raw.reshape(-1, 1)).ravel()\n    y_val = y_scaler.transform(y_val_raw.reshape(-1, 1)).ravel()\n\n    keras.utils.set_random_seed(SEED)\n    model = build_baseline_model(X_train.shape[1])\n    hist = model.fit(X_train, y_train, batch_size=32, epochs=epochs,\n                      validation_data=(X_val, y_val), verbose=verbose)\n\n    y_pred_scaled = model.predict(X_test, verbose=0).ravel()\n    y_pred = y_scaler.inverse_transform(y_pred_scaled.reshape(-1, 1)).ravel()\n    mae = mean_absolute_error(y_test_raw, y_pred)\n    rmse = np.sqrt(mean_squared_error(y_test_raw, y_pred))\n    mape = 100 * mean_absolute_percentage_error(y_test_raw, y_pred)\n    return {'model': model, 'history': hist, 'scaler': scaler, 'y_scaler': y_scaler,\n            'mae': mae, 'rmse': rmse, 'mape': mape,\n            'X_test': X_test, 'y_test': y_test_raw, 'y_pred': y_pred}",
    "que_hace": "Entrena una variante del baseline de punta a punta: prepara los tres splits, escala `SalePrice`, corre `fit` y reporta MAE, RMSE y MAPE en dólares.",
-   "como_funciona": "1. Llama a `prepare_numeric_split` para train/val/test.\n2. `y_scaler = StandardScaler().fit(y_train_raw...)`: el target también se z-normaliza con estadísticas de train.\n3. `keras.utils.set_random_seed(SEED)` y `build_baseline_model`.\n4. `model.fit(..., batch_size=32, epochs=epochs, validation_data=(X_val, y_val))`: forward + backward por lotes durante 100 épocas.\n5. `y_scaler.inverse_transform` vuelve las predicciones a dólares y calcula `mae`, `rmse`, `mape`.",
+   "como_funciona": "1. Llama a `prepare_numeric_split` para train/val/test (pasándole `lotarea_imputer` si la variante lo usa).\n2. `y_scaler = StandardScaler().fit(y_train_raw...)`: el target también se z-normaliza con estadísticas de train.\n3. `keras.utils.set_random_seed(SEED)` y `build_baseline_model`.\n4. `model.fit(..., batch_size=32, epochs=epochs, validation_data=(X_val, y_val))`: forward + backward por lotes durante 100 épocas.\n5. `y_scaler.inverse_transform` vuelve las predicciones a dólares y calcula `mae`, `rmse`, `mape` sobre test.",
    "proposito": "El comentario lo dice: con `SalePrice` crudo (50 mil a 1,6 millones) los gradientes eran enormes para el paso de Adam y no convergía en 100 épocas; escalar el target lo resolvió sin tocar el learning rate.",
-   "interaccion": "La llama la celda 11 con tres imputaciones; el resultado `variant_median_flag` pasa a ser `baseline` (celdas 15, 17, 18) y la referencia del Milestone 3.",
+   "interaccion": "La llama la celda 17 con cinco imputaciones; `variant_median_noflag` pasa a ser `baseline` (celda 23) y es la referencia de la casa de Wheatfield (celda 27), de `ListingId` (celda 30) y de la tabla del Milestone 3 (celda 36).",
    "teoria": "Paso de actualización $w\\leftarrow w-\\eta\\,\\partial E/\\partial w$: la escala del target condiciona el tamaño del gradiente; épocas y batches del ciclo de entrenamiento."
   },
   {
    "id": "comparar-imputaciones",
-   "titulo": "Mediana + flag vs mediana vs cero (celda 11)",
+   "titulo": "Cinco formas de completar LotFrontage (celda 17)",
    "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
-   "desde": 1,
-   "hasta": 10,
+   "desde": 3,
+   "hasta": 39,
    "lenguaje": "python",
-   "codigo": "variant_median_flag = train_and_report(lotfrontage_median, add_indicator=True)\nvariant_median_noflag = train_and_report(lotfrontage_median, add_indicator=False)\nvariant_zero_noflag = train_and_report(0.0, add_indicator=False)\n\nprint(f\"{'Variante':28} {'MAE':>12} {'RMSE':>12} {'MAPE %':>8}\")\nprint(\"-\" * 64)\nfor name, r in [('Mediana + indicador', variant_median_flag),\n                ('Mediana sin indicador', variant_median_noflag),\n                ('Cero sin indicador', variant_zero_noflag)]:\n    print(f\"{name:28} {r['mae']:12,.0f} {r['rmse']:12,.0f} {r['mape']:8.2f}\")",
-   "que_hace": "Entrena tres variantes del baseline que solo difieren en cómo se completa `LotFrontage` y las compara en MAE, RMSE y MAPE.",
-   "como_funciona": "- `variant_median_flag`: mediana de train + indicador.\n- `variant_median_noflag`: mediana sin indicador.\n- `variant_zero_noflag`: rellena con `0.0`.\n- Imprime una tabla con las tres métricas de test.",
-   "proposito": "Responde la Pregunta 4: rellenar con 0 le dice a la red \"lote sin frente\", un valor fuera de la distribución. La variante elegida como baseline oficial fue mediana + indicador.",
-   "interaccion": "Usa `train_and_report` y `lotfrontage_median` (celda 10). Su salida `variant_median_flag` se reusa como `baseline` en las celdas siguientes.",
-   "teoria": "Error de codificación caro: faltante rellenado con 0."
+   "codigo": "variant_median_flag = train_and_report(\n    lotfrontage_median,\n    add_indicator=True\n)\n\nvariant_median_noflag = train_and_report(\n    lotfrontage_median,\n    add_indicator=False\n)\n\nvariant_zero_noflag = train_and_report(\n    0.0,\n    add_indicator=False\n)\n\nvariant_lotarea_group_flag = train_and_report(\n    None,\n    add_indicator=True,\n    lotarea_imputer=lotarea_imputer\n)\n\nvariant_lotarea_group_noflag = train_and_report(\n    None,\n    add_indicator=False,\n    lotarea_imputer=lotarea_imputer\n)\n\nprint(f\"{'Variante':35} {'MAE':>12} {'RMSE':>12} {'MAPE %':>8}\")\nprint(\"-\" * 70)\n\nresults = [\n    (\"Mediana global + indicador\", variant_median_flag),\n    (\"Mediana global sin indicador\", variant_median_noflag),\n    (\"Cero sin indicador\", variant_zero_noflag),\n    (\"Mediana por LotArea + indicador\", variant_lotarea_group_flag),\n    (\"Mediana por LotArea sin indicador\", variant_lotarea_group_noflag),\n]",
+   "que_hace": "Entrena cinco variantes del baseline que solo difieren en cómo se completa `LotFrontage` y si se agrega el indicador de faltante, y las compara en MAE, RMSE y MAPE de test.",
+   "como_funciona": "- `variant_median_flag`: mediana global de train + indicador (MAE 51.411).\n- `variant_median_noflag`: mediana global sin indicador (MAE 50.940) → **baseline oficial**.\n- `variant_zero_noflag`: rellena con `0.0` (MAE 47.440).\n- `variant_lotarea_group_flag` / `_noflag`: mediana por quintil de `LotArea`, con y sin indicador (54.127 y 50.891).\n- `results` recorre las cinco y arma la tabla.",
+   "proposito": "Responde la Pregunta 4. Ojo para la defensa: el cero dio el menor error en esta corrida, pero se descartó por criterio (para la red, 0 es \"lote sin frente\", no \"dato desconocido\"); y la mediana por `LotArea` empató con la global, así que se eligió la más simple. El indicador empeoró en los dos casos y quedó afuera.",
+   "interaccion": "Usa `train_and_report`, `lotfrontage_median` y `lotarea_imputer` (celdas 14-16). `variant_median_noflag` se reusa como `baseline` desde la celda 23.",
+   "teoria": "Error de codificación caro (faltante rellenado con 0) y el checklist \"¿puede faltar?\"; elección de imputación comparando variantes."
   },
   {
    "id": "faltante-informa",
-   "titulo": "¿El faltante de LotFrontage informa? (celda 12)",
+   "titulo": "¿El faltante de LotFrontage informa? (celda 18)",
    "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
    "desde": 1,
-   "hasta": 10,
+   "hasta": 9,
    "lenguaje": "python",
-   "codigo": "# ¿El hecho de que falte LotFrontage dice algo por sí solo?\nmissing_flag_full = df['LotFrontage'].isna()\ncorr_missing_price = missing_flag_full.astype(int).corr(df['SalePrice'])\nmedia_con_dato = df.loc[~missing_flag_full, 'SalePrice'].mean()\nmedia_sin_dato = df.loc[missing_flag_full, 'SalePrice'].mean()\n\nprint(f\"Correlación entre 'falta LotFrontage' y SalePrice: {corr_missing_price:.3f}\")\nprint(f\"Precio promedio cuando SÍ está el dato: ${media_con_dato:,.0f}\")\nprint(f\"Precio promedio cuando FALTA el dato:   ${media_sin_dato:,.0f}\")\nprint(f\"Diferencia: {100 * (media_sin_dato / media_con_dato - 1):.1f}%\")",
-   "que_hace": "Mide si el hecho de que falte `LotFrontage` está asociado al precio.",
-   "como_funciona": "1. `missing_flag_full` marca las filas sin dato.\n2. `corr_missing_price`: correlación entre el flag (0/1) y `SalePrice`.\n3. Compara el precio promedio con dato (`media_con_dato`) y sin dato (`media_sin_dato`) y la diferencia porcentual (≈ −12%).",
-   "proposito": "Justifica que el indicador viaje como feature: el faltante no es aleatorio, las casas sin dato valen menos. Se calcula sobre `df` completo porque es un análisis descriptivo, no un ajuste del modelo.",
-   "interaccion": "No alimenta al modelo directamente; respalda la decisión de `add_indicator=True` en `prepare_numeric_split` y la respuesta escrita de la celda 13.",
+   "codigo": "missing_flag_full = df_train['LotFrontage'].isna()\ncorr_missing_price = missing_flag_full.astype(int).corr(df_train['SalePrice'])\nmedia_con_dato = df_train.loc[~missing_flag_full, 'SalePrice'].mean()\nmedia_sin_dato = df_train.loc[missing_flag_full, 'SalePrice'].mean()\n\nprint(f\"Correlación entre 'falta LotFrontage' y SalePrice: {corr_missing_price:.3f}\")\nprint(f\"Precio promedio cuando SÍ está el dato: ${media_con_dato:,.0f}\")\nprint(f\"Precio promedio cuando FALTA el dato:   ${media_sin_dato:,.0f}\")\nprint(f\"Diferencia: {100 * (media_sin_dato / media_con_dato - 1):.1f}%\")",
+   "que_hace": "Mide, sobre `df_train`, si el hecho de que falte `LotFrontage` está asociado al precio.",
+   "como_funciona": "1. `missing_flag_full` marca las filas de train sin dato.\n2. `corr_missing_price`: correlación entre el flag (0/1) y `SalePrice` (dio −0,064).\n3. Compara el precio promedio con dato (`media_con_dato`, $213.592) y sin dato (`media_sin_dato`, $184.285): −13,7%.",
+   "proposito": "Es la evidencia descriptiva de la Pregunta 4: las casas sin dato valen algo menos en promedio, pero la correlación es muy baja y el indicador no mejoró las métricas (celda 17), así que no viajó como feature. Se calcula solo con train para no mirar val/test.",
+   "interaccion": "No alimenta al modelo; junto con el heatmap de la celda 12 y la tabla de la celda 17 respalda la respuesta escrita de la celda 21 y la fila `LotFrontage` de la tabla de decisiones.",
    "teoria": "Checklist por variable: \"¿puede faltar?\" y si la ausencia misma es señal."
   },
   {
+   "id": "baseline-oficial",
+   "titulo": "El baseline oficial y su curva de pérdida (celda 23)",
+   "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
+   "desde": 1,
+   "hasta": 11,
+   "lenguaje": "python",
+   "codigo": "import matplotlib.pyplot as plt\n\nbaseline = variant_median_noflag\n\nplt.plot(baseline['history'].history['loss'])\nplt.plot(baseline['history'].history['val_loss'])\nplt.title('Baseline numérico — pérdida (MSE, target escalado)')\nplt.ylabel('Loss')\nplt.xlabel('Epoch')\nplt.legend(['Train', 'Val'], loc='upper right')\nplt.show()",
+   "que_hace": "Fija `baseline = variant_median_noflag` (mediana global sin indicador) y grafica `loss` contra `val_loss` del historial de entrenamiento.",
+   "como_funciona": "- Toma el diccionario que devolvió `train_and_report` en la celda 17.\n- Lee `history.history['loss']` y `['val_loss']` del objeto que devuelve `model.fit` y los grafica por época.\n- La celda 25 imprime sus métricas en test: MAE $50.940, RMSE $68.271, MAPE 27,20%.",
+   "proposito": "Deja un único punto de referencia numérico para el resto del notebook. La curva muestra que `val_loss` toca su mínimo muy temprano (≈ época 3) y después sube: ya hay sobreajuste, que se trata a propósito en el Milestone 4.",
+   "interaccion": "`baseline` lo consumen la celda 25 (métricas), la celda 27 (casa con mayor error), la celda 30 (ListingId) y la tabla de la celda 36.",
+   "teoria": "La loss que se minimiza (MSE con target escalado) se mira en train y en validación para detectar cuándo el modelo deja de generalizar."
+  },
+  {
    "id": "casa-peor-mae-rmse",
-   "titulo": "La casa que más separa MAE de RMSE (celda 18)",
+   "titulo": "La casa que más separa MAE de RMSE (celda 27)",
    "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
    "desde": 1,
    "hasta": 22,
    "lenguaje": "python",
    "codigo": "# ¿Qué casa de test separa más al MAE del RMSE?\n# RMSE castiga el CUADRADO del error: una sola casa con un error enorme mueve el\n# RMSE mucho más de lo que mueve al MAE. La buscamos como la de mayor error absoluto.\nerrores_abs = np.abs(baseline['y_test'] - baseline['y_pred'])\nidx_peor = np.argmax(errores_abs)\n\ndf_test_reset = df_test.reset_index(drop=False)\ncasa_peor = df_test_reset.iloc[idx_peor]\n\nprint(\"Casa con el mayor error absoluto del conjunto de prueba:\")\nprint(casa_peor[['ListingId', 'SalePrice'] + NUMERIC_COLS + ['State', 'District', 'HouseStyle']])\nprint(f\"\\nPrecio real:      ${baseline['y_test'][idx_peor]:,.0f}\")\nprint(f\"Precio predicho:  ${baseline['y_pred'][idx_peor]:,.0f}\")\nprint(f\"Error absoluto:   ${errores_abs[idx_peor]:,.0f}\")\n\n# Cuánto mueve esta única casa al RMSE, comparado con cuánto mueve al MAE\nmae_sin_esa_casa = np.mean(np.delete(errores_abs, idx_peor))\nrmse_sin_esa_casa = np.sqrt(np.mean(np.delete(errores_abs, idx_peor) ** 2))\nprint(f\"\\nMAE  con esa casa: ${baseline['mae']:,.0f}   |  MAE  sin esa casa: ${mae_sin_esa_casa:,.0f}\"\n      f\"   ({100 * (1 - mae_sin_esa_casa / baseline['mae']):.1f}% menos)\")\nprint(f\"RMSE con esa casa: ${baseline['rmse']:,.0f}   |  RMSE sin esa casa: ${rmse_sin_esa_casa:,.0f}\"\n      f\"   ({100 * (1 - rmse_sin_esa_casa / baseline['rmse']):.1f}% menos)\")",
    "que_hace": "Busca la casa de test con mayor error absoluto y mide cuánto cambian el MAE y el RMSE si se la saca.",
-   "como_funciona": "1. `errores_abs = |y_test - y_pred|` sobre el baseline.\n2. `idx_peor = np.argmax(errores_abs)` y se imprime la fila (fue Wheatfield, error $226.171).\n3. `mae_sin_esa_casa` y `rmse_sin_esa_casa` recalculan sin esa fila con `np.delete`.\n4. Imprime el porcentaje que baja cada métrica (RMSE 3,3% vs MAE 2,3%).",
+   "como_funciona": "1. `errores_abs = |y_test - y_pred|` sobre el baseline.\n2. `idx_peor = np.argmax(errores_abs)` y se imprime la fila: `ListingId 781978`, Wheatfield (NC), real $357.100, predicho $571.333, error $214.233.\n3. `mae_sin_esa_casa` y `rmse_sin_esa_casa` recalculan sin esa fila con `np.delete`.\n4. Imprime cuánto baja cada métrica: RMSE 3,1% vs MAE 2,2%.",
    "proposito": "Responde la Pregunta 1 con evidencia: el cuadrado del RMSE pesa desproporcionadamente un error grande. Se eligió reportar MAE a la inmobiliaria y usar RMSE como alarma interna.",
-   "interaccion": "Consume `baseline['y_test']` y `baseline['y_pred']` producidos por `train_and_report`; la interpretación está en la celda 19.",
+   "interaccion": "Consume `baseline['y_test']` y `baseline['y_pred']` producidos por `train_and_report`; la interpretación está en la celda 28 (al baseline le falta la ubicación, que entra en el Milestone 3).",
    "teoria": "MSE/RMSE castigan al cuadrado y MAE es lineal: la loss elegida cambia cuánto pesa un outlier."
   },
   {
    "id": "listingid-adentro",
-   "titulo": "Entrenar con ListingId adentro (celda 21)",
+   "titulo": "Entrenar con ListingId adentro (celda 30)",
    "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
    "desde": 1,
-   "hasta": 35,
+   "hasta": 42,
    "lenguaje": "python",
-   "codigo": "FEATURES_CON_ID = ['ListingId'] + NUMERIC_COLS\n\ndef prepare_with_listingid(frame, scaler=None, fit_scaler=False):\n    frame = frame.copy()\n    missing_flag = frame['LotFrontage'].isna().to_numpy(dtype=float)\n    frame['LotFrontage'] = frame['LotFrontage'].fillna(lotfrontage_median)\n    X_num = frame[FEATURES_CON_ID].to_numpy(dtype=float)\n    if fit_scaler:\n        scaler = StandardScaler().fit(X_num)\n    X = np.column_stack([scaler.transform(X_num), missing_flag])\n    y = frame[TARGET].to_numpy(dtype=float)\n    return X, y, scaler\n\nX_train_id, y_train_id_raw, scaler_id = prepare_with_listingid(df_train, fit_scaler=True)\nX_val_id, y_val_id_raw, _ = prepare_with_listingid(df_val, scaler=scaler_id)\nX_test_id, y_test_id_raw, _ = prepare_with_listingid(df_test, scaler=scaler_id)\n\ny_scaler_id = StandardScaler().fit(y_train_id_raw.reshape(-1, 1))\ny_train_id = y_scaler_id.transform(y_train_id_raw.reshape(-1, 1)).ravel()\ny_val_id = y_scaler_id.transform(y_val_id_raw.reshape(-1, 1)).ravel()\n\nkeras.utils.set_random_seed(SEED)\nmodel_con_id = build_baseline_model(X_train_id.shape[1])\nhist_con_id = model_con_id.fit(X_train_id, y_train_id, batch_size=32, epochs=100,\n                                validation_data=(X_val_id, y_val_id), verbose=0)\n\ny_pred_id = y_scaler_id.inverse_transform(\n    model_con_id.predict(X_test_id, verbose=0)).ravel()\nmae_id = mean_absolute_error(y_test_id_raw, y_pred_id)\n\n# Comparamos la brecha train/val de loss (MSE, target escalado) de los últimos 10 epochs\ngap_baseline = (np.mean(baseline['history'].history['val_loss'][-10:])\n                - np.mean(baseline['history'].history['loss'][-10:]))\ngap_con_id = (np.mean(hist_con_id.history['val_loss'][-10:])\n              - np.mean(hist_con_id.history['loss'][-10:]))",
+   "codigo": "FEATURES_CON_ID = ['ListingId'] + NUMERIC_COLS\n\ndef prepare_with_listingid(frame, scaler=None, fit_scaler=False):\n    frame = frame.copy()\n    frame['LotFrontage'] = frame['LotFrontage'].fillna(lotfrontage_median)\n    X_num = frame[FEATURES_CON_ID].to_numpy(dtype=float)\n    if fit_scaler:\n        scaler = StandardScaler().fit(X_num)\n    X = np.column_stack([scaler.transform(X_num)])\n    y = frame[TARGET].to_numpy(dtype=float)\n    return X, y, scaler\n\nX_train_id, y_train_id_raw, scaler_id = prepare_with_listingid(df_train, fit_scaler=True)\nX_val_id, y_val_id_raw, _ = prepare_with_listingid(df_val, scaler=scaler_id)\nX_test_id, y_test_id_raw, _ = prepare_with_listingid(df_test, scaler=scaler_id)\n\ny_scaler_id = StandardScaler().fit(y_train_id_raw.reshape(-1, 1))\ny_train_id = y_scaler_id.transform(y_train_id_raw.reshape(-1, 1)).ravel()\ny_val_id = y_scaler_id.transform(y_val_id_raw.reshape(-1, 1)).ravel()\n\nkeras.utils.set_random_seed(SEED)\nmodel_con_id = build_baseline_model(X_train_id.shape[1])\nhist_con_id = model_con_id.fit(X_train_id, y_train_id, batch_size=32, epochs=100,\n                                validation_data=(X_val_id, y_val_id), verbose=0)\n\ny_pred_id = y_scaler_id.inverse_transform(\n    model_con_id.predict(X_test_id, verbose=0)).ravel()\nmae_id = mean_absolute_error(y_test_id_raw, y_pred_id)\n\n# Comparamos la brecha train/val de loss (MSE, target escalado) de los últimos 10 epochs\ngap_baseline = (np.mean(baseline['history'].history['val_loss'][-10:])\n                - np.mean(baseline['history'].history['loss'][-10:]))\ngap_con_id = (np.mean(hist_con_id.history['val_loss'][-10:])\n              - np.mean(hist_con_id.history['loss'][-10:]))\n\nprint(f\"MAE con ListingId adentro: ${mae_id:,.0f}  (baseline sin ListingId: ${baseline['mae']:,.0f})\")\nprint()\nprint(f\"{'':22} {'loss train':>12} {'loss val':>12} {'brecha val-train':>18}\")\nprint(f\"{'Sin ListingId':22} {np.mean(baseline['history'].history['loss'][-10:]):12.4f} \"\n      f\"{np.mean(baseline['history'].history['val_loss'][-10:]):12.4f} {gap_baseline:18.4f}\")\nprint(f\"{'Con ListingId':22} {np.mean(hist_con_id.history['loss'][-10:]):12.4f} \"\n      f\"{np.mean(hist_con_id.history['val_loss'][-10:]):12.4f} {gap_con_id:18.4f}\")",
    "que_hace": "Repite el baseline agregando `ListingId` como feature y compara MAE y la brecha train/val contra el baseline sin ella.",
-   "como_funciona": "- `FEATURES_CON_ID` antepone `ListingId` a `NUMERIC_COLS`.\n- `prepare_with_listingid` replica la imputación + scaler de train.\n- Entrena `build_baseline_model` igual que el baseline (100 épocas, batch 32).\n- `gap_baseline` y `gap_con_id` promedian `val_loss - loss` de las últimas 10 épocas.",
-   "proposito": "Responde la Pregunta 3: el MAE casi no cambia ($51.131 vs $51.411), pero el ID único es un número de carga sin significado y solo invita a memorizar. Se lo descarta en la tabla de decisiones.",
-   "interaccion": "Reusa `build_baseline_model`, `lotfrontage_median` y `baseline` de la celda 10/11; las curvas se grafican en la celda 22.",
-   "teoria": "Error de codificación caro: ID único como feature."
+   "como_funciona": "- `FEATURES_CON_ID` antepone `ListingId` a `NUMERIC_COLS`.\n- `prepare_with_listingid` replica la imputación con `lotfrontage_median` + scaler de train.\n- Entrena `build_baseline_model` igual que el baseline (100 épocas, batch 32, misma semilla).\n- `gap_baseline` y `gap_con_id` promedian `val_loss - loss` de las últimas 10 épocas: 0,2820 sin ID vs 0,3445 con ID.",
+   "proposito": "Responde la Pregunta 3: el MAE de test baja ($49.000 vs $50.940), pero la brecha train/val crece y el ID no correlaciona con el precio: es un número de carga que solo invita a memorizar. Se lo descarta y la mejora puntual se atribuye a variación de la corrida.",
+   "interaccion": "Reusa `build_baseline_model`, `lotfrontage_median` (celda 14) y `baseline` (celda 23); las curvas se grafican en la celda 31 y la interpretación está en la celda 32.",
+   "teoria": "Error de codificación caro: ID único como feature; brecha train/val como señal de memorización."
   },
   {
    "id": "encoders-solo-train",
-   "titulo": "One-hot y mapa District→índice ajustados en train (celda 25)",
+   "titulo": "One-hot y mapa District→índice ajustados en train (celda 34)",
    "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
    "desde": 1,
    "hasta": 17,
@@ -137,12 +151,12 @@
    "que_hace": "Crea los `OneHotEncoder` de `State`, `HouseStyle` y `SaleCondition` y el diccionario `district_to_idx`, todos ajustados solo con train.",
    "como_funciona": "1. `OneHotEncoder(handle_unknown='ignore', sparse_output=False).fit(df_train[[...]])` para cada categórica chica.\n2. `district_categories = sorted(df_train['District'].unique())` → 72 distritos vistos en train.\n3. `district_to_idx` asigna un entero 0..71 a cada uno.\n4. `DISTRICT_OOV_IDX = 72` reserva un índice para distritos desconocidos y `DISTRICT_VOCAB_SIZE = 73`.",
    "proposito": "Igual que el scaler, los encoders y el vocabulario son parte del modelo y se aprenden de train. Para `State` (12) basta one-hot; para `District` (72) se arma el índice que consume el embedding.",
-   "interaccion": "Los usan `build_dense_features` (one-hots) y `build_district_idx` (celda 26), y `DISTRICT_VOCAB_SIZE` fija el tamaño de `Embedding` en las celdas 26 y 34.",
+   "interaccion": "Los usan `build_dense_features` (one-hots) y `build_district_idx` (celda 35); `DISTRICT_VOCAB_SIZE` fija el tamaño de `Embedding` en las celdas 35, 43 y 54. En el M5 (celda 50) se reutilizan tal cual para tasar una casa escrita a mano.",
    "teoria": "One-hot vs embedding según cardinalidad; diccionarios y encoders calculados solo con train para no filtrar información."
   },
   {
    "id": "month-cyclical",
-   "titulo": "MonthSold como seno y coseno (celda 25)",
+   "titulo": "MonthSold como seno y coseno (celda 34)",
    "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
    "desde": 19,
    "hasta": 22,
@@ -151,26 +165,26 @@
    "que_hace": "Convierte el mes de venta (1–12) en dos columnas: seno y coseno del ángulo del mes en el ciclo anual.",
    "como_funciona": "- `radians = 2 * np.pi * month / 12` ubica cada mes sobre un círculo.\n- `np.sin(radians)` y `np.cos(radians)` dan las dos coordenadas.\n- Devuelve una matriz de 2 columnas (2 floats por casa).",
    "proposito": "Resuelve la trampa 2: como entero, diciembre (12) y enero (1) estarían a 11 de distancia; en el círculo quedan vecinos. Hace falta seno y coseno juntos para que cada mes tenga un punto único.",
-   "interaccion": "La llama `build_dense_features` (celda 26) cuando `cyclical_month=True`, que además saca `MonthSold` de las numéricas.",
+   "interaccion": "La llama `build_dense_features` (celda 35) cuando `cyclical_month=True`, que además saca `MonthSold` de las numéricas.",
    "teoria": "Codificación cíclica con senos y cosenos, la misma idea que el positional encoding del Transformer."
   },
   {
    "id": "build-dense-features",
-   "titulo": "El vector de entrada: numéricas, flag, mes cíclico y one-hots (celda 26)",
+   "titulo": "El vector de entrada: numéricas, mes cíclico y one-hots (celda 35)",
    "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
    "desde": 1,
-   "hasta": 34,
+   "hasta": 33,
    "lenguaje": "python",
-   "codigo": "def build_dense_features(frame, fill_value, use_state, use_housestyle, use_centralair,\n                          use_salecondition, cyclical_month, district_int=False,\n                          scaler=None, fit_scaler=False):\n    \"\"\"Arma el bloque de features que entra 'directo' a la red (sin pasar por embedding).\n    district_int=True mete a District como un entero plano más -del bloque numérico-\n    en vez de mandarlo por la rama de embedding: es el experimento a propósito de la Pregunta 2.\"\"\"\n    frame = frame.copy()\n    missing_flag = frame['LotFrontage'].isna().to_numpy(dtype=float)\n    frame['LotFrontage'] = frame['LotFrontage'].fillna(fill_value)\n\n    numeric_cols_here = [c for c in NUMERIC_COLS if not (cyclical_month and c == 'MonthSold')]\n    X_num = frame[numeric_cols_here].to_numpy(dtype=float)\n    if district_int:\n        district_col = frame['District'].map(\n            lambda d: district_to_idx.get(d, DISTRICT_OOV_IDX)).to_numpy(dtype=float).reshape(-1, 1)\n        X_num = np.column_stack([X_num, district_col])\n\n    if fit_scaler:\n        scaler = StandardScaler().fit(X_num)\n    X_num_scaled = scaler.transform(X_num)\n\n    blocks = [X_num_scaled, missing_flag.reshape(-1, 1)]\n    if cyclical_month:\n        blocks.append(month_cyclical(frame['MonthSold']))\n    if use_state:\n        blocks.append(state_encoder.transform(frame[['State']]))\n    if use_housestyle:\n        blocks.append(housestyle_encoder.transform(frame[['HouseStyle']]))\n    if use_salecondition:\n        blocks.append(salecondition_encoder.transform(frame[['SaleCondition']]))\n    if use_centralair:\n        blocks.append((frame['CentralAir'] == 'Y').to_numpy(dtype=float).reshape(-1, 1))\n\n    return np.column_stack(blocks), scaler",
-   "que_hace": "Arma el bloque de features \"directo\" de cada casa: numéricas escaladas, flag de faltante, mes sin/cos, one-hots y `CentralAir` 0/1.",
-   "como_funciona": "1. Imputa `LotFrontage` y guarda `missing_flag`.\n2. `numeric_cols_here` excluye `MonthSold` si va cíclico.\n3. Con `district_int=True` agrega District como entero plano (experimento trampa de la Pregunta 2).\n4. `StandardScaler` se ajusta solo si `fit_scaler=True`.\n5. `blocks` concatena según los flags `use_state`, `use_housestyle`, `use_salecondition`, `use_centralair` y `cyclical_month`.",
+   "codigo": "def build_dense_features(frame, fill_value, use_state, use_housestyle, use_centralair,\n                          use_salecondition, cyclical_month, district_int=False,\n                          scaler=None, fit_scaler=False):\n    \"\"\"Arma el bloque de features que entra 'directo' a la red (sin pasar por embedding).\n    district_int=True mete a District como un entero plano más -del bloque numérico-\n    en vez de mandarlo por la rama de embedding: es el experimento a propósito de la Pregunta 2.\"\"\"\n    frame = frame.copy()\n    frame['LotFrontage'] = frame['LotFrontage'].fillna(fill_value)\n\n    numeric_cols_here = [c for c in NUMERIC_COLS if not (cyclical_month and c == 'MonthSold')]\n    X_num = frame[numeric_cols_here].to_numpy(dtype=float)\n    if district_int:\n        district_col = frame['District'].map(\n            lambda d: district_to_idx.get(d, DISTRICT_OOV_IDX)).to_numpy(dtype=float).reshape(-1, 1)\n        X_num = np.column_stack([X_num, district_col])\n\n    if fit_scaler:\n        scaler = StandardScaler().fit(X_num)\n    X_num_scaled = scaler.transform(X_num)\n\n    blocks = [X_num_scaled]\n    if cyclical_month:\n        blocks.append(month_cyclical(frame['MonthSold']))\n    if use_state:\n        blocks.append(state_encoder.transform(frame[['State']]))\n    if use_housestyle:\n        blocks.append(housestyle_encoder.transform(frame[['HouseStyle']]))\n    if use_salecondition:\n        blocks.append(salecondition_encoder.transform(frame[['SaleCondition']]))\n    if use_centralair:\n        blocks.append((frame['CentralAir'] == 'Y').to_numpy(dtype=float).reshape(-1, 1))\n\n    return np.column_stack(blocks), scaler",
+   "que_hace": "Arma el bloque de features \"directo\" de cada casa: numéricas escaladas, mes sin/cos, one-hots y `CentralAir` 0/1.",
+   "como_funciona": "1. Imputa `LotFrontage` con `fill_value` (la mediana de train, sin flag).\n2. `numeric_cols_here` excluye `MonthSold` si va cíclico.\n3. Con `district_int=True` agrega District como entero plano (experimento trampa de la Pregunta 2).\n4. `StandardScaler` se ajusta solo si `fit_scaler=True`; si no, usa el `scaler` recibido.\n5. `blocks` concatena según los flags `use_state`, `use_housestyle`, `use_salecondition`, `use_centralair` y `cyclical_month`.",
    "proposito": "Los flags permiten encender bloques de a uno y medir el aporte de cada uno (criterio del Milestone 3). District queda afuera de este bloque porque va por su propia rama de embedding.",
-   "interaccion": "La llaman `train_categorical_variant` (celda 26) y el Milestone 4 (celda 34). Usa los encoders y `month_cyclical` de la celda 25.",
+   "interaccion": "La llaman `train_categorical_variant` (misma celda), el Milestone 4 (celda 43) y `preprocess_house_for_final_model` del M5 (celda 50). Usa los encoders y `month_cyclical` de la celda 34.",
    "teoria": "La red solo ve una fila de floats de largo fijo: este es el traductor de casa a vector."
   },
   {
    "id": "modelo-embedding-funcional",
-   "titulo": "API funcional con Embedding(73, 8) para District (celda 26)",
+   "titulo": "API funcional con Embedding(73, 8) para District (celda 35)",
    "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
    "desde": 36,
    "hasta": 55,
@@ -179,78 +193,204 @@
    "que_hace": "Construye el modelo del Milestone 3 con dos entradas: el bloque denso y el índice de distrito que pasa por un embedding.",
    "como_funciona": "- `build_district_idx` mapea cada distrito a su entero (o al OOV).\n- `Input(shape=(1,), name='district_idx')` → `Embedding(input_dim=district_vocab_size, output_dim=embed_dim)` (73×8) → `Flatten`.\n- `Concatenate()([dense_input, embed])` une ambos caminos.\n- Sigue el tronco `Dense(32, relu)` → `Dense(32, relu)` → `Dense(1, linear)` con Adam + MSE.",
    "proposito": "La tabla 73×8 es un parámetro aprendido, no una entrada: 8 floats densos por distrito en lugar de 72 columnas one-hot dispersas. Se pasó de `Sequential` a la API funcional porque hacen falta dos entradas.",
-   "interaccion": "La llama `train_categorical_variant` (celda 26), que le pasa `[X_dense, district_idx]`; sus variantes se comparan en la celda 27.",
+   "interaccion": "La llama `train_categorical_variant` (misma celda), que le pasa `[X_dense, district_idx]`; sus variantes se comparan en la celda 36. La misma rama de embedding se repite en `build_big_model` (celda 43) y `build_quantile_model` (celda 54).",
    "teoria": "Embedding: vector denso y aprendido por categoría, igual que el embedding de un token."
   },
   {
+   "id": "train-categorical-variant",
+   "titulo": "Entrenar una variante: features, índices de distrito y fit (celda 35)",
+   "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
+   "desde": 57,
+   "hasta": 93,
+   "lenguaje": "python",
+   "codigo": "def train_categorical_variant(use_state, use_district, use_housestyle, use_centralair,\n                               use_salecondition, cyclical_month, district_int=False, epochs=100):\n    X_dense_train, scaler = build_dense_features(\n        df_train, lotfrontage_median, use_state, use_housestyle, use_centralair,\n        use_salecondition, cyclical_month, district_int, fit_scaler=True)\n    X_dense_val, _ = build_dense_features(\n        df_val, lotfrontage_median, use_state, use_housestyle, use_centralair,\n        use_salecondition, cyclical_month, district_int, scaler=scaler)\n    X_dense_test, _ = build_dense_features(\n        df_test, lotfrontage_median, use_state, use_housestyle, use_centralair,\n        use_salecondition, cyclical_month, district_int, scaler=scaler)\n\n    y_train_raw = df_train[TARGET].to_numpy(dtype=float)\n    y_val_raw = df_val[TARGET].to_numpy(dtype=float)\n    y_test_raw = df_test[TARGET].to_numpy(dtype=float)\n    y_scaler = StandardScaler().fit(y_train_raw.reshape(-1, 1))\n    y_train = y_scaler.transform(y_train_raw.reshape(-1, 1)).ravel()\n    y_val = y_scaler.transform(y_val_raw.reshape(-1, 1)).ravel()\n\n    if use_district:\n        inputs_train = [X_dense_train, build_district_idx(df_train)]\n        inputs_val = [X_dense_val, build_district_idx(df_val)]\n        inputs_test = [X_dense_test, build_district_idx(df_test)]\n    else:\n        inputs_train, inputs_val, inputs_test = X_dense_train, X_dense_val, X_dense_test\n\n    keras.utils.set_random_seed(SEED)\n    model = build_model_categorical(X_dense_train.shape[1], use_district, DISTRICT_VOCAB_SIZE)\n    hist = model.fit(inputs_train, y_train, batch_size=32, epochs=epochs,\n                      validation_data=(inputs_val, y_val), verbose=0)\n\n    y_pred = y_scaler.inverse_transform(model.predict(inputs_test, verbose=0)).ravel()\n    mae = mean_absolute_error(y_test_raw, y_pred)\n    rmse = np.sqrt(mean_squared_error(y_test_raw, y_pred))\n    mape = 100 * mean_absolute_percentage_error(y_test_raw, y_pred)\n    return {'model': model, 'history': hist, 'mae': mae, 'rmse': rmse, 'mape': mape,\n            'y_test': y_test_raw, 'y_pred': y_pred}",
+   "que_hace": "Arma las entradas de train/val/test para una combinación de columnas, construye la red con `build_model_categorical`, la entrena y devuelve MAE, RMSE y MAPE en dólares sobre test.",
+   "como_funciona": "- Llama tres veces a `build_dense_features`: con `fit_scaler=True` en `df_train` y reusando ese `scaler` en `df_val` y `df_test`.\n- Escala `SalePrice` con un `y_scaler` ajustado solo en train.\n- Si `use_district`, cada entrada pasa a ser una lista `[X_dense, build_district_idx(...)]` para las dos ramas del modelo.\n- Fija `SEED`, entrena con `batch_size=32` y desescala las predicciones con `inverse_transform` antes de medir.",
+   "proposito": "Es el banco de pruebas del Milestone 3: el mismo procedimiento para todas las variantes, así la única diferencia entre filas de la tabla es qué columnas entran y cómo se codifican.",
+   "interaccion": "La llaman la celda 36 (`v1_state`, `v2_district`, `v3_full`) y la celda 40 (trampa con `district_int=True`). Consume `build_dense_features`, `build_district_idx` y `build_model_categorical` (misma celda) y los encoders de la celda 34.",
+   "teoria": "Materializa la idea de que la red solo ve una fila de números: la arquitectura queda fija y lo que cambia es la codificación de la entrada."
+  },
+  {
    "id": "variantes-incrementales",
-   "titulo": "Aporte incremental de cada bloque de columnas (celda 27)",
+   "titulo": "Aporte incremental de cada bloque de columnas (celda 36)",
    "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
    "desde": 1,
    "hasta": 13,
    "lenguaje": "python",
    "codigo": "v1_state = train_categorical_variant(use_state=True, use_district=False, use_housestyle=False,\n                                      use_centralair=False, use_salecondition=False, cyclical_month=False)\nv2_district = train_categorical_variant(use_state=True, use_district=True, use_housestyle=False,\n                                         use_centralair=False, use_salecondition=False, cyclical_month=False)\nv3_full = train_categorical_variant(use_state=True, use_district=True, use_housestyle=True,\n                                     use_centralair=True, use_salecondition=True, cyclical_month=True)\n\nprint(f\"{'Modelo':40} {'MAE':>12} {'RMSE':>12} {'MAPE %':>8}\")\nprint(\"-\" * 76)\nprint(f\"{'Solo numérico (Milestone 2)':40} {baseline['mae']:12,.0f} {baseline['rmse']:12,.0f} {baseline['mape']:8.2f}\")\nprint(f\"{'+ State (one-hot)':40} {v1_state['mae']:12,.0f} {v1_state['rmse']:12,.0f} {v1_state['mape']:8.2f}\")\nprint(f\"{'+ District (embedding)':40} {v2_district['mae']:12,.0f} {v2_district['rmse']:12,.0f} {v2_district['mape']:8.2f}\")\nprint(f\"{'+ resto categóricas + mes cíclico':40} {v3_full['mae']:12,.0f} {v3_full['rmse']:12,.0f} {v3_full['mape']:8.2f}\")",
    "que_hace": "Entrena tres modelos sumando bloques de a uno y tabula MAE, RMSE y MAPE contra el baseline numérico.",
-   "como_funciona": "- `v1_state`: numéricas + `State` one-hot.\n- `v2_district`: + `District` por embedding.\n- `v3_full`: + `HouseStyle`, `CentralAir`, `SaleCondition` y mes cíclico.\n- Imprime la tabla: MAE $51.411 → $30.956 → $25.380 → $20.844.",
-   "proposito": "Muestra que con la misma red 32-32 la mejora vino de la entrada, no de la arquitectura. Ojo: la comparación se hace con métricas de test; en rigor elegir entre variantes es trabajo de validación.",
-   "interaccion": "Usa `train_categorical_variant` (celda 26) y `baseline` (celda 11). `v3_full` es la referencia para la trampa de District (celda 31) y para el Milestone 4.",
+   "como_funciona": "- `v1_state`: numéricas + `State` one-hot → MAE $30.011 (−41,1%).\n- `v2_district`: + `District` por embedding → $23.791 (−20,7%).\n- `v3_full`: + `HouseStyle`, `CentralAir`, `SaleCondition` y mes cíclico → $24.923 (+4,8% vs el anterior).\n- Imprime la tabla desde $50.940 del baseline; el resto de la celda calcula las variaciones relativas (−51,1% de MAE del completo contra el baseline).",
+   "proposito": "Muestra que con la misma red 32-32 la mejora vino de la entrada, no de la arquitectura: casi todo lo aportó la ubicación. Ojo: la comparación se hace con métricas de test; en rigor elegir entre variantes es trabajo de validación.",
+   "interaccion": "Usa `train_categorical_variant` (celda 35) y `baseline` (celda 23). `v3_full` es la referencia para la trampa de District (celda 40) y para el Milestone 4.",
    "teoria": "El modelo se gana en la entrada y la salida, no en las capas."
   },
   {
    "id": "district-entero-trampa",
-   "titulo": "District como entero 0–71: la trampa a propósito (celda 31)",
+   "titulo": "District como entero 0–71: la trampa a propósito (celda 40)",
    "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
    "desde": 1,
    "hasta": 8,
    "lenguaje": "python",
    "codigo": "v_district_trap = train_categorical_variant(use_state=True, use_district=False, use_housestyle=True,\n                                             use_centralair=True, use_salecondition=True,\n                                             cyclical_month=True, district_int=True)\n\nprint(f\"{'Modelo':40} {'MAE':>12} {'RMSE':>12} {'MAPE %':>8}\")\nprint(\"-\" * 76)\nprint(f\"{'District como embedding (correcto)':40} {v3_full['mae']:12,.0f} {v3_full['rmse']:12,.0f} {v3_full['mape']:8.2f}\")\nprint(f\"{'District como entero 0-71 (trampa)':40} {v_district_trap['mae']:12,.0f} {v_district_trap['rmse']:12,.0f} {v_district_trap['mape']:8.2f}\")",
    "que_hace": "Entrena el modelo completo pero con `District` como un entero plano escalado en vez de embedding, y lo compara con `v3_full`.",
-   "como_funciona": "- `use_district=False` apaga la rama de embedding.\n- `district_int=True` hace que `build_dense_features` meta el índice como una numérica más.\n- Imprime ambas filas: MAE $20.844 (embedding) vs $25.856 (entero).",
-   "proposito": "Responde la Pregunta 2: como entero, la red asume que el distrito 40 está \"entre\" el 39 y el 41 y que la distancia importa. Entrena sin error, pero el error sube 24%.",
-   "interaccion": "Reusa `train_categorical_variant` y compara contra `v3_full` de la celda 27.",
+   "como_funciona": "- `use_district=False` apaga la rama de embedding.\n- `district_int=True` hace que `build_dense_features` meta el índice como una numérica más.\n- Imprime ambas filas: MAE $24.923 (embedding) vs $28.842 (entero); RMSE $31.351 vs $38.441.",
+   "proposito": "Responde la Pregunta 2: como entero, la red asume que el distrito 40 está \"entre\" el 39 y el 41 y que la distancia importa, cuando el índice es alfabético. Entrena sin error, pero el MAE sube 15,7% y el RMSE 22,6%.",
+   "interaccion": "Reusa `train_categorical_variant` (celda 35) y compara contra `v3_full` de la celda 36; la interpretación está en la celda 41.",
    "teoria": "Error de codificación caro: código nominal tratado como número."
   },
   {
+   "id": "features-milestone4",
+   "titulo": "Entradas del Milestone 4: mismo vector del modelo completo (celda 43)",
+   "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
+   "desde": 1,
+   "hasta": 17,
+   "lenguaje": "python",
+   "codigo": "from keras.layers import Dropout\nfrom keras import regularizers\nfrom keras.callbacks import EarlyStopping\n\n# Mismo feature set que el modelo completo del Milestone 3 (fit_scaler solo en train).\nX4_train, scaler4 = build_dense_features(df_train, lotfrontage_median, True, True, True, True, True, fit_scaler=True)\nX4_val, _ = build_dense_features(df_val, lotfrontage_median, True, True, True, True, True, scaler=scaler4)\nX4_test, _ = build_dense_features(df_test, lotfrontage_median, True, True, True, True, True, scaler=scaler4)\n\nd4_train, d4_val, d4_test = build_district_idx(df_train), build_district_idx(df_val), build_district_idx(df_test)\n\ny4_train_raw = df_train[TARGET].to_numpy(dtype=float)\ny4_val_raw = df_val[TARGET].to_numpy(dtype=float)\ny4_test_raw = df_test[TARGET].to_numpy(dtype=float)\ny4_scaler = StandardScaler().fit(y4_train_raw.reshape(-1, 1))\ny4_train = y4_scaler.transform(y4_train_raw.reshape(-1, 1)).ravel()\ny4_val = y4_scaler.transform(y4_val_raw.reshape(-1, 1)).ravel()",
+   "que_hace": "Construye una vez los tensores `X4_*` (features densas), `d4_*` (índices de distrito) e `y4_*` (target escalado) que usan la red grande, la regularizada y el modelo de cuantiles.",
+   "como_funciona": "- Llama a `build_dense_features` con todas las opciones en `True`, ajustando `scaler4` solo con `df_train`.\n- `build_district_idx` convierte cada `District` en el índice que va al `Embedding`.\n- `y4_scaler` se ajusta con el precio de train y transforma train y val.",
+   "proposito": "Fija el mismo conjunto de features del modelo completo del Milestone 3 para que la comparación del Milestone 4 aísle el efecto del tamaño y la regularización. `scaler4` e `y4_scaler` son además los objetos \"de producción\" que reutiliza el M5.",
+   "interaccion": "Sus salidas las consumen `model_overfit.fit` (misma celda), `model_regularized.fit` (celda 46), la comparación en dólares (celda 47), `predict_house_price` (celda 50) y el modelo de cuantiles (celdas 54 y 56).",
+   "teoria": "Entrada de largo fijo, ajustada solo en train: el preprocesamiento queda separado de la arquitectura que se está probando."
+  },
+  {
    "id": "modelo-grande-512",
-   "titulo": "Red 512-512-512 sobredimensionada y configurable (celda 34)",
+   "titulo": "Red 512-512-512 sobredimensionada y configurable (celda 43)",
    "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
    "desde": 19,
    "hasta": 42,
    "lenguaje": "python",
    "codigo": "def build_big_model(n_dense, district_vocab_size, embed_dim=8, units=(512, 512, 512),\n                     l2=0.0, dropout=0.0):\n    dense_input = Input(shape=(n_dense,), name='dense_features')\n    district_input = Input(shape=(1,), name='district_idx')\n    embed = Embedding(input_dim=district_vocab_size, output_dim=embed_dim, name='district_embedding')(district_input)\n    embed = Flatten()(embed)\n    x = Concatenate()([dense_input, embed])\n    reg = regularizers.l2(l2) if l2 > 0 else None\n    for units_in_layer in units:\n        x = Dense(units_in_layer, activation='relu', kernel_regularizer=reg)(x)\n        if dropout > 0:\n            x = Dropout(dropout)(x)\n    output = Dense(1, activation='linear')(x)\n    model = Model(inputs=[dense_input, district_input], outputs=output)\n    model.compile(optimizer='adam', loss='mse', metrics=['mae'])\n    return model\n\nkeras.utils.set_random_seed(SEED)\nmodel_overfit = build_big_model(X4_train.shape[1], DISTRICT_VOCAB_SIZE)\nprint(f\"Parámetros del modelo sobredimensionado: {model_overfit.count_params():,}\"\n      f\"  (contra {X4_train.shape[0]} casas de entrenamiento)\")\n\nhist_overfit = model_overfit.fit([X4_train, d4_train], y4_train, batch_size=32, epochs=150,\n                                  validation_data=([X4_val, d4_val], y4_val), verbose=0)",
    "que_hace": "Define `build_big_model` (embedding + capas anchas con L2 y dropout opcionales) y entrena la versión sin regularizar durante 150 épocas.",
-   "como_funciona": "1. Misma entrada doble que el Milestone 3 (`dense_features` + `district_idx` → `Embedding` → `Flatten` → `Concatenate`).\n2. `reg = regularizers.l2(l2)` si `l2 > 0`; se pasa como `kernel_regularizer` a cada `Dense(units_in_layer, relu)`.\n3. Si `dropout > 0` agrega `Dropout(dropout)` tras cada capa.\n4. `model_overfit` usa los defaults (sin L2 ni dropout); `count_params()` imprime 550.985 parámetros contra 1022 casas.\n5. `fit` 150 épocas sin callbacks.",
+   "como_funciona": "1. Misma entrada doble que el Milestone 3 (`dense_features` + `district_idx` → `Embedding` → `Flatten` → `Concatenate`).\n2. `reg = regularizers.l2(l2)` si `l2 > 0`; se pasa como `kernel_regularizer` a cada `Dense(units_in_layer, relu)`.\n3. Si `dropout > 0` agrega `Dropout(dropout)` tras cada capa.\n4. `model_overfit` usa los defaults (sin L2 ni dropout); `count_params()` imprime 550.473 parámetros contra 1022 casas.\n5. `fit` 150 épocas sin callbacks.",
    "proposito": "Overfitear a propósito para ver el problema en las curvas: ancho ×16 respecto del 32-32 (unos 540 parámetros por casa). Ancho, L2 y dropout son hiperparámetros que se fijan antes de entrenar.",
-   "interaccion": "Usa `X4_train`/`d4_train` armados al inicio de la celda con `build_dense_features`. La misma función se reutiliza en la celda 37 con `l2=0.001, dropout=0.3`.",
+   "interaccion": "Usa `X4_train`/`d4_train` armados al inicio de la celda con `build_dense_features`. La misma función se reutiliza en la celda 46 con `l2=0.001, dropout=0.3`, y ese modelo regularizado es el que usa el M5.",
    "teoria": "Ancho y profundidad, parámetros vs hiperparámetros y la función objetivo $J=\\text{cost}+\\lambda R(w)$."
   },
   {
+   "id": "curva-overfit",
+   "titulo": "Curva y diagnóstico de la red sobredimensionada (celda 44)",
+   "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
+   "desde": 1,
+   "hasta": 12,
+   "lenguaje": "python",
+   "codigo": "plt.plot(hist_overfit.history['loss'])\nplt.plot(hist_overfit.history['val_loss'])\nplt.title('Modelo sobredimensionado (sin regularizar) — pérdida')\nplt.ylabel('Loss')\nplt.xlabel('Epoch')\nplt.legend(['Train', 'Val'], loc='upper right')\nplt.show()\n\nmin_val_epoch = int(np.argmin(hist_overfit.history['val_loss']))\nprint(f\"val_loss mínimo en la época {min_val_epoch}: {min(hist_overfit.history['val_loss']):.4f}\")\nprint(f\"val_loss final (época {len(hist_overfit.history['val_loss']) - 1}): {hist_overfit.history['val_loss'][-1]:.4f}\")\nprint(f\"train_loss final: {hist_overfit.history['loss'][-1]:.4f}\")",
+   "que_hace": "Grafica `loss` y `val_loss` de `hist_overfit` e imprime en qué época `val_loss` fue mínima y cómo terminaron ambas pérdidas.",
+   "como_funciona": "- `plt.plot` de las dos series del historial.\n- `np.argmin(hist_overfit.history['val_loss'])` ubica la mejor época de validación: la 7, con 0,0717.\n- Compara ese mínimo con el `val_loss` final (0,1435) y el `train_loss` final (0,0375).",
+   "proposito": "Es la evidencia del sobreajuste: el train sigue bajando mientras validación sube desde la época 7, lo que justifica regularizar y cortar antes.",
+   "interaccion": "Lee `hist_overfit` de la celda 43; motiva la celda 46 (L2, Dropout y `EarlyStopping` con `patience=15`), cuyo resultado se compara en la celda 47.",
+   "teoria": "Diagnóstico de overfitting: brecha creciente entre la pérdida de entrenamiento y la de validación."
+  },
+  {
    "id": "regularizado-early-stopping",
-   "titulo": "L2 0,001 + Dropout 0,3 + EarlyStopping (celda 37)",
+   "titulo": "L2 0,001 + Dropout 0,3 + EarlyStopping (celda 46)",
    "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
    "desde": 1,
    "hasta": 11,
    "lenguaje": "python",
    "codigo": "keras.utils.set_random_seed(SEED)\nmodel_regularized = build_big_model(X4_train.shape[1], DISTRICT_VOCAB_SIZE, l2=0.001, dropout=0.3)\n\nearly_stopping = EarlyStopping(monitor='val_loss', patience=15, restore_best_weights=True)\n\nhist_regularized = model_regularized.fit(\n    [X4_train, d4_train], y4_train, batch_size=32, epochs=150,\n    validation_data=([X4_val, d4_val], y4_val), callbacks=[early_stopping], verbose=0)\n\nprint(f\"Entrenó {len(hist_regularized.history['loss'])} épocas \"\n      f\"(de las 150 posibles) antes de que early stopping cortara.\")",
    "que_hace": "Entrena la misma red 512-512-512 pero regularizada y con early stopping sobre `val_loss`.",
-   "como_funciona": "- `build_big_model(..., l2=0.001, dropout=0.3)`.\n- `EarlyStopping(monitor='val_loss', patience=15, restore_best_weights=True)` corta si la validación no mejora en 15 épocas y restaura los mejores pesos.\n- `fit` con `batch_size=32`, hasta 150 épocas; imprime cuántas corrió (76).",
-   "proposito": "Combina tres frenos al sobreajuste: L2 achica pesos, dropout apaga neuronas al azar en entrenamiento y early stopping usa la validación para decidir cuándo parar.",
-   "interaccion": "Usa `build_big_model` y los tensores de la celda 34; sus curvas y métricas se comparan con `model_overfit` en la celda 38.",
+   "como_funciona": "- `build_big_model(..., l2=0.001, dropout=0.3)`.\n- `EarlyStopping(monitor='val_loss', patience=15, restore_best_weights=True)` corta si la validación no mejora en 15 épocas y restaura los mejores pesos.\n- `fit` con `batch_size=32`, hasta 150 épocas; imprime cuántas corrió (81).",
+   "proposito": "Combina tres frenos al sobreajuste: L2 achica pesos, dropout apaga neuronas al azar en entrenamiento y early stopping usa la validación para decidir cuándo parar. Este `model_regularized` quedó como modelo final del TP.",
+   "interaccion": "Usa `build_big_model` y los tensores de la celda 43; sus métricas se comparan con `model_overfit` en la celda 47 y es el modelo por defecto de `predict_house_price` (celda 50).",
    "teoria": "Regularización y lectura de la curva train vs val; ciclo forward/backward por épocas y lotes."
   },
   {
    "id": "comparar-overfit-regularizado",
-   "titulo": "Sobredimensionado vs regularizado en dólares (celda 38)",
+   "titulo": "Sobredimensionado vs regularizado en dólares (celda 47)",
    "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
    "desde": 9,
    "hasta": 22,
    "lenguaje": "python",
    "codigo": "y_pred_overfit = y4_scaler.inverse_transform(model_overfit.predict([X4_test, d4_test], verbose=0)).ravel()\ny_pred_regularized = y4_scaler.inverse_transform(model_regularized.predict([X4_test, d4_test], verbose=0)).ravel()\n\nmae_overfit = mean_absolute_error(y4_test_raw, y_pred_overfit)\nrmse_overfit = np.sqrt(mean_squared_error(y4_test_raw, y_pred_overfit))\nmae_regularized = mean_absolute_error(y4_test_raw, y_pred_regularized)\nrmse_regularized = np.sqrt(mean_squared_error(y4_test_raw, y_pred_regularized))\n\nprint(f\"{'Modelo':30} {'MAE':>12} {'RMSE':>12} {'train_loss final':>18} {'val_loss final':>16}\")\nprint(\"-\" * 92)\nprint(f\"{'Sobredimensionado':30} {mae_overfit:12,.0f} {rmse_overfit:12,.0f} \"\n      f\"{hist_overfit.history['loss'][-1]:18.4f} {hist_overfit.history['val_loss'][-1]:16.4f}\")\nprint(f\"{'Regularizado':30} {mae_regularized:12,.0f} {rmse_regularized:12,.0f} \"\n      f\"{hist_regularized.history['loss'][-1]:18.4f} {hist_regularized.history['val_loss'][-1]:16.4f}\")",
    "que_hace": "Predice test con ambos modelos grandes, desescala a dólares y tabula MAE, RMSE y las losses finales de train y val.",
-   "como_funciona": "- `y4_scaler.inverse_transform` vuelve las predicciones a dólares.\n- Calcula `mae_*` y `rmse_*` para `model_overfit` y `model_regularized`.\n- Imprime `train_loss` y `val_loss` finales: el sobredimensionado termina con train 0,0121 y val 0,1273; el regularizado baja el MAE a $16.538.",
-   "proposito": "Es la evidencia numérica del Milestone 4: la brecha train/val del modelo grande es memorización y la regularización la cierra.",
-   "interaccion": "Consume `model_overfit`/`hist_overfit` (celda 34) y `model_regularized`/`hist_regularized` (celda 37).",
-   "teoria": "Overfitting: train baja y val sube; la curva se lee para diagnosticar."
+   "como_funciona": "- `y4_scaler.inverse_transform` vuelve las predicciones a dólares.\n- Calcula `mae_*` y `rmse_*` para `model_overfit` y `model_regularized`.\n- Sobredimensionado: MAE $19.214, RMSE $28.433. Regularizado: MAE $19.481, RMSE $25.672.\n- Las losses finales del regularizado (0,1142 / 0,1790) incluyen el término L2, así que no se comparan directo con las del otro.",
+   "proposito": "Es la evidencia numérica del Milestone 4: la regularización baja el RMSE 9,7% (menos errores grandes) aunque el MAE sube 1,4%. Por ese equilibrio, y porque mejora al 32-32 del M3 en ambas métricas, se eligió como modelo final.",
+   "interaccion": "Consume `model_overfit`/`hist_overfit` (celda 43) y `model_regularized`/`hist_regularized` (celda 46); la conclusión escrita está en la celda 48.",
+   "teoria": "Overfitting: train baja y val sube; regularizar cambia el balance entre error típico y errores grandes."
+  },
+  {
+   "id": "m5-pipeline",
+   "titulo": "Milestone 5: de casa escrita a mano a precio en dólares (celda 50)",
+   "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
+   "desde": 31,
+   "hasta": 60,
+   "lenguaje": "python",
+   "codigo": "def human_house_frame(house_like):\n    \"\"\"Normaliza un dict/DataFrame humano al esquema crudo que espera el preprocesador.\"\"\"\n    if isinstance(house_like, dict):\n        frame = pd.DataFrame([house_like])\n    elif isinstance(house_like, pd.DataFrame):\n        frame = house_like.copy()\n    else:\n        raise TypeError('La casa debe venir como dict o como pandas.DataFrame.')\n\n    for col, default in HOUSE_DEFAULTS.items():\n        if col not in frame.columns:\n            frame[col] = default\n    return frame[RAW_FEATURE_COLS].copy()\n\ndef preprocess_house_for_final_model(house_like):\n    \"\"\"Convierte una casa humana en los dos inputs del modelo regularizado del Milestone 4.\"\"\"\n    frame = human_house_frame(house_like)\n    dense_features, _ = build_dense_features(\n        frame, lotfrontage_median,\n        use_state=True, use_housestyle=True, use_centralair=True,\n        use_salecondition=True, cyclical_month=True,\n        scaler=scaler4, fit_scaler=False\n    )\n    district_features = build_district_idx(frame)\n    return [dense_features, district_features]\n\ndef predict_house_price(house_like, model=model_regularized):\n    \"\"\"Devuelve predicciones en dólares, deshaciendo el escalado del target.\"\"\"\n    prediction_scaled = model.predict(preprocess_house_for_final_model(house_like), verbose=0)\n    return y4_scaler.inverse_transform(prediction_scaled).ravel()",
+   "que_hace": "Define el contrato de entrada \"humano\" del modelo final: una casa como `dict` o `DataFrame` se normaliza, se preprocesa con los objetos ajustados en train y se predice en dólares.",
+   "como_funciona": "1. `human_house_frame` acepta `dict` o `DataFrame`, completa las columnas que falten con `HOUSE_DEFAULTS` (medianas y modas de `df_train`) y ordena según `RAW_FEATURE_COLS`.\n2. `preprocess_house_for_final_model` llama a `build_dense_features` con `scaler=scaler4, fit_scaler=False` y a `build_district_idx`: devuelve los dos inputs `[dense, district]`.\n3. `predict_house_price` corre `model.predict` (por defecto `model_regularized`) y deshace el escalado con `y4_scaler.inverse_transform`.",
+   "proposito": "Cumple el criterio del M5: nadie arma un vector escalado a mano. Nada se reajusta: mediana, `scaler4`, encoders, `district_to_idx` e `y4_scaler` son los de train, así que no hay leakage. Ojo para la defensa: el preprocesamiento viaja como funciones de Python que envuelven al modelo, no como capas de preprocesamiento dentro del grafo de Keras.",
+   "interaccion": "Reutiliza `build_dense_features`/`build_district_idx` (celda 35), los encoders (celda 34), `scaler4`/`y4_scaler` (celda 43) y `model_regularized` (celda 46). Lo llaman la casa inventada (misma celda) y la prueba de sensibilidad a `State` (celda 52).",
+   "teoria": "El modelo no son solo los pesos: el preprocesamiento aprendido en train es parte del modelo y tiene que aplicarse igual al predecir."
+  },
+  {
+   "id": "m5-casa-inventada",
+   "titulo": "La casa inventada y su tasación (celda 50)",
+   "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
+   "desde": 62,
+   "hasta": 85,
+   "lenguaje": "python",
+   "codigo": "casa_inventada = {\n    'LotArea': 9800,\n    'OverallQual': 7,\n    'OverallCond': 6,\n    'TotalBsmtSF': 1100,\n    'FullBath': 2,\n    'HalfBath': 1,\n    'BedroomAbvGr': 3,\n    'TotRmsAbvGrd': 7,\n    'Fireplaces': 1,\n    'GarageArea': 520,\n    'YearBuilt': 2005,\n    'LotFrontage': 72,\n    'MonthSold': 6,\n    'State': 'CA',\n    'District': 'Greenfield',\n    'HouseStyle': '2Story',\n    'SaleCondition': 'Normal',\n    'CentralAir': 'Y',\n}\n\nprecio_casa = predict_house_price(casa_inventada)[0]\nprint(f\"Precio estimado para la casa inventada: ${precio_casa:,.0f}\")\ndisplay(human_house_frame(casa_inventada))",
+   "que_hace": "Describe una casa como la escribiría una persona y le pide el precio al pipeline del M5.",
+   "como_funciona": "- `casa_inventada` es un `dict` con valores legibles: `OverallQual=7`, `State='CA'`, `District='Greenfield'`, `HouseStyle='2Story'`, `CentralAir='Y'`, `MonthSold=6`…\n- `predict_house_price(casa_inventada)[0]` devuelve el precio: **$482.971**.\n- `display(human_house_frame(...))` muestra la fila cruda que entra al preprocesamiento.",
+   "proposito": "Es la prueba de uso del M5: la entrada son categorías y números crudos (strings incluidos), no un tensor. Si faltara un campo, `HOUSE_DEFAULTS` lo completaría con un valor de train.",
+   "interaccion": "Usa `predict_house_price` y `human_house_frame` (misma celda). El mismo diccionario es la base de la prueba de sensibilidad de la celda 52.",
+   "teoria": "Inferencia: misma transformación de entrada que en entrenamiento, y salida desescalada a la unidad del problema."
+  },
+  {
+   "id": "m5-sensibilidad-state",
+   "titulo": "Misma casa, cambiando solo State (celda 52)",
+   "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
+   "desde": 8,
+   "hasta": 40,
+   "lenguaje": "python",
+   "codigo": "state_rows = []\nfor state in sorted(df_train['State'].unique()):\n    casa_state = {**casa_inventada, 'State': state}\n    state_rows.append({\n        'State': state,\n        'Precio predicho': predict_house_price(casa_state)[0],\n    })\n\nstate_effect = pd.DataFrame(state_rows).merge(state_reference, on='State')\nbase_prediction = state_effect.loc[state_effect['State'] == casa_inventada['State'], 'Precio predicho'].iloc[0]\nstate_effect['Diferencia vs CA'] = state_effect['Precio predicho'] - base_prediction\nstate_effect = state_effect.sort_values('Precio predicho', ascending=False)\n\ndisplay(state_effect.style.format({\n    'Precio predicho': '${:,.0f}',\n    'Mediana train por State': '${:,.0f}',\n    'Diferencia vs CA': '${:+,.0f}',\n}))\n\nplt.figure(figsize=(10, 4))\nplt.bar(state_effect['State'], state_effect['Precio predicho'])\nplt.axhline(base_prediction, color='black', linestyle='--', linewidth=1, label='Predicción con CA')\nplt.title('Misma casa inventada, cambiando únicamente State')\nplt.ylabel('Precio predicho en dólares')\nplt.xlabel('State')\nplt.legend()\nplt.xticks(rotation=45)\nplt.tight_layout()\nplt.show()\n\ncorr_state = state_effect['Precio predicho'].corr(state_effect['Mediana train por State'])\nprint(f\"Correlación entre predicción por State y mediana histórica de train: {corr_state:.3f}\")\nprint(\"El precio cambia aunque todas las demás variables quedan fijas: el pipeline empaquetado conserva el efecto aprendido de State.\")",
+   "que_hace": "Tasa la casa inventada una vez por cada estado de train, dejando todo lo demás fijo, y compara las predicciones con la mediana histórica de precio por estado.",
+   "como_funciona": "- Para cada `state`, `{**casa_inventada, 'State': state}` cambia un solo campo y llama a `predict_house_price`.\n- `state_effect` une la predicción con `state_reference` (mediana de `SalePrice` por estado en `df_train`) y calcula la diferencia contra CA.\n- Grafica las barras con una línea en la predicción con CA.\n- `corr_state` correlaciona predicción y mediana histórica: 0,966.",
+   "proposito": "Es el segundo criterio del M5: cambiar solo el estado mueve el precio en la dirección esperada. La alta correlación con las medianas de train muestra que el one-hot de `State` llega bien al modelo; el markdown aclara que no se lo interpreta como causalidad.",
+   "interaccion": "Usa `casa_inventada` y `predict_house_price` (celda 50) y `df_train` (celda 8). Verifica de punta a punta el `state_encoder` de la celda 34.",
+   "teoria": "One-hot de una categórica nominal: cada estado activa su propia columna y la red aprende un efecto por estado."
+  },
+  {
+   "id": "pinball-loss",
+   "titulo": "Pinball loss y orden P10 ≤ P50 ≤ P90 con softplus (celda 54)",
+   "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
+   "desde": 1,
+   "hasta": 15,
+   "lenguaje": "python",
+   "codigo": "import tensorflow as tf\nfrom keras.layers import Lambda\n\nQUANTILES = tf.constant([0.10, 0.50, 0.90], dtype=tf.float32)\n\ndef pinball_loss(y_true, y_pred):\n    y_true = tf.cast(tf.expand_dims(y_true, axis=-1), tf.float32)\n    error = y_true - tf.cast(y_pred, tf.float32)\n    return tf.reduce_mean(tf.maximum(QUANTILES * error, (QUANTILES - 1.0) * error))\n\ndef enforce_order(raw_quantiles):\n    q10 = raw_quantiles[:, 0:1]\n    q50 = q10 + tf.nn.softplus(raw_quantiles[:, 1:2])\n    q90 = q50 + tf.nn.softplus(raw_quantiles[:, 2:3])\n    return tf.concat([q10, q50, q90], axis=1)",
+   "que_hace": "Define la pérdida pinball para tres cuantiles a la vez (0,10, 0,50 y 0,90) y una función que garantiza que los tres percentiles predichos no se crucen.",
+   "como_funciona": "1. `QUANTILES = [0.10, 0.50, 0.90]`.\n2. `pinball_loss`: `error = y_true - y_pred` (con `expand_dims` para comparar el precio real contra las 3 salidas) y `tf.maximum(q * error, (q - 1) * error)`, promediado.\n3. Si el real queda por encima (error > 0) cuesta `q·error`; si queda por debajo, `(1−q)·|error|`: para P10 sobreestimar sale caro, para P90 subestimar sale caro.\n4. `enforce_order`: `q10` es la salida cruda, `q50 = q10 + softplus(...)` y `q90 = q50 + softplus(...)`; como softplus > 0, el orden queda garantizado.",
+   "proposito": "La asimetría de la pinball es lo que hace que cada salida aprenda un percentil y no la media. El orden se fuerza en la arquitectura en vez de corregir cruces a mano después de predecir.",
+   "interaccion": "`pinball_loss` es la loss de `build_quantile_model` y `enforce_order` va dentro de su capa `Lambda` (misma celda). En la celda 56 se reimplementa en NumPy (`pinball_loss_np`) para reportarla en dólares.",
+   "teoria": "Pinball (quantile) loss: $L_q=\\max(q\\,e,(q-1)\\,e)$; con $q=0{,}5$ es la mitad del MAE y apunta a la mediana."
+  },
+  {
+   "id": "quantile-model",
+   "titulo": "Red de cuantiles 128-64-32 con tres salidas (celda 54)",
+   "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
+   "desde": 17,
+   "hasta": 45,
+   "lenguaje": "python",
+   "codigo": "def build_quantile_model(n_dense, district_vocab_size, embed_dim=8, l2=0.001, dropout=0.2):\n    dense_input = Input(shape=(n_dense,), name='dense_features')\n    district_input = Input(shape=(1,), name='district_idx')\n    embed = Embedding(input_dim=district_vocab_size, output_dim=embed_dim, name='district_embedding')(district_input)\n    embed = Flatten()(embed)\n    x = Concatenate()([dense_input, embed])\n    reg = regularizers.l2(l2)\n    for units_in_layer in (128, 64, 32):\n        x = Dense(units_in_layer, activation='relu', kernel_regularizer=reg)(x)\n        x = Dropout(dropout)(x)\n    raw_output = Dense(3, activation='linear', name='raw_quantiles')(x)\n    ordered_output = Lambda(enforce_order, name='ordered_quantiles')(raw_output)\n    model = Model(inputs=[dense_input, district_input], outputs=ordered_output)\n    model.compile(optimizer='adam', loss=pinball_loss)\n    return model\n\nkeras.utils.set_random_seed(SEED)\nquantile_model = build_quantile_model(X4_train.shape[1], DISTRICT_VOCAB_SIZE)\nquantile_stop = EarlyStopping(monitor='val_loss', patience=20, restore_best_weights=True)\nhist_quantile = quantile_model.fit(\n    [X4_train, d4_train], y4_train,\n    batch_size=32, epochs=220,\n    validation_data=([X4_val, d4_val], y4_val),\n    callbacks=[quantile_stop], verbose=0\n)\n\nprint(f\"Entrenó {len(hist_quantile.history['loss'])} épocas para cuantiles.\")\nprint(f\"Pinball loss final train: {hist_quantile.history['loss'][-1]:.4f}\")\nprint(f\"Pinball loss final val:   {hist_quantile.history['val_loss'][-1]:.4f}\")",
+   "que_hace": "Construye y entrena una red con la misma entrada doble del M4 pero tres salidas (P10, P50, P90), entrenada con pinball loss y early stopping.",
+   "como_funciona": "- Misma entrada que el M4: `dense_features` + `district_idx` → `Embedding` → `Flatten` → `Concatenate`.\n- Tronco `Dense(128)` → `Dense(64)` → `Dense(32)`, cada una con ReLU, L2 0,001 y `Dropout(0.2)`.\n- `Dense(3, activation='linear')` da los cuantiles crudos y `Lambda(enforce_order)` los ordena.\n- `compile(optimizer='adam', loss=pinball_loss)`; `EarlyStopping(patience=20, restore_best_weights=True)`, hasta 220 épocas: cortó en 106 (pinball final train 0,0640, val 0,0815).",
+   "proposito": "Cambia la salida y la loss, no la entrada: así la tasación pasa de un punto a un rango. Es una red más chica que la 512-512-512 porque solo tiene que aprender tres percentiles sobre las mismas features.",
+   "interaccion": "Reusa `X4_*`, `d4_*`, `y4_*` y `DISTRICT_VOCAB_SIZE` (celdas 34 y 43). `quantile_model` se evalúa en test en la celda 56 y sus curvas se grafican en la celda 55.",
+   "teoria": "La loss define qué aprende la red: con MSE la media, con pinball un percentil; varias salidas comparten el mismo tronco."
+  },
+  {
+   "id": "quantile-eval",
+   "titulo": "Cobertura P10–P90 y pinball en test (celda 56)",
+   "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
+   "desde": 1,
+   "hasta": 25,
+   "lenguaje": "python",
+   "codigo": "quantiles_scaled = quantile_model.predict([X4_test, d4_test], verbose=0)\nquantiles_pred = y4_scaler.inverse_transform(quantiles_scaled.reshape(-1, 1)).reshape(-1, 3)\np10, p50, p90 = quantiles_pred[:, 0], quantiles_pred[:, 1], quantiles_pred[:, 2]\n\ncoverage_p10_p90 = np.mean((y4_test_raw >= p10) & (y4_test_raw <= p90))\nmedian_mae = mean_absolute_error(y4_test_raw, p50)\ninterval_width = np.mean(p90 - p10)\n\ndef pinball_loss_np(y_true, y_pred, quantile):\n    error = y_true - y_pred\n    return np.mean(np.maximum(quantile * error, (quantile - 1) * error))\n\nquantile_report = pd.DataFrame({\n    'Cuantil': ['P10', 'P50', 'P90'],\n    'Pinball loss en test ($)': [\n        pinball_loss_np(y4_test_raw, p10, 0.10),\n        pinball_loss_np(y4_test_raw, p50, 0.50),\n        pinball_loss_np(y4_test_raw, p90, 0.90),\n    ]\n})\n\nprint(f\"Cobertura del intervalo P10-P90 en test: {coverage_p10_p90:.1%}\")\nprint(f\"Ancho promedio del intervalo P10-P90: ${interval_width:,.0f}\")\nprint(f\"MAE del P50 contra SalePrice real: ${median_mae:,.0f}\")\ndisplay(quantile_report.style.format({'Pinball loss en test ($)': '${:,.0f}'}))",
+   "que_hace": "Predice los tres cuantiles en test, los pasa a dólares y mide cobertura del intervalo, ancho promedio, MAE del P50 y pinball por cuantil.",
+   "como_funciona": "1. `y4_scaler.inverse_transform` sobre `quantiles_scaled.reshape(-1, 1)` y vuelta a `(-1, 3)`: separa `p10`, `p50`, `p90` en dólares.\n2. `coverage_p10_p90`: fracción de casas cuyo precio real cae entre P10 y P90 → **82,2%** (lo esperado es 80%).\n3. `interval_width`: ancho promedio del rango → **$53.090**.\n4. `median_mae`: MAE del P50 → **$15.006**.\n5. `pinball_loss_np` reporta la pinball de cada cuantil en dólares.",
+   "proposito": "La cobertura es el criterio de éxito del extra: un intervalo P10–P90 bien calibrado debería contener ~80% de los precios reales. El P50 da un MAE menor que el del modelo final ($19.481), lo esperable porque la pinball con q=0,5 optimiza justamente el error absoluto; es una sola corrida, así que conviene no sobreinterpretarlo.",
+   "interaccion": "Consume `quantile_model` (celda 54) y `X4_test`, `d4_test`, `y4_test_raw` (celda 43). La celda 57 grafica una muestra de 35 casas con su banda P10–P90.",
+   "teoria": "Evaluación de cuantiles: cobertura del intervalo y pinball loss por percentil."
   },
   {
    "id": "clase-sigmoide",
@@ -263,7 +403,7 @@
    "que_hace": "Es el modelo del notebook de clase del que partió el TP: el mismo 32-32 pero con una neurona sigmoide de salida.",
    "como_funciona": "- `Dense(32, relu, input_shape=(10,))` y `Dense(32, relu)` sobre las 10 numéricas escaladas con MinMax.\n- `Dense(1, activation='sigmoid')` devuelve una probabilidad en (0,1) de estar sobre la mediana.",
    "proposito": "Muestra el punto de partida: en el TP2 solo la salida cambió a `linear`, porque una sigmoide acotaría el precio a (0,1).",
-   "interaccion": "En el notebook de clase lo compila la celda 29 con BCE; en el TP2 lo reemplaza `build_baseline_model` (celda 10 del notebook del grupo).",
+   "interaccion": "En el notebook de clase lo compila la celda 29 con BCE; en el TP2 lo reemplaza `build_baseline_model` (celda 14 del notebook del grupo).",
    "teoria": "Sigmoide como activación de salida para probabilidades; el catálogo salida ↔ tarea."
   },
   {
@@ -279,76 +419,6 @@
    "proposito": "Es el contraste directo con el TP2, que pasó a `adam` + `mse` + `mae` porque el objetivo es un real en dólares, donde accuracy no significa nada.",
    "interaccion": "Se aplica al `model` de la celda 25 del notebook de clase y lo entrena la celda 31.",
    "teoria": "Binary cross-entropy para clasificación binaria vs MSE para regresión."
-  },
-  {
-   "id": "mision-m5-pinball",
-   "titulo": "Diseño pendiente: M5 (tasar una casa) y extra P10/P50/P90 (mission.md)",
-   "archivo": "mission.md",
-   "desde": 57,
-   "hasta": 67,
-   "lenguaje": "markdown",
-   "codigo": "### 5. Tasar una casa\n\nPredigan el precio de una casa que inventen ustedes, escrita como la escribiría una persona (`OverallQual=7`, `State='CA'`, `District='Greenfield'`, …), no como un vector escalado a mano.\n\n**Criterio de éxito:** el preprocesamiento es parte del modelo, no un paso suelto del notebook. Cambiar solo el estado y volver a predecir mueve el precio en la dirección esperada.\n\n## Extra: el rango, no el punto\n\nUna tasación de \"esta casa vale 240.000\" es menos útil que \"entre 205.000 y 290.000\". Cambien la salida para que devuelva **P10, P50 y P90** con pinball loss.\n\n**Criterio de éxito:** aproximadamente el 80% de las casas de prueba caen entre P10 y P90.",
-   "que_hace": "Es la consigna de lo que quedó sin hacer: el Milestone 5 (preprocesamiento dentro del modelo) y el extra de pinball loss. No hay código en el notebook para esto.",
-   "como_funciona": "- M5: predecir una casa escrita \"como la escribiría una persona\" (`State='CA'`, `District='Greenfield'`), no un vector escalado a mano.\n- Criterio: el preprocesamiento viaja con el modelo y cambiar solo el estado mueve el precio.\n- Extra: salida P10/P50/P90 con pinball loss, con ~80% de las casas de test entre P10 y P90.",
-   "proposito": "Es diseño, no código: el notebook termina en el Milestone 4. Hoy el scaler, la mediana y los encoders viven sueltos en celdas (celdas 10 y 25), justo lo que el M5 pide cerrar.",
-   "interaccion": "Para implementarlo habría que envolver `prepare_numeric_split`/`build_dense_features`, los encoders y `district_to_idx` en capas de preprocesamiento del modelo, y cambiar la salida a 3 neuronas con pinball.",
-   "teoria": "La loss define qué aprende la red (media, mediana o percentil); el modelo no son solo los pesos."
-  },
-  {
-   "id": "train-categorical-variant",
-   "titulo": "Entrenar una variante: features, índices de distrito y fit (celda 26)",
-   "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
-   "desde": 57,
-   "hasta": 93,
-   "lenguaje": "python",
-   "codigo": "def train_categorical_variant(use_state, use_district, use_housestyle, use_centralair,\n                               use_salecondition, cyclical_month, district_int=False, epochs=100):\n    X_dense_train, scaler = build_dense_features(\n        df_train, lotfrontage_median, use_state, use_housestyle, use_centralair,\n        use_salecondition, cyclical_month, district_int, fit_scaler=True)\n    X_dense_val, _ = build_dense_features(\n        df_val, lotfrontage_median, use_state, use_housestyle, use_centralair,\n        use_salecondition, cyclical_month, district_int, scaler=scaler)\n    X_dense_test, _ = build_dense_features(\n        df_test, lotfrontage_median, use_state, use_housestyle, use_centralair,\n        use_salecondition, cyclical_month, district_int, scaler=scaler)\n\n    y_train_raw = df_train[TARGET].to_numpy(dtype=float)\n    y_val_raw = df_val[TARGET].to_numpy(dtype=float)\n    y_test_raw = df_test[TARGET].to_numpy(dtype=float)\n    y_scaler = StandardScaler().fit(y_train_raw.reshape(-1, 1))\n    y_train = y_scaler.transform(y_train_raw.reshape(-1, 1)).ravel()\n    y_val = y_scaler.transform(y_val_raw.reshape(-1, 1)).ravel()\n\n    if use_district:\n        inputs_train = [X_dense_train, build_district_idx(df_train)]\n        inputs_val = [X_dense_val, build_district_idx(df_val)]\n        inputs_test = [X_dense_test, build_district_idx(df_test)]\n    else:\n        inputs_train, inputs_val, inputs_test = X_dense_train, X_dense_val, X_dense_test\n\n    keras.utils.set_random_seed(SEED)\n    model = build_model_categorical(X_dense_train.shape[1], use_district, DISTRICT_VOCAB_SIZE)\n    hist = model.fit(inputs_train, y_train, batch_size=32, epochs=epochs,\n                      validation_data=(inputs_val, y_val), verbose=0)\n\n    y_pred = y_scaler.inverse_transform(model.predict(inputs_test, verbose=0)).ravel()\n    mae = mean_absolute_error(y_test_raw, y_pred)\n    rmse = np.sqrt(mean_squared_error(y_test_raw, y_pred))\n    mape = 100 * mean_absolute_percentage_error(y_test_raw, y_pred)\n    return {'model': model, 'history': hist, 'mae': mae, 'rmse': rmse, 'mape': mape,\n            'y_test': y_test_raw, 'y_pred': y_pred}",
-   "que_hace": "Arma las entradas de train/val/test para una combinación de columnas, construye la red con `build_model_categorical`, la entrena y devuelve MAE, RMSE y MAPE en dólares sobre test.",
-   "como_funciona": "- Llama tres veces a `build_dense_features`: con `fit_scaler=True` en `df_train` y reusando ese `scaler` en `df_val` y `df_test`.\n- Escala `SalePrice` con un `y_scaler` ajustado solo en train.\n- Si `use_district`, cada entrada pasa a ser una lista `[X_dense, build_district_idx(...)]` para las dos ramas del modelo.\n- Fija `SEED`, entrena con `batch_size=32` y desescala las predicciones con `inverse_transform` antes de medir.",
-   "proposito": "Es el banco de pruebas del Milestone 3: el mismo procedimiento para todas las variantes, así la única diferencia entre filas de la tabla es qué columnas entran y cómo se codifican.",
-   "interaccion": "La llaman la celda 27 (`v1_state`, `v2_district`, `v3_full`) y la celda 31 (trampa con `district_int=True`). Consume `build_dense_features`, `build_district_idx` y `build_model_categorical` (misma celda) y los encoders de la celda 25.",
-   "teoria": "Materializa la idea de que la red solo ve una fila de números: la arquitectura queda fija y lo que cambia es la codificación de la entrada."
-  },
-  {
-   "id": "features-milestone4",
-   "titulo": "Entradas del Milestone 4: mismo vector del modelo completo (celda 34)",
-   "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
-   "desde": 1,
-   "hasta": 17,
-   "lenguaje": "python",
-   "codigo": "from keras.layers import Dropout\nfrom keras import regularizers\nfrom keras.callbacks import EarlyStopping\n\n# Mismo feature set que el modelo completo del Milestone 3 (fit_scaler solo en train).\nX4_train, scaler4 = build_dense_features(df_train, lotfrontage_median, True, True, True, True, True, fit_scaler=True)\nX4_val, _ = build_dense_features(df_val, lotfrontage_median, True, True, True, True, True, scaler=scaler4)\nX4_test, _ = build_dense_features(df_test, lotfrontage_median, True, True, True, True, True, scaler=scaler4)\n\nd4_train, d4_val, d4_test = build_district_idx(df_train), build_district_idx(df_val), build_district_idx(df_test)\n\ny4_train_raw = df_train[TARGET].to_numpy(dtype=float)\ny4_val_raw = df_val[TARGET].to_numpy(dtype=float)\ny4_test_raw = df_test[TARGET].to_numpy(dtype=float)\ny4_scaler = StandardScaler().fit(y4_train_raw.reshape(-1, 1))\ny4_train = y4_scaler.transform(y4_train_raw.reshape(-1, 1)).ravel()\ny4_val = y4_scaler.transform(y4_val_raw.reshape(-1, 1)).ravel()",
-   "que_hace": "Construye una vez los tensores `X4_*` (features densas), `d4_*` (índices de distrito) e `y4_*` (target escalado) que usan la red grande y la regularizada.",
-   "como_funciona": "- Llama a `build_dense_features` con todas las opciones en `True`, ajustando `scaler4` solo con `df_train`.\n- `build_district_idx` convierte cada `District` en el índice que va al `Embedding`.\n- `y4_scaler` se ajusta con el precio de train y transforma train y val.",
-   "proposito": "Fija el mismo conjunto de features del modelo completo del Milestone 3 para que la comparación del Milestone 4 aísle el efecto del tamaño y la regularización.",
-   "interaccion": "Sus salidas las consumen `build_big_model`/`model_overfit.fit` (misma celda), `model_regularized.fit` (celda 37) y la comparación en dólares con `y4_scaler.inverse_transform` (celda 38).",
-   "teoria": "Entrada de largo fijo, ajustada solo en train: el preprocesamiento queda separado de la arquitectura que se está probando."
-  },
-  {
-   "id": "baseline-oficial",
-   "titulo": "El baseline oficial y su curva de pérdida (celda 15)",
-   "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
-   "desde": 1,
-   "hasta": 11,
-   "lenguaje": "python",
-   "codigo": "import matplotlib.pyplot as plt\n\nbaseline = variant_median_flag\n\nplt.plot(baseline['history'].history['loss'])\nplt.plot(baseline['history'].history['val_loss'])\nplt.title('Baseline numérico — pérdida (MSE, target escalado)')\nplt.ylabel('Loss')\nplt.xlabel('Epoch')\nplt.legend(['Train', 'Val'], loc='upper right')\nplt.show()",
-   "que_hace": "Fija `baseline = variant_median_flag` (mediana + indicador) y grafica `loss` contra `val_loss` del historial de entrenamiento.",
-   "como_funciona": "- Toma el diccionario que devolvió `train_and_report` en la celda 11.\n- Lee `history.history['loss']` y `['val_loss']` del objeto que devuelve `model.fit` y los grafica por época.",
-   "proposito": "Deja un único punto de referencia numérico para el resto del notebook y muestra, con la curva, que `val_loss` toca su mínimo temprano.",
-   "interaccion": "`baseline` lo consumen la celda 17 (métricas), la celda 18 (casa con mayor error), la celda 21 (ListingId) y la tabla de la celda 27.",
-   "teoria": "La loss que se minimiza (MSE con target escalado) se mira en train y en validación para detectar cuándo el modelo deja de generalizar."
-  },
-  {
-   "id": "curva-overfit",
-   "titulo": "Curva y diagnóstico de la red sobredimensionada (celda 35)",
-   "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
-   "desde": 1,
-   "hasta": 12,
-   "lenguaje": "python",
-   "codigo": "plt.plot(hist_overfit.history['loss'])\nplt.plot(hist_overfit.history['val_loss'])\nplt.title('Modelo sobredimensionado (sin regularizar) — pérdida')\nplt.ylabel('Loss')\nplt.xlabel('Epoch')\nplt.legend(['Train', 'Val'], loc='upper right')\nplt.show()\n\nmin_val_epoch = int(np.argmin(hist_overfit.history['val_loss']))\nprint(f\"val_loss mínimo en la época {min_val_epoch}: {min(hist_overfit.history['val_loss']):.4f}\")\nprint(f\"val_loss final (época {len(hist_overfit.history['val_loss']) - 1}): {hist_overfit.history['val_loss'][-1]:.4f}\")\nprint(f\"train_loss final: {hist_overfit.history['loss'][-1]:.4f}\")",
-   "que_hace": "Grafica `loss` y `val_loss` de `hist_overfit` e imprime en qué época `val_loss` fue mínima y cómo terminaron ambas pérdidas.",
-   "como_funciona": "- `plt.plot` de las dos series del historial.\n- `np.argmin(hist_overfit.history['val_loss'])` ubica la mejor época de validación.\n- Compara ese mínimo con el `val_loss` final y el `train_loss` final.",
-   "proposito": "Es la evidencia del sobreajuste: el train sigue bajando mientras validación sube, lo que justifica regularizar y cortar antes.",
-   "interaccion": "Lee `hist_overfit` de la celda 34; motiva la celda 37 (L2, Dropout y `EarlyStopping` con `patience=15`), cuyo resultado se compara en la celda 38.",
-   "teoria": "Diagnóstico de overfitting: brecha creciente entre la pérdida de entrenamiento y la de validación."
   },
   {
    "id": "clase-fit",
@@ -380,10 +450,10 @@
    "i": 32,
    "snippets": [
     "train-and-report",
-    "train-categorical-variant",
-    "variantes-incrementales"
+    "variantes-incrementales",
+    "comparar-overfit-regularizado"
    ],
-   "nota": "Regresión: las dos funciones de entrenamiento desescalan y miden el MAE en dólares, y la tabla final lo muestra bajando de 51.411 a 20.844."
+   "nota": "Regresión: todas las variantes desescalan y miden el MAE en dólares; de 50.940 en el baseline pasa a 24.923 con categóricas y a 19.481 con el modelo regularizado final."
   },
   {
    "slug": "introduccion",
@@ -427,7 +497,7 @@
     "modelo-grande-512",
     "regularizado-early-stopping"
    ],
-   "nota": "`count_params()` cuenta los 550.985 parámetros aprendidos; `l2=0.001`, `dropout=0.3` y `patience=15` son hiperparámetros que se fijan en la celda 37."
+   "nota": "`count_params()` cuenta los 550.473 parámetros aprendidos; `l2=0.001`, `dropout=0.3` y `patience=15` son hiperparámetros que se fijan en la celda 46."
   },
   {
    "slug": "intro-redes-neuronales",
@@ -455,7 +525,7 @@
     "modelo-grande-512",
     "regularizado-early-stopping"
    ],
-   "nota": "Cada `fit` es el ciclo forward/backward: 100 épocas en el baseline, 150 en la red grande y corte en la 76 con early stopping."
+   "nota": "Cada `fit` es el ciclo forward/backward: 100 épocas en el baseline, 150 en la red grande y corte en la 81 con early stopping."
   },
   {
    "slug": "intro-redes-neuronales",
@@ -466,7 +536,7 @@
     "baseline-oficial",
     "casa-peor-mae-rmse"
    ],
-   "nota": "Se entrenó con `loss='mse'`; el último paso muestra cómo una sola casa pesa más en la métrica cuadrática."
+   "nota": "Se entrenó con `loss='mse'`; el último paso muestra cómo una sola casa (Wheatfield, error $214.233) pesa más en la métrica cuadrática."
   },
   {
    "slug": "intro-redes-neuronales",
@@ -484,7 +554,7 @@
     "train-categorical-variant",
     "variantes-incrementales"
    ],
-   "nota": "Mismo tronco 32-32 en todas las filas: solo cambia la fila de floats que arma `build_dense_features`."
+   "nota": "Mismo tronco 32-32 en todas las filas: solo cambia la fila de floats que arma `build_dense_features`, y el MAE baja de 50.940 a 24.923."
   },
   {
    "slug": "modelado-redes-neuronales",
@@ -511,9 +581,10 @@
     "encoders-solo-train",
     "build-dense-features",
     "modelo-embedding-funcional",
-    "train-categorical-variant"
+    "variantes-incrementales",
+    "m5-sensibilidad-state"
    ],
-   "nota": "`State` va por one-hot dentro de `build_dense_features`; `District` va por la rama `Embedding`, y `train_categorical_variant` une las dos entradas."
+   "nota": "`State` va por one-hot dentro de `build_dense_features` y `District` por la rama `Embedding`; la tabla muestra el MAE 50.940 → 30.011 → 23.791, y el último paso prueba que el one-hot de `State` sigue moviendo el precio en el M5."
   },
   {
    "slug": "modelado-redes-neuronales",
@@ -524,7 +595,7 @@
     "district-entero-trampa",
     "listingid-adentro"
    ],
-   "nota": "`district_int=True` es el error \"código como número\" hecho a propósito; el último paso prueba la otra trampa, `ListingId` como feature."
+   "nota": "`district_int=True` es el error \"código como número\" hecho a propósito (MAE 28.842 vs 24.923); el último paso prueba la otra trampa, `ListingId` como feature."
   },
   {
    "slug": "modelado-redes-neuronales",
@@ -547,21 +618,23 @@
    "slug": "modelado-redes-neuronales",
    "i": 17,
    "snippets": [
+    "comparar-imputaciones",
     "train-categorical-variant",
     "variantes-incrementales"
    ],
-   "nota": "Ojo para la defensa: las métricas salen de `X_dense_test`, así que la tabla elige entre variantes con test; en rigor eso le tocaba a validación."
+   "nota": "Ojo para la defensa: tanto la tabla de imputaciones como la de variantes salen de métricas de test (`X_test`, `X_dense_test`); en rigor esa elección le tocaba a validación."
   },
   {
    "slug": "modelado-redes-neuronales",
    "i": 18,
    "snippets": [
-    "prepare-numeric-split",
     "encoders-solo-train",
-    "train-categorical-variant",
-    "mision-m5-pinball"
+    "features-milestone4",
+    "m5-pipeline",
+    "m5-casa-inventada",
+    "m5-sensibilidad-state"
    ],
-   "nota": "Mediana, scaler y encoders se ajustan con `df_train`, pero quedan sueltos en celdas: el M5 (empaquetarlos con el modelo) quedó pendiente."
+   "nota": "Encoders, `scaler4` e `y4_scaler` se ajustan con `df_train`; en el M5, `predict_house_price` los reutiliza sin reajustar para tasar una casa escrita a mano ($482.971)."
   },
   {
    "slug": "modelado-redes-neuronales",
@@ -589,15 +662,28 @@
     "train-and-report",
     "baseline-oficial",
     "casa-peor-mae-rmse"
-   ]
+   ],
+   "nota": "Sacar la casa de Wheatfield baja el RMSE 3,1% y el MAE solo 2,2%: el cuadrado pesa más los errores grandes."
+  },
+  {
+   "slug": "modelado-redes-neuronales",
+   "i": 31,
+   "snippets": [
+    "pinball-loss",
+    "quantile-model",
+    "quantile-eval"
+   ],
+   "nota": "La pinball es la loss especializada que usó el extra: en vez de un precio, la red devuelve un rango P10–P90 de unos $53 mil de ancho promedio."
   },
   {
    "slug": "modelado-redes-neuronales",
    "i": 32,
    "snippets": [
-    "mision-m5-pinball"
+    "pinball-loss",
+    "quantile-model",
+    "quantile-eval"
    ],
-   "nota": "El extra con pinball loss no se implementó; esto es la consigna, no código del grupo."
+   "nota": "`tf.maximum(q * error, (q - 1) * error)` es la fórmula de la diapositiva para los tres cuantiles a la vez; `softplus` evita cruces y la cobertura P10–P90 en test dio 82,2%."
   },
   {
    "slug": "modelado-redes-neuronales",
@@ -623,7 +709,7 @@
     "modelo-grande-512",
     "regularizado-early-stopping"
    ],
-   "nota": "`kernel_regularizer=reg` suma $\\lambda\\sum w^2$ a la loss y `Dropout(dropout)` apaga neuronas al entrenar; la celda 37 los activa con 0,001 y 0,3."
+   "nota": "`kernel_regularizer=reg` suma $\\lambda\\sum w^2$ a la loss y `Dropout(dropout)` apaga neuronas al entrenar; la celda 46 los activa con 0,001 y 0,3."
   },
   {
    "slug": "modelado-redes-neuronales",
@@ -634,7 +720,7 @@
     "regularizado-early-stopping",
     "comparar-overfit-regularizado"
    ],
-   "nota": "Train 0,0121 vs val 0,1273 es el patrón de overfitting; el regularizado corta en la época 76 y baja el MAE a 16.538."
+   "nota": "Train 0,0375 vs val 0,1435 (mínimo 0,0717 en la época 7) es el patrón de overfitting; el regularizado corta en la época 81 y baja el RMSE de 28.433 a 25.672."
   },
   {
    "slug": "modelado-redes-neuronales",
@@ -643,7 +729,8 @@
     "baseline-mlp-32-32",
     "modelo-grande-512",
     "curva-overfit"
-   ]
+   ],
+   "nota": "550.473 parámetros para 1022 casas: la 512-512-512 memorizó desde la época 7, mientras el 32-32 era el punto de partida razonable."
   },
   {
    "slug": "modelado-redes-neuronales",
@@ -661,7 +748,7 @@
     "prepare-numeric-split",
     "comparar-imputaciones"
    ],
-   "nota": "La correlación justifica el `add_indicator=True`, y la comparación de imputaciones lo pone a prueba."
+   "nota": "La pregunta \"¿puede faltar?\" aplicada a `LotFrontage`: el faltante se asocia a precios 13,7% menores, pero el indicador no mejoró las métricas y el baseline quedó con mediana sin flag."
   },
   {
    "slug": "modelado-redes-neuronales",
@@ -759,9 +846,10 @@
    "snippets": [
     "build-dense-features",
     "train-categorical-variant",
-    "modelo-embedding-funcional"
+    "modelo-embedding-funcional",
+    "m5-pipeline"
    ],
-   "nota": "Cada casa sale de `build_dense_features` como un vector de largo fijo, y ese largo (`X_dense_train.shape[1]`) define el `Input` del MLP."
+   "nota": "Cada casa sale de `build_dense_features` como un vector de largo fijo (`X_dense_train.shape[1]` define el `Input`); en el M5 hasta una casa escrita a mano pasa por la misma traducción."
   },
   {
    "slug": "segmentacion-y-stable-diffusion",
@@ -771,7 +859,7 @@
     "modelo-grande-512",
     "regularizado-early-stopping"
    ],
-   "nota": "Este `fit` es el ciclo forward/backward; con early stopping la red cortó en la época 76 de 150."
+   "nota": "Este `fit` es el ciclo forward/backward; con early stopping la red cortó en la época 81 de 150."
   },
   {
    "slug": "segmentacion-y-stable-diffusion",
@@ -781,7 +869,8 @@
     "modelo-embedding-funcional",
     "train-categorical-variant",
     "variantes-incrementales"
-   ]
+   ],
+   "nota": "Sumar el embedding de `District` bajó el MAE de 30.011 a 23.791 con la misma red."
   }
  ]
 }

@@ -224,11 +224,11 @@
      "tp": [
       {
        "tp": 3,
-       "texto": "Es el ejemplo de los 14 tests de la parte 4 del TP3 ('the cat sat', d=4), que quedó pendiente.",
+       "texto": "Es el ejemplo de los 14 tests de la parte 4 del TP3 ('the cat sat', d=4); tu `atencion.py` los pasó todos.",
        "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
-       "code": "tp3-test-atencion-ejemplo-clase",
-       "ncode": 1,
-       "nota": "Pendiente: estos tests con 'the cat sat' son los que tenía que pasar `atencion.py`."
+       "code": "tp3-test-atencion-ejemplo-clase,tp3-atencion-softmax-mascara",
+       "ncode": 2,
+       "nota": "Estos tests con 'the cat sat' (d = 4) son los que pasó tu `atencion.py`: 14 de 14."
       }
      ],
      "ver": [
@@ -392,11 +392,11 @@
      "tp": [
       {
        "tp": 3,
-       "texto": "Pendiente en el TP3; el plan era `S = QKᵀ/√d_k` y softmax restando el máximo para estabilidad numérica.",
+       "texto": "Tu `atencion` calcula `Q @ K.T / np.sqrt(d_k)`, y `softmax` resta el máximo de cada fila antes de exponenciar para que sea estable.",
        "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
-       "code": "tp3-test-atencion-escala-multicabeza-ln",
-       "ncode": 1,
-       "nota": "Pendiente: `test_escala_por_raiz_de_dk` y la estabilidad del softmax fijan el escalado y el truco de restar el máximo."
+       "code": "tp3-atencion-softmax-mascara,tp3-test-atencion-escala-multicabeza-ln",
+       "ncode": 2,
+       "nota": "`Q @ K.T / np.sqrt(d_k)` es el escalado y `M - maximo` el truco de estabilidad; `test_escala_por_raiz_de_dk` y el test con `[1000, 1000]` los verifican."
       }
      ],
      "ver": [],
@@ -442,11 +442,11 @@
      "tp": [
       {
        "tp": 3,
-       "texto": "Quedó pendiente (plan: `np.triu(…,1) → −∞`). La parte 5 lo pide: con máscara, 'banco' queda igual en las dos frases.",
+       "texto": "Tu máscara pone −∞ con `np.triu(…, k=1)` antes del softmax. En la parte 5, con máscara, 'banco' quedó igual en las dos frases.",
        "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
-       "code": "tp3-test-atencion-ejemplo-clase",
-       "ncode": 1,
-       "nota": "Pendiente: `test_mascara_causal` exige ceros arriba de la diagonal; la parte 5 lo aplica a mano."
+       "code": "tp3-atencion-softmax-mascara,tp3-test-atencion-ejemplo-clase,tp3-informe-parte5",
+       "ncode": 3,
+       "nota": "`np.triu(..., k=1)` marca lo que está arriba de la diagonal y `np.where` le pone −∞: después del softmax esos pesos son 0. Por eso en la parte 5, con máscara, 'banco' quedó igual en las dos frases."
       }
      ],
      "ver": [],
@@ -597,11 +597,11 @@
      "tp": [
       {
        "tp": 3,
-       "texto": "Pendiente en el TP3; el plan era `layer_norm` sin γ/β, verificada por los tests.",
+       "texto": "Tu `layer_norm` lleva cada fila a media 0 y varianza 1, sin γ ni β, y pasó los tests de invariantes.",
        "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
-       "code": "tp3-test-atencion-escala-multicabeza-ln",
-       "ncode": 1,
-       "nota": "Pendiente: `TestLayerNorm` fija layer norm sin γ/β."
+       "code": "tp3-atencion-layer-norm,tp3-test-atencion-escala-multicabeza-ln",
+       "ncode": 2,
+       "nota": "`layer_norm` resta la media y divide por la desviación de cada fila, sin γ ni β; `TestLayerNorm` verifica media 0, varianza 1 y las invariancias."
       }
      ],
      "ver": [],
@@ -991,11 +991,11 @@
      "tp": [
       {
        "tp": 3,
-       "texto": "El ejercicio a mano es la parte 5 del TP3 ('El banco aguanta/presta'), pendiente en tu repo.",
+       "texto": "Es la parte 5 del TP3, resuelta a mano (`a_mano/Punto5_a_mano.pdf`): con máscara, el modelo predice 'peso' y 'dinero' con 59,6% cada una.",
        "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
-       "code": "tp3-ejercicio-a-mano",
-       "ncode": 1,
-       "nota": ""
+       "code": "tp3-ejercicio-a-mano,tp3-informe-parte5",
+       "ncode": 2,
+       "nota": "La consigna fija los pasos del bloque; el informe resume lo que dio a mano (el desarrollo está escaneado en `a_mano/Punto5_a_mano.pdf`): con máscara, 'peso' y 'dinero' con 59,6 % cada una."
       }
      ],
      "ver": [],
@@ -1425,12 +1425,50 @@
    "hasta": 61,
    "lenguaje": "python",
    "codigo": "X = np.array([[1, 0, 1, 0], [0, 2, 0, 1], [1, 1, 1, 1]], float)\nWQ = np.eye(4)\nWK = np.array([[0, 1, 0, 0], [1, 0, 0, 0], [0, 0, 0, 1], [0, 0, 1, 0]], float)\nWV = np.array([[1, 0], [0, 1], [1, 0], [0, 1]], float)\n\n\nclass TestSoftmax(unittest.TestCase):\n    def test_filas_suman_uno(self):\n        M = np.array([[1.5, 0, 1.5], [3, -2, 0.5]])\n        np.testing.assert_allclose(at.softmax(M).sum(-1), 1)\n\n    def test_valor_de_la_clase(self):\n        np.testing.assert_allclose(at.softmax(np.array([[1.5, 0, 1.5]])), [[0.4498, 0.1004, 0.4498]], atol=1e-3)\n\n    def test_estable_con_numeros_grandes(self):\n        s = at.softmax(np.array([[1000.0, 1000.0]]))\n        self.assertTrue(np.all(np.isfinite(s)))\n        np.testing.assert_allclose(s, [[0.5, 0.5]])\n\n\nclass TestAtencion(unittest.TestCase):\n    def test_matriz_de_atencion(self):\n        _, A = at.autoatencion(X, WQ, WK, WV)\n        np.testing.assert_allclose(A, [[0.1220, 0.5465, 0.3315], [0.4498, 0.1004, 0.4498], [0.1863, 0.3072, 0.5065]], atol=1e-3)\n\n    def test_salida(self):\n        out, _ = at.autoatencion(X, WQ, WK, WV)\n        np.testing.assert_allclose(out, [[0.9069, 2.3026], [1.7993, 1.2007], [1.3856, 1.9345]], atol=1e-3)\n\n    def test_formas_con_n_distinto_de_d(self):\n        out, A = at.autoatencion(X, WQ, WK, WV)\n        self.assertEqual(A.shape, (3, 3))\n        self.assertEqual(out.shape, (3, 2))\n\n    def test_mascara_causal(self):\n        out, A = at.autoatencion(X, WQ, WK, WV, mascara=True)\n        np.testing.assert_allclose(np.triu(A, 1), 0, atol=1e-12)\n        np.testing.assert_allclose(A.sum(-1), 1)\n        np.testing.assert_allclose(out, [[2, 0], [1.6351, 0.5474], [1.3856, 1.9345]], atol=1e-3)",
-   "que_hace": "Tests provistos por la cátedra para la parte 4 (pendiente): definen el ejemplo de clase ('the cat sat', d = 4) y los valores esperados de softmax, matriz de atención, salida y máscara causal.",
+   "que_hace": "Tests provistos por la cátedra para la parte 4: definen el ejemplo de clase ('the cat sat', d = 4) y los valores esperados de softmax, matriz de atención, salida y máscara causal.",
    "como_funciona": "- `X` son 3 tokens de dimensión 4; `WQ` es la identidad, `WK` permuta dimensiones y `WV` proyecta a 2.\n- `TestSoftmax`: filas que suman 1, el valor de clase `[0.4498, 0.1004, 0.4498]` y estabilidad con `[1000, 1000]`.\n- `test_matriz_de_atencion` y `test_salida`: la `A` 3×3 y la salida 3×2 esperadas.\n- `test_mascara_causal`: el triángulo superior de `A` es 0 y la primera fila solo mira a sí misma (`[2, 0]`).",
-   "proposito": "Es la especificación ejecutable de lo que `atencion.py` tenía que cumplir; el archivo no se puede modificar. La implementación no existe todavía.",
-   "interaccion": "Carga dinámicamente el `atencion.py` que se le pase por argumento y llama a `softmax` y `autoatencion`; el PLAN (paso 4) lo usa como guía de TDD.",
+   "proposito": "Es la especificación ejecutable de lo que `atencion.py` tenía que cumplir; el archivo no se puede modificar. El `atencion.py` de la parte 4 pasa los 14 tests.",
+   "interaccion": "Carga dinámicamente el `atencion.py` que se le pase por argumento y llama a `softmax` y `autoatencion`; se corre con `python3 atencion/test_atencion.py atencion.py`.",
    "teoria": "Cada token mira a todos: A = softmax(QKᵀ/√d_k) y salida = A V; con máscara causal un token no ve los posteriores.",
    "key": "tp3-test-atencion-ejemplo-clase",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
+     "i": 11,
+     "title": "El ciclo de generación con el transformer abierto",
+     "extra": false,
+     "url": "/clases/08/#d=transformers-a-fondo&s=11"
+    },
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
+     "i": 20,
+     "title": "La máscara causal",
+     "extra": false,
+     "url": "/clases/08/#d=transformers-a-fondo&s=20"
+    }
+   ],
+   "nusos": 2
+  },
+  {
+   "id": "atencion-softmax-mascara",
+   "titulo": "softmax estable y atención escalada con máscara causal",
+   "archivo": "atencion.py",
+   "desde": 6,
+   "hasta": 34,
+   "lenguaje": "python",
+   "codigo": "def softmax(M):\n    \"\"\"Calcula softmax de cada fila, de forma numéricamente estable.\"\"\"\n    M = np.asarray(M)\n    maximo = np.max(M, axis=-1, keepdims=True)\n    exp = np.exp(M - maximo)\n    return exp / np.sum(exp, axis=-1, keepdims=True)\n\n\ndef atencion(Q, K, V, mascara=False):\n    \"\"\"Calcula atención de producto punto escalado.\n\n    Devuelve tanto la salida ponderada por los valores como la matriz de\n    pesos de atención.\n    \"\"\"\n    Q = np.asarray(Q)\n    K = np.asarray(K)\n    V = np.asarray(V)\n    d_k = Q.shape[-1]\n    puntajes = Q @ K.T / np.sqrt(d_k)\n\n    if mascara:\n        puntajes = np.where(\n            np.triu(np.ones(puntajes.shape, dtype=bool), k=1),\n            -np.inf,\n            puntajes,\n        )\n\n    A = softmax(puntajes)\n    return A @ V, A",
+   "que_hace": "Implementa con NumPy el softmax por fila y la atención de producto punto escalado, con máscara causal opcional; devuelve la salida y la matriz de pesos.",
+   "como_funciona": "- `softmax` resta `maximo` (el máximo de cada fila, `keepdims=True`) antes de `np.exp`, y divide por la suma de la fila.\n- `atencion` calcula `puntajes = Q @ K.T / np.sqrt(d_k)` con `d_k = Q.shape[-1]`.\n- Si `mascara`, `np.triu(np.ones(...), k=1)` marca lo que está arriba de la diagonal (tokens posteriores) y `np.where` les pone `-np.inf`.\n- `A = softmax(puntajes)`: los `-inf` quedan en peso 0. Devuelve `A @ V, A`.",
+   "proposito": "Restar el máximo no cambia el resultado pero evita overflow en `exp` (el test con `[1000, 1000]`). Dividir por √d_k evita que productos grandes saturen el softmax. Devolver `A` permite verificar la matriz contra los valores del ejemplo de clase.",
+   "interaccion": "La usa `autoatencion` (mismo archivo) y la prueban `TestSoftmax`, `test_matriz_de_atencion`, `test_mascara_causal` y `test_escala_por_raiz_de_dk` de `atencion/test_atencion.py`.",
+   "teoria": "Atención: A = softmax(QKᵀ/√d_k), salida = A V; la máscara causal (−∞ antes del softmax) impide que un token mire a los siguientes, como en un decoder.",
+   "key": "tp3-atencion-softmax-mascara",
    "tp": 3,
    "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
    "usos": [
@@ -1456,13 +1494,22 @@
      "clase": 8,
      "cnn": "08",
      "slug": "transformers-a-fondo",
+     "i": 18,
+     "title": "Escalar y repartir: el softmax",
+     "extra": false,
+     "url": "/clases/08/#d=transformers-a-fondo&s=18"
+    },
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
      "i": 20,
      "title": "La máscara causal",
      "extra": false,
      "url": "/clases/08/#d=transformers-a-fondo&s=20"
     }
    ],
-   "nusos": 3
+   "nusos": 4
   },
   {
    "id": "lora-config",
@@ -1622,10 +1669,10 @@
    "hasta": 101,
    "lenguaje": "python",
    "codigo": "    def test_permutar_filas_permuta_la_salida(self):\n        perm = [2, 0, 1]\n        out, _ = at.autoatencion(X, WQ, WK, WV)\n        out_p, _ = at.autoatencion(X[perm], WQ, WK, WV)\n        np.testing.assert_allclose(out_p, out[perm], atol=1e-9)\n\n    def test_escala_por_raiz_de_dk(self):\n        Q = np.array([[1.0, 0, 0, 0]]); K = np.array([[4.0, 0, 0, 0], [0, 0, 0, 0]]); V = np.eye(2)\n        _, A = at.atencion(Q, K, V)\n        np.testing.assert_allclose(A, [[np.exp(2) / (np.exp(2) + 1), 1 / (np.exp(2) + 1)]], atol=1e-6)\n\n\nclass TestMulticabeza(unittest.TestCase):\n    def test_una_cabeza_con_wo_identidad_es_autoatencion(self):\n        out1, _ = at.autoatencion(X, WQ, WK, WV)\n        outm = at.multicabeza(X, [(WQ, WK, WV)], np.eye(2))\n        np.testing.assert_allclose(outm, out1, atol=1e-9)\n\n    def test_dos_cabezas_concatenan_y_proyectan(self):\n        c1 = (WQ[:, :2], WK[:, :2], WV[:, :1]); c2 = (WQ[:, 2:], WK[:, 2:], WV[:, 1:])\n        Wo = np.array([[1.0, 2.0], [0.0, 1.0]])\n        esperado = np.concatenate([at.autoatencion(X, *c1)[0], at.autoatencion(X, *c2)[0]], axis=1) @ Wo\n        np.testing.assert_allclose(at.multicabeza(X, [c1, c2], Wo), esperado, atol=1e-9)\n        self.assertEqual(at.multicabeza(X, [c1, c2], Wo).shape, (3, 2))\n\n\nclass TestLayerNorm(unittest.TestCase):\n    def test_valor_de_la_clase(self):\n        np.testing.assert_allclose(at.layer_norm(np.array([[2.0, 0, 1, 1]])), [[1.4142, -1.4142, 0, 0]], atol=1e-3)\n\n    def test_invariante_a_escala_y_corrimiento(self):\n        x = np.array([[2.0, 0, 1, 1]])\n        np.testing.assert_allclose(at.layer_norm(2 * x), at.layer_norm(x), atol=1e-4)\n        np.testing.assert_allclose(at.layer_norm(x + 10), at.layer_norm(x), atol=1e-4)\n\n    def test_por_fila(self):\n        y = at.layer_norm(np.array([[1.0, 0, 1, 0], [0, 20, 0, 10], [300, 0, 100, 200]]))\n        np.testing.assert_allclose(y.mean(-1), 0, atol=1e-6)\n        np.testing.assert_allclose(y.var(-1), 1, atol=1e-3)",
-   "que_hace": "Resto de los tests de la parte 4 (pendiente): permutar la entrada permuta la salida, la escala por √d_k, multicabeza y layer norm.",
+   "que_hace": "Resto de los tests de la parte 4: permutar la entrada permuta la salida, la escala por √d_k, multicabeza y layer norm.",
    "como_funciona": "- `test_permutar_filas_permuta_la_salida`: sin posiciones, la atención es equivariante a permutaciones.\n- `test_escala_por_raiz_de_dk`: con d_k = 4, un producto de 4 se escala a 2 antes del softmax.\n- `TestMulticabeza`: una cabeza con `Wo` identidad es autoatención; dos cabezas se concatenan y se proyectan con `Wo`.\n- `TestLayerNorm`: `[2, 0, 1, 1]` → `[1.414, -1.414, 0, 0]`, invariancia a escala y corrimiento, media 0 y varianza 1 por fila.",
-   "proposito": "Fija propiedades que hay que entender para el final (por qué hacen falta posiciones, por qué se escala, qué normaliza layer norm). La implementación quedó pendiente.",
-   "interaccion": "Igual que los anteriores: se corre con `python3 atencion/test_atencion.py atencion.py` contra el `atencion.py` que faltaba escribir.",
+   "proposito": "Fija propiedades que hay que entender para el final (por qué hacen falta posiciones, por qué se escala, qué normaliza layer norm). `atencion.py` los pasa.",
+   "interaccion": "Igual que los anteriores: se corre con `python3 atencion/test_atencion.py atencion.py` contra `atencion.py`: 14 tests, `OK`.",
    "teoria": "Escalado del softmax, atención multi-cabeza, layer norm y que la atención por sí sola no conoce el orden.",
    "key": "tp3-test-atencion-escala-multicabeza-ln",
    "tp": 3,
@@ -1653,17 +1700,55 @@
    "nusos": 2
   },
   {
+   "id": "informe-parte5",
+   "titulo": "Parte 5 en el informe: 'peso' y 'dinero', con y sin máscara",
+   "archivo": "INFORME.md",
+   "desde": 312,
+   "hasta": 335,
+   "lenguaje": "markdown",
+   "codigo": "## 5. Bloque de transformer a mano\n\nSe procesaron manualmente las frases **“El banco aguanta ___”** y **“El banco presta ___”** mediante un bloque Transformer completo. Para cada frase se calcularon los embeddings de palabra y posición, las proyecciones Q, K y V, los puntajes de atención, softmax, mezcla de valores, conexiones residuales, layer normalization, feed-forward y la predicción final.\n\nResultados con máscara causal\n\nEn la configuración tipo decoder, la representación de **“banco”** es la misma en ambas frases, ya que la máscara causal impide que este token vea las palabras posteriores (“aguanta” o “presta”).\n\nSin embargo, la representación de la última palabra sí incorpora el contexto anterior y permite obtener predicciones diferentes:\n\n- **“El banco aguanta ___” → “peso”**, con una probabilidad aproximada de **59,6 %**.\n- **“El banco presta ___” → “dinero”**, con una probabilidad aproximada de **59,6 %**.\n\nComparación sin máscara\n\nAl eliminar la máscara causal, como en un encoder, cada token puede atender a toda la oración. Por este motivo, la representación de **“banco”** cambia según aparezca junto a “aguanta” o a “presta”. Esto muestra cómo la atención permite contextualizar una palabra ambigua utilizando las palabras que la rodean.\n\nConclusión\n\nLa parte con máscara causal se asemeja al funcionamiento de un modelo decoder como GPT, que predice el siguiente token sin utilizar información futura. La atención sin máscara se asemeja a un encoder como BERT, donde cada palabra puede utilizar información de toda la secuencia.\n\nLos embeddings de posición también son importantes porque incorporan información sobre el orden de las palabras. Si se eliminaran, el modelo perdería parte de la información necesaria para distinguir frases en las que el orden modifica el significado.\n\nEl desarrollo completo de las operaciones y sus justificaciones se encuentra escaneado en la carpeta `a_mano/`.",
+   "que_hace": "Resume el bloque de transformer resuelto a mano para «El banco aguanta ___» y «El banco presta ___», con y sin máscara causal.",
+   "como_funciona": "- Se hicieron a mano embeddings + posición, Q/K/V, puntajes, softmax, mezcla, residuales, layer norm, feed-forward y predicción.\n- Con máscara (decoder): «banco» queda igual en las dos frases porque no ve la palabra siguiente; la última palabra sí junta contexto: «peso» y «dinero», con ~59,6 % cada una.\n- Sin máscara (encoder): «banco» cambia según «aguanta» o «presta».\n- Conclusión: con máscara se parece a GPT, sin máscara a BERT; sin embeddings de posición se pierde el orden.",
+   "proposito": "Conecta las cuentas a mano con la teoría: qué hace la máscara causal y por qué la misma atención da un decoder o un encoder. El desarrollo completo está en `a_mano/Punto5_a_mano.pdf` (hojas escaneadas).",
+   "interaccion": "Responde la consigna de `a_mano/ejercicio.md`; son las mismas operaciones que implementan `atencion` y `layer_norm` en `atencion.py`.",
+   "teoria": "Un bloque transformer completo (atención, residual, layer norm, FFN) y la diferencia decoder (máscara causal) vs. encoder (bidireccional).",
+   "key": "tp3-informe-parte5",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
+     "i": 20,
+     "title": "La máscara causal",
+     "extra": false,
+     "url": "/clases/08/#d=transformers-a-fondo&s=20"
+    },
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
+     "i": 42,
+     "title": "Un bloque repetido",
+     "extra": false,
+     "url": "/clases/08/#d=transformers-a-fondo&s=42"
+    }
+   ],
+   "nusos": 2
+  },
+  {
    "id": "baseline-mlp-32-32",
-   "titulo": "MLP baseline Dense(32)→Dense(32)→Dense(1, linear) (celda 10)",
+   "titulo": "MLP baseline Dense(32)→Dense(32)→Dense(1, linear) (celda 14)",
    "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
-   "desde": 31,
-   "hasta": 41,
+   "desde": 50,
+   "hasta": 60,
    "lenguaje": "python",
    "codigo": "def build_baseline_model(n_features):\n    model = Sequential([\n        Input(shape=(n_features,)),\n        Dense(32, activation='relu'),\n        Dense(32, activation='relu'),\n        Dense(1, activation='linear'),\n    ])\n    # Salida real -> activación lineal + loss de regresión (mse). 'accuracy' no aplica acá:\n    # no hay clases que acertar, hay una distancia en dólares que minimizar.\n    model.compile(optimizer='adam', loss='mse', metrics=['mae'])\n    return model",
    "que_hace": "Construye y compila el MLP del baseline numérico: dos capas ocultas de 32 ReLU y una salida lineal para predecir un real.",
-   "como_funciona": "- `Input(shape=(n_features,))` recibe la fila de floats (13 numéricas + flag).\n- Cada `Dense(32, activation='relu')` calcula $W\\cdot x+b$ y aplica ReLU.\n- `Dense(1, activation='linear')` devuelve un número sin acotar (el precio escalado).\n- `compile(optimizer='adam', loss='mse', metrics=['mae'])`: el comentario explica por qué `accuracy` no aplica.",
+   "como_funciona": "- `Input(shape=(n_features,))` recibe la fila de floats (las 13 numéricas; 14 en las variantes con flag).\n- Cada `Dense(32, activation='relu')` calcula $W\\cdot x+b$ y aplica ReLU.\n- `Dense(1, activation='linear')` devuelve un número sin acotar (el precio escalado).\n- `compile(optimizer='adam', loss='mse', metrics=['mae'])`: el comentario explica por qué `accuracy` no aplica.",
    "proposito": "Pasar de la sigmoide + BCE del notebook de clase a lineal + MSE es el cambio central de la misión: la tarea (predecir dólares) fija la salida y la loss.",
-   "interaccion": "La usan `train_and_report` (celda 10) y el experimento con `ListingId` (celda 21). En el Milestone 3, `build_model_categorical` repite el mismo tronco 32-32-1 con la API funcional.",
+   "interaccion": "La usan `train_and_report` (misma celda) y el experimento con `ListingId` (celda 30). En el Milestone 3, `build_model_categorical` repite el mismo tronco 32-32-1 con la API funcional.",
    "teoria": "Neurona/capa = combinación lineal + no linealidad; ReLU en ocultas y salida lineal + MSE para regresión.",
    "key": "tp2-baseline-mlp-32-32",
    "tp": 2,
@@ -1817,8 +1902,37 @@
    "nusos": 16
   },
   {
+   "id": "atencion-layer-norm",
+   "titulo": "Layer norm sin γ ni β",
+   "archivo": "atencion.py",
+   "desde": 54,
+   "hasta": 59,
+   "lenguaje": "python",
+   "codigo": "def layer_norm(x, eps=1e-5):\n    \"\"\"Normaliza cada fila a media cero y varianza aproximadamente uno.\"\"\"\n    x = np.asarray(x)\n    media = np.mean(x, axis=-1, keepdims=True)\n    varianza = np.mean((x - media) ** 2, axis=-1, keepdims=True)\n    return (x - media) / np.sqrt(varianza + eps)",
+   "que_hace": "Normaliza cada fila (cada token) a media 0 y varianza aproximadamente 1.",
+   "como_funciona": "- `media` y `varianza` se calculan sobre el último eje con `keepdims=True`.\n- Devuelve `(x - media) / np.sqrt(varianza + eps)`; `eps = 1e-5` evita dividir por cero.\n- No tiene los parámetros aprendidos γ y β.",
+   "proposito": "Mantiene los números en rango entre capas, token por token. La consigna la pide sin γ/β, así que es solo la normalización.",
+   "interaccion": "La prueba `TestLayerNorm` de `atencion/test_atencion.py` (`[2, 0, 1, 1]` → `[1.414, -1.414, 0, 0]`, invariancia a escala y corrimiento). Es el mismo LN que la parte 5 calcula a mano.",
+   "teoria": "Layer normalization: normaliza por token (no por batch) después de cada residual del bloque transformer.",
+   "key": "tp3-atencion-layer-norm",
+   "tp": 3,
+   "tp_titulo": "RAG, MCP y Transformers en el Hospital Arroyo Claro",
+   "usos": [
+    {
+     "clase": 8,
+     "cnn": "08",
+     "slug": "transformers-a-fondo",
+     "i": 26,
+     "title": "Layer norm: mantener los números en rango",
+     "extra": false,
+     "url": "/clases/08/#d=transformers-a-fondo&s=26"
+    }
+   ],
+   "nusos": 1
+  },
+  {
    "id": "month-cyclical",
-   "titulo": "MonthSold como seno y coseno (celda 25)",
+   "titulo": "MonthSold como seno y coseno (celda 34)",
    "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
    "desde": 19,
    "hasta": 22,
@@ -1827,7 +1941,7 @@
    "que_hace": "Convierte el mes de venta (1–12) en dos columnas: seno y coseno del ángulo del mes en el ciclo anual.",
    "como_funciona": "- `radians = 2 * np.pi * month / 12` ubica cada mes sobre un círculo.\n- `np.sin(radians)` y `np.cos(radians)` dan las dos coordenadas.\n- Devuelve una matriz de 2 columnas (2 floats por casa).",
    "proposito": "Resuelve la trampa 2: como entero, diciembre (12) y enero (1) estarían a 11 de distancia; en el círculo quedan vecinos. Hace falta seno y coseno juntos para que cada mes tenga un punto único.",
-   "interaccion": "La llama `build_dense_features` (celda 26) cuando `cyclical_month=True`, que además saca `MonthSold` de las numéricas.",
+   "interaccion": "La llama `build_dense_features` (celda 35) cuando `cyclical_month=True`, que además saca `MonthSold` de las numéricas.",
    "teoria": "Codificación cíclica con senos y cosenos, la misma idea que el positional encoding del Transformer.",
    "key": "tp2-month-cyclical",
    "tp": 2,
@@ -1856,16 +1970,16 @@
   },
   {
    "id": "build-dense-features",
-   "titulo": "El vector de entrada: numéricas, flag, mes cíclico y one-hots (celda 26)",
+   "titulo": "El vector de entrada: numéricas, mes cíclico y one-hots (celda 35)",
    "archivo": "calveyra-desivo-giordanelli-rickert.ipynb",
    "desde": 1,
-   "hasta": 34,
+   "hasta": 33,
    "lenguaje": "python",
-   "codigo": "def build_dense_features(frame, fill_value, use_state, use_housestyle, use_centralair,\n                          use_salecondition, cyclical_month, district_int=False,\n                          scaler=None, fit_scaler=False):\n    \"\"\"Arma el bloque de features que entra 'directo' a la red (sin pasar por embedding).\n    district_int=True mete a District como un entero plano más -del bloque numérico-\n    en vez de mandarlo por la rama de embedding: es el experimento a propósito de la Pregunta 2.\"\"\"\n    frame = frame.copy()\n    missing_flag = frame['LotFrontage'].isna().to_numpy(dtype=float)\n    frame['LotFrontage'] = frame['LotFrontage'].fillna(fill_value)\n\n    numeric_cols_here = [c for c in NUMERIC_COLS if not (cyclical_month and c == 'MonthSold')]\n    X_num = frame[numeric_cols_here].to_numpy(dtype=float)\n    if district_int:\n        district_col = frame['District'].map(\n            lambda d: district_to_idx.get(d, DISTRICT_OOV_IDX)).to_numpy(dtype=float).reshape(-1, 1)\n        X_num = np.column_stack([X_num, district_col])\n\n    if fit_scaler:\n        scaler = StandardScaler().fit(X_num)\n    X_num_scaled = scaler.transform(X_num)\n\n    blocks = [X_num_scaled, missing_flag.reshape(-1, 1)]\n    if cyclical_month:\n        blocks.append(month_cyclical(frame['MonthSold']))\n    if use_state:\n        blocks.append(state_encoder.transform(frame[['State']]))\n    if use_housestyle:\n        blocks.append(housestyle_encoder.transform(frame[['HouseStyle']]))\n    if use_salecondition:\n        blocks.append(salecondition_encoder.transform(frame[['SaleCondition']]))\n    if use_centralair:\n        blocks.append((frame['CentralAir'] == 'Y').to_numpy(dtype=float).reshape(-1, 1))\n\n    return np.column_stack(blocks), scaler",
-   "que_hace": "Arma el bloque de features \"directo\" de cada casa: numéricas escaladas, flag de faltante, mes sin/cos, one-hots y `CentralAir` 0/1.",
-   "como_funciona": "1. Imputa `LotFrontage` y guarda `missing_flag`.\n2. `numeric_cols_here` excluye `MonthSold` si va cíclico.\n3. Con `district_int=True` agrega District como entero plano (experimento trampa de la Pregunta 2).\n4. `StandardScaler` se ajusta solo si `fit_scaler=True`.\n5. `blocks` concatena según los flags `use_state`, `use_housestyle`, `use_salecondition`, `use_centralair` y `cyclical_month`.",
+   "codigo": "def build_dense_features(frame, fill_value, use_state, use_housestyle, use_centralair,\n                          use_salecondition, cyclical_month, district_int=False,\n                          scaler=None, fit_scaler=False):\n    \"\"\"Arma el bloque de features que entra 'directo' a la red (sin pasar por embedding).\n    district_int=True mete a District como un entero plano más -del bloque numérico-\n    en vez de mandarlo por la rama de embedding: es el experimento a propósito de la Pregunta 2.\"\"\"\n    frame = frame.copy()\n    frame['LotFrontage'] = frame['LotFrontage'].fillna(fill_value)\n\n    numeric_cols_here = [c for c in NUMERIC_COLS if not (cyclical_month and c == 'MonthSold')]\n    X_num = frame[numeric_cols_here].to_numpy(dtype=float)\n    if district_int:\n        district_col = frame['District'].map(\n            lambda d: district_to_idx.get(d, DISTRICT_OOV_IDX)).to_numpy(dtype=float).reshape(-1, 1)\n        X_num = np.column_stack([X_num, district_col])\n\n    if fit_scaler:\n        scaler = StandardScaler().fit(X_num)\n    X_num_scaled = scaler.transform(X_num)\n\n    blocks = [X_num_scaled]\n    if cyclical_month:\n        blocks.append(month_cyclical(frame['MonthSold']))\n    if use_state:\n        blocks.append(state_encoder.transform(frame[['State']]))\n    if use_housestyle:\n        blocks.append(housestyle_encoder.transform(frame[['HouseStyle']]))\n    if use_salecondition:\n        blocks.append(salecondition_encoder.transform(frame[['SaleCondition']]))\n    if use_centralair:\n        blocks.append((frame['CentralAir'] == 'Y').to_numpy(dtype=float).reshape(-1, 1))\n\n    return np.column_stack(blocks), scaler",
+   "que_hace": "Arma el bloque de features \"directo\" de cada casa: numéricas escaladas, mes sin/cos, one-hots y `CentralAir` 0/1.",
+   "como_funciona": "1. Imputa `LotFrontage` con `fill_value` (la mediana de train, sin flag).\n2. `numeric_cols_here` excluye `MonthSold` si va cíclico.\n3. Con `district_int=True` agrega District como entero plano (experimento trampa de la Pregunta 2).\n4. `StandardScaler` se ajusta solo si `fit_scaler=True`; si no, usa el `scaler` recibido.\n5. `blocks` concatena según los flags `use_state`, `use_housestyle`, `use_salecondition`, `use_centralair` y `cyclical_month`.",
    "proposito": "Los flags permiten encender bloques de a uno y medir el aporte de cada uno (criterio del Milestone 3). District queda afuera de este bloque porque va por su propia rama de embedding.",
-   "interaccion": "La llaman `train_categorical_variant` (celda 26) y el Milestone 4 (celda 34). Usa los encoders y `month_cyclical` de la celda 25.",
+   "interaccion": "La llaman `train_categorical_variant` (misma celda), el Milestone 4 (celda 43) y `preprocess_house_for_final_model` del M5 (celda 50). Usa los encoders y `month_cyclical` de la celda 34.",
    "teoria": "La red solo ve una fila de floats de largo fijo: este es el traductor de casa a vector.",
    "key": "tp2-build-dense-features",
    "tp": 2,
@@ -2302,16 +2416,16 @@
   },
   {
    "id": "ejercicio-a-mano",
-   "titulo": "Parte 5: el bloque de transformer a mano (pendiente)",
+   "titulo": "Parte 5: la consigna del bloque de transformer a mano",
    "archivo": "a_mano/ejercicio.md",
    "desde": 63,
    "hasta": 93,
    "lenguaje": "markdown",
    "codigo": "## Parte A: el bloque completo como decoder (con máscara causal)\n\nPara cada una de las dos frases:\n\n1. **Entrada.** X = E + P, una fila por token.\n2. **Proyecciones.** Q = X Wq, K = X Wk, V = X Wv.\n3. **Afinidades.** S = Q Kᵀ.\n4. **Escala.** S / √d, con d = 4.\n5. **Máscara causal.** Poner −∞ donde un token mira a uno posterior.\n6. **Matriz de atención.** A = softmax por fila.\n7. **Mezcla.** A V, y después la proyección de salida (A V) Wo.\n8. **Residual.** Z = X + (A V) Wo.\n9. **Layer norm.** LN(Z), fila por fila (media y varianza de cada fila; ε despreciable).\n10. **Feed-forward.** FFN = ReLU(LN(Z) W1) W2.\n11. **Residual.** H = Z + FFN.\n12. **Layer norm final.** LN(H).\n13. **Predicción.** Con la última fila de LN(H), logits = fila · Wout (un valor por palabra del vocabulario) y softmax sobre esos seis valores. ¿Qué palabra completa la frase, y con qué probabilidad?\n\n## Parte B: la misma atención sin máscara (encoder)\n\nPara cada frase, repitan los pasos 5 a 9 sin la máscara causal y anoten la fila de \"banco\" en LN(Z).\n\n## Preguntas\n\nContesten en la misma hoja, en dos o tres líneas cada una:\n\n1. Comparen la fila de \"banco\" en LN(Z) entre las dos frases en la parte A y en la parte B. ¿En cuál de las dos partes el vector de \"banco\" cambia según la frase? ¿Por qué?\n2. En la parte A, ¿cómo \"sabe\" el modelo si tiene que predecir \"peso\" o \"dinero\", si el vector de \"banco\" es el mismo en las dos frases?\n3. La predicción de la parte A y la que resultaría de la parte B para la última posición, ¿son iguales o distintas? Expliquen por qué con lo que hace la máscara.\n4. ¿Qué modelo de la clase se parece a la parte A y cuál a la parte B? ¿Para qué se usa cada uno?\n5. Si P fuera todo ceros, ¿qué cambiaría en los resultados de este ejercicio? ¿Y en una frase donde el orden de las palabras cambie el sentido?",
-   "que_hace": "Es la consigna de la cátedra para la parte 5, que quedó pendiente en el repo: pasar «El banco aguanta» y «El banco presta» por un bloque completo, con y sin máscara causal.",
+   "que_hace": "Es la consigna de la cátedra para la parte 5: pasar «El banco aguanta» y «El banco presta» por un bloque completo, con y sin máscara causal. Las cuentas están en `a_mano/Punto5_a_mano.pdf` (hojas escaneadas) y el resumen en la sección 5 del INFORME.",
    "como_funciona": "- Parte A (decoder): X = E + P, proyecciones Q/K/V, S = QKᵀ, escala por √d, máscara causal, softmax, A V y Wo, residual, layer norm, FFN con ReLU, residual, layer norm final y predicción con Wout.\n- Parte B (encoder): la misma atención sin máscara, mirando la fila de «banco».\n- Las preguntas comparan cómo cambia «banco» según el contexto y qué hace la máscara.",
-   "proposito": "Obliga a hacer a mano cada operación del bloque para entender qué aporta cada una. Por regla del TP se resuelve sin IA; no hay hojas escaneadas en el repo.",
-   "interaccion": "Usa los datos del mismo archivo (embeddings, posiciones y pesos); el PLAN preveía verificar las cuentas con `atencion.py` desde `a_mano/verificar.py`, que tampoco existe.",
+   "proposito": "Obliga a hacer a mano cada operación del bloque para entender qué aporta cada una. Por regla del TP se resolvió sin IA, en papel.",
+   "interaccion": "Usa los datos del mismo archivo (embeddings, posiciones y pesos); lo que dio está resumido en la sección 5 de `INFORME.md` (snippet siguiente).",
    "teoria": "Un bloque de transformer completo: atención, residuales, layer norm y feed-forward; diferencia entre decoder (máscara causal) y encoder (bidireccional).",
    "key": "tp3-ejercicio-a-mano",
    "tp": 3,

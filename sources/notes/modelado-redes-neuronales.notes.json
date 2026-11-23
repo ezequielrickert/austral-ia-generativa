@@ -24,7 +24,7 @@
   "tp": [
    {
     "tp": 2,
-    "texto": "La lección central del TP2: con la misma red 32-32, solo cambiar cómo armaste la entrada bajó el MAE 60%."
+    "texto": "La lección central del TP2: con la misma red 32-32, solo cambiar cómo armaste la entrada bajó el MAE 51% (de 50.940 a 24.923)."
    }
   ],
   "ver": [],
@@ -163,7 +163,7 @@
   "tp": [
    {
     "tp": 2,
-    "texto": "`State` (12) con one-hot y `District` (72) con `Embedding(73, 8)`: el MAE bajó de 51.411 a 30.956 y luego a 25.380."
+    "texto": "`State` (12) con one-hot y `District` (72) con `Embedding(73, 8)`: el MAE bajó de 50.940 a 30.011 y luego a 23.791."
    }
   ],
   "ver": [
@@ -184,7 +184,7 @@
   "tp": [
    {
     "tp": 2,
-    "texto": "Las tres trampas del dataset más `LotFrontage`. `District` como entero entrenó sin error pero dio MAE 25.856 vs 20.844 con embedding."
+    "texto": "Las tres trampas del dataset más `LotFrontage`. `District` como entero entrenó sin error pero dio MAE 28.842 vs 24.923 con embedding (+15,7%)."
    }
   ],
   "ver": [],
@@ -201,7 +201,7 @@
   "tp": [
    {
     "tp": 2,
-    "texto": "`ListingId` descartado (0 floats), `MonthSold` como seno y coseno (2 floats), `CentralAir` 0/1, `LotFrontage` mediana 70,0 + flag."
+    "texto": "`ListingId` descartado (0 floats), `MonthSold` como seno y coseno (2 floats), `CentralAir` 0/1, `LotFrontage` mediana de train (70,0) sin flag."
    }
   ],
   "ver": [],
@@ -239,7 +239,7 @@
   "tp": [
    {
     "tp": 2,
-    "texto": "Ojo: comparaste todas las variantes con el MAE de test. En rigor esa elección era trabajo de validación."
+    "texto": "Ojo: elegiste la imputación y el modelo final comparando métricas de test. En rigor esa elección era trabajo de validación."
    },
    {
     "tp": 4,
@@ -264,7 +264,7 @@
   "tp": [
    {
     "tp": 2,
-    "texto": "Scaler, mediana, encoders y mapa de distritos ajustados solo en train. Pero el M5 (preprocesamiento dentro del modelo) quedó pendiente."
+    "texto": "Scaler, mediana, encoders y mapa de distritos ajustados solo en train. En el M5, `predict_house_price` reutiliza esos mismos objetos para tasar una casa escrita a mano."
    }
   ],
   "ver": [],
@@ -394,7 +394,7 @@
   "tp": [
    {
     "tp": 2,
-    "texto": "Sacar la casa de Wheatfield (error \\$226.171) bajó el RMSE 3,3% y el MAE solo 2,3%: el cuadrado pesa más los errores grandes."
+    "texto": "Sacar la casa de Wheatfield (error \\$214.233) bajó el RMSE 3,1% y el MAE solo 2,2%: el cuadrado pesa más los errores grandes."
    }
   ],
   "ver": [],
@@ -434,7 +434,12 @@
    "pinball-loss",
    "funcion-de-perdida"
   ],
-  "tp": [],
+  "tp": [
+   {
+    "tp": 2,
+    "texto": "En el extra del TP2 usaste pinball para dar un rango de precio en vez de un punto: P10–P90 de unos \\$53 mil de ancho en promedio."
+   }
+  ],
   "ver": [],
   "clave_examen": false
  },
@@ -447,7 +452,7 @@
   "tp": [
    {
     "tp": 2,
-    "texto": "El extra P10/P50/P90 con pinball loss quedó pendiente en tu TP2."
+    "texto": "En el extra del TP2 la red tuvo 3 salidas (P10, P50, P90) entrenadas con `pinball_loss`, y `softplus` forzó que no se crucen. Cobertura P10–P90 en test: 82,2% (lo esperado es 80%)."
    }
   ],
   "ver": [],
@@ -645,7 +650,7 @@
   "tp": [
    {
     "tp": 2,
-    "texto": "Tu 512-512-512 terminó con train 0,0121 y val 0,1273. Con regularización y early stopping (cortó en la época 76), el MAE bajó a 16.538."
+    "texto": "Tu 512-512-512 llegó a train 0,0375 y val 0,1435 (mínimo 0,0717 en la época 7). Regularizada y con early stopping (81 épocas) el RMSE bajó 9,7% (28.433 → 25.672) y el MAE quedó parejo (19.214 → 19.481)."
    }
   ],
   "ver": [
@@ -759,7 +764,7 @@
   "tp": [
    {
     "tp": 2,
-    "texto": "La 512-512-512 tenía 550.985 parámetros para 1022 casas (unos 540 por ejemplo) y memorizó. Tu 32-32 era el punto de partida razonable."
+    "texto": "La 512-512-512 tenía 550.473 parámetros para 1022 casas (unos 540 por ejemplo) y memorizó. Tu 32-32 era el punto de partida razonable."
    }
   ],
   "ver": [
@@ -821,7 +826,7 @@
   "tp": [
    {
     "tp": 2,
-    "texto": "Tu conclusión fue la misma: el salto no vino de la arquitectura sino de codificar la ubicación (MAE de 51 mil a 21 mil)."
+    "texto": "Tu conclusión fue la misma: el salto no vino de la arquitectura sino de codificar la ubicación (MAE de 50.940 a 24.923 con la misma 32-32)."
    }
   ],
   "ver": [],
@@ -838,7 +843,7 @@
   "tp": [
    {
     "tp": 2,
-    "texto": "La pregunta \"¿puede faltar?\" es tu `LotFrontage`: faltaba en 7%, y esas casas valen 12% menos, así que el flag aporta señal."
+    "texto": "La pregunta \"¿puede faltar?\" es tu `LotFrontage`: faltaba en 7% y esas casas valían 13,7% menos, pero el flag no mejoró las métricas y quedó afuera."
    }
   ],
   "ver": [],

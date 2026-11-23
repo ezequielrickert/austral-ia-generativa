@@ -2704,7 +2704,7 @@
    "codigo": "### Dónde falló el agente y qué se cambió\n\n**A11** (\"Necesito turno con cardiología, ¿cuál es el primero y qué tengo que llevar?\") fue la única pregunta con\nproblemas en la corrida 1 (CR 4, AR 4). El log muestra que el ruteo estuvo bien: llamó a `consultar_turnos` y a\n`buscar_documentos`. Pero buscó *\"requisitos y documentación para turno en consultorios externos de cardiología\"*, y el\nrecuperador devolvió solo la sección \"Cómo se pide un turno\", que menciona la derivación. La sección \"Qué llevar a la\nprimera consulta\" (DNI, credencial, derivación, estudios previos) quedó tercera, a 0,018 del primero y fuera del\nmargen de 0,005. La respuesta fue fiel a lo que recibió (F 5), pero incompleta.\n\nPrimero se probó darle más fragmentos al agente, porque la métrica de la parte 1 castiga cada fragmento extra y la del\njuez no tanto:\n\n- Con **top-3 fijo** (corrida 2), A11 sube a 5, pero el ruido baja el CR de A01–A04 y A12 (3 y 4): el juez penaliza\n  los fragmentos que no hacen falta. El promedio de CR cae a 4,417.\n- Con **margen 0,02** (corrida 3), el resto vuelve a 5. Pero A11 falla otra vez (CR 3), porque el modelo redactó la\n  consulta de otra forma y la sección correcta ya no quedaba cerca del primero.\n\nEl problema no era la cantidad de fragmentos sino la consulta. Buscar \"requisitos y documentación\" no se parece al\nencabezado \"Qué llevar a la primera consulta\"; buscar con las palabras del paciente (\"qué tengo que llevar\") sí. Por\neso en la corrida 4 se volvió a la selección de la parte 1 y se cambió la descripción de `buscar_documentos`: la\nconsulta va \"con las mismas palabras que usó el paciente\" y, si la pregunta toca varios temas, se hace una búsqueda por\ntema. En A11 el modelo buscó *\"qué llevar a un turno de cardiología…\"*, recibió la sección correcta y contestó completo.\n\nEn el mismo cambio se reemplazó el ejemplo de la descripción (\"horario de visita de los abuelos en neonatología\"), que\nera literalmente la pregunta A01 de dev, por uno que no aparece en ninguna pregunta dev (\"cómo es una consulta por\ntelemedicina\"). Así se evita ajustar el agente a las preguntas dev.\n\n**Límites de esta medición.** Son 12 preguntas y una corrida por configuración. El modelo redacta la consulta distinto\nen cada corrida aun con temperatura 0: en A11, con la misma descripción, las corridas 1 a 3 buscaron \"…consultorios\nexternos de cardiología\", \"…consultorios externos cardiología\" y \"…consultorios externos\" a secas. Así que una\ndiferencia de una pregunta entre corridas está dentro del ruido. Lo que se sostiene en las cuatro corridas es el ruteo\n(1,00 siempre) y la fidelidad (5,00 siempre): el agente no inventó datos en ninguna respuesta.",
    "que_hace": "Analiza la única pregunta que falló (A11, turno de cardiología y qué llevar), las dos soluciones que no funcionaron y la que sí, más los límites de la medición.",
    "como_funciona": "- El ruteo estaba bien, pero el modelo buscó «requisitos y documentación…» y la sección «Qué llevar a la primera consulta» quedó tercera, fuera del margen.\n- Top-3 fijo la arreglaba pero el ruido bajó el CR general a 4,417; margen 0,02 falló por otra redacción de la consulta.\n- Solución: la descripción de `buscar_documentos` pide usar las palabras del paciente y una búsqueda por tema.\n- Se sacó del ejemplo la pregunta A01 de dev.\n- Con 12 preguntas y una corrida, una pregunta de diferencia es ruido.",
-   "proposito": "Muestra que se corrigió el síntoma «la sección correcta queda tercera» mejorando la consulta (descripción de la tool) en vez de agregar un reranker o más contexto.",
+   "proposito": "Muestra que se corrigió el síntoma «la sección correcta queda tercera» mejorando la consulta (descripción de la tool) en vez de agregar un reranker o más contexto. Ojo: después de la corrida MCP se agregó además una regla por palabra clave en `buscar_documentos` (top-3 sin margen si la consulta dice «llevar» o «document»); este informe no la menciona y no se evaluó con una corrida nueva.",
    "interaccion": "Se apoya en los logs de `experimentos/corridas/` y explica el texto final de `BUSCAR_DOCUMENTOS` en `hospital/descripciones.py`.",
    "teoria": "Diagnóstico de RAG: cuando falta una etapa (consulta mal formulada) más contexto mete ruido; y la variabilidad del LLM aun con temperatura 0.",
    "key": "tp3-informe-a11",
@@ -2761,7 +2761,7 @@
    "que_hace": "Fija el tope de pasos del bucle y el prompt de sistema del agente del hospital.",
    "como_funciona": "- `MAX_PASOS = 6` limita las llamadas al modelo por pregunta.\n- El prompt dice que el modelo no sabe nada del hospital y que todo sale de las herramientas.\n- Rutea: normas y procedimientos → `buscar_documentos`; estado de hoy → la tool de la API; preguntas mixtas → cada parte con su fuente.\n- Pide reintentar ante errores con opciones válidas, usar solo datos de los resultados y decir si falta algo.",
    "proposito": "Es la mitigación de alucinaciones por prompt: el hospital es ficticio, así que todo dato no recuperado sería inventado. Resultado: Faithfulness 5,00 en las 4 corridas. Es zero-shot: el único ejemplo (camas + acompañantes) ilustra el patrón mixto sin copiar preguntas de dev.",
-   "interaccion": "Lo usa `responder()` en el mismo archivo como `SystemMessage(PROMPT)`; aplica igual a las tools de LangChain y a las que cargaría el cliente MCP.",
+   "interaccion": "Lo usa `responder()` en el mismo archivo como `SystemMessage(PROMPT)`; aplica igual a las tools de LangChain y a las que carga `agente_mcp.py` desde el servidor MCP.",
    "teoria": "Grounding: restringir la respuesta al contexto recuperado y admitir cuando falta información.",
    "key": "tp3-prompt-sistema",
    "tp": 3,
@@ -2807,8 +2807,8 @@
    "codigo": "async def _ejecutar(por_nombre, llamada):\n    tool = por_nombre.get(llamada[\"name\"])\n    if tool is None:\n        return ToolMessage(f\"Error: la herramienta '{llamada['name']}' no existe. Herramientas disponibles: \"\n                           f\"{', '.join(sorted(por_nombre))}.\", tool_call_id=llamada[\"id\"], name=llamada[\"name\"])\n    try:\n        return await tool.ainvoke({**llamada, \"type\": \"tool_call\"})\n    except Exception as e:  # el error vuelve al modelo como texto para que pueda corregirse\n        return ToolMessage(f\"Error al ejecutar {llamada['name']}: {e}\", tool_call_id=llamada[\"id\"], name=llamada[\"name\"])\n\n\nasync def responder(llm, tools, pregunta):\n    \"\"\"Devuelve todos los mensajes de la conversación: sistema, pregunta, AIMessage y ToolMessage.\"\"\"\n    llm_con_tools = llm.bind_tools(tools)\n    por_nombre = {t.name: t for t in tools}\n    mensajes = [SystemMessage(PROMPT), HumanMessage(pregunta)]\n    for _ in range(MAX_PASOS):\n        ai = await llm_con_tools.ainvoke(mensajes)\n        mensajes.append(ai)\n        if not ai.tool_calls:\n            break\n        for llamada in ai.tool_calls:\n            mensajes.append(await _ejecutar(por_nombre, llamada))\n    return mensajes",
    "que_hace": "Implementa el agente: el modelo pide herramientas, se ejecutan, sus resultados vuelven como `ToolMessage` y se repite hasta que responde sin pedir nada o se llega a 6 pasos.",
    "como_funciona": "- `responder` enlaza las tools con `llm.bind_tools(tools)` y arma `por_nombre`.\n- Arranca con `[SystemMessage(PROMPT), HumanMessage(pregunta)]`.\n- En cada paso: `ai = await llm_con_tools.ainvoke(mensajes)`; si `ai.tool_calls` está vacío, termina.\n- Si no, ejecuta cada llamada con `_ejecutar` y agrega el `ToolMessage` (puede haber varias en paralelo en el mismo paso).\n- `_ejecutar` devuelve un `ToolMessage` de error si la tool no existe o lanza una excepción.",
-   "proposito": "Se escribió a mano, sin LangGraph ni AgentExecutor, para tener todos los mensajes y poder loguearlos. Es agnóstico del origen de las tools: el docstring lo prepara para las de `langchain-mcp-adapters` (parte 3, pendiente).",
-   "interaccion": "Lo llama `correr()` en `hospital/agente/corrida.py` por cada pregunta; devuelve la lista completa de mensajes, que `resumir()` convierte en respuesta, contextos, herramientas y costo. `tests/test_agente.py` lo prueba con un modelo falso.",
+   "proposito": "Se escribió a mano, sin LangGraph ni AgentExecutor, para tener todos los mensajes y poder loguearlos. Es agnóstico del origen de las tools: sirvió sin cambios para las `@tool` de la parte 2 y para las que carga `langchain-mcp-adapters` en la parte 3.",
+   "interaccion": "Lo llama `correr()` en `hospital/agente/corrida.py` por cada pregunta (desde `agente.py` y desde `agente_mcp.py`); devuelve la lista completa de mensajes, que `resumir()` convierte en respuesta, contextos, herramientas y costo. `tests/test_agente.py` lo prueba con un modelo falso.",
    "teoria": "Agente ReAct / ciclo de vida de una tool: AIMessage con tool_calls → ejecución → ToolMessage → nueva llamada al modelo.",
    "key": "tp3-bucle-tool-calling",
    "tp": 3,
@@ -2858,15 +2858,6 @@
      "title": "El ciclo de vida de una herramienta MCP",
      "extra": false,
      "url": "/clases/06/#d=rag-y-mcp&s=54"
-    },
-    {
-     "clase": 6,
-     "cnn": "06",
-     "slug": "rag-y-mcp",
-     "i": 57,
-     "title": "Demo: un servidor MCP mínimo",
-     "extra": false,
-     "url": "/clases/06/#d=rag-y-mcp&s=57"
     },
     {
      "clase": 7,
@@ -2959,7 +2950,7 @@
      "url": "/clases/13/#d=cierre-magnifica-humanitas&s=25"
     }
    ],
-   "nusos": 16
+   "nusos": 15
   },
   {
    "id": "guarda-practica",
@@ -3261,7 +3252,7 @@
    "que_hace": "Define el texto que lee el modelo para decidir qué herramienta llamar: `buscar_documentos` para normas fijas y las de la API para el estado de hoy.",
    "como_funciona": "- `BUSCAR_DOCUMENTOS` lista los temas de los documentos y aclara que NO tiene el estado de hoy; pide buscar «con las mismas palabras que usó el paciente» y hacer una búsqueda por tema.\n- `CONSULTAR_CAMAS`, `CONSULTAR_GUARDIA` y `CONSULTAR_TURNOS` dicen que son el estado de HOY y enumeran los valores válidos del parámetro.\n- `CONSULTAR_TURNOS` agrega: «No dice qué hay que llevar al turno: eso está en los documentos».",
    "proposito": "El ruteo depende solo de estas descripciones, así que separan norma (documentos) de estado (API) y dicen cuándo NO usar cada tool: ruteo 1,00 en las 4 corridas. La frase de las palabras del paciente arregló A11, y el ejemplo de consulta se cambió por uno de telemedicina para no filtrar la pregunta A01 de dev.",
-   "interaccion": "Las importa `hospital/herramientas.py` a través del diccionario `DESCRIPCIONES`; el PLAN prevé que el servidor MCP use exactamente los mismos textos para que la comparación parte 2 vs. parte 3 sea justa.",
+   "interaccion": "Las importan `hospital/herramientas.py` (parte 2) y `servidor_mcp.py` (parte 3) a través del diccionario `DESCRIPCIONES`: los dos agentes ven exactamente los mismos textos, así la comparación parte 2 vs. parte 3 es justa.",
    "teoria": "Diseño de herramientas: la descripción es la interfaz para el modelo (qué hace, cuándo usarla, cuándo no, parámetros válidos).",
    "key": "tp3-descripciones-tools",
    "tp": 3,
