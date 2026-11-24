@@ -1,0 +1,718 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>TP2 en diapositivas · ¿Cuánto vale esta casa? · IA Generativa</title>
+  <meta name="description" content="Las diapositivas de IA Generativa (Universidad Austral, 2c 2026) con notas por diapositiva y vínculos a los TPs.">
+  <script>
+    (function(){try{var t=localStorage.getItem('iagen:theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t)}catch(e){}})();
+    window.SITE_BASE = "https://ezequielrickert.github.io/austral-ia-generativa".replace(/\/$/, '');
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <link rel="stylesheet" href="https://ezequielrickert.github.io/austral-ia-generativa/css/site.css?h=4f6959f565a2de28cda5">
+</head>
+<body>
+
+
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <a class="sb-head" href="https://ezequielrickert.github.io/austral-ia-generativa/">
+      <span class="sb-logo">IA</span>
+      <span class="sb-title"><b>IA Generativa</b><span>Guía de estudio · 2c 2026</span></span>
+    </a>
+    <div class="sb-search">
+      <div class="input-icon">
+        <svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input class="input" id="search" type="search" placeholder="Buscar" autocomplete="off" aria-label="Buscar diapositivas y conceptos">
+        <kbd>/</kbd>
+      </div>
+      <div class="search-results" id="search-results" hidden></div>
+    </div>
+    <nav class="sb-body" aria-label="Navegación">
+      <div class="nav-group">
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/">
+          <svg class="i" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span class="t">Inicio</span></a>
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/">
+          <svg class="i" viewBox="0 0 24 24"><path d="M4 19.5V5a2 2 0 0 1 2-2h14v16H6.5A2.5 2.5 0 0 0 4 21.5"/><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/></svg><span class="t">Glosario</span></a>
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/practica/">
+          <svg class="i" viewBox="0 0 24 24"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg><span class="t">Práctica</span></a>
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/marcadas/">
+          <svg class="i" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg><span class="t">Marcadas</span><span class="count" id="star-count"></span></a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-label">Clases</div>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/" title="Bienvenida + CoWork: fundamentos de IA, modelos fundacionales y el chat extendido">
+          <span class="n">01</span><span class="t">Bienvenida + CoWork: fundamentos de IA, modelos fundacionales y el chat extendido</span><span class="meter" data-class="1" data-total="100"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/" title="CoWork: agentes de código, contexto, CLAUDE.md, Skills, subagentes y MCP">
+          <span class="n">02</span><span class="t">CoWork: agentes de código, contexto, CLAUDE.md, Skills, subagentes y MCP</span><span class="meter" data-class="2" data-total="66"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/03/" title="Introducción a las redes neuronales">
+          <span class="n">03</span><span class="t">Introducción a las redes neuronales</span><span class="meter" data-class="3" data-total="51"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/" title="Diseño de redes neuronales (modelado de un MLP)">
+          <span class="n">04</span><span class="t">Diseño de redes neuronales (modelado de un MLP)</span><span class="meter" data-class="4" data-total="64"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/05/" title="LLMs: prompting, costos y producción">
+          <span class="n">05</span><span class="t">LLMs: prompting, costos y producción</span><span class="meter" data-class="5" data-total="72"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/" title="RAG, bases vectoriales, inverted index">
+          <span class="n">06</span><span class="t">RAG, bases vectoriales, inverted index</span><span class="meter" data-class="6" data-total="71"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/" title="MCP y herramientas (con repaso de RAG) · De la palabra al transformer">
+          <span class="n">07</span><span class="t">MCP y herramientas (con repaso de RAG) · De la palabra al transformer</span><span class="meter" data-class="7" data-total="69"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/08/" title="El transformer por dentro: atención, el bloque completo y la familia de modelos">
+          <span class="n">08</span><span class="t">El transformer por dentro: atención, el bloque completo y la familia de modelos</span><span class="meter" data-class="8" data-total="43"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/" title="LLM training: pre-training, SFT, RLHF, herramientas y fine-tuning">
+          <span class="n">09</span><span class="t">LLM training: pre-training, SFT, RLHF, herramientas y fine-tuning</span><span class="meter" data-class="9" data-total="60"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/10/" title="Agentes: sistemas multiagente, especialización, contexto y orquestación">
+          <span class="n">10</span><span class="t">Agentes: sistemas multiagente, especialización, contexto y orquestación</span><span class="meter" data-class="10" data-total="64"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/11/" title="Redes generativas antagónicas (GANs)">
+          <span class="n">11</span><span class="t">Redes generativas antagónicas (GANs)</span><span class="meter" data-class="11" data-total="54"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/12/" title="Modelos generativos de señales, imágenes y multimodalidad">
+          <span class="n">12</span><span class="t">Modelos generativos de señales, imágenes y multimodalidad</span><span class="meter" data-class="12" data-total="79"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/" title="Del poder a la responsabilidad: seguridad, ética y lo que viene">
+          <span class="n">13</span><span class="t">Del poder a la responsabilidad: seguridad, ética y lo que viene</span><span class="meter" data-class="13" data-total="56"><i></i></span></a>
+        
+      </div>
+      <div class="nav-group">
+        <div class="nav-label">Trabajos prácticos</div>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/tp/1/" title="Corta, del caos a producción">
+          <span class="n">1</span><span class="t">Corta, del caos a producción</span></a>
+        <a class="nav-item sub " href="https://ezequielrickert.github.io/austral-ia-generativa/tp-diapositivas/1/" title="TP1 en diapositivas">
+          <span class="n"></span><span class="t">En diapositivas</span><span class="meter" data-class="101" data-total="25"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/tp/2/" title="¿Cuánto vale esta casa?">
+          <span class="n">2</span><span class="t">¿Cuánto vale esta casa?</span></a>
+        <a class="nav-item sub active" href="https://ezequielrickert.github.io/austral-ia-generativa/tp-diapositivas/2/" title="TP2 en diapositivas">
+          <span class="n"></span><span class="t">En diapositivas</span><span class="meter" data-class="102" data-total="27"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/tp/3/" title="RAG, MCP y Transformers en el Hospital Arroyo Claro">
+          <span class="n">3</span><span class="t">RAG, MCP y Transformers en el Hospital Arroyo Claro</span></a>
+        <a class="nav-item sub " href="https://ezequielrickert.github.io/austral-ia-generativa/tp-diapositivas/3/" title="TP3 en diapositivas">
+          <span class="n"></span><span class="t">En diapositivas</span><span class="meter" data-class="103" data-total="27"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/tp/4/" title="El agente de admisión de guardia (TP final)">
+          <span class="n">4</span><span class="t">El agente de admisión de guardia (TP final)</span></a>
+        <a class="nav-item sub " href="https://ezequielrickert.github.io/austral-ia-generativa/tp-diapositivas/4/" title="TP4 en diapositivas">
+          <span class="n"></span><span class="t">En diapositivas</span><span class="meter" data-class="104" data-total="25"><i></i></span></a>
+        
+      </div>
+    </nav>
+    <div class="sb-foot">
+      <span id="exam-left">Final: 4 dic</span>
+      <button class="btn icon sm ghost" id="theme-btn" aria-label="Cambiar tema" title="Cambiar tema">
+        <svg class="i" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+    </div>
+  </aside>
+  <div class="main">
+    <div class="topbar">
+      <button class="btn icon" id="menu-btn" aria-label="Abrir navegación"><svg class="i" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+      <b>IA Generativa</b>
+    </div>
+    <main class="content is-viewer">
+      
+
+<div class="viewer-page" id="viewer" data-class="102" data-path="/tp-diapositivas/2/">
+<header class="page-header">
+  <div class="ph-main">
+    
+    <nav class="crumbs"><span>Trabajos prácticos</span><span class="sep">/</span><a href="https://ezequielrickert.github.io/austral-ia-generativa/tp/2/">TP2</a><span class="sep">·</span><span>En diapositivas</span><span class="sep">·</span><span class="mono">house-prices</span></nav>
+    <h1>¿Cuánto vale esta casa?</h1>
+    
+  </div>
+  <div class="ph-actions">
+    
+    <button class="btn icon" id="focus-btn" aria-pressed="false" title="Modo foco: ocultar el menú (f)" aria-label="Modo foco"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg></button>
+    <button class="btn icon" id="fs-btn" title="Pantalla completa: diapositivas, notas y TPs (p)" aria-label="Pantalla completa"><svg class="i" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+    
+    <a class="btn" href="https://ezequielrickert.github.io/austral-ia-generativa/tp/2/">Ficha del TP</a>
+    <a class="btn" href="https://ezequielrickert.github.io/austral-ia-generativa/practica/#t2">Preguntas de defensa</a>
+    <a class="btn icon " href="https://ezequielrickert.github.io/austral-ia-generativa/tp-diapositivas/1/" aria-label="TP anterior" title="TP anterior"><svg class="i" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></a>
+    <a class="btn icon " href="https://ezequielrickert.github.io/austral-ia-generativa/tp-diapositivas/3/" aria-label="TP siguiente" title="TP siguiente"><svg class="i" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></a>
+    
+  </div>
+</header>
+
+<div class="viewer-area">
+<div class="viewer">
+  <section class="card stage-card">
+    <div class="card-header">
+      <span class="deck-kind"><span class="pill sched" id="deck-kind" hidden data-kind-sched="Calendario" data-kind-extra="Complementaria" title="Figura en el calendario de la materia">Calendario</span><span class="card-sub" id="sec-name">&nbsp;</span></span>
+      <div class="seg" id="filter" aria-label="Filtrar diapositivas">
+        <button aria-pressed="true" data-f="all">Todas<span class="fc mono" data-fc="all"></span></button>
+        <button aria-pressed="false" data-f="key"><span class="bar"></span>Clave<span class="fc mono" data-fc="key"></span></button>
+        
+      </div>
+      <button class="btn icon sm ghost" id="fs-exit" title="Salir de pantalla completa (p o Esc)" aria-label="Salir de pantalla completa"><svg class="i" viewBox="0 0 24 24"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg></button>
+    </div>
+    <div class="stage" id="stage">
+      <iframe id="deck-frame" title="Diapositivas de la clase" allow="autoplay; fullscreen"></iframe>
+      <button class="tp-mark" id="tp-mark" hidden aria-expanded="false" aria-controls="tp-pop" title="¿Dónde lo usaste? (t)"><b>?</b><span id="tp-mark-label">TP</span></button>
+      <div class="tp-pop card" id="tp-pop" hidden role="dialog" aria-label="Dónde lo usaste en los TPs"></div>
+    </div>
+    <div class="card-footer">
+      <button class="btn icon sm" id="prev" aria-label="Diapositiva anterior"><svg class="i" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>
+      <span class="pos" id="pos">—</span>
+      <button class="btn icon sm" id="next" aria-label="Diapositiva siguiente"><svg class="i" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>
+      
+      <div class="scrub" data-scrub="tp-2"  role="slider" aria-label="Ir a una diapositiva" aria-valuemin="0" aria-valuemax="26" tabindex="0">
+        <span class="tk" data-i="0" data-t="Portada"></span><span class="tk" data-i="1" data-t="El punto de partida: el notebook de clase"></span><span class="tk" data-i="2" data-t="El dataset nuevo: tres casas de ejemplo"></span><span class="tk key" data-i="3" data-t="Lo que esconden las columnas"></span><span class="tk" data-i="4" data-t="Por qué la red no puede comer el CSV"></span><span class="tk" data-i="5" data-t="Qué pedía la misión"></span><span class="tk" data-i="6" data-t="Los milestones, como pedidos"></span><span class="tk" data-i="7" data-t="Las cinco preguntas que se corrigen"></span><span class="tk key" data-i="8" data-t="M1 · ¿Qué significa la resta?"></span><span class="tk key" data-i="9" data-t="Partir primero y ajustar solo en train"></span><span class="tk" data-i="10" data-t="M2 · El hueco de `LotFrontage`"></span><span class="tk" data-i="11" data-t="M2 · Salida, loss y escala del precio"></span><span class="tk key" data-i="12" data-t="M3 · La ubicación: `State` y `District`"></span><span class="tk" data-i="13" data-t="Dos entradas: la rama del embedding"></span><span class="tk" data-i="14" data-t="M3 · ¿Cuánto aporta cada bloque?"></span><span class="tk" data-i="15" data-t="M4 · Overfitear a propósito y frenarlo"></span><span class="tk" data-i="16" data-t="M5 · Tasar una casa escrita a mano"></span><span class="tk" data-i="17" data-t="Extra · Un rango en vez de un punto"></span><span class="tk" data-i="18" data-t="Contra lo pedido"></span><span class="tk key" data-i="19" data-t="El error en cada etapa"></span><span class="tk" data-i="20" data-t="Qué funcionó y qué queda flojo"></span><span class="tk" data-i="21" data-t="Mapa: clase → concepto → dónde apareció"></span><span class="tk" data-i="22" data-t="Lo que vuelve en clases posteriores"></span><span class="tk" data-i="23" data-t="La trampa del entero"></span><span class="tk" data-i="24" data-t="Pregunta 5: ¿dónde se ajustó el escalador?"></span><span class="tk key" data-i="25" data-t="El problema metodológico"></span><span class="tk" data-i="26" data-t="Cierre"></span>
+      </div>
+      
+      <button class="btn sm" id="side-toggle" aria-pressed="true" title="Esconder las notas (n)"><svg class="i chev-hide" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg><svg class="i chev-show" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>Notas</button>
+    </div>
+  </section>
+
+  <aside class="card side-card" id="side-card">
+    <div class="card-header">
+      <div class="seg" role="tablist" data-tabs="side-card">
+        <button role="tab" data-tab="nota" aria-selected="true">Nota</button>
+        <button role="tab" data-tab="indice" aria-selected="false">Índice</button>
+      </div>
+      <span class="count mono faint" id="note-pos" style="font-size:12px"></span>
+    </div>
+
+    <div class="side-panel" data-panel="nota" id="notes" aria-live="polite">
+      
+        
+        <article class="note" data-deck="tp-2" data-i="0" hidden>
+          <div class="card-section head">
+            <h2>Portada</h2>
+            
+            <p class="summary">El TP2 es la misión <code>missions/mlp</code>, sobre las clases 3 y 4. El deck sigue el orden de una historia: qué se recibió, qué se pedía, qué problemas aparecieron y cómo se resolvió cada uno, y recién al final los resultados. El hilo conductor: la red es la misma de siempre; lo difícil es traducir cada columna a números.</p>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-2" data-i="1" hidden>
+          <div class="card-section head">
+            <h2>El punto de partida: el notebook de clase</h2>
+            
+            <p class="summary">Es importante tener presente de dónde se arranca: una red chica que ya funciona, pero para otra pregunta y con datos limpios. El TP no pide inventar otra arquitectura sino cambiar la pregunta (de sí/no a dólares) y la entrada (de 10 columnas prolijas a 19 columnas reales). Cada una de esas tres líneas de <code>compile</code> y la última <code>Dense</code> va a tener que cambiar.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=63"><span class="ref">04·63</span><span><span class="t">Los notebooks de la clase</span><small>El notebook de clase sobre las casas es la base directa del TP.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/03/#d=intro-redes-neuronales&amp;s=9"><span class="ref">03·9</span><span><span class="t">La capa: el bloque que se repite</span><small>Cada `Dense(32, relu)` es el bloque combinación lineal + no linealidad.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-2" data-i="2" hidden>
+          <div class="card-section head">
+            <h2>El dataset nuevo: tres casas de ejemplo</h2>
+            
+            <p class="summary">A simple vista son datos razonables, y ahí está la trampa. <code>ListingId</code> parece un número, <code>MonthSold</code> parece un número, y <code>State</code> y <code>District</code> son texto. Además vienen las 10 numéricas de clase (superficies, baños, calidad, año), <code>HouseStyle</code>, <code>CentralAir</code>, <code>SaleCondition</code> y <code>LotFrontage</code>. Ninguna de estas columnas avisa si está bien o mal usarla tal como viene.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=2"><span class="ref">04·2</span><span><span class="t">La red ve una fila de números</span><small>La red solo ve una fila de floats de largo fijo: esta tabla todavía no lo es.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-2" data-i="3" hidden>
+          <div class="card-section head">
+            <h2>Lo que esconden las columnas</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para la defensa</span>
+            <p class="summary">Estas son las dificultades que el resto del deck va a resolver una por una. La consigna avisa que el dataset esconde al menos tres trampas de codificación; las tres primeras filas son esas. Lo peligroso es que ninguna rompe nada: si las metés tal cual, Keras entrena igual y solo da un error más grande.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=13"><span class="ref">04·13</span><span><span class="t">Errores de codificación caros</span><small>Los «errores de codificación caros»: código como número, ID único, cíclica plana, faltante con 0.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=62"><span class="ref">04·62</span><span><span class="t">Checklist operativo para la práctica</span><small>El checklist por variable: qué es, qué significa la resta, cardinalidad, si falta.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-2" data-i="4" hidden>
+          <div class="card-section head">
+            <h2>Por qué la red no puede comer el CSV</h2>
+            
+            <p class="summary">Esta lámina es la idea que ordena todo el TP. El cliente final es alguien que quiere tasar una casa describiéndola con palabras, y entre esa descripción y la red hay una traducción. La clase 4 da una pregunta para hacerla bien: si restar dos valores de la columna da una cantidad con sentido, el número puede entrar; si no, hay que traducirlo de otra manera.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=2"><span class="ref">04·2</span><span><span class="t">La red ve una fila de números</span><small>La red ve una fila de números: convertir el dato es una traducción con pérdida.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=10"><span class="ref">04·10</span><span><span class="t">La pregunta que decide la codificación</span><small>La pregunta que decide la codificación: ¿qué significa la resta entre dos valores?</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/12/#d=segmentacion-y-stable-diffusion&amp;s=2"><span class="ref">12·2</span><span><span class="t">Una red neuronal clásica solo acepta entradas de largo fijo</span><small>Una red densa solo acepta entradas de largo fijo.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-2" data-i="5" hidden>
+          <div class="card-section head">
+            <h2>Qué pedía la misión</h2>
+            
+            <p class="summary">La consigna está armada como contraste: lo que ya sabías hacer contra lo nuevo. Los dos cambios (salida y entrada) son independientes y cada uno tiene su teoría en la clase 4. Que se entregue un notebook que corra de punta a punta obliga a que todo el preprocesamiento sea reproducible.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=22"><span class="ref">04·22</span><span><span class="t">Un catálogo para elegir sin dudar</span><small>El catálogo de salidas: la tarea fija la última capa y la loss.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-2" data-i="6" hidden>
+          <div class="card-section head">
+            <h2>Los milestones, como pedidos</h2>
+            
+            <p class="summary">Los milestones siguen el orden de la clase 4: primero la entrada, después la salida, después el entrenamiento y al final el uso real. Cada uno se apoya en el anterior, así que una decisión mala en el M1 arrastra todo. El extra cambia otra vez la salida: de un punto a un rango.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=62"><span class="ref">04·62</span><span><span class="t">Checklist operativo para la práctica</span><small>El checklist por variable que pide el M1.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=47"><span class="ref">04·47</span><span><span class="t">Qué mirar cuando esto se entrena</span><small>Leer las curvas train vs val, como pide el M4.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-2" data-i="7" hidden>
+          <div class="card-section head">
+            <h2>Las cinco preguntas que se corrigen</h2>
+            
+            <p class="summary">Las preguntas son lo que se corrige, y cada una apunta a una trampa del problema. Las preguntas 2 y 3 se pueden responder entrenando a propósito la versión equivocada y midiendo qué pasa. La 5 es puramente conceptual: el leakage no se ve en ninguna salida, se razona.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=13"><span class="ref">04·13</span><span><span class="t">Errores de codificación caros</span><small>Las preguntas 2, 3 y 4 son errores de codificación caros de la clase.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=18"><span class="ref">04·18</span><span><span class="t">Todo se aprende solo del train</span><small>La pregunta 5 es «todo se aprende solo del train».</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-2" data-i="8" hidden>
+          <div class="card-section head">
+            <h2>M1 · ¿Qué significa la resta?</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para la defensa</span>
+            <p class="summary">El seno y el coseno ubican cada mes sobre un círculo: así diciembre y enero quedan vecinos. Hacen falta los dos porque con solo el seno dos meses distintos darían el mismo valor. Con <code>ListingId</code> adentro el MAE de test hasta bajó un poco (49.000 contra 50.940), lo que muestra que mirar una sola métrica esconde la memorización.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=10"><span class="ref">04·10</span><span><span class="t">La pregunta que decide la codificación</span><small>La pregunta que decide la codificación.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=14"><span class="ref">04·14</span><span><span class="t">La tabla de decisiones</span><small>La tabla tipo de variable → codificación → cuántos floats.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=13"><span class="ref">04·13</span><span><span class="t">Errores de codificación caros</span><small>ID único como feature y variable cíclica plana: dos errores caros.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-2" data-i="9" hidden>
+          <div class="card-section head">
+            <h2>Partir primero y ajustar solo en train</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para la defensa</span>
+            <p class="summary">Lo que miente con leakage no es el entrenamiento sino el número que reportás. La semilla fija tiene otra ventaja: todas las variantes posteriores se comparan sobre exactamente las mismas casas. Estos objetos ajustados en train van a reaparecer en el M5, cuando haya que tasar una casa nueva.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=16"><span class="ref">04·16</span><span><span class="t">Un dataset, tres trabajos distintos</span><small>Un dataset, tres trabajos distintos.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=18"><span class="ref">04·18</span><span><span class="t">Todo se aprende solo del train</span><small>Todo se aprende solo del train; calcularlo sobre todo es data leakage.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=20"><span class="ref">04·20</span><span><span class="t">Qué hacer y qué no</span><small>Partir antes de explorar y con semilla fija.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-2" data-i="10" hidden>
+          <div class="card-section head">
+            <h2>M2 · El hueco de `LotFrontage`</h2>
+            
+            <p class="summary">Acá el número y el concepto chocan, y el grupo eligió el concepto y lo dijo explícitamente. Con una sola semilla, la ventaja del cero puede ser ruido; para afirmarlo habría que promediar varias corridas. La mediana por <code>LotArea</code> (que correlaciona ~0,83 con <code>LotFrontage</code>) empató, así que se eligió la más simple.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=13"><span class="ref">04·13</span><span><span class="t">Errores de codificación caros</span><small>Faltante rellenado con 0: el cuarto error caro.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=62"><span class="ref">04·62</span><span><span class="t">Checklist operativo para la práctica</span><small>La pregunta «¿puede faltar?» del checklist.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-2" data-i="11" hidden>
+          <div class="card-section head">
+            <h2>M2 · Salida, loss y escala del precio</h2>
+            
+            <p class="summary">Activación y loss se eligen juntas, y las dos las decide la tarea, no el gusto. La Pregunta 1 lo muestra con una casa: <code>ListingId 781978</code> (Wheatfield) tuvo un error de USD 214.233, y sacarla baja el RMSE 3,1% pero el MAE solo 2,2%, porque el cuadrado pesa los errores grandes. Para una inmobiliaria se reporta el MAE; el RMSE sirve como alarma interna.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=22"><span class="ref">04·22</span><span><span class="t">Un catálogo para elegir sin dudar</span><small>Real → 1 neurona lineal + MSE; sí/no → sigmoide + BCE.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=28"><span class="ref">04·28</span><span><span class="t">Regresión: MSE, MAE y Huber</span><small>MSE castiga al cuadrado, MAE es lineal.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/03/#d=intro-redes-neuronales&amp;s=34"><span class="ref">03·34</span><span><span class="t">El paso de actualización</span><small>El paso de actualización depende del gradiente y de η.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-2" data-i="12" hidden>
+          <div class="card-section head">
+            <h2>M3 · La ubicación: `State` y `District`</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para la defensa</span>
+            <p class="summary">La regla de la clase: hasta 15 valores one-hot, 50 o más embedding. El one-hot dice la verdad (nadie se parece a nadie) pero no aprende parecidos; el embedding sí. En el fondo, un embedding es un one-hot seguido de una capa lineal sin sesgo: la tabla es un peso de la red, no una entrada.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=12"><span class="ref">04·12</span><span><span class="t">Categóricas: one-hot contra embedding</span><small>Categóricas: one-hot contra embedding según cardinalidad.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=13"><span class="ref">04·13</span><span><span class="t">Errores de codificación caros</span><small>Código como número: un error caro y silencioso.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=palabra-al-transformer&amp;s=15"><span class="ref">07·15</span><span><span class="t">De token a vector</span><small>Un embedding es un vector denso aprendido por categoría.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-2" data-i="13" hidden>
+          <div class="card-section head">
+            <h2>Dos entradas: la rama del embedding</h2>
+            
+            <p class="summary">Por esto hizo falta la API funcional: dos caminos que se unen en <code>Concatenate</code>. <code>Flatten</code> convierte la salida del embedding en 8 floats. Con <code>use_district=False</code> la misma función arma el modelo sin la rama, y eso permitió medir el aporte de cada bloque con todo lo demás fijo.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=12"><span class="ref">04·12</span><span><span class="t">Categóricas: one-hot contra embedding</span><small>La tabla k×d del embedding es un parámetro, no una entrada.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/03/#d=intro-redes-neuronales&amp;s=9"><span class="ref">03·9</span><span><span class="t">La capa: el bloque que se repite</span><small>Cada `Dense(32, relu)` es el bloque combinación lineal + no linealidad.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-2" data-i="14" hidden>
+          <div class="card-section head">
+            <h2>M3 · ¿Cuánto aporta cada bloque?</h2>
+            
+            <p class="summary">Es un diseño experimental, no solo un entrenamiento: fijar todo menos una cosa. El resultado (en Resultados) va a mostrar que la ubicación era lo que le faltaba al baseline. Con una sola semilla, diferencias chicas entre filas no alcanzan para decidir.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=2"><span class="ref">04·2</span><span><span class="t">La red ve una fila de números</span><small>La red ve una fila de números.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=61"><span class="ref">04·61</span><span><span class="t">Lo que hay que llevarse</span><small>El modelo se gana en la entrada y la salida, no en las capas.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-2" data-i="15" hidden>
+          <div class="card-section head">
+            <h2>M4 · Overfitear a propósito y frenarlo</h2>
+            
+            <p class="summary">Regularizar empeora a propósito el train a cambio de generalizar. Dropout funciona como un ensamble implícito: cada paso entrena una subred distinta. Las losses del modelo regularizado incluyen el término L2, así que no se comparan directo con las del otro: la comparación justa es en dólares.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=47"><span class="ref">04·47</span><span><span class="t">Qué mirar cuando esto se entrena</span><small>Train baja y val sube: el patrón del overfitting.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=46"><span class="ref">04·46</span><span><span class="t">La función objetivo</span><small>J = cost + λR(w): L2 y dropout como regularizadores.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=57"><span class="ref">04·57</span><span><span class="t">Cuántas capas y cuánto ancho</span><small>Para tabulares, arrancar chico; val mal y train bien → regularizar.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-2" data-i="16" hidden>
+          <div class="card-section head">
+            <h2>M5 · Tasar una casa escrita a mano</h2>
+            
+            <p class="summary">Para probar el contrato, el grupo cambió solo <code>State</code> en una casa inventada y miró si la predicción se movía con sentido. La debilidad que hay que reconocer: el preprocesamiento vive en funciones del notebook, así que para usar el modelo en otro lado hay que guardar también los objetos ajustados.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=18"><span class="ref">04·18</span><span><span class="t">Todo se aprende solo del train</span><small>μ, σ, medianas y diccionarios viajan con el modelo.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=62"><span class="ref">04·62</span><span><span class="t">Checklist operativo para la práctica</span><small>«¿La tengo al predecir?»: la última pregunta del checklist.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-2" data-i="17" hidden>
+          <div class="card-section head">
+            <h2>Extra · Un rango en vez de un punto</h2>
+            
+            <p class="summary">Con q = 0,5 la pinball equivale a MAE, así que el P50 aprende la mediana. Softplus siempre da un número positivo: sumarlo garantiza el orden sin corregir cruces a mano. Un rango bien calibrado comunica la incertidumbre que una tasación puntual esconde.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=32"><span class="ref">04·32</span><span><span class="t">Percentiles: la pinball loss</span><small>Percentiles: la pinball loss.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=31"><span class="ref">04·31</span><span><span class="t">Las especializadas, para tener ubicadas</span><small>Losses especializadas: pinball para rangos.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-2" data-i="18" hidden>
+          <div class="card-section head">
+            <h2>Contra lo pedido</h2>
+            
+            <p class="summary">El M3 pedía que el MAE bajara claro: bajó a la mitad sin tocar la arquitectura. El M4 sumó regularización sobre una red más grande. El extra pedía cerca del 80% de cobertura y dio 82,2%. En el M5, la casa inventada (CA, Greenfield) sale USD 482.971 y, cambiando solo <code>State</code>, la predicción correlaciona 0,966 con la mediana de cada estado.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=61"><span class="ref">04·61</span><span><span class="t">Lo que hay que llevarse</span><small>El modelo se gana en la entrada y la salida, no en las capas.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-2" data-i="19" hidden>
+          <div class="card-section head">
+            <h2>El error en cada etapa</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para la defensa</span>
+            <p class="summary">Las cuatro primeras filas son la misma red: la mejora es solo información. La trampa muestra que el error de codificación cuesta caro y no avisa. En la última fila, regularizar dejó el MAE parejo (+1,4%) pero bajó el RMSE 9,7%: atacó justo los errores grandes, que son los que el cuadrado castiga.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=2"><span class="ref">04·2</span><span><span class="t">La red ve una fila de números</span><small>Cambiar la fila de floats cambió todo.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=47"><span class="ref">04·47</span><span><span class="t">Qué mirar cuando esto se entrena</span><small>Regularizar recortó los errores grandes.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-2" data-i="20" hidden>
+          <div class="card-section head">
+            <h2>Qué funcionó y qué queda flojo</h2>
+            
+            <p class="summary">La columna derecha es lo que conviene llevar preparado a la defensa. El punto metodológico más serio es usar el test para elegir: su número deja de ser insesgado. Reconocerlo y decir qué se haría distinto (comparar en validación, promediar semillas) suma más que defender cada número.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=17"><span class="ref">04·17</span><span><span class="t">Los tres, lado a lado</span><small>El test se abre una vez, al final; si lo usás para elegir, deja de medir.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-2" data-i="21" hidden>
+          <div class="card-section head">
+            <h2>Mapa: clase → concepto → dónde apareció</h2>
+            
+            <p class="summary">La clase 3 da las piezas (neurona, capa, activación, ciclo de entrenamiento) y la clase 4 da el criterio para usarlas con datos reales. El TP casi no ejercita la clase 3 de forma explícita, porque está adentro de Keras. Lo que se ve en cada celda es la clase 4: entrada, salida, partición y regularización.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/03/#d=intro-redes-neuronales&amp;s=24"><span class="ref">03·24</span><span><span class="t">Sin activación, la red colapsa</span><small>Sin activación, las capas colapsan en una sola transformación lineal.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=14"><span class="ref">04·14</span><span><span class="t">La tabla de decisiones</span><small>La tabla de decisiones de la clase, aplicada al dataset.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=18"><span class="ref">04·18</span><span><span class="t">Todo se aprende solo del train</span><small>Todo se aprende solo del train.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-2" data-i="22" hidden>
+          <div class="card-section head">
+            <h2>Lo que vuelve en clases posteriores</h2>
+            
+            <p class="summary">Estas conexiones no son parte de la consigna, pero muestran que el TP2 no es un tema aislado. El embedding de <code>District</code> es la misma tabla de embeddings de tokens de un modelo de lenguaje, solo que con 73 filas en vez de un vocabulario entero. Tenerlo claro acá hace más fácil entender los Transformers.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=palabra-al-transformer&amp;s=14"><span class="ref">07·14</span><span><span class="t">Tres formas de volver texto en números</span><small>Tres formas de volver texto en números: el mismo dilema que `State`/`District`.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/08/#d=transformers-a-fondo&amp;s=27"><span class="ref">08·27</span><span><span class="t">La fórmula de la posición: senos y cosenos</span><small>Senos y cosenos para la posición, como `MonthSold`.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/08/#d=transformers-a-fondo&amp;s=23"><span class="ref">08·23</span><span><span class="t">La feed-forward: la misma red para cada posición</span><small>La FFN es el mismo bloque Dense + ReLU del TP.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-2" data-i="23" hidden>
+          <div class="card-section head">
+            <h2>La trampa del entero</h2>
+            
+            <p class="summary">La clave de la respuesta es la última frase: el error es silencioso. Poner un número real en el vector es afirmar algo sobre el dato, y acá esa afirmación es falsa. Por eso la tabla de decisiones va antes que la red.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=13"><span class="ref">04·13</span><span><span class="t">Errores de codificación caros</span><small>Código como número: un error de codificación caro y silencioso.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-2" data-i="24" hidden>
+          <div class="card-section head">
+            <h2>Pregunta 5: ¿dónde se ajustó el escalador?</h2>
+            
+            <p class="summary">El argumento más convincente es el de producción: nunca vas a tener las casas futuras para calcular μ y σ. El test tiene que simular exactamente eso. Lo que miente no es el entrenamiento, es el número que reportás.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=18"><span class="ref">04·18</span><span><span class="t">Todo se aprende solo del train</span><small>Calcular μ, σ y medianas sobre todo el dataset es data leakage.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-2" data-i="25" hidden>
+          <div class="card-section head">
+            <h2>El problema metodológico</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para la defensa</span>
+            <p class="summary">Es la crítica más probable y conviene adelantarse: el grupo la reconoce en sus propias observaciones. Admitirla y explicar la corrección muestra que se entendió para qué existe cada partición. El caso concreto es el cero contra la mediana en <code>LotFrontage</code>.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=17"><span class="ref">04·17</span><span><span class="t">Los tres, lado a lado</span><small>La validación decide; el test se abre una vez.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=20"><span class="ref">04·20</span><span><span class="t">Qué hacer y qué no</span><small>No tunear contra test.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-2" data-i="26" hidden>
+          <div class="card-section head">
+            <h2>Cierre</h2>
+            
+            <p class="summary">Las cuatro conclusiones del grupo: el salto vino de la codificación; un error de codificación no da error; regularizar no movió el MAE pero recortó los errores grandes; y un rango P10–P90 bien calibrado comunica la incertidumbre que una tasación puntual esconde.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/#d=modelado-redes-neuronales&amp;s=61"><span class="ref">04·61</span><span><span class="t">Lo que hay que llevarse</span><small>Lo que hay que llevarse de la clase 4.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+      
+    </div>
+
+    <div class="side-panel" data-panel="indice" hidden>
+      
+      <div data-index="tp-2" >
+        
+        <details class="idx-sec" data-first="0" data-last="0">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">Portada</span>
+            <span class="range">0–0</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="0"><span class="n">0</span><span class="t">Portada</span><span class="marks"></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="1" data-last="4">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">El problema</span>
+            <span class="range">1–4</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="1"><span class="n">1</span><span class="t">El punto de partida: el notebook de clase</span><span class="marks"></span></button><button class="idx-row" data-i="2"><span class="n">2</span><span class="t">El dataset nuevo: tres casas de ejemplo</span><span class="marks"></span></button><button class="idx-row" data-i="3"><span class="n">3</span><span class="t">Lo que esconden las columnas</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="4"><span class="n">4</span><span class="t">Por qué la red no puede comer el CSV</span><span class="marks"></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="5" data-last="7">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">La consigna</span>
+            <span class="range">5–7</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="5"><span class="n">5</span><span class="t">Qué pedía la misión</span><span class="marks"></span></button><button class="idx-row" data-i="6"><span class="n">6</span><span class="t">Los milestones, como pedidos</span><span class="marks"></span></button><button class="idx-row" data-i="7"><span class="n">7</span><span class="t">Las cinco preguntas que se corrigen</span><span class="marks"></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="8" data-last="17">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">El recorrido</span>
+            <span class="range">8–17</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="8"><span class="n">8</span><span class="t">M1 · ¿Qué significa la resta?</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="9"><span class="n">9</span><span class="t">Partir primero y ajustar solo en train</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="10"><span class="n">10</span><span class="t">M2 · El hueco de `LotFrontage`</span><span class="marks"></span></button><button class="idx-row" data-i="11"><span class="n">11</span><span class="t">M2 · Salida, loss y escala del precio</span><span class="marks"></span></button><button class="idx-row" data-i="12"><span class="n">12</span><span class="t">M3 · La ubicación: `State` y `District`</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="13"><span class="n">13</span><span class="t">Dos entradas: la rama del embedding</span><span class="marks"></span></button><button class="idx-row" data-i="14"><span class="n">14</span><span class="t">M3 · ¿Cuánto aporta cada bloque?</span><span class="marks"></span></button><button class="idx-row" data-i="15"><span class="n">15</span><span class="t">M4 · Overfitear a propósito y frenarlo</span><span class="marks"></span></button><button class="idx-row" data-i="16"><span class="n">16</span><span class="t">M5 · Tasar una casa escrita a mano</span><span class="marks"></span></button><button class="idx-row" data-i="17"><span class="n">17</span><span class="t">Extra · Un rango en vez de un punto</span><span class="marks"></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="18" data-last="20">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">Resultados</span>
+            <span class="range">18–20</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="18"><span class="n">18</span><span class="t">Contra lo pedido</span><span class="marks"></span></button><button class="idx-row" data-i="19"><span class="n">19</span><span class="t">El error en cada etapa</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="20"><span class="n">20</span><span class="t">Qué funcionó y qué queda flojo</span><span class="marks"></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="21" data-last="22">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">Teoría en la práctica</span>
+            <span class="range">21–22</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="21"><span class="n">21</span><span class="t">Mapa: clase → concepto → dónde apareció</span><span class="marks"></span></button><button class="idx-row" data-i="22"><span class="n">22</span><span class="t">Lo que vuelve en clases posteriores</span><span class="marks"></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="23" data-last="25">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">Para la defensa</span>
+            <span class="range">23–25</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="23"><span class="n">23</span><span class="t">La trampa del entero</span><span class="marks"></span></button><button class="idx-row" data-i="24"><span class="n">24</span><span class="t">Pregunta 5: ¿dónde se ajustó el escalador?</span><span class="marks"></span></button><button class="idx-row" data-i="25"><span class="n">25</span><span class="t">El problema metodológico</span><span class="marks"><span class="mk-key"></span></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="26" data-last="26">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">Cierre</span>
+            <span class="range">26–26</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="26"><span class="n">26</span><span class="t">Cierre</span><span class="marks"></span></button>
+          </div>
+        </details>
+        
+      </div>
+      
+    </div>
+
+    <div class="card-footer side-foot">
+      <button class="btn sm" id="star" title="Marcar para repasar (m)"><svg class="i" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg><span>Marcar</span></button>
+      <span class="hints"><kbd>←</kbd><kbd>→</kbd> <kbd>t</kbd> <kbd>m</kbd> <kbd>n</kbd> <kbd>p</kbd></span>
+    </div>
+  </aside>
+</div>
+</div>
+</div>
+
+
+    </main>
+  </div>
+</div>
+<dialog class="code-dlg" id="code-dlg" aria-labelledby="code-dlg-title">
+  <div class="card-header">
+    <div class="code-dlg-title"><span class="pill tp" id="code-dlg-tp">TP</span><span class="card-title" id="code-dlg-title"></span></div>
+    <div class="card-actions"><a class="btn sm" id="code-dlg-open" href="#">Ver todo el código del TP</a><button class="btn icon sm ghost" id="code-dlg-close" aria-label="Cerrar" autofocus><svg class="i" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+  </div>
+  <div id="code-dlg-body"></div>
+</dialog>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<script src="https://ezequielrickert.github.io/austral-ia-generativa/js/site.js?h=5d528413180e25d02fd3"></script>
+<script src="https://ezequielrickert.github.io/austral-ia-generativa/js/viewer.js?h=316e7aba0f3051532446"></script>
+</body>
+</html>

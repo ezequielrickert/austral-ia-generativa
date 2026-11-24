@@ -1,0 +1,718 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>TP3 en diapositivas · RAG, MCP y Transformers en el Hospital Arroyo Claro · IA Generativa</title>
+  <meta name="description" content="Las diapositivas de IA Generativa (Universidad Austral, 2c 2026) con notas por diapositiva y vínculos a los TPs.">
+  <script>
+    (function(){try{var t=localStorage.getItem('iagen:theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t)}catch(e){}})();
+    window.SITE_BASE = "https://ezequielrickert.github.io/austral-ia-generativa".replace(/\/$/, '');
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <link rel="stylesheet" href="https://ezequielrickert.github.io/austral-ia-generativa/css/site.css?h=4f6959f565a2de28cda5">
+</head>
+<body>
+
+
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <a class="sb-head" href="https://ezequielrickert.github.io/austral-ia-generativa/">
+      <span class="sb-logo">IA</span>
+      <span class="sb-title"><b>IA Generativa</b><span>Guía de estudio · 2c 2026</span></span>
+    </a>
+    <div class="sb-search">
+      <div class="input-icon">
+        <svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input class="input" id="search" type="search" placeholder="Buscar" autocomplete="off" aria-label="Buscar diapositivas y conceptos">
+        <kbd>/</kbd>
+      </div>
+      <div class="search-results" id="search-results" hidden></div>
+    </div>
+    <nav class="sb-body" aria-label="Navegación">
+      <div class="nav-group">
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/">
+          <svg class="i" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span class="t">Inicio</span></a>
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/">
+          <svg class="i" viewBox="0 0 24 24"><path d="M4 19.5V5a2 2 0 0 1 2-2h14v16H6.5A2.5 2.5 0 0 0 4 21.5"/><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/></svg><span class="t">Glosario</span></a>
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/practica/">
+          <svg class="i" viewBox="0 0 24 24"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg><span class="t">Práctica</span></a>
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/marcadas/">
+          <svg class="i" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg><span class="t">Marcadas</span><span class="count" id="star-count"></span></a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-label">Clases</div>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/" title="Bienvenida + CoWork: fundamentos de IA, modelos fundacionales y el chat extendido">
+          <span class="n">01</span><span class="t">Bienvenida + CoWork: fundamentos de IA, modelos fundacionales y el chat extendido</span><span class="meter" data-class="1" data-total="100"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/" title="CoWork: agentes de código, contexto, CLAUDE.md, Skills, subagentes y MCP">
+          <span class="n">02</span><span class="t">CoWork: agentes de código, contexto, CLAUDE.md, Skills, subagentes y MCP</span><span class="meter" data-class="2" data-total="66"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/03/" title="Introducción a las redes neuronales">
+          <span class="n">03</span><span class="t">Introducción a las redes neuronales</span><span class="meter" data-class="3" data-total="51"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/" title="Diseño de redes neuronales (modelado de un MLP)">
+          <span class="n">04</span><span class="t">Diseño de redes neuronales (modelado de un MLP)</span><span class="meter" data-class="4" data-total="64"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/05/" title="LLMs: prompting, costos y producción">
+          <span class="n">05</span><span class="t">LLMs: prompting, costos y producción</span><span class="meter" data-class="5" data-total="72"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/" title="RAG, bases vectoriales, inverted index">
+          <span class="n">06</span><span class="t">RAG, bases vectoriales, inverted index</span><span class="meter" data-class="6" data-total="71"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/" title="MCP y herramientas (con repaso de RAG) · De la palabra al transformer">
+          <span class="n">07</span><span class="t">MCP y herramientas (con repaso de RAG) · De la palabra al transformer</span><span class="meter" data-class="7" data-total="69"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/08/" title="El transformer por dentro: atención, el bloque completo y la familia de modelos">
+          <span class="n">08</span><span class="t">El transformer por dentro: atención, el bloque completo y la familia de modelos</span><span class="meter" data-class="8" data-total="43"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/" title="LLM training: pre-training, SFT, RLHF, herramientas y fine-tuning">
+          <span class="n">09</span><span class="t">LLM training: pre-training, SFT, RLHF, herramientas y fine-tuning</span><span class="meter" data-class="9" data-total="60"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/10/" title="Agentes: sistemas multiagente, especialización, contexto y orquestación">
+          <span class="n">10</span><span class="t">Agentes: sistemas multiagente, especialización, contexto y orquestación</span><span class="meter" data-class="10" data-total="64"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/11/" title="Redes generativas antagónicas (GANs)">
+          <span class="n">11</span><span class="t">Redes generativas antagónicas (GANs)</span><span class="meter" data-class="11" data-total="54"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/12/" title="Modelos generativos de señales, imágenes y multimodalidad">
+          <span class="n">12</span><span class="t">Modelos generativos de señales, imágenes y multimodalidad</span><span class="meter" data-class="12" data-total="79"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/" title="Del poder a la responsabilidad: seguridad, ética y lo que viene">
+          <span class="n">13</span><span class="t">Del poder a la responsabilidad: seguridad, ética y lo que viene</span><span class="meter" data-class="13" data-total="56"><i></i></span></a>
+        
+      </div>
+      <div class="nav-group">
+        <div class="nav-label">Trabajos prácticos</div>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/tp/1/" title="Corta, del caos a producción">
+          <span class="n">1</span><span class="t">Corta, del caos a producción</span></a>
+        <a class="nav-item sub " href="https://ezequielrickert.github.io/austral-ia-generativa/tp-diapositivas/1/" title="TP1 en diapositivas">
+          <span class="n"></span><span class="t">En diapositivas</span><span class="meter" data-class="101" data-total="25"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/tp/2/" title="¿Cuánto vale esta casa?">
+          <span class="n">2</span><span class="t">¿Cuánto vale esta casa?</span></a>
+        <a class="nav-item sub " href="https://ezequielrickert.github.io/austral-ia-generativa/tp-diapositivas/2/" title="TP2 en diapositivas">
+          <span class="n"></span><span class="t">En diapositivas</span><span class="meter" data-class="102" data-total="27"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/tp/3/" title="RAG, MCP y Transformers en el Hospital Arroyo Claro">
+          <span class="n">3</span><span class="t">RAG, MCP y Transformers en el Hospital Arroyo Claro</span></a>
+        <a class="nav-item sub active" href="https://ezequielrickert.github.io/austral-ia-generativa/tp-diapositivas/3/" title="TP3 en diapositivas">
+          <span class="n"></span><span class="t">En diapositivas</span><span class="meter" data-class="103" data-total="27"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/tp/4/" title="El agente de admisión de guardia (TP final)">
+          <span class="n">4</span><span class="t">El agente de admisión de guardia (TP final)</span></a>
+        <a class="nav-item sub " href="https://ezequielrickert.github.io/austral-ia-generativa/tp-diapositivas/4/" title="TP4 en diapositivas">
+          <span class="n"></span><span class="t">En diapositivas</span><span class="meter" data-class="104" data-total="25"><i></i></span></a>
+        
+      </div>
+    </nav>
+    <div class="sb-foot">
+      <span id="exam-left">Final: 4 dic</span>
+      <button class="btn icon sm ghost" id="theme-btn" aria-label="Cambiar tema" title="Cambiar tema">
+        <svg class="i" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+    </div>
+  </aside>
+  <div class="main">
+    <div class="topbar">
+      <button class="btn icon" id="menu-btn" aria-label="Abrir navegación"><svg class="i" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+      <b>IA Generativa</b>
+    </div>
+    <main class="content is-viewer">
+      
+
+<div class="viewer-page" id="viewer" data-class="103" data-path="/tp-diapositivas/3/">
+<header class="page-header">
+  <div class="ph-main">
+    
+    <nav class="crumbs"><span>Trabajos prácticos</span><span class="sep">/</span><a href="https://ezequielrickert.github.io/austral-ia-generativa/tp/3/">TP3</a><span class="sep">·</span><span>En diapositivas</span><span class="sep">·</span><span class="mono">rag-mcp-transfomers</span></nav>
+    <h1>RAG, MCP y Transformers en el Hospital Arroyo Claro</h1>
+    
+  </div>
+  <div class="ph-actions">
+    
+    <button class="btn icon" id="focus-btn" aria-pressed="false" title="Modo foco: ocultar el menú (f)" aria-label="Modo foco"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg></button>
+    <button class="btn icon" id="fs-btn" title="Pantalla completa: diapositivas, notas y TPs (p)" aria-label="Pantalla completa"><svg class="i" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+    
+    <a class="btn" href="https://ezequielrickert.github.io/austral-ia-generativa/tp/3/">Ficha del TP</a>
+    <a class="btn" href="https://ezequielrickert.github.io/austral-ia-generativa/practica/#t3">Preguntas de defensa</a>
+    <a class="btn icon " href="https://ezequielrickert.github.io/austral-ia-generativa/tp-diapositivas/2/" aria-label="TP anterior" title="TP anterior"><svg class="i" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></a>
+    <a class="btn icon " href="https://ezequielrickert.github.io/austral-ia-generativa/tp-diapositivas/4/" aria-label="TP siguiente" title="TP siguiente"><svg class="i" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></a>
+    
+  </div>
+</header>
+
+<div class="viewer-area">
+<div class="viewer">
+  <section class="card stage-card">
+    <div class="card-header">
+      <span class="deck-kind"><span class="pill sched" id="deck-kind" hidden data-kind-sched="Calendario" data-kind-extra="Complementaria" title="Figura en el calendario de la materia">Calendario</span><span class="card-sub" id="sec-name">&nbsp;</span></span>
+      <div class="seg" id="filter" aria-label="Filtrar diapositivas">
+        <button aria-pressed="true" data-f="all">Todas<span class="fc mono" data-fc="all"></span></button>
+        <button aria-pressed="false" data-f="key"><span class="bar"></span>Clave<span class="fc mono" data-fc="key"></span></button>
+        
+      </div>
+      <button class="btn icon sm ghost" id="fs-exit" title="Salir de pantalla completa (p o Esc)" aria-label="Salir de pantalla completa"><svg class="i" viewBox="0 0 24 24"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg></button>
+    </div>
+    <div class="stage" id="stage">
+      <iframe id="deck-frame" title="Diapositivas de la clase" allow="autoplay; fullscreen"></iframe>
+      <button class="tp-mark" id="tp-mark" hidden aria-expanded="false" aria-controls="tp-pop" title="¿Dónde lo usaste? (t)"><b>?</b><span id="tp-mark-label">TP</span></button>
+      <div class="tp-pop card" id="tp-pop" hidden role="dialog" aria-label="Dónde lo usaste en los TPs"></div>
+    </div>
+    <div class="card-footer">
+      <button class="btn icon sm" id="prev" aria-label="Diapositiva anterior"><svg class="i" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>
+      <span class="pos" id="pos">—</span>
+      <button class="btn icon sm" id="next" aria-label="Diapositiva siguiente"><svg class="i" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>
+      
+      <div class="scrub" data-scrub="tp-3"  role="slider" aria-label="Ir a una diapositiva" aria-valuemin="0" aria-valuemax="26" tabindex="0">
+        <span class="tk" data-i="0" data-t="Portada"></span><span class="tk" data-i="1" data-t="Un hospital que ningún modelo conoce"></span><span class="tk" data-i="2" data-t="Lo que se recibió"></span><span class="tk" data-i="3" data-t="Lo que tiene que contestar"></span><span class="tk" data-i="4" data-t="Por qué buscar por palabras no alcanza"></span><span class="tk" data-i="5" data-t="Cinco pedidos"></span><span class="tk" data-i="6" data-t="Cómo se corrige"></span><span class="tk" data-i="7" data-t="Las reglas que condicionan todo"></span><span class="tk key" data-i="8" data-t="1. Elegir el encoder"></span><span class="tk" data-i="9" data-t="Los cuatro encoders lado a lado"></span><span class="tk" data-i="10" data-t="2. Cómo partir los documentos"></span><span class="tk" data-i="11" data-t="3. El tema perdido en el fragmento"></span><span class="tk key" data-i="12" data-t="4. Cuántos fragmentos devolver"></span><span class="tk" data-i="13" data-t="El margen en ocho líneas"></span><span class="tk" data-i="14" data-t="5. Un agente con dos fuentes"></span><span class="tk key" data-i="15" data-t="El bucle del agente, sin framework"></span><span class="tk key" data-i="16" data-t="6. A11: la respuesta fiel pero incompleta"></span><span class="tk" data-i="17" data-t="7. Las mismas herramientas, por MCP"></span><span class="tk" data-i="18" data-t="8. Abrir el transformer"></span><span class="tk" data-i="19" data-t="Contra lo pedido"></span><span class="tk" data-i="20" data-t="Las corridas del agente, 12 preguntas dev"></span><span class="tk" data-i="21" data-t="Qué funcionó y qué quedó flojo"></span><span class="tk" data-i="22" data-t="Mapa: de cada clase al TP"></span><span class="tk key" data-i="23" data-t="BERT contra e5"></span><span class="tk" data-i="24" data-t="Por qué no k = 1"></span><span class="tk" data-i="25" data-t="La regla tardía de A11"></span><span class="tk" data-i="26" data-t="Poco y bien elegido"></span>
+      </div>
+      
+      <button class="btn sm" id="side-toggle" aria-pressed="true" title="Esconder las notas (n)"><svg class="i chev-hide" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg><svg class="i chev-show" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>Notas</button>
+    </div>
+  </section>
+
+  <aside class="card side-card" id="side-card">
+    <div class="card-header">
+      <div class="seg" role="tablist" data-tabs="side-card">
+        <button role="tab" data-tab="nota" aria-selected="true">Nota</button>
+        <button role="tab" data-tab="indice" aria-selected="false">Índice</button>
+      </div>
+      <span class="count mono faint" id="note-pos" style="font-size:12px"></span>
+    </div>
+
+    <div class="side-panel" data-panel="nota" id="notes" aria-live="polite">
+      
+        
+        <article class="note" data-deck="tp-3" data-i="0" hidden>
+          <div class="card-section head">
+            <h2>Portada</h2>
+            
+            <p class="summary">El deck sigue el orden en que se enfrentó el TP: primero el hospital y por qué es difícil contestarle a un paciente, después lo que pedía la cátedra, y recién ahí cada problema con su solución y la teoría que la explica. Los resultados van al final, contra lo que se había pedido.</p>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-3" data-i="1" hidden>
+          <div class="card-section head">
+            <h2>Un hospital que ningún modelo conoce</h2>
+            
+            <p class="summary">Que el hospital sea inventado es una decisión pedagógica de la cátedra: elimina la posibilidad de que el modelo acierte de memoria. Todo el TP gira alrededor de una pregunta simple: ¿cómo hago para que el modelo tenga delante el texto correcto en el momento justo? Y su contracara: ¿cómo evito que complete lo que no sabe?</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=2"><span class="ref">06·2</span><span><span class="t">RAG suma lo que no está en los pesos</span><small>RAG suma lo que no está en los pesos: acá no hay nada del hospital en los pesos.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=10"><span class="ref">06·10</span><span><span class="t">Las fuentes ponen el techo de calidad</span><small>Las fuentes ponen el techo: documentos por un lado, API por el otro.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-3" data-i="2" hidden>
+          <div class="card-section head">
+            <h2>Lo que se recibió</h2>
+            
+            <p class="summary">Mirá la forma del corpus, porque condiciona todo: secciones muy cortas, cada una sobre un solo tema, y muchas que no repiten el tema en el cuerpo porque ya está en el título. La API, en cambio, no se busca: se consulta con un parámetro de una lista cerrada (sectores, especialidades, medicamentos).</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=35"><span class="ref">06·35</span><span><span class="t">El corte decide qué se recupera junto</span><small>Documentación con estructura (títulos y secciones): el corte por estructura sale gratis.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-3" data-i="3" hidden>
+          <div class="card-section head">
+            <h2>Lo que tiene que contestar</h2>
+            
+            <p class="summary">Las preguntas están escritas como habla la gente, no como están redactadas las normas. Eso es lo que separa este problema de una búsqueda en un manual: hay que conectar «ir a verlo» con «franjas de visita» y «terapia intensiva» con «La unidad». Las preguntas mixtas como A11 obligan además a decidir qué fuente consultar para cada parte.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=rag-mcp-rapida&amp;s=5"><span class="ref">07·5</span><span><span class="t">Como herramienta: el agente decide cuándo buscar</span><small>Con la recuperación como herramienta, el modelo decide si busca y dónde.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-3" data-i="4" hidden>
+          <div class="card-section head">
+            <h2>Por qué buscar por palabras no alcanza</h2>
+            
+            <p class="summary">Esta lámina es el porqué de la parte 1. Si las palabras alcanzaran, no haría falta un transformer. Lo que hace falta es una función que ponga cerca, en un espacio de vectores, textos que significan lo mismo; el TP es en buena medida la búsqueda de esa función y de cómo alimentarla.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=rag-mcp-rapida&amp;s=3"><span class="ref">07·3</span><span><span class="t">Por palabras: el índice invertido</span><small>Por palabras: el índice invertido falla con sinónimos.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=rag-mcp-rapida&amp;s=4"><span class="ref">07·4</span><span><span class="t">Por significado: embeddings y similitud</span><small>Por significado: embeddings y similitud coseno.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-3" data-i="5" hidden>
+          <div class="card-section head">
+            <h2>Cinco pedidos</h2>
+            
+            <p class="summary">La primera pregunta tiene trampa: la consigna obliga a incluir BERT sin ajustar justamente para que se vea que no todo transformer encoder sirve para medir parecido. Las partes 4 y 5 no dependen de las anteriores, pero explican por qué un encoder y un decoder hacen cosas distintas, que es lo que se usa en las partes 1 y 2.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=rag-mcp-rapida&amp;s=2"><span class="ref">07·2</span><span><span class="t">RAG en tres pasos</span><small>Parte 1: RAG en tres pasos.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=rag-mcp-rapida&amp;s=16"><span class="ref">07·16</span><span><span class="t">MCP conecta modelos con herramientas</span><small>Parte 3: MCP conecta modelos con herramientas.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/08/#d=transformers-a-fondo&amp;s=11"><span class="ref">08·11</span><span><span class="t">El ciclo de generación con el transformer abierto</span><small>Parte 4: el ejemplo &#39;the cat sat&#39; con d = 4 de la clase.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-3" data-i="6" hidden>
+          <div class="card-section head">
+            <h2>Cómo se corrige</h2>
+            
+            <p class="summary">Separar las métricas es lo que después permite diagnosticar: si la respuesta es fiel pero incompleta, el problema está en lo que se recuperó, no en cómo se redactó. Fijate también que la media armónica hace que traer un fragmento de más cueste caro cuando la evidencia es una sola frase.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=39"><span class="ref">06·39</span><span><span class="t">Evaluar las dos etapas por separado</span><small>Evaluar las dos etapas por separado: CR para recuperar, F y AR para generar.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-3" data-i="7" hidden>
+          <div class="card-section head">
+            <h2>Las reglas que condicionan todo</h2>
+            
+            <p class="summary">El test oculto funciona como el conjunto de test de la clase 4: si se optimiza dev hasta el último decimal, se aprende el conjunto y no el problema. Esa tensión aparece en casi todas las decisiones del recorrido. El log obligatorio empuja a un agente trazable, donde se vea cada llamada y su resultado.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/05/#d=prompting&amp;s=8"><span class="ref">05·8</span><span><span class="t">La fórmula del costo</span><small>La fórmula del costo: tokens de entrada y salida por precio.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-3" data-i="8" hidden>
+          <div class="card-section head">
+            <h2>1. Elegir el encoder</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para la defensa</span>
+            <p class="summary">La trampa de la consigna está acá: BERT es un transformer encoder igual que e5, pero su objetivo de entrenamiento nunca le pidió que el ángulo entre vectores signifique parecido. Por eso lo que importa no es el valor del coseno sino cómo ordena: dentro de una franja estrecha, e5 pone la evidencia bien arriba y BERT apenas la separa. Los prefijos <code>query:</code> y <code>passage:</code> son parte de cómo se entrenó e5: le avisan si el texto es una pregunta o un pasaje.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/08/#d=transformers-a-fondo&amp;s=34"><span class="ref">08·34</span><span><span class="t">Del encoder al embedding de oración</span><small>Del encoder al embedding de oración: BERT promediado es un mal embedding (Sentence-BERT).</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=20"><span class="ref">06·20</span><span><span class="t">Embeddings: cada texto es un punto</span><small>Los embeddings se aprenden con entrenamiento contrastivo de pares pregunta–respuesta.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=palabra-al-transformer&amp;s=21"><span class="ref">07·21</span><span><span class="t">Promediar una frase pierde el orden</span><small>Promediar los vectores de una frase pierde información.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-3" data-i="9" hidden>
+          <div class="card-section head">
+            <h2>Los cuatro encoders lado a lado</h2>
+            
+            <p class="summary">El z es una medida que inventó el grupo para no quedarse solo con el CR: explica el porqué del ranking. MiniLM separa menos que e5 porque fue entrenado para reconocer paráfrasis entre oraciones, no preguntas contra pasajes. Entre los dos e5, el base acierta el primer lugar en más configuraciones (CR medio con k = 1 de 0,85 contra 0,80).</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/12/#d=segmentacion-y-stable-diffusion&amp;s=51"><span class="ref">12·51</span><span><span class="t">CLIP: el puente texto ↔ imagen</span><small>CLIP: misma idea contrastiva, entre imagen y texto.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-3" data-i="10" hidden>
+          <div class="card-section head">
+            <h2>2. Cómo partir los documentos</h2>
+            
+            <p class="summary">El corte por oración fue el peor para los cuatro encoders: una oración suelta no le alcanza al encoder para reconocer de qué se habla. Las ventanas se miden en palabras y se recortan con posiciones del texto original para que cada fragmento siga siendo literal. Ante el empate, la sección entera tiene una ventaja práctica para el agente: le llega, por ejemplo, toda la preparación de la colonoscopía de una vez.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=35"><span class="ref">06·35</span><span><span class="t">El corte decide qué se recupera junto</span><small>El corte decide qué se recupera junto: largo fijo, semántico o estructural.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=36"><span class="ref">06·36</span><span><span class="t">Tamaño del fragmento y solapamiento</span><small>Tamaño y solapamiento: se miden en tu corpus.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=rag-mcp-rapida&amp;s=9"><span class="ref">07·9</span><span><span class="t">Chunking: dónde cortar y cuánto solapar</span><small>Importa más dónde caen los cortes que el tamaño.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-3" data-i="11" hidden>
+          <div class="card-section head">
+            <h2>3. El tema perdido en el fragmento</h2>
+            
+            <p class="summary">La idea conceptual es que el vector y el texto devuelto no tienen por qué ser lo mismo: el vector es una dirección para encontrar el fragmento, no el fragmento. Con chunking estructural y k = 1 mejoró a los cuatro encoders (e5-base de 0,85 a 1,00, BERT de 0,25 a 0,35). La única combinación donde empeoró fue BERT con ventanas de 40 palabras.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=rag-mcp-rapida&amp;s=10"><span class="ref">07·10</span><span><span class="t">Metadatos: filtrar antes de buscar</span><small>Los metadatos también se buscan: pegar &#39;título &gt; sección&#39; ubica el vector.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=37"><span class="ref">06·37</span><span><span class="t">Los metadatos filtran antes de buscar</span><small>La versión de la clase 6: metadatos para filtrar antes de buscar.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-3" data-i="12" hidden>
+          <div class="card-section head">
+            <h2>4. Cuántos fragmentos devolver</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para la defensa</span>
+            <p class="summary">Es una apuesta razonada: con k = 1 un empate mal resuelto vale 0, y devolviendo los dos vale 0,667. Se resignaron 0,033 en dev para protegerse en test, que es exactamente no sobreajustar al conjunto de validación. Los cosenos de e5 viven en una franja estrecha (el mejor va de 0,82 a 0,91 según la pregunta), por eso un número fijo es frágil.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=rag-mcp-rapida&amp;s=8"><span class="ref">07·8</span><span><span class="t">Top-k y similitud mínima</span><small>Top-k y similitud mínima: el umbral depende del modelo y hay que calibrarlo.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=32"><span class="ref">06·32</span><span><span class="t">Ajustes de producción</span><small>Ajustes de producción: cuántos fragmentos llevar al prompt.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-3" data-i="13" hidden>
+          <div class="card-section head">
+            <h2>El margen en ocho líneas</h2>
+            
+            <p class="summary">Con la configuración entregada (<code>top_k: 2</code>, <code>umbral: null</code>, <code>margen: 0.005</code>) casi siempre sale un fragmento, y dos solo en empates: por eso el k medio da 1,10. Antes de esta función, <code>recuperador.py</code> calcula <code>matriz @ q</code> contra los 56 fragmentos: búsqueda exacta, sin índice aproximado, porque son pocos.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=21"><span class="ref">06·21</span><span><span class="t">Coseno: importa el ángulo</span><small>El coseno que ordena la lista: con vectores normalizados es un producto punto.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-3" data-i="14" hidden>
+          <div class="card-section head">
+            <h2>5. Un agente con dos fuentes</h2>
+            
+            <p class="summary">La clave de las descripciones es separar norma (documentos) de estado de hoy (API). Con seis tools no hizo falta un ruteo jerárquico. El bucle propio se eligió por trazabilidad, porque el log por corrida es obligatorio, y porque no depende de dónde vienen las tools: eso se va a aprovechar en MCP. Los errores de una tool vuelven al modelo como texto para que reintente.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=rag-mcp-rapida&amp;s=28"><span class="ref">07·28</span><span><span class="t">La descripción dice cuándo NO usarla</span><small>La descripción dice cuándo NO usar una tool.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/05/#d=prompting&amp;s=17"><span class="ref">05·17</span><span><span class="t">Mitigar alucinaciones: el prompt</span><small>Mitigar alucinaciones desde el prompt: grounding.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/10/#d=agentes-y-multiagentes&amp;s=26"><span class="ref">10·26</span><span><span class="t">ReAct en LangGraph</span><small>ReAct en LangGraph: el mismo loop que el grupo escribió a mano.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-3" data-i="15" hidden>
+          <div class="card-section head">
+            <h2>El bucle del agente, sin framework</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para la defensa</span>
+            <p class="summary">Es ReAct sin texto de «Thought» explícito: usa function calling nativo, y el tope es <code>MAX_PASOS = 6</code> llamadas al modelo. En las preguntas mixtas el modelo puede pedir dos tools en el mismo paso, y por eso se recorre <code>ai.tool_calls</code> completo. Cada <code>AIMessage</code> y <code>ToolMessage</code> queda en la lista, que es lo que se vuelca al log <code>.md</code>.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/#d=como-se-entrena-un-llm&amp;s=36"><span class="ref">09·36</span><span><span class="t">El circuito con un agente</span><small>El circuito con un agente: ejecutar las tools, agregar el resultado y repetir con tope.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/10/#d=agentes-y-multiagentes&amp;s=14"><span class="ref">10·14</span><span><span class="t">Workflow o agente</span><small>Es un agente, no un workflow: el modelo elige las tools y cuándo terminar.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-3" data-i="16" hidden>
+          <div class="card-section head">
+            <h2>6. A11: la respuesta fiel pero incompleta</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para la defensa</span>
+            <p class="summary">Es el ejemplo más claro de diagnosticar con métricas separadas: fidelidad alta con relevancia de contexto baja apunta a la recuperación, y el log mostró que el problema era la consulta que armaba el modelo. «Qué tengo que llevar», las palabras del paciente, sí se parece al encabezado. En el mismo cambio se sacó de la descripción el ejemplo «abuelos en neonatología», que era literalmente la pregunta A01, y se puso «consulta por telemedicina» para no filtrar dev.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=29"><span class="ref">06·29</span><span><span class="t">Tres síntomas de que falta una etapa</span><small>Síntoma: el documento correcto existe pero queda fuera del top-k.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=rag-mcp-rapida&amp;s=31"><span class="ref">07·31</span><span><span class="t">Poco y bien elegido</span><small>Poco y bien elegido.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/05/#d=prompting&amp;s=33"><span class="ref">05·33</span><span><span class="t">Zero-shot vs. few-shot</span><small>Un ejemplo en el prompt condiciona al modelo: por eso no podía ser una pregunta dev.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-3" data-i="17" hidden>
+          <div class="card-section head">
+            <h2>7. Las mismas herramientas, por MCP</h2>
+            
+            <p class="summary">La idea a defender es que MCP no cambia al modelo: cambia dónde viven las herramientas y cómo se descubren. Por eso la hipótesis razonable era que ruteo y fidelidad no deberían moverse. Validar el catálogo antes de correr es una defensa barata contra un servidor mal configurado.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=rag-mcp-rapida&amp;s=19"><span class="ref">07·19</span><span><span class="t">Herramienta hardcodeada o servidor aparte</span><small>Herramienta hardcodeada o servidor aparte: con stdio el cliente lanza el subproceso.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=rag-mcp-rapida&amp;s=18"><span class="ref">07·18</span><span><span class="t">JSON-RPC 2.0: la capa de mensajes</span><small>JSON-RPC 2.0: `tools/list` y `tools/call`; la sesión MCP tiene estado.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/#d=como-se-entrena-un-llm&amp;s=47"><span class="ref">09·47</span><span><span class="t">MCP: host, cliente y servidor</span><small>MCP: host, cliente y servidor; el modelo queda fuera.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-3" data-i="18" hidden>
+          <div class="card-section head">
+            <h2>8. Abrir el transformer</h2>
+            
+            <p class="summary">La parte 5 es la intuición de todo el TP. Con máscara, «banco» solo ve «El» y a sí mismo, que son iguales en las dos frases: no puede saber de qué banco se habla. Sin máscara también mira el verbo y su vector cambia. Eso explica por qué para embeber pasajes se usa un encoder (e5) y para generar un decoder (deepseek).</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/08/#d=transformers-a-fondo&amp;s=18"><span class="ref">08·18</span><span><span class="t">Escalar y repartir: el softmax</span><small>Escalar por √d_k y repartir con softmax.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/08/#d=transformers-a-fondo&amp;s=20"><span class="ref">08·20</span><span><span class="t">La máscara causal</span><small>La máscara causal: −∞ y no 0.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/08/#d=transformers-a-fondo&amp;s=42"><span class="ref">08·42</span><span><span class="t">Un bloque repetido</span><small>Un bloque repetido: softmax(QKᵀ/√d_k)V.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-3" data-i="19" hidden>
+          <div class="card-section head">
+            <h2>Contra lo pedido</h2>
+            
+            <p class="summary">El 0,967 y no 1,000 es la decisión del desafío 4: se pagó un poco en dev para cubrir empates en test. Los números más robustos son el ruteo y la fidelidad, porque se repiten en todas las corridas; el CR del agente varía de corrida en corrida por cómo redacta la consulta el modelo. En la parte 5, la última posición predice «peso» (59,6%) con aguanta y «dinero» (59,6%) con presta.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/05/#d=prompting&amp;s=17"><span class="ref">05·17</span><span><span class="t">Mitigar alucinaciones: el prompt</span><small>Grounding: la fidelidad perfecta es el efecto del prompt restrictivo.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-3" data-i="20" hidden>
+          <div class="card-section head">
+            <h2>Las corridas del agente, 12 preguntas dev</h2>
+            
+            <p class="summary">Por MCP la diferencia fue solo A11: la búsqueda trajo «Llegada» y cómo pedir el turno, sin la lista de documentación, con una llamada extra (25 contra 24). El informe es honesto: con una corrida por versión y 12 preguntas, una pregunta de diferencia está dentro del ruido y no se puede atribuir al transporte. Costo total medido de las partes 2 y 3: USD 0,042442, casi todo del juez.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=rag-mcp-rapida&amp;s=13"><span class="ref">07·13</span><span><span class="t">Evaluar las dos etapas por separado</span><small>Evaluar las dos etapas por separado: F se mantuvo mientras CR variaba.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/05/#d=prompting&amp;s=14"><span class="ref">05·14</span><span><span class="t">Limitaciones de los LLM</span><small>No-determinismo: aun con temperatura 0 la consulta cambió entre corridas.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-3" data-i="21" hidden>
+          <div class="card-section head">
+            <h2>Qué funcionó y qué quedó flojo</h2>
+            
+            <p class="summary">La regla por palabra clave contradice la conclusión del propio informe: top-3 arreglaba A11 pero bajaba el CR de otras, y lo robusto era mejorar la consulta. Además está ajustada a una pregunta dev, el sobreajuste que el grupo había evitado en el desafío 4. El repo no explica el commit; la lectura más probable es que responde al fallo de A11 en la corrida MCP. Vive en <code>hospital/documentos.py</code> y no toca <code>config.json</code>.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/10/#d=agentes-y-multiagentes&amp;s=20"><span class="ref">10·20</span><span><span class="t">Principios para diseñar tools</span><small>Principios para diseñar tools: el arreglo vía descripción y la regla tardía.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=69"><span class="ref">06·69</span><span><span class="t">Analítica en producción</span><small>Analítica en producción: el log por corrida volvió medible el diseño.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-3" data-i="22" hidden>
+          <div class="card-section head">
+            <h2>Mapa: de cada clase al TP</h2>
+            
+            <p class="summary">La clase 4 aparece aunque sea de aprendizaje supervisado: dev contra test oculto es la misma idea que validación contra test. La clase 8 está dos veces, en la elección del encoder y en las partes 4 y 5, y es la que une el TP: un encoder para encontrar y un decoder para responder.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=3"><span class="ref">06·3</span><span><span class="t">Recuperar, aumentar, generar</span><small>Clase 6: recuperar, aumentar, generar.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/08/#d=transformers-a-fondo&amp;s=36"><span class="ref">08·36</span><span><span class="t">El mapa de la familia</span><small>Clase 8: encoder para embeddings, decoder para generar.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/10/#d=agentes-y-multiagentes&amp;s=14"><span class="ref">10·14</span><span><span class="t">Workflow o agente</span><small>Clase 10: workflow o agente.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-3" data-i="23" hidden>
+          <div class="card-section head">
+            <h2>BERT contra e5</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para la defensa</span>
+            <p class="summary">Si te repreguntan por qué e5 tiene cosenos tan altos como BERT (0,83 vs. 0,79), la respuesta es que importa el orden relativo y no el valor absoluto. Por eso mismo un umbral absoluto es frágil y el grupo usó un margen relativo al mejor.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/08/#d=transformers-a-fondo&amp;s=34"><span class="ref">08·34</span><span><span class="t">Del encoder al embedding de oración</span><small>Del encoder al embedding de oración.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-3" data-i="24" hidden>
+          <div class="card-section head">
+            <h2>Por qué no k = 1</h2>
+            
+            <p class="summary">Conectalo con la métrica: con una sola evidencia, dos fragmentos dan recall 1 y precisión 1/2, y la media armónica es 0,667. Con k = 3 la precisión cae a un tercio y el CR no pasa de 0,5, que es por qué ningún encoder superó 0,515 con k = 3.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=rag-mcp-rapida&amp;s=8"><span class="ref">07·8</span><span><span class="t">Top-k y similitud mínima</span><small>Top-k y similitud mínima.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-3" data-i="25" hidden>
+          <div class="card-section head">
+            <h2>La regla tardía de A11</h2>
+            
+            <p class="summary">Es una pregunta incómoda, conviene llevarla preparada. La regla deja intacta la configuración de la parte 1, así que no afecta el CR de <code>recuperar.py</code>, solo lo que recibe el agente.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=29"><span class="ref">06·29</span><span><span class="t">Tres síntomas de que falta una etapa</span><small>Síntoma: el documento correcto queda fuera del top-k.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-3" data-i="26" hidden>
+          <div class="card-section head">
+            <h2>Poco y bien elegido</h2>
+            
+            <p class="summary">Si tenés que resumir el TP en una frase para la defensa: medir cada etapa por separado, elegir con datos y no sobreajustar a dev. Y la razón de fondo de por qué funciona: un encoder entrenado para acercar preguntas a pasajes encuentra, y un decoder obligado a usar solo lo encontrado responde sin inventar.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=rag-mcp-rapida&amp;s=31"><span class="ref">07·31</span><span><span class="t">Poco y bien elegido</span><small>La lección compartida de RAG y MCP en la clase 7.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+      
+    </div>
+
+    <div class="side-panel" data-panel="indice" hidden>
+      
+      <div data-index="tp-3" >
+        
+        <details class="idx-sec" data-first="0" data-last="0">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">Portada</span>
+            <span class="range">0–0</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="0"><span class="n">0</span><span class="t">Portada</span><span class="marks"></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="1" data-last="4">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">El problema</span>
+            <span class="range">1–4</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="1"><span class="n">1</span><span class="t">Un hospital que ningún modelo conoce</span><span class="marks"></span></button><button class="idx-row" data-i="2"><span class="n">2</span><span class="t">Lo que se recibió</span><span class="marks"></span></button><button class="idx-row" data-i="3"><span class="n">3</span><span class="t">Lo que tiene que contestar</span><span class="marks"></span></button><button class="idx-row" data-i="4"><span class="n">4</span><span class="t">Por qué buscar por palabras no alcanza</span><span class="marks"></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="5" data-last="7">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">La consigna</span>
+            <span class="range">5–7</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="5"><span class="n">5</span><span class="t">Cinco pedidos</span><span class="marks"></span></button><button class="idx-row" data-i="6"><span class="n">6</span><span class="t">Cómo se corrige</span><span class="marks"></span></button><button class="idx-row" data-i="7"><span class="n">7</span><span class="t">Las reglas que condicionan todo</span><span class="marks"></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="8" data-last="18">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">El recorrido</span>
+            <span class="range">8–18</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="8"><span class="n">8</span><span class="t">1. Elegir el encoder</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="9"><span class="n">9</span><span class="t">Los cuatro encoders lado a lado</span><span class="marks"></span></button><button class="idx-row" data-i="10"><span class="n">10</span><span class="t">2. Cómo partir los documentos</span><span class="marks"></span></button><button class="idx-row" data-i="11"><span class="n">11</span><span class="t">3. El tema perdido en el fragmento</span><span class="marks"></span></button><button class="idx-row" data-i="12"><span class="n">12</span><span class="t">4. Cuántos fragmentos devolver</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="13"><span class="n">13</span><span class="t">El margen en ocho líneas</span><span class="marks"></span></button><button class="idx-row" data-i="14"><span class="n">14</span><span class="t">5. Un agente con dos fuentes</span><span class="marks"></span></button><button class="idx-row" data-i="15"><span class="n">15</span><span class="t">El bucle del agente, sin framework</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="16"><span class="n">16</span><span class="t">6. A11: la respuesta fiel pero incompleta</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="17"><span class="n">17</span><span class="t">7. Las mismas herramientas, por MCP</span><span class="marks"></span></button><button class="idx-row" data-i="18"><span class="n">18</span><span class="t">8. Abrir el transformer</span><span class="marks"></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="19" data-last="21">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">Resultados</span>
+            <span class="range">19–21</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="19"><span class="n">19</span><span class="t">Contra lo pedido</span><span class="marks"></span></button><button class="idx-row" data-i="20"><span class="n">20</span><span class="t">Las corridas del agente, 12 preguntas dev</span><span class="marks"></span></button><button class="idx-row" data-i="21"><span class="n">21</span><span class="t">Qué funcionó y qué quedó flojo</span><span class="marks"></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="22" data-last="22">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">Teoría en la práctica</span>
+            <span class="range">22–22</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="22"><span class="n">22</span><span class="t">Mapa: de cada clase al TP</span><span class="marks"></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="23" data-last="25">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">Para la defensa</span>
+            <span class="range">23–25</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="23"><span class="n">23</span><span class="t">BERT contra e5</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="24"><span class="n">24</span><span class="t">Por qué no k = 1</span><span class="marks"></span></button><button class="idx-row" data-i="25"><span class="n">25</span><span class="t">La regla tardía de A11</span><span class="marks"></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="26" data-last="26">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">Cierre</span>
+            <span class="range">26–26</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="26"><span class="n">26</span><span class="t">Poco y bien elegido</span><span class="marks"></span></button>
+          </div>
+        </details>
+        
+      </div>
+      
+    </div>
+
+    <div class="card-footer side-foot">
+      <button class="btn sm" id="star" title="Marcar para repasar (m)"><svg class="i" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg><span>Marcar</span></button>
+      <span class="hints"><kbd>←</kbd><kbd>→</kbd> <kbd>t</kbd> <kbd>m</kbd> <kbd>n</kbd> <kbd>p</kbd></span>
+    </div>
+  </aside>
+</div>
+</div>
+</div>
+
+
+    </main>
+  </div>
+</div>
+<dialog class="code-dlg" id="code-dlg" aria-labelledby="code-dlg-title">
+  <div class="card-header">
+    <div class="code-dlg-title"><span class="pill tp" id="code-dlg-tp">TP</span><span class="card-title" id="code-dlg-title"></span></div>
+    <div class="card-actions"><a class="btn sm" id="code-dlg-open" href="#">Ver todo el código del TP</a><button class="btn icon sm ghost" id="code-dlg-close" aria-label="Cerrar" autofocus><svg class="i" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+  </div>
+  <div id="code-dlg-body"></div>
+</dialog>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<script src="https://ezequielrickert.github.io/austral-ia-generativa/js/site.js?h=5d528413180e25d02fd3"></script>
+<script src="https://ezequielrickert.github.io/austral-ia-generativa/js/viewer.js?h=316e7aba0f3051532446"></script>
+</body>
+</html>

@@ -1,0 +1,688 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>TP1 en diapositivas · Corta, del caos a producción · IA Generativa</title>
+  <meta name="description" content="Las diapositivas de IA Generativa (Universidad Austral, 2c 2026) con notas por diapositiva y vínculos a los TPs.">
+  <script>
+    (function(){try{var t=localStorage.getItem('iagen:theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t)}catch(e){}})();
+    window.SITE_BASE = "https://ezequielrickert.github.io/austral-ia-generativa".replace(/\/$/, '');
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <link rel="stylesheet" href="https://ezequielrickert.github.io/austral-ia-generativa/css/site.css?h=4f6959f565a2de28cda5">
+</head>
+<body>
+
+
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <a class="sb-head" href="https://ezequielrickert.github.io/austral-ia-generativa/">
+      <span class="sb-logo">IA</span>
+      <span class="sb-title"><b>IA Generativa</b><span>Guía de estudio · 2c 2026</span></span>
+    </a>
+    <div class="sb-search">
+      <div class="input-icon">
+        <svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input class="input" id="search" type="search" placeholder="Buscar" autocomplete="off" aria-label="Buscar diapositivas y conceptos">
+        <kbd>/</kbd>
+      </div>
+      <div class="search-results" id="search-results" hidden></div>
+    </div>
+    <nav class="sb-body" aria-label="Navegación">
+      <div class="nav-group">
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/">
+          <svg class="i" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span class="t">Inicio</span></a>
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/">
+          <svg class="i" viewBox="0 0 24 24"><path d="M4 19.5V5a2 2 0 0 1 2-2h14v16H6.5A2.5 2.5 0 0 0 4 21.5"/><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/></svg><span class="t">Glosario</span></a>
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/practica/">
+          <svg class="i" viewBox="0 0 24 24"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg><span class="t">Práctica</span></a>
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/marcadas/">
+          <svg class="i" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg><span class="t">Marcadas</span><span class="count" id="star-count"></span></a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-label">Clases</div>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/" title="Bienvenida + CoWork: fundamentos de IA, modelos fundacionales y el chat extendido">
+          <span class="n">01</span><span class="t">Bienvenida + CoWork: fundamentos de IA, modelos fundacionales y el chat extendido</span><span class="meter" data-class="1" data-total="100"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/" title="CoWork: agentes de código, contexto, CLAUDE.md, Skills, subagentes y MCP">
+          <span class="n">02</span><span class="t">CoWork: agentes de código, contexto, CLAUDE.md, Skills, subagentes y MCP</span><span class="meter" data-class="2" data-total="66"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/03/" title="Introducción a las redes neuronales">
+          <span class="n">03</span><span class="t">Introducción a las redes neuronales</span><span class="meter" data-class="3" data-total="51"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/" title="Diseño de redes neuronales (modelado de un MLP)">
+          <span class="n">04</span><span class="t">Diseño de redes neuronales (modelado de un MLP)</span><span class="meter" data-class="4" data-total="64"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/05/" title="LLMs: prompting, costos y producción">
+          <span class="n">05</span><span class="t">LLMs: prompting, costos y producción</span><span class="meter" data-class="5" data-total="72"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/" title="RAG, bases vectoriales, inverted index">
+          <span class="n">06</span><span class="t">RAG, bases vectoriales, inverted index</span><span class="meter" data-class="6" data-total="71"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/" title="MCP y herramientas (con repaso de RAG) · De la palabra al transformer">
+          <span class="n">07</span><span class="t">MCP y herramientas (con repaso de RAG) · De la palabra al transformer</span><span class="meter" data-class="7" data-total="69"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/08/" title="El transformer por dentro: atención, el bloque completo y la familia de modelos">
+          <span class="n">08</span><span class="t">El transformer por dentro: atención, el bloque completo y la familia de modelos</span><span class="meter" data-class="8" data-total="43"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/" title="LLM training: pre-training, SFT, RLHF, herramientas y fine-tuning">
+          <span class="n">09</span><span class="t">LLM training: pre-training, SFT, RLHF, herramientas y fine-tuning</span><span class="meter" data-class="9" data-total="60"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/10/" title="Agentes: sistemas multiagente, especialización, contexto y orquestación">
+          <span class="n">10</span><span class="t">Agentes: sistemas multiagente, especialización, contexto y orquestación</span><span class="meter" data-class="10" data-total="64"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/11/" title="Redes generativas antagónicas (GANs)">
+          <span class="n">11</span><span class="t">Redes generativas antagónicas (GANs)</span><span class="meter" data-class="11" data-total="54"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/12/" title="Modelos generativos de señales, imágenes y multimodalidad">
+          <span class="n">12</span><span class="t">Modelos generativos de señales, imágenes y multimodalidad</span><span class="meter" data-class="12" data-total="79"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/" title="Del poder a la responsabilidad: seguridad, ética y lo que viene">
+          <span class="n">13</span><span class="t">Del poder a la responsabilidad: seguridad, ética y lo que viene</span><span class="meter" data-class="13" data-total="56"><i></i></span></a>
+        
+      </div>
+      <div class="nav-group">
+        <div class="nav-label">Trabajos prácticos</div>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/tp/1/" title="Corta, del caos a producción">
+          <span class="n">1</span><span class="t">Corta, del caos a producción</span></a>
+        <a class="nav-item sub active" href="https://ezequielrickert.github.io/austral-ia-generativa/tp-diapositivas/1/" title="TP1 en diapositivas">
+          <span class="n"></span><span class="t">En diapositivas</span><span class="meter" data-class="101" data-total="25"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/tp/2/" title="¿Cuánto vale esta casa?">
+          <span class="n">2</span><span class="t">¿Cuánto vale esta casa?</span></a>
+        <a class="nav-item sub " href="https://ezequielrickert.github.io/austral-ia-generativa/tp-diapositivas/2/" title="TP2 en diapositivas">
+          <span class="n"></span><span class="t">En diapositivas</span><span class="meter" data-class="102" data-total="27"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/tp/3/" title="RAG, MCP y Transformers en el Hospital Arroyo Claro">
+          <span class="n">3</span><span class="t">RAG, MCP y Transformers en el Hospital Arroyo Claro</span></a>
+        <a class="nav-item sub " href="https://ezequielrickert.github.io/austral-ia-generativa/tp-diapositivas/3/" title="TP3 en diapositivas">
+          <span class="n"></span><span class="t">En diapositivas</span><span class="meter" data-class="103" data-total="27"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/tp/4/" title="El agente de admisión de guardia (TP final)">
+          <span class="n">4</span><span class="t">El agente de admisión de guardia (TP final)</span></a>
+        <a class="nav-item sub " href="https://ezequielrickert.github.io/austral-ia-generativa/tp-diapositivas/4/" title="TP4 en diapositivas">
+          <span class="n"></span><span class="t">En diapositivas</span><span class="meter" data-class="104" data-total="25"><i></i></span></a>
+        
+      </div>
+    </nav>
+    <div class="sb-foot">
+      <span id="exam-left">Final: 4 dic</span>
+      <button class="btn icon sm ghost" id="theme-btn" aria-label="Cambiar tema" title="Cambiar tema">
+        <svg class="i" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+    </div>
+  </aside>
+  <div class="main">
+    <div class="topbar">
+      <button class="btn icon" id="menu-btn" aria-label="Abrir navegación"><svg class="i" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+      <b>IA Generativa</b>
+    </div>
+    <main class="content is-viewer">
+      
+
+<div class="viewer-page" id="viewer" data-class="101" data-path="/tp-diapositivas/1/">
+<header class="page-header">
+  <div class="ph-main">
+    
+    <nav class="crumbs"><span>Trabajos prácticos</span><span class="sep">/</span><a href="https://ezequielrickert.github.io/austral-ia-generativa/tp/1/">TP1</a><span class="sep">·</span><span>En diapositivas</span><span class="sep">·</span><span class="mono">corta</span></nav>
+    <h1>Corta, del caos a producción</h1>
+    
+  </div>
+  <div class="ph-actions">
+    
+    <button class="btn icon" id="focus-btn" aria-pressed="false" title="Modo foco: ocultar el menú (f)" aria-label="Modo foco"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg></button>
+    <button class="btn icon" id="fs-btn" title="Pantalla completa: diapositivas, notas y TPs (p)" aria-label="Pantalla completa"><svg class="i" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+    
+    <a class="btn" href="https://ezequielrickert.github.io/austral-ia-generativa/tp/1/">Ficha del TP</a>
+    <a class="btn" href="https://ezequielrickert.github.io/austral-ia-generativa/practica/#t1">Preguntas de defensa</a>
+    <a class="btn icon disabled"  aria-label="TP anterior" title="TP anterior"><svg class="i" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></a>
+    <a class="btn icon " href="https://ezequielrickert.github.io/austral-ia-generativa/tp-diapositivas/2/" aria-label="TP siguiente" title="TP siguiente"><svg class="i" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></a>
+    
+  </div>
+</header>
+
+<div class="viewer-area">
+<div class="viewer">
+  <section class="card stage-card">
+    <div class="card-header">
+      <span class="deck-kind"><span class="pill sched" id="deck-kind" hidden data-kind-sched="Calendario" data-kind-extra="Complementaria" title="Figura en el calendario de la materia">Calendario</span><span class="card-sub" id="sec-name">&nbsp;</span></span>
+      <div class="seg" id="filter" aria-label="Filtrar diapositivas">
+        <button aria-pressed="true" data-f="all">Todas<span class="fc mono" data-fc="all"></span></button>
+        <button aria-pressed="false" data-f="key"><span class="bar"></span>Clave<span class="fc mono" data-fc="key"></span></button>
+        
+      </div>
+      <button class="btn icon sm ghost" id="fs-exit" title="Salir de pantalla completa (p o Esc)" aria-label="Salir de pantalla completa"><svg class="i" viewBox="0 0 24 24"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg></button>
+    </div>
+    <div class="stage" id="stage">
+      <iframe id="deck-frame" title="Diapositivas de la clase" allow="autoplay; fullscreen"></iframe>
+      <button class="tp-mark" id="tp-mark" hidden aria-expanded="false" aria-controls="tp-pop" title="¿Dónde lo usaste? (t)"><b>?</b><span id="tp-mark-label">TP</span></button>
+      <div class="tp-pop card" id="tp-pop" hidden role="dialog" aria-label="Dónde lo usaste en los TPs"></div>
+    </div>
+    <div class="card-footer">
+      <button class="btn icon sm" id="prev" aria-label="Diapositiva anterior"><svg class="i" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>
+      <span class="pos" id="pos">—</span>
+      <button class="btn icon sm" id="next" aria-label="Diapositiva siguiente"><svg class="i" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>
+      
+      <div class="scrub" data-scrub="tp-1"  role="slider" aria-label="Ir a una diapositiva" aria-valuemin="0" aria-valuemax="24" tabindex="0">
+        <span class="tk" data-i="0" data-t="Portada"></span><span class="tk" data-i="1" data-t="Lo que dejó el dev anterior"></span><span class="tk" data-i="2" data-t="El corazón de Corta, roto"></span><span class="tk" data-i="3" data-t="Lo que no se ve a simple vista"></span><span class="tk" data-i="4" data-t="Por qué no es solo arreglar bugs"></span><span class="tk" data-i="5" data-t="Qué se pedía"></span><span class="tk key" data-i="6" data-t="Los milestones como pedidos"></span><span class="tk" data-i="7" data-t="Los extras"></span><span class="tk key" data-i="8" data-t="M1: el primer commit y la credencial"></span><span class="tk key" data-i="9" data-t="El método: contrato y SPEC antes del código"></span><span class="tk" data-i="10" data-t="M3: el link no te llevaba a destino"></span><span class="tk" data-i="11" data-t="M3: dos URLs con el mismo código"></span><span class="tk" data-i="12" data-t="El test que fuerza la colisión"></span><span class="tk" data-i="13" data-t="M2: ordenar sin romper"></span><span class="tk" data-i="14" data-t="M4: estadísticas que digan la verdad"></span><span class="tk key" data-i="15" data-t="M5: ¿dónde viven los datos?"></span><span class="tk" data-i="16" data-t="La base garantiza unicidad y conteo"></span><span class="tk" data-i="17" data-t="La memoria del agente: Skill progress-log"></span><span class="tk" data-i="18" data-t="Contra lo pedido"></span><span class="tk key" data-i="19" data-t="Qué quedó flojo"></span><span class="tk key" data-i="20" data-t="Mapa: clase → concepto → dónde apareció"></span><span class="tk" data-i="21" data-t="¿Por qué no pushearon «tal cual»?"></span><span class="tk" data-i="22" data-t="¿Por qué TDD con un agente?"></span><span class="tk" data-i="23" data-t="¿Dónde viven los datos?"></span><span class="tk" data-i="24" data-t="Cierre"></span>
+      </div>
+      
+      <button class="btn sm" id="side-toggle" aria-pressed="true" title="Esconder las notas (n)"><svg class="i chev-hide" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg><svg class="i chev-show" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>Notas</button>
+    </div>
+  </section>
+
+  <aside class="card side-card" id="side-card">
+    <div class="card-header">
+      <div class="seg" role="tablist" data-tabs="side-card">
+        <button role="tab" data-tab="nota" aria-selected="true">Nota</button>
+        <button role="tab" data-tab="indice" aria-selected="false">Índice</button>
+      </div>
+      <span class="count mono faint" id="note-pos" style="font-size:12px"></span>
+    </div>
+
+    <div class="side-panel" data-panel="nota" id="notes" aria-live="polite">
+      
+        
+        <article class="note" data-deck="tp-1" data-i="0" hidden>
+          <div class="card-section head">
+            <h2>Portada</h2>
+            
+            <p class="summary">El TP1 es la misión de la clase 2: heredar un repo desordenado y llevarlo a producción trabajando con un agente de código. El deck sigue el orden del trabajo real: primero cómo llegó Corta, después qué se pedía y recién ahí cada dificultad con su solución y la teoría que la explica.</p>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-1" data-i="1" hidden>
+          <div class="card-section head">
+            <h2>Lo que dejó el dev anterior</h2>
+            
+            <p class="summary">El estado inicial está documentado en el primer commit del repo (<code>a6061b7</code>), que subió la carpeta sin curar. Fijate que el desorden no es solo estético: con tres servers parecidos, ni una persona ni un agente saben cuál es el que corre. Y <code>notas.txt</code> es la mina enterrada del TP: cualquiera que haga <code>git add .</code> la sube.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=32"><span class="ref">02·32</span><span><span class="t">La historia de Corta</span><small>La historia de Corta: el repo heredado que plantea la misión.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-1" data-i="2" hidden>
+          <div class="card-section head">
+            <h2>El corazón de Corta, roto</h2>
+            
+            <p class="summary">Un acortador tiene una sola tarea importante —llevarte a destino— y justo esa no funcionaba. El segundo bug es más traicionero: el contador parece funcionar dentro del request, pero el archivo nunca cambia, así que no hay ningún error visible. La consigna pedía encontrarlos usando la app y leyendo el código.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=9"><span class="ref">02·9</span><span><span class="t">Qué lee el agente al pararse en el repo</span><small>El agente explora el repo heredado con herramientas para entenderlo.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-1" data-i="3" hidden>
+          <div class="card-section head">
+            <h2>Lo que no se ve a simple vista</h2>
+            
+            <p class="summary">Ninguno de estos problemas tira un error: todos fallan en silencio. Eso es lo que vuelve difícil el TP, porque no alcanza con correr la app y ver que «anda». Hace falta definir qué significa que ande bien y comprobarlo, que es exactamente lo que después hacen el SPEC y los tests.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=introduccion&amp;s=13"><span class="ref">01·13</span><span><span class="t">Limitaciones de la IA Generativa</span><small>Limitaciones y riesgos: nada se acepta sin pruebas ni revisión.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-1" data-i="4" hidden>
+          <div class="card-section head">
+            <h2>Por qué no es solo arreglar bugs</h2>
+            
+            <p class="summary">Estas tres tensiones organizan todo el recorrido. La primera se resuelve con contexto escrito (<code>CLAUDE.md</code>, <code>SPEC.md</code>), la segunda con tests escritos antes del código y la tercera con disciplina de secretos. Tenelas en mente: cada desafío que sigue es un caso de alguna de ellas.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=claude-desktop-chat&amp;s=9"><span class="ref">01·9</span><span><span class="t">El chat responde de memoria <span class="pill compl" title="Presentación complementaria: no figura en el calendario">Compl.</span></span><small>El modelo responde de memoria: el contexto es la única palanca.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=30"><span class="ref">02·30</span><span><span class="t">Antes de cerrar: cuidados</span><small>El agente se equivoca con confianza; secretos fuera del contexto.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=3"><span class="ref">02·3</span><span><span class="t">Agentes de código: Claude Code y Codex</span><small>Agente de código: planifica, edita, corre comandos y verifica en un loop.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-1" data-i="5" hidden>
+          <div class="card-section head">
+            <h2>Qué se pedía</h2>
+            
+            <p class="summary">La consigna evalúa el método tanto como el resultado: no alcanza con que Corta funcione, la historia de git tiene que probar cómo se trabajó. El paso 0 tiene sentido conceptual: el catálogo de un MCP dice qué hace cada tool, pero cuándo conviene usarla lo dice la documentación del server.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=33"><span class="ref">02·33</span><span><span class="t">La misión: del caos a producción</span><small>La misión: del caos a producción con SPEC.md + TDD.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=6"><span class="ref">02·6</span><span><span class="t">Dónde se empieza: pararse en una carpeta</span><small>Pararse en una carpeta define el alcance del agente (paso 0).</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=55"><span class="ref">06·55</span><span><span class="t">Conectar un servidor MCP: tres caminos</span><small>Conectar un servidor MCP antes de usarlo.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-1" data-i="6" hidden>
+          <div class="card-section head">
+            <h2>Los milestones como pedidos</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para la defensa</span>
+            <p class="summary">Cada milestone esconde una pregunta conceptual. La del M1 apunta a los secretos; la del M3, a que «decir la verdad» hay que convertirlo en algo comprobable; la del M5, a que el disco de un contenedor es efímero. Leé la columna de la derecha como el examen real de cada etapa.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=33"><span class="ref">02·33</span><span><span class="t">La misión: del caos a producción</span><small>Los cinco milestones y la pregunta «¿dónde viven los datos?».</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-1" data-i="7" hidden>
+          <div class="card-section head">
+            <h2>Los extras</h2>
+            
+            <p class="summary">Los extras empujan dos ideas de la clase: que un agente puede trabajar sin que lo invoques (tareas programadas) y que el conocimiento del proyecto se acumula en archivos del repo, no en la cabeza del agente. Más adelante vas a ver que la memoria se resolvió con una Skill distinta de la pedida.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=claude-desktop-chat&amp;s=27"><span class="ref">01·27</span><span><span class="t">Describir una vez, que corra sola <span class="pill compl" title="Presentación complementaria: no figura en el calendario">Compl.</span></span><small>Schedule: describir un trabajo una vez y que corra solo.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=16"><span class="ref">02·16</span><span><span class="t">Un ejemplo de CLAUDE.md</span><small>CLAUDE.md generado por el agente recolectando instrucciones.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-1" data-i="8" hidden>
+          <div class="card-section head">
+            <h2>M1: el primer commit y la credencial</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para la defensa</span>
+            <p class="summary">Es el punto medio defendible entre la letra y el espíritu de la consigna: el espíritu era la trazabilidad del caos inicial, y se cumplió. Las alternativas descartadas fueron subir todo literal (filtra la credencial para siempre) o limpiar antes del primer commit (pierde el punto de partida).</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=30"><span class="ref">02·30</span><span><span class="t">Antes de cerrar: cuidados</span><small>Secretos fuera del código y fuera del contexto.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/#d=cierre-magnifica-humanitas&amp;s=14"><span class="ref">13·14</span><span><span class="t">Clasificá antes de pegar</span><small>Clasificá el dato antes de compartirlo.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=introduccion&amp;s=13"><span class="ref">01·13</span><span><span class="t">Limitaciones de la IA Generativa</span><small>Fugas de privacidad como limitación de la IA generativa.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-1" data-i="9" hidden>
+          <div class="card-section head">
+            <h2>El método: contrato y SPEC antes del código</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para la defensa</span>
+            <p class="summary">En <code>git log</code> se ve el orden: <code>460a04a</code> agrega <code>CLAUDE.md</code> y <code>MISSION.md</code>, <code>d4b0dc2</code> agrega <code>SPEC.md</code>, y recién después aparece el primer test. Separar los commits de test e implementación convierte la disciplina en algo verificable, que era el criterio de evaluación. Y el push solo al cerrar un milestone deja al humano en el punto que no se puede deshacer.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=claude-desktop-chat&amp;s=9"><span class="ref">01·9</span><span><span class="t">El chat responde de memoria <span class="pill compl" title="Presentación complementaria: no figura en el calendario">Compl.</span></span><small>El chat responde de memoria; el contexto es la única palanca.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=15"><span class="ref">02·15</span><span><span class="t">CLAUDE.md / AGENTS.md: la memoria del repo</span><small>CLAUDE.md / AGENTS.md: la memoria del repo.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=12"><span class="ref">02·12</span><span><span class="t">El manejo del contexto</span><small>Manejo del contexto: ventana chica con la máxima información relevante.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-1" data-i="10" hidden>
+          <div class="card-section head">
+            <h2>M3: el link no te llevaba a destino</h2>
+            
+            <p class="summary">El test usa <code>fetch</code> con <code>redirect: 'manual'</code> para poder ver el 302 en vez de seguirlo. El segundo caso (404 sin tocar contadores) cubre un borde que el bug original no rompía pero que un fix descuidado sí podría romper. Por eso el SPEC enumera casos borde y no solo el camino feliz.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=13"><span class="ref">02·13</span><span><span class="t">Iterar con el agente sobre el código</span><small>Iterar en vueltas chicas con tests como unidad de revisión.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=introduccion&amp;s=12"><span class="ref">01·12</span><span><span class="t">Transformación en Ingeniería de Software</span><small>La IA escribe código y tests; el equipo responde por el cambio.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-1" data-i="11" hidden>
+          <div class="card-section head">
+            <h2>M3: dos URLs con el mismo código</h2>
+            
+            <p class="summary">La idea clave es volver reproducible lo aleatorio: controlando <code>Math.random</code>, el choque deja de ser cuestión de suerte. La garantía definitiva llegó en el M5, cuando la unicidad pasó a la base con una PRIMARY KEY. El <code>while</code> de reintento no tiene tope, una brecha que vas a ver en Resultados.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=13"><span class="ref">02·13</span><span><span class="t">Iterar con el agente sobre el código</span><small>TDD: tests derivados del SPEC, escritos antes de implementar.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=11"><span class="ref">02·11</span><span><span class="t">El conocimiento del proyecto en .md</span><small>El SPEC.md como conocimiento del proyecto del que salen los tests.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-1" data-i="12" hidden>
+          <div class="card-section head">
+            <h2>El test que fuerza la colisión</h2>
+            
+            <p class="summary"><code>iniciarServerDeTest</code> levanta la app real con un repositorio en memoria, así que el test ejercita la ruta HTTP de verdad sin necesitar una base. Las dos aserciones finales son las que importan: hay dos links y <code>aaa</code> conserva su URL original.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=13"><span class="ref">02·13</span><span><span class="t">Iterar con el agente sobre el código</span><small>Un caso borde convertido en test antes del fix.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-1" data-i="13" hidden>
+          <div class="card-section head">
+            <h2>M2: ordenar sin romper</h2>
+            
+            <p class="summary">El M2 se hizo después de los fixes del M3, con los tests ya en verde: eso permitió mover y borrar archivos sabiendo que, si algo se rompía, la suite lo iba a mostrar. <code>axios</code> quedó como dependencia solo por <code>manual-check.js</code>, un resto que conviene reconocer.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=9"><span class="ref">02·9</span><span><span class="t">Qué lee el agente al pararse en el repo</span><small>Qué lee el agente al pararse en el repo: el orden es contexto.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-1" data-i="14" hidden>
+          <div class="card-section head">
+            <h2>M4: estadísticas que digan la verdad</h2>
+            
+            <p class="summary">El test de coherencia (clicks reportados = redirecciones servidas) une dos rutas: si el redirect no persistiera, este test también fallaría. Es un ejemplo de cómo un requisito de negocio se vuelve verificable. La página <code>stats.html</code> es el último eslabón: lo que el test garantiza es lo que termina viendo el usuario.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=11"><span class="ref">02·11</span><span><span class="t">El conocimiento del proyecto en .md</span><small>El conocimiento del proyecto (SPEC.md) en .md dentro del repo.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=13"><span class="ref">02·13</span><span><span class="t">Iterar con el agente sobre el código</span><small>Tests derivados del SPEC como unidad de revisión.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/#d=cierre-magnifica-humanitas&amp;s=33"><span class="ref">13·33</span><span><span class="t">La potencia del centauro</span><small>El centauro: la IA produce, el equipo diseña la verificación.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-1" data-i="15" hidden>
+          <div class="card-section head">
+            <h2>M5: ¿dónde viven los datos?</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para la defensa</span>
+            <p class="summary">Otra vez test primero: <code>tests/postgres.test.js</code> (<code>d541d7c</code>) con un pool falso, antes de la implementación (<code>c331778</code>). La app se refactorizó a <code>crearApp(repositorio)</code>: recibe la persistencia inyectada, así los tests usan un repositorio en memoria y <code>npm test</code> no necesita PostgreSQL. Al arrancar se importan los links heredados con <code>ON CONFLICT DO NOTHING</code>, sin pisar nada.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=24"><span class="ref">02·24</span><span><span class="t">Qué es MCP</span><small>Qué es MCP: acciones de un servicio como tools del agente.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=4"><span class="ref">02·4</span><span><span class="t">Delegar una tarea completa</span><small>Delegar una tarea completa (migrar a Postgres) con el criterio fijado antes.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/#d=cierre-magnifica-humanitas&amp;s=20"><span class="ref">13·20</span><span><span class="t">Cada conector, una decisión de confianza</span><small>Cada conector MCP es una decisión de confianza.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-1" data-i="16" hidden>
+          <div class="card-section head">
+            <h2>La base garantiza unicidad y conteo</h2>
+            
+            <p class="summary">Este archivo cierra dos preguntas de la misión. La unicidad vive en la PRIMARY KEY, así que no hay carrera entre requests; y el contador se suma en la base, así que dos redirecciones simultáneas no se pisan. Las consultas son parametrizadas (<code>$1</code>), sin concatenar strings.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=33"><span class="ref">02·33</span><span><span class="t">La misión: del caos a producción</span><small>La respuesta a «¿dónde viven los datos?».</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-1" data-i="17" hidden>
+          <div class="card-section head">
+            <h2>La memoria del agente: Skill progress-log</h2>
+            
+            <p class="summary">La <code>description</code> enumera frases como «log progress» o «update the progress log» para que la Skill se active sola, además de con <code>/progress-log</code>. <code>CLAUDE.md</code> se mantuvo aparte, no con <code>/collect-memory</code>: en la defensa conviene asumirlo como una decisión, no esconderlo.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=18"><span class="ref">02·18</span><span><span class="t">Qué es una Skill</span><small>Qué es una Skill: se escribe una vez, un trabajo por Skill.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=19"><span class="ref">02·19</span><span><span class="t">Cómo se dispara una Skill</span><small>La description es el disparador automático.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=claude-cowork&amp;s=17"><span class="ref">02·17</span><span><span class="t">Qué es una Skill <span class="pill compl" title="Presentación complementaria: no figura en el calendario">Compl.</span></span><small>Una Skill es un instructivo: la tarea sale siempre igual.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-1" data-i="18" hidden>
+          <div class="card-section head">
+            <h2>Contra lo pedido</h2>
+            
+            <p class="summary">El último número es el más importante para la defensa: se creó el link <code>v4v</code>, se registró una redirección, se forzó un redeploy y seguía con <code>clicks: 1</code>. Eso responde de punta a punta la pregunta del M5. Los commits son de FranCalveyra (16), MartuGiordanelli (4) y ezequielrickert (1).</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=introduccion&amp;s=17"><span class="ref">01·17</span><span><span class="t">Entregables de clase</span><small>Trazabilidad de decisiones, código y pruebas como entregable.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=29"><span class="ref">02·29</span><span><span class="t">El nuevo rol: Diseñar, delegar y revisar</span><small>El nuevo rol: diseñar, delegar y revisar.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-1" data-i="19" hidden>
+          <div class="card-section head">
+            <h2>Qué quedó flojo</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para la defensa</span>
+            <p class="summary">Las brechas no invalidan el método, lo confirman: el único caso borde del SPEC que no se convirtió en test es el único que el código no cumple. El arreglo sería agregar el test (URL sin esquema, <code>ftp://</code>, string vacío) y validar con <code>new URL()</code> restringiendo a <code>http</code>/<code>https</code>. El <code>while</code> se resolvería agrandando el código o cortando tras N intentos.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=11"><span class="ref">02·11</span><span><span class="t">El conocimiento del proyecto en .md</span><small>Lo que describe el SPEC tiene que estar cubierto por un test.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=claude-desktop-chat&amp;s=27"><span class="ref">01·27</span><span><span class="t">Describir una vez, que corra sola <span class="pill compl" title="Presentación complementaria: no figura en el calendario">Compl.</span></span><small>Schedule: la tarea programada que faltó.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-1" data-i="20" hidden>
+          <div class="card-section head">
+            <h2>Mapa: clase → concepto → dónde apareció</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para la defensa</span>
+            <p class="summary">La clase 2 es la de la misión: el TP es la práctica de sus piezas apiladas. Las otras clases aportan lentes para leer lo mismo: la 7 explica qué es mecánicamente un MCP, la 10 por qué Claude Code es un agente (un loop con tools) y la 13 por qué <code>notas.txt</code> es el caso de libro de seguridad.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=rag-mcp-rapida&amp;s=16"><span class="ref">07·16</span><span><span class="t">MCP conecta modelos con herramientas</span><small>MCP conecta modelos con herramientas (clase 7).</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/10/#d=agentes-y-multiagentes&amp;s=12"><span class="ref">10·12</span><span><span class="t">Agente = LLM + planificación + tools</span><small>Agente = LLM + planificación + tools.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/#d=cierre-magnifica-humanitas&amp;s=23"><span class="ref">13·23</span><span><span class="t">Defensa en profundidad</span><small>Defensa en profundidad (clase 13).</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-1" data-i="21" hidden>
+          <div class="card-section head">
+            <h2>¿Por qué no pushearon «tal cual»?</h2>
+            
+            <p class="summary">Lo que se defiende es el criterio, no la regla: el espíritu del M1 es la trazabilidad del punto de partida, y se cumplió. Mencionar que la excepción quedó escrita en el mensaje del commit muestra que fue deliberada y documentada.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=30"><span class="ref">02·30</span><span><span class="t">Antes de cerrar: cuidados</span><small>Secretos fuera del código y fuera del contexto.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-1" data-i="22" hidden>
+          <div class="card-section head">
+            <h2>¿Por qué TDD con un agente?</h2>
+            
+            <p class="summary">Si preguntan por un contraejemplo, la brecha del 400 sirve a favor: el caso borde del SPEC que no tuvo test es justo el que el código no cumple. Eso muestra que el método funciona donde se aplicó.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=13"><span class="ref">02·13</span><span><span class="t">Iterar con el agente sobre el código</span><small>Iterar en vueltas chicas con tests como unidad de revisión.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=30"><span class="ref">02·30</span><span><span class="t">Antes de cerrar: cuidados</span><small>El agente se equivoca con confianza: leer cada diff.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-1" data-i="23" hidden>
+          <div class="card-section head">
+            <h2>¿Dónde viven los datos?</h2>
+            
+            <p class="summary">Si repreguntan por concurrencia, el click se cuenta con un único <code>UPDATE … SET clicks = clicks + 1</code>: la base lo hace atómico, sin el patrón leer-modificar-escribir que pierde incrementos. Y el test de stats verifica que dos redirecciones reporten exactamente 2.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=33"><span class="ref">02·33</span><span><span class="t">La misión: del caos a producción</span><small>La pregunta clave de la misión.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=24"><span class="ref">02·24</span><span><span class="t">Qué es MCP</span><small>La base se provisionó con el MCP de Railway.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="tp-1" data-i="24" hidden>
+          <div class="card-section head">
+            <h2>Cierre</h2>
+            
+            <p class="summary">Es la tesis de la clase 1 vista en un caso real: la IA generativa amplía la capacidad de quien la usa con criterio técnico, validación y responsabilidad. En Corta, el criterio está en <code>CLAUDE.md</code> y <code>SPEC.md</code>, la validación en los tests y la prueba de redeploy, y la responsabilidad en la revisión de diffs y el push por milestone.</p>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Teoría que aplica</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=29"><span class="ref">02·29</span><span><span class="t">El nuevo rol: Diseñar, delegar y revisar</span><small>El nuevo rol: diseñar, delegar y revisar.</small></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/#d=cierre-magnifica-humanitas&amp;s=33"><span class="ref">13·33</span><span><span class="t">La potencia del centauro</span><small>La potencia del centauro: humano + máquina.</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+      
+    </div>
+
+    <div class="side-panel" data-panel="indice" hidden>
+      
+      <div data-index="tp-1" >
+        
+        <details class="idx-sec" data-first="0" data-last="0">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">Portada</span>
+            <span class="range">0–0</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="0"><span class="n">0</span><span class="t">Portada</span><span class="marks"></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="1" data-last="4">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">El problema</span>
+            <span class="range">1–4</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="1"><span class="n">1</span><span class="t">Lo que dejó el dev anterior</span><span class="marks"></span></button><button class="idx-row" data-i="2"><span class="n">2</span><span class="t">El corazón de Corta, roto</span><span class="marks"></span></button><button class="idx-row" data-i="3"><span class="n">3</span><span class="t">Lo que no se ve a simple vista</span><span class="marks"></span></button><button class="idx-row" data-i="4"><span class="n">4</span><span class="t">Por qué no es solo arreglar bugs</span><span class="marks"></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="5" data-last="7">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">La consigna</span>
+            <span class="range">5–7</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="5"><span class="n">5</span><span class="t">Qué se pedía</span><span class="marks"></span></button><button class="idx-row" data-i="6"><span class="n">6</span><span class="t">Los milestones como pedidos</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="7"><span class="n">7</span><span class="t">Los extras</span><span class="marks"></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="8" data-last="17">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">El recorrido</span>
+            <span class="range">8–17</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="8"><span class="n">8</span><span class="t">M1: el primer commit y la credencial</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="9"><span class="n">9</span><span class="t">El método: contrato y SPEC antes del código</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="10"><span class="n">10</span><span class="t">M3: el link no te llevaba a destino</span><span class="marks"></span></button><button class="idx-row" data-i="11"><span class="n">11</span><span class="t">M3: dos URLs con el mismo código</span><span class="marks"></span></button><button class="idx-row" data-i="12"><span class="n">12</span><span class="t">El test que fuerza la colisión</span><span class="marks"></span></button><button class="idx-row" data-i="13"><span class="n">13</span><span class="t">M2: ordenar sin romper</span><span class="marks"></span></button><button class="idx-row" data-i="14"><span class="n">14</span><span class="t">M4: estadísticas que digan la verdad</span><span class="marks"></span></button><button class="idx-row" data-i="15"><span class="n">15</span><span class="t">M5: ¿dónde viven los datos?</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="16"><span class="n">16</span><span class="t">La base garantiza unicidad y conteo</span><span class="marks"></span></button><button class="idx-row" data-i="17"><span class="n">17</span><span class="t">La memoria del agente: Skill progress-log</span><span class="marks"></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="18" data-last="19">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">Resultados</span>
+            <span class="range">18–19</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="18"><span class="n">18</span><span class="t">Contra lo pedido</span><span class="marks"></span></button><button class="idx-row" data-i="19"><span class="n">19</span><span class="t">Qué quedó flojo</span><span class="marks"><span class="mk-key"></span></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="20" data-last="20">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">Teoría en la práctica</span>
+            <span class="range">20–20</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="20"><span class="n">20</span><span class="t">Mapa: clase → concepto → dónde apareció</span><span class="marks"><span class="mk-key"></span></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="21" data-last="23">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">Para la defensa</span>
+            <span class="range">21–23</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="21"><span class="n">21</span><span class="t">¿Por qué no pushearon «tal cual»?</span><span class="marks"></span></button><button class="idx-row" data-i="22"><span class="n">22</span><span class="t">¿Por qué TDD con un agente?</span><span class="marks"></span></button><button class="idx-row" data-i="23"><span class="n">23</span><span class="t">¿Dónde viven los datos?</span><span class="marks"></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="24" data-last="24">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">Cierre</span>
+            <span class="range">24–24</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="24"><span class="n">24</span><span class="t">Cierre</span><span class="marks"></span></button>
+          </div>
+        </details>
+        
+      </div>
+      
+    </div>
+
+    <div class="card-footer side-foot">
+      <button class="btn sm" id="star" title="Marcar para repasar (m)"><svg class="i" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg><span>Marcar</span></button>
+      <span class="hints"><kbd>←</kbd><kbd>→</kbd> <kbd>t</kbd> <kbd>m</kbd> <kbd>n</kbd> <kbd>p</kbd></span>
+    </div>
+  </aside>
+</div>
+</div>
+</div>
+
+
+    </main>
+  </div>
+</div>
+<dialog class="code-dlg" id="code-dlg" aria-labelledby="code-dlg-title">
+  <div class="card-header">
+    <div class="code-dlg-title"><span class="pill tp" id="code-dlg-tp">TP</span><span class="card-title" id="code-dlg-title"></span></div>
+    <div class="card-actions"><a class="btn sm" id="code-dlg-open" href="#">Ver todo el código del TP</a><button class="btn icon sm ghost" id="code-dlg-close" aria-label="Cerrar" autofocus><svg class="i" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+  </div>
+  <div id="code-dlg-body"></div>
+</dialog>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<script src="https://ezequielrickert.github.io/austral-ia-generativa/js/site.js?h=5d528413180e25d02fd3"></script>
+<script src="https://ezequielrickert.github.io/austral-ia-generativa/js/viewer.js?h=316e7aba0f3051532446"></script>
+</body>
+</html>

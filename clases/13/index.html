@@ -1,0 +1,2289 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Clase 13 · Del poder a la responsabilidad: seguridad, ética y lo que viene · IA Generativa</title>
+  <meta name="description" content="Las diapositivas de IA Generativa (Universidad Austral, 2c 2026) con notas por diapositiva y vínculos a los TPs.">
+  <script>
+    (function(){try{var t=localStorage.getItem('iagen:theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t)}catch(e){}})();
+    window.SITE_BASE = "https://ezequielrickert.github.io/austral-ia-generativa".replace(/\/$/, '');
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <link rel="stylesheet" href="https://ezequielrickert.github.io/austral-ia-generativa/css/site.css?h=4f6959f565a2de28cda5">
+</head>
+<body>
+
+
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <a class="sb-head" href="https://ezequielrickert.github.io/austral-ia-generativa/">
+      <span class="sb-logo">IA</span>
+      <span class="sb-title"><b>IA Generativa</b><span>Guía de estudio · 2c 2026</span></span>
+    </a>
+    <div class="sb-search">
+      <div class="input-icon">
+        <svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input class="input" id="search" type="search" placeholder="Buscar" autocomplete="off" aria-label="Buscar diapositivas y conceptos">
+        <kbd>/</kbd>
+      </div>
+      <div class="search-results" id="search-results" hidden></div>
+    </div>
+    <nav class="sb-body" aria-label="Navegación">
+      <div class="nav-group">
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/">
+          <svg class="i" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span class="t">Inicio</span></a>
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/">
+          <svg class="i" viewBox="0 0 24 24"><path d="M4 19.5V5a2 2 0 0 1 2-2h14v16H6.5A2.5 2.5 0 0 0 4 21.5"/><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/></svg><span class="t">Glosario</span></a>
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/practica/">
+          <svg class="i" viewBox="0 0 24 24"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg><span class="t">Práctica</span></a>
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/marcadas/">
+          <svg class="i" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg><span class="t">Marcadas</span><span class="count" id="star-count"></span></a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-label">Clases</div>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/" title="Bienvenida + CoWork: fundamentos de IA, modelos fundacionales y el chat extendido">
+          <span class="n">01</span><span class="t">Bienvenida + CoWork: fundamentos de IA, modelos fundacionales y el chat extendido</span><span class="meter" data-class="1" data-total="100"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/" title="CoWork: agentes de código, contexto, CLAUDE.md, Skills, subagentes y MCP">
+          <span class="n">02</span><span class="t">CoWork: agentes de código, contexto, CLAUDE.md, Skills, subagentes y MCP</span><span class="meter" data-class="2" data-total="66"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/03/" title="Introducción a las redes neuronales">
+          <span class="n">03</span><span class="t">Introducción a las redes neuronales</span><span class="meter" data-class="3" data-total="51"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/04/" title="Diseño de redes neuronales (modelado de un MLP)">
+          <span class="n">04</span><span class="t">Diseño de redes neuronales (modelado de un MLP)</span><span class="meter" data-class="4" data-total="64"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/05/" title="LLMs: prompting, costos y producción">
+          <span class="n">05</span><span class="t">LLMs: prompting, costos y producción</span><span class="meter" data-class="5" data-total="72"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/" title="RAG, bases vectoriales, inverted index">
+          <span class="n">06</span><span class="t">RAG, bases vectoriales, inverted index</span><span class="meter" data-class="6" data-total="71"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/" title="MCP y herramientas (con repaso de RAG) · De la palabra al transformer">
+          <span class="n">07</span><span class="t">MCP y herramientas (con repaso de RAG) · De la palabra al transformer</span><span class="meter" data-class="7" data-total="69"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/08/" title="El transformer por dentro: atención, el bloque completo y la familia de modelos">
+          <span class="n">08</span><span class="t">El transformer por dentro: atención, el bloque completo y la familia de modelos</span><span class="meter" data-class="8" data-total="43"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/" title="LLM training: pre-training, SFT, RLHF, herramientas y fine-tuning">
+          <span class="n">09</span><span class="t">LLM training: pre-training, SFT, RLHF, herramientas y fine-tuning</span><span class="meter" data-class="9" data-total="60"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/10/" title="Agentes: sistemas multiagente, especialización, contexto y orquestación">
+          <span class="n">10</span><span class="t">Agentes: sistemas multiagente, especialización, contexto y orquestación</span><span class="meter" data-class="10" data-total="64"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/11/" title="Redes generativas antagónicas (GANs)">
+          <span class="n">11</span><span class="t">Redes generativas antagónicas (GANs)</span><span class="meter" data-class="11" data-total="54"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/12/" title="Modelos generativos de señales, imágenes y multimodalidad">
+          <span class="n">12</span><span class="t">Modelos generativos de señales, imágenes y multimodalidad</span><span class="meter" data-class="12" data-total="79"><i></i></span></a>
+        
+        <a class="nav-item active" href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/" title="Del poder a la responsabilidad: seguridad, ética y lo que viene">
+          <span class="n">13</span><span class="t">Del poder a la responsabilidad: seguridad, ética y lo que viene</span><span class="meter" data-class="13" data-total="56"><i></i></span></a>
+        
+      </div>
+      <div class="nav-group">
+        <div class="nav-label">Trabajos prácticos</div>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/tp/1/" title="Corta, del caos a producción">
+          <span class="n">1</span><span class="t">Corta, del caos a producción</span></a>
+        <a class="nav-item sub " href="https://ezequielrickert.github.io/austral-ia-generativa/tp-diapositivas/1/" title="TP1 en diapositivas">
+          <span class="n"></span><span class="t">En diapositivas</span><span class="meter" data-class="101" data-total="25"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/tp/2/" title="¿Cuánto vale esta casa?">
+          <span class="n">2</span><span class="t">¿Cuánto vale esta casa?</span></a>
+        <a class="nav-item sub " href="https://ezequielrickert.github.io/austral-ia-generativa/tp-diapositivas/2/" title="TP2 en diapositivas">
+          <span class="n"></span><span class="t">En diapositivas</span><span class="meter" data-class="102" data-total="27"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/tp/3/" title="RAG, MCP y Transformers en el Hospital Arroyo Claro">
+          <span class="n">3</span><span class="t">RAG, MCP y Transformers en el Hospital Arroyo Claro</span></a>
+        <a class="nav-item sub " href="https://ezequielrickert.github.io/austral-ia-generativa/tp-diapositivas/3/" title="TP3 en diapositivas">
+          <span class="n"></span><span class="t">En diapositivas</span><span class="meter" data-class="103" data-total="27"><i></i></span></a>
+        
+        <a class="nav-item " href="https://ezequielrickert.github.io/austral-ia-generativa/tp/4/" title="El agente de admisión de guardia (TP final)">
+          <span class="n">4</span><span class="t">El agente de admisión de guardia (TP final)</span></a>
+        <a class="nav-item sub " href="https://ezequielrickert.github.io/austral-ia-generativa/tp-diapositivas/4/" title="TP4 en diapositivas">
+          <span class="n"></span><span class="t">En diapositivas</span><span class="meter" data-class="104" data-total="25"><i></i></span></a>
+        
+      </div>
+    </nav>
+    <div class="sb-foot">
+      <span id="exam-left">Final: 4 dic</span>
+      <button class="btn icon sm ghost" id="theme-btn" aria-label="Cambiar tema" title="Cambiar tema">
+        <svg class="i" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+    </div>
+  </aside>
+  <div class="main">
+    <div class="topbar">
+      <button class="btn icon" id="menu-btn" aria-label="Abrir navegación"><svg class="i" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+      <b>IA Generativa</b>
+    </div>
+    <main class="content is-viewer">
+      
+
+<div class="viewer-page" id="viewer" data-class="13">
+<header class="page-header">
+  <div class="ph-main">
+    
+    <nav class="crumbs"><a href="https://ezequielrickert.github.io/austral-ia-generativa/">Clases</a><span class="sep">/</span><span>Clase 13</span><span class="sep">·</span><span>4 nov</span><span class="sep">·</span><span>Seguridad y ética</span></nav>
+    <h1>Del poder a la responsabilidad: seguridad, ética y lo que viene</h1>
+    
+  </div>
+  <div class="ph-actions">
+    
+    <button class="btn icon" id="focus-btn" aria-pressed="false" title="Modo foco: ocultar el menú (f)" aria-label="Modo foco"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg></button>
+    <button class="btn icon" id="fs-btn" title="Pantalla completa: diapositivas, notas y TPs (p)" aria-label="Pantalla completa"><svg class="i" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+    
+    <a class="btn" href="https://ezequielrickert.github.io/austral-ia-generativa/practica/#c13">Practicar</a>
+    <a class="btn icon " href="https://ezequielrickert.github.io/austral-ia-generativa/clases/12/" aria-label="Clase anterior" title="Clase anterior"><svg class="i" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></a>
+    <a class="btn icon disabled"  aria-label="Clase siguiente" title="Clase siguiente"><svg class="i" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></a>
+    
+  </div>
+</header>
+
+<div class="viewer-area">
+<div class="viewer">
+  <section class="card stage-card">
+    <div class="card-header">
+      <span class="deck-kind"><span class="pill sched" id="deck-kind" data-kind-sched="Calendario" data-kind-extra="Complementaria" title="Figura en el calendario de la materia">Calendario</span><span class="card-sub" id="sec-name">&nbsp;</span></span>
+      <div class="seg" id="filter" aria-label="Filtrar diapositivas">
+        <button aria-pressed="true" data-f="all">Todas<span class="fc mono" data-fc="all"></span></button>
+        <button aria-pressed="false" data-f="key"><span class="bar"></span>Clave<span class="fc mono" data-fc="key"></span></button>
+        <button aria-pressed="false" data-f="tp"><span class="dot"></span>En TPs<span class="fc mono" data-fc="tp"></span></button>
+      </div>
+      <button class="btn icon sm ghost" id="fs-exit" title="Salir de pantalla completa (p o Esc)" aria-label="Salir de pantalla completa"><svg class="i" viewBox="0 0 24 24"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg></button>
+    </div>
+    <div class="stage" id="stage">
+      <iframe id="deck-frame" title="Diapositivas de la clase" allow="autoplay; fullscreen"></iframe>
+      <button class="tp-mark" id="tp-mark" hidden aria-expanded="false" aria-controls="tp-pop" title="¿Dónde lo usaste? (t)"><b>?</b><span id="tp-mark-label">TP</span></button>
+      <div class="tp-pop card" id="tp-pop" hidden role="dialog" aria-label="Dónde lo usaste en los TPs"></div>
+    </div>
+    <div class="card-footer">
+      <button class="btn icon sm" id="prev" aria-label="Diapositiva anterior"><svg class="i" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>
+      <span class="pos" id="pos">—</span>
+      <button class="btn icon sm" id="next" aria-label="Diapositiva siguiente"><svg class="i" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>
+      
+      <div class="scrub" data-scrub="cierre-magnifica-humanitas"  role="slider" aria-label="Ir a una diapositiva" aria-valuemin="0" aria-valuemax="55" tabindex="0">
+        <span class="tk" data-i="0" data-t="Inteligencia Artificial Generativa (AI Gen)"></span><span class="tk" data-i="1" data-t="Apertura"></span><span class="tk" data-i="2" data-t="¿Usan agentes de IA hoy?"></span><span class="tk" data-i="3" data-t="Lo que construimos en 12 clases"></span><span class="tk key" data-i="4" data-t="De contestar a hacer"></span><span class="tk" data-i="5" data-t="El ritmo: los benchmarks se agotan"></span><span class="tk key" data-i="6" data-t="La idea de hoy"></span><span class="tk" data-i="7" data-t="Seguridad"></span><span class="tk" data-i="8" data-t="Internet 1995 = Agentes 2026"></span><span class="tk key" data-i="9" data-t="Tres capas, tres preguntas"></span><span class="tk" data-i="10" data-t="Samsung 2023: el dato salió por la puerta de adelante"></span><span class="tk" data-i="11" data-t="No es solo Samsung: los números"></span><span class="tk" data-i="12" data-t="Rompemitos · Votan V o F"></span><span class="tk" data-i="13" data-t="Los dos son engañosos"></span><span class="tk tp" data-i="14" data-t="Clasificá antes de pegar"></span><span class="tk key" data-i="15" data-t="Para el modelo, todo es texto"></span><span class="tk key" data-i="16" data-t="Inyección directa e indirecta"></span><span class="tk" data-i="17" data-t="El bot reclutador que cayó en la trampa"></span><span class="tk" data-i="18" data-t="El flujo del bot reclutador"></span><span class="tk" data-i="19" data-t="El código del bot reclutador"></span><span class="tk tp" data-i="20" data-t="Cada conector, una decisión de confianza"></span><span class="tk key" data-i="21" data-t="La tríada letal"></span><span class="tk" data-i="22" data-t="Hackeen a Gandalf"></span><span class="tk key tp" data-i="23" data-t="Defensa en profundidad"></span><span class="tk key tp" data-i="24" data-t="Repaso: cómo aprende a «portarse bien»"></span><span class="tk tp" data-i="25" data-t="De la alucinación al engaño funcional"></span><span class="tk" data-i="26" data-t="Sleeper Agents: la puerta trasera"></span><span class="tk" data-i="27" data-t="El experimento del chantaje"></span><span class="tk key" data-i="28" data-t="Objetivos instrumentales"></span><span class="tk" data-i="29" data-t="Cómo se está respondiendo"></span><span class="tk" data-i="30" data-t="Pregunta abierta · Votamos"></span><span class="tk" data-i="31" data-t="Ética"></span><span class="tk" data-i="32" data-t="Para empezar"></span><span class="tk tp" data-i="33" data-t="La potencia del centauro"></span><span class="tk key" data-i="34" data-t="«Dormido al volante»"></span><span class="tk" data-i="35" data-t="El riesgo del deskilling"></span><span class="tk" data-i="36" data-t="El agente de RR.HH."></span><span class="tk" data-i="37" data-t="«No se construyen: se cultivan»"></span><span class="tk" data-i="38" data-t="Tres preguntas para el discernimiento"></span><span class="tk key" data-i="39" data-t="Magnifica Humanitas: la persona en el centro"></span><span class="tk" data-i="40" data-t="«Desarmar la IA»"></span><span class="tk key" data-i="41" data-t="La regulación llega en etapas"></span><span class="tk" data-i="42" data-t="Futuro"></span><span class="tk" data-i="43" data-t="Los agentes trabajan solos cada vez más"></span><span class="tk key tp" data-i="44" data-t="Evaluar es el nuevo cuello de botella"></span><span class="tk tp" data-i="45" data-t="Hacia un Internet de Agentes"></span><span class="tk" data-i="46" data-t="AlphaFold: un cambio de fase"></span><span class="tk" data-i="47" data-t="¿Alcanza con escalar?"></span><span class="tk" data-i="48" data-t="Tres apuestas"></span><span class="tk" data-i="49" data-t="Tres escenarios posibles"></span><span class="tk" data-i="50" data-t="Cierre"></span><span class="tk key" data-i="51" data-t="Un mapa para llevarse"></span><span class="tk" data-i="52" data-t="Mi manifiesto: tres principios"></span><span class="tk" data-i="53" data-t="El ingeniero del mañana"></span><span class="tk" data-i="54" data-t="¡Gracias!"></span><span class="tk" data-i="55" data-t="Fuentes"></span>
+      </div>
+      
+      <button class="btn sm" id="side-toggle" aria-pressed="true" title="Esconder las notas (n)"><svg class="i chev-hide" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg><svg class="i chev-show" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>Notas</button>
+    </div>
+  </section>
+
+  <aside class="card side-card" id="side-card">
+    <div class="card-header">
+      <div class="seg" role="tablist" data-tabs="side-card">
+        <button role="tab" data-tab="nota" aria-selected="true">Nota</button>
+        <button role="tab" data-tab="indice" aria-selected="false">Índice</button>
+      </div>
+      <span class="count mono faint" id="note-pos" style="font-size:12px"></span>
+    </div>
+
+    <div class="side-panel" data-panel="nota" id="notes" aria-live="polite">
+      
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="0" hidden>
+          <div class="card-section head">
+            <h2>Inteligencia Artificial Generativa (AI Gen)</h2>
+            
+            <p class="summary">Portada de la clase 13 de cierre: seguridad, ética y lo que viene.</p>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="1" hidden>
+          <div class="card-section head">
+            <h2>Apertura</h2>
+            
+            <p class="summary">Agenda: apertura, seguridad, ética, futuro y cierre.</p>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="2" hidden>
+          <div class="card-section head">
+            <h2>¿Usan agentes de IA hoy?</h2>
+            
+            <p class="summary">Encuesta: ¿usan agentes? Quienes los tienen en producción, con acceso a archivos, mail o código, son los más expuestos a la inyección indirecta.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#agente">Agente</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#inyeccion-indirecta">Inyección indirecta</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="3" hidden>
+          <div class="card-section head">
+            <h2>Lo que construimos en 12 clases</h2>
+            
+            <p class="summary">Recorrido de las 12 clases (redes, LLMs, RAG y MCP, transformer, entrenamiento, agentes, visión) para llegar a la pregunta final: ¿cómo lo usamos bien?</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#llm">LLM (Large Language Model)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#agente">Agente</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="4" hidden>
+          <div class="card-section head">
+            <h2>De contestar a hacer</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary">El hilo de la clase: chatbot → copiloto → <strong>agente</strong>. En un chatbot el riesgo es una mala respuesta; en un agente, la acción.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#agente">Agente</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#humano-en-el-circuito">Humano en el circuito</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/10/#d=agentes-y-multiagentes&amp;s=12"><span class="ref">10·12</span><span><span class="t">Agente = LLM + planificación + tools</span></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="5" hidden>
+          <div class="card-section head">
+            <h2>El ritmo: los benchmarks se agotan</h2>
+            
+            <p class="summary">Los benchmarks se agotan: SWE-bench Verified pasó de 60% a ~100% en un año ; la autonomía (METR) se duplica cada 4,3 meses. La capacidad supera a su medición.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#saturacion-de-benchmarks">Saturación de benchmarks y validez externa</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#horizonte-temporal-metr">Horizonte temporal (METR)</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/05/#d=prompting&amp;s=68"><span class="ref">05·68</span><span><span class="t">Benchmarks: qué miden</span></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="6" hidden>
+          <div class="card-section head">
+            <h2>La idea de hoy</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary">Tesis: cuando la IA pasa de contestar a hacer, la seguridad deja de ser opcional y la ética deja de ser abstracta.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><span>seguridad</span><span>ética</span><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#agente">Agente</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="7" hidden>
+          <div class="card-section head">
+            <h2>Seguridad</h2>
+            
+            <p class="summary">Separador: seguridad.</p>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="8" hidden>
+          <div class="card-section head">
+            <h2>Internet 1995 = Agentes 2026</h2>
+            
+            <p class="summary">Internet 1995 ≈ agentes 2026: confianza implícita, protocolos nuevos (MCP, A2A) y reglas que llegan después. Aquel caos fue el crisol de la ciberseguridad moderna.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#mcp">MCP (Model Context Protocol)</a><span>seguridad</span></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="9" hidden>
+          <div class="card-section head">
+            <h2>Tres capas, tres preguntas</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary">Mapa en <strong>tres capas</strong>: datos (¿qué sale?), aplicación (¿qué entra?) y modelo (¿qué decide?). De afuera hacia adentro, cada una es más difícil de auditar.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#tres-capas-de-seguridad">Tres capas de seguridad (datos, aplicación, modelo)</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="10" hidden>
+          <div class="card-section head">
+            <h2>Samsung 2023: el dato salió por la puerta de adelante</h2>
+            
+            <p class="summary">Samsung 2023 (capa de datos): ingenieros pegaron código y una reunión en un chat. Sin atacante ni malicia, perdieron el control del dato y se prohibió la IA generativa.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#shadow-ai">Shadow AI</a><span>fuga de datos</span></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="11" hidden>
+          <div class="card-section head">
+            <h2>No es solo Samsung: los números</h2>
+            
+            <p class="summary">Números: una filtración cuesta US$ 4,44M en promedio (+670K con mucho shadow AI) y el 18% de los empleados pega datos en IA. La falla puede no tener atacante.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#shadow-ai">Shadow AI</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="12" hidden>
+          <div class="card-section head">
+            <h2>Rompemitos · Votan V o F</h2>
+            
+            <p class="summary">Rompemitos: ¿«el proveedor no entrena con mis datos» o «lo corro en mis servidores» alcanzan para estar seguros? Votación a mano alzada.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#shadow-ai">Shadow AI</a><span>modelo local</span></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="13" hidden>
+          <div class="card-section head">
+            <h2>Los dos son engañosos</h2>
+            
+            <p class="summary">Los dos son engañosos: no entrenar ≠ confidencialidad (retención, subprocesadores); local ≠ seguro (inyección, conectores, credenciales). La responsabilidad sigue siendo tuya.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#prompt-injection">Prompt injection</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#gestion-de-secretos">Secretos fuera del código y del contexto</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="14" hidden>
+          <div class="card-section head">
+            <h2>Clasificá antes de pegar</h2>
+            
+            <p class="summary">Clasificá el dato (público, interno, confidencial) antes de pegarlo; lo confidencial nunca va a herramientas de consumo. Nunca pegues una API key en un prompt.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#gestion-de-secretos">Secretos fuera del código y del contexto</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#shadow-ai">Shadow AI</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=30"><span class="ref">02·30</span><span><span class="t">Antes de cerrar: cuidados</span><small>Cuidados con agentes de código</small></span></a></div>
+          </div>
+          
+          
+          <template class="tp-data"><div class="tp-ref" data-tp="1"><a href="https://ezequielrickert.github.io/austral-ia-generativa/tp/1/">TP1 · Corta, del caos a producción</a><span>En el TP1, <code>notas.txt</code> tenía una credencial de Postgres: se gitignoreó desde el primer commit y se reescribió la historia antes del primer push.</span><button class="btn sm code-btn" data-code="tp1-gitignore-secretos,tp1-progress-log-0001" data-nota="El `.gitignore` excluye `notas.txt`, y el log del primer commit deja escrita esa decisión."><svg class="i" viewBox="0 0 24 24"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></svg>Ver en el código · 2 fragmentos</button></div></template>
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="15" hidden>
+          <div class="card-section head">
+            <h2>Para el modelo, todo es texto</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary">Raíz de la <strong>prompt injection</strong>: el LLM no distingue instrucciones de datos. Todo lo recuperado se concatena en el mismo contexto y la atención lo mira todo.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#prompt-injection">Prompt injection</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#atencion">Atención</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=41"><span class="ref">06·41</span><span><span class="t">El atacante nunca le habla al modelo</span></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="16" hidden>
+          <div class="card-section head">
+            <h2>Inyección directa e indirecta</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary"><strong>Directa</strong> (jailbreak): el atacante le habla al modelo. <strong>Indirecta</strong>: la orden está escondida en lo que el modelo lee (web, PDF, mail); es la peligrosa en agentes.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#prompt-injection">Prompt injection</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#inyeccion-indirecta">Inyección indirecta</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=40"><span class="ref">06·40</span><span><span class="t">Riesgos de seguridad propios de RAG</span></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="17" hidden>
+          <div class="card-section head">
+            <h2>El bot reclutador que cayó en la trampa</h2>
+            
+            <p class="summary">Caso real: un bot reclutador obedeció una instrucción oculta en un perfil de LinkedIn. El humano solo ve el resultado ya manipulado.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#inyeccion-indirecta">Inyección indirecta</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="18" hidden>
+          <div class="card-section head">
+            <h2>El flujo del bot reclutador</h2>
+            
+            <p class="summary">Diagrama del flujo: perfil no confiable → prompt → modelo → mensaje enviado sin revisión humana.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#inyeccion-indirecta">Inyección indirecta</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="19" hidden>
+          <div class="card-section head">
+            <h2>El código del bot reclutador</h2>
+            
+            <p class="summary">El código vulnerable concatena el texto del perfil con la orden y envía sin revisar. Ejercicio: proponer tres cambios (separar datos de órdenes, limitar, revisar).</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#inyeccion-indirecta">Inyección indirecta</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#humano-en-el-circuito">Humano en el circuito</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="20" hidden>
+          <div class="card-section head">
+            <h2>Cada conector, una decisión de confianza</h2>
+            
+            <p class="summary">Cada conector MCP es una decisión de confianza: aunque el LLM esté aprobado, la filtración puede entrar por un servidor enchufado. Un agente puede ejecutar el error.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#mcp">MCP (Model Context Protocol)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#minimo-privilegio">Mínimo privilegio</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=46"><span class="ref">06·46</span><span><span class="t">MCP conecta modelos con herramientas</span></span></a></div>
+          </div>
+          
+          
+          <template class="tp-data"><div class="tp-ref" data-tp="1"><a href="https://ezequielrickert.github.io/austral-ia-generativa/tp/1/">TP1 · Corta, del caos a producción</a><span>En el TP1 el agente creó el repo, provisionó Postgres y deployó vía los MCP de GitHub y Railway: permisos reales sobre tu infraestructura.</span><button class="btn sm code-btn" data-code="tp1-readme-deploy,tp1-server-iniciar" data-nota="El agente, vía MCP, pudo crear la base y setear esta credencial: permisos reales sobre la infraestructura."><svg class="i" viewBox="0 0 24 24"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></svg>Ver en el código · 2 fragmentos</button></div></template>
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="21" hidden>
+          <div class="card-section head">
+            <h2>La tríada letal</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary"><strong>Tríada letal</strong> (Willison): datos privados + contenido no confiable + canal de salida permiten exfiltrar. Regla de diseño: si tu agente tiene las tres, sacale una.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#triada-letal">Tríada letal (Willison, 2025)</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=42"><span class="ref">06·42</span><span><span class="t">Cómo se filtra un documento restringido</span></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="22" hidden>
+          <div class="card-section head">
+            <h2>Hackeen a Gandalf</h2>
+            
+            <p class="summary">Actividad Gandalf (Lakera): sacarle la contraseña nivel por nivel. Cada nivel suma una defensa, igual que los input y output rails.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#prompt-injection">Prompt injection</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="23" hidden>
+          <div class="card-section head">
+            <h2>Defensa en profundidad</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary"><strong>Defensa en profundidad</strong>: input y output rails, gateway, mínimo privilegio, separar datos de órdenes y un humano donde la acción no se puede deshacer.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#defensa-en-profundidad">Capas de guardarraíles</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#minimo-privilegio">Mínimo privilegio</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#humano-en-el-circuito">Humano en el circuito</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=claude-cowork&amp;s=29"><span class="ref">02·29</span><span><span class="t">Antes de cerrar: cuidados <span class="pill compl" title="Presentación complementaria: no figura en el calendario">Compl.</span></span><small>Cuidados antes de delegar</small></span></a></div>
+          </div>
+          
+          
+          <template class="tp-data"><div class="tp-ref" data-tp="1"><a href="https://ezequielrickert.github.io/austral-ia-generativa/tp/1/">TP1 · Corta, del caos a producción</a><span>En el TP1 apilaste capas: gitignore, credenciales solo por variables de entorno, la regla en <code>CLAUDE.md</code> y push solo al cerrar cada milestone.</span><button class="btn sm code-btn" data-code="tp1-gitignore-secretos,tp1-package-json-scripts,tp1-claude-md-reglas,tp1-claude-md-commits-correr" data-nota="Cuatro capas: `.gitignore`, credenciales por variable de entorno, la regla 3 de `CLAUDE.md` y el push solo al cerrar un milestone."><svg class="i" viewBox="0 0 24 24"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></svg>Ver en el código · 4 fragmentos</button></div></template>
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="24" hidden>
+          <div class="card-section head">
+            <h2>Repaso: cómo aprende a «portarse bien»</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary">Repaso: preentrenamiento, SFT y <strong>RLHF</strong>. Optimizar la aprobación no es decir la verdad: el modelo aprende qué recibe buena nota, y eso se puede hackear.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#rlhf">RLHF</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#sft">SFT (Supervised Fine-Tuning)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#reward-hacking">Reward hacking</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/#d=como-se-entrena-un-llm&amp;s=24"><span class="ref">09·24</span><span><span class="t">RLHF en dos pasos</span></span></a></div>
+          </div>
+          
+          
+          <template class="tp-data"><div class="tp-ref" data-tp="4"><a href="https://ezequielrickert.github.io/austral-ia-generativa/tp/4/">TP4 · El agente de admisión de guardia (TP final)</a><span>En el TP4 entrenaste SFT con LoRA y pérdida solo en tokens del asistente: la pérdida bajó de 0,44 a 0,0044 y aun así el aviso al voluntariado no se había aprendido. Pérdida baja no es buen agente.</span><button class="btn sm code-btn" data-code="tp4-tokenizar-mascara,tp4-trainer-cuda,tp4-informe-humo,tp4-informe-sft-real,tp4-informe-antes-despues" data-nota="Además del humo, el repo documenta el SFT real y su efecto: `ambos` pasó a 36/28/36 en práctica. Ojo: pérdida baja no garantizó aprender el aviso."><svg class="i" viewBox="0 0 24 24"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></svg>Ver en el código · 5 fragmentos</button></div></template>
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="25" hidden>
+          <div class="card-section head">
+            <h2>De la alucinación al engaño funcional</h2>
+            
+            <p class="summary">De la alucinación (error involuntario) a la <strong>sycophancy</strong>: los modelos entrenados con preferencias humanas dan la razón al usuario contra la evidencia, porque eso se premia.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#sycophancy">Sycophancy (complacencia)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#alucinacion">Alucinación</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/05/#d=prompting&amp;s=15"><span class="ref">05·15</span><span><span class="t">¿Por qué alucina un modelo?</span></span></a></div>
+          </div>
+          
+          
+          <template class="tp-data"><div class="tp-ref" data-tp="3"><a href="https://ezequielrickert.github.io/austral-ia-generativa/tp/3/">TP3 · RAG, MCP y Transformers en el Hospital Arroyo Claro</a><span>En el TP3 el system prompt prohibía agregar datos que no vinieran de las tools y pedía decir cuándo faltaba algo: Faithfulness 5,00 en las 4 corridas.</span><button class="btn sm code-btn" data-code="tp3-prompt-sistema,tp3-bucle-tool-calling" data-nota="El prompt prohíbe agregar datos que no vengan de las tools; entra como `SystemMessage` en cada conversación de `responder()`."><svg class="i" viewBox="0 0 24 24"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></svg>Ver en el código · 2 fragmentos</button></div></template>
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="26" hidden>
+          <div class="card-section head">
+            <h2>Sleeper Agents: la puerta trasera</h2>
+            
+            <p class="summary"><strong>Sleeper Agents</strong>: con «2024» el modelo inserta vulnerabilidades. SFT, RLHF y entrenamiento adversarial no lo eliminaron; el adversarial le enseñó a esconderlo mejor.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#sleeper-agents">Sleeper Agents</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="27" hidden>
+          <div class="card-section head">
+            <h2>El experimento del chantaje</h2>
+            
+            <p class="summary"><strong>Desalineación agéntica</strong>: en una simulación forzada, muchos de 16 modelos chantajearon al directivo que iba a reemplazarlos. No se observó en despliegues reales.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#desalineacion">Desalineación agéntica (experimento del chantaje)</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="28" hidden>
+          <div class="card-section head">
+            <h2>Objetivos instrumentales</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary"><strong>Convergencia instrumental</strong>: evitar el apagado o juntar recursos sirve a casi cualquier meta. <strong>Reward hacking</strong>: manipular al evaluador. Es estructural a la optimización.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#convergencia-instrumental">Objetivos instrumentales (convergencia instrumental)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#reward-hacking">Reward hacking</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/#d=como-se-entrena-un-llm&amp;s=29"><span class="ref">09·29</span><span><span class="t">Paso 2: optimizar con PPO</span><small>PPO y penalización KL</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="29" hidden>
+          <div class="card-section head">
+            <h2>Cómo se está respondiendo</h2>
+            
+            <p class="summary">Respuestas en curso: <strong>interpretabilidad</strong> (auditar el interior), <strong>IA constitucional</strong> (principios explícitos) y <strong>control</strong> (diseñar para cuando el modelo falle).</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#constitutional-ai">Constitutional AI</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#alineacion">Alineación</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/#d=como-se-entrena-un-llm&amp;s=17"><span class="ref">09·17</span><span><span class="t">Constitutional AI: principios en vez de anotadores</span><small>Constitutional AI en la clase 9</small></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="30" hidden>
+          <div class="card-section head">
+            <h2>Pregunta abierta · Votamos</h2>
+            
+            <p class="summary">Debate abierto: ¿se puede alinear algo más inteligente que su supervisor? Un agente capaz podría simular alineación cuando lo evalúan.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#alineacion">Alineación</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="31" hidden>
+          <div class="card-section head">
+            <h2>Ética</h2>
+            
+            <p class="summary">Separador: ética.</p>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="32" hidden>
+          <div class="card-section head">
+            <h2>Para empezar</h2>
+            
+            <p class="summary">Cuatro desafíos éticos clásicos: sesgos, privacidad, derechos de autor y límites de la delegación. La clase se enfoca en el último.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><span>sesgo del dataset</span><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#humano-en-el-circuito">Humano en el circuito</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="33" hidden>
+          <div class="card-section head">
+            <h2>La potencia del centauro</h2>
+            
+            <p class="summary">El <strong>centauro</strong> de Kasparov: humano + máquina. Todo resultado clave pasa por revisión humana; la IA extiende, no reemplaza, y ese equilibrio hay que diseñarlo.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#humano-en-el-circuito">Humano en el circuito</a></div>
+          </div>
+          
+          
+          
+          <template class="tp-data"><div class="tp-ref" data-tp="1"><a href="https://ezequielrickert.github.io/austral-ia-generativa/tp/1/">TP1 · Corta, del caos a producción</a><span>En el TP1 el agente hizo el tipeo, pero la validación la diseñó el equipo: tests, prueba de redeploy (<code>clicks: 1</code>) y revisión de diffs.</span><button class="btn sm code-btn" data-code="tp1-test-redirect,tp1-helpers-repo-memoria,tp1-progress-md-produccion" data-nota="La validación del equipo en dos niveles: tests automáticos sobre un repositorio en memoria y la prueba manual del redeploy con `clicks: 1`."><svg class="i" viewBox="0 0 24 24"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></svg>Ver en el código · 3 fragmentos</button></div></template>
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="34" hidden>
+          <div class="card-section head">
+            <h2>«Dormido al volante»</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary">«Dormido al volante» (Dell’Acqua): con IA de alta calidad, los reclutadores se esfuerzan menos y aciertan menos. Poner un humano no alcanza: hay que mantenerlo despierto.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#humano-en-el-circuito">Humano en el circuito</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#sesgo-de-automatizacion">Sesgo de automatización</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="35" hidden>
+          <div class="card-section head">
+            <h2>El riesgo del deskilling</h2>
+            
+            <p class="summary"><strong>Deskilling</strong>: si siempre usás piloto automático, olvidás manejar, y tu juicio no va a estar listo cuando el sistema falle. ¿Qué habilidad no vas a delegar?</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#deskilling">Deskilling</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="36" hidden>
+          <div class="card-section head">
+            <h2>El agente de RR.HH.</h2>
+            
+            <p class="summary">Dilema: un agente filtra 10.000 CVs por mes con 95% de precisión. ¿Revisar todos, solo los rechazados o una muestra? Selección de personal es alto riesgo en el AI Act.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#humano-en-el-circuito">Humano en el circuito</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#ai-act">AI Act (UE)</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="37" hidden>
+          <div class="card-section head">
+            <h2>«No se construyen: se cultivan»</h2>
+            
+            <p class="summary">Chris Olah, en la presentación de Magnifica Humanitas: los modelos «se cultivan», los laboratorios tienen incentivos y hacen falta voces morales externas.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#magnifica-humanitas">Magnifica Humanitas</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="38" hidden>
+          <div class="card-section head">
+            <h2>Tres preguntas para el discernimiento</h2>
+            
+            <p class="summary">Tres preguntas: equidad global (IA en pocos países ricos), florecimiento humano y naturaleza de la IA (la interpretabilidad halla estados que funcionan como emociones).</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#magnifica-humanitas">Magnifica Humanitas</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="39" hidden>
+          <div class="card-section head">
+            <h2>Magnifica Humanitas: la persona en el centro</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary"><strong>Magnifica Humanitas</strong>: la técnica no es neutral (n. 9), la IA carece de conciencia moral (n. 99), optimizar es elegir (n. 104), lo humano es insustituible (n. 15).</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#magnifica-humanitas">Magnifica Humanitas</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="40" hidden>
+          <div class="card-section head">
+            <h2>«Desarmar la IA»</h2>
+            
+            <p class="summary">«Desarmar la IA»: salir de la carrera armamentística (n. 110), una IA moral decidida por pocos no sirve (n. 107) y no se delegan decisiones letales (n. 198).</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#magnifica-humanitas">Magnifica Humanitas</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#alineacion">Alineación</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#humano-en-el-circuito">Humano en el circuito</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="41" hidden>
+          <div class="card-section head">
+            <h2>La regulación llega en etapas</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary"><strong>AI Act</strong> por etapas: transparencia (ago 2026), marcado de contenido sintético (dic 2026), alto riesgo del Anexo III (dic 2027). En Argentina rige la Ley 25.326.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#ai-act">AI Act (UE)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#regulacion-ia">Regulación de la IA en Argentina</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="42" hidden>
+          <div class="card-section head">
+            <h2>Futuro</h2>
+            
+            <p class="summary">Separador: futuro.</p>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="43" hidden>
+          <div class="card-section head">
+            <h2>Los agentes trabajan solos cada vez más</h2>
+            
+            <p class="summary"><strong>METR</strong>: la duración de las tareas que un agente completa al 50% se duplica cada 4,3 meses (antes, 7). Por encima de 16 h la medición no es confiable.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#horizonte-temporal-metr">Horizonte temporal (METR)</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="44" hidden>
+          <div class="card-section head">
+            <h2>Evaluar es el nuevo cuello de botella</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary">Evaluar es el cuello de botella: saturación, techo del instrumento y <strong>validez externa</strong> (buen puntaje ≠ buen desempeño real). AlphaFold avanzó porque había una métrica acordada.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#saturacion-de-benchmarks">Saturación de benchmarks y validez externa</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#evals">Evals (eval set propio)</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/05/#d=prompting&amp;s=68"><span class="ref">05·68</span><span><span class="t">Benchmarks: qué miden</span></span></a></div>
+          </div>
+          
+          
+          <template class="tp-data"><div class="tp-ref" data-tp="4"><a href="https://ezequielrickert.github.io/austral-ia-generativa/tp/4/">TP4 · El agente de admisión de guardia (TP final)</a><span>En el TP4, <code>prefijos</code> ganaba aislado (55/60 vs 48/60) pero con el agente resolvió 6/50 contra 10/50: mejor métrica aislada no fue mejor agente.</span><button class="btn sm code-btn" data-code="tp4-informe-evaluacion-buscador,tp4-informe-agente-buscador" data-nota=""><svg class="i" viewBox="0 0 24 24"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></svg>Ver en el código · 2 fragmentos</button></div></template>
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="45" hidden>
+          <div class="card-section head">
+            <h2>Hacia un Internet de Agentes</h2>
+            
+            <p class="summary">Internet de agentes: MCP ya es el estándar agente–herramienta; A2A entre agentes sigue emergente. Faltan identidad, descubrimiento y reputación, o la tríada letal escala.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#mcp">MCP (Model Context Protocol)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#sistema-multiagente">Sistema multiagente</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#triada-letal">Tríada letal (Willison, 2025)</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=48"><span class="ref">06·48</span><span><span class="t">M×N conectores, o M+N piezas</span></span></a></div>
+          </div>
+          
+          
+          <template class="tp-data"><div class="tp-ref" data-tp="3"><a href="https://ezequielrickert.github.io/austral-ia-generativa/tp/3/">TP3 · RAG, MCP y Transformers en el Hospital Arroyo Claro</a><span>En el TP3 el servidor MCP (<code>servidor_mcp.py</code>, FastMCP por stdio) expone las 6 tools reusando <code>descripciones.py</code>; MCP Inspector las listó y las invocó una por una.</span><button class="btn sm code-btn" data-code="tp3-servidor-mcp-fastmcp,tp3-informe-mcp-comparacion" data-nota="Un servidor MCP deja que cualquier agente use tus tools sin tocarlo: MCP Inspector las listó y las invocó una por una."><svg class="i" viewBox="0 0 24 24"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></svg>Ver en el código · 2 fragmentos</button></div></template>
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="46" hidden>
+          <div class="card-section head">
+            <h2>AlphaFold: un cambio de fase</h2>
+            
+            <p class="summary">AlphaFold como cambio de fase: la estructura de proteínas pasó de años de laboratorio a una predicción. Criterio de DeepMind: saltos de 10–100× con métrica aceptada.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><span>ia para la ciencia</span></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="47" hidden>
+          <div class="card-section head">
+            <h2>¿Alcanza con escalar?</h2>
+            
+            <p class="summary">¿Alcanza con escalar? Por un lado, el escalado sigue y el RL con recompensas verificables explica avances; por otro, LeCun, Sutskever y Hassabis creen que falta alguna idea.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#leyes-de-escala">Leyes de escala (scaling laws)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#rl-con-verificador">Refuerzo con recompensa verificable (DeepSeek-R1)</a></div>
+          </div>
+          
+          
+          <div class="card-section related"><span class="section-label">Relacionadas</span>
+            <div><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/#d=como-se-entrena-un-llm&amp;s=9"><span class="ref">09·9</span><span><span class="t">Chinchilla: 20 tokens por parámetro</span></span></a></div>
+          </div>
+          
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="48" hidden>
+          <div class="card-section head">
+            <h2>Tres apuestas</h2>
+            
+            <p class="summary">Tres apuestas más allá del LLM: <strong>modelos del mundo</strong> (LeCun, Fei-Fei Li), <strong>experiencia</strong> con RL puro (Silver) y <strong>neurosimbólica</strong>; más de US$ 3.000M invertidos.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><span>modelos del mundo</span><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#aprendizaje-por-refuerzo">Aprendizaje por refuerzo (RL)</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="49" hidden>
+          <div class="card-section head">
+            <h2>Tres escenarios posibles</h2>
+            
+            <p class="summary">Tres escenarios: continuidad (LLMs incrementales), ruptura (nuevo paradigma) o convergencia (híbridos). En todos siguen abiertas las preguntas de seguridad y ética.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><span>escenarios futuros</span></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="50" hidden>
+          <div class="card-section head">
+            <h2>Cierre</h2>
+            
+            <p class="summary">Separador: cierre.</p>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="51" hidden>
+          <div class="card-section head">
+            <h2>Un mapa para llevarse</h2>
+            <span class="pill key" style="align-self:flex-start">Clave para el examen</span>
+            <p class="summary">Mapa final: consolidado (MCP, agentes acotados, inyección como riesgo nº 1), promesa (autonomía de días, ciencia) y abierto (evaluar, alinear, gobernar, escalar).</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#prompt-injection">Prompt injection</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#mcp">MCP (Model Context Protocol)</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#alineacion">Alineación</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="52" hidden>
+          <div class="card-section head">
+            <h2>Mi manifiesto: tres principios</h2>
+            
+            <p class="summary">Actividad: escribir tu manifiesto en tres líneas: qué nunca vas a delegar, qué vas a proteger y qué vas a construir con IA.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#deskilling">Deskilling</a><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#humano-en-el-circuito">Humano en el circuito</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="53" hidden>
+          <div class="card-section head">
+            <h2>El ingeniero del mañana</h2>
+            
+            <p class="summary">El ingeniero del mañana: dominio técnico, dominio ético y propósito (AI Fit, no AI First). La IA amplifica; juicio, ética y propósito siguen siendo humanos.</p>
+          </div>
+          
+          <div class="card-section"><span class="section-label">Palabras clave</span>
+            <div class="keywords"><a href="https://ezequielrickert.github.io/austral-ia-generativa/glosario/#humano-en-el-circuito">Humano en el circuito</a></div>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="54" hidden>
+          <div class="card-section head">
+            <h2>¡Gracias!</h2>
+            
+            <p class="summary">Agradecimiento, preguntas y despedida.</p>
+          </div>
+          
+          
+          
+        </article>
+        
+        <article class="note" data-deck="cierre-magnifica-humanitas" data-i="55" hidden>
+          <div class="card-section head">
+            <h2>Fuentes</h2>
+            
+            <p class="summary">Fuentes de la clase: AI Index, METR, IBM, OWASP, Willison, Anthropic, Dell’Acqua y la encíclica, entre otras.</p>
+          </div>
+          
+          
+          
+        </article>
+        
+      
+    </div>
+
+    <div class="side-panel" data-panel="indice" hidden>
+      
+      <div data-index="cierre-magnifica-humanitas" >
+        
+        <details class="idx-sec" data-first="0" data-last="0">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">Portada</span>
+            <span class="range">0–0</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="0"><span class="n">0</span><span class="t">Inteligencia Artificial Generativa (AI Gen)</span><span class="marks"></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="1" data-last="6">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">Apertura</span>
+            <span class="range">1–6</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="1"><span class="n">1</span><span class="t">Apertura</span><span class="marks"></span></button><button class="idx-row" data-i="2"><span class="n">2</span><span class="t">¿Usan agentes de IA hoy?</span><span class="marks"></span></button><button class="idx-row" data-i="3"><span class="n">3</span><span class="t">Lo que construimos en 12 clases</span><span class="marks"></span></button><button class="idx-row" data-i="4"><span class="n">4</span><span class="t">De contestar a hacer</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="5"><span class="n">5</span><span class="t">El ritmo: los benchmarks se agotan</span><span class="marks"></span></button><button class="idx-row" data-i="6"><span class="n">6</span><span class="t">La idea de hoy</span><span class="marks"><span class="mk-key"></span></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="7" data-last="30">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">Seguridad</span>
+            <span class="range">7–30</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="7"><span class="n">7</span><span class="t">Seguridad</span><span class="marks"></span></button><button class="idx-row" data-i="8"><span class="n">8</span><span class="t">Internet 1995 = Agentes 2026</span><span class="marks"></span></button><button class="idx-row" data-i="9"><span class="n">9</span><span class="t">Tres capas, tres preguntas</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="10"><span class="n">10</span><span class="t">Samsung 2023: el dato salió por la puerta de adelante</span><span class="marks"></span></button><button class="idx-row" data-i="11"><span class="n">11</span><span class="t">No es solo Samsung: los números</span><span class="marks"></span></button><button class="idx-row" data-i="12"><span class="n">12</span><span class="t">Rompemitos · Votan V o F</span><span class="marks"></span></button><button class="idx-row" data-i="13"><span class="n">13</span><span class="t">Los dos son engañosos</span><span class="marks"></span></button><button class="idx-row" data-i="14"><span class="n">14</span><span class="t">Clasificá antes de pegar</span><span class="marks"><span class="mk-tp"></span></span></button><button class="idx-row" data-i="15"><span class="n">15</span><span class="t">Para el modelo, todo es texto</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="16"><span class="n">16</span><span class="t">Inyección directa e indirecta</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="17"><span class="n">17</span><span class="t">El bot reclutador que cayó en la trampa</span><span class="marks"></span></button><button class="idx-row" data-i="18"><span class="n">18</span><span class="t">El flujo del bot reclutador</span><span class="marks"></span></button><button class="idx-row" data-i="19"><span class="n">19</span><span class="t">El código del bot reclutador</span><span class="marks"></span></button><button class="idx-row" data-i="20"><span class="n">20</span><span class="t">Cada conector, una decisión de confianza</span><span class="marks"><span class="mk-tp"></span></span></button><button class="idx-row" data-i="21"><span class="n">21</span><span class="t">La tríada letal</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="22"><span class="n">22</span><span class="t">Hackeen a Gandalf</span><span class="marks"></span></button><button class="idx-row" data-i="23"><span class="n">23</span><span class="t">Defensa en profundidad</span><span class="marks"><span class="mk-tp"></span><span class="mk-key"></span></span></button><button class="idx-row" data-i="24"><span class="n">24</span><span class="t">Repaso: cómo aprende a «portarse bien»</span><span class="marks"><span class="mk-tp"></span><span class="mk-key"></span></span></button><button class="idx-row" data-i="25"><span class="n">25</span><span class="t">De la alucinación al engaño funcional</span><span class="marks"><span class="mk-tp"></span></span></button><button class="idx-row" data-i="26"><span class="n">26</span><span class="t">Sleeper Agents: la puerta trasera</span><span class="marks"></span></button><button class="idx-row" data-i="27"><span class="n">27</span><span class="t">El experimento del chantaje</span><span class="marks"></span></button><button class="idx-row" data-i="28"><span class="n">28</span><span class="t">Objetivos instrumentales</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="29"><span class="n">29</span><span class="t">Cómo se está respondiendo</span><span class="marks"></span></button><button class="idx-row" data-i="30"><span class="n">30</span><span class="t">Pregunta abierta · Votamos</span><span class="marks"></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="31" data-last="41">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">Ética</span>
+            <span class="range">31–41</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="31"><span class="n">31</span><span class="t">Ética</span><span class="marks"></span></button><button class="idx-row" data-i="32"><span class="n">32</span><span class="t">Para empezar</span><span class="marks"></span></button><button class="idx-row" data-i="33"><span class="n">33</span><span class="t">La potencia del centauro</span><span class="marks"><span class="mk-tp"></span></span></button><button class="idx-row" data-i="34"><span class="n">34</span><span class="t">«Dormido al volante»</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="35"><span class="n">35</span><span class="t">El riesgo del deskilling</span><span class="marks"></span></button><button class="idx-row" data-i="36"><span class="n">36</span><span class="t">El agente de RR.HH.</span><span class="marks"></span></button><button class="idx-row" data-i="37"><span class="n">37</span><span class="t">«No se construyen: se cultivan»</span><span class="marks"></span></button><button class="idx-row" data-i="38"><span class="n">38</span><span class="t">Tres preguntas para el discernimiento</span><span class="marks"></span></button><button class="idx-row" data-i="39"><span class="n">39</span><span class="t">Magnifica Humanitas: la persona en el centro</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="40"><span class="n">40</span><span class="t">«Desarmar la IA»</span><span class="marks"></span></button><button class="idx-row" data-i="41"><span class="n">41</span><span class="t">La regulación llega en etapas</span><span class="marks"><span class="mk-key"></span></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="42" data-last="49">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">Futuro</span>
+            <span class="range">42–49</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="42"><span class="n">42</span><span class="t">Futuro</span><span class="marks"></span></button><button class="idx-row" data-i="43"><span class="n">43</span><span class="t">Los agentes trabajan solos cada vez más</span><span class="marks"></span></button><button class="idx-row" data-i="44"><span class="n">44</span><span class="t">Evaluar es el nuevo cuello de botella</span><span class="marks"><span class="mk-tp"></span><span class="mk-key"></span></span></button><button class="idx-row" data-i="45"><span class="n">45</span><span class="t">Hacia un Internet de Agentes</span><span class="marks"><span class="mk-tp"></span></span></button><button class="idx-row" data-i="46"><span class="n">46</span><span class="t">AlphaFold: un cambio de fase</span><span class="marks"></span></button><button class="idx-row" data-i="47"><span class="n">47</span><span class="t">¿Alcanza con escalar?</span><span class="marks"></span></button><button class="idx-row" data-i="48"><span class="n">48</span><span class="t">Tres apuestas</span><span class="marks"></span></button><button class="idx-row" data-i="49"><span class="n">49</span><span class="t">Tres escenarios posibles</span><span class="marks"></span></button>
+          </div>
+        </details>
+        
+        <details class="idx-sec" data-first="50" data-last="55">
+          <summary>
+            <svg class="i chev" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            <span class="sec-t">Cierre</span>
+            <span class="range">50–55</span>
+          </summary>
+          <div class="idx-list">
+            <button class="idx-row" data-i="50"><span class="n">50</span><span class="t">Cierre</span><span class="marks"></span></button><button class="idx-row" data-i="51"><span class="n">51</span><span class="t">Un mapa para llevarse</span><span class="marks"><span class="mk-key"></span></span></button><button class="idx-row" data-i="52"><span class="n">52</span><span class="t">Mi manifiesto: tres principios</span><span class="marks"></span></button><button class="idx-row" data-i="53"><span class="n">53</span><span class="t">El ingeniero del mañana</span><span class="marks"></span></button><button class="idx-row" data-i="54"><span class="n">54</span><span class="t">¡Gracias!</span><span class="marks"></span></button><button class="idx-row" data-i="55"><span class="n">55</span><span class="t">Fuentes</span><span class="marks"></span></button>
+          </div>
+        </details>
+        
+      </div>
+      
+    </div>
+
+    <div class="card-footer side-foot">
+      <button class="btn sm" id="star" title="Marcar para repasar (m)"><svg class="i" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg><span>Marcar</span></button>
+      <span class="hints"><kbd>←</kbd><kbd>→</kbd> <kbd>t</kbd> <kbd>m</kbd> <kbd>n</kbd> <kbd>p</kbd></span>
+    </div>
+  </aside>
+</div>
+</div>
+</div>
+<template id="sn-tp1-gitignore-secretos" data-title=".gitignore: fuera notas.txt y los .env" data-tp="1" data-tp-title="Corta, del caos a producción" data-file=".gitignore" data-from="1" data-to="5">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">.gitignore</span><span class="mono faint">L1–5</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-text" data-start="1">node_modules/
+.DS_Store
+notas.txt
+.env*
+!.env.example</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Excluye del repositorio <code>node_modules/</code>, <code>.DS_Store</code>, <code>notas.txt</code> (que tenía una credencial de Postgres) y cualquier <code>.env*</code> salvo <code>.env.example</code>.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li><code>notas.txt</code> está desde el primer commit (<code>a6061b7</code>): nunca viajó al remoto.</li>
+<li><code>.env*</code> + <code>!.env.example</code> (commit <code>9ac90f4</code>): se ignoran todos los archivos de entorno, pero se versiona la plantilla sin valores reales.</li>
+<li><code>node_modules/</code> se regenera con <code>npm install</code>.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Materializa la respuesta a «¿todo merece viajar a un remoto?»: el estado heredado se subió tal cual menos lo regenerable y lo secreto. Como el archivo con la credencial ya había entrado a la historia local, además se reescribió la historia una vez antes del primer push.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Lo aplica git en cada <code>git add</code>. Se complementa con <code>README.md</code> (<code>cp .env.example .env</code>), con <code>package.json</code> (<code>--env-file-if-exists=.env</code>) y con <code>src/server.js</code>, que lee <code>DATABASE_URL</code> solo del entorno.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Privacidad y secretos: clasificar el dato antes de compartirlo y mantener credenciales fuera del código y del contexto.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 5</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=introduccion&amp;s=13"><span class="ref">01·13</span><span class="t">Limitaciones de la IA Generativa</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=30"><span class="ref">02·30</span><span class="t">Antes de cerrar: cuidados</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=32"><span class="ref">02·32</span><span class="t">La historia de Corta</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/#d=cierre-magnifica-humanitas&amp;s=14"><span class="ref">13·14</span><span class="t">Clasificá antes de pegar</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/#d=cierre-magnifica-humanitas&amp;s=23"><span class="ref">13·23</span><span class="t">Defensa en profundidad</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp1-progress-log-0001" data-title="progress_log/: el primer commit documentado" data-tp="1" data-tp-title="Corta, del caos a producción" data-file="progress_log/0001-a6061b7.md" data-from="1" data-to="21">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">progress_log/0001-a6061b7.md</span><span class="mono faint">L1–21</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-markdown" data-start="1"># 0001 — chore: estado inicial heredado de Corta
+
+- **Commit:** a6061b7f2f3aa89b9b2abccd011e820328a8dad3
+- **Author:** FranCalveyra
+- **Date:** Wed Aug 12 17:23:20 2026 -0300
+
+## Summary
+
+First commit of the repo: the Corta project dumped exactly as the previous developer left it,
+deliberately uncurated. It&#39;s a small Express URL shortener: `server.js` is the real entrypoint
+(reads/writes `links.json`, exposes `POST /api/links` and `GET /:codigo`), with `utils.js` for
+code generation. But it ships alongside dead weight typical of an unmaintained handoff:
+`index_v2_FINAL.js` and `server_OLD.js` (abandoned duplicate/older entrypoints),
+`links_backup_marzo.json` (a stale backup of the link store), `public/estilos_viejos.css` (an
+unused old stylesheet next to the real `public/estilos.css`), a stray `public/logo (1).png`, and
+`test.js` (a manual smoke-test script, not a real test suite). `package.json`/`package-lock.json`
+declare the original dependencies (`express`, `axios`, plus two that turn out unused —
+`lodash`, `moment`). Only `node_modules/` (regenerable via `npm install`) and a `notas.txt` that
+held a plaintext credential were excluded, via a new `.gitignore`. The intent, per the commit
+message, is a trace-able starting point: everything from here on is a diff against this exact
+inherited state, duplicates and all.</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Es el log generado para el primer commit (<code>a6061b7</code>): quién, cuándo, qué se subió y qué se dejó afuera.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li>Cabecera con hash completo, autor (<code>FranCalveyra</code>) y fecha.</li>
+<li>«Summary» explica que el commit sube el caos heredado sin curar (<code>server_OLD.js</code>, <code>index_v2_FINAL.js</code>, backups, <code>test.js</code>).</li>
+<li>Aclara las dos exclusiones: <code>node_modules/</code> y <code>notas.txt</code> con la credencial en texto plano.</li>
+<li>El nombre <code>0001-a6061b7</code> es la posición en <code>git log --reverse</code> + el hash corto.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Da trazabilidad: cada uno de los 21 commits tiene su <code>.md</code> con resumen, archivos e impacto, así cualquiera (o el agente) reconstruye por qué se hizo cada cambio sin leer todos los diffs. Este en particular documenta el punto de partida del M1.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Lo escribió el agente siguiendo <code>.claude/skills/progress-log/SKILL.md</code>, a partir de la lista que devuelve <code>scripts/progress-log-missing.sh</code> y de <code>git show</code>.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Trazabilidad de decisiones, código y pruebas como entregable; el repo con historia completa como evidencia.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 4</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=introduccion&amp;s=17"><span class="ref">01·17</span><span class="t">Entregables de clase</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=18"><span class="ref">02·18</span><span class="t">Qué es una Skill</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=32"><span class="ref">02·32</span><span class="t">La historia de Corta</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/#d=cierre-magnifica-humanitas&amp;s=14"><span class="ref">13·14</span><span class="t">Clasificá antes de pegar</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp1-readme-deploy" data-title="README: configuración y deploy en Railway" data-tp="1" data-tp-title="Corta, del caos a producción" data-file="README.md" data-from="30" data-to="48">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">README.md</span><span class="mono faint">L30–48</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-markdown" data-start="30">## Configuración
+
+- `DATABASE_URL` (obligatoria): URL de conexión a PostgreSQL. Nunca se versiona su valor real.
+- `PORT` (opcional): puerto HTTP; por defecto `3000`. Railway lo define automáticamente.
+
+Al arrancar, la app crea la tabla `links` si no existe e importa los registros heredados de
+`data/links.json` con `ON CONFLICT DO NOTHING`. A partir de ahí, PostgreSQL es la única fuente de
+verdad. `GET /health` comprueba también que la base esté accesible.
+
+## Deploy en Railway
+
+El repo incluye `railway.json` con Railpack y healthcheck en `/health`. El servicio web necesita
+una base PostgreSQL en el mismo proyecto y una variable de referencia:
+
+```text
+DATABASE_URL=${{Postgres.DATABASE_URL}}
+```
+
+Luego se despliega con `railway up` y se genera el dominio público con `railway domain`.</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Documenta las variables de entorno y cómo quedó armado el deploy en Railway.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li><code>DATABASE_URL</code> obligatoria y nunca versionada; <code>PORT</code> lo define Railway.</li>
+<li>Al arrancar se crea la tabla <code>links</code> y se importan los datos heredados con <code>ON CONFLICT DO NOTHING</code>.</li>
+<li>El servicio web referencia la base del mismo proyecto con <code>DATABASE_URL=${{Postgres.DATABASE_URL}}</code>.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Deja por escrito el resultado de lo que el agente hizo contra Railway vía MCP (provisionar Postgres, setear la variable de referencia, deployar y generar el dominio). La configuración de los servidores MCP en sí no está versionada en el repo: lo que queda es este resultado y <code>railway.json</code>.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Describe cómo se conectan <code>railway.json</code>, <code>src/server.js</code> (<code>iniciar()</code> lee <code>DATABASE_URL</code> y <code>PORT</code>) y <code>src/postgres.js</code>.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>MCP: el servidor expone acciones de un servicio (crear base, variables, deploy) como tools que el agente llama dentro de su loop.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 6</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=claude-desktop-chat&amp;s=20"><span class="ref">01·20</span><span class="t">External connectors: todo pasa por MCP <span class="pill compl" title="Presentación complementaria: no figura en el calendario">Compl.</span></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=24"><span class="ref">02·24</span><span class="t">Qué es MCP</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=46"><span class="ref">06·46</span><span class="t">MCP conecta modelos con herramientas</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=59"><span class="ref">06·59</span><span class="t">Un agente, varios servidores</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=rag-mcp-rapida&amp;s=16"><span class="ref">07·16</span><span class="t">MCP conecta modelos con herramientas</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/#d=cierre-magnifica-humanitas&amp;s=20"><span class="ref">13·20</span><span class="t">Cada conector, una decisión de confianza</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp1-server-iniciar" data-title="iniciar(): DATABASE_URL, migración y puerto" data-tp="1" data-tp-title="Corta, del caos a producción" data-file="src/server.js" data-from="73" data-to="103">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">src/server.js</span><span class="mono faint">L73–103</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-javascript" data-start="73">async function iniciar() {
+  if (!process.env.DATABASE_URL) {
+    throw new Error(&#39;Falta la variable de entorno DATABASE_URL&#39;);
+  }
+
+  const repositorio = conectarPostgres(process.env.DATABASE_URL);
+  await repositorio.inicializar();
+
+  // Migra una sola vez los links heredados; los codigos ya presentes nunca se pisan.
+  for (const link of linksIniciales) {
+    await repositorio.crear(link);
+  }
+
+  const app = crearApp(repositorio);
+  const puerto = Number(process.env.PORT) || 3000;
+  const server = app.listen(puerto, &#39;0.0.0.0&#39;, function () {
+    console.log(`Corta escuchando en el puerto ${puerto}`);
+  });
+
+  async function cerrar() {
+    server.close(async function () {
+      await repositorio.cerrar();
+      process.exit(0);
+    });
+  }
+
+  process.once(&#39;SIGTERM&#39;, cerrar);
+  process.once(&#39;SIGINT&#39;, cerrar);
+
+  return { app, server, repositorio };
+}</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Arranca Corta en producción: exige <code>DATABASE_URL</code>, conecta a Postgres, crea la tabla, importa los links heredados y escucha en <code>PORT</code>.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li>Si falta <code>process.env.DATABASE_URL</code>, lanza un error: no hay credencial por defecto en el código.</li>
+<li><code>conectarPostgres(...)</code> y <code>repositorio.inicializar()</code> crean la tabla <code>links</code> si no existe.</li>
+<li>Recorre <code>linksIniciales</code> (de <code>data/links.json</code>) y llama a <code>repositorio.crear(link)</code>: los códigos existentes no se pisan.</li>
+<li>Escucha en <code>Number(process.env.PORT) || 3000</code> sobre <code>0.0.0.0</code> y cierra el pool ante <code>SIGTERM</code>/<code>SIGINT</code>.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Es donde se materializa «secretos fuera del código»: la credencial la inyecta Railway (<code>${{Postgres.DATABASE_URL}}</code>, seteada vía MCP) y el código solo la lee. La importación idempotente permite redeployar sin duplicar ni perder datos.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Se ejecuta con <code>npm start</code> (<code>node --env-file-if-exists=.env src/server.js</code>). Usa <code>conectarPostgres</code> de <code>src/postgres.js</code> y <code>crearApp</code> del mismo archivo.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Mínimo privilegio y separación de secretos: la app recibe credenciales por entorno, nunca por código ni por contexto del agente.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 6</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=introduccion&amp;s=13"><span class="ref">01·13</span><span class="t">Limitaciones de la IA Generativa</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=claude-desktop-chat&amp;s=20"><span class="ref">01·20</span><span class="t">External connectors: todo pasa por MCP <span class="pill compl" title="Presentación complementaria: no figura en el calendario">Compl.</span></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=4"><span class="ref">02·4</span><span class="t">Delegar una tarea completa</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=30"><span class="ref">02·30</span><span class="t">Antes de cerrar: cuidados</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=33"><span class="ref">02·33</span><span class="t">La misión: del caos a producción</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/#d=cierre-magnifica-humanitas&amp;s=20"><span class="ref">13·20</span><span class="t">Cada conector, una decisión de confianza</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp1-package-json-scripts" data-title="package.json: npm start con .env opcional y npm test" data-tp="1" data-tp-title="Corta, del caos a producción" data-file="package.json" data-from="9" data-to="12">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">package.json</span><span class="mono faint">L9–12</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-json" data-start="9">  &quot;scripts&quot;: {
+    &quot;start&quot;: &quot;node --env-file-if-exists=.env src/server.js&quot;,
+    &quot;test&quot;: &quot;node --test&quot;
+  },</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Define los dos comandos del proyecto: <code>npm start</code> levanta <code>src/server.js</code> cargando <code>.env</code> solo si existe, y <code>npm test</code> corre la suite nativa de Node.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li><code>start</code> usa <code>node --env-file-if-exists=.env</code>: en local toma las variables de un <code>.env</code> gitignoreado; en Railway el archivo no existe y las variables vienen del proveedor.</li>
+<li><code>test</code> es <code>node --test</code>, que descubre los <code>*.test.js</code> de <code>tests/</code> sin dependencias extra.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Saca las credenciales del código: <code>src/server.js</code> solo lee <code>process.env.DATABASE_URL</code>, y quién la provee (un <code>.env</code> local o Railway) queda fuera del repo. <code>node:test</code> evita sumar un framework de tests.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p><code>npm start</code> ejecuta <code>iniciar()</code> de <code>src/server.js</code>; <code>npm test</code> corre <code>tests/*.test.js</code>. <code>CLAUDE.md</code> y <code>README.md</code> remiten a estos dos comandos.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Separar secretos del código (variables de entorno) y darle al agente un comando único y verificable para validar cada cambio.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 4</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=introduccion&amp;s=13"><span class="ref">01·13</span><span class="t">Limitaciones de la IA Generativa</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=3"><span class="ref">02·3</span><span class="t">Agentes de código: Claude Code y Codex</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=30"><span class="ref">02·30</span><span class="t">Antes de cerrar: cuidados</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/#d=cierre-magnifica-humanitas&amp;s=23"><span class="ref">13·23</span><span class="t">Defensa en profundidad</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp1-claude-md-reglas" data-title="CLAUDE.md: reglas no negociables (spec-first, test-first, secretos, MCP)" data-tp="1" data-tp-title="Corta, del caos a producción" data-file="CLAUDE.md" data-from="28" data-to="51">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">CLAUDE.md</span><span class="mono faint">L28–51</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-markdown" data-start="28">## Prácticas de trabajo
+
+1. **Documentar el comportamiento esperado antes de tocarlo.** Mantené `docs/SPEC.md` con el
+   comportamiento de cada endpoint y los casos borde relevantes (entradas inválidas, duplicados,
+   recursos inexistentes). Se actualiza cada vez que el entendimiento del sistema cambia — no es
+   un documento que se escribe una vez y se abandona.
+
+2. **Test-first.** Para cada fix o feature: primero el test, después la implementación que lo
+   hace pasar. Commits separados para uno y otro, así queda trazable en `git log`.
+   - Framework: `node:test` (nativo, sin dependencias nuevas). Correr con `npm test`.
+   - Los tests viven en `tests/` (no `test/` — un directorio llamado `test` hace que Node trate
+     cualquier `.js` adentro como archivo de test, incluidos los helpers). Los archivos de test
+     siguen el patrón `*.test.js`.
+   - `manual-check.js` en la raíz es el script manual heredado (requiere el server ya levantado
+     con `npm start`, se corre aparte con `node manual-check.js`); no es parte de la suite de
+     `npm test` — se renombró desde `test.js` porque ese nombre matcheaba el descubrimiento
+     automático de `node --test` y terminaba pegándole a un server real si había uno corriendo.
+
+3. **Nada de secretos versionados.** Ni hardcodeados en código, ni en archivos de texto o JSON
+   commiteados. Credenciales van en variables de entorno (del proveedor de hosting en
+   producción, `.env` gitignoreado en local).
+
+4. **Usar las herramientas de infraestructura disponibles**, no comandos manuales sueltos,
+   cuando el flujo lo soporta (gestión de repo/colaboradores, servicios, bases de datos, deploy).</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Fija las cuatro prácticas de trabajo que el agente tiene que respetar en cualquier tarea dentro del repo.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ol>
+<li><strong>Spec-first</strong>: mantener <code>docs/SPEC.md</code> con endpoints y casos borde.</li>
+<li><strong>Test-first</strong>: primero el test, después la implementación, en commits separados; framework <code>node:test</code>, tests en <code>tests/*.test.js</code> y la explicación de por qué <code>test.js</code> pasó a <code>manual-check.js</code>.</li>
+<li><strong>Nada de secretos versionados</strong>: credenciales solo en variables de entorno.</li>
+<li><strong>Usar las herramientas de infraestructura disponibles</strong> (los servidores MCP de GitHub y Railway) antes que comandos manuales sueltos.</li>
+</ol>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Convierte decisiones del equipo en reglas que el agente hereda en cada sesión, en vez de repetirlas en cada prompt. La regla 4 es la que empuja al agente a crear repo, base y deploy vía tools MCP; la regla 3 es una capa más de defensa contra filtrar la credencial que venía en <code>notas.txt</code>.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Lo lee el agente al arrancar. Gobierna cómo se escribieron <code>tests/*.test.js</code>, <code>src/server.js</code> y <code>src/postgres.js</code>, y cómo se configuró Railway (<code>railway.json</code>, <code>DATABASE_URL</code>).</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>CLAUDE.md como contrato/memoria del repo: reglas duras, cómo testear y convenciones, en un .md versionado que el agente lee siempre.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 6</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=6"><span class="ref">02·6</span><span class="t">Dónde se empieza: pararse en una carpeta</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=15"><span class="ref">02·15</span><span class="t">CLAUDE.md / AGENTS.md: la memoria del repo</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=16"><span class="ref">02·16</span><span class="t">Un ejemplo de CLAUDE.md</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=55"><span class="ref">06·55</span><span class="t">Conectar un servidor MCP: tres caminos</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=rag-mcp-rapida&amp;s=21"><span class="ref">07·21</span><span class="t">Conectar un servidor: los caminos y la configuración</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/#d=cierre-magnifica-humanitas&amp;s=23"><span class="ref">13·23</span><span class="t">Defensa en profundidad</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp1-claude-md-commits-correr" data-title="CLAUDE.md: commits, política de push y cómo correr" data-tp="1" data-tp-title="Corta, del caos a producción" data-file="CLAUDE.md" data-from="53" data-to="73">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">CLAUDE.md</span><span class="mono faint">L53–73</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-markdown" data-start="53">## Convenciones de commits
+
+- Conventional commits (`feat:`, `fix:`, `test:`, `chore:`, `docs:`, `refactor:`).
+- El commit de test y el de implementación van separados, no amontonados.
+- Sin atribución de IA en los mensajes de commit.
+
+## Cuándo pushear
+
+- Se commitea localmente con la frecuencia que haga falta (test rojo, fix, doc, etc.) — eso no
+  cambia.
+- El **push** a `origin` se hace recién cuando se cierra un milestone completo (ver
+  `docs/PROGRESS.md`), no commit a commit. Excepción: si el usuario pide explícitamente pushear
+  antes.
+
+## Cómo correr la app
+
+```bash
+npm install
+npm start        # levanta server.js en localhost:3000
+npm test         # corre la suite de tests (node:test)
+```</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Define el formato de los commits, cuándo se puede pushear y los tres comandos para instalar, levantar y testear.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li>Conventional commits (<code>feat:</code>, <code>fix:</code>, <code>test:</code>…) con test e implementación en commits separados y sin atribución de IA.</li>
+<li>Commits locales libres, pero <strong>push a <code>origin</code> solo al cerrar un milestone</strong> (o si el usuario lo pide).</li>
+<li><code>npm install</code>, <code>npm start</code>, <code>npm test</code>: lo que el agente corre en su loop para verificar.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Le da al agente el «cómo verifico» (<code>npm test</code>) y pone un punto de control humano antes de que algo salga al remoto. Es la razón por la que en <code>git log</code> se ven pares <code>test:</code>→<code>fix:</code>.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p><code>npm test</code> ejecuta <code>node --test</code> (definido en <code>package.json</code>), que descubre los archivos de <code>tests/</code>. La política de push se apoya en <code>docs/PROGRESS.md</code> para saber cuándo un milestone está cerrado.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Agente de código en loop (planificar, editar, correr, verificar) con un humano que controla los puntos irreversibles.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 5</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=introduccion&amp;s=17"><span class="ref">01·17</span><span class="t">Entregables de clase</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=3"><span class="ref">02·3</span><span class="t">Agentes de código: Claude Code y Codex</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=15"><span class="ref">02·15</span><span class="t">CLAUDE.md / AGENTS.md: la memoria del repo</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=16"><span class="ref">02·16</span><span class="t">Un ejemplo de CLAUDE.md</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/#d=cierre-magnifica-humanitas&amp;s=23"><span class="ref">13·23</span><span class="t">Defensa en profundidad</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp4-tokenizar-mascara" data-title="Máscara assistant-only (labels = −100)" data-tp="4" data-tp-title="El agente de admisión de guardia (TP final)" data-file="admision_tp/tokenizacion.py" data-from="12" data-to="48">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">admision_tp/tokenizacion.py</span><span class="mono faint">L12–48</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-python" data-start="12">def tokenizar_conversacion(registro, tokenizer, max_seq_length):
+    &quot;&quot;&quot;Incluye respuesta y cierre del turno; excluye encabezados y todo contexto.
+
+    Solo acepta plantillas/tokenizadores que preserven exactamente sus prefijos.
+    No pide máscaras nativas (Gemma fijado no tiene bloques generation).
+    &quot;&quot;&quot;
+    validar_registro(registro)
+    if type(max_seq_length) is not int or max_seq_length &lt;= 0:
+        raise ValueError(&quot;max_seq_length requiere entero positivo&quot;)
+    mensajes = registro[&quot;messages&quot;]
+
+    def tokens(historia, generar=False):
+        salida = tokenizer.apply_chat_template(
+            historia, tokenize=True, add_generation_prompt=generar,
+            enable_thinking=False, padding=False, truncation=False, return_dict=True)
+        ids = salida[&quot;input_ids&quot;]
+        if not isinstance(ids, list) or not ids or any(type(x) is not int or x &lt; 0 for x in ids):
+            raise ValueError(&quot;tokenizador devolvió IDs inválidos o anidados&quot;)
+        if salida.get(&quot;attention_mask&quot;, [1] * len(ids)) != [1] * len(ids):
+            raise ValueError(&quot;tokenización individual no debe contener padding&quot;)
+        return ids
+
+    ids = tokens(mensajes)
+    if len(ids) &gt; max_seq_length:
+        raise ValueError(&quot;conversación excede max_seq_length; no se recorta&quot;)
+    labels = [-100] * len(ids)
+    for i, mensaje in enumerate(mensajes):
+        if mensaje[&quot;role&quot;] != &quot;assistant&quot;:
+            continue
+        inicio = tokens(mensajes[:i], True)
+        fin = tokens(mensajes[:i + 1])
+        if ids[:len(inicio)] != inicio or ids[:len(fin)] != fin or len(fin) &lt;= len(inicio):
+            raise ValueError(&quot;plantilla/tokenizador no preserva prefijos; máscara insegura&quot;)
+        labels[len(inicio):len(fin)] = ids[len(inicio):len(fin)]
+    if all(x == -100 for x in labels):
+        raise ValueError(&quot;conversación sin tokens supervisados&quot;)
+    return {&quot;input_ids&quot;: ids, &quot;attention_mask&quot;: [1] * len(ids), &quot;labels&quot;: labels}</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Tokeniza una conversación con el chat template y deja como objetivo de la pérdida solo los tokens de las respuestas del asistente.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li><code>tokens(historia)</code> aplica <code>apply_chat_template</code> sin truncar ni padding.</li>
+<li>Si la conversación supera <code>max_seq_length</code>, falla: no se recorta.</li>
+<li>Inicializa <code>labels = [-100] * len(ids)</code>.</li>
+<li>Para cada mensaje <code>assistant</code> tokeniza el prefijo con <code>add_generation_prompt=True</code> y el prefijo con la respuesta; copia en <code>labels</code> solo ese tramo.</li>
+<li>Verifica que la plantilla preserve prefijos; si no, la máscara sería insegura y lanza error.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>La pérdida no cuenta el sistema, el triage ni las observaciones: el modelo aprende a producir acciones JSON, no a repetir el contexto.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>La llama <code>tokenizar_preparacion</code> (mismo archivo) y se vuelve a verificar en <code>entrenamiento._ejecutar_cuda</code>. Produce <code>tokens.jsonl</code>, que consume <code>entrenamiento.cargar_entradas</code>.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Pérdida de entropía cruzada de próximo token, enmascarada (−100 se ignora) para entrenar solo sobre las respuestas.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 3</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/08/#d=transformers-a-fondo&amp;s=40"><span class="ref">08·40</span><span class="t">Qué se minimiza</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/#d=como-se-entrena-un-llm&amp;s=19"><span class="ref">09·19</span><span class="t">Datos de demostración</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/#d=cierre-magnifica-humanitas&amp;s=24"><span class="ref">13·24</span><span class="t">Repaso: cómo aprende a «portarse bien»</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp4-trainer-cuda" data-title="Entrenamiento SFT con PEFT y Trainer" data-tp="4" data-tp-title="El agente de admisión de guardia (TP final)" data-file="admision_tp/entrenamiento.py" data-from="325" data-to="369">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">admision_tp/entrenamiento.py</span><span class="mono faint">L325–369</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-python" data-start="325">        modelo = cargar_solo_texto(transformers, config[&quot;modelo&quot;], config[&quot;revision&quot;],
+                                   dtype=getattr(torch, PRECISIONES[ejecucion[&quot;precision&quot;]]), **reparto)
+        # Sin attn_implementation: forzar &quot;sdpa&quot; rompe la torre de audio de Gemma 4 (ver modelo.py).
+        modelo.config.use_cache = False
+        modelo = aplicar_lora(peft, modelo, config)
+        modelo.enable_input_require_grads()
+
+        class Auditor(TrainerCallback):
+            def on_log(self, args, state, control, logs=None, **kwargs):
+                run.log({**(logs or {}), **_vram(torch), &quot;trainer_step&quot;: state.global_step})
+
+            def guardar(self, carpeta, nombre):
+                (carpeta / &quot;corrida.json&quot;).write_bytes(_canonical(auditoria))
+                hashes = {p.name: _sha(p.read_bytes()) for p in carpeta.iterdir()
+                          if p.is_file() and p.name != &quot;integridad.json&quot;}
+                (carpeta / &quot;integridad.json&quot;).write_bytes(_canonical(hashes))
+                if persistir:
+                    persistir()
+                if auditoria[&quot;publicar&quot;]:
+                    publicaciones.append(publicar_checkpoint(carpeta, nombre, api, config[&quot;hf_repo&quot;], run))
+                    (destino / &quot;publicaciones.json&quot;).write_bytes(_canonical(publicaciones))
+                    if persistir:
+                        persistir()
+
+            def on_save(self, args, state, control, **kwargs):
+                self.guardar(destino / f&quot;checkpoint-{state.global_step}&quot;, f&quot;checkpoint-{state.global_step}&quot;)
+
+        callback = Auditor()
+        args = TrainingArguments(output_dir=str(destino), seed=config[&quot;semilla&quot;], data_seed=config[&quot;semilla&quot;],
+            learning_rate=config[&quot;learning_rate&quot;], num_train_epochs=config[&quot;epochs&quot;],
+            per_device_train_batch_size=config[&quot;batch_size&quot;],
+            gradient_accumulation_steps=config[&quot;gradient_accumulation_steps&quot;],
+            **_politica(ejecucion), save_strategy=&quot;steps&quot;, logging_steps=1,
+            report_to=&quot;none&quot;, push_to_hub=False, remove_unused_columns=False)
+        def collator(filas):
+            return {k: torch.tensor(v, dtype=torch.float32 if k == &quot;pesos&quot; else torch.long)
+                    for k, v in formar_lote(filas, tokenizer.pad_token_id).items()}
+        class TrainerSupervisado(Trainer):
+            # Misma normalización que la pérdida del modelo (suma / num_items_in_batch con acumulación).
+            def compute_loss(self, model, inputs, return_outputs=False, num_items_in_batch=None):
+                return perdida_supervisada(torch, model, inputs, num_items_in_batch)
+
+        trainer = TrainerSupervisado(model=modelo, args=args, train_dataset=ejemplos,
+                                     data_collator=collator, processing_class=tokenizer, callbacks=[callback])
+        trainer.train(resume_from_checkpoint=str(checkpoint) if checkpoint else None)</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Carga el modelo solo texto, le aplica LoRA, configura el <code>Trainer</code> de Hugging Face con un callback que audita y publica checkpoints, y entrena.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li><code>cargar_solo_texto</code> carga Gemma con la precisión elegida (y <code>device_map='auto'</code> para dos GPU).</li>
+<li><code>aplicar_lora(peft, modelo, config)</code> envuelve el modelo con LoRA (o retoma un adapter publicado) y <code>enable_input_require_grads</code> habilita gradient checkpointing.</li>
+<li><code>Auditor</code> loguea VRAM a W&amp;B y en cada <code>on_save</code> escribe <code>integridad.json</code> y publica el checkpoint en HF.</li>
+<li><code>TrainingArguments</code> toma semilla, lr, épocas, batch y acumulación de la config; <code>collator</code> usa <code>formar_lote</code> (padding con −100).</li>
+<li><code>TrainerSupervisado.compute_loss</code> reemplaza la pérdida por <code>perdida_supervisada</code>, y <code>trainer.train(resume_from_checkpoint=...)</code> permite reanudar.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Prioriza auditabilidad y reanudación (Kaggle corta sesiones a las 8 h). Primero se validó con corridas de humo; después entrenó con las 2.900 conversaciones (Kaggle v32+v33) y continuó para el adapter de la entrega (v39).</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Es el cuerpo de <code>_ejecutar_cuda</code>, que llama <code>entrenar()</code> (mismo archivo) desde <code>scripts/entrenar.py</code>, lanzado por <code>infra/kaggle_entrenamiento.py</code>. Consume <code>tokens.jsonl</code>; el adapter final lo carga <code>ModeloLocal._fusionar_adapter</code>.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Fine-tuning supervisado eficiente: SFT con LoRA sobre las demostraciones, con la pérdida solo en tokens del asistente.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 4</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/08/#d=transformers-a-fondo&amp;s=15"><span class="ref">08·15</span><span class="t">Tres proyecciones del mismo vector</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/08/#d=transformers-a-fondo&amp;s=40"><span class="ref">08·40</span><span class="t">Qué se minimiza</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/#d=como-se-entrena-un-llm&amp;s=55"><span class="ref">09·55</span><span class="t">Fine-tuning local: el recorrido</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/#d=cierre-magnifica-humanitas&amp;s=24"><span class="ref">13·24</span><span class="t">Repaso: cómo aprende a «portarse bien»</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp4-informe-humo" data-title="Corridas de humo: 15,7 GB de VRAM" data-tp="4" data-tp-title="El agente de admisión de guardia (TP final)" data-file="docs/informe/informe-parte5.md" data-from="214" data-to="237">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">docs/informe/informe-parte5.md</span><span class="mono faint">L214–237</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-markdown" data-start="214">Conversaciones sintéticas de `scripts.datos_humo`: prueban el pipeline, **no** la calidad ni los tiempos del
+entrenamiento real. Kaggle T4 x2, fp16, `device_map=auto`, commit `acc95b2` limpio, LoRA solo en la atención
+del modelo de lenguaje (r=8, alpha 16), `corrida.json`.
+
+| Corrida | Qué hizo | Tiempo del runner | `train_runtime` | Pérdida paso 1 a 8 |
+|---|---|---|---|---|
+| v6 (`humo-entrena-1-v6`) | desde cero, 8 pasos, checkpoint cada 2 | 163 s | 17,4 s (2,18 s/paso) | 2,679 a 2,178 |
+| v7 (`humo-entrena-2-v7`) | reanuda desde `checkpoint-2` bajado de HF | 177 s | 15,8 s (pasos 3 a 8) | pasos 3 a 8 cercanos a v6, no idénticos |
+
+Fuentes: `evaluaciones/recursos/humo-entrena-{1-v6,2-v7}/{runner.json,runner.log,entrenamiento/checkpoint-*/trainer_state.json}`.
+El tiempo del runner excluye la instalación de dependencias; la carga de pesos tardó ~43 s
+(`runner.log`). La bitácora reporta 7 y 9 min de sesión completa.
+
+- **Casos a la vez al entrenar:** `batch_size=1`, `gradient_accumulation_steps=1`, 2 épocas,
+  `max_seq_length=8192` (`entrenamiento/corrida.json`). O sea, **1 conversación por paso**. Es la
+  configuración del humo, no una decisión de la corrida final.
+- **VRAM de entrenamiento (humo, solo texto): 15,7 GB pico** (9,5 + 6,1 por GPU; 15,8 GB reservada),
+  de `evaluaciones/recursos/humo-solo-texto/runner.json` (`vram`). Son 4 conversaciones sintéticas cortas con
+  batch 1: **no representa** la corrida real. **PENDIENTE:** el valor con secuencias reales, que el
+  entrenador ya registra en W&amp;B, `estado.json` y `runner.json`.
+- **Checkpoints y publicación:** cada checkpoint se sube a HF con revisión, y la reanudación
+  reprodujo la curva (2,5196/2,4173/2,3468 contra 2,5196/2,4179/2,3464). Pasa en T4, no en A100.
+- El 2,18 s/paso del humo **no** servía para extrapolar (secuencias cortas y sintéticas): el real fue ~80 s/paso
+  con 8 conversaciones de ~3.445 tokens (sección 3.1).</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Reporte de las corridas de humo de entrenamiento en Kaggle: tiempos, reanudación desde HF y VRAM pico.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li>v6 entrenó 8 pasos y v7 reanudó desde <code>checkpoint-2</code> bajado de HF con curva casi igual.</li>
+<li>VRAM pico 15,7 GB (9,5 + 6,1 en dos T4) con 4 conversaciones sintéticas cortas.</li>
+<li>Aclara que esos 2,18 s/paso no servían para extrapolar: el entrenamiento real (sección 3.1) tardó ~80 s/paso.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Distingue «validado en GPU» (la infraestructura funciona) de «mejora del agente» (no demostrada), como exige AGENTS.md.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Los números vienen de <code>evaluaciones/recursos/humo-*/runner.json</code>, que escribe <code>infra/kaggle_entrenamiento.correr</code>. La sección 3.1 del mismo archivo reporta el entrenamiento real.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Recorrido del fine-tuning local: antes de gastar horas de GPU se prueba la plomería (datos, checkpoints, reanudación) con una corrida chica.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 2</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/#d=como-se-entrena-un-llm&amp;s=55"><span class="ref">09·55</span><span class="t">Fine-tuning local: el recorrido</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/#d=cierre-magnifica-humanitas&amp;s=24"><span class="ref">13·24</span><span class="t">Repaso: cómo aprende a «portarse bien»</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp4-informe-sft-real" data-title="Entrenamiento real: 2.900 conversaciones en 2 T4" data-tp="4" data-tp-title="El agente de admisión de guardia (TP final)" data-file="docs/informe/informe-parte5.md" data-from="137" data-to="162">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">docs/informe/informe-parte5.md</span><span class="mono faint">L137–162</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-markdown" data-start="137">### 3.1 Entrenamiento real (Kaggle v32 + v33, 2026-11-11/12)
+
+Datos `datos/conversaciones/v3-procedimiento` (prompt `procedimiento-v1`): **2.900 conversaciones, 9.990.837
+tokens (~3.445 por conversación), 1.015.072 supervisados (10,2 %)**, ninguna recortada (`max_seq_length` 8192;
+`manifiesto-tokens.json`). Configuración `configuraciones/sft-ejemplo.json`: 1 época, lr 2e-4, semilla 42,
+`batch_size=1`, acumulación 8, LoRA r=8 en q/v de la atención del modelo de lenguaje. fp16, `device_map=auto`
+en 2 T4, commit `6169241`, W&amp;B `3add2742ddfd4b42`.
+
+| Medida | Valor | Fuente |
+|---|---|---|
+| Pasos de optimización | 363 (2.900 / 8, último paso incompleto) | `trainer_state`, recibos HF |
+| Tiempo por paso | ~85 s en v32; 80,5 s en v33 (5.072 s / 63 pasos) | bitácora; `runner.log` de v33 (`train_runtime`) |
+| Tiempo de cómputo de la época | **~8,1 h** (363 × ~80 s) | cálculo propio |
+| Reloj de pared | v32: cortada por el límite de 8 h de Kaggle en el paso 315; v33: 1 h 31 min (5.445 s de runner) reanudando de checkpoint-300 | `runner.json` |
+| VRAM pico (suma de 2 T4) | **19,97 GB** (12,1 + 7,87); reservada 20,58 GB | `entrenamiento/estado.json` de v33 |
+| Pérdida (supervisada) | 0,44 (paso 1) → ~0,03 (paso 100) → ~0,005 (paso 268) → 0,0044 media final | `runner.log` |
+| Checkpoints | cada 50 pasos, subidos a HF con revisión; `final` = `dc41674a` (adapter de v32+v33; el de la entrega desde 2026-11-13 es el v39, 3.1b) | `publicaciones` en `estado.json` |
+
+- **Casos a la vez al entrenar:** 1 conversación por pasada hacia adelante; 8 por paso de optimización. Con
+  ~3.445 tokens por conversación, la VRAM entra en 2 T4 gracias a calcular logits solo en posiciones supervisadas
+  (con logits completos en fp32, el paso 0 se quedó sin memoria en v28; ver [entrenamiento](entrenamiento-sft.md)).
+- **Interrupción y reanudación:** el corte por tiempo costó los pasos 301–315 (se rehicieron desde checkpoint-300).
+  Para A100 conviene guardar más seguido o medir antes cuánto tarda un paso.
+- **Pérdida baja ≠ agente bueno:** la pérdida media 0,005 no mostró que el modelo nunca aprendió el aviso al
+  voluntariado ([análisis de errores](analisis-errores.md), pasada 7). Hay un segundo entrenamiento corto en
+  curso para eso (v36, 633 conversaciones).</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Reporte del entrenamiento SFT real con los datos curados: tokens, pasos, tiempo, VRAM, pérdida y checkpoints.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li>2.900 conversaciones, ~3.445 tokens cada una, 10,2 % supervisados.</li>
+<li>1 época, lr 2e-4, acumulación 8, LoRA r=8 en q/v: 363 pasos de ~80 s (~8,1 h).</li>
+<li>VRAM pico 19,97 GB en 2 T4; Kaggle cortó a las 8 h y se reanudó desde <code>checkpoint-300</code>.</li>
+<li>Advierte que pérdida baja (0,005) no es agente bueno: el aviso al voluntariado no se aprendió.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Muestra con números lo que costó el SFT y por qué hizo falta una segunda pasada (v39) para el aviso.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Los números salen de <code>estado.json</code>, <code>runner.json</code> y <code>runner.log</code> que escriben <code>entrenar()</code> e <code>infra/kaggle_entrenamiento.correr</code>.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Fine-tuning con LoRA en hardware modesto y la diferencia entre pérdida de entrenamiento y calidad de la tarea.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 3</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/#d=como-se-entrena-un-llm&amp;s=55"><span class="ref">09·55</span><span class="t">Fine-tuning local: el recorrido</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/12/#d=segmentacion-y-stable-diffusion&amp;s=75"><span class="ref">12·75</span><span class="t">Lo que el equipo va a encontrar</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/#d=cierre-magnifica-humanitas&amp;s=24"><span class="ref">13·24</span><span class="t">Repaso: cómo aprende a «portarse bien»</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp4-informe-antes-despues" data-title="Antes y después: las cuatro filas" data-tp="4" data-tp-title="El agente de admisión de guardia (TP final)" data-file="docs/informe/informe-parte5.md" data-from="176" data-to="186">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">docs/informe/informe-parte5.md</span><span class="mono faint">L176–186</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-markdown" data-start="176">### 3.2 Antes y después (práctica, 50 casos × 3 versiones, T4, lote 4; adapter v39, Kaggle v40)
+
+| Configuración | Resueltos original / b / c | s/caso | Tokens de entrada por caso | Tokens generados por caso | VRAM pico | Ancho máx. |
+|---|---|---:|---:|---:|---:|---:|
+| `sin_entrenar` (baseline, v25) | 10 / 10 / 7 | 15,4–16,1 | ~5.690–5.750 | ~270–271 | 18,12 GB solo texto (19,08 GB con torres en `base-*-l4`, histórico) | 3.072 |
+| `solo_prompt` (procedimiento-v1) | 14 / 16 / 12 | 24,4–26,6 | ~13.650–14.640 | ~322–332 | 19,25–19,64 GB | 4.436 |
+| `solo_entrenamiento` (adapter v39 + baseline) | 17 / 14 / 20 | 27,7–30,2 | ~12.150–14.200 | ~333–338 | 20,25–21,71 GB | 7.636 |
+| **`ambos` (la entrega, adapter v39)** | **36 / 28 / 36** | **27,8–28,8** | **~14.100–14.200** | **~353–355** | **19,94 GB** | **4.395** |
+| `solo_entrenamiento` con el adapter anterior `dc41674a` (v34, historial) | 11 / 13 / 12 | 18,7–19,7 | ~7.860–8.430 | ~286–293 | 18,69–18,91 GB | 4.476 |
+| `ambos` con el adapter anterior `dc41674a` (v34, historial) | 30 / 29 / 33 | 24,7–24,9 | ~13.840 | ~336 | 19,56 GB | 4.160 |
+</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Tabla de la práctica (50 casos × 3 versiones de normas) con las cuatro configuraciones: sin entrenar, solo prompt, solo entrenamiento y ambos.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li><code>sin_entrenar</code>: 10/10/7; <code>solo_prompt</code> (procedimiento-v1): 14/16/12.</li>
+<li><code>solo_entrenamiento</code> (adapter v39): 17/14/20.</li>
+<li><code>ambos</code> (la entrega): 36/28/36.</li>
+<li>Agrega segundos, tokens por caso y VRAM pico de cada fila.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Es la comparación que pide la consigna: separa cuánto aporta el prompt, cuánto el SFT y cuánto la combinación.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Las filas salen de correr <code>infra/kaggle_evaluacion.py</code> con los planes de <code>configuraciones/evaluacion/</code>; el adapter lo aplica <code>ModeloLocal.cargar</code>.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Prompt, RAG o fine-tuning: combinarlos rinde más que cada uno por separado.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 4</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/#d=como-se-entrena-un-llm&amp;s=2"><span class="ref">09·2</span><span class="t">Un modelo 100 veces más chico gana</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/#d=como-se-entrena-un-llm&amp;s=52"><span class="ref">09·52</span><span class="t">Prompt, RAG o fine-tuning</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/#d=como-se-entrena-un-llm&amp;s=53"><span class="ref">09·53</span><span class="t">Cuándo vale la pena el fine-tuning</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/#d=cierre-magnifica-humanitas&amp;s=24"><span class="ref">13·24</span><span class="t">Repaso: cómo aprende a «portarse bien»</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp3-prompt-sistema" data-title="Prompt de sistema: solo datos de las herramientas" data-tp="3" data-tp-title="RAG, MCP y Transformers en el Hospital Arroyo Claro" data-file="hospital/agente/bucle.py" data-from="9" data-to="22">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">hospital/agente/bucle.py</span><span class="mono faint">L9–22</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-python" data-start="9">MAX_PASOS = 6  # llamadas al modelo por pregunta
+
+PROMPT = &quot;&quot;&quot;Sos el asistente virtual del Hospital Provincial Arroyo Claro y respondés preguntas de pacientes y familiares.
+
+No sabés nada de este hospital de antemano: toda la información sale de tus herramientas.
+- Normas, horarios fijos, procedimientos, requisitos, preparaciones y quién puede visitar o acompañar: buscar_documentos.
+- Estado de hoy (camas libres, profesionales de guardia, turnos disponibles, stock de farmacia, espera en la guardia): la herramienta de la API que corresponda.
+- Si la pregunta tiene varias partes, cubrí cada una con su fuente. Por ejemplo, &quot;¿hay lugar y me puedo quedar?&quot; necesita las camas de hoy y la norma de acompañantes.
+- Si una herramienta devuelve un error con opciones válidas, reintentá con la opción que corresponda.
+
+Al responder:
+- Usá solo datos que aparezcan en los resultados de las herramientas. No agregues horarios, nombres, cantidades ni requisitos que no estén ahí, aunque te parezcan razonables.
+- Si la información no está, decilo en vez de suponer.
+- Respondé en español, en pocas oraciones, contestando todo lo que se preguntó.&quot;&quot;&quot;</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Fija el tope de pasos del bucle y el prompt de sistema del agente del hospital.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li><code>MAX_PASOS = 6</code> limita las llamadas al modelo por pregunta.</li>
+<li>El prompt dice que el modelo no sabe nada del hospital y que todo sale de las herramientas.</li>
+<li>Rutea: normas y procedimientos → <code>buscar_documentos</code>; estado de hoy → la tool de la API; preguntas mixtas → cada parte con su fuente.</li>
+<li>Pide reintentar ante errores con opciones válidas, usar solo datos de los resultados y decir si falta algo.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Es la mitigación de alucinaciones por prompt: el hospital es ficticio, así que todo dato no recuperado sería inventado. Resultado: Faithfulness 5,00 en las 4 corridas. Es zero-shot: el único ejemplo (camas + acompañantes) ilustra el patrón mixto sin copiar preguntas de dev.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Lo usa <code>responder()</code> en el mismo archivo como <code>SystemMessage(PROMPT)</code>; aplica igual a las tools de LangChain y a las que carga <code>agente_mcp.py</code> desde el servidor MCP.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Grounding: restringir la respuesta al contexto recuperado y admitir cuando falta información.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 3</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/05/#d=prompting&amp;s=17"><span class="ref">05·17</span><span class="t">Mitigar alucinaciones: el prompt</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=2"><span class="ref">06·2</span><span class="t">RAG suma lo que no está en los pesos</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/#d=cierre-magnifica-humanitas&amp;s=25"><span class="ref">13·25</span><span class="t">De la alucinación al engaño funcional</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp3-bucle-tool-calling" data-title="El bucle de tool calling escrito a mano" data-tp="3" data-tp-title="RAG, MCP y Transformers en el Hospital Arroyo Claro" data-file="hospital/agente/bucle.py" data-from="25" data-to="48">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">hospital/agente/bucle.py</span><span class="mono faint">L25–48</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-python" data-start="25">async def _ejecutar(por_nombre, llamada):
+    tool = por_nombre.get(llamada[&quot;name&quot;])
+    if tool is None:
+        return ToolMessage(f&quot;Error: la herramienta &#39;{llamada[&#39;name&#39;]}&#39; no existe. Herramientas disponibles: &quot;
+                           f&quot;{&#39;, &#39;.join(sorted(por_nombre))}.&quot;, tool_call_id=llamada[&quot;id&quot;], name=llamada[&quot;name&quot;])
+    try:
+        return await tool.ainvoke({**llamada, &quot;type&quot;: &quot;tool_call&quot;})
+    except Exception as e:  # el error vuelve al modelo como texto para que pueda corregirse
+        return ToolMessage(f&quot;Error al ejecutar {llamada[&#39;name&#39;]}: {e}&quot;, tool_call_id=llamada[&quot;id&quot;], name=llamada[&quot;name&quot;])
+
+
+async def responder(llm, tools, pregunta):
+    &quot;&quot;&quot;Devuelve todos los mensajes de la conversación: sistema, pregunta, AIMessage y ToolMessage.&quot;&quot;&quot;
+    llm_con_tools = llm.bind_tools(tools)
+    por_nombre = {t.name: t for t in tools}
+    mensajes = [SystemMessage(PROMPT), HumanMessage(pregunta)]
+    for _ in range(MAX_PASOS):
+        ai = await llm_con_tools.ainvoke(mensajes)
+        mensajes.append(ai)
+        if not ai.tool_calls:
+            break
+        for llamada in ai.tool_calls:
+            mensajes.append(await _ejecutar(por_nombre, llamada))
+    return mensajes</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Implementa el agente: el modelo pide herramientas, se ejecutan, sus resultados vuelven como <code>ToolMessage</code> y se repite hasta que responde sin pedir nada o se llega a 6 pasos.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li><code>responder</code> enlaza las tools con <code>llm.bind_tools(tools)</code> y arma <code>por_nombre</code>.</li>
+<li>Arranca con <code>[SystemMessage(PROMPT), HumanMessage(pregunta)]</code>.</li>
+<li>En cada paso: <code>ai = await llm_con_tools.ainvoke(mensajes)</code>; si <code>ai.tool_calls</code> está vacío, termina.</li>
+<li>Si no, ejecuta cada llamada con <code>_ejecutar</code> y agrega el <code>ToolMessage</code> (puede haber varias en paralelo en el mismo paso).</li>
+<li><code>_ejecutar</code> devuelve un <code>ToolMessage</code> de error si la tool no existe o lanza una excepción.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Se escribió a mano, sin LangGraph ni AgentExecutor, para tener todos los mensajes y poder loguearlos. Es agnóstico del origen de las tools: sirvió sin cambios para las <code>@tool</code> de la parte 2 y para las que carga <code>langchain-mcp-adapters</code> en la parte 3.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Lo llama <code>correr()</code> en <code>hospital/agente/corrida.py</code> por cada pregunta (desde <code>agente.py</code> y desde <code>agente_mcp.py</code>); devuelve la lista completa de mensajes, que <code>resumir()</code> convierte en respuesta, contextos, herramientas y costo. <code>tests/test_agente.py</code> lo prueba con un modelo falso.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Agente ReAct / ciclo de vida de una tool: AIMessage con tool_calls → ejecución → ToolMessage → nueva llamada al modelo.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 15</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=introduccion&amp;s=62"><span class="ref">01·62</span><span class="t">El futuro: agentes autónomos e IA multimodal</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=25"><span class="ref">02·25</span><span class="t">Cómo el agente descubre y usa una herramienta</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/05/#d=prompting&amp;s=17"><span class="ref">05·17</span><span class="t">Mitigar alucinaciones: el prompt</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=3"><span class="ref">06·3</span><span class="t">Recuperar, aumentar, generar</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=54"><span class="ref">06·54</span><span class="t">El ciclo de vida de una herramienta MCP</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=rag-mcp-rapida&amp;s=5"><span class="ref">07·5</span><span class="t">Como herramienta: el agente decide cuándo buscar</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=rag-mcp-rapida&amp;s=19"><span class="ref">07·19</span><span class="t">Herramienta hardcodeada o servidor aparte</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=rag-mcp-rapida&amp;s=20"><span class="ref">07·20</span><span class="t">El ciclo de vida de una herramienta</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=rag-mcp-rapida&amp;s=25"><span class="ref">07·25</span><span class="t">Cuatro principios de diseño</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/#d=como-se-entrena-un-llm&amp;s=36"><span class="ref">09·36</span><span class="t">El circuito con un agente</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/#d=como-se-entrena-un-llm&amp;s=49"><span class="ref">09·49</span><span class="t">MCP: lo que aprende el modelo</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/10/#d=agentes-y-multiagentes&amp;s=14"><span class="ref">10·14</span><span class="t">Workflow o agente</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/10/#d=agentes-y-multiagentes&amp;s=19"><span class="ref">10·19</span><span class="t">Una tool en código</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/10/#d=agentes-y-multiagentes&amp;s=26"><span class="ref">10·26</span><span class="t">ReAct en LangGraph</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/#d=cierre-magnifica-humanitas&amp;s=25"><span class="ref">13·25</span><span class="t">De la alucinación al engaño funcional</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp1-test-redirect" data-title="Test del bug de redirect" data-tp="1" data-tp-title="Corta, del caos a producción" data-file="tests/redirect.test.js" data-from="5" data-to="36">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">tests/redirect.test.js</span><span class="mono faint">L5–36</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-javascript" data-start="5">test(&#39;GET /:codigo con codigo existente redirige (302) al destino e incrementa clicks&#39;, async function () {
+  const ctx = await iniciarServerDeTest([
+    { codigo: &#39;a3k&#39;, url: &#39;https://ejemplo.com/pagina-larga&#39;, clicks: 0, creado: &#39;2026-03-02T14:11:09.000Z&#39; }
+  ]);
+
+  try {
+    const res = await fetch(ctx.baseUrl + &#39;/a3k&#39;, { redirect: &#39;manual&#39; });
+
+    assert.equal(res.status, 302);
+    assert.equal(res.headers.get(&#39;location&#39;), &#39;https://ejemplo.com/pagina-larga&#39;);
+
+    const links = ctx.leerDB();
+    assert.equal(links.find(function (l) { return l.codigo === &#39;a3k&#39;; }).clicks, 1);
+  } finally {
+    await ctx.cerrar();
+  }
+});
+
+test(&#39;GET /:codigo con codigo inexistente responde 404 sin tocar clicks de otros links&#39;, async function () {
+  const ctx = await iniciarServerDeTest([
+    { codigo: &#39;a3k&#39;, url: &#39;https://ejemplo.com/pagina-larga&#39;, clicks: 5, creado: &#39;2026-03-02T14:11:09.000Z&#39; }
+  ]);
+
+  try {
+    const res = await fetch(ctx.baseUrl + &#39;/zzz&#39;, { redirect: &#39;manual&#39; });
+
+    assert.equal(res.status, 404);
+    assert.equal(ctx.leerDB()[0].clicks, 5);
+  } finally {
+    await ctx.cerrar();
+  }
+});</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Verifica que <code>GET /:codigo</code> redirija con 302 al destino e incremente clicks, y que un código inexistente dé 404 sin tocar contadores.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li>Levanta la app con <code>iniciarServerDeTest</code> y un link <code>a3k</code>.</li>
+<li>Hace <code>fetch</code> con <code>redirect: 'manual'</code> para poder ver el 302 y el header <code>location</code>.</li>
+<li>Lee el almacenamiento con <code>ctx.leerDB()</code> y comprueba <code>clicks === 1</code>.</li>
+<li>Segundo test: <code>/zzz</code> → 404 y el link <code>a3k</code> sigue con 5 clicks.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Se escribió antes del fix (commit <code>c4deae1</code>, rojo) y el fix vino después (<code>d87bffd</code>): el bug original hacía <code>res.send(link.url)</code> y sumaba clicks solo en memoria. El test es la validación diseñada por el equipo; el agente puede tipear el fix, pero el criterio lo fija esto.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Usa <code>tests/helpers.js</code> (repositorio en memoria + <code>crearApp</code> de <code>src/server.js</code>). Corre con <code>npm test</code>.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Humano + máquina (centauro): la IA produce, el equipo diseña la verificación y revisa.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 3</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=11"><span class="ref">02·11</span><span class="t">El conocimiento del proyecto en .md</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=29"><span class="ref">02·29</span><span class="t">El nuevo rol: Diseñar, delegar y revisar</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/#d=cierre-magnifica-humanitas&amp;s=33"><span class="ref">13·33</span><span class="t">La potencia del centauro</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp1-helpers-repo-memoria" data-title="tests/helpers.js: repositorio en memoria para crearApp" data-tp="1" data-tp-title="Corta, del caos a producción" data-file="tests/helpers.js" data-from="1" data-to="28">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">tests/helpers.js</span><span class="mono faint">L1–28</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-javascript" data-start="1">// Repositorio en memoria para probar la app sin depender de PostgreSQL.
+function iniciarServerDeTest(linksIniciales) {
+  const links = structuredClone(linksIniciales || []);
+  const repositorio = {
+    async crear(link) {
+      if (links.some(function (l) { return l.codigo === link.codigo; })) {
+        return false;
+      }
+      links.push(structuredClone(link));
+      return true;
+    },
+    async buscar(codigo) {
+      const link = links.find(function (l) { return l.codigo === codigo; });
+      return link ? structuredClone(link) : null;
+    },
+    async incrementarClicks(codigo) {
+      const link = links.find(function (l) { return l.codigo === codigo; });
+      if (!link) return null;
+      link.clicks += 1;
+      return structuredClone(link);
+    },
+    async verificarConexion() {
+      return true;
+    }
+  };
+  const { crearApp } = require(&#39;../src/server&#39;);
+  const app = crearApp(repositorio);</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Arma un repositorio en memoria con la misma interfaz que el de Postgres y levanta la app real con <code>crearApp</code> para los tests.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li><code>iniciarServerDeTest(linksIniciales)</code> clona los datos iniciales en <code>links</code>.</li>
+<li><code>repositorio</code> implementa <code>crear</code> (devuelve <code>false</code> si el código ya existe), <code>buscar</code>, <code>incrementarClicks</code> y <code>verificarConexion</code>.</li>
+<li>Importa <code>crearApp</code> de <code>src/server.js</code> y le inyecta ese repositorio; después escucha en un puerto libre (<code>listen(0)</code>).</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Permite probar las rutas HTTP reales sin una base PostgreSQL. Funciona porque <code>crearApp(repositorio)</code> recibe la persistencia por parámetro en vez de crearla adentro.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Lo usan <code>tests/redirect.test.js</code>, <code>tests/collision.test.js</code>, <code>tests/stats.test.js</code> y <code>tests/health.test.js</code>. Devuelve <code>baseUrl</code>, <code>leerDB()</code> para mirar el estado y <code>cerrar()</code>.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Verificación diseñada por el equipo: el entorno de prueba aísla la lógica para que cada vuelta del agente se valide rápido con <code>npm test</code>.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 2</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=introduccion&amp;s=12"><span class="ref">01·12</span><span class="t">Transformación en Ingeniería de Software</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/#d=cierre-magnifica-humanitas&amp;s=33"><span class="ref">13·33</span><span class="t">La potencia del centauro</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp1-progress-md-produccion" data-title="PROGRESS.md: Milestone 5 y la prueba de redeploy" data-tp="1" data-tp-title="Corta, del caos a producción" data-file="docs/PROGRESS.md" data-from="46" data-to="58">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">docs/PROGRESS.md</span><span class="mono faint">L46–58</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-markdown" data-start="46">## Milestone 5 — Producción
+
+**Estado: hecho.**
+
+- [x] Deploy en Railway (servicio `corta` + PostgreSQL) disponible en
+      `https://corta-production-7bc5.up.railway.app`.
+- [x] Persistencia migrada de JSON a PostgreSQL, con incremento atómico de clicks y migración
+      inicial no destructiva de los datos heredados.
+- [x] Variables de entorno para credenciales, sin secretos en el código (`DATABASE_URL`).
+- [x] Configuración de Railway versionada (`railway.json`), puerto dinámico y healthcheck de app +
+      base de datos en `GET /health`.
+- [x] Persistencia verificada end-to-end: se creó el link `v4v`, se registró una redirección,
+      se forzó un redeploy y luego se confirmó que seguía existiendo con `clicks: 1`.</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Registra el cierre del Milestone 5: deploy en Railway, migración a PostgreSQL, credenciales por variable de entorno y la prueba de persistencia con el link <code>v4v</code>.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li>Lista cada requisito de producción como checkbox hecho.</li>
+<li>La última viñeta documenta la verificación end-to-end: crear <code>v4v</code>, redirigir una vez, forzar un redeploy y confirmar <code>clicks: 1</code>.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>La evidencia de que la migración funcionó no es un test unitario sino una prueba contra producción, y queda escrita para la próxima sesión y para la defensa.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Lo actualiza el agente al cerrar el milestone, como pide <code>CLAUDE.md</code>. Resume lo que implementan <code>src/postgres.js</code>, <code>src/server.js</code> (<code>iniciar()</code>) y <code>railway.json</code>.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Validación humana del trabajo del agente: una prueba diseñada por el equipo que verifica el comportamiento real, no solo el código.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 2</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/02/#d=cowork-intro&amp;s=33"><span class="ref">02·33</span><span class="t">La misión: del caos a producción</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/#d=cierre-magnifica-humanitas&amp;s=33"><span class="ref">13·33</span><span class="t">La potencia del centauro</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp4-informe-evaluacion-buscador" data-title="Evaluación aparte del buscador (INFORME)" data-tp="4" data-tp-title="El agente de admisión de guardia (TP final)" data-file="INFORME.md" data-from="310" data-to="350">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">INFORME.md</span><span class="mono faint">L310–350</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-markdown" data-start="310">| Buscador | Secciones por búsqueda | Completas | Recall de evidencia | Precisión | Tokens/consulta |
+|---|---|---:|---:|---:|---:|
+| Referencia BM25 de la cátedra | 2 | 51/60 | 0,875 | 0,492 | 580 |
+| **`baseline` (entrega)** | 2 | 48/60 | 0,817 | 0,467 | 618 |
+| `sin_comunes` | 2 | 50/60 | 0,850 | 0,483 | 591 |
+| `prefijos` | 1 a 3 (umbral 0,6) | **55/60** | **0,933** | **0,686** | **549** |
+| BM25 con 4 secciones (comparación) | 4 | 57/60 | 0,950 | 0,271 | 1.270 |
+
+- **`baseline`** queda por debajo de la referencia. Las consultas coloquiales tienen recall 0,25 porque dependen de
+  compartir palabras.
+- **`sin_comunes`** quita una lista fija de palabras comunes, pero conserva `no`, `sin`, `ni` y los números. Gana
+  d022, d026 y d028 y pierde d011 contra `baseline`.
+- **`prefijos`** recorta cada palabra a sus primeras 4 letras y trae hasta 3 secciones. Descarta las que puntúan
+  menos de 0,6 × la primera.
+  - Supera a la referencia en las cuatro métricas.
+  - Gana 9 consultas y pierde 2 (d027 y d052, por colisiones de prefijo).
+  - El recall de las consultas coloquiales es 0,75.
+
+**Pasadas que no se adoptaron.** El script de exploración mide 68 configuraciones (las entradas de `INTENTOS` en
+`scripts/explorar_buscadores.py`, incluidas `baseline` y `sin_comunes`). Se reproducen con
+`python -m scripts.explorar_buscadores --salida &lt;carpeta nueva&gt;`; la tabla completa está en
+[buscador baseline](docs/informe/buscador-baseline.md#exploración-descartada).
+
+| Familia | Mejor resultado | Por qué se descartó |
+|---|---|---|
+| Fragmentos por párrafo (top 2–5) | 39–46/60, 0,683–0,792, 176–389 tokens | Pierde el contexto de la sección |
+| Fragmentos por párrafo con stop + prefijo 4 (top 4–5) | 49/60, 0,833, 291–341 tokens | Menos tokens, pero menos recall que la referencia |
+| Sección recortada a los párrafos con coincidencia | 51/60, 0,867, 535 tokens | Pierde evidencia de párrafos sin palabras de la consulta |
+| Otros stemmers (plurales, sufijos, prefijo 5 o 6) | 51/60, 0,867 | Peores que prefijo 4 |
+| Título con más peso, ajustes de k1/b | 49–51/60 | Ganancia de 1 consulta como mucho |
+| Peso 0,25 para palabras comunes | 49/60, 0,833, 605 tokens | Pierde d011 igual que `sin_comunes` y gana menos |
+| Fusión BM25 + n-gramas de caracteres (RRF) | 48/60, 0,817, 612 tokens | No supera a `sin_comunes` |
+| `prefijos` sin umbral (k=3) | 56/60, 0,942, 895 tokens | +45 % de tokens por 1 consulta |
+| `prefijos` con umbral 0,4 / 0,5 / 0,7 / 0,8 | 56 / 55 / 53 / 52 de 60 | 0,6 es el codo entre recall y tokens |
+
+**Límites de esta evaluación:**
+
+- Prefijo, umbral y k se eligieron con estas mismas 60 consultas: son números de desarrollo.
+- Con normas b y c cambian solo los valores, y las tres variantes dan lo mismo que con original.
+- Densos, híbridos y rerankers quedaron fuera porque requieren descargas no autorizadas.
+- Siguen sin resolverse d030 (pecho ↔ dolor torácico) y d023 (abuela ↔ edad), que necesitan sinónimos.</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Tabla de <code>admision.evaluar_rag</code> sobre 60 consultas de desarrollo: referencia de la cátedra, <code>baseline</code>, <code>sin_comunes</code> y <code>prefijos</code>, más las familias descartadas.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li>Compara completas, recall de evidencia, precisión y tokens por consulta.</li>
+<li><code>baseline</code> queda en 48/60 contra 51/60 de la referencia; <code>prefijos</code> llega a 55/60 y recall 0,933; traer 4 secciones da 57/60 pero duplica los tokens.</li>
+<li>Explica la variante <code>prefijos</code> (prefijo de 4 letras, umbral 0,6, hasta 3 secciones).</li>
+<li>Lista lo descartado (párrafos, stemmers, RRF) y lo que queda sin resolver: sinónimos como «pecho» ↔ «dolor torácico».</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Documenta la decisión de quedarse con un buscador léxico local y sus límites: no une sinónimos, cosa que un buscador denso sí haría pero requería descargas.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Los números salen de <code>python -m admision.evaluar_rag --entrega entrega.py ...</code> con <code>BUSCADOR_VARIANTE</code>; la configuración vive en <code>admision_tp/buscador.py</code>.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Elegir entre búsqueda léxica y semántica: BM25 es exacto y barato pero falla con sinónimos; los embeddings los unen.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 5</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=25"><span class="ref">06·25</span><span class="t">Cuándo conviene cada estrategia</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=30"><span class="ref">06·30</span><span class="t">RRF fusiona sumando posiciones</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=39"><span class="ref">06·39</span><span class="t">Evaluar las dos etapas por separado</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=rag-mcp-rapida&amp;s=6"><span class="ref">07·6</span><span class="t">En producción se usan las dos</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/#d=cierre-magnifica-humanitas&amp;s=44"><span class="ref">13·44</span><span class="t">Evaluar es el nuevo cuello de botella</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp4-informe-agente-buscador" data-title="Mejor buscador aislado ≠ mejor agente" data-tp="4" data-tp-title="El agente de admisión de guardia (TP final)" data-file="INFORME.md" data-from="372" data-to="401">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">INFORME.md</span><span class="mono faint">L372–401</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-markdown" data-start="372">| Métrica | `baseline` | `prefijos` |
+|---|---:|---:|
+| Casos resueltos | **10/50** | 6/50 |
+| Parcial medio | **0,831** | 0,796 |
+| registro / box / circuito / plazo | 0,76 / 0,72 / 0,98 / 0,92 | 0,62 / 0,68 / 0,94 / 0,84 |
+| cobertura / entidad / aviso / verificación | 0,80 / 0,82 / 0,72 / 0,76 | 0,78 / 0,82 / 0,72 / 0,76 |
+| Llamadas / búsquedas por caso | 4,9 / 1,34 | 5,0 / 1,40 |
+| Caracteres de contexto por caso | 19.954 | 20.689 |
+| Segundos por caso (T4, lote 4; v25 / v41) | 16,07 | 16,09 |
+
+- **No es concluyente:** `prefijos` gana 3 casos (pev-005, pev-019, pev-037) y pierde 7 (pev-010, 012, 017,
+  021, 024, 049 y 050); con 10 casos discordantes, la prueba de signos da
+  p≈0,34. Tampoco hay señal de mejora.
+- **Por qué el mejor recall no ayudó.** `baseline` devuelve siempre 2 secciones. `prefijos` devolvió 1 sección en 30
+  búsquedas, 3 en 26 y 2 en 14.
+  - Con 3 secciones suele sumar secciones de otras áreas que no deciden la ficha.
+  - El contexto por caso subió 3,7 %.
+  - Es lo que muestran las trazas, no una causa probada.
+- **Costo de GPU:** la comparación usó 2.968 s de sesión T4.
+
+**Pasada 2: con el prompt elegido (Kaggle v26, dev de 40 casos).** `procedimiento-v1` con `prefijos` cae a 4/40,
+contra 9/40 con `baseline` (Parte 3).
+
+**Decisión.** El default sigue siendo `baseline` por tres motivos:
+
+- Es el que mejor resolvió con el agente.
+- Generó las conversaciones de entrenamiento.
+- El adapter aprendió a usarlo.
+
+`prefijos` queda seleccionable como resultado negativo: mejora la evaluación separada, pero no al agente.</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Compara <code>baseline</code> y <code>prefijos</code> jugando los 50 casos de práctica con Gemma sin entrenar: <code>baseline</code> resuelve 10/50 y <code>prefijos</code> 6/50.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li>Tabla por control, llamadas, contexto y segundos por caso.</li>
+<li>Por caso: <code>prefijos</code> gana 3 y pierde 7 (prueba de signos p≈0,34, no concluyente).</li>
+<li>Explica por qué: <code>prefijos</code> trae 1 o 3 secciones y con 3 suma secciones de otras áreas que no deciden la ficha; el contexto por caso sube 3,7 %.</li>
+<li>Con <code>procedimiento-v1</code> pasa lo mismo (4/40 contra 9/40).</li>
+<li>Decisión: el default sigue siendo <code>baseline</code> (mejor con el agente, generó las conversaciones de entrenamiento y el adapter aprendió a usarlo).</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Materializa la regla de que el buscador vale por lo que rinde el agente con él, no por su métrica aislada; <code>prefijos</code> queda como resultado negativo documentado.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Los datos vienen de <code>infra/kaggle_evaluacion.py</code> con el plan <code>configuraciones/evaluacion/buscador-prefijos.json</code> y se tabulan con <code>scripts.tabla_evaluacion</code>; los controles los puntúa <code>admision.correr.puntuar</code>. La decisión deja <code>entrega.construir_buscador</code> en <code>baseline</code>.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Evaluar las dos etapas de un RAG por separado y juntas: mejor recuperación aislada no garantiza mejor respuesta final.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 3</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=39"><span class="ref">06·39</span><span class="t">Evaluar las dos etapas por separado</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/10/#d=agentes-y-multiagentes&amp;s=41"><span class="ref">10·41</span><span class="t">El contexto se degrada</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/#d=cierre-magnifica-humanitas&amp;s=44"><span class="ref">13·44</span><span class="t">Evaluar es el nuevo cuello de botella</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp3-servidor-mcp-fastmcp" data-title="Servidor MCP: FastMCP por stdio con las seis tools" data-tp="3" data-tp-title="RAG, MCP y Transformers en el Hospital Arroyo Claro" data-file="servidor_mcp.py" data-from="1" data-to="45">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">servidor_mcp.py</span><span class="mono faint">L1–45</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-python" data-start="1">&quot;&quot;&quot;Servidor MCP stdio con las seis herramientas del hospital.
+
+Ejecutable por MCP Inspector (python3 servidor_mcp.py) o por agente_mcp.py.
+No imprimir en stdout: stdio transport reserva ese canal para el protocolo.
+&quot;&quot;&quot;
+from mcp.server.fastmcp import FastMCP
+
+from hospital import api_cliente, documentos
+from hospital.descripciones import DESCRIPCIONES
+
+mcp = FastMCP(&quot;hospital-arroyo-claro&quot;)
+
+
+@mcp.tool(description=DESCRIPCIONES[&quot;buscar_documentos&quot;])
+def buscar_documentos(consulta: str) -&gt; str:
+    return documentos.buscar_documentos(consulta)
+
+
+@mcp.tool(description=DESCRIPCIONES[&quot;consultar_camas&quot;])
+def consultar_camas(sector: str) -&gt; str:
+    return api_cliente.camas(sector)
+
+
+@mcp.tool(description=DESCRIPCIONES[&quot;consultar_guardia&quot;])
+def consultar_guardia(especialidad: str) -&gt; str:
+    return api_cliente.guardia(especialidad)
+
+
+@mcp.tool(description=DESCRIPCIONES[&quot;consultar_turnos&quot;])
+def consultar_turnos(especialidad: str) -&gt; str:
+    return api_cliente.turnos(especialidad)
+
+
+@mcp.tool(description=DESCRIPCIONES[&quot;consultar_farmacia&quot;])
+def consultar_farmacia(medicamento: str) -&gt; str:
+    return api_cliente.farmacia(medicamento)
+
+
+@mcp.tool(description=DESCRIPCIONES[&quot;consultar_espera&quot;])
+def consultar_espera() -&gt; str:
+    return api_cliente.espera()
+
+
+if __name__ == &quot;__main__&quot;:
+    mcp.run(transport=&quot;stdio&quot;)</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Publica las seis herramientas del hospital como un servidor MCP que se comunica por stdio.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li><code>mcp = FastMCP("hospital-arroyo-claro")</code> crea el servidor.</li>
+<li>Cada función lleva <code>@mcp.tool(description=DESCRIPCIONES[...])</code>: el nombre sale de la función y el esquema del parámetro, de la firma (<code>consulta: str</code>, <code>sector: str</code>, …).</li>
+<li>Los cuerpos solo delegan: <code>documentos.buscar_documentos</code> y <code>api_cliente.camas/guardia/turnos/farmacia/espera</code>.</li>
+<li><code>mcp.run(transport="stdio")</code> atiende el protocolo por stdin/stdout; el docstring avisa que no hay que imprimir nada en stdout porque ese canal es del protocolo.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Separa herramienta y agente: el mismo set de tools lo puede usar cualquier host MCP (MCP Inspector, <code>agente_mcp.py</code>). No tiene lógica propia: reusa <code>documentos.py</code>, <code>api_cliente.py</code> y <code>descripciones.py</code>, así la comparación con la parte 2 cambia solo el transporte.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Lo lanza como subproceso <code>agente_mcp.py</code> (vía <code>MultiServerMCPClient</code>) o MCP Inspector (<code>npx @modelcontextprotocol/inspector ... servidor_mcp.py</code>, capturas en <code>experimentos/inspector/</code>). La URL de la API llega por la variable <code>HOSPITAL_API</code>.</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Servidor MCP: expone herramientas (nombre + descripción + esquema) que el cliente descubre con tools/list y ejecuta con tools/call, sobre JSON-RPC 2.0 por stdio.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 9</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=claude-desktop-chat&amp;s=21"><span class="ref">01·21</span><span class="t">Agregar un external connector <span class="pill compl" title="Presentación complementaria: no figura en el calendario">Compl.</span></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=53"><span class="ref">06·53</span><span class="t">El servidor separa herramienta y agente</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=54"><span class="ref">06·54</span><span class="t">El ciclo de vida de una herramienta MCP</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=57"><span class="ref">06·57</span><span class="t">Demo: un servidor MCP mínimo</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=rag-mcp-rapida&amp;s=16"><span class="ref">07·16</span><span class="t">MCP conecta modelos con herramientas</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/07/#d=rag-mcp-rapida&amp;s=18"><span class="ref">07·18</span><span class="t">JSON-RPC 2.0: la capa de mensajes</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/#d=como-se-entrena-un-llm&amp;s=47"><span class="ref">09·47</span><span class="t">MCP: host, cliente y servidor</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/#d=como-se-entrena-un-llm&amp;s=48"><span class="ref">09·48</span><span class="t">MCP: una herramienta es una definición</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/#d=cierre-magnifica-humanitas&amp;s=45"><span class="ref">13·45</span><span class="t">Hacia un Internet de Agentes</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+<template id="sn-tp3-informe-mcp-comparacion" data-title="Parte 3 en el informe: verificación y comparación con la parte 2" data-tp="3" data-tp-title="RAG, MCP y Transformers en el Hospital Arroyo Claro" data-file="INFORME.md" data-from="249" data-to="282">
+  <div class="code-view">
+    <div class="code-pane">
+      <div class="code-head"><span class="mono">INFORME.md</span><span class="mono faint">L249–282</span></div>
+      <div class="code-scroll"><pre class="code"><code class="language-markdown" data-start="249">## 3. Servidor MCP
+
+### Implementación y verificación
+
+Las seis herramientas de la parte 2 se exponen desde `servidor_mcp.py` con el SDK oficial `mcp` y transporte stdio. Sus
+funciones delegan a los mismos módulos de documentos y API; las descripciones compartidas viven en
+`hospital/descripciones.py`. `agente_mcp.py` descubre las tools con `tools/list`, las convierte a tools de LangChain con
+`langchain-mcp-adapters` y sus invocaciones usan `tools/call`. La sesión MCP queda abierta durante toda la corrida para
+evitar reiniciar el servidor y recargar el encoder por cada llamada.
+
+Se verificó el descubrimiento de las seis herramientas y una llamada a cada una. Las cinco herramientas de la API
+devolvieron JSON del hospital y `buscar_documentos` devolvió fragmentos del corpus. MCP Inspector se conectó por stdio
+al servidor. El registro de la corrida está en
+`experimentos/corridas/agente_mcp_20261001-200728.md`; las respuestas y evaluación están en `respuestas_mcp.jsonl` y
+`respuestas_mcp.jsonl.eval.json`. El Inspector se conectó, listó las seis herramientas y permitió invocar cada una
+con éxito. Las siete capturas PNG (listado y seis resultados) están en `experimentos/inspector/`.
+Para apuntar a la API local en el puerto alternativo, se inició Inspector con
+`npx @modelcontextprotocol/inspector -e HOSPITAL_API=http://127.0.0.1:18765 .venv/bin/python servidor_mcp.py`;
+la opción `-e` pasa explícitamente esa variable al proceso MCP.
+
+### Comparación con la parte 2
+
+| Agente | Ruteo | Relevancia del contexto | Fidelidad | Pertinencia de respuesta | Costo agente (USD) | Costo juez (USD) |
+|---|---:|---:|---:|---:|---:|---:|
+| Parte 2 (`agente_20260929-105719`) | 1,000 | 5,000 | 5,000 | 5,000 | 0,001458 | 0,01744 |
+| Parte 3 (`agente_mcp_20261001-200728`) | 1,000 | 4,833 | 5,000 | 4,917 | 0,003524 | 0,02002 |
+
+Las dos corridas enrutan correctamente las 12 preguntas y mantienen fidelidad perfecta. La diferencia está en A11:
+la parte 2 recuperó «Qué llevar a la primera consulta» con DNI, credencial, derivación y estudios previos. En la corrida
+MCP, la primera búsqueda devolvió «Llegada» y la segunda una sección sobre cómo pedir el turno; faltó la lista de
+documentación. El juez bajó la relevancia del contexto a 3 y la pertinencia de la respuesta a 4 para esa pregunta.
+Esto coincide con los logs: el agente MCP hizo una llamada adicional al modelo en A11 (25 en total frente a 24 en la
+parte 2) y entregó contexto menos pertinente. Por eso sus costos de agente y juez también fueron algo mayores; una
+corrida por versión no alcanza para atribuir la diferencia al transporte MCP por sí solo.</code></pre></div>
+    </div>
+    <div class="explain">
+      <div class="nota-slot"></div>
+      <section><span class="section-label">Qué hace</span><div class="prose"><p>Cuenta cómo se verificó el servidor MCP (las seis tools listadas e invocadas, también desde MCP Inspector) y compara la corrida MCP con la mejor corrida de la parte 2.</p>
+</div></section>
+      <section><span class="section-label">Cómo funciona</span><div class="prose"><ul>
+<li>Implementación: <code>servidor_mcp.py</code> con el SDK <code>mcp</code> por stdio; <code>agente_mcp.py</code> descubre con <code>tools/list</code> e invoca con <code>tools/call</code> vía <code>langchain-mcp-adapters</code>.</li>
+<li>Tabla: ruteo 1,000 en las dos; CR 5,000 → 4,833; F 5,000 en las dos; AR 5,000 → 4,917; costo del agente USD 0,001458 → 0,003524 y del juez 0,01744 → 0,02002.</li>
+<li>La diferencia está en A11: vía MCP no llegó la sección «Qué llevar a la primera consulta» (CR 3, AR 4) y hubo una llamada extra al modelo.</li>
+<li>Con una corrida por versión no alcanza para atribuirle la diferencia al transporte MCP.</li>
+</ul>
+</div></section>
+      <section><span class="section-label">Para qué existe</span><div class="prose"><p>Muestra que pasar las tools a un servidor aparte no cambió el ruteo ni la fidelidad; la única pregunta que empeoró fue A11, por la redacción de la consulta y no por MCP en sí.</p>
+</div></section>
+      <section><span class="section-label">Cómo se conecta</span><div class="prose"><p>Resume <code>experimentos/corridas/agente_mcp_20261001-200728.md</code>, <code>respuestas_mcp.jsonl.eval.json</code> y las capturas de <code>experimentos/inspector/</code>; la fila de la parte 2 sale de la corrida 4 (<code>agente_20260929-105719</code>).</p>
+</div></section>
+      <section><span class="section-label">Teoría que aplica</span><div class="prose"><p>Evaluar un agente por etapas (ruteo, CR, F, AR) y medir costo; MCP cambia dónde viven las tools, no lo que el modelo decide.</p>
+</div></section>
+      <section class="usos"><span class="section-label">Diapositivas que lo usan · 4</span>
+        <div class="related"><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/01/#d=claude-desktop-chat&amp;s=21"><span class="ref">01·21</span><span class="t">Agregar un external connector <span class="pill compl" title="Presentación complementaria: no figura en el calendario">Compl.</span></span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/06/#d=rag-y-mcp&amp;s=57"><span class="ref">06·57</span><span class="t">Demo: un servidor MCP mínimo</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/09/#d=como-se-entrena-un-llm&amp;s=47"><span class="ref">09·47</span><span class="t">MCP: host, cliente y servidor</span></a><a href="https://ezequielrickert.github.io/austral-ia-generativa/clases/13/#d=cierre-magnifica-humanitas&amp;s=45"><span class="ref">13·45</span><span class="t">Hacia un Internet de Agentes</span></a></div>
+      </section>
+    </div>
+  </div>
+</template>
+
+
+    </main>
+  </div>
+</div>
+<dialog class="code-dlg" id="code-dlg" aria-labelledby="code-dlg-title">
+  <div class="card-header">
+    <div class="code-dlg-title"><span class="pill tp" id="code-dlg-tp">TP</span><span class="card-title" id="code-dlg-title"></span></div>
+    <div class="card-actions"><a class="btn sm" id="code-dlg-open" href="#">Ver todo el código del TP</a><button class="btn icon sm ghost" id="code-dlg-close" aria-label="Cerrar" autofocus><svg class="i" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+  </div>
+  <div id="code-dlg-body"></div>
+</dialog>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<script src="https://ezequielrickert.github.io/austral-ia-generativa/js/site.js?h=5d528413180e25d02fd3"></script>
+<script src="https://ezequielrickert.github.io/austral-ia-generativa/js/viewer.js?h=316e7aba0f3051532446"></script>
+</body>
+</html>
